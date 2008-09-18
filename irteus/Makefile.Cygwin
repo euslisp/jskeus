@@ -1,0 +1,52 @@
+###############################################################################
+###
+### $Id$
+###
+### Copyright (c) 1987- JSK, The University of Tokyo.  All Rights Reserved.
+###
+### This software is a collisoin of EusLisp code for robot applications,
+### which has been developed by the JSK Laboratory for the IRT project.
+### For more information on EusLisp and it's application to the robotics,
+### please refer to the following papers.
+###
+### Toshihiro Matsui
+### Multithread object-oriented language euslisp for parallel and
+###  asynchronous programming in robotics
+### Workshop on Concurrent Object-based Systems,
+###  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
+###
+### Permission to use this software for educational, research
+### and non-profit purposes, without fee, and without a written
+### agreement is hereby granted to all researchers working on
+### the IRT project at the University of Tokyo, provided that the
+### above copyright notice remains intact.  
+###
+
+CC=gcc
+CXX=g++
+LD=g++ -shared
+OBJOPT=-o
+OUTOPT=-o 
+OSFX=o
+LSFX=dll
+LPFX=lib
+ARCH=Cygwin
+ESFX=.exe
+SOFLAGS=-g -falign-functions=4 -Xlinker --export-all-symbols --unresolved-symbols=ignore-all
+IMPLIB=$(EUSDIR)/$(ARCH)/bin/eusgl.a
+IMPLIBGL=$(EUSDIR)/$(ARCH)/bin/eusgl.a -L/usr/X11R6/lib -lGLU -lGL -lXext
+IMPLIBJPG=-ljpeg
+EXPLIB=
+RAPID=-LRAPID/$(ARCHDIR) -lRAPID-static
+RAPIDLIB=RAPID/$(ARCHDIR)/$(LPFX)RAPID-static.a
+FFTW=-L/usr/local/lib -lfftw -lrfftw
+
+MACHINE=i486
+THREAD= -DTHREADED -DPTHREAD
+
+CFLAGS=-O2 -D$(MACHINE) -Di386 -D$(ARCH) -D_REENTRANT -DGCC -I$(EUSDIR)/include $(THREAD)
+CXXFLAGS=$(CFLAGS)
+
+CFLAGS+= -g -falign-functions=4
+CXXFLAGS+=-g -falign-functions=4
+
