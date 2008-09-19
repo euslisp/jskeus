@@ -478,15 +478,15 @@
 	  joint-angle-limit-weight
 	  joint-angle-limit-weight-old
 	  la sca)
-     (unless (get self :joint-angle-limit-weight-old)
-       (setf (get self :joint-angle-limit-weight-old) (make-hash-table)))
      (setq joint-angle-limit-weight-old
-       (gethash link-list (get self :joint-angle-limit-weight-old)))
+       (cadr (assoc link-list (get self :joint-angle-limit-weight-old) :test #'equal)))
      (unless joint-angle-limit-weight-old
        (setq joint-angle-limit-weight-old (instantiate float-vector len))
        (fill joint-angle-limit-weight-old 1.0e+20)
-       (setf (gethash link-list (get self :joint-angle-limit-weight-old))
-	     joint-angle-limit-weight-old))
+       (setf (get self :joint-angle-limit-weight-old)
+	 (nconc (get self :joint-angle-limit-weight-old)
+		(list (list link-list joint-angle-limit-weight-old))))
+       )
      (if (null tmp-len) (setq tmp-len (instantiate float-vector len)))
      (if (null tmp-len2) (setq tmp-len2 (instantiate float-vector len)))
 
@@ -754,6 +754,9 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
+;;; Revision 1.2  2008-09-19 05:01:34  k-okada
+;;; use assoc instead of hash-table
+;;;
 ;;; Revision 1.1  2008-09-18 18:11:01  k-okada
 ;;; add irteus
 ;;;
