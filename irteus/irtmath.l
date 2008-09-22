@@ -228,53 +228,37 @@
 		       mat-tmp-cc mat-tmp-rc)
   (let* ((d (array-dimensions mat))
 	 (r (car d)) (c (cadr d))
-	 a b mat-tmp-rr)
-    (setq a (max r c)
-	  b (min r c))
+	 mat-tmp-rr)
     ;; mat (r c)
-    (if (null ret) (setq ret (make-matrix c r)))
-    (if (null wmat) (setq wmat (make-matrix a a)))
     (if (null tmat) (setq tmat (make-matrix c r)))
-    (if (null mat-tmp-cc) (setq mat-tmp-cc (make-matrix c c)))
 
-    (if (null mat-tmp-rc) (setq mat-tmp-rc (make-matrix r c)))
-    
-    ;; k=0 => sr-inverse = pseudo-inverse
-    (if (= k 0.0) 
-	(return-from sr-inverse (pseudo-inverse mat weight-vector
-				ret wmat mat-tmp-rc mat-tmp-cc tmat)))
     ;; without weight
     (when (null weight-vector)
       (setq mat-tmp-rr (make-matrix r r))
       (return-from sr-inverse (sr-inverse-org mat k
 					      mat-tmp-rr tmat)))
 
+    (if (null ret) (setq ret (make-matrix c r)))
+    (if (null wmat) (setq wmat (make-matrix c c)))
+    (if (null mat-tmp-cc) (setq mat-tmp-cc (make-matrix c c)))
+    (if (null mat-tmp-rc) (setq mat-tmp-rc (make-matrix r c)))
+    
+    ;; k=0 => sr-inverse = pseudo-inverse
+    (if (= k 0.0) 
+	(return-from sr-inverse (pseudo-inverse mat weight-vector
+				ret wmat mat-tmp-rc mat-tmp-cc tmat)))
     ;;
     (if (null umat)
-	(setq umat (unit-matrix b))
+	(setq umat (unit-matrix r))
       (progn (fill (array-entity umat) 0)
-	     (dotimes (i b) (setf (aref umat i i) 1.0))))
-    (if (null umat2)
-	(setq umat2 (unit-matrix b))
-      (progn (fill (array-entity umat2) 0)
-	     (dotimes (i b) (setf (aref umat2 i i) 1.0))))
-    (if (null mat-tmp) (setq mat-tmp (make-matrix a b)))
+	     (dotimes (i r) (setf (aref umat i i) 1.0))))
+    (if (null umat2) (setq umat2 (make-matrix r r)))
+    (if (null mat-tmp) (setq mat-tmp (make-matrix c r)))
     ;; with weight
     (dotimes (i c) (setf (aref wmat i i) (aref weight-vector i)))
-    (setq tmat (transpose mat tmat))
-    (if (<= r c) ;; a = c
-	(progn
-	  (setq mat-tmp (m* wmat tmat mat-tmp))
-	  (m* mat-tmp
-	      (inverse-matrix (m+ (m* mat mat-tmp umat2)
-				  (scale-matrix k umat umat) umat)) ret))
-      ;; (> r c) ;; a = r
-      (progn
-	(setq mat-tmp (m* wmat mat mat-tmp))
-	(m* (inverse-matrix (m+ (m* tmat mat-tmp umat2)
-				(scale-matrix k umat umat) umat))
-	    (m* tmat wmat ret) ret))
-      )
+    (m* (m* wmat (transpose mat tmat) mat-tmp)
+	(inverse-matrix (m+ (m* mat mat-tmp umat2)
+			    (scale-matrix k umat umat) umat)) ret)
     ret
     ))
 
@@ -325,7 +309,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.1  2008-09-18 18:11:01  k-okada
+;;; Revision 1.2  2008-09-22 06:15:46  k-okada
+;;; update sr-inverse
+;;;
+;;; Revision 1.1  2008/09/18 18:11:01  k-okada
 ;;; add irteus
 ;;;
 ;;;
