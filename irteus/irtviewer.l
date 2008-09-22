@@ -185,7 +185,7 @@
    (send self :draw-objects))
   (:draw-objects
    (&rest args)
-   (apply #'gl::draw-objects viewer draw-things args))
+   (apply #'gl::draw-globjects viewer draw-things args))
   (:objects
    (&rest args)
    (when
@@ -272,7 +272,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.1  2008-09-18 18:11:01  k-okada
+;;; Revision 1.2  2008-09-22 06:02:10  k-okada
+;;; fix to work with jskeusgl
+;;;
+;;; Revision 1.1  2008/09/18 18:11:01  k-okada
 ;;; add irteus
 ;;;
 ;;;

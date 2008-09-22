@@ -89,7 +89,7 @@
    )
   )
 
-(defun draw-objects (vwr draw-things &key (clear t) (flush t))
+(defun draw-globjects (vwr draw-things &key (clear t) (flush t))
   (let (pcolor)
     (resetperspective (send vwr :viewing) (send vwr :viewsurface))
     (if clear (send vwr :viewsurface :clear))
@@ -103,7 +103,8 @@
     (glColor3fv #f(0 1 0)) (glVertex3fv #f(0 0 0)) (glVertex3fv #f(0 100 0))
     (glColor3fv #f(0 0 1)) (glVertex3fv #f(0 0 0)) (glVertex3fv #f(0 0 100))
     (glEnd GL_LINES)
-    (glenable GL_LIGHTING)
+    (glEnable GL_LIGHTING)
+    (glDisable GL_BLEND)
     (send vwr :viewsurface :color pcolor)
       
     (dolist (abody draw-things)
@@ -112,7 +113,7 @@
        ((find-method abody :draw)
 	(send abody :draw vwr))
        ((derivedp abody faceset)
-	(draw-body vwr abody))
+	(draw-glbody vwr abody))
        ((find-method abody :draw-on)
 	(send abody :draw-on :viewer vwr))
        (t (warn "Unknown body to draw ~A~%" abody)))
@@ -123,7 +124,7 @@
 ;;
 ;; re-definition
 ;;  
-(defun draw-body (vwr abody)
+(defun draw-glbody (vwr abody)
   (let* (glcon
 	 (lis (cdr (assq glcon (get abody :GL-DISPLAYLIST-ID))))
 	 (col (get abody :face-color)))
@@ -210,7 +211,7 @@
 	(glEndList)
 	(setf (get abody :GL-DISPLAYLIST-ID)
 	      (cons (cons glcon newlis) (get abody :GL-DISPLAYLIST-ID)))
-	(draw-body vwr abody)
+	(draw-glbody vwr abody)
 	)))
     ))
 
@@ -385,7 +386,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.1  2008-09-18 18:11:01  k-okada
+;;; Revision 1.2  2008-09-22 06:02:10  k-okada
+;;; fix to work with jskeusgl
+;;;
+;;; Revision 1.1  2008/09/18 18:11:01  k-okada
 ;;; add irteus
 ;;;
 ;;;
