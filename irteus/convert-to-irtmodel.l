@@ -108,7 +108,7 @@
       (format ostrm "     ;; definition of ~A~%" (send j :name))
       (format ostrm "     (setq joint~A (instance ~A-joint :init
 			     :parent-link blink~d :child-link blink~d :name ~10A :axis ~3A
-			     :min-angle ~6,1f :max-angle ~6,1f))~%" 
+			     :min ~6,1f :max ~6,1f))~%" 
 	      (1- (assoc2 :id child-link))
 	      (if (derivedp j rotational-joint) "rotational" "linear")
 	      (assoc2 :id parent-link)
