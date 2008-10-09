@@ -32,6 +32,10 @@
 (defun forward-message-to-all (to args)
   (if args (apply #'send-all to args) to))
 
+(defmacro send-message* (&rest msgs)
+  `(apply #'send-message . ,msgs)
+  )
+
 (defmacro do-until-key (&rest forms)
   `(while (null (select-stream (list *standard-input*) 0.0000001))
      ,@forms
@@ -58,7 +62,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.1  2008-09-18 18:11:01  k-okada
+;;; Revision 1.2  2008-10-09 15:09:46  k-okada
+;;; add send-message
+;;;
+;;; Revision 1.1  2008/09/18 18:11:01  k-okada
 ;;; add irteus
 ;;;
 ;;;
