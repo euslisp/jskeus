@@ -206,7 +206,7 @@
      (setq m (manipulability jacobi umat tmat))
      (if (< m ml) (setq k (* mg (expt (- 1.0 (/ m  ml)) 2))))
      (when debug-view
-       (warn "k     : ~7,3f (manipulability:~7,3f, gain:~7,3f, limit:~7,3f, len:~d)~%" k m mg ml (cadr (array-dimensions jacobi))))
+       (warn "k     :~7,3f (manipulability:~7,3f, gain:~7,3f, limit:~7,3f, len:~d)~%" k m mg ml (cadr (array-dimensions jacobi))))
 
      ;; calc weighted SR-inverse
      (setq jacobi# (sr-inverse jacobi k weight 
@@ -304,6 +304,7 @@
     (rotation-axis nil) (translation-axis t)
     (p-limit 100.0) (r-limit 0.5)
     (weight (fill (instantiate float-vector (length link-list)) 1))
+    (debug-view nil)
     (tmp-pos (float-vector 0 0 0))
     (tmp-rot (float-vector 0 0 0))
     (tmp-v0 (instantiate float-vector 0))
@@ -362,6 +363,9 @@
      (if (null tmp-len) (setq tmp-len (instantiate float-vector len)))
      (if (null tmp-len2) (setq tmp-len2 (instantiate float-vector len)))
      (setq J#x (transform jacobi# tmp-dim tmp-len))
+     (when debug-view
+       (warn "J#x   :")
+       (dotimes (i len) (warn "~7,3f " (elt J#x i))) (warn "~%"))
 
      ;; if use null space
      (when (and (vectorp null-space)
@@ -589,8 +593,8 @@
        (setq dif-pos (send move-target :difference-position target-coords)
 	     dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
        (when debug-view
-	 (warn ";; ~3d: dif-pos : ~a/(~a), dif-rot : ~a/(~a)~%"
-	       loop dif-pos (norm dif-pos) dif-rot (norm dif-rot)))
+	 (warn ";; ~3d: dif-pos : ~a/(~a/~A), dif-rot : ~a/(~a/~A)~%"
+	       loop dif-pos (norm dif-pos) thre dif-rot (norm dif-rot) rthre))
        ;; check loop end
        (if (and (> loop (/ stop 10))
 		(< (norm dif-pos) thre)
@@ -642,8 +646,13 @@
        (progn
 	 (when warnp
 	   (warn ";; inverse-kinematics failed.~%")
-	   (warn ";; dif-pos : ~a/(~a), dif-rot : ~a/(~a)~%"
-		 dif-pos (norm dif-pos) dif-rot (norm dif-rot)))
+	   (warn ";; dif-pos : ~a/(~a/~a)~%" dif-pos (norm dif-pos) thre)
+	   (warn ";; dif-rot : ~a/(~a/~a)~%" dif-rot (norm dif-rot) rthre)
+	   (warn ";;  coords : ~a~%" 
+		 (send (let ((p self)) (while (send p :parent) (setq p (send p :parent))) p) :worldcoords))
+	   (warn ";;  angles : ~a~%" av0)
+	   (warn ";;    args : ~a~%" (append (list target-coords) args))
+	   )
 	 (mapc #'(lambda (j a) (send j :joint-angle a)) (send-all link-list :joint) av0)
 	 nil))
      ))
@@ -758,7 +767,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.3  2008-10-09 15:10:08  k-okada
+;;; Revision 1.4  2008-10-10 05:12:28  k-okada
+;;; add debug message
+;;;
+;;; Revision 1.3  2008/10/09 15:10:08  k-okada
 ;;; fix to work with jskrbeusgl
 ;;;
 ;;; Revision 1.1  2008/09/18 18:11:01  k-okada
