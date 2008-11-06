@@ -35,7 +35,7 @@
      (send bc0 :assoc bc1)
      (send bc1 :assoc bc2)
      
-     (setq jc0 (instance rotational-joint :init :parent-link bc0 :child-link bc1 :name :torso-waist-y :axis :z :min-angle -45 :max-angle 45))
+     (setq jc0 (instance rotational-joint :init :parent-link bc0 :child-link bc1 :name :torso-waist-y :axis :z :min -45 :max 45))
      (setq jc1 (instance rotational-joint :init :parent-link bc1 :child-link bc2 :name :torso-waist-p :axis :y))
      
      ;;
@@ -111,17 +111,17 @@
      (send bc2  :assoc bar1)
 
      (setq jal0 (instance rotational-joint :init :parent-link bc2  :child-link bal1 :name :larm-shoulder-p :axis :y))
-     (setq jal1 (instance rotational-joint :init :parent-link bal1 :child-link bal2 :name :larm-shoulder-r :axis :x :min-angle -30 :max-angle 180))
+     (setq jal1 (instance rotational-joint :init :parent-link bal1 :child-link bal2 :name :larm-shoulder-r :axis :x :min -30 :max 180))
      (setq jal2 (instance rotational-joint :init :parent-link bal2 :child-link bal3 :name :larm-shoulder-y :axis :z))
-     (setq jal3 (instance rotational-joint :init :parent-link bal3 :child-link bal4 :name :larm-elbow-p :axis :y :min-angle -180 :max-angle 0))
+     (setq jal3 (instance rotational-joint :init :parent-link bal3 :child-link bal4 :name :larm-elbow-p :axis :y :min -180 :max 0))
      (setq jal4 (instance rotational-joint :init :parent-link bal4 :child-link bal5 :name :larm-wrist-y :axis :z))
      (setq jal5 (instance rotational-joint :init :parent-link bal5 :child-link bal6 :name :larm-wrist-r :axis :x))
      (setq jal6 (instance rotational-joint :init :parent-link bal6 :child-link bal7 :name :larm-wrist-p :axis :y))
 
      (setq jar0 (instance rotational-joint :init :parent-link bc2  :child-link bar1 :name :rarm-shoulder-p :axis :y))
-     (setq jar1 (instance rotational-joint :init :parent-link bar1 :child-link bar2 :name :rarm-shoulder-r :axis :-x :min-angle -30 :max-angle 180))
+     (setq jar1 (instance rotational-joint :init :parent-link bar1 :child-link bar2 :name :rarm-shoulder-r :axis :-x :min -30 :max 180))
      (setq jar2 (instance rotational-joint :init :parent-link bar2 :child-link bar3 :name :rarm-shoulder-y :axis :-z))
-     (setq jar3 (instance rotational-joint :init :parent-link bar3 :child-link bar4 :name :rarm-elbow-p :axis :y :min-angle -180 :max-angle 0))
+     (setq jar3 (instance rotational-joint :init :parent-link bar3 :child-link bar4 :name :rarm-elbow-p :axis :y :min -180 :max 0))
      (setq jar4 (instance rotational-joint :init :parent-link bar4 :child-link bar5 :name :rarm-wrist-y :axis :z))
      (setq jar5 (instance rotational-joint :init :parent-link bar5 :child-link bar6 :name :rarm-wrist-r :axis :-x))
      (setq jar6 (instance rotational-joint :init :parent-link bar6 :child-link bar7 :name :rarm-wrist-p :axis :y))
@@ -176,14 +176,14 @@
      (setq jll0 (instance rotational-joint :init :parent-link bc0 :child-link bll1 :name :lleg-crotch-y :axis :z))
      (setq jll1 (instance rotational-joint :init :parent-link bll1 :child-link bll2 :name :lleg-crotch-r :axis :x))
      (setq jll2 (instance rotational-joint :init :parent-link bll2 :child-link bll3 :name :lleg-crotch-p :axis :y))
-     (setq jll3 (instance rotational-joint :init :parent-link bll3 :child-link bll4 :name :lleg-knee-p :axis :y :min-angle 0))
+     (setq jll3 (instance rotational-joint :init :parent-link bll3 :child-link bll4 :name :lleg-knee-p :axis :y :min 0))
      (setq jll4 (instance rotational-joint :init :parent-link bll4 :child-link bll5 :name :lleg-ankle-p :axis :x))
      (setq jll5 (instance rotational-joint :init :parent-link bll5 :child-link bll6 :name :lleg-ankle-r :axis :y))
 
      (setq jlr0 (instance rotational-joint :init :parent-link bc0 :child-link blr1 :name :rleg-crotch-y :axis :-z))
      (setq jlr1 (instance rotational-joint :init :parent-link blr1 :child-link blr2 :name :rleg-crotch-r :axis :-x))
      (setq jlr2 (instance rotational-joint :init :parent-link blr2 :child-link blr3 :name :rleg-crotch-p :axis :y))
-     (setq jlr3 (instance rotational-joint :init :parent-link blr3 :child-link blr4 :name :rleg-kneep-p :axis :y :min-angle 0))
+     (setq jlr3 (instance rotational-joint :init :parent-link blr3 :child-link blr4 :name :rleg-kneep-p :axis :y :min 0))
      (setq jlr4 (instance rotational-joint :init :parent-link blr4 :child-link blr5 :name :rleg-ankle-p :axis :-x))
      (setq jlr5 (instance rotational-joint :init :parent-link blr5 :child-link blr6 :name :rleg-ankle-r :axis :y))
 
@@ -210,8 +210,8 @@
 			    jll0 jll1 jll2 jll3 jll4 jll5
 			    jlr0 jlr1 jlr2 jlr3 jlr4 jlr5
 			    ))
-     (setq ik-collision-link-pair (list (list bal4 bc0) (list bal4 bc2)
-					(list bar4 bc0) (list bar4 bc2)))
+     (setq collision-avoidance-link-pair (list (list bal4 bc0) (list bal4 bc2)
+					       (list bar4 bc0) (list bar4 bc2)))
      (send self :init-ending)
      self))
   )
@@ -244,17 +244,16 @@
 	      :move-target (send *robot* :larm :end-coords)
 	      :rotation-axis nil :translation-axis t
 	      :p-limit 10
-	      :debug-view t
+	      :debug-view :no-flush
 	      )
       (send *robot* :head :look-at (send *robot* :larm :end-coords :worldpos))
       (send *robot* :transform
 	    (send *robot* :transformation (make-coords)))
       (send *robot* :transform
 	    (send (send *robot* :lleg :end-coords) :transformation (make-coords)))
-      (send *irtviewer* :draw-objects :flush nil)
       (send *irtviewer* :viewer :viewsurface :color #f(1 1 1))
-      (send *irtviewer* :viewer :viewsurface :line-width 8)
-      (send *irtviewer* :draw-line
+      (send *irtviewer* :viewer :viewsurface :line-width 2)
+      (send *irtviewer* :viewer :viewsurface :3d-line
 	    (send *robot* :larm :end-coords :worldpos)
 	    (send *robot* :rarm :end-coords :worldpos))
       (send *irtviewer* :flush)
@@ -265,6 +264,7 @@
 (defun test2 nil
   (let ((i 0))
     ;;
+    ;; import jsk/rbrain library
     (provide :rbrain-basic nil)
     (defclass robot-link :super cascaded-link)
     (defclass articulated-link :super cascaded-link
@@ -277,23 +277,25 @@
     (load "~/prog/euslib/rbrain/jskmapclass.l")
     (defmethod bodyset-with-knowledge
       (:vertices () (list (send self :worldpos))))
+    ;;
     (setq r0 (instance sample-robot :init))
-    (send r0 :lleg :move-end-pos #f(0 0 50) :local :rotation-axis t)
-    (send r0 :rleg :move-end-pos #f(0 0 50) :local :rotation-axis t)
     (setq b0 (instance broom :init :length 700 :bar-color :brown :sweep-color :red))
     (send b0 :locate #f(200 0 0))
-    (objects (list  r0 b0))
+
+    (objects (list  r0 ))
+    (send r0 :lleg :move-end-pos #f(0 0 50) :local :rotation-axis t)
+    (send r0 :rleg :move-end-pos #f(0 0 50) :local :rotation-axis t)
     ;;
     (do-until-key
       (send r0 :larm :inverse-kinematics (car (send b0 :handle))
-	    :rotation-axis nil :thre 10.0 :rthre 100.0 :debug-view nil)
+	    :rotation-axis nil :debug-view nil)
       (send r0 :rarm :inverse-kinematics (cadr (send b0 :handle))
-	    :rotation-axis nil :thre 10.0 :rthre 100.0 :debug-view nil)
+	    :rotation-axis nil :debug-view t)
       (send b0 :orient (* 0.2 (sin (/ i 10.0))) :x :world)
       (send b0 :locate (float-vector 200 (* 100 (sin (/ (incf i) 10.0))) 0) :world)
       (incf i)
-	    
-      (send *irtviewer* :draw-objects)
+      
+      ;(send *irtviewer* :draw-objects)
      )
     ))
 ;;;
@@ -377,25 +379,25 @@
      ;;
      (setq j00 (instance rotational-joint :init :name :j00
 			 :child-link b00 :parent-link b0 :axis :y
-			 :min-angle 00 :max-angle 120))
+			 :min 00 :max 120))
      (setq j01 (instance rotational-joint :init :name :j01
 			 :child-link b01 :parent-link b00 :axis :y
-			 :min-angle 0 :max-angle 120))
+			 :min 0 :max 120))
      (setq j10 (instance rotational-joint :init :name :j10
 			 :child-link b10 :parent-link b0 :axis :y
-			 :min-angle 0 :max-angle 120))
+			 :min 0 :max 120))
      (setq j11 (instance rotational-joint :init :name :j11
 			 :child-link b11 :parent-link b10 :axis :y
-			 :min-angle 0 :max-angle 120))
+			 :min 0 :max 120))
      (setq j20 (instance rotational-joint :init :name :j10
 			 :child-link b20 :parent-link b0 :axis :x
-			 :min-angle -90 :max-angle 45))
+			 :min -90 :max 45))
      (setq j21 (instance rotational-joint :init :name :j11
 			 :child-link b21 :parent-link b20 :axis :y
-			 :min-angle -90 :max-angle 0))
+			 :min -90 :max 0))
      (setq j22 (instance rotational-joint :init :name :j11
 			 :child-link b22 :parent-link b21 :axis :y
-			 :min-angle 0 :max-angle 120))
+			 :min 0 :max 120))
      (send self :assoc b0)
      (send b0 :assoc b00)
      (send b00 :assoc b01)
@@ -479,13 +481,13 @@
 	  (send j :joint-angle -0.1 :relative t))
 	(push (cdar r) ln)
 	)
-      (print i)
-
+      (mapcar #'(lambda (l) (warn "~7,3f " (apply #'distance l))) ln)
+      (warn "~%")
       (send *irtviewer* :draw-objects :flush nil)
       (send *irtviewer* :viewer :viewsurface :color #f(1 1 1))
       (send *irtviewer* :viewer :viewsurface :line-width 4)
       (dolist (l ln)
-	(send* *irtviewer* :draw-line l))
+	(send* *irtviewer* :viewer :draw-line l))
       (send *irtviewer* :flush)
       (incf i)
       )
@@ -498,5 +500,8 @@
 (warn "(test2) for tool usage~%")
 (warn "(test3) for hand model~%")
 
+(load "~/prog/eus/irteus/irtmodel.l ")
 
 (unless (boundp '*irtviewer*) (make-irtviewer))
+#+:jsk
+(defun objects (&rest args) (apply #'irt-objects args))

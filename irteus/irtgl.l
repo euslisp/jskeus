@@ -68,16 +68,31 @@
        (glGetFloatv GL_POINT_SIZE tmp)
        (elt tmp 0))
      ))
-  (:3d-line (start end &rest points) ;; redefined
-	    (glDisable GL_DEPTH_TEST)
-	    (glDisable GL_LIGHTING)
+  (:3d-point (pos &key (depth-test t) (lighting t)) ;; redefined
+	     (if depth-test (glDisable GL_DEPTH_TEST))
+	     (if lighting (glDisable GL_LIGHTING))
+	     (glBegin GL_POINTS)
+	     (glVertex3fv pos)
+	     (glEnd)
+	     (if depth-test (glEnable GL_DEPTH_TEST))
+	     (if lighting (glEnable GL_LIGHTING)))
+  (:3d-line (start end &key (depth-test t) (lighting t)) ;; redefined
+	    (if depth-test (glDisable GL_DEPTH_TEST))
+	    (if lighting (glDisable GL_LIGHTING))
 	    (glBegin GL_LINE_STRIP)
 	    (glVertex3fv start)
 	    (glVertex3fv end)
-	    (if points (dolist (p points) (glVertex3fv p)))
 	    (glEnd)
-	    (glEnable GL_DEPTH_TEST)
-	    (glEnable GL_LIGHTING))
+	    (if depth-test (glEnable GL_DEPTH_TEST))
+	    (if lighting (glEnable GL_LIGHTING)))
+  (:3d-lines (points &key (depth-test t) (lighting t))
+	     (if depth-test (glDisable GL_DEPTH_TEST))
+	     (if lighting (glDisable GL_LIGHTING))
+	     (glBegin GL_LINE_STRIP)
+	     (dolist (p points) (glVertex3fv p))
+	     (glEnd)
+	     (if depth-test (glEnable GL_DEPTH_TEST))
+	     (if lighting (glEnable GL_LIGHTING)))
   ;;
   (:makecurrent () (gl::glxMakeCurrent x::*display* x::drawable glcon))
   (:redraw (&rest args) )
@@ -95,7 +110,6 @@
     (if clear (send vwr :viewsurface :clear))
     ;;(apply #'geo::draw things)
     (setq pcolor (send vwr :viewsurface :color))
-
     ;; draw origin
     (glDisable GL_LIGHTING)
     (glBegin GL_LINES)
@@ -118,7 +132,7 @@
 	(send abody :draw-on :viewer vwr))
        (t (warn "Unknown body to draw ~A~%" abody)))
        )
-    (if flush (swapb (geo::viewer-surface vwr)))
+    (if flush (send vwr :viewsurface :flush))
     ))
 
 ;;
@@ -252,7 +266,7 @@
 	 (v (float-vector 0 0 0)))
      (send vwer :viewsurface :line-width width)
      (send vwer :viewsurface :color color)
-     (send* vwer :viewsurface :3d-line (send self :vertices))
+     (send vwer :viewsurface :3d-lines (send self :vertices))
      (send vwer :viewsurface :line-width pwidth)
      (send vwer :viewsurface :color pcolor)
      (if flush (send vwer :viewsurface :flush))
@@ -287,7 +301,8 @@
          (pcolor (send vwer :viewsurface :color)))
      (send vwer :viewsurface :line-width width)
      (send vwer :viewsurface :color color)
-     (send* vwer :viewsurface :3d-line (send self :vertices))
+     (dolist (f (send self :faces))
+       (send vwer :viewsurface :3d-lines (send f :vertices)))
      (send vwer :viewsurface :line-width pwidth)
      (send vwer :viewsurface :color pcolor)
      (if flush (send vwer :viewsurface :flush))
@@ -386,7 +401,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.2  2008-09-22 06:02:10  k-okada
+;;; Revision 1.3  2008-11-06 17:19:47  k-okada
+;;; fix to work with jskrbeusgl
+;;;
+;;; Revision 1.2  2008/09/22 06:02:10  k-okada
 ;;; fix to work with jskeusgl
 ;;;
 ;;; Revision 1.1  2008/09/18 18:11:01  k-okada
