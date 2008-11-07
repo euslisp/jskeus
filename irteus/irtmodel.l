@@ -579,10 +579,11 @@
 				  :tmp-dim nil
 				  :tmp-len nil :tmp-len2 nil
 				  args))))
+       (setq la (v+ la sca la))
        )
      ;;
      (send* self :move-joints vel-pos vel-rot
-		    :null-space (if null-space (v+ null-space (v+ la sca la) la) (v+ la sca la))
+		    :null-space (if null-space (v+ null-space la la) la)
 		    :debug-view debug-view
 		    :weight weight
 		    args)
@@ -832,7 +833,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.5  2008-11-06 17:19:47  k-okada
+;;; Revision 1.6  2008-11-07 01:15:41  k-okada
+;;; fix when avoid-collision-gain 0
+;;;
+;;; Revision 1.5  2008/11/06 17:19:47  k-okada
 ;;; fix to work with jskrbeusgl
 ;;;
 ;;; Revision 1.4  2008/10/10 05:12:28  k-okada
