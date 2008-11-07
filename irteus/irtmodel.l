@@ -809,7 +809,7 @@
       (cond
        ((or (eq (send j :name) :torso-waist-p)
 	    (eq (send j :name) :waist-p))
-	(setq nang (- jmin (get j :min-angle)))
+	(setq nang (- jmin (j . min-angle)))
 	(cond
 	 ((= nang jmax) (setq nang (- jmax 1)))
 	 ((= nang jmin) (setq nang (+ jmin 1))))
@@ -833,7 +833,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.6  2008-11-07 01:15:41  k-okada
+;;; Revision 1.7  2008-11-07 06:30:07  k-okada
+;;; fix
+;;;
+;;; Revision 1.6  2008/11/07 01:15:41  k-okada
 ;;; fix when avoid-collision-gain 0
 ;;;
 ;;; Revision 1.5  2008/11/06 17:19:47  k-okada
