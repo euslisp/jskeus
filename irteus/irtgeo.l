@@ -22,6 +22,8 @@
 ;;; above copyright notice remains intact.  
 ;;;
 
+(require :irtmath)
+
 (in-package "GEOMETRY")
 
 (export '(midcoords bodyset))
@@ -309,7 +311,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.1  2008-09-18 18:11:00  k-okada
+;;; Revision 1.2  2008-11-11 14:01:54  k-okada
+;;; error handling when normalize-vector #f(0 0 0), again
+;;;
+;;; Revision 1.1  2008/09/18 18:11:00  k-okada
 ;;; add irteus
 ;;;
 ;;;
