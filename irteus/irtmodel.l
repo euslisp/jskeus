@@ -397,7 +397,7 @@
    (let (dav dtheta)
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
 
-     (if (and debug-view (not (memq :no-clear debug-view)) (boundp '*viewer*))
+     (if (and debug-view (not (memq :no-clear debug-view)) *viewer*)
 	 (send *viewer* :viewsurface :clear))
 
      (setq dav (send* self :calc-joint-angle-speed vel-pos vel-rot args))
@@ -411,7 +411,7 @@
        (send (elt link-list i) :joint :joint-angle dtheta :relative t))
      ;;
      ;; done
-     (when (and debug-view (boundp '*viewer*))
+     (when (and debug-view *viewer*)
        (send (send *viewer* :viewsurface :parent) :draw-objects
 	     :clear nil :flush nil)
        (if (memq :move-target args)
@@ -466,7 +466,7 @@
        (setq vel-pos (scale (* 0.001 sc) (normalize-vector dif-pos)))
        (setq drag-coords (make-cascoords :pos (elt np 1)))
        (send (car pair) :assoc drag-coords)
-       (when (and debug-view (boundp '*viewer*))
+       (when (and debug-view *viewer*)
 
 	 (let ((pwidth (send *viewer* :viewsurface :line-width))
 	       (psize (send *viewer* :viewsurface :point-size))
@@ -557,7 +557,7 @@
        (dotimes (i  len) (warn "~7,3f " (elt la i))) (warn "~%"))
      ;;
      (when (> avoid-collision-gain 0.0)
-       (when (and debug-view (not (memq :no-clear debug-view)) (boundp '*viewer*))
+       (when (and debug-view (not (memq :no-clear debug-view)) *viewer*)
 	 (send *viewer* :viewsurface :clear)
 	 (if (atom debug-view) (setq debug-view (list debug-view)))
 
@@ -652,7 +652,7 @@
 		(if rotation-axis (< (norm dif-rot) rthre) t))
 	   (return nil))
        ;; ik
-       (when (and need-clear debug-view (boundp '*viewer*))
+       (when (and need-clear debug-view *viewer*)
 	 (if need-clear (send *viewer* :viewsurface :clear)))
        (send-message* self cascaded-link
 		      :move-joints-avoidance
@@ -833,7 +833,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.7  2008-11-07 06:30:07  k-okada
+;;; Revision 1.8  2008-11-11 11:09:35  k-okada
+;;; fix when no pickview/irtviewer is created
+;;;
+;;; Revision 1.7  2008/11/07 06:30:07  k-okada
 ;;; fix
 ;;;
 ;;; Revision 1.6  2008/11/07 01:15:41  k-okada
