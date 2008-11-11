@@ -287,6 +287,21 @@
     (if (null tmp-mcr) (setq tmp-mcr (make-matrix c r)))
     (sqrt (max 0.0 (matrix-determinant (m* jacobi (transpose jacobi tmp-mcr) tmp-mrr))))))
 
+;;
+;; re-define
+;;
+(unless (fboundp 'normalize-vector-org)
+  (remprop 'normalize-vector 'compiler::builtin-function-entry)
+  (setf (symbol-function 'normalize-vector-org) (symbol-function 'normalize-vector))
+  (comp::def-builtin-entry 'NORMALIZE-VECTOR-ORG "VNORMALIZE"))
+(defun normalize-vector (v &optional r)
+  "normalize-vector #f(0 0 0)->#f(0 0 0)."
+  (if (< (norm v) 1.0e-5)
+      (if r (fill r 0)
+        (instantiate float-vector (length v)))
+    (if r (normalize-vector-org v r)
+      (normalize-vector-org v))))
+
 (provide :irtmath "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -294,7 +309,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.3  2008-11-11 03:01:18  k-okada
+;;; Revision 1.4  2008-11-11 11:10:25  k-okada
+;;; error handling when normalize-vector #f(0 0 0), again
+;;;
+;;; Revision 1.3  2008/11/11 03:01:18  k-okada
 ;;; error handling when normalize-vector #f(0 0 0) -> 0, add VNORMALIZE in irtc.c remove defun normalize-vector from irtmath.l
 ;;;
 ;;; Revision 1.2  2008/09/22 06:15:46  k-okada
