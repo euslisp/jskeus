@@ -835,6 +835,34 @@ pointer MATMINUS(ctx,n,argv)
   return(result);
 }
 
+// redefined
+pointer VNORMALIZE(ctx,n,argv)
+register context *ctx;
+int n;
+register pointer argv[];
+{ register pointer result;
+  register float_t *a,*r,sum=0.0;
+  register int i,s;
+
+  ckarg2(1,2);
+  if (!isfltvector(argv[0])) error(E_FLOATVECTOR);
+  s=vecsize(argv[0]);
+  if (n==2) { 
+    result=argv[1];
+    if (!isfltvector(result)) error(E_FLOATVECTOR);
+    if (s!=vecsize(result)) error(E_VECINDEX);}
+  else result=makefvector(s);
+  a=argv[0]->c.fvec.fv;
+  r=result->c.fvec.fv;
+  for (i=0; i<s; i++) sum+= a[i]*a[i];
+  sum=sqrt(sum);
+  if ( sum < 1.0e-5 ) {
+    for (i=0; i<s; i++) r[i]=0.0;
+  }else{
+    for (i=0; i<s; i++) r[i]=a[i]/sum;
+  }
+  return(result);}
+
 pointer ___irtc(ctx,n,argv, env)
 register context *ctx;
 int n;
@@ -850,6 +878,7 @@ pointer env;
   defun(ctx,"LU-SOLVE2",mod,LU_SOLVE2);
   defun(ctx,"LU-DECOMPOSE2",mod,LU_DECOMPOSE2);
   defun(ctx,"MATRIX-DETERMINANT",mod,MATRIX_DETERMINANT);
+  defun(ctx,"NORMALIZE-VECTOR",mod,VNORMALIZE);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -857,7 +886,10 @@ pointer env;
 /// $Id$
 ///
 /// $Log$
-/// Revision 1.1  2008-09-18 18:11:00  k-okada
+/// Revision 1.2  2008-11-11 03:01:18  k-okada
+/// error handling when normalize-vector #f(0 0 0) -> 0, add VNORMALIZE in irtc.c remove defun normalize-vector from irtmath.l
+///
+/// Revision 1.1  2008/09/18 18:11:00  k-okada
 /// add irteus
 ///
 ///
