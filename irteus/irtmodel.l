@@ -467,7 +467,6 @@
        (setq drag-coords (make-cascoords :pos (elt np 1)))
        (send (car pair) :assoc drag-coords)
        (when (and debug-view *viewer*)
-
 	 (let ((pwidth (send *viewer* :viewsurface :line-width))
 	       (psize (send *viewer* :viewsurface :point-size))
 	       (pcolor (send *viewer* :viewsurface :color)))
@@ -674,7 +673,7 @@
 		      :tmp-len tmp-len :tmp-len2 tmp-len2
 		      :tmp-pos tmp-pos :tmp-rot tmp-rot
 		      args)
-       (when debug-view
+       (when (and debug-view  *viewer*)
 	 (send target-coords :draw-on :flush nil :color #f(1 0 0))
 	 (if need-flush (send *viewer* :viewsurface :flush)))
        (if look-at-target
@@ -833,7 +832,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.8  2008-11-11 11:09:35  k-okada
+;;; Revision 1.9  2008-11-11 14:05:34  eus
+;;; fix to work when no viewer created, again
+;;;
+;;; Revision 1.8  2008/11/11 11:09:35  k-okada
 ;;; fix when no pickview/irtviewer is created
 ;;;
 ;;; Revision 1.7  2008/11/07 06:30:07  k-okada
