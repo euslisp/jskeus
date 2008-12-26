@@ -150,8 +150,14 @@
 (defun matrix-log (m)
   (let* ((qq (matrix2quaternion m))
 	 (q0 (elt qq 0))
-	 (q (subseq qq 1 4)))
-    (scale (* 2 (atan2 (norm q) q0)) (normalize-vector q))))
+	 (q (subseq qq 1 4))
+	 th)
+    (cond ((or (> q0 1.0e-10) (< q0 -1.0e-10))
+	   (setq th (* 2 (atan (/ (norm q) q0)))))
+	  ((> q0 0)(setq th pi/2))
+	  (t (setq th -pi/2)))
+    (scale th (normalize-vector q))
+    ))
 
 (defun matrix-exponent (omega &optional (p 1.0))
   (let (w amat)
@@ -309,7 +315,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.4  2008-11-11 11:10:25  k-okada
+;;; Revision 1.5  2008-12-26 11:20:19  k-okada
+;;; fix matrix-log, use atan not atan2
+;;;
+;;; Revision 1.4  2008/11/11 11:10:25  k-okada
 ;;; error handling when normalize-vector #f(0 0 0), again
 ;;;
 ;;; Revision 1.3  2008/11/11 03:01:18  k-okada
