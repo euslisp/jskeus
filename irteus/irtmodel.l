@@ -105,8 +105,23 @@
 
 (defclass bodyset-link
   :super bodyset
-  :slots (joint parent-link child-links))
+  :slots (joint parent-link child-links analysis-level))
 (defmethod bodyset-link
+  (:init 
+   (coords
+    &rest args
+    &key
+    ((:analysis-level level) :body)
+    &allow-other-keys)
+   (setq analysis-level level)
+   (send-super* :init coords args))
+  (:worldcoords
+   (&optional (level analysis-level))
+   (case
+    level
+    (:coords (send-message self cascaded-coords :worldcoords))
+    (t       (send-super :worldcoords)))
+   )
   (:joint (&rest args) (user::forward-message-to joint args))
   (:add-joint (j) (setq joint j))
 
@@ -832,7 +847,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.9  2008-11-11 14:05:34  eus
+;;; Revision 1.10  2009-01-02 08:09:27  k-okada
+;;; declare analysis-level in bodyset-link
+;;;
+;;; Revision 1.9  2008/11/11 14:05:34  eus
 ;;; fix to work when no viewer created, again
 ;;;
 ;;; Revision 1.8  2008/11/11 11:09:35  k-okada
