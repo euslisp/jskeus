@@ -227,12 +227,6 @@
    (send (send self :worldcoords) :inverse-transform-vector v v3a v3b m33)))
 
 
-(defmethod polygon
- (:reset-normal ()
-    (setq normal (face-normal-vector (rest vertices))
-          distance (- (v. normal (car vertices))))))
-
-
 (defclass bodyset
   :super cascaded-coords
   :slots 
@@ -311,7 +305,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.2  2008-11-11 14:01:54  k-okada
+;;; Revision 1.3  2009-01-05 03:48:31  k-okada
+;;; move defmethod polygon :reset-normal to jskgeo.l
+;;;
+;;; Revision 1.2  2008/11/11 14:01:54  k-okada
 ;;; error handling when normalize-vector #f(0 0 0), again
 ;;;
 ;;; Revision 1.1  2008/09/18 18:11:00  k-okada
