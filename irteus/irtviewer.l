@@ -51,7 +51,8 @@
 	   up-down-angle 20
 	   viewpoint (float-vector 700 400 250)
 	   viewtarget (float-vector 0 0 0))
-     (send-super* :create :width width :height height :title name args)
+     (send-super* :create :width width :height height :title name 
+		  :event-mask '(:configure) args)
      (setq gl::*perspective-far* yon)
      (setq gl::*perspective-near* hither)
      (setq viewer (apply #'user::view :parent self
@@ -94,22 +95,21 @@
   (:viewer (&rest args) (user::forward-message-to viewer args))
   (:redraw () (send self :draw-objects))
   ;;
-  (:expose (event) (send self :configureNotify event))
-  (:resize 
-   (&rest args)
-   (send-super* :resize args)
-   (send self :configureNotify event))
+  (:expose (event) )
+  (:resize (newwidth newheight)
+   (setq x::width newwidth x::height newheight)
+   (send-super  :resize newwidth newheight)
+   (send viewer :viewsurface :resize newwidth newheight)
+   (send viewer :viewsurface :makecurrent)
+   (send viewer :viewsurface :3d-mode)
+   (send self :redraw))
   (:configureNotify
    (event)
    (if *debug* (warn "ConfigureNotify came to ~S~%" self))
    (let ((newwidth (send-message self x::xwindow :width))
 	 (newheight (send-message self x::xwindow :height)))
-     (when t (or (/= newwidth x::width) (/= newheight x::height))
-	   (setq x::width newwidth x::height newheight)
-	   (send viewer :viewsurface :resize newwidth newheight)
-	   (send viewer :viewsurface :makecurrent)
-	   (send viewer :viewsurface :3d-mode)
-	   (send self :redraw))))
+     (when (or (/= newwidth x::width) (/= newheight x::height))
+       (send self :resize newwidth newheight))))
   ;;
   (:viewtarget (&optional p) (if p (setq viewtarget p)) viewtarget)
   (:viewpoint  (&optional p) (if p (setq viewpoint p))  viewpoint)
@@ -272,7 +272,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.2  2008-09-22 06:02:10  k-okada
+;;; Revision 1.3  2009-01-06 13:18:23  k-okada
+;;; check event-type and window-id for skipping x event, use :expose for each item
+;;;
+;;; Revision 1.2  2008/09/22 06:02:10  k-okada
 ;;; fix to work with jskeusgl
 ;;;
 ;;; Revision 1.1  2008/09/18 18:11:01  k-okada

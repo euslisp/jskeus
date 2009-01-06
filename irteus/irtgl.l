@@ -95,7 +95,7 @@
 	     (if lighting (glEnable GL_LIGHTING)))
   ;;
   (:makecurrent () (gl::glxMakeCurrent x::*display* x::drawable glcon))
-  (:redraw (&rest args) )
+  (:redraw (&rest args) (send self :flush))
   (:flush 
    ()
    (send self :makecurrent)
@@ -401,7 +401,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.3  2008-11-06 17:19:47  k-okada
+;;; Revision 1.4  2009-01-06 13:18:23  k-okada
+;;; check event-type and window-id for skipping x event, use :expose for each item
+;;;
+;;; Revision 1.3  2008/11/06 17:19:47  k-okada
 ;;; fix to work with jskrbeusgl
 ;;;
 ;;; Revision 1.2  2008/09/22 06:02:10  k-okada

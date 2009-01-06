@@ -36,7 +36,10 @@
 		(while
 		    (and (> (Pending *display*) 0)
 			 (progn (PeekEvent *display* event2)
-				(memq (event-type event2) *skip-motion-event*)))
+				(and
+				 (memq (event-type event2) *skip-motion-event*)
+				 (= (xevent-type event) (xevent-type event2))
+				 (= (xevent-window event) (xevent-window event2)))))
 		    ;ignore the previous event
 		    (nextEvent *display* event)
 		    (incf *skipped-event-count*)) )
@@ -85,7 +88,7 @@
    (if (member type '(:ClientMessage))
        (send self :event-notify-dispatch type event)
      (send self :event-notify-org type event)))
-  (:quit ()
+  (:quit (&rest a)
     (send self :destroy)
     (sync *display* 1)
     :destroyed)
@@ -137,13 +140,10 @@
   )
   
 (defmethod panel
-  (:delete-item (item)
-		(setq items (delete item items))
-		(send item :destroy))
-  (:quit ()
-    (send self :delete-items)
-    (send-super :quit))
-  )
+  (:quit (&rest args) (send-super* :quit args)))
+
+(defmethod Xscroll-bar
+  (:redraw () (send self :draw-pattern)))
 
 (defclass tabbed-panel
   :super panel
@@ -161,6 +161,8 @@
 	       :map nil
 	       :parent self))
      (send self :locate-item p)
+     (send p :state :up)
+     (send-all tabbed-buttons :state :down)
      (push p tabbed-buttons)
      (push p items)
      (setq p (instance panel :create
@@ -172,7 +174,6 @@
 		       :parent self))
      (push p tabbed-panels)
      (push p items)
-     (send-all items :expose nil)
      p))
   (:change-tabbed-panel
    (obj)
@@ -182,7 +183,7 @@
      (when selected-tabbed-panel
        (send-all tabbed-panels :unmap)
        (send selected-tabbed-panel :map)
-       (send-all (send selected-tabbed-panel :items) :expose nil))
+       )
      (send-all tabbed-buttons :draw-label :down)
      (setq p (send self :tabbed-button (if (stringp obj) obj (send obj :name))))
      (if p (send p :draw-label :up))
@@ -211,11 +212,6 @@
    (dolist (p tabbed-panels)
      (send p :resize (- w 4) (- h 34)))
    (send-all items :expose nil))
-  (:expose (ev) )
-  (:visibilitynotify
-   (ev)
-   (send-all items :expose nil)
-   (send-all (send selected-tabbed-panel :items) :expose nil))
   )
 
 (defclass panel-tab-button-item
@@ -224,6 +220,7 @@
 (defmethod panel-tab-button-item
  (:draw-label (&optional (state :up) (offset 0))
       (let ((org-pixel (send gcon :foreground)))
+	(setf 3D-state state)
 	(if (eq state :up)
 	    (send gcon :foreground *fg-pixel*)
 	  (send gcon :foreground dark-edge-color))
@@ -253,7 +250,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.1  2008-09-18 18:11:01  k-okada
+;;; Revision 1.2  2009-01-06 13:18:23  k-okada
+;;; check event-type and window-id for skipping x event, use :expose for each item
+;;;
+;;; Revision 1.1  2008/09/18 18:11:01  k-okada
 ;;; add irteus
 ;;;
 ;;;
