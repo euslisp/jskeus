@@ -122,6 +122,9 @@
     (:coords (send-message self cascaded-coords :worldcoords))
     (t       (send-super :worldcoords)))
    )
+  (:analysis-level
+   (&optional v)
+   (if v (setq analysis-level v)) analysis-level)
   (:joint (&rest args) (user::forward-message-to joint args))
   (:add-joint (j) (setq joint j))
 
@@ -265,7 +268,6 @@
      (unless fik (setq fik (make-matrix dim len)))
      (dotimes (i len)
        (setq j (send (elt link-list i) :joint))
-
        (cond ((and (< (+ i 1) len)
 		   (not (eq (send j :child-link)
 			    (send (elt link-list (+ i 1)) :parent-link))))
@@ -847,7 +849,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.10  2009-01-02 08:09:27  k-okada
+;;; Revision 1.11  2009-02-17 01:51:08  k-okada
+;;; add :analysis-level to bodyset-link
+;;;
+;;; Revision 1.10  2009/01/02 08:09:27  k-okada
 ;;; declare analysis-level in bodyset-link
 ;;;
 ;;; Revision 1.9  2008/11/11 14:05:34  eus
