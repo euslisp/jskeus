@@ -4,9 +4,9 @@
 ;;;
 ;;; Copyright (c) 1987- JSK, The University of Tokyo.  All Rights Reserved.
 ;;;
-;;; This software is a collisoin of EusLisp code for robot applications,
+;;; This software is a collection of EusLisp code for robot applications,
 ;;; which has been developed by the JSK Laboratory for the IRT project.
-;;; For more information on EusLisp and it's application to the robotics,
+;;; For more information on EusLisp and its application to the robotics,
 ;;; please refer to the following papers.
 ;;;
 ;;; Toshihiro Matsui
@@ -305,7 +305,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.3  2009-01-05 03:48:31  k-okada
+;;; Revision 1.4  2009-02-17 02:04:48  k-okada
+;;; fix typo on copyright
+;;;
+;;; Revision 1.3  2009/01/05 03:48:31  k-okada
 ;;; move defmethod polygon :reset-normal to jskgeo.l
 ;;;
 ;;; Revision 1.2  2008/11/11 14:01:54  k-okada

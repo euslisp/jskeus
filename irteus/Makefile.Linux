@@ -4,9 +4,9 @@
 ###
 ### Copyright (c) 1987- JSK, The University of Tokyo.  All Rights Reserved.
 ###
-### This software is a collisoin of EusLisp code for robot applications,
+### This software is a collection of EusLisp code for robot applications,
 ### which has been developed by the JSK Laboratory for the IRT project.
-### For more information on EusLisp and it's application to the robotics,
+### For more information on EusLisp and its application to the robotics,
 ### please refer to the following papers.
 ###
 ### Toshihiro Matsui

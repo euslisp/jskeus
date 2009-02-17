@@ -4,9 +4,9 @@
 ///
 /// Copyright (c) 1987- JSK, The University of Tokyo.  All Rights Reserved.
 ///
-/// This software is a collisoin of EusLisp code for robot applications,
+/// This software is a collection of EusLisp code for robot applications,
 /// which has been developed by the JSK Laboratory for the IRT project.
-/// For more information on EusLisp and it's application to the robotics,
+/// For more information on EusLisp and its application to the robotics,
 /// please refer to the following papers.
 ///
 /// Toshihiro Matsui
@@ -857,7 +857,10 @@ pointer env;
 /// $Id$
 ///
 /// $Log$
-/// Revision 1.3  2008-11-11 11:10:25  k-okada
+/// Revision 1.4  2009-02-17 02:04:48  k-okada
+/// fix typo on copyright
+///
+/// Revision 1.3  2008/11/11 11:10:25  k-okada
 /// error handling when normalize-vector #f(0 0 0), again
 ///
 /// Revision 1.2  2008/11/11 03:01:18  k-okada

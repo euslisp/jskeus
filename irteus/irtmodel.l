@@ -4,9 +4,9 @@
 ;;;
 ;;; Copyright (c) 1987- JSK, The University of Tokyo.  All Rights Reserved.
 ;;;
-;;; This software is a collisoin of EusLisp code for robot applications,
+;;; This software is a collection of EusLisp code for robot applications,
 ;;; which has been developed by the JSK Laboratory for the IRT project.
-;;; For more information on EusLisp and it's application to the robotics,
+;;; For more information on EusLisp and its application to the robotics,
 ;;; please refer to the following papers.
 ;;;
 ;;; Toshihiro Matsui
@@ -849,7 +849,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.11  2009-02-17 01:51:08  k-okada
+;;; Revision 1.12  2009-02-17 02:04:48  k-okada
+;;; fix typo on copyright
+;;;
+;;; Revision 1.11  2009/02/17 01:51:08  k-okada
 ;;; add :analysis-level to bodyset-link
 ;;;
 ;;; Revision 1.10  2009/01/02 08:09:27  k-okada
