@@ -171,7 +171,10 @@ pointer ___euspqp(register context *ctx, int n, register pointer *argv)
 /// $Id$
 ///
 /// $Log$
-/// Revision 1.1  2008-09-18 18:11:00  k-okada
+/// Revision 1.2  2009-02-17 02:03:54  k-okada
+/// fix file encoding
+///
+/// Revision 1.1  2008/09/18 18:11:00  k-okada
 /// add irteus
 ///
 ///
