@@ -231,7 +231,7 @@
 
 (defun sr-inverse (mat &optional (k 1.0) weight-vector ret
 		       wmat tmat umat umat2 mat-tmp
-		       mat-tmp-cc mat-tmp-rc)
+		       mat-tmp-cc mat-tmp-rc mat-tmp-rr mat-tmp-rr2)
   (let* ((d (array-dimensions mat))
 	 (r (car d)) (c (cadr d))
 	 mat-tmp-rr)
@@ -240,9 +240,11 @@
 
     ;; without weight
     (when (null weight-vector)
-      (setq mat-tmp-rr (make-matrix r r))
+      (if (null mat-tmp-rr) (setq mat-tmp-rr (make-matrix r r)))
+      (if (null mat-tmp-rr2) (setq mat-tmp-rr2 (make-matrix r r)))
       (return-from sr-inverse (sr-inverse-org mat k
-					      mat-tmp-rr tmat)))
+					      mat-tmp-rr tmat
+					      mat-tmp-rr2)))
 
     (if (null ret) (setq ret (make-matrix c r)))
     (if (null wmat) (setq wmat (make-matrix c c)))
@@ -268,9 +270,8 @@
     ret
     ))
 
-
 (defun sr-inverse-org (mat &optional (k 1)
-			   me mat-tmp-cr)
+			   me mat-tmp-cr mat-tmp-rr)
   (let* ((d (array-dimensions mat))
 	 (r (car d)) (c (cadr d)))
     (if (null me)
@@ -280,9 +281,10 @@
 	(dotimes (i r) (setf (aref me i i) 1.0))))
     
     (if (null mat-tmp-cr) (setq mat-tmp-cr (make-matrix c r)))
+    (if (null mat-tmp-rr) (setq mat-tmp-rr (make-matrix r r)))
     (setq mat-tmp-cr (transpose mat mat-tmp-cr))
     (m* mat-tmp-cr
-	(inverse-matrix (m+ (m* mat mat-tmp-cr) (scale-matrix k me)))
+	(inverse-matrix (m+ (m* mat mat-tmp-cr mat-tmp-rr) (scale-matrix k me me) mat-tmp-rr))
 	mat-tmp-cr)
     ))
 
@@ -315,7 +317,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.6  2009-02-17 02:04:48  k-okada
+;;; Revision 1.7  2009-03-02 15:44:53  k-okada
+;;; speed up sr-inverse-org
+;;;
+;;; Revision 1.6  2009/02/17 02:04:48  k-okada
 ;;; fix typo on copyright
 ;;;
 ;;; Revision 1.5  2008/12/26 11:20:19  k-okada
