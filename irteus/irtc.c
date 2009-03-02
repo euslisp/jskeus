@@ -585,12 +585,12 @@ pointer LU_DECOMPOSE2(ctx,n,argv) /* re-definition */
 register context *ctx;
 int n;
 pointer argv[];
-/* (LU-DECOMPOSE mat [result]) */
+/* (LU-DECOMPOSE mat [result] [tmp-vector]) */
 { pointer a,result,pv;
   float **aa, d;
   int i, j, s, stat, *indx;
 
-  ckarg2(1,2);
+  ckarg2(1,3);
   a=argv[0];
   if (!ismatrix(a)) error(E_NOVECTOR);
   s=colsize(a);
@@ -602,7 +602,13 @@ pointer argv[];
     if (s!=colsize(result)) error(E_VECSIZE);
     copymat(result,a,s); 
   }
-  pv=makevector(C_VECTOR,s);
+  if (n==3) {
+    pv=argv[2];
+    if (!isvector(pv)) error(E_NOVECTOR);
+    if (s!=vecsize(pv)) error(E_VECSIZE);
+  }else{
+    pv=makevector(C_VECTOR,s);
+  }
 
   aa = nr_matrix(1,s,1,s);
   indx = malloc(sizeof(int)*(s+1));
@@ -857,7 +863,10 @@ pointer env;
 /// $Id$
 ///
 /// $Log$
-/// Revision 1.4  2009-02-17 02:04:48  k-okada
+/// Revision 1.5  2009-03-02 12:12:49  k-okada
+/// lu-decompose2 accepts LU-DECOMPOSE2 mat [result] [tmp-vector]
+///
+/// Revision 1.4  2009/02/17 02:04:48  k-okada
 /// fix typo on copyright
 ///
 /// Revision 1.3  2008/11/11 11:10:25  k-okada
