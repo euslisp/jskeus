@@ -217,11 +217,11 @@
     ((:manipulability-gain mg) 0.001)
     weight debug-view
     ret wmat tmat umat umat2 mat-tmp
-    tmp-mcc tmp-mrc
+    tmp-mcc tmp-mrc tmp-mrr tmp-mrr2
     &allow-other-keys)
    (let (jacobi# m m2 (k 0))
      ;; m : manipulability
-     (setq m (manipulability jacobi umat tmat))
+     (setq m (manipulability jacobi tmp-mrr tmat))
      (if (< m ml) (setq k (* mg (expt (- 1.0 (/ m  ml)) 2))))
      (when debug-view
        (warn "k     :~7,3f (manipulability:~7,3f, gain:~7,3f, limit:~7,3f, len:~d)~%" k m mg ml (cadr (array-dimensions jacobi))))
@@ -229,7 +229,7 @@
      ;; calc weighted SR-inverse
      (setq jacobi# (sr-inverse jacobi k weight 
 			       ret wmat tmat umat umat2 mat-tmp
-			       tmp-mcc tmp-mrc
+			       tmp-mcc tmp-mrc tmp-mrr tmp-mrr2
 			       ))
      jacobi#))
   (:calc-gradH-from-link-list
@@ -320,7 +320,7 @@
     link-list
     move-target jacobi jacobi# null-space
     (rotation-axis nil) (translation-axis t)
-    (p-limit 100.0) (r-limit 0.5)
+    p-limit r-limit
     (weight (fill (instantiate float-vector (length link-list)) 1))
     (debug-view nil)
     (tmp-pos (float-vector 0 0 0))
@@ -345,6 +345,8 @@
 	 (return-from :calc-joint-angle-speed null-space))
 
      ;; limit
+     (unless p-limit (setq p-limit 100.0))
+     (unless r-limit (setq r-limit 0.5))
      (if (> (norm vel-pos) p-limit)
 	 (setq vel-pos (scale p-limit (normalize-vector vel-pos tmp-pos) tmp-pos)))
      (if (> (norm vel-rot) r-limit)
@@ -849,7 +851,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.12  2009-02-17 02:04:48  k-okada
+;;; Revision 1.13  2009-03-02 12:16:47  k-okada
+;;; fix :calc-inverse-jacobian when degenerated link-list,  fix when p-limit/r-limit is nil
+;;;
+;;; Revision 1.12  2009/02/17 02:04:48  k-okada
 ;;; fix typo on copyright
 ;;;
 ;;; Revision 1.11  2009/02/17 01:51:08  k-okada
