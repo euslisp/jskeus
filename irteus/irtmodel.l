@@ -622,14 +622,12 @@
 	  ;;
 	  (c (length link-list))
 	  (r (send self :calc-target-axis-dimension rotation-axis translation-axis))
-	  (a (max c r))
-	  (b (min c r))
 	  (ret (make-matrix c r))
-	  (wmat (make-matrix a a))
+	  (wmat (make-matrix c c))
 	  (tmat (make-matrix c r))
-	  (umat (make-matrix b b))
-	  (umat2 (make-matrix b b))
-	  (mat-tmp (make-matrix a b))
+	  (umat (make-matrix r r))
+	  (umat2 (make-matrix r r))
+	  (mat-tmp (make-matrix c r))
 	  (tmp-mcc (make-matrix c c))
 	  (tmp-mcc2 (make-matrix c c))
 	  (tmp-mrc (make-matrix r c))
@@ -787,7 +785,7 @@
 	(t dif)))
 
 (defun joint-angle-limit-weight (j-l &optional (res (instantiate float-vector (length j-l))))
-  (let (j jang jmax jmin nang wang (e (deg2rad 1)))
+  (let (j jang jmax jmin nang wang (e (deg2rad 1)) r)
     (dotimes (i (length j-l))
       (setq j (elt j-l i))
       (setq jang (deg2rad (send j :joint-angle))
@@ -810,15 +808,17 @@
 	      (abs (/ (* (expt (* 2 wang) 2) (* 2 (- jang nang)))
 		      (* 4 (expt (- (* wang wang) (* jang jang)) 2))))))
        (t
-	(setf (elt res i)
+	(setq r
 	      (abs (/ (* (expt (- jmax jmin) 2) (- (* 2 jang) jmax jmin))
-		      (* 4 (expt (- jmax jang) 2) (expt (- jang jmin) 2))))))
+		      (* 4 (expt (- jmax jang) 2) (expt (- jang jmin) 2)))))
+	(if (and (< r 0.0) (> r 0.0)) (setq r 0.0))
+	(setf (elt res i) r))
        )
       )
     res))
 
 (defun joint-angle-limit-nspace (j-l &optional (res (instantiate float-vector (length j-l))))
-  (let (j jang jmax jmin nang)
+  (let (j jang jmax jmin nang r)
     (dotimes (i (length j-l))
       (setq j (elt j-l i))
       (setq jang (send j :joint-angle)
@@ -838,8 +838,9 @@
        (t
 	(setf (elt res i) (/ (- (/ (+ jmax jmin) 2.0) jang)
 			     (/ (- jmax jmin) 2.0)))))
-      (setf (elt res i)
-	    (* (if (plusp (elt res i)) 1 -1) (expt (elt res i) 2))))
+      (setq r (* (if (plusp (elt res i)) 1 -1) (expt (elt res i) 2)))
+      (if (and (< r 0.0) (> r 0.0)) (setq r 0.0))
+      (setf (elt res i) r))
     res))
 
 (in-package "GEOMETRY")
@@ -851,7 +852,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.13  2009-03-02 12:16:47  k-okada
+;;; Revision 1.14  2009-03-05 10:45:13  k-okada
+;;; fix wmat, umat, support when min/max-angle is *inf*
+;;;
+;;; Revision 1.13  2009/03/02 12:16:47  k-okada
 ;;; fix :calc-inverse-jacobian when degenerated link-list,  fix when p-limit/r-limit is nil
 ;;;
 ;;; Revision 1.12  2009/02/17 02:04:48  k-okada
