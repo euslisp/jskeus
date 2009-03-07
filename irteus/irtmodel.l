@@ -407,19 +407,65 @@
        ;; add null space
        (v+ J#x (transform I-J#J null-space tmp-len2) J#x))
      J#x))
+  (:collision-avoidance-link-pair () collision-avoidance-link-pair)
+  (:collision-avoidance
+   (&rest args
+	  &key link-list (warnp t)
+	  &allow-other-keys)
+   (let* ((pair-list (send self :collision-avoidance-link-pair))
+	  (pair-len (length pair-list))
+	  (ret (make-list pair-len))
+	  (col-list (send self :get :collision-distance))
+	  (distance-limit 1.0)
+	  (sc 0.0) np collidep pair)
+     (dotimes (i pair-len) (setf (elt ret i) (float-vector 0 0 0)))
+     (when (or (null link-list) (= pair-len 0))
+       (print (send self :collision-avoidance-link-pair))
+       (warn ";; ERROR: :link-list ~A / pair-len ~A required~%" link-list pair-len)
+       (return-from :collision-avoidance ret))
+     (if (or (null col-list) (/= (length col-list) pair-len))
+	 (setq col-list (make-list pair-len)))
+     ;; pair (part of this limb . part of another limb)
+     (dotimes (i pair-len)
+       (setq pair (elt pair-list i))
+       (if (not (memq (car pair) link-list)) 
+	   (progn
+	     (setf (elt col-list i) nil)
+	     )
+	 (progn
+	   (setq np (pqp-collision-distance (car pair) (cadr pair) :qsize 2))
+	   (if (<= (car np) distance-limit)
+	       (progn
+		 (if warnp
+		     (warn ";; !!WARNING!! collision detected~%;; (~a . ~a . ~a)~%"
+			   (send (car pair) :name) (send (cadr pair) :name) np))
+		 (if (elt col-list i)
+		     (setq np (elt col-list i))
+		   (setf (elt col-list i) np))
+		 (setf (elt (elt col-list i) 0) distance-limit)
+		 (setq collidep t))
+	     (progn
+	       (setf (elt col-list i) np)
+	       (setq collidep nil)))
+	   (setf (elt ret i)
+		 (normalize-vector (v- (elt np 1) (elt np 2) (elt ret i)) (elt ret i)))
+	   ))) ;; dotimes
+     (send self :put :collision-distance col-list)
+     ret))
   (:move-joints
    (vel-pos vel-rot &rest args
     &key
     link-list
+    move-target
     (debug-view nil)
     &allow-other-keys)
    (let (dav dtheta)
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
-
-     (if (and debug-view (not (memq :no-clear debug-view)) *viewer*)
+     (if (and debug-view (not (equal debug-view :no-clear)) (boundp '*viewer*))
 	 (send *viewer* :viewsurface :clear))
 
      (setq dav (send* self :calc-joint-angle-speed vel-pos vel-rot args))
+
      ;; update body
      (dotimes (i (length link-list))
        (setq dtheta
@@ -433,93 +479,22 @@
      (when (and debug-view *viewer*)
        (send (send *viewer* :viewsurface :parent) :draw-objects
 	     :clear nil :flush nil)
-       (if (memq :move-target args)
-	   (send-message (cadr (memq :move-target args)) cascaded-link :draw-on :flush nil :size 100))
-       (if (not (memq :no-flush debug-view))
-	   (send *viewer* :viewsurface :flush))
-       )
+       (if move-target
+	   (send-message move-target cascaded-link :draw-on :flush nil :size 100)))
      t))
-  (:collision-avoidance-link-pair () collision-avoidance-link-pair)
-  (:collision-avoidance
-   (link-list &rest args
-	      &key (p-limit 100.0) (collision-limit 50) (warnp t) debug-view
-	      &allow-other-keys)
-   (let* ((pair-list (mapcan #'(lambda (p) (if (or (memq (car p) link-list)
-						   (memq (cadr p) link-list)) (list p)))
-			     (send self :collision-avoidance-link-pair)))
-	  (dav (instantiate float-vector (length link-list)))
-	  (sc 0.0) (pair-len (length pair-list))
-	  drag-coords np ddav jacobi jacobi#
-	  collidep col-list dif-pos vel-pos pair)
-     (if (or (= pair-len 0) (not (functionp 'pqp-collision-distance)))
-	 (return-from :collision-avoidance dav))
-     (setq col-list (send self :get :collision-distance))
-     (if (or (null col-list) (/= (length col-list) pair-len)) (setq col-list (make-list pair-len)))
-     ;; pair (part of this limb . part of another limb)
-     (dotimes (i pair-len)
-       (setq pair (elt pair-list i))
-       (setq np (pqp-collision-distance (car pair) (cadr pair) :qsize 2))
-       (if (= (car np) 0.0)
-	   (progn
-	     (if warnp
-		 (warn ";; !!WARNING!! collision detected~%;; (~a . ~a . ~a)~%"
-		       (send (car pair) :name) (send (cadr pair) :name) np))
-	     (if (elt col-list i)
-		 (setq np (elt col-list i))
-	       (setf (elt col-list i) np))
-	     (setq collidep t))
-	 (progn
-	   (setf (elt col-list i) np)
-	   (setq collidep nil)))
-       (cond
-	(collidep
-	 (setq sc (* 10 p-limit)))
-	((< (car np) collision-limit)
-	 (setq sc (min p-limit
-		       (* (/ p-limit (/ collision-limit 2))
-			  (abs (- (car np) collision-limit))))))
-	(t
-	 (setq sc 0)))
-       (setq dif-pos (v- (elt np 1) (elt np 2)))
-
-       (setq vel-pos (scale (* 0.001 sc) (normalize-vector dif-pos)))
-       (setq drag-coords (make-cascoords :pos (elt np 1)))
-       (send (car pair) :assoc drag-coords)
-       (when (and debug-view *viewer*)
-	 (let ((pwidth (send *viewer* :viewsurface :line-width))
-	       (psize (send *viewer* :viewsurface :point-size))
-	       (pcolor (send *viewer* :viewsurface :color)))
-	   (send *viewer* :viewsurface :point-size 5)
-	   (send *viewer* :viewsurface :line-width 1)
-	   (send *viewer* :viewsurface :color #f(1 0 0))
-	   (send *viewer* :viewsurface :3d-line (elt np 1)(elt np 2) :depth-test t)
-	   (send *viewer* :viewsurface :3d-point (elt np 1) :depth-test t)
-	   (send *viewer* :viewsurface :3d-point (elt np 2) :depth-test t)
-	   (send *viewer* :viewsurface :line-width pwidth)
-	   (send *viewer* :viewsurface :point-size psize)
-	   (send *viewer* :viewsurface :color pcolor)
-	   ))
-       (setq jacobi (send self :calc-jacobian-from-link-list 
-			  (send self :link-list (car pair) (car link-list))
-			  :move-target drag-coords
-			  :rotation-axis nil :translation-axis t))
-       (setq jacobi# (send* self :calc-inverse-jacobian jacobi :weight nil args))
-       (setq ddav (transform jacobi# vel-pos))
-       (dotimes (i (length ddav))
-	 (setf (elt dav  i) (+ (elt dav i) (elt ddav i))))
-       (send (car pair) :dissoc drag-coords)
-       )
-     (send self :put :collision-distance col-list)
-     (scale (/ 1.0 pair-len) dav)))
   (:move-joints-avoidance
    (vel-pos vel-rot &rest args
 	    &key
 	    link-list
+	    move-target
 	    (weight (fill (instantiate float-vector (length link-list)) 1))
 	    (null-space)
 	    (avoid-nspace-gain 0.1)
 	    (avoid-weight-gain 1.0)
-	    (avoid-collision-gain 1.0)
+	    (avoid-collision-null-gain 1.0)
+	    (avoid-collision-joint-gain 0.3)
+	    (avoid-collision-nspace-distance 50)
+	    (avoid-collision-joint-distance 500)
 	    (tmp-len) (tmp-len2) (debug-view)
 	    &allow-other-keys)
    (let* ((len (length link-list))
@@ -527,7 +502,12 @@
 	  joint-angle-limit-nspace
 	  joint-angle-limit-weight
 	  joint-angle-limit-weight-old
-	  la sca)
+	  la dav dtheta 
+	  (nul-col (instantiate float-vector len))
+	  (dav-col (instantiate float-vector len)))
+     (when (or (null link-list) (null move-target))
+       (warn ";; ERROR: :link-list or :move-target required~%")
+       (return-from :move-joints-avoidance t))
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
      (unless (get self :joint-angle-limit-weight-old)
        (setf (get self :joint-angle-limit-weight-old) (make-hash-table)))
@@ -574,37 +554,182 @@
        (warn "nspace:")
        (dotimes (i  len) (warn "~7,3f " (elt la i))) (warn "~%"))
      ;;
-     (when (> avoid-collision-gain 0.0)
-       (when (and debug-view (not (memq :no-clear debug-view)) *viewer*)
-	 (send *viewer* :viewsurface :clear)
-	 (if (atom debug-view) (setq debug-view (list debug-view)))
+     (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
+     ;; avoiding self collision
+     (if (or (> avoid-collision-null-gain 0.0)
+	     (> avoid-collision-joint-gain 0.0))
+       (let* ((ret (send* self :collision-avoidance args))
+	      (collision-limit (min avoid-collision-joint-distance 
+				    (* 0.5 (norm vel-pos))))
+	      (pair-list (send self :collision-avoidance-link-pair))
+	      (pair-len (length pair-list)) pair 
+	      (col-args-list (send self :get :collision-avoidance-args-list))
+	      col-args
+	      (p-limit (cadr (memq :p-limit args)))
+	      (r-limit (cadr (memq :r-limit args)))
+	      col-link-list col-link-len col-scale 
+	      vel-col (vel-rot (float-vector 0 0 0)) 
+	      (tmp-vel-col (float-vector 0 0 0))
+	      (ddav-len 0)
+	      drag-coords np jacobi jacobi# nnul-col ddav-col)
+	 (dotimes (i pair-len)
+	   (setq vel-col (elt ret i)
+		 pair (elt pair-list i)
+		 np (elt (send self :get :collision-distance) i)
+		 col-link-list (send self :link-list (car pair) (car link-list))
+		 col-link-len (length col-link-list)
+		 )
+	   (if (> col-link-len (length col-args-list))
+	       (setq col-args-list
+		 (nconc col-args-list 
+			(make-list (- col-link-len
+				      (length col-args-list))))))
+	   (setq col-args (elt col-args-list (1- col-link-len)))
+	   (when np
+	     (when debug-view
+	       (warn "col   : ~6,2f ~A ~A~%" (car np) (send (car pair) :name) (send (cadr pair) :name)))
+	     (unless col-args
+	       (let* ((c col-link-len)
+		      (r 3) ;; :rotation-axis nil :translation-axis t
+		      (ret (make-matrix c r))
+		      (wmat (make-matrix c c))
+		      (tmat (make-matrix c r))
+		      (umat (make-matrix r r))
+		      (umat2 (make-matrix r r))
+		      (mat-tmp (make-matrix c r))
+		      (tmp-mcc (make-matrix c c))
+		      (tmp-mcc2 (make-matrix c c))
+		      (tmp-mrc (make-matrix r c))
+		      (tmp-mrr (make-matrix r r))
+		      (tmp-mrr2 (make-matrix r r))
+		      (fik (make-matrix r c))
+		      (tmp-v0 (instantiate float-vector 0))
+		      (tmp-v1 (instantiate float-vector 1))
+		      (tmp-v2 (instantiate float-vector 2))
+		      (tmp-v3 (instantiate float-vector 3))
+		      (tmp-v3a (instantiate float-vector 3))
+		      (tmp-v3b (instantiate float-vector 3))
+		      (tmp-v3c (instantiate float-vector 3))
+		      (tmp-m33 (make-matrix 3 3))
+		      (tmp-dim (instantiate float-vector r))
+		      (tmp-len (instantiate float-vector c))
+		      (tmp-len2 (instantiate float-vector c))
+		      (tmp-pos (instantiate float-vector 3))
+		      (tmp-rot (instantiate float-vector 3))
+		      )
+		 (setq col-args
+		   (list :ret ret :wmat wmat :tmat tmat :umat umat :umat2 umat2
+			 :mat-tmp mat-tmp :tmp-mcc tmp-mcc :tmp-mcc2 tmp-mcc2
+			 :tmp-mrc tmp-mrc :tmp-mrr tmp-mrr :tmp-mrr2 tmp-mrr2
+			 :fik fik :weight nil
+			 :tmp-v0 tmp-v0 :tmp-v1 tmp-v1
+			 :tmp-v2 tmp-v2 :tmp-v3 tmp-v3
+			 :tmp-v3a tmp-v3a :tmp-v3b tmp-v3b :tmp-v3c tmp-v3c
+			 :tmp-m33 tmp-m33
+			 :tmp-dim tmp-dim :tmp-len tmp-len :tmp-len2 tmp-len2
+			 :tmp-pos tmp-pos :tmp-rot tmp-rot
+			 ))
+		 (setf (elt col-args-list (1- col-link-len)) col-args)
+		 (send self :put :collision-avoidance-args-list col-args-list)
+		 ))
+	     (if (eq (car pair) (send move-target :parent))
+		 (progn
+		   (setq col-scale (* collision-limit (/ collision-limit (car np))))
+		   (setq vel-pos (v+ vel-pos (scale col-scale vel-col vel-col) vel-pos)))
+	       (progn
+		 (setq drag-coords (make-cascoords :pos (elt np 1)))
+		 (send (car pair) :assoc drag-coords)
+		 (setq col-link-list (send self :link-list (car pair) (car link-list)))
+		 (setq jacobi (send* self :calc-jacobian-from-link-list
+				     col-link-list :move-target drag-coords
+				     col-args))
+		 (setq jacobi# (send* self :calc-inverse-jacobian jacobi col-args))
+		 (when (> avoid-collision-null-gain 0.0)
+		   (setq col-scale (* avoid-collision-nspace-distance (/ avoid-collision-nspace-distance (car np))))
+		   (setq nnul-col
+		     (send* self :calc-joint-angle-speed
+			    (scale col-scale vel-col tmp-vel-col) vel-rot
+			    :link-list col-link-list
+			    :move-target drag-coords
+			    :jacobi jacobi :jacobi# jacobi#
+			    :p-limit p-limit :p-limit r-limit
+			    col-args
+			    ))
+		   (when debug-view
+		     (warn "nspace:")
+		     (dotimes (i col-link-len) (warn "~7,3f " (elt nnul-col i))) (warn "~%"))
 
-	 (push :no-clear debug-view))
-       (setq sca
-	 (scale avoid-collision-gain
-		(transform wmat
-			   (send* self :collision-avoidance link-list
-				  :dim nil
-				  :fik nil
-				  :ret nil
-				  :wmat nil :tmat nil :umat nil :umat2 nil :mat-tmp nil
-				  :tmp-mcc nil :tmp-mcc2 nil
-				  :tmp-mrc nil
-				  :tmp-v0 nil :tmp-v1 nil
-				  :tmp-v2 nil :tmp-v3 nil
-				  :tmp-v3a nil :tmp-v3b nil  :tmp-v3c nil
-				  :tmp-m33 nil
-				  :tmp-dim nil
-				  :tmp-len nil :tmp-len2 nil
-				  args))))
-       (setq la (v+ la sca la))
-       )
+		   (dotimes (i (length nnul-col))
+		     (setf (elt nul-col i) (+ (elt nul-col i) (elt nnul-col i))))
+		   )
+		 (when (> avoid-collision-joint-gain 0.0)
+		   (setq col-scale (* collision-limit (/ collision-limit (car np))))
+		   (setq ddav-col
+		     (send* self :calc-joint-angle-speed
+			    (scale col-scale vel-col tmp-vel-col) vel-rot
+			    :link-list col-link-list
+			    :move-target drag-coords
+			    :jacobi jacobi :jacobi# jacobi#
+			    :p-limit p-limit :p-limit r-limit
+			    col-args))
+		   (when debug-view
+		     (warn "joint :")
+		     (dotimes (i col-link-len) (warn "~7,3f " (elt ddav-col i))) (warn "~%"))
+
+		   (dotimes (i (length ddav-col))
+		     (setf (elt dav-col i) (+ (elt dav-col i) (elt ddav-col i))))
+		   )
+		 (incf ddav-len)
+		 )))
+	   )
+	 (if (> ddav-len 0)
+	     (setq dav-col (scale (/ 1.0 ddav-len) dav-col dav-col)
+		   nul-col (scale (/ 1.0 ddav-len) nul-col nul-col)))
+	 ))
      ;;
-     (send* self :move-joints vel-pos vel-rot
-		    :null-space (if null-space (v+ null-space la la) la)
-		    :debug-view debug-view
+     (when (> avoid-collision-null-gain 0)
+       (setq nul-col (scale avoid-collision-null-gain (transform wmat nul-col nul-col) nul-col))
+       (when debug-view
+	 (warn "nspace:")
+	 (dotimes (i len) (warn "~7,3f " (elt nul-col i))) (warn "~%")))
+
+     (send-message* self cascaded-link
+		    :move-joints vel-pos vel-rot
+		    :null-space (if null-space (v+ null-space (v+ la nul-col la) la) (v+ la nul-col la))
+		    :angle-speed (if (> avoid-collision-joint-gain 0) (scale avoid-collision-joint-gain (transform wmat dav-col dav-col) dav-col))
 		    :weight weight
 		    args)
+     ;;
+     ;; done
+     (when (and debug-view *viewer*)
+       (if (or (> avoid-collision-null-gain 0.0)
+	       (> avoid-collision-joint-gain 0.0))
+	 (let ((pwidth (send *viewer* :viewsurface :line-width))
+	       (psize (send *viewer* :viewsurface :point-size))
+	       (pcolor (send *viewer* :viewsurface :color))
+	       (pair-list (send self :collision-avoidance-link-pair))
+	       np)
+	   (send *viewer* :viewsurface :point-size 5)
+	   (send *viewer* :viewsurface :line-width 1)
+	   (send *viewer* :viewsurface :color #f(1 0 0))
+	   (dotimes (i (length pair-list))
+	     (setq np (elt (send self :get :collision-distance) i))
+	     (unless np (return))
+	     (if (<= (car np) -1.0)
+		 (dolist (obj (elt pair-list i))
+		   (dolist (e (cdr (send obj :edges)))
+		     (send *viewer* :viewsurface :3d-line
+			   (e . pvert) (e . nvert) :depth-test t))))
+	     (send *viewer* :viewsurface :3d-line (elt np 1)(elt np 2) :depth-test t)
+	     (send *viewer* :viewsurface :3d-point (elt np 1) :depth-test t)
+	     (send *viewer* :viewsurface :3d-point (elt np 2) :depth-test t))
+	   (send *viewer* :viewsurface :line-width pwidth)
+	   (send *viewer* :viewsurface :point-size psize)
+	   (send *viewer* :viewsurface :color pcolor)
+	   ))
+       (if (not (memq :no-flush debug-view))
+	   (send *viewer* :viewsurface :flush))
+       )
      ))
   (:inverse-kinematics
    (target-coords &rest args 
@@ -622,6 +747,8 @@
 	  ;;
 	  (c (length link-list))
 	  (r (send self :calc-target-axis-dimension rotation-axis translation-axis))
+	  (a (max c r))
+	  (b (min c r))
 	  (ret (make-matrix c r))
 	  (wmat (make-matrix c c))
 	  (tmat (make-matrix c r))
@@ -852,7 +979,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.14  2009-03-05 10:45:13  k-okada
+;;; Revision 1.15  2009-03-07 01:53:00  k-okada
+;;; update (:collision-avoidance, (:move-joints-avoidance
+;;;
+;;; Revision 1.14  2009/03/05 10:45:13  k-okada
 ;;; fix wmat, umat, support when min/max-angle is *inf*
 ;;;
 ;;; Revision 1.13  2009/03/02 12:16:47  k-okada
