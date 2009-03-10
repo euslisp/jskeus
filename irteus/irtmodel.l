@@ -457,6 +457,7 @@
     &key
     link-list
     move-target
+    angle-speed
     (debug-view nil)
     &allow-other-keys)
    (let (dav dtheta)
@@ -465,6 +466,7 @@
 	 (send *viewer* :viewsurface :clear))
 
      (setq dav (send* self :calc-joint-angle-speed vel-pos vel-rot args))
+     (if angle-speed (v+ dav angle-speed dav))
 
      ;; update body
      (dotimes (i (length link-list))
@@ -979,7 +981,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.15  2009-03-07 01:53:00  k-okada
+;;; Revision 1.16  2009-03-10 09:58:59  k-okada
+;;; add :angle-speed keyword to :move-joints
+;;;
+;;; Revision 1.15  2009/03/07 01:53:00  k-okada
 ;;; update (:collision-avoidance, (:move-joints-avoidance
 ;;;
 ;;; Revision 1.14  2009/03/05 10:45:13  k-okada
