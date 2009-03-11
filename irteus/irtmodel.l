@@ -291,7 +291,7 @@
 	  ;(setq pos-r (scale 0.001 pos-r pos-r));; scale [mm] -> [m]
 	  (setq pos-r (calc-dif-with-axis tmp-v3 translation-axis tmp-v0 tmp-v1 tmp-v2))
 	  (dotimes (j (length pos-r)) (setf (aref fik j i) (elt pos-r j)))
-	  (setq pos-i (calc-dif-with-axis #f(0 0 0) rotation-axis tmp-v0 tmp-v2))
+	  (setq pos-i (calc-dif-with-axis #f(0 0 0) rotation-axis tmp-v0 tmp-v1 tmp-v2))
 	  (dotimes (j (length pos-i)) (setf (aref fik (+ j (length pos-r)) i) (elt pos-i j)))
 	  )
 	 (t
@@ -303,7 +303,7 @@
 	  (setq pos-r (v* tmp-v3 pos-i tmp-v3b))
 	  (setq pos-r (calc-dif-with-axis pos-r translation-axis tmp-v0 tmp-v1 tmp-v2))
 	  (dotimes (j (length pos-r)) (setf (aref fik j i) (elt pos-r j)))
-	  (setq pos-i (calc-dif-with-axis tmp-v3 rotation-axis tmp-v0 tmp-v2))
+	  (setq pos-i (calc-dif-with-axis tmp-v3 rotation-axis tmp-v0 tmp-v1 tmp-v2))
 	  (dotimes (j (length pos-i)) (setf (aref fik (+ j (length pos-r)) i) (elt pos-i j)))
 	  ))
 	;;
@@ -379,7 +379,7 @@
 		      (send move-target :inverse-transform-vector #f(0 0 0)
 			    tmp-v3a tmp-v3b tmp-m33) tmp-v3)
 		  rotation-axis
-		  tmp-v0 tmp-v2))
+		  tmp-v0 tmp-v1 tmp-v2))
      (dotimes (i (length vel-r)) (setf (elt tmp-dim (+ i (length vel-p))) (elt vel-r i)))
      
      (if (null tmp-len) (setq tmp-len (instantiate float-vector len)))
@@ -965,7 +965,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.19  2009-03-11 16:32:49  k-okada
+;;; Revision 1.20  2009-03-11 16:37:03  k-okada
+;;; integrate calc-dif-with-{translation,rotation}-axis to calc-dif-with-axis
+;;;
+;;; Revision 1.19  2009/03/11 16:32:49  k-okada
 ;;; integrate calc-dif-with-{translation,rotation}-axis to calc-dif-with-axis
 ;;;
 ;;; Revision 1.18  2009/03/11 13:07:03  k-okada
