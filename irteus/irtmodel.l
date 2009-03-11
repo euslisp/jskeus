@@ -859,8 +859,8 @@
      ))
   )
 
-(defun calc-dif-with-axis (dif translation-axis &optional tmp-v0 tmp-v1 tmp-v2)
-  (case translation-axis
+(defun calc-dif-with-axis (dif axis &optional tmp-v0 tmp-v1 tmp-v2)
+  (case axis
 	(:x (if tmp-v2 
 		(progn
 		  (setf (elt tmp-v2 0) (elt dif 1) (elt tmp-v2 1) (elt dif 2))
@@ -965,7 +965,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.18  2009-03-11 13:07:03  k-okada
+;;; Revision 1.19  2009-03-11 16:32:49  k-okada
+;;; integrate calc-dif-with-{translation,rotation}-axis to calc-dif-with-axis
+;;;
+;;; Revision 1.18  2009/03/11 13:07:03  k-okada
 ;;; integrate calc-dif-with-{translation,rotation}-axis to calc-dif-with-axis
 ;;;
 ;;; Revision 1.17  2009/03/11 12:59:30  k-okada
