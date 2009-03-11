@@ -504,7 +504,8 @@
 	  joint-angle-limit-nspace
 	  joint-angle-limit-weight
 	  joint-angle-limit-weight-old
-	  la dav dtheta 
+	  dav dtheta 
+	  (la (instantiate float-vector len))
 	  (nul-col (instantiate float-vector len))
 	  (dav-col (instantiate float-vector len)))
      (when (or (null link-list) (null move-target))
@@ -523,38 +524,41 @@
      (if (null tmp-len) (setq tmp-len (instantiate float-vector len)))
      (if (null tmp-len2) (setq tmp-len2 (instantiate float-vector len)))
 
-     ;; weighting joint angle weight : W(dH/dq)
-     (setq joint-angle-limit-weight 
-       (scale avoid-weight-gain
-	      (joint-angle-limit-weight (send-all link-list :joint) tmp-len) tmp-len))
      (when debug-view
        (warn "angle :")
-       (dolist (j (send-all link-list :joint)) (warn "~7,1f " (send j :joint-angle))) (warn "~%")
-       (warn "cost  :")
-       (dotimes (i len) (warn "~7,3f " (elt joint-angle-limit-weight i))) (warn "~%")
-       )
-     (dotimes (i len)
-       (setf (elt weight i)
-	     (* (elt weight i) 
-		(if (> (elt joint-angle-limit-weight i)
-		       (elt joint-angle-limit-weight-old i))
-		    (/ 1.0 (+ 1.0 (elt joint-angle-limit-weight i)))
-		  1.0))))
-     (dotimes (i len) (setf (elt joint-angle-limit-weight-old i)
-			    (elt joint-angle-limit-weight i)))
-     (dotimes (i len) (setf (aref wmat i i) (aref weight i)))
-     (when debug-view
-       (warn "weight:")
-       (dotimes (i  len) (warn "~7,3f " (elt weight i))) (warn "~%"))
+       (dolist (j (send-all link-list :joint)) (warn "~7,1f " (send j :joint-angle))(warn "~%")))
+     ;; weighting joint angle weight : W(dH/dq)
+     (when (> avoid-weight-gain 0)
+       (setq joint-angle-limit-weight 
+	 (scale avoid-weight-gain
+		(joint-angle-limit-weight (send-all link-list :joint) tmp-len) tmp-len))
+       (when debug-view
+	 (warn "cost  :")
+	 (dotimes (i len) (warn "~7,3f " (elt joint-angle-limit-weight i))) (warn "~%"))
+       
+       (dotimes (i len)
+	 (setf (elt weight i)
+	       (* (elt weight i) 
+		  (if (> (elt joint-angle-limit-weight i)
+			 (elt joint-angle-limit-weight-old i))
+		      (/ 1.0 (+ 1.0 (elt joint-angle-limit-weight i)))
+		    1.0))))
+       (dotimes (i len) (setf (elt joint-angle-limit-weight-old i)
+			      (elt joint-angle-limit-weight i)))
+       (dotimes (i len) (setf (aref wmat i i) (aref weight i)))
+       (when debug-view
+	 (warn "weight:")
+	 (dotimes (i  len) (warn "~7,3f " (elt weight i))) (warn "~%")))
 
      ;; avoiding joint angle limit : a * W(dH/dq)
-     (setq joint-angle-limit-nspace (joint-angle-limit-nspace (send-all link-list :joint) tmp-len2))
-     (setq la
-       (scale avoid-nspace-gain
-	      (transform wmat joint-angle-limit-nspace tmp-len2) tmp-len2))
-     (when debug-view
-       (warn "nspace:")
-       (dotimes (i  len) (warn "~7,3f " (elt la i))) (warn "~%"))
+     (when (> avoid-nspace-gain 0)
+       (setq joint-angle-limit-nspace (joint-angle-limit-nspace (send-all link-list :joint) tmp-len2))
+       (setq la
+	 (scale avoid-nspace-gain
+		(transform wmat joint-angle-limit-nspace tmp-len2) tmp-len2))
+       (when debug-view
+	 (warn "nspace:")
+	 (dotimes (i  len) (warn "~7,3f " (elt la i))) (warn "~%")))
      ;;
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
      ;; avoiding self collision
@@ -981,7 +985,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.16  2009-03-10 09:58:59  k-okada
+;;; Revision 1.17  2009-03-11 12:59:30  k-okada
+;;; do not calculate weight when avoid-weight-gain and avoid-nspace-gain
+;;;
+;;; Revision 1.16  2009/03/10 09:58:59  k-okada
 ;;; add :angle-speed keyword to :move-joints
 ;;;
 ;;; Revision 1.15  2009/03/07 01:53:00  k-okada
