@@ -204,11 +204,11 @@
   (:calc-target-axis-dimension
    (rotation-axis translation-axis)
    (let ((dim 6))
-     (case translation-axis
-	   ((:x :y :z) (decf dim 1))
-	   ((:xy :yx :yz :zy :zx :zy) (decf dim 2))
-	   (nil (decf dim 3)))
-     (case rotation-axis ((:x :y :z) (decf dim 1)) (nil (decf dim 3)))
+     (dolist (axis (list translation-axis rotation-axis))
+       (case axis
+	     ((:x :y :z) (decf dim 1))
+	     ((:xy :yx :yz :zy :zx :zy) (decf dim 2))
+	     (nil (decf dim 3))))
      dim))
   (:calc-inverse-jacobian
    (jacobi &rest args
@@ -289,9 +289,9 @@
 	(cond 
 	 ((derivedp j linear-joint)
 	  ;(setq pos-r (scale 0.001 pos-r pos-r));; scale [mm] -> [m]
-	  (setq pos-r (calc-dif-with-translation-axis tmp-v3 translation-axis tmp-v0 tmp-v1 tmp-v2))
+	  (setq pos-r (calc-dif-with-axis tmp-v3 translation-axis tmp-v0 tmp-v1 tmp-v2))
 	  (dotimes (j (length pos-r)) (setf (aref fik j i) (elt pos-r j)))
-	  (setq pos-i (calc-dif-with-rotation-axis #f(0 0 0) rotation-axis tmp-v0 tmp-v2))
+	  (setq pos-i (calc-dif-with-axis #f(0 0 0) rotation-axis tmp-v0 tmp-v2))
 	  (dotimes (j (length pos-i)) (setf (aref fik (+ j (length pos-r)) i) (elt pos-i j)))
 	  )
 	 (t
@@ -301,9 +301,9 @@
 	  (setq pos-i (scale 0.001 pos-i pos-i));; scale [mm] -> [m]
 
 	  (setq pos-r (v* tmp-v3 pos-i tmp-v3b))
-	  (setq pos-r (calc-dif-with-translation-axis pos-r translation-axis tmp-v0 tmp-v1 tmp-v2))
+	  (setq pos-r (calc-dif-with-axis pos-r translation-axis tmp-v0 tmp-v1 tmp-v2))
 	  (dotimes (j (length pos-r)) (setf (aref fik j i) (elt pos-r j)))
-	  (setq pos-i (calc-dif-with-rotation-axis tmp-v3 rotation-axis tmp-v0 tmp-v2))
+	  (setq pos-i (calc-dif-with-axis tmp-v3 rotation-axis tmp-v0 tmp-v2))
 	  (dotimes (j (length pos-i)) (setf (aref fik (+ j (length pos-r)) i) (elt pos-i j)))
 	  ))
 	;;
@@ -364,7 +364,7 @@
      (if (null tmp-dim)
 	 (setq tmp-dim (instantiate float-vector (send self :calc-target-axis-dimension rotation-axis translation-axis))))
 
-     (setq vel-p (calc-dif-with-translation-axis
+     (setq vel-p (calc-dif-with-axis
 		  (v- (send move-target :inverse-transform-vector vel-pos
 			    tmp-v3 tmp-v3b tmp-m33)
 		      (send move-target :inverse-transform-vector #f(0 0 0)
@@ -373,7 +373,7 @@
 		  tmp-v0 tmp-v1 tmp-v2))
      (dotimes (i (length vel-p)) (setf (elt tmp-dim i) (elt vel-p i)))
 
-     (setq vel-r (calc-dif-with-rotation-axis
+     (setq vel-r (calc-dif-with-axis
 		  (v- (send move-target :inverse-transform-vector vel-rot 
 			    tmp-v3 tmp-v3b tmp-m33)
 		      (send move-target :inverse-transform-vector #f(0 0 0)
@@ -832,11 +832,11 @@
      ;; update difference
      (setq dif-pos (send move-target :difference-position target-coords)
 	   dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
-     (setq dif-pos (calc-dif-with-translation-axis
+     (setq dif-pos (calc-dif-with-axis
 		    (v- (send move-target :inverse-transform-vector dif-pos)
 			(send move-target :inverse-transform-vector (float-vector 0 0 0)))
 		    translation-axis))
-     (setq dif-rot (calc-dif-with-rotation-axis
+     (setq dif-rot (calc-dif-with-axis
 		    (v- (send move-target :inverse-transform-vector dif-rot)
 			(send move-target :inverse-transform-vector (float-vector 0 0 0)))
 		    rotation-axis))
@@ -859,7 +859,7 @@
      ))
   )
 
-(defun calc-dif-with-translation-axis (dif translation-axis &optional tmp-v0 tmp-v1 tmp-v2)
+(defun calc-dif-with-axis (dif translation-axis &optional tmp-v0 tmp-v1 tmp-v2)
   (case translation-axis
 	(:x (if tmp-v2 
 		(progn
@@ -894,26 +894,6 @@
 	       (setf (elt tmp-v1 0) (elt dif 1))
 	       tmp-v1)
 	   (float-vector (elt dif 1))))
-	(nil (if tmp-v0 tmp-v0 (float-vector)))
-	(t dif)))
-
-(defun calc-dif-with-rotation-axis (dif rotation-axis &optional tmp-v0 tmp-v2)
-  (case rotation-axis
-	(:x (if tmp-v2
-		(progn
-		  (setf (elt tmp-v2 0) (elt dif 1) (elt tmp-v2 1) (elt dif 2))
-		  tmp-v2)
-		(float-vector (elt dif 1) (elt dif 2))))
-	(:y (if tmp-v2
-		(progn
-		  (setf (elt tmp-v2 0) (elt dif 0) (elt tmp-v2 1) (elt dif 2))
-		  tmp-v2)
-	      (float-vector (elt dif 0) (elt dif 2))))
-	(:z (if tmp-v2
-		(progn
-		  (setf (elt tmp-v2 0) (elt dif 0) (elt tmp-v2 1) (elt dif 1))
-		  tmp-v2)
-	      (float-vector (elt dif 0) (elt dif 1))))
 	(nil (if tmp-v0 tmp-v0 (float-vector)))
 	(t dif)))
 
@@ -985,7 +965,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.17  2009-03-11 12:59:30  k-okada
+;;; Revision 1.18  2009-03-11 13:07:03  k-okada
+;;; integrate calc-dif-with-{translation,rotation}-axis to calc-dif-with-axis
+;;;
+;;; Revision 1.17  2009/03/11 12:59:30  k-okada
 ;;; do not calculate weight when avoid-weight-gain and avoid-nspace-gain
 ;;;
 ;;; Revision 1.16  2009/03/10 09:58:59  k-okada
