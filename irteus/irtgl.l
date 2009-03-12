@@ -30,7 +30,11 @@
 (let (glu-lib)
 #+:cygwin
   (progn
-    (setq glu-lib ( load-foreign "/usr/X11R6/bin/cygGLU-1.dll")))
+    (cond
+     ((probe-file "/usr/bin/cygGLU-1.dll")
+      (setq glu-lib ( load-foreign "/usr/bin/cygGLU-1.dll")))
+     (t
+      (setq glu-lib ( load-foreign "/usr/X11R6/bin/cygGLU-1.dll")))))
 #+:linux 
   (progn
     (setq glu-lib
@@ -401,7 +405,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.5  2009-02-17 02:04:48  k-okada
+;;; Revision 1.6  2009-03-12 13:43:02  k-okada
+;;; fix for new cygwin/X
+;;;
+;;; Revision 1.5  2009/02/17 02:04:48  k-okada
 ;;; fix typo on copyright
 ;;;
 ;;; Revision 1.4  2009/01/06 13:18:23  k-okada

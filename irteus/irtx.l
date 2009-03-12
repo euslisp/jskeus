@@ -53,7 +53,9 @@
 
 (let (x-lib pname)
 #+:cygwin
-  (setq pname "/usr/X11R6/bin/cygX11-6.dll")
+  (if (probe-file "/usr/bin/cygX11-6.dll")
+      (setq pname "/usr/bin/cygX11-6.dll")
+    (setq pname "/usr/X11R6/bin/cygX11-6.dll"))
 #+:linux 
   (if (probe-file "/usr/X11R6/lib/libX11.so")
       (setq pname "/usr/X11R6/lib/libX11.so")
@@ -250,7 +252,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.3  2009-02-17 02:04:48  k-okada
+;;; Revision 1.4  2009-03-12 13:43:02  k-okada
+;;; fix for new cygwin/X
+;;;
+;;; Revision 1.3  2009/02/17 02:04:48  k-okada
 ;;; fix typo on copyright
 ;;;
 ;;; Revision 1.2  2009/01/06 13:18:23  k-okada
