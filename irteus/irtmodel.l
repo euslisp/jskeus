@@ -526,7 +526,7 @@
 
      (when debug-view
        (warn "angle :")
-       (dolist (j (send-all link-list :joint)) (warn "~7,1f " (send j :joint-angle))(warn "~%")))
+       (dolist (j (send-all link-list :joint)) (warn "~7,1f " (send j :joint-angle)))(warn "~%"))
      ;; weighting joint angle weight : W(dH/dq)
      (when (> avoid-weight-gain 0)
        (setq joint-angle-limit-weight 
@@ -965,7 +965,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.20  2009-03-11 16:37:03  k-okada
+;;; Revision 1.21  2009-03-23 08:40:04  k-okada
+;;; fix debug-view angle: display format error
+;;;
+;;; Revision 1.20  2009/03/11 16:37:03  k-okada
 ;;; integrate calc-dif-with-{translation,rotation}-axis to calc-dif-with-axis
 ;;;
 ;;; Revision 1.19  2009/03/11 16:32:49  k-okada
