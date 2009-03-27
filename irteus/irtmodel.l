@@ -407,12 +407,12 @@
        ;; add null space
        (v+ J#x (transform I-J#J null-space tmp-len2) J#x))
      J#x))
-  (:collision-avoidance-link-pair () collision-avoidance-link-pair)
+  (:collision-avoidance-link-pair (&rest args) collision-avoidance-link-pair)
   (:collision-avoidance
    (&rest args
 	  &key link-list (warnp t)
 	  &allow-other-keys)
-   (let* ((pair-list (send self :collision-avoidance-link-pair))
+   (let* ((pair-list (send* self :collision-avoidance-link-pair args))
 	  (pair-len (length pair-list))
 	  (ret (make-list pair-len))
 	  (col-list (send self :get :collision-distance))
@@ -420,7 +420,7 @@
 	  (sc 0.0) np collidep pair)
      (dotimes (i pair-len) (setf (elt ret i) (float-vector 0 0 0)))
      (when (or (null link-list) (= pair-len 0))
-       (print (send self :collision-avoidance-link-pair))
+       (print (send* self :collision-avoidance-link-pair args))
        (warn ";; ERROR: :link-list ~A / pair-len ~A required~%" link-list pair-len)
        (return-from :collision-avoidance ret))
      (if (or (null col-list) (/= (length col-list) pair-len))
@@ -965,7 +965,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.21  2009-03-23 08:40:04  k-okada
+;;; Revision 1.22  2009-03-27 20:19:35  nozawa
+;;; add argument(args) to :collision-avoidance-link-pair
+;;;
+;;; Revision 1.21  2009/03/23 08:40:04  k-okada
 ;;; fix debug-view angle: display format error
 ;;;
 ;;; Revision 1.20  2009/03/11 16:37:03  k-okada
