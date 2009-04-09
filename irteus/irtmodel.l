@@ -59,15 +59,16 @@
 	 self)
   (:joint-angle
    (&optional v &key relative)
-   (let (relang)
+   (let ()
      (when v
        (if relative (setq v (+ v joint-angle)))
        (when (>= v max-angle)
 	 (setq v max-angle))
        (when (<= v min-angle)
 	 (setq v min-angle))
-       (setq relang (- v joint-angle) joint-angle v)
-       (send child-link :rotate (deg2rad relang) axis))
+       (setq joint-angle v)
+       (send child-link :replace-coords (send child-link :default-coords))
+       (send child-link :rotate (deg2rad joint-angle) axis))
      joint-angle))
   )
 
@@ -91,21 +92,22 @@
 	 self)
   (:joint-angle
    (&optional v &key relative)
-   (let (relang)
+   (let ()
      (when v
        (if relative (setq v (+ v joint-angle)))
        (when (>= v max-angle)
 	 (setq v max-angle))
        (when (<= v min-angle)
 	 (setq v min-angle))
-       (setq relang (- v joint-angle) joint-angle v)
-       (send child-link :translate (scale relang axis)))
+       (setq joint-angle v)
+       (send child-link :replace-coords (send child-link :default-coords))
+       (send child-link :translate (scale joint-angle axis)))
      joint-angle))
   )
 
 (defclass bodyset-link
   :super bodyset
-  :slots (joint parent-link child-links analysis-level))
+  :slots (joint parent-link child-links analysis-level default-coords))
 (defmethod bodyset-link
   (:init 
    (coords
@@ -136,6 +138,8 @@
 
   (:del-child-link  (l) (setq child-links (delete l child-links)))
   (:del-parent-link ()  (setq parent-link nil))
+
+  (:default-coords (&optional c) (if c (setq default-coords c)) default-coords)
   )
 
 (defclass cascaded-link
@@ -152,6 +156,8 @@
   (:init-ending
    ()
    (setq bodies (flatten (send-all links :bodies)))
+   (dolist (l links)
+     (send l :default-coords (send l :coords)))
    (dolist (j joint-list)
      (send (send j :child-link) :add-joint j)
      (send (send j :child-link) :add-parent-link (send j :parent-link))
@@ -965,7 +971,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.22  2009-03-27 20:19:35  nozawa
+;;; Revision 1.23  2009-04-09 08:52:17  k-okada
+;;; add default-coords to bodyset-link, use default-coords in :joint-angle of linear-joint and rotational-joint
+;;;
+;;; Revision 1.22  2009/03/27 20:19:35  nozawa
 ;;; add argument(args) to :collision-avoidance-link-pair
 ;;;
 ;;; Revision 1.21  2009/03/23 08:40:04  k-okada
