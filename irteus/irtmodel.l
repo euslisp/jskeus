@@ -29,7 +29,7 @@
 
 (defclass joint
   :super propertied-object
-  :slots (parent-link child-link joint-angle min-angle max-angle))
+  :slots (parent-link child-link joint-angle min-angle max-angle default-coords))
 
 (defmethod joint
   (:init (&key (name :joint) ((:child-link clink)) ((:parent-link plink))
@@ -37,6 +37,7 @@
 	 (send self :name name)
 	 (setq parent-link plink child-link clink
 	       min-angle min max-angle max)
+	 (setq default-coords (send child-link :copy-coords))
 	 self)
   (:min-angle (&optional v) (if v (setq min-angle v)) min-angle)
   (:max-angle (&optional v) (if v (setq max-angle v)) max-angle)
@@ -67,7 +68,7 @@
        (when (<= v min-angle)
 	 (setq v min-angle))
        (setq joint-angle v)
-       (send child-link :replace-coords (send child-link :default-coords))
+       (send child-link :replace-coords default-coords)
        (send child-link :rotate (deg2rad joint-angle) axis))
      joint-angle))
   )
@@ -100,7 +101,7 @@
        (when (<= v min-angle)
 	 (setq v min-angle))
        (setq joint-angle v)
-       (send child-link :replace-coords (send child-link :default-coords))
+       (send child-link :replace-coords default-coords)
        (send child-link :translate (scale joint-angle axis)))
      joint-angle))
   )
@@ -156,8 +157,6 @@
   (:init-ending
    ()
    (setq bodies (flatten (send-all links :bodies)))
-   (dolist (l links)
-     (send l :default-coords (send l :coords)))
    (dolist (j joint-list)
      (send (send j :child-link) :add-joint j)
      (send (send j :child-link) :add-parent-link (send j :parent-link))
@@ -971,7 +970,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.23  2009-04-09 08:52:17  k-okada
+;;; Revision 1.24  2009-04-23 02:12:39  k-okada
+;;; add default-coords to slot of joint class
+;;;
+;;; Revision 1.23  2009/04/09 08:52:17  k-okada
 ;;; add default-coords to bodyset-link, use default-coords in :joint-angle of linear-joint and rotational-joint
 ;;;
 ;;; Revision 1.22  2009/03/27 20:19:35  nozawa
