@@ -377,6 +377,16 @@
        (make-cascoords :pos (float-vector 47 25 (+ 55 20))))
      (send b22 :assoc thumb-end-coords)
      ;;
+     (send self :assoc b0)
+     (send b0 :assoc b00)
+     (send b00 :assoc b01)
+     (send b0 :assoc b10)
+     (send b10 :assoc b11)
+     (send b0 :assoc b20)
+     (send b20 :assoc b21)
+     (send b21 :assoc b22)
+     (send b00 :rotate 0.14889 :x)
+
      (setq j00 (instance rotational-joint :init :name :j00
 			 :child-link b00 :parent-link b0 :axis :y
 			 :min 00 :max 120))
@@ -398,17 +408,7 @@
      (setq j22 (instance rotational-joint :init :name :j11
 			 :child-link b22 :parent-link b21 :axis :y
 			 :min 0 :max 120))
-     (send self :assoc b0)
-     (send b0 :assoc b00)
-     (send b00 :assoc b01)
-     (send b0 :assoc b10)
-     (send b10 :assoc b11)
-     (send b0 :assoc b20)
-     (send b20 :assoc b21)
-     (send b21 :assoc b22)
      
-     (send b00 :rotate 0.14889 :x)
-
      ;;
      (setq links (list b0 b00 b01 b10 b11 b20 b21 b22))
      (setq joint-list (list j00 j01 j10 j11 j20 j21 j22))
