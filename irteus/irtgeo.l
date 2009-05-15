@@ -258,6 +258,7 @@
      (dolist (b bodies) (send b :worldcoords)))
    worldcoords)
   (:draw-on (&rest args) (dolist (b bodies) (send* b :draw-on args)))
+  (:box () (bounding-box-union (send-all (send self :bodies) :box)))
   )
 
 (defun face-to-triangle-aux (f)
@@ -305,7 +306,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.4  2009-02-17 02:04:48  k-okada
+;;; Revision 1.5  2009-05-15 01:02:27  nozawa
+;;; add :box to bodyset
+;;;
+;;; Revision 1.4  2009/02/17 02:04:48  k-okada
 ;;; fix typo on copyright
 ;;;
 ;;; Revision 1.3  2009/01/05 03:48:31  k-okada
