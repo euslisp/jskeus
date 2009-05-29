@@ -212,7 +212,7 @@
      (dolist (axis (list translation-axis rotation-axis))
        (case axis
 	     ((:x :y :z) (decf dim 1))
-	     ((:xy :yx :yz :zy :zx :zy) (decf dim 2))
+	     ((:xy :yx :yz :zy :zx :xz) (decf dim 2))
 	     (nil (decf dim 3))))
      dim))
   (:calc-inverse-jacobian
@@ -970,7 +970,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.24  2009-04-23 02:12:39  k-okada
+;;; Revision 1.25  2009-05-29 06:23:56  nozawa
+;;; fix typo
+;;;
+;;; Revision 1.24  2009/04/23 02:12:39  k-okada
 ;;; add default-coords to slot of joint class
 ;;;
 ;;; Revision 1.23  2009/04/09 08:52:17  k-okada
