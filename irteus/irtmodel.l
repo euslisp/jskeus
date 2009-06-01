@@ -106,6 +106,60 @@
      joint-angle))
   )
 
+(defclass omniwheel-joint
+  :super joint
+  :slots (axis))
+
+(defmethod omniwheel-joint
+  (:init (&rest args &key &allow-other-keys)
+	 (setq joint-angle #f(0 0 0))
+	 (setq axis :z)
+	 (send-super* :init args)
+	 ;; set default value
+	 self)
+  (:joint-angle
+   (&optional v &key relative)
+   (let (relang relx rely)
+     (unless relative
+       (warn "wheel-joint does not support non-relative mode??~%")
+       (return-from :joint-angle joint-angle))
+     (when v
+       (if relative (setq v (v+ v joint-angle)))
+       (setq relx   (- (elt v 0) (elt joint-angle 0))
+	     rely   (- (elt v 1) (elt joint-angle 1))
+	     relang (- (elt v 2) (elt joint-angle 2))
+	     joint-angle v)
+       (send child-link :translate (float-vector relx rely 0))
+       (send child-link :rotate (deg2rad relang) :z))
+     joint-angle
+     ))
+  )
+
+(defclass wheel-joint
+  :super joint
+  :slots (axis))
+
+(defmethod wheel-joint
+  (:init (&rest args &key &allow-other-keys)
+	 (setq joint-angle #f(0 0 0))
+	 (setq axis :z)
+	 (send-super* :init args)
+	 ;; set default value
+	 self)
+  (:joint-angle
+   (&optional v &key relative)
+   (let (relvel relang)
+     (unless relative
+       (warn "wheel-joint does not support non-relative mode??~%")
+       (return-from :joint-angle joint-angle))
+     (when v
+       (setq relvel (elt v 0) relang (elt v 1))
+       (send child-link :translate (float-vector relvel 0 0))
+       (send child-link :rotate (deg2rad relang) :z)
+       )
+     joint-angle))
+  )
+
 (defclass bodyset-link
   :super bodyset
   :slots (joint parent-link child-links analysis-level default-coords))
@@ -215,6 +269,16 @@
 	     ((:xy :yx :yz :zy :zx :xz) (decf dim 2))
 	     (nil (decf dim 3))))
      dim))
+  (:calc-target-joint-dimension
+   (link-list)
+   (let ((n 0))
+     (dolist (j (send-all link-list :joint))
+       (cond 
+	((derivedp j wheel-joint)
+	 (incf n 2))
+	((derivedp j omniwheel-joint)
+	 (incf n 3))
+	(t (incf n)))) n))
   (:calc-inverse-jacobian
    (jacobi &rest args
     &key
@@ -251,10 +315,84 @@
 	     (/ (- (elt mid-range-list i) (elt angle-list i))
 		(elt angle-range-list i))))
      res))
+  (:calc-jacobian-child-rotate-vector
+   (paxis child-link move-target tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+   (setq tmp-v3 (normalize-vector (send child-link :rotate-vector paxis tmp-v3) tmp-v3))
+   (setq tmp-v3
+     (v- (send move-target :inverse-transform-vector tmp-v3 tmp-v3 tmp-v3b tmp-m33)
+	 (send move-target :inverse-transform-vector #f(0 0 0) tmp-v3a tmp-v3b tmp-m33)  tmp-v3))
+   tmp-v3)
+  (:calc-jacobian-linear-joint
+   (fik i joint paxis child-link child-reverse
+	move-target rotation-axis translation-axis
+	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+   (let ()
+     (setq tmp-v3 (send self :calc-jacobian-child-rotate-vector
+			paxis child-link move-target tmp-v3 tmp-v3a tmp-v3b tmp-m33))
+
+     (setq pos-r (calc-dif-with-axis tmp-v3 translation-axis tmp-v0 tmp-v1 tmp-v2))
+     ;;(setq pos-r (scale 0.001 pos-r pos-r));; scale [mm] -> [m]
+     (dotimes (j (length pos-r)) (setf (aref fik j i) (elt pos-r j)))
+     (setq pos-i (calc-dif-with-axis #f(0 0 0) rotation-axis tmp-v0 tmp-v1 tmp-v2))
+     (dotimes (j (length pos-i)) (setf (aref fik (+ j (length pos-r)) i) (elt pos-i j)))
+     ))
+  (:calc-jacobian-rotational-joint
+   (fik i joint paxis child-link child-reverse
+	move-target rotation-axis translation-axis
+	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+   (let ()
+     (setq tmp-v3 (send self :calc-jacobian-child-rotate-vector
+			paxis child-link move-target tmp-v3 tmp-v3a tmp-v3b tmp-m33))
+
+     (setq pos-i (scale (if child-reverse 1 -1)
+			(send move-target :inverse-transform-vector
+			      (send child-link :worldpos) tmp-v3a tmp-v3b tmp-m33) tmp-v3a))
+     (setq pos-i (scale 0.001 pos-i pos-i));; scale [mm] -> [m]
+     
+     (setq pos-r (v* tmp-v3 pos-i tmp-v3b))
+     (setq pos-r (calc-dif-with-axis pos-r translation-axis tmp-v0 tmp-v1 tmp-v2))
+     (dotimes (j (length pos-r)) (setf (aref fik j i) (elt pos-r j)))
+     (setq pos-i (calc-dif-with-axis tmp-v3 rotation-axis tmp-v0 tmp-v1 tmp-v2))
+     (dotimes (j (length pos-i)) (setf (aref fik (+ j (length pos-r)) i) (elt pos-i j)))
+     ))
+  (:calc-jacobian-omniwheel-joint
+   (fik i joint paxis child-link child-reverse
+	move-target rotation-axis translation-axis
+	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+   (let ()
+     (send self :calc-jacobian-linear-joint
+	   fik i joint #f(1 0 0) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+     (send self :calc-jacobian-linear-joint
+	   fik (+ i 1) joint #f(0 1 0) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+     (send self :calc-jacobian-rotational-joint
+	   fik (+ i 2) joint #f(0 0 1) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+     ))
+  (:calc-jacobian-wheel-joint
+   (fik i joint paxis child-link child-reverse
+	move-target rotation-axis translation-axis
+	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+   (let ()
+     (send self :calc-jacobian-linear-joint
+	   fik i joint #f(1 0 0) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+     (send self :calc-jacobian-rotational-joint
+	   fik (+ i 1) joint #f(0 0 1) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+     ;;(setf (aref fik 2 1) 0)
+     ))
   (:calc-jacobian-from-link-list
    (link-list &rest args 
 	      &key move-target (rotation-axis nil) (translation-axis t)
 	      (dim (send self :calc-target-axis-dimension rotation-axis translation-axis))
+              (fik-len (send self :calc-target-joint-dimension link-list))
 	      fik
 	      (tmp-v0 (instantiate float-vector 0))
 	      (tmp-v1 (instantiate float-vector 1))
@@ -270,12 +408,17 @@
 	  paxis
 	  child-link child-reverse
 	  j)
-     (unless fik (setq fik (make-matrix dim len)))
-     (dotimes (i len)
-       (setq j (send (elt link-list i) :joint))
-       (cond ((and (< (+ i 1) len)
+     (unless fik (setq fik (make-matrix dim fik-len)))
+     (do ((i 0 (1+ i))
+	  (l 0 (1+ l)))
+	 ((>= l len))
+       (setq j (send (elt link-list l) :joint))
+       (cond ((not (derivedp (send j :child-link) bodyset-link))
+	      (setq child-reverse nil)
+	      (setq child-link (send j :child-link)))
+             ((and (< (+ l 1) len)
 		   (not (eq (send j :child-link)
-			    (send (elt link-list (+ i 1)) :parent-link))))
+			    (send (elt link-list (+ l 1)) :parent-link))))
 	      (setq child-reverse t)
 	      (setq child-link (send j :parent-link)))
 	     (t
@@ -286,31 +429,31 @@
 		      (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1))
 		      (t (j . axis))))
 
-	(setq tmp-v3 (normalize-vector (send child-link :rotate-vector paxis tmp-v3) tmp-v3))
-	(setq tmp-v3
-	 (v- (send move-target :inverse-transform-vector tmp-v3 tmp-v3 tmp-v3b tmp-m33)
-	     (send move-target :inverse-transform-vector #f(0 0 0) tmp-v3a tmp-v3b tmp-m33)  tmp-v3))
-
 	(cond 
 	 ((derivedp j linear-joint)
-	  ;(setq pos-r (scale 0.001 pos-r pos-r));; scale [mm] -> [m]
-	  (setq pos-r (calc-dif-with-axis tmp-v3 translation-axis tmp-v0 tmp-v1 tmp-v2))
-	  (dotimes (j (length pos-r)) (setf (aref fik j i) (elt pos-r j)))
-	  (setq pos-i (calc-dif-with-axis #f(0 0 0) rotation-axis tmp-v0 tmp-v1 tmp-v2))
-	  (dotimes (j (length pos-i)) (setf (aref fik (+ j (length pos-r)) i) (elt pos-i j)))
-	  )
+	  (send self :calc-jacobian-linear-joint
+		fik i j paxis child-link child-reverse move-target
+		rotation-axis translation-axis pos-i pos-r
+		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33))
+	 ((derivedp j rotational-joint)
+	  (send self :calc-jacobian-rotational-joint
+		fik i j paxis child-link child-reverse move-target
+		rotation-axis translation-axis pos-i pos-r
+		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33))
+	 ((derivedp j omniwheel-joint)
+	  (send self :calc-jacobian-omniwheel-joint
+		fik i j paxis child-link child-reverse move-target
+		rotation-axis translation-axis pos-i pos-r
+		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+	  (incf i 2))
+	 ((derivedp j wheel-joint)
+	  (send self :calc-jacobian-wheel-joint
+		fik i j paxis child-link child-reverse move-target
+		rotation-axis translation-axis pos-i pos-r
+		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+	  (incf i 1))
 	 (t
-	  (setq pos-i (scale (if child-reverse 1 -1)
-			     (send move-target :inverse-transform-vector
-				   (send child-link :worldpos) tmp-v3a tmp-v3b tmp-m33) tmp-v3a))
-	  (setq pos-i (scale 0.001 pos-i pos-i));; scale [mm] -> [m]
-
-	  (setq pos-r (v* tmp-v3 pos-i tmp-v3b))
-	  (setq pos-r (calc-dif-with-axis pos-r translation-axis tmp-v0 tmp-v1 tmp-v2))
-	  (dotimes (j (length pos-r)) (setf (aref fik j i) (elt pos-r j)))
-	  (setq pos-i (calc-dif-with-axis tmp-v3 rotation-axis tmp-v0 tmp-v1 tmp-v2))
-	  (dotimes (j (length pos-i)) (setf (aref fik (+ j (length pos-r)) i) (elt pos-i j)))
-	  ))
+	  (warn "unknown joint type ~A~%" j)))
 	;;
 	)
      fik))
@@ -326,7 +469,7 @@
     move-target jacobi jacobi# null-space
     (rotation-axis nil) (translation-axis t)
     p-limit r-limit
-    (weight (fill (instantiate float-vector (length link-list)) 1))
+    (weight (fill (instantiate float-vector (send self :calc-target-joint-dimension link-list)) 1))
     (debug-view nil)
     (tmp-pos (float-vector 0 0 0))
     (tmp-rot (float-vector 0 0 0))
@@ -342,7 +485,7 @@
     (tmp-len) (tmp-len2)
     (tmp-mcc) (tmp-mcc2)
     &allow-other-keys)
-   (let (vel-p vel-r J#x I-J#J (len (length link-list)))
+   (let (vel-p vel-r J#x I-J#J (len (send self :calc-target-joint-dimension link-list)))
      (when (or (null link-list) (null move-target))
        (warn ";; ERROR: :link-list or :move-target required~%")
        (return-from :calc-joint-angle-speed null-space))
@@ -465,7 +608,7 @@
     angle-speed
     (debug-view nil)
     &allow-other-keys)
-   (let (dav dtheta)
+   (let (dav dtheta j)
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
      (if (and debug-view (not (equal debug-view :no-clear)) (boundp '*viewer*))
 	 (send *viewer* :viewsurface :clear))
@@ -474,13 +617,25 @@
      (if angle-speed (v+ dav angle-speed dav))
 
      ;; update body
-     (dotimes (i (length link-list))
+     (do ((i 0 (1+ i))
+	  (l 0 (1+ l)))
+	 ((>= l (length link-list)))
+       (setq j (send (elt link-list l) :joint))
        (setq dtheta
-	 (cond ((derivedp (send (elt link-list i) :joint) linear-joint)
+	 (cond ((derivedp j linear-joint)
 		(* 1000.0 (elt dav i)))
-	       ((derivedp (send (elt link-list i) :joint) rotational-joint)
-		(rad2deg (elt dav i)))))
-       (send (elt link-list i) :joint :joint-angle dtheta :relative t))
+	       ((derivedp j rotational-joint)
+		(rad2deg (elt dav i)))
+	       ((derivedp j omniwheel-joint)
+		(float-vector (* 1000 (elt dav i))
+			      (* 1000 (elt dav (incf i)))
+			      (rad2deg (elt dav (incf i)))))
+	       ((derivedp j wheel-joint)
+		(float-vector (* 1000 (elt dav i))
+			      (rad2deg (elt dav (incf i)))))
+
+               ))
+       (send (elt link-list l) :joint :joint-angle dtheta :relative t))
      ;;
      ;; done
      (when (and debug-view *viewer*)
@@ -494,7 +649,7 @@
 	    &key
 	    link-list
 	    move-target
-	    (weight (fill (instantiate float-vector (length link-list)) 1))
+	    (weight (fill (instantiate float-vector (send self :calc-target-joint-dimension link-list)) 1))
 	    (null-space)
 	    (avoid-nspace-gain 0.1)
 	    (avoid-weight-gain 1.0)
@@ -531,7 +686,12 @@
 
      (when debug-view
        (warn "angle :")
-       (dolist (j (send-all link-list :joint)) (warn "~7,1f " (send j :joint-angle)))(warn "~%"))
+       (dolist (j (send-all link-list :joint))
+	 (let ((a (send j :joint-angle)))
+	   (if (vectorp a)
+	       (dotimes (i (length a)) (warn "~7,1f " (elt a i)))
+	     (warn "~7,1f " a))))
+	   (warn "~%"))
      ;; weighting joint angle weight : W(dH/dq)
      (when (> avoid-weight-gain 0)
        (setq joint-angle-limit-weight 
@@ -756,7 +916,7 @@
    (let* ((loop 0) (av0 (send-all (send-all link-list :joint) :joint-angle))
 	  dif-pos dif-rot need-clear need-flush
 	  ;;
-	  (c (length link-list))
+	  (c (send self :calc-target-joint-dimension link-list))
 	  (r (send self :calc-target-axis-dimension rotation-axis translation-axis))
 	  (a (max c r))
 	  (b (min c r))
@@ -784,6 +944,7 @@
 	  (tmp-len2 (instantiate float-vector c))
 	  (tmp-pos (instantiate float-vector 3))
 	  (tmp-rot (instantiate float-vector 3))
+	  ndif-pos ndif-rot
 	  )
      (when debug-view
        (if (atom debug-view) (setq debug-view (list debug-view)))
@@ -797,13 +958,21 @@
      (while (< (incf loop) stop)
        (setq dif-pos (send move-target :difference-position target-coords)
 	     dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
+       (setq ndif-pos (calc-dif-with-axis
+		       (v- (send move-target :inverse-transform-vector dif-pos)
+			   (send move-target :inverse-transform-vector (float-vector 0 0 0)))
+		       translation-axis))
+       (setq ndif-rot (calc-dif-with-axis
+		       (v- (send move-target :inverse-transform-vector dif-rot)
+			   (send move-target :inverse-transform-vector (float-vector 0 0 0)))
+		       rotation-axis))
        (when debug-view
 	 (warn ";; ~3d: dif-pos : ~a/(~a/~A), dif-rot : ~a/(~a/~A)~%"
-	       loop dif-pos (norm dif-pos) thre dif-rot (norm dif-rot) rthre))
+	       loop ndif-pos (norm ndif-pos) thre ndif-rot (norm ndif-rot) rthre))
        ;; check loop end
        (if (and (> loop (/ stop 10))
-		(< (norm dif-pos) thre)
-		(if rotation-axis (< (norm dif-rot) rthre) t))
+		(< (norm ndif-pos) thre)
+		(if rotation-axis (< (norm ndif-rot) rthre) t))
 	   (return nil))
        ;; ik
        (when (and need-clear debug-view *viewer*)
@@ -970,7 +1139,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.25  2009-05-29 06:23:56  nozawa
+;;; Revision 1.26  2009-06-01 12:42:41  k-okada
+;;; add wheel/omni-joint
+;;;
+;;; Revision 1.25  2009/05/29 06:23:56  nozawa
 ;;; fix typo
 ;;;
 ;;; Revision 1.24  2009/04/23 02:12:39  k-okada
