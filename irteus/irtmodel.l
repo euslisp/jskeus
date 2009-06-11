@@ -823,7 +823,7 @@
 			    :link-list col-link-list
 			    :move-target drag-coords
 			    :jacobi jacobi :jacobi# jacobi#
-			    :p-limit p-limit :p-limit r-limit
+			    :p-limit p-limit :r-limit r-limit
 			    col-args
 			    ))
 		   (when debug-view
@@ -841,7 +841,7 @@
 			    :link-list col-link-list
 			    :move-target drag-coords
 			    :jacobi jacobi :jacobi# jacobi#
-			    :p-limit p-limit :p-limit r-limit
+			    :p-limit p-limit :r-limit r-limit
 			    col-args))
 		   (when debug-view
 		     (warn "joint :")
@@ -1139,7 +1139,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.26  2009-06-01 12:42:41  k-okada
+;;; Revision 1.27  2009-06-11 08:42:21  nagahama
+;;; fixed typos in move-joints-avoidance
+;;;
+;;; Revision 1.26  2009/06/01 12:42:41  k-okada
 ;;; add wheel/omni-joint
 ;;;
 ;;; Revision 1.25  2009/05/29 06:23:56  nozawa
