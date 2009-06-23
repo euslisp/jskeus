@@ -112,11 +112,11 @@
 
 (defmethod omniwheel-joint
   (:init (&rest args &key &allow-other-keys)
-	 (setq joint-angle #f(0 0 0))
-	 (setq axis :z)
-	 (send-super* :init args)
-	 ;; set default value
-	 self)
+       (setq joint-angle (float-vector 0 0 0))
+       (setq axis :z)
+       (send-super* :init args)
+       ;; set default value
+       self)
   (:joint-angle
    (&optional v &key relative)
    (let (relang relx rely)
@@ -141,7 +141,7 @@
 
 (defmethod wheel-joint
   (:init (&rest args &key &allow-other-keys)
-	 (setq joint-angle #f(0 0 0))
+	 (setq joint-angle (float-vector 0 0 0))
 	 (setq axis :z)
 	 (send-super* :init args)
 	 ;; set default value
@@ -1017,7 +1017,7 @@
 
      ;; check solved or not
      (if (and (< (norm dif-pos) thre)  (< (norm dif-rot) rthre))
-	   (send self :angle-vector)
+         (send self :angle-vector)
        (progn
 	 (when warnp
 	   (warn ";; inverse-kinematics failed.~%")
@@ -1139,7 +1139,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.27  2009-06-11 08:42:21  nagahama
+;;; Revision 1.28  2009-06-23 13:27:10  ueda
+;;; #f() -> (float-vector) in wheel-joint, because it invekes SEGV
+;;;
+;;; Revision 1.27  2009/06/11 08:42:21  nagahama
 ;;; fixed typos in move-joints-avoidance
 ;;;
 ;;; Revision 1.26  2009/06/01 12:42:41  k-okada
