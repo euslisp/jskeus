@@ -55,6 +55,24 @@
 	    (+ (car tmp) (/ (cadr tmp) 1000000f))))
   )
 
+(defun permutation (lst n)
+  (if (< n 1)
+      '(())
+    (mapcan #'(lambda (x)
+                (mapcar #'(lambda (y) (cons x y))
+                        (permutation (remove x lst :count 1) (1- n))))
+            lst)))
+
+(defun combination (lst n)
+  (if (< n 1)
+      '(())
+    (mapcan #'(lambda (x)
+                (mapcan #'(lambda (y)
+                            (list (cons x y)))
+                        (combination (cdr (member x lst)) (1- n))))
+            lst)))
+
+
 (provide :irtutil "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -62,7 +80,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.3  2009-02-17 02:04:48  k-okada
+;;; Revision 1.4  2009-06-28 12:03:41  ueda
+;;; add permutation and combination
+;;;
+;;; Revision 1.3  2009/02/17 02:04:48  k-okada
 ;;; fix typo on copyright
 ;;;
 ;;; Revision 1.2  2008/10/09 15:09:46  k-okada
