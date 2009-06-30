@@ -162,15 +162,19 @@
 
 (defclass bodyset-link
   :super bodyset
-  :slots (joint parent-link child-links analysis-level default-coords))
+  :slots (joint parent-link child-links analysis-level default-coords
+                weight inertia-tensor))
 (defmethod bodyset-link
   (:init 
    (coords
     &rest args
     &key
     ((:analysis-level level) :body)
+    ((:weight w) 1)
+    ((:inertia-tensor i) (unit-matrix 3))
     &allow-other-keys)
    (setq analysis-level level)
+   (setq weight w inertia-tensor i)
    (send-super* :init coords args))
   (:worldcoords
    (&optional (level analysis-level))
@@ -182,6 +186,12 @@
   (:analysis-level
    (&optional v)
    (if v (setq analysis-level v)) analysis-level)
+  (:weight
+   (&optional w)
+   (if w (setq weight w)) weight)
+  (:inertia-tensor
+   (&optional i)
+   (if i (setq inertia-tensor i)) inertia-tensor)
   (:joint (&rest args) (user::forward-message-to joint args))
   (:add-joint (j) (setq joint j))
 
@@ -1139,7 +1149,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.28  2009-06-23 13:27:10  ueda
+;;; Revision 1.29  2009-06-30 01:00:31  k-okada
+;;; add :weight and :intertia-tensor
+;;;
+;;; Revision 1.28  2009/06/23 13:27:10  ueda
 ;;; #f() -> (float-vector) in wheel-joint, because it invekes SEGV
 ;;;
 ;;; Revision 1.27  2009/06/11 08:42:21  nagahama
