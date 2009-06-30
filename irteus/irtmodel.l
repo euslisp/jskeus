@@ -163,7 +163,7 @@
 (defclass bodyset-link
   :super bodyset
   :slots (joint parent-link child-links analysis-level default-coords
-                weight centroid inertia-tensor))
+                weight acentroid inertia-tensor))
 (defmethod bodyset-link
   (:init 
    (coords
@@ -175,7 +175,7 @@
     ((:inertia-tensor i) (unit-matrix 3))
     &allow-other-keys)
    (setq analysis-level level)
-   (setq weight w inertia-tensor i)
+   (setq weight w inertia-tensor i acentroid c)
    (send-super* :init coords args))
   (:worldcoords
    (&optional (level analysis-level))
@@ -192,8 +192,8 @@
    (if w (setq weight w)) weight)
   (:centroid
    (&optional c)
-   (if c (setq centroid c))
-   (send (send self :worldcoords) :transform-vector centroid))
+   (if c (setq acentroid c))
+   (send (send self :worldcoords) :transform-vector acentroid))
   (:inertia-tensor
    (&optional i)
    (if i (setq inertia-tensor i)) inertia-tensor)
@@ -1154,7 +1154,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.30  2009-06-30 08:35:14  k-okada
+;;; Revision 1.31  2009-06-30 11:08:42  k-okada
+;;; change slot variable name from centroid to acentroid
+;;;
+;;; Revision 1.30  2009/06/30 08:35:14  k-okada
 ;;; add centroid
 ;;;
 ;;; Revision 1.29  2009/06/30 01:00:31  k-okada
