@@ -163,7 +163,7 @@
 (defclass bodyset-link
   :super bodyset
   :slots (joint parent-link child-links analysis-level default-coords
-                weight inertia-tensor))
+                weight centroid inertia-tensor))
 (defmethod bodyset-link
   (:init 
    (coords
@@ -171,6 +171,7 @@
     &key
     ((:analysis-level level) :body)
     ((:weight w) 1)
+    ((:centroid c) #f(0 0 0))
     ((:inertia-tensor i) (unit-matrix 3))
     &allow-other-keys)
    (setq analysis-level level)
@@ -189,6 +190,10 @@
   (:weight
    (&optional w)
    (if w (setq weight w)) weight)
+  (:centroid
+   (&optional c)
+   (if c (setq centroid c))
+   (send (send self :worldcoords) :transform-vector centroid))
   (:inertia-tensor
    (&optional i)
    (if i (setq inertia-tensor i)) inertia-tensor)
@@ -1149,7 +1154,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.29  2009-06-30 01:00:31  k-okada
+;;; Revision 1.30  2009-06-30 08:35:14  k-okada
+;;; add centroid
+;;;
+;;; Revision 1.29  2009/06/30 01:00:31  k-okada
 ;;; add :weight and :intertia-tensor
 ;;;
 ;;; Revision 1.28  2009/06/23 13:27:10  ueda
