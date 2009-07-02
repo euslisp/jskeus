@@ -622,8 +622,11 @@
     move-target
     angle-speed
     (debug-view nil)
+    (fix-targets)
     &allow-other-keys)
    (let (dav dtheta j)
+     (if fix-targets
+         (setq fix-targets-coords (send-all fix-targets :copy-worldcoords)))
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
      (if (and debug-view (not (equal debug-view :no-clear)) (boundp '*viewer*))
 	 (send *viewer* :viewsurface :clear))
@@ -651,6 +654,19 @@
 
                ))
        (send (elt link-list l) :joint :joint-angle dtheta :relative t))
+     (when fix-targets
+       (let ((tmp-coords (pop fix-targets-coords)))
+         (send tmp-coords :transform
+               (send (pop fix-targets) :transformation self))
+         (send self :newcoords tmp-coords)
+         (while (setq fix-target (pop fix-targets))
+           (unless
+               (send self :inverse-kinematics (pop fix-targets-coords)
+                     :move-target fix-target
+                     :link-list (send self :link-list fix-target)
+                     :avoid-collision-null-gain 0
+                     :avoid-collision-joint-gain 0)
+             (return-from :move-joints nil)))))
      ;;
      ;; done
      (when (and debug-view *viewer*)
@@ -928,7 +944,9 @@
 		  (look-at-target)
 		  (thre 1) (rthre (deg2rad 1))
 		  &allow-other-keys)
-   (let* ((loop 0) (av0 (send-all (send-all link-list :joint) :joint-angle))
+   (let* ((loop 0)
+          (av0 (send-all (send-all link-list :joint) :joint-angle))
+          (c0 (unless (send self :parent) (send self :copy-worldcoords)))
 	  dif-pos dif-rot need-clear need-flush
 	  ;;
 	  (c (send self :calc-target-joint-dimension link-list))
@@ -1044,6 +1062,7 @@
 	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   )
 	 (mapc #'(lambda (j a) (send j :joint-angle a)) (send-all link-list :joint) av0)
+         (if c0 (send self :newcoords c0))
 	 nil))
      ))
   )
@@ -1154,7 +1173,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.31  2009-06-30 11:08:42  k-okada
+;;; Revision 1.32  2009-07-02 14:43:31  k-okada
+;;; support fullbody ik
+;;;
+;;; Revision 1.31  2009/06/30 11:08:42  k-okada
 ;;; change slot variable name from centroid to acentroid
 ;;;
 ;;; Revision 1.30  2009/06/30 08:35:14  k-okada
