@@ -624,7 +624,7 @@
     (debug-view nil)
     (fix-targets)
     &allow-other-keys)
-   (let (dav dtheta j)
+   (let (dav dtheta j fix-target fix-targets-coords (ret t))
      (if fix-targets
          (setq fix-targets-coords (send-all fix-targets :copy-worldcoords)))
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
@@ -666,7 +666,7 @@
                      :link-list (send self :link-list fix-target)
                      :avoid-collision-null-gain 0
                      :avoid-collision-joint-gain 0)
-             (return-from :move-joints nil)))))
+             (setq ret nil)))))
      ;;
      ;; done
      (when (and debug-view *viewer*)
@@ -674,7 +674,7 @@
 	     :clear nil :flush nil)
        (if move-target
 	   (send-message move-target cascaded-link :draw-on :flush nil :size 100)))
-     t))
+     ret))
   (:move-joints-avoidance
    (vel-pos vel-rot &rest args
 	    &key
@@ -698,7 +698,7 @@
 	  dav dtheta 
 	  (la (instantiate float-vector len))
 	  (nul-col (instantiate float-vector len))
-	  (dav-col (instantiate float-vector len)))
+	  (dav-col (instantiate float-vector len)) (ret t))
      (when (or (null link-list) (null move-target))
        (warn ";; ERROR: :link-list or :move-target required~%")
        (return-from :move-joints-avoidance t))
@@ -894,13 +894,13 @@
        (when debug-view
 	 (warn "nspace:")
 	 (dotimes (i len) (warn "~7,3f " (elt nul-col i))) (warn "~%")))
-
-     (send-message* self cascaded-link
-		    :move-joints vel-pos vel-rot
-		    :null-space (if null-space (v+ null-space (v+ la nul-col la) la) (v+ la nul-col la))
-		    :angle-speed (if (> avoid-collision-joint-gain 0) (scale avoid-collision-joint-gain (transform wmat dav-col dav-col) dav-col))
-		    :weight weight
-		    args)
+     (setq ret
+         (send-message* self cascaded-link
+                        :move-joints vel-pos vel-rot
+                        :null-space (if null-space (v+ null-space (v+ la nul-col la) la) (v+ la nul-col la))
+                        :angle-speed (if (> avoid-collision-joint-gain 0) (scale avoid-collision-joint-gain (transform wmat dav-col dav-col) dav-col))
+                        :weight weight
+                        args))
      ;;
      ;; done
      (when (and debug-view *viewer*)
@@ -932,7 +932,7 @@
        (if (not (memq :no-flush debug-view))
 	   (send *viewer* :viewsurface :flush))
        )
-     ))
+     ret))
   (:inverse-kinematics
    (target-coords &rest args 
 		  &key (stop 50)
@@ -942,6 +942,7 @@
 		  (rotation-axis t)
 		  (translation-axis t)
 		  (look-at-target)
+                  (fix-targets)
 		  (thre 1) (rthre (deg2rad 1))
 		  &allow-other-keys)
    (let* ((loop 0)
@@ -978,6 +979,10 @@
 	  (tmp-pos (instantiate float-vector 3))
 	  (tmp-rot (instantiate float-vector 3))
 	  ndif-pos ndif-rot
+          (success t) 
+          (fix-targets-av 
+           (mapcar #'(lambda (l) (send-all l :joint :joint-angle))
+                   (mapcar #'(lambda (l) (send self :link-list l)) fix-targets)))
 	  )
      (when debug-view
        (if (atom debug-view) (setq debug-view (list debug-view)))
@@ -1010,29 +1015,33 @@
        ;; ik
        (when (and need-clear debug-view *viewer*)
 	 (if need-clear (send *viewer* :viewsurface :clear)))
-       (send-message* self cascaded-link
-		      :move-joints-avoidance
-		      dif-pos dif-rot :link-list link-list
-		      :rotation-axis rotation-axis :translation-axis translation-axis
-		      :warnp warnp :debug-view debug-view
-		      ;; buffer for calculation
-		      :dim r
-		      :fik fik
-		      :ret ret
-		      :wmat wmat :tmat tmat :umat umat :umat2 umat2 :mat-tmp mat-tmp
-		      :tmp-mcc tmp-mcc :tmp-mcc2 tmp-mcc2 :tmp-mrr tmp-mrr
-		      :tmp-mrc tmp-mrc
-		      :tmp-v0 tmp-v0 :tmp-v1 tmp-v1
-		      :tmp-v2 tmp-v2 :tmp-v3 tmp-v3
-		      :tmp-v3a tmp-v3a :tmp-v3b tmp-v3b  :tmp-v3c tmp-v3c
-		      :tmp-m33 tmp-m33 
-		      :tmp-dim tmp-dim
-		      :tmp-len tmp-len :tmp-len2 tmp-len2
-		      :tmp-pos tmp-pos :tmp-rot tmp-rot
-		      args)
+       (setq
+        success
+        (send-message* self cascaded-link
+                       :move-joints-avoidance
+                       dif-pos dif-rot :link-list link-list
+                       :rotation-axis rotation-axis :translation-axis translation-axis
+                       :warnp warnp :debug-view debug-view
+                       :fix-targets fix-targets
+                       ;; buffer for calculation
+                       :dim r
+                       :fik fik
+                       :ret ret
+                       :wmat wmat :tmat tmat :umat umat :umat2 umat2 :mat-tmp mat-tmp
+                       :tmp-mcc tmp-mcc :tmp-mcc2 tmp-mcc2 :tmp-mrr tmp-mrr
+                       :tmp-mrc tmp-mrc
+                       :tmp-v0 tmp-v0 :tmp-v1 tmp-v1
+                       :tmp-v2 tmp-v2 :tmp-v3 tmp-v3
+                       :tmp-v3a tmp-v3a :tmp-v3b tmp-v3b  :tmp-v3c tmp-v3c
+                       :tmp-m33 tmp-m33 
+                       :tmp-dim tmp-dim
+                       :tmp-len tmp-len :tmp-len2 tmp-len2
+                       :tmp-pos tmp-pos :tmp-rot tmp-rot
+                       args))
        (when (and debug-view  *viewer*)
 	 (send target-coords :draw-on :flush nil :color #f(1 0 0))
 	 (if need-flush (send *viewer* :viewsurface :flush)))
+       (unless success (return nil))
        (if look-at-target
 	   (send self :head :look-at (send target-coords :worldpos)))
        )
@@ -1049,7 +1058,7 @@
 		    rotation-axis))
 
      ;; check solved or not
-     (if (and (< (norm dif-pos) thre)  (< (norm dif-rot) rthre))
+     (if (and success (< (norm dif-pos) thre)  (< (norm dif-rot) rthre))
          (send self :angle-vector)
        (progn
 	 (when warnp
@@ -1062,6 +1071,10 @@
 	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   )
 	 (mapc #'(lambda (j a) (send j :joint-angle a)) (send-all link-list :joint) av0)
+         (if fix-targets-av
+             (mapcar #'(lambda (ll aa) (mapc #'(lambda (j a) (send j :joint-angle a)) (send-all ll :joint) aa))
+                     (mapcar #'(lambda (l) (send self :link-list l)) fix-targets)
+                     fix-targets-av))
          (if c0 (send self :newcoords c0))
 	 nil))
      ))
@@ -1173,7 +1186,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.32  2009-07-02 14:43:31  k-okada
+;;; Revision 1.33  2009-07-02 15:28:29  k-okada
+;;; restore when fillbody ik failed
+;;;
+;;; Revision 1.32  2009/07/02 14:43:31  k-okada
 ;;; support fullbody ik
 ;;;
 ;;; Revision 1.31  2009/06/30 11:08:42  k-okada
