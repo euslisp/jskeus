@@ -168,6 +168,70 @@
      joint-angle))
   )
 
+(defclass sphere-joint
+  :super joint
+  :slots (axis))
+
+(defmethod sphere-joint
+  (:init (&rest args
+                &key
+                (min (float-vector *-inf* *-inf* *-inf*))
+                (max (float-vector *inf* *inf* *inf*))
+                &allow-other-keys)
+	 (setq joint-angle (float-vector 0 0 0))
+         (setq axis :z)
+	 (send-super* :init :min min :max max args)
+	 ;; set default value
+	 self)
+  (:joint-angle
+   (&optional v &key relative)
+   (let ()
+     (when v
+       (if relative (setq v (v+ v joint-angle)))
+       (setq v (vmax v min-angle))
+       (setq v (vmin v max-angle))
+       (setq joint-angle v)
+       (send child-link :replace-coords default-coords)
+       (send child-link :rotate (deg2rad (elt joint-angle 0)) :x)
+       (send child-link :rotate (deg2rad (elt joint-angle 1)) :y)
+       (send child-link :rotate (deg2rad (elt joint-angle 2)) :z))
+     joint-angle))
+  )
+
+(defclass 6d-joint
+  :super joint
+  :slots (axis))
+
+(defmethod 6d-joint
+  (:init (&rest args
+                &key
+                (min (float-vector *-inf* *-inf* *-inf* *-inf* *-inf* *-inf*))
+                (max (float-vector *inf* *inf* *inf* *inf* *inf* *inf*))
+                &allow-other-keys)
+	 (setq joint-angle (float-vector 0 0 0 0 0 0))
+         (setq axis :z)
+	 (send-super* :init :min min :max max args)
+	 ;; set default value
+	 self)
+  (:joint-angle
+   (&optional v &key relative)
+   (let ()
+     (when v
+       (if relative (setq v (v+ v joint-angle)))
+       (setq v (vmax v min-angle))
+       (setq v (vmin v max-angle))
+       (setq joint-angle v)
+       (send child-link :replace-coords default-coords)
+       (send child-link :translate (subseq joint-angle 0 3))
+       (send child-link :rotate (deg2rad (elt joint-angle 3)) :x)
+       (send child-link :rotate (deg2rad (elt joint-angle 4)) :y)
+       (send child-link :rotate (deg2rad (elt joint-angle 5)) :z))
+     joint-angle))
+  )
+
+;;;
+;;;
+
 (defclass bodyset-link
   :super bodyset
   :slots (joint parent-link child-links analysis-level default-coords
@@ -371,6 +435,21 @@
      (setq pos-i (calc-dif-with-axis tmp-v3 rotation-axis tmp-v0 tmp-v1 tmp-v2))
      (dotimes (j (length pos-i)) (setf (aref fik (+ j (length pos-r)) i) (elt pos-i j)))
      ))
+  (:calc-jacobian-wheel-joint
+   (fik i joint paxis child-link child-reverse
+	move-target rotation-axis translation-axis
+	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+   (let ()
+     (send self :calc-jacobian-linear-joint
+	   fik i joint #f(1 0 0) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+     (send self :calc-jacobian-rotational-joint
+	   fik (+ i 1) joint #f(0 0 1) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+     ;;(setf (aref fik 2 1) 0)
+     ))
   (:calc-jacobian-omniwheel-joint
    (fik i joint paxis child-link child-reverse
 	move-target rotation-axis translation-axis
@@ -389,7 +468,25 @@
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
-  (:calc-jacobian-wheel-joint
+  (:calc-jacobian-sphere-joint
+   (fik i joint paxis child-link child-reverse
+	move-target rotation-axis translation-axis
+	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+   (let ()
+     (send self :calc-jacobian-rotational-joint
+	   fik i joint #f(1 0 0) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+     (send self :calc-jacobian-rotational-joint
+	   fik (+ i 1) joint #f(0 1 0) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+     (send self :calc-jacobian-rotational-joint
+	   fik (+ i 2) joint #f(0 0 1) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+     ))
+  (:calc-jacobian-6d-joint
    (fik i joint paxis child-link child-reverse
 	move-target rotation-axis translation-axis
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
@@ -398,11 +495,26 @@
 	   fik i joint #f(1 0 0) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-     (send self :calc-jacobian-rotational-joint
-	   fik (+ i 1) joint #f(0 0 1) child-link child-reverse
+     (send self :calc-jacobian-linear-joint
+	   fik (+ i 1) joint #f(0 1 0) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-     ;;(setf (aref fik 2 1) 0)
+     (send self :calc-jacobian-linear-joint
+	   fik (+ i 2) joint #f(0 0 1) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+     (send self :calc-jacobian-rotational-joint
+	   fik (+ i 3) joint #f(1 0 0) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+     (send self :calc-jacobian-rotational-joint
+	   fik (+ i 4) joint #f(0 1 0) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+     (send self :calc-jacobian-rotational-joint
+	   fik (+ i 5) joint #f(0 0 1) child-link child-reverse
+	   move-target rotation-axis translation-axis
+	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
   (:calc-jacobian-from-link-list
    (link-list &rest args 
@@ -456,18 +568,30 @@
 		fik i j paxis child-link child-reverse move-target
 		rotation-axis translation-axis pos-i pos-r
 		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33))
-	 ((derivedp j omniwheel-joint)
-	  (send self :calc-jacobian-omniwheel-joint
-		fik i j paxis child-link child-reverse move-target
-		rotation-axis translation-axis pos-i pos-r
-		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-	  (incf i 2))
 	 ((derivedp j wheel-joint)
 	  (send self :calc-jacobian-wheel-joint
 		fik i j paxis child-link child-reverse move-target
 		rotation-axis translation-axis pos-i pos-r
 		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
 	  (incf i 1))
+	 ((derivedp j omniwheel-joint)
+	  (send self :calc-jacobian-omniwheel-joint
+		fik i j paxis child-link child-reverse move-target
+		rotation-axis translation-axis pos-i pos-r
+		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+	  (incf i 2))
+	 ((derivedp j sphere-joint)
+	  (send self :calc-jacobian-sphere-joint
+		fik i j paxis child-link child-reverse move-target
+		rotation-axis translation-axis pos-i pos-r
+		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+	  (incf i 2))
+	 ((derivedp j 6d-joint)
+	  (send self :calc-jacobian-6d-joint
+		fik i j paxis child-link child-reverse move-target
+		rotation-axis translation-axis pos-i pos-r
+		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+	  (incf i 5))
 	 (t
 	  (warn "unknown joint type ~A~%" j)))
 	;;
@@ -645,14 +769,24 @@
 		(* 1000.0 (elt dav i)))
 	       ((derivedp j rotational-joint)
 		(rad2deg (elt dav i)))
+	       ((derivedp j wheel-joint)
+		(float-vector (* 1000 (elt dav i))
+			      (rad2deg (elt dav (incf i)))))
 	       ((derivedp j omniwheel-joint)
 		(float-vector (* 1000 (elt dav i))
 			      (* 1000 (elt dav (incf i)))
 			      (rad2deg (elt dav (incf i)))))
-	       ((derivedp j wheel-joint)
-		(float-vector (* 1000 (elt dav i))
+	       ((derivedp j sphere-joint)
+		(float-vector (rad2deg (elt dav i))
+			      (rad2deg (elt dav (incf i)))
 			      (rad2deg (elt dav (incf i)))))
-
+	       ((derivedp j 6d-joint)
+		(float-vector (* 1000 (elt dav i))
+			      (* 1000 (elt dav (incf i)))
+                              (* 1000 (elt dav (incf i)))
+			      (rad2deg (elt dav (incf i)))
+                              (rad2deg (elt dav (incf i)))
+                              (rad2deg (elt dav (incf i)))))
                ))
        (send (elt link-list l) :joint :joint-angle dtheta :relative t))
      (when fix-targets
@@ -742,7 +876,6 @@
 		    1.0))))
        (dotimes (i len) (setf (elt joint-angle-limit-weight-old i)
 			      (elt joint-angle-limit-weight i))))
-
      (dotimes (i len) (setf (aref wmat i i) (aref weight i)))
      (when debug-view
        (warn "weight:")
@@ -1128,6 +1261,10 @@
 	 (incf n 2))
 	((derivedp j omniwheel-joint)
 	 (incf n 3))
+	((derivedp j sphere-joint)
+	 (incf n 3))
+	((derivedp j 6d-joint)
+	 (incf n 6))
 	(t (incf n))))
      n))
 
@@ -1217,7 +1354,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.35  2009-07-03 09:48:54  k-okada
+;;; Revision 1.36  2009-07-03 10:40:22  k-okada
+;;; add sphere and 6d joint
+;;;
+;;; Revision 1.35  2009/07/03 09:48:54  k-okada
 ;;; support avoid-weight-gain and avoid-null-gain for omniwheel/wheel-joints
 ;;;
 ;;; Revision 1.34  2009/07/03 06:16:47  k-okada
