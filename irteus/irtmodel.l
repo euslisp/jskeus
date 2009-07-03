@@ -870,8 +870,8 @@
        (dotimes (i len)
 	 (setf (elt weight i)
 	       (* (elt weight i) 
-		  (if (> (elt joint-angle-limit-weight i)
-			 (elt joint-angle-limit-weight-old i))
+		  (if (> (- (elt joint-angle-limit-weight i)
+                            (elt joint-angle-limit-weight-old i)) 0.0)
 		      (/ 1.0 (+ 1.0 (elt joint-angle-limit-weight i)))
 		    1.0))))
        (dotimes (i len) (setf (elt joint-angle-limit-weight-old i)
@@ -1284,7 +1284,8 @@
               jmax (deg2rad (send j :max-angle))
               jmin (deg2rad (send j :min-angle)))
         (incf k)))
-      (cond 
+      (cond
+       ((and (eps= jang jmax e) (eps= jang jmin e)))
        ((eps= jang jmax e)
 	(setq jang (- jmax e)))
        ((eps= jang jmin e)
@@ -1300,6 +1301,8 @@
 	(setf (elt res i)
 	      (abs (/ (* (expt (* 2 wang) 2) (* 2 (- jang nang)))
 		      (* 4 (expt (- (* wang wang) (* jang jang)) 2))))))
+       ((and (eps= jang jmax e) (eps= jang jmin e))
+        (setf (elt res i) *inf*))
        (t
 	(setq r
 	      (abs (/ (* (expt (- jmax jmin) 2) (- (* 2 jang) jmax jmin))
@@ -1354,7 +1357,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.36  2009-07-03 10:40:22  k-okada
+;;; Revision 1.37  2009-07-03 11:00:48  k-okada
+;;; set weight=0 when min-angle == max-angle, with avoid-weight-gain
+;;;
+;;; Revision 1.36  2009/07/03 10:40:22  k-okada
 ;;; add sphere and 6d joint
 ;;;
 ;;; Revision 1.35  2009/07/03 09:48:54  k-okada
