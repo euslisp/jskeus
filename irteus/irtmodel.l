@@ -111,17 +111,21 @@
   :slots (axis))
 
 (defmethod omniwheel-joint
-  (:init (&rest args &key &allow-other-keys)
+  (:init (&rest args
+                &key
+                (min (float-vector *-inf* *-inf* *-inf*))
+                (max (float-vector *inf* *inf* *inf*))
+                &allow-other-keys)
        (setq joint-angle (float-vector 0 0 0))
        (setq axis :z)
-       (send-super* :init args)
+       (send-super* :init :min min :max max args)
        ;; set default value
        self)
   (:joint-angle
    (&optional v &key relative)
    (let (relang relx rely)
      (unless relative
-       (warn "wheel-joint does not support non-relative mode??~%")
+       (if v (warn "wheel-joint does not support non-relative mode??~%"))
        (return-from :joint-angle joint-angle))
      (when v
        (if relative (setq v (v+ v joint-angle)))
@@ -140,17 +144,21 @@
   :slots (axis))
 
 (defmethod wheel-joint
-  (:init (&rest args &key &allow-other-keys)
+  (:init (&rest args
+                &key
+                (min (float-vector *-inf* *-inf* *-inf*))
+                (max (float-vector *inf* *inf* *inf*))
+                &allow-other-keys)
 	 (setq joint-angle (float-vector 0 0 0))
 	 (setq axis :z)
-	 (send-super* :init args)
+	 (send-super* :init :min min :max max args)
 	 ;; set default value
 	 self)
   (:joint-angle
    (&optional v &key relative)
    (let (relvel relang)
      (unless relative
-       (warn "wheel-joint does not support non-relative mode??~%")
+       (if v (warn "wheel-joint does not support non-relative mode??~%"))
        (return-from :joint-angle joint-angle))
      (when v
        (setq relvel (elt v 0) relang (elt v 1))
@@ -286,14 +294,7 @@
      dim))
   (:calc-target-joint-dimension
    (link-list)
-   (let ((n 0))
-     (dolist (j (send-all link-list :joint))
-       (cond 
-	((derivedp j wheel-joint)
-	 (incf n 2))
-	((derivedp j omniwheel-joint)
-	 (incf n 3))
-	(t (incf n)))) n))
+   (calc-target-joint-dimension (send-all link-list :joint)))
   (:calc-inverse-jacobian
    (jacobi &rest args
     &key
@@ -690,7 +691,7 @@
 	    (avoid-collision-joint-distance 500)
 	    (tmp-len) (tmp-len2) (debug-view)
 	    &allow-other-keys)
-   (let* ((len (length link-list))
+   (let* ((len (send self :calc-target-joint-dimension link-list))
 	  (wmat (make-matrix len len))
 	  joint-angle-limit-nspace
 	  joint-angle-limit-weight
@@ -1119,13 +1120,33 @@
 	(nil (if tmp-v0 tmp-v0 (float-vector)))
 	(t dif)))
 
-(defun joint-angle-limit-weight (j-l &optional (res (instantiate float-vector (length j-l))))
-  (let (j jang jmax jmin nang wang (e (deg2rad 1)) r)
-    (dotimes (i (length j-l))
-      (setq j (elt j-l i))
-      (setq jang (deg2rad (send j :joint-angle))
-	    jmax (deg2rad (send j :max-angle))
-	    jmin (deg2rad (send j :min-angle)))
+(defun calc-target-joint-dimension (joint-list)
+   (let ((n 0))
+     (dolist (j joint-list)
+       (cond 
+	((derivedp j wheel-joint)
+	 (incf n 2))
+	((derivedp j omniwheel-joint)
+	 (incf n 3))
+	(t (incf n))))
+     n))
+
+(defun joint-angle-limit-weight (j-l &optional (res (instantiate float-vector (calc-target-joint-dimension j-l))))
+  (let (j jang jmax jmin nang wang (e (deg2rad 1)) (k 0) (kk 0) r)
+    (dotimes (i (calc-target-joint-dimension j-l))
+      (setq j (elt j-l k))
+      (cond
+       ((vectorp (send j :joint-angle))
+        (setq jang (elt (send j :joint-angle) kk)
+              jmax (elt (send j :max-angle) kk)
+              jmin (elt (send j :min-angle) kk))
+        (when (>= (incf kk) (length (send j :joint-angle))) (setq kk 0) (incf k))
+        )
+       (t
+        (setq jang (deg2rad (send j :joint-angle))
+              jmax (deg2rad (send j :max-angle))
+              jmin (deg2rad (send j :min-angle)))
+        (incf k)))
       (cond 
        ((eps= jang jmax e)
 	(setq jang (- jmax e)))
@@ -1152,13 +1173,22 @@
       )
     res))
 
-(defun joint-angle-limit-nspace (j-l &optional (res (instantiate float-vector (length j-l))))
-  (let (j jang jmax jmin nang r)
-    (dotimes (i (length j-l))
-      (setq j (elt j-l i))
-      (setq jang (send j :joint-angle)
-	    jmax (send j :max-angle)
-	    jmin (send j :min-angle))
+(defun joint-angle-limit-nspace (j-l &optional (res (instantiate float-vector (calc-target-joint-dimension j-l))))
+  (let (j jang jmax jmin nang (k 0) (kk 0) r)
+    (dotimes (i (calc-target-joint-dimension j-l))
+      (setq j (elt j-l k))
+      (cond
+       ((vectorp (send j :joint-angle))
+        (setq jang (elt (send j :joint-angle) kk)
+              jmax (elt (send j :max-angle) kk)
+              jmin (elt (send j :min-angle) kk))
+        (when (>= (incf kk) (length (send j :joint-angle))) (setq kk 0) (incf k))
+        )
+       (t
+        (setq jang (send j :joint-angle)
+              jmax (send j :max-angle)
+              jmin (send j :min-angle))
+        (incf k)))
       (cond
        ((or (eq (send j :name) :torso-waist-p)
 	    (eq (send j :name) :waist-p))
@@ -1187,7 +1217,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.34  2009-07-03 06:16:47  k-okada
+;;; Revision 1.35  2009-07-03 09:48:54  k-okada
+;;; support avoid-weight-gain and avoid-null-gain for omniwheel/wheel-joints
+;;;
+;;; Revision 1.34  2009/07/03 06:16:47  k-okada
 ;;; set weight (wmax) even if  avoid-weight-gain == 0
 ;;;
 ;;; Revision 1.33  2009/07/02 15:28:29  k-okada
