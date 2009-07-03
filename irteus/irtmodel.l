@@ -740,11 +740,12 @@
 		      (/ 1.0 (+ 1.0 (elt joint-angle-limit-weight i)))
 		    1.0))))
        (dotimes (i len) (setf (elt joint-angle-limit-weight-old i)
-			      (elt joint-angle-limit-weight i)))
-       (dotimes (i len) (setf (aref wmat i i) (aref weight i)))
-       (when debug-view
-	 (warn "weight:")
-	 (dotimes (i  len) (warn "~7,3f " (elt weight i))) (warn "~%")))
+			      (elt joint-angle-limit-weight i))))
+
+     (dotimes (i len) (setf (aref wmat i i) (aref weight i)))
+     (when debug-view
+       (warn "weight:")
+       (dotimes (i  len) (warn "~7,3f " (elt weight i))) (warn "~%"))
 
      ;; avoiding joint angle limit : a * W(dH/dq)
      (when (> avoid-nspace-gain 0)
@@ -1186,7 +1187,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.33  2009-07-02 15:28:29  k-okada
+;;; Revision 1.34  2009-07-03 06:16:47  k-okada
+;;; set weight (wmax) even if  avoid-weight-gain == 0
+;;;
+;;; Revision 1.33  2009/07/02 15:28:29  k-okada
 ;;; restore when fillbody ik failed
 ;;;
 ;;; Revision 1.32  2009/07/02 14:43:31  k-okada
