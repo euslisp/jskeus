@@ -372,7 +372,7 @@
      ;; m : manipulability
      (setq m (manipulability jacobi tmp-mrr tmat))
      (if (< m ml) (setq k (* mg (expt (- 1.0 (/ m  ml)) 2))))
-     (when debug-view
+     (unless (memq :no-message debug-view)
        (warn "k     :~7,3f (manipulability:~7,3f, gain:~7,3f, limit:~7,3f, len:~d)~%" k m mg ml (cadr (array-dimensions jacobi))))
 
      ;; calc weighted SR-inverse
@@ -673,7 +673,7 @@
      (if (null tmp-len) (setq tmp-len (instantiate float-vector len)))
      (if (null tmp-len2) (setq tmp-len2 (instantiate float-vector len)))
      (setq J#x (transform jacobi# tmp-dim tmp-len))
-     (when debug-view
+     (unless (memq :no-message debug-view)
        (warn "J#t   :")
        (dotimes (j (cadr (array-dimensions jacobi#)))
 	 (if (/= j 0) (warn "       "))
@@ -850,7 +850,7 @@
      (if (null tmp-len) (setq tmp-len (instantiate float-vector len)))
      (if (null tmp-len2) (setq tmp-len2 (instantiate float-vector len)))
 
-     (when debug-view
+     (unless (memq :no-message debug-view)
        (warn "angle :")
        (dolist (j (send-all link-list :joint))
 	 (let ((a (send j :joint-angle)))
@@ -863,7 +863,7 @@
        (setq joint-angle-limit-weight 
 	 (scale avoid-weight-gain
 		(joint-angle-limit-weight (send-all link-list :joint) tmp-len) tmp-len))
-       (when debug-view
+       (unless (memq :no-message debug-view)
 	 (warn "cost  :")
 	 (dotimes (i len) (warn "~7,3f " (elt joint-angle-limit-weight i))) (warn "~%"))
        
@@ -877,7 +877,7 @@
        (dotimes (i len) (setf (elt joint-angle-limit-weight-old i)
 			      (elt joint-angle-limit-weight i))))
      (dotimes (i len) (setf (aref wmat i i) (aref weight i)))
-     (when debug-view
+     (unless (memq :no-message debug-view)
        (warn "weight:")
        (dotimes (i  len) (warn "~7,3f " (elt weight i))) (warn "~%"))
 
@@ -887,7 +887,7 @@
        (setq la
 	 (scale avoid-nspace-gain
 		(transform wmat joint-angle-limit-nspace tmp-len2) tmp-len2))
-       (when debug-view
+       (unless (memq :no-message debug-view)
 	 (warn "nspace:")
 	 (dotimes (i  len) (warn "~7,3f " (elt la i))) (warn "~%")))
      ;;
@@ -923,7 +923,7 @@
 				      (length col-args-list))))))
 	   (setq col-args (elt col-args-list (1- col-link-len)))
 	   (when np
-	     (when debug-view
+	     (unless (memq :no-message debug-view)
 	       (warn "col   : ~6,2f ~A ~A~%" (car np) (send (car pair) :name) (send (cadr pair) :name)))
 	     (unless col-args
 	       (let* ((c col-link-len)
@@ -992,7 +992,7 @@
 			    :p-limit p-limit :r-limit r-limit
 			    col-args
 			    ))
-		   (when debug-view
+		   (unless (memq :no-message debug-view)
 		     (warn "nspace:")
 		     (dotimes (i col-link-len) (warn "~7,3f " (elt nnul-col i))) (warn "~%"))
 
@@ -1009,7 +1009,7 @@
 			    :jacobi jacobi :jacobi# jacobi#
 			    :p-limit p-limit :r-limit r-limit
 			    col-args))
-		   (when debug-view
+		   (unless (memq :no-message debug-view)
 		     (warn "joint :")
 		     (dotimes (i col-link-len) (warn "~7,3f " (elt ddav-col i))) (warn "~%"))
 
@@ -1026,7 +1026,7 @@
      ;;
      (when (> avoid-collision-null-gain 0)
        (setq nul-col (scale avoid-collision-null-gain (transform wmat nul-col nul-col) nul-col))
-       (when debug-view
+       (unless (memq :no-message debug-view)
 	 (warn "nspace:")
 	 (dotimes (i len) (warn "~7,3f " (elt nul-col i))) (warn "~%")))
      (setq ret
@@ -1139,7 +1139,7 @@
 		       (v- (send move-target :inverse-transform-vector dif-rot)
 			   (send move-target :inverse-transform-vector (float-vector 0 0 0)))
 		       rotation-axis))
-       (when debug-view
+       (unless (memq :no-message debug-view)
 	 (warn ";; ~3d: dif-pos : ~a/(~a/~A), dif-rot : ~a/(~a/~A)~%"
 	       loop ndif-pos (norm ndif-pos) thre ndif-rot (norm ndif-rot) rthre))
        ;; check loop end
@@ -1357,7 +1357,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.37  2009-07-03 11:00:48  k-okada
+;;; Revision 1.38  2009-07-07 07:23:20  k-okada
+;;; support :no-message mode
+;;;
+;;; Revision 1.37  2009/07/03 11:00:48  k-okada
 ;;; set weight=0 when min-angle == max-angle, with avoid-weight-gain
 ;;;
 ;;; Revision 1.36  2009/07/03 10:40:22  k-okada
