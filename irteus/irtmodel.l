@@ -198,11 +198,11 @@
      joint-angle))
   )
 
-(defclass 6d-joint
+(defclass 6dof-joint
   :super joint
   :slots (axis))
 
-(defmethod 6d-joint
+(defmethod 6dof-joint
   (:init (&rest args
                 &key
                 (min (float-vector *-inf* *-inf* *-inf* *-inf* *-inf* *-inf*))
@@ -486,7 +486,7 @@
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
-  (:calc-jacobian-6d-joint
+  (:calc-jacobian-6dof-joint
    (fik i joint paxis child-link child-reverse
 	move-target rotation-axis translation-axis
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
@@ -586,8 +586,8 @@
 		rotation-axis translation-axis pos-i pos-r
 		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
 	  (incf i 2))
-	 ((derivedp j 6d-joint)
-	  (send self :calc-jacobian-6d-joint
+	 ((derivedp j 6dof-joint)
+	  (send self :calc-jacobian-6dof-joint
 		fik i j paxis child-link child-reverse move-target
 		rotation-axis translation-axis pos-i pos-r
 		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
@@ -780,7 +780,7 @@
 		(float-vector (rad2deg (elt dav i))
 			      (rad2deg (elt dav (incf i)))
 			      (rad2deg (elt dav (incf i)))))
-	       ((derivedp j 6d-joint)
+	       ((derivedp j 6dof-joint)
 		(float-vector (* 1000 (elt dav i))
 			      (* 1000 (elt dav (incf i)))
                               (* 1000 (elt dav (incf i)))
@@ -1263,7 +1263,7 @@
 	 (incf n 3))
 	((derivedp j sphere-joint)
 	 (incf n 3))
-	((derivedp j 6d-joint)
+	((derivedp j 6dof-joint)
 	 (incf n 6))
 	(t (incf n))))
      n))
@@ -1357,7 +1357,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.40  2009-07-09 02:41:45  k-okada
+;;; Revision 1.41  2009-07-09 07:11:48  k-okada
+;;; change 6d-joint -> 6dof->joint
+;;;
+;;; Revision 1.40  2009/07/09 02:41:45  k-okada
 ;;; fix joint-angle-limit-nspace not to return inf
 ;;;
 ;;; Revision 1.39  2009/07/09 01:18:25  k-okada
