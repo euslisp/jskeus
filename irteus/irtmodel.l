@@ -1344,7 +1344,7 @@
 	(setf (elt res i) (/ (- (/ (+ jmax jmin) 2.0) jang)
 			     (/ (- jmax jmin) 2.0)))))
       (setq r (* (if (plusp (elt res i)) 1 -1) (expt (elt res i) 2)))
-      (if (and (< r 0.0) (> r 0.0)) (setq r 0.0))
+      (if (or (eq r *nan*) (eq r *inf*) (eq r *-inf*)) (setq r 0.0))
       (setf (elt res i) r))
     res))
 
@@ -1357,7 +1357,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.39  2009-07-09 01:18:25  k-okada
+;;; Revision 1.40  2009-07-09 02:41:45  k-okada
+;;; fix joint-angle-limit-nspace not to return inf
+;;;
+;;; Revision 1.39  2009/07/09 01:18:25  k-okada
 ;;; support  :no-message in debug-view
 ;;;
 ;;; Revision 1.38  2009/07/07 07:23:20  k-okada
