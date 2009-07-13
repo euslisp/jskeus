@@ -192,9 +192,9 @@
        (setq v (vmin v max-angle))
        (setq joint-angle v)
        (send child-link :replace-coords default-coords)
-       (send child-link :rotate (deg2rad (elt joint-angle 0)) :x)
+       (send child-link :rotate (deg2rad (elt joint-angle 0)) :z)
        (send child-link :rotate (deg2rad (elt joint-angle 1)) :y)
-       (send child-link :rotate (deg2rad (elt joint-angle 2)) :z))
+       (send child-link :rotate (deg2rad (elt joint-angle 2)) :x))
      joint-angle))
   )
 
@@ -223,9 +223,9 @@
        (setq joint-angle v)
        (send child-link :replace-coords default-coords)
        (send child-link :translate (subseq joint-angle 0 3))
-       (send child-link :rotate (deg2rad (elt joint-angle 3)) :x)
+       (send child-link :rotate (deg2rad (elt joint-angle 3)) :z)
        (send child-link :rotate (deg2rad (elt joint-angle 4)) :y)
-       (send child-link :rotate (deg2rad (elt joint-angle 5)) :z))
+       (send child-link :rotate (deg2rad (elt joint-angle 5)) :x))
      joint-angle))
   )
 
@@ -474,7 +474,7 @@
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
      (send self :calc-jacobian-rotational-joint
-	   fik i joint #f(1 0 0) child-link child-reverse
+	   fik i joint #f(0 0 1) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-rotational-joint
@@ -482,7 +482,7 @@
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-rotational-joint
-	   fik (+ i 2) joint #f(0 0 1) child-link child-reverse
+	   fik (+ i 2) joint #f(1 0 0) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
@@ -504,7 +504,7 @@
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-rotational-joint
-	   fik (+ i 3) joint #f(1 0 0) child-link child-reverse
+	   fik (+ i 3) joint #f(0 0 1) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-rotational-joint
@@ -512,7 +512,7 @@
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-rotational-joint
-	   fik (+ i 5) joint #f(0 0 1) child-link child-reverse
+	   fik (+ i 5) joint #f(1 0 0) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
@@ -1357,7 +1357,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.41  2009-07-09 07:11:48  k-okada
+;;; Revision 1.42  2009-07-13 11:41:31  k-okada
+;;; fix sphere/6dof-joint to zyx-angle
+;;;
+;;; Revision 1.41  2009/07/09 07:11:48  k-okada
 ;;; change 6d-joint -> 6dof->joint
 ;;;
 ;;; Revision 1.40  2009/07/09 02:41:45  k-okada
