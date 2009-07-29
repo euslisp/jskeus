@@ -1045,12 +1045,12 @@
                  null-space-collision-avoidance (cdr ret))))
      ;;
      (when (> avoid-collision-null-gain 0)
-       (setq null-space-collision-avoidane
+       (setq null-space-collision-avoidance
              (scale avoid-collision-null-gain
-                    (transform wmat null-space-collision-avoidane null-space-collision-avoidane) null-space-collision-avoidane))
+                    (transform wmat null-space-collision-avoidance null-space-collision-avoidance) null-space-collision-avoidance))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "nspace:")
-	 (dotimes (i len) (warn "~7,3f " (elt nul-col i))) (warn "~%")))
+	 (dotimes (i len) (warn "~7,3f " (elt null-space-collision-avoidance i))) (warn "~%")))
      (when (> avoid-collision-joint-gain 0)
        (setq angle-speed-collision-avoidance (scale avoid-collision-joint-gain (transform wmat angle-speed-collision-avoidance angle-speed-collision-avoidance) angle-speed-collision-avoidance))
        (when (and debug-view (not (memq :no-message debug-view)))
@@ -1395,7 +1395,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.45  2009-07-29 06:21:46  k-okada
+;;; Revision 1.46  2009-07-29 06:25:56  k-okada
+;;; fix typo
+;;;
+;;; Revision 1.45  2009/07/29 06:21:46  k-okada
 ;;; rearrange, la, nul-col, dav-col to null-space-joint-limit, null-space-collision-avoidance, angle-speed-collision-avoidance
 ;;;
 ;;; Revision 1.44  2009/07/29 06:10:36  k-okada
