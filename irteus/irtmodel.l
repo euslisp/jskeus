@@ -287,7 +287,7 @@
 (defclass cascaded-link
   :super cascaded-coords
   :slots (links joint-list bodies
-		collision-avoidance-link-pair))
+		collision-avoidance-links))
 
 (defmethod cascaded-link
   (:init (&rest args
@@ -695,21 +695,63 @@
        ;; add null space
        (v+ J#x (transform I-J#J null-space tmp-len2) J#x))
      J#x))
-  (:collision-avoidance-link-pair (&rest args) collision-avoidance-link-pair)
+  (:collision-avoidance-links
+   (&optional l)
+   (if l (setq collision-avoidance-links l)) collision-avoidance-links)
+  (:collision-avoidance-link-pair-from-link-list
+   (link-list &optional obstacles)
+   (let* ((parent-links
+           (mapcar
+            #'(lambda (ll)
+                (let ((l ll))
+                  (while (and l (send l :parent-link)
+                              (eps= (distance (send ll :worldpos)
+                                              (send (send l :parent-link) :worldpos)) 0))
+                    (setq l (send l :parent-link)))
+                  (send l :parent-link)))
+            collision-avoidance-links))
+          (valid-link-list
+           (subseq
+            link-list
+            (let ((i 1))
+              (while (eps= (distance (send (elt link-list 0) :worldpos)
+                                     (send (elt link-list i) :worldpos)) 0.0)
+                (incf i)) i)))
+          (index-links
+           (mapcar #'(lambda (l) (position l valid-link-list)) collision-avoidance-links))
+          (len (length collision-avoidance-links))
+          i0 ret)
+     (dotimes (i len)
+       (do ((j (1+ i) (1+ j)))
+           ((>= j len))
+           (if (and (or (setq i0 (elt index-links i))
+                        (elt index-links j))
+                    (not (eq (elt parent-links i)
+                             (elt collision-avoidance-links j)))
+                    (not (eq (elt parent-links j)
+                             (elt collision-avoidance-links i))))
+               (push (list (elt collision-avoidance-links (if i0 i j))
+                           (elt collision-avoidance-links (if i0 j i))) ret))))
+     (when obstacles
+       (if (atom obstacles) (setq obstacles (list obstacles)))
+       (dotimes (i len)
+         (if (elt index-links i)
+             (dolist (o obstacles)
+               (push (list (elt collision-avoidance-links i) o) ret)))))
+     ret))
   (:collision-avoidance-calc-distance
    (&rest args
 	  &key link-list (warnp t)
+          ((:collision-avoidance-link-pair pair-list))
 	  &allow-other-keys)
-   (let* ((pair-list (send* self :collision-avoidance-link-pair args))
-	  (pair-len (length pair-list))
+   (let* ((pair-len (length pair-list))
 	  (ret (make-list pair-len))
 	  (col-list (send self :get :collision-distance))
 	  (distance-limit 1.0)
 	  (sc 0.0) np collidep pair)
      (dotimes (i pair-len) (setf (elt ret i) (float-vector 0 0 0)))
      (when (or (null link-list) (= pair-len 0))
-       (print (send* self :collision-avoidance-link-pair args))
-       (warn ";; ERROR: :link-list ~A / pair-len ~A required~%" link-list pair-len)
+       (warn ";; ERROR: :link-list ~A or pair-len ~A required~%" link-list pair-len)
        (return-from :collision-avoidance-calc-distance ret))
      (if (or (null col-list) (/= (length col-list) pair-len))
 	 (setq col-list (make-list pair-len)))
@@ -718,6 +760,7 @@
        (setq pair (elt pair-list i))
        (if (not (memq (car pair) link-list)) 
 	   (progn
+             (warn ";; ERROR : (car pair) is not included in link-list ~A~%" (send-all pair :name))
 	     (setf (elt col-list i) nil)
 	     )
 	 (progn
@@ -805,13 +848,13 @@
             (avoid-collision-joint-distance 500)
             (debug-view)
             (link-list)
+            ((:collision-avoidance-link-pair pair-list))
             (move-target)
             &allow-other-keys)
    (let* ((len (send self :calc-target-joint-dimension link-list))
           (ret (send* self :collision-avoidance-calc-distance args))
           (collision-limit (min avoid-collision-joint-distance 
                                 (* 0.5 (norm vel-pos))))
-          (pair-list (send self :collision-avoidance-link-pair))
           (pair-len (length pair-list)) pair 
           col-args
           (p-limit (cadr (memq :p-limit args)))
@@ -967,6 +1010,8 @@
 	    (avoid-weight-gain 1.0)
 	    (avoid-collision-null-gain 1.0)
 	    (avoid-collision-joint-gain 0.3)
+            ((:collision-avoidance-link-pair pair-list)
+             (send self :collision-avoidance-link-pair-from-link-list link-list))
 	    (tmp-len) (tmp-len2) (debug-view)
 	    &allow-other-keys)
    (let* ((len (send self :calc-target-joint-dimension link-list))
@@ -1040,7 +1085,8 @@
      ;; avoiding self collision
      (if (or (> avoid-collision-null-gain 0.0)
 	     (> avoid-collision-joint-gain 0.0))
-         (let ((ret (send* self :collision-avoidance vel-pos args)))
+         (let ((ret (send* self :collision-avoidance vel-pos
+                           :collision-avoidance-link-pair pair-list args)))
            (setq angle-speed-collision-avoidance (car ret)
                  null-space-collision-avoidance (cdr ret))))
      ;;
@@ -1082,14 +1128,15 @@
 	 (let ((pwidth (send *viewer* :viewsurface :line-width))
 	       (psize (send *viewer* :viewsurface :point-size))
 	       (pcolor (send *viewer* :viewsurface :color))
-	       (pair-list (send self :collision-avoidance-link-pair))
 	       np)
 	   (send *viewer* :viewsurface :point-size 5)
 	   (send *viewer* :viewsurface :line-width 1)
 	   (send *viewer* :viewsurface :color #f(1 0 0))
 	   (dotimes (i (length pair-list))
 	     (setq np (elt (send self :get :collision-distance) i))
-	     (unless np (return))
+	     (unless np
+               (warn ";; ERROR : could not get collision-distance ~A" (send-all pair-list :name))
+               (return))
 	     (if (<= (car np) -1.0)
 		 (dolist (obj (elt pair-list i))
 		   (dolist (e (cdr (send obj :edges)))
@@ -1395,7 +1442,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.46  2009-07-29 06:25:56  k-okada
+;;; Revision 1.47  2009-07-29 08:33:53  k-okada
+;;; remove collision-avoidance-link-pair, add :collision-aovidance-link-pair-from-link-list
+;;;
+;;; Revision 1.46  2009/07/29 06:25:56  k-okada
 ;;; fix typo
 ;;;
 ;;; Revision 1.45  2009/07/29 06:21:46  k-okada
