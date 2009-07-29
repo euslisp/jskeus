@@ -1029,6 +1029,7 @@
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "nspace:")
 	 (dotimes (i len) (warn "~7,3f " (elt nul-col i))) (warn "~%")))
+     (if (listp null-space) (setq null-space (eval null-space)))
      (setq ret
          (send-message* self cascaded-link
                         :move-joints vel-pos vel-rot
@@ -1357,7 +1358,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.42  2009-07-13 11:41:31  k-okada
+;;; Revision 1.43  2009-07-29 04:15:16  k-okada
+;;; support :null-space '(....)
+;;;
+;;; Revision 1.42  2009/07/13 11:41:31  k-okada
 ;;; fix sphere/6dof-joint to zyx-angle
 ;;;
 ;;; Revision 1.41  2009/07/09 07:11:48  k-okada
