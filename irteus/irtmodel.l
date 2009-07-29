@@ -975,8 +975,9 @@
 	  joint-angle-limit-weight
 	  joint-angle-limit-weight-old
 	  dav dtheta 
-	  (la (instantiate float-vector len))
-          nul-col dav-col
+	  (null-space-joint-limit (instantiate float-vector len))
+          null-space-collision-avoidance
+          angle-speed-collision-avoidance
           (ret t))
      (when (or (null link-list) (null move-target))
        (warn ";; ERROR: :link-list or :move-target required~%")
@@ -1028,39 +1029,49 @@
      ;; avoiding joint angle limit : a * W(dH/dq)
      (when (> avoid-nspace-gain 0)
        (setq joint-angle-limit-nspace (joint-angle-limit-nspace (send-all link-list :joint) tmp-len2))
-       (setq la
+       (setq null-space-joint-limit
 	 (scale avoid-nspace-gain
 		(transform wmat joint-angle-limit-nspace tmp-len2) tmp-len2))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "nspace:")
-	 (dotimes (i  len) (warn "~7,3f " (elt la i))) (warn "~%")))
+	 (dotimes (i  len) (warn "~7,3f " (elt null-space-joint-limit i))) (warn "~%")))
      ;;
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
      ;; avoiding self collision
      (if (or (> avoid-collision-null-gain 0.0)
 	     (> avoid-collision-joint-gain 0.0))
          (let ((ret (send* self :collision-avoidance vel-pos args)))
-           (setq dav-col (car ret)
-                 nul-col (cdr ret))))
+           (setq angle-speed-collision-avoidance (car ret)
+                 null-space-collision-avoidance (cdr ret))))
      ;;
      (when (> avoid-collision-null-gain 0)
-       (setq nul-col (scale avoid-collision-null-gain (transform wmat nul-col nul-col) nul-col))
+       (setq null-space-collision-avoidane
+             (scale avoid-collision-null-gain
+                    (transform wmat null-space-collision-avoidane null-space-collision-avoidane) null-space-collision-avoidane))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "nspace:")
 	 (dotimes (i len) (warn "~7,3f " (elt nul-col i))) (warn "~%")))
      (when (> avoid-collision-joint-gain 0)
-       (setq dav-col (scale avoid-collision-joint-gain (transform wmat dav-col dav-col) dav-col))
+       (setq angle-speed-collision-avoidance (scale avoid-collision-joint-gain (transform wmat angle-speed-collision-avoidance angle-speed-collision-avoidance) angle-speed-collision-avoidance))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "joint :")
-	 (dotimes (i len) (warn "~7,3f " (elt dav-col i))) (warn "~%")))
+	 (dotimes (i len) (warn "~7,3f " (elt angle-speed-collision-avoidance i))) (warn "~%")))
      (if (listp null-space) (setq null-space (eval null-space)))
-     (if nul-col (setq la (v+ la nul-col la)))
-     (if null-space (setq la (v+ null-space la la)))
+     (if (> avoid-collision-null-gain 0)
+         (setq null-space-joint-limit
+               (v+ null-space-joint-limit
+                   null-space-collision-avoidance
+                   null-space-joint-limit)))
+     (if null-space
+         (setq null-space-joint-limit
+               (v+ null-space
+                   null-space-joint-limit
+                   null-space-joint-limit)))
      (setq ret
          (send-message* self cascaded-link
                         :move-joints vel-pos vel-rot
-                        :null-space la
-                        :angle-speed dav-col
+                        :null-space null-space-joint-limit
+                        :angle-speed angle-speed-collision-avoidance
                         :weight weight
                         args))
      ;;
@@ -1384,7 +1395,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.44  2009-07-29 06:10:36  k-okada
+;;; Revision 1.45  2009-07-29 06:21:46  k-okada
+;;; rearrange, la, nul-col, dav-col to null-space-joint-limit, null-space-collision-avoidance, angle-speed-collision-avoidance
+;;;
+;;; Revision 1.44  2009/07/29 06:10:36  k-okada
 ;;; re-arraange collision-avoidance related codes :collision-avoidance, collisoin-avoidance-args :collision-avoidance-calc-distance
 ;;;
 ;;; Revision 1.43  2009/07/29 04:15:16  k-okada
