@@ -994,8 +994,7 @@
      ;;
      ;; done
      (when (and debug-view *viewer*)
-       (send (send *viewer* :viewsurface :parent) :draw-objects
-	     :clear nil :flush nil)
+       (send *viewer* :draw-objects :clear nil :flush nil)
        (if move-target
 	   (send-message move-target cascaded-link :draw-on :flush nil :size 100)))
      ret))
@@ -1442,7 +1441,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.48  2009-07-31 10:08:08  ueda
+;;; Revision 1.49  2009-07-31 11:10:02  ueda
+;;; chage debug-view in move-joints for (pickview :separate t)
+;;;
+;;; Revision 1.48  2009/07/31 10:08:08  ueda
 ;;; support :obstacle and :collision-avoidance keyword for :collision-avoidance-link-pair-from-link-list
 ;;;
 ;;; Revision 1.47  2009/07/29 08:33:53  k-okada
