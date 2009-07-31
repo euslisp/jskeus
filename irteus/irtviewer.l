@@ -30,6 +30,11 @@
     (send c :rotate (- (deg2rad uda)) :y)
     c))
 
+(defmethod geo::viewer
+  (:draw-objects
+    (&rest args)
+    (send* (get self :pickviewer) :draw-objects args)))
+
 (defclass irtviewer
   :super x::panel
   :slots (viewer
@@ -59,6 +64,7 @@
 			 :x 0 :y 0
 			 :width width :height height 
 			 :title name args))
+     (setf (get viewer :pickviewer) self)
      (setq user::*viewer* viewer)
 
      (setq gl::*light0* 
@@ -272,7 +278,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.4  2009-02-17 02:04:48  k-okada
+;;; Revision 1.5  2009-07-31 11:10:31  ueda
+;;; add :draw-objects to geo::viewer for (pickview :separate t)
+;;;
+;;; Revision 1.4  2009/02/17 02:04:48  k-okada
 ;;; fix typo on copyright
 ;;;
 ;;; Revision 1.3  2009/01/06 13:18:23  k-okada
