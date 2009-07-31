@@ -699,7 +699,7 @@
    (&optional l)
    (if l (setq collision-avoidance-links l)) collision-avoidance-links)
   (:collision-avoidance-link-pair-from-link-list
-   (link-list &optional obstacles)
+   (link-list &key obstacles ((:collision-avoidnace-links collision-links) collision-avoidance-links))
    (let* ((parent-links
            (mapcar
             #'(lambda (ll)
@@ -709,7 +709,7 @@
                                               (send (send l :parent-link) :worldpos)) 0))
                     (setq l (send l :parent-link)))
                   (send l :parent-link)))
-            collision-avoidance-links))
+            collision-links))
           (valid-link-list
            (subseq
             link-list
@@ -718,8 +718,8 @@
                                      (send (elt link-list i) :worldpos)) 0.0)
                 (incf i)) i)))
           (index-links
-           (mapcar #'(lambda (l) (position l valid-link-list)) collision-avoidance-links))
-          (len (length collision-avoidance-links))
+           (mapcar #'(lambda (l) (position l valid-link-list)) collision-links))
+          (len (length collision-links))
           i0 ret)
      (dotimes (i len)
        (do ((j (1+ i) (1+ j)))
@@ -727,17 +727,17 @@
            (if (and (or (setq i0 (elt index-links i))
                         (elt index-links j))
                     (not (eq (elt parent-links i)
-                             (elt collision-avoidance-links j)))
+                             (elt collision-links j)))
                     (not (eq (elt parent-links j)
-                             (elt collision-avoidance-links i))))
-               (push (list (elt collision-avoidance-links (if i0 i j))
-                           (elt collision-avoidance-links (if i0 j i))) ret))))
+                             (elt collision-links i))))
+               (push (list (elt collision-links (if i0 i j))
+                           (elt collision-links (if i0 j i))) ret))))
      (when obstacles
        (if (atom obstacles) (setq obstacles (list obstacles)))
        (dotimes (i len)
          (if (elt index-links i)
              (dolist (o obstacles)
-               (push (list (elt collision-avoidance-links i) o) ret)))))
+               (push (list (elt collision-links i) o) ret)))))
      ret))
   (:collision-avoidance-calc-distance
    (&rest args
@@ -1442,7 +1442,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.47  2009-07-29 08:33:53  k-okada
+;;; Revision 1.48  2009-07-31 10:08:08  ueda
+;;; support :obstacle and :collision-avoidance keyword for :collision-avoidance-link-pair-from-link-list
+;;;
+;;; Revision 1.47  2009/07/29 08:33:53  k-okada
 ;;; remove collision-avoidance-link-pair, add :collision-aovidance-link-pair-from-link-list
 ;;;
 ;;; Revision 1.46  2009/07/29 06:25:56  k-okada
