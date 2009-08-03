@@ -38,7 +38,9 @@
 #+:linux 
   (progn
     (setq glu-lib
-	  (cond ((probe-file "/usr/lib/libGLU.so")
+	  (cond ((member :ia32 *features*)
+		 (load-foreign "/usr/lib32/libGLU.so"))
+		((probe-file "/usr/lib/libGLU.so")
 		 (load-foreign "/usr/lib/libGLU.so"))
 		((probe-file "/usr/X11R6/lib/libGLU.so")
 		 (load-foreign "/usr/X11R6/lib/libGLU.so"))
@@ -405,7 +407,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.6  2009-03-12 13:43:02  k-okada
+;;; Revision 1.7  2009-08-03 06:26:32  eus
+;;; add ia32 mode for x86_64 linux
+;;;
+;;; Revision 1.6  2009/03/12 13:43:02  k-okada
 ;;; fix for new cygwin/X
 ;;;
 ;;; Revision 1.5  2009/02/17 02:04:48  k-okada

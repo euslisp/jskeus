@@ -57,9 +57,11 @@
       (setq pname "/usr/bin/cygX11-6.dll")
     (setq pname "/usr/X11R6/bin/cygX11-6.dll"))
 #+:linux 
-  (if (probe-file "/usr/X11R6/lib/libX11.so")
-      (setq pname "/usr/X11R6/lib/libX11.so")
-    (setq pname "/usr/lib/libX11.so"))
+  (cond ((member :ia32 *features*)
+	 (setq pname "/usr/lib32/libX11.so"))
+	((probe-file "/usr/lib/libX11.so")
+	 (setq pname "/usr/lib/libX11.so"))
+	(t (setq pname "/usr/X11R6/lib/libX11.so")))
   ;; for receiving Window Manager Messages
   (when (probe-file pname)
     (setq x-lib (load-foreign pname))
@@ -252,7 +254,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.4  2009-03-12 13:43:02  k-okada
+;;; Revision 1.5  2009-08-03 06:26:32  eus
+;;; add ia32 mode for x86_64 linux
+;;;
+;;; Revision 1.4  2009/03/12 13:43:02  k-okada
 ;;; fix for new cygwin/X
 ;;;
 ;;; Revision 1.3  2009/02/17 02:04:48  k-okada

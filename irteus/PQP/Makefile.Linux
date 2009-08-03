@@ -8,3 +8,12 @@ EXESFX =
 LSFX = so
 LPFX = lib
 LIBS = -L$(ARCHDIR) -lRAPID 
+
+
+ifeq ($(shell /bin/uname -m), x86_64)
+CC += -m32 
+LD += -m32
+EXELD += -m32 
+endif
+
+
