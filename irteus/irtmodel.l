@@ -699,7 +699,7 @@
    (&optional l)
    (if l (setq collision-avoidance-links l)) collision-avoidance-links)
   (:collision-avoidance-link-pair-from-link-list
-   (link-list &key obstacles ((:collision-avoidnace-links collision-links) collision-avoidance-links))
+    (link-list &key obstacles ((:collision-avoidance-links collision-links) collision-avoidance-links))
    (let* ((parent-links
            (mapcar
             #'(lambda (ll)
@@ -1443,7 +1443,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.50  2009-08-04 04:53:34  eus
+;;; Revision 1.51  2009-08-04 08:35:28  ueda
+;;; fix a typo
+;;;
+;;; Revision 1.50  2009/08/04 04:53:34  eus
 ;;; modify :move-joints-avoidance
 ;;;
 ;;; Revision 1.49  2009/07/31 11:10:02  ueda
