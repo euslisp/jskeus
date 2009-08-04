@@ -1085,6 +1085,8 @@
      (if (or (> avoid-collision-null-gain 0.0)
 	     (> avoid-collision-joint-gain 0.0))
          (let ((ret (send* self :collision-avoidance vel-pos
+                           :avoid-collision-null-gain avoid-collision-null-gain
+                           :avoid-collision-joint-gain avoid-collision-joint-gain
                            :collision-avoidance-link-pair pair-list args)))
            (setq angle-speed-collision-avoidance (car ret)
                  null-space-collision-avoidance (cdr ret))))
@@ -1441,7 +1443,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.49  2009-07-31 11:10:02  ueda
+;;; Revision 1.50  2009-08-04 04:53:34  eus
+;;; modify :move-joints-avoidance
+;;;
+;;; Revision 1.49  2009/07/31 11:10:02  ueda
 ;;; chage debug-view in move-joints for (pickview :separate t)
 ;;;
 ;;; Revision 1.48  2009/07/31 10:08:08  ueda
