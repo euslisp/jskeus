@@ -37,8 +37,8 @@
      (setf (get self :pqpmodel) m)
      (pqpbeginmodel m)
      (dolist (f (send self :faces))
-       (dolist (polygon (face-to-triangle-aux f))
-	 (setq vs (send polygon :vertices)
+       (dolist (poly (face-to-triangle-aux f))
+	 (setq vs (send poly :vertices)
 	       v1 (send self :inverse-transform-vector (first vs))
 	       v2 (send self :inverse-transform-vector (second vs))
 	       v3 (send self :inverse-transform-vector (third vs)))
@@ -125,7 +125,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.2  2009-02-17 02:04:48  k-okada
+;;; Revision 1.3  2009-08-05 16:22:58  ueda
+;;; change polygon -> poly for thread safe
+;;;
+;;; Revision 1.2  2009/02/17 02:04:48  k-okada
 ;;; fix typo on copyright
 ;;;
 ;;; Revision 1.1  2008/09/18 18:11:01  k-okada
