@@ -1204,7 +1204,9 @@
           (fix-targets-av 
            (mapcar #'(lambda (l) (send-all l :joint :joint-angle))
                    (mapcar #'(lambda (l) (send self :link-list l)) fix-targets)))
+	  (old-analysis-level (send-all link-list :analysis-level))
 	  )
+     (send-all link-list :analysis-level :coords)
      (when debug-view
        (if (atom debug-view) (setq debug-view (list debug-view)))
        (when (not (memq :no-clear debug-view))
@@ -1278,6 +1280,7 @@
 			(send move-target :inverse-transform-vector (float-vector 0 0 0)))
 		    rotation-axis))
 
+     (mapcar #'(lambda (l a) (send l :analysis-level a)) link-list old-analysis-level)
      ;; check solved or not
      (if (and success (< (norm dif-pos) thre)  (< (norm dif-rot) rthre))
          (send self :angle-vector)
@@ -1443,7 +1446,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.51  2009-08-04 08:35:28  ueda
+;;; Revision 1.52  2009-08-07 11:19:10  k-okada
+;;; set analysis-level in inverse-kinematics
+;;;
+;;; Revision 1.51  2009/08/04 08:35:28  ueda
 ;;; fix a typo
 ;;;
 ;;; Revision 1.50  2009/08/04 04:53:34  eus
