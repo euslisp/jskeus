@@ -60,6 +60,16 @@
 	     a1 (send coords :axis rotation-axis))
        (setq dif-rot (scale (acos (v. a0 a1)) (normalize-vector (v* a0 a1))))
        )
+      ((or (eq rotation-axis :xx)
+	   (eq rotation-axis :yy)
+	   (eq rotation-axis :zz))
+       (let ((axis (case rotation-axis (:xx :x) (:yy :y) (:zz :z))) a2)
+	 (setq a0 (send self :axis axis)
+	       a1 (send coords :axis axis)
+	       a2 (v- (send coords :axis axis)))
+	 (setq a1 (scale (acos (v. a0 a1)) (normalize-vector (v* a0 a1))))
+	 (setq a2 (scale (acos (v. a0 a2)) (normalize-vector (v* a0 a2))))
+	 (if (< (norm a1) (norm a2)) (setq dif-rot a1) (setq dif-rot a2))))
       (t
        (setq dif-rotmatrix (m* (transpose (send self :worldrot)) (send coords :worldrot)))
        (setq dif-rot (user::matrix-log dif-rotmatrix))
@@ -305,7 +315,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.6  2009-05-15 07:45:48  eus
+;;; Revision 1.7  2009-08-07 12:13:20  k-okada
+;;; support rotation-axis :xx :yy :zz
+;;;
+;;; Revision 1.6  2009/05/15 07:45:48  eus
 ;;; remove :box from bodyset
 ;;;
 ;;; Revision 1.5  2009/05/15 01:02:27  nozawa

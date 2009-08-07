@@ -352,7 +352,7 @@
    (let ((dim 6))
      (dolist (axis (list translation-axis rotation-axis))
        (case axis
-	     ((:x :y :z) (decf dim 1))
+	     ((:x :y :z :xx :yy :zz) (decf dim 1))
 	     ((:xy :yx :yz :zy :zx :xz) (decf dim 2))
 	     (nil (decf dim 3))))
      dim))
@@ -554,6 +554,7 @@
 	      (setq child-link (send j :child-link))))
 	(setq paxis (case (j . axis)
 		      (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1))
+		      (:xx #f(1 0 0)) (:yy #f(0 1 0)) (:zz #f(0 0 1))
 		      (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1))
 		      (t (j . axis))))
 
@@ -1306,21 +1307,24 @@
 
 (defun calc-dif-with-axis (dif axis &optional tmp-v0 tmp-v1 tmp-v2)
   (case axis
-	(:x (if tmp-v2 
-		(progn
-		  (setf (elt tmp-v2 0) (elt dif 1) (elt tmp-v2 1) (elt dif 2))
-		  tmp-v2)
-	      (float-vector (elt dif 1) (elt dif 2))))
-	(:y (if tmp-v2
-		(progn
-		  (setf (elt tmp-v2 0) (elt dif 0) (elt tmp-v2 1) (elt dif 2))
-		  tmp-v2)
-	      (float-vector (elt dif 0) (elt dif 2))))
-	(:z (if tmp-v2
-		(progn
-		  (setf (elt tmp-v2 0) (elt dif 0) (elt tmp-v2 1) (elt dif 1))
-		  tmp-v2)
-	      (float-vector (elt dif 0) (elt dif 1))))
+	((:x :xx)
+	 (if tmp-v2 
+	     (progn
+	       (setf (elt tmp-v2 0) (elt dif 1) (elt tmp-v2 1) (elt dif 2))
+	       tmp-v2)
+	   (float-vector (elt dif 1) (elt dif 2))))
+	((:y :yy)
+	 (if tmp-v2
+	     (progn
+	       (setf (elt tmp-v2 0) (elt dif 0) (elt tmp-v2 1) (elt dif 2))
+	       tmp-v2)
+	   (float-vector (elt dif 0) (elt dif 2))))
+	((:z :zz)
+	 (if tmp-v2
+	     (progn
+	       (setf (elt tmp-v2 0) (elt dif 0) (elt tmp-v2 1) (elt dif 1))
+	       tmp-v2)
+	   (float-vector (elt dif 0) (elt dif 1))))
 	((:xy :yx)
 	 (if tmp-v1
 	     (progn 
@@ -1446,7 +1450,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.52  2009-08-07 11:19:10  k-okada
+;;; Revision 1.53  2009-08-07 12:13:20  k-okada
+;;; support rotation-axis :xx :yy :zz
+;;;
+;;; Revision 1.52  2009/08/07 11:19:10  k-okada
 ;;; set analysis-level in inverse-kinematics
 ;;;
 ;;; Revision 1.51  2009/08/04 08:35:28  ueda
