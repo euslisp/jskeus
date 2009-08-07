@@ -181,8 +181,7 @@
 
 (defun pseudo-inverse (mat &optional weight-vector 
 			   ret wmat mat-tmp mat-tmp-cc mat-tmp-cr)
-  (let* ((d (array-dimensions mat))
-	 (r (car d)) (c (cadr d))
+  (let* ((r (array-dimension mat 0)) (c (array-dimension mat 1))
 	 a p tmp-mat)
     (if (null ret) (setq ret (make-matrix c r)))
     (if (null mat-tmp-cc) (setq mat-tmp-cc (make-matrix c c)))
@@ -190,7 +189,7 @@
 
     ;; without weight (use sv-decompose)
     (if (null weight-vector)
-      (return-from pseudo-inverse (pseudo-inverse-org mat))); ret mat-tmp-cc mat-tmp-cr)))
+      (return-from pseudo-inverse (pseudo-inverse2 mat)))
     ;; with weight
     (setq a (max r c))
     (if (null wmat) (setq wmat (make-matrix a a)))
@@ -198,13 +197,12 @@
     (dotimes (i a) (setf (aref wmat i i) (sqrt (aref weight-vector i))))
     (if (<= r c)
 	(progn
-	  (setq p (pseudo-inverse-org (m* mat wmat mat-tmp) ret mat-tmp-cc mat-tmp-cr))
+	  (setq p (pseudo-inverse2 (m* mat wmat mat-tmp) ret))
 	  (if p (m* wmat p ret) nil))
       ;; (> r c)
       (progn
-	(setq p (pseudo-inverse-org (m* wmat mat mat-tmp) ret mat-tmp-cc mat-tmp-cr))
-	(if p (m* p wmat ret) nil)))
-    ))
+	(setq p (pseudo-inverse2 (m* wmat mat mat-tmp) ret))
+	(if p (m* p wmat ret) nil)))))
 
 (defun pseudo-inverse-org (m &optional ret winv mat-tmp-cr)
   (let (s r u w v x)
@@ -232,8 +230,7 @@
 (defun sr-inverse (mat &optional (k 1.0) weight-vector ret
 		       wmat tmat umat umat2 mat-tmp
 		       mat-tmp-cc mat-tmp-rc mat-tmp-rr mat-tmp-rr2)
-  (let* ((d (array-dimensions mat))
-	 (r (car d)) (c (cadr d))
+  (let* ((r (array-dimension mat 0)) (c (array-dimension mat 1))
 	 mat-tmp-rr)
     ;; mat (r c)
     (if (null tmat) (setq tmat (make-matrix c r)))
@@ -289,8 +286,8 @@
     ))
 
 (defun manipulability (jacobi &optional tmp-mrr tmp-mcr)
-  (let* ((d (array-dimensions jacobi))
-	 (r (car d)) (c (cadr d)))
+  (let* ((r (array-dimension jacobi 0))
+	 (c (array-dimension jacobi 1)))
     (if (null tmp-mrr) (setq tmp-mrr (make-matrix r r)))
     (if (null tmp-mcr) (setq tmp-mcr (make-matrix c r)))
     (sqrt (max 0.0 (matrix-determinant (m* jacobi (transpose jacobi tmp-mcr) tmp-mrr))))))
@@ -317,7 +314,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.7  2009-03-02 15:44:53  k-okada
+;;; Revision 1.8  2009-08-07 11:22:38  k-okada
+;;; add pseudo-inverse2, use array-dimensions
+;;;
+;;; Revision 1.7  2009/03/02 15:44:53  k-okada
 ;;; speed up sr-inverse-org
 ;;;
 ;;; Revision 1.6  2009/02/17 02:04:48  k-okada

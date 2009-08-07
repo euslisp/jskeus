@@ -666,6 +666,78 @@ pointer argv[];
   if (stat<0) return(makeflt(0.0));
   else return(makeflt(d));}
 
+pointer PSEUDO_INVERSE2(ctx,n,argv)
+register context *ctx;
+int n;
+pointer argv[];
+{ pointer a,result;
+  numunion nu;
+  float **u, **v, *w, y;
+  int c, r, i, j, k, *idx;
+
+  ckarg2(1,2);
+  a=argv[0];
+  if (!ismatrix(a)) error(E_NOVECTOR);
+  c=colsize(a);
+  r=rowsize(a);
+  if (n==1) {
+    result=makematrix(ctx,r,c); vpush(result);
+  }else {
+    result=argv[1];
+    if (!ismatrix(result)) error(E_NOVECTOR);
+    if (r!=colsize(result)||c!=rowsize(result)) error(E_VECSIZE);
+  }
+
+  u = nr_matrix(1,r,1,c);
+  v = nr_matrix(1,c,1,c);
+  w = nr_vector(1,c);
+  for (i = 0; i < c; i++){
+    for (j = 0; j < r; j++){
+      u[j+1][i+1]=a->c.ary.entity->c.fvec.fv[j*c+i];
+    }
+  }
+  if ( svdcmp(u, r, c, w, v) < 0 ) {
+    nrerror("svdcmp() returns error"); 
+    free_nr_matrix(u,1,r,1,c);
+    free_nr_matrix(v,1,c,1,c);
+    free_nr_vector(w,1,c);
+    return NIL;
+  }
+  idx = malloc(sizeof(int)*(c+1));
+
+  for (i = 0; i < c; i++){ idx[i+1] = i+1 ;}
+  for (i = 0; i < c; i++) {
+    for (j = i+1; j < c; j++) {
+      if ( w[i+1] < w[j+1] ) {
+	SWAP(w[i+1], w[j+1]);
+	k = idx[i+1]; idx[i+1] = idx[j+1]; idx[j+1] = k;
+      }
+    }
+  }
+  
+  // A* = v w ut
+  for (i=1;i<=c;i++) {
+    if (w[i]>0.0001) w[i] = 1.0/w[i];
+  }
+  for (i=0;i<c;i++) {
+    for (j=0;j<r;j++) {
+      result->c.ary.entity->c.fvec.fv[(i)*r+(j)]=0.0;
+      for (k=0;k<c;k++) {
+	result->c.ary.entity->c.fvec.fv[(i)*r+(j)]+=
+	  v[(i+1)][idx[(k+1)]]*w[(k+1)]*u[(j+1)][idx[(k+1)]];
+      }
+    }
+  }
+
+  free_nr_matrix(u,1,r,1,c);
+  free_nr_matrix(v,1,c,1,c);
+  free_nr_vector(w,1,c);
+
+  free(idx);
+
+  vpop(); // vpush(result)
+  return(result);}
+
 /*
  *
  */
@@ -856,6 +928,7 @@ pointer env;
   defun(ctx,"LU-SOLVE2",mod,LU_SOLVE2);
   defun(ctx,"LU-DECOMPOSE2",mod,LU_DECOMPOSE2);
   defun(ctx,"MATRIX-DETERMINANT",mod,MATRIX_DETERMINANT);
+  defun(ctx,"PSEUDO-INVERSE2",mod,PSEUDO_INVERSE2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -863,7 +936,10 @@ pointer env;
 /// $Id$
 ///
 /// $Log$
-/// Revision 1.5  2009-03-02 12:12:49  k-okada
+/// Revision 1.6  2009-08-07 11:22:38  k-okada
+/// add pseudo-inverse2, use array-dimensions
+///
+/// Revision 1.5  2009/03/02 12:12:49  k-okada
 /// lu-decompose2 accepts LU-DECOMPOSE2 mat [result] [tmp-vector]
 ///
 /// Revision 1.4  2009/02/17 02:04:48  k-okada
