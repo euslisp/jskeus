@@ -27,10 +27,14 @@
 (export '(forward-message-to forward-message-to-all))
 
 (defun forward-message-to (to args)
-  (if args (send* to args) to))
+  (if to
+      (if args (send* to args) to)
+    (if *debug* (warn ";; (forward-message-to ~A ~A) ~%" to args))))
 
 (defun forward-message-to-all (to args)
-  (if args (apply #'send-all to args) to))
+  (if to
+      (if args (apply #'send-all to args) to)
+    (if *debug* (warn ";; (forward-message-to-all ~A ~A) ~%" to args))))
 
 (defmacro send-message* (&rest msgs)
   `(apply #'send-message . ,msgs)
@@ -80,7 +84,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.4  2009-06-28 12:03:41  ueda
+;;; Revision 1.5  2009-08-11 18:00:31  eus
+;;; modify forward-message-to/to-all 's warning in case to is nil while only in *debug*
+;;;
+;;; Revision 1.4  2009/06/28 12:03:41  ueda
 ;;; add permutation and combination
 ;;;
 ;;; Revision 1.3  2009/02/17 02:04:48  k-okada
