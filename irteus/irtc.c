@@ -681,7 +681,7 @@ pointer argv[];
   c=colsize(a);
   r=rowsize(a);
   if (n==1) {
-    result=makematrix(ctx,r,c); vpush(result);
+    result=makematrix(ctx,c,r); vpush(result);
   }else {
     result=argv[1];
     if (!ismatrix(result)) error(E_NOVECTOR);
@@ -936,7 +936,10 @@ pointer env;
 /// $Id$
 ///
 /// $Log$
-/// Revision 1.6  2009-08-07 11:22:38  k-okada
+/// Revision 1.7  2009-08-13 16:43:37  fujimoto
+/// fix pseudo-inverse2
+///
+/// Revision 1.6  2009/08/07 11:22:38  k-okada
 /// add pseudo-inverse2, use array-dimensions
 ///
 /// Revision 1.5  2009/03/02 12:12:49  k-okada
