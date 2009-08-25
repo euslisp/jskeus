@@ -366,7 +366,7 @@
     ((:manipulability-gain mg) 0.001)
     weight debug-view
     ret wmat tmat umat umat2 mat-tmp
-    tmp-mcc tmp-mrc tmp-mrr tmp-mrr2
+    mat-tmp-rc tmp-mrr tmp-mrr2
     &allow-other-keys)
    (let (jacobi# m m2 (k 0))
      ;; m : manipulability
@@ -378,7 +378,7 @@
      ;; calc weighted SR-inverse
      (setq jacobi# (sr-inverse jacobi k weight 
 			       ret wmat tmat umat umat2 mat-tmp
-			       tmp-mcc tmp-mrc tmp-mrr tmp-mrr2
+			       mat-tmp-rc tmp-mrr tmp-mrr2
 			       ))
      jacobi#))
   (:calc-gradH-from-link-list
@@ -1450,7 +1450,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.53  2009-08-07 12:13:20  k-okada
+;;; Revision 1.54  2009-08-25 01:51:01  k-okada
+;;; mat-tmp-cc, mat-tmp-cr nolonger used in pseudo-inverse
+;;;
+;;; Revision 1.53  2009/08/07 12:13:20  k-okada
 ;;; support rotation-axis :xx :yy :zz
 ;;;
 ;;; Revision 1.52  2009/08/07 11:19:10  k-okada

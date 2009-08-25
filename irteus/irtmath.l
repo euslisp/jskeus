@@ -179,17 +179,14 @@
 ;;
 ;;
 
-(defun pseudo-inverse (mat &optional weight-vector 
-			   ret wmat mat-tmp mat-tmp-cc mat-tmp-cr)
+(defun pseudo-inverse (mat &optional weight-vector ret wmat mat-tmp)
   (let* ((r (array-dimension mat 0)) (c (array-dimension mat 1))
 	 a p tmp-mat)
     (if (null ret) (setq ret (make-matrix c r)))
-    (if (null mat-tmp-cc) (setq mat-tmp-cc (make-matrix c c)))
-    (if (null mat-tmp-cr) (setq mat-tmp-cr (make-matrix c r)))
 
     ;; without weight (use sv-decompose)
     (if (null weight-vector)
-      (return-from pseudo-inverse (pseudo-inverse2 mat)))
+      (return-from pseudo-inverse (pseudo-inverse2 mat ret)))
     ;; with weight
     (setq a (max r c))
     (if (null wmat) (setq wmat (make-matrix a a)))
@@ -229,9 +226,8 @@
 
 (defun sr-inverse (mat &optional (k 1.0) weight-vector ret
 		       wmat tmat umat umat2 mat-tmp
-		       mat-tmp-cc mat-tmp-rc mat-tmp-rr mat-tmp-rr2)
-  (let* ((r (array-dimension mat 0)) (c (array-dimension mat 1))
-	 mat-tmp-rr)
+		       mat-tmp-rc mat-tmp-rr mat-tmp-rr2)
+  (let* ((r (array-dimension mat 0)) (c (array-dimension mat 1)))
     ;; mat (r c)
     (if (null tmat) (setq tmat (make-matrix c r)))
 
@@ -245,13 +241,11 @@
 
     (if (null ret) (setq ret (make-matrix c r)))
     (if (null wmat) (setq wmat (make-matrix c c)))
-    (if (null mat-tmp-cc) (setq mat-tmp-cc (make-matrix c c)))
     (if (null mat-tmp-rc) (setq mat-tmp-rc (make-matrix r c)))
     
     ;; k=0 => sr-inverse = pseudo-inverse
     (if (= k 0.0) 
-	(return-from sr-inverse (pseudo-inverse mat weight-vector
-				ret wmat mat-tmp-rc mat-tmp-cc tmat)))
+	(return-from sr-inverse (pseudo-inverse mat weight-vector ret wmat mat-tmp-rc)))
     ;;
     (if (null umat)
 	(setq umat (unit-matrix r))
@@ -314,7 +308,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.8  2009-08-07 11:22:38  k-okada
+;;; Revision 1.9  2009-08-25 01:51:01  k-okada
+;;; mat-tmp-cc, mat-tmp-cr nolonger used in pseudo-inverse
+;;;
+;;; Revision 1.8  2009/08/07 11:22:38  k-okada
 ;;; add pseudo-inverse2, use array-dimensions
 ;;;
 ;;; Revision 1.7  2009/03/02 15:44:53  k-okada
