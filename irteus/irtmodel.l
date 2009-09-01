@@ -1327,7 +1327,7 @@
      n))
 
 (defun joint-angle-limit-weight (j-l &optional (res (instantiate float-vector (calc-target-joint-dimension j-l))))
-  (let (j jang jmax jmin nang wang (e (deg2rad 1)) (k 0) (kk 0) r)
+  (let (j jang jmax jmin nang wang (e (deg2rad 1)) (k 0) (kk 0) )
     (dotimes (i (calc-target-joint-dimension j-l))
       (setq j (elt j-l k))
       (cond
@@ -1335,12 +1335,26 @@
         (setq jang (elt (send j :joint-angle) kk)
               jmax (elt (send j :max-angle) kk)
               jmin (elt (send j :min-angle) kk))
+        (if (vectorp (elt (j . axis) kk))
+            (setq jang (* 0.001 jang)
+                  jmax (* 0.001 jmax)
+                  jmin (* 0.001 jmin))
+          (setq jang (deg2rad jang)
+                jmax (deg2rad jmax)
+                jmin (deg2rad jmin)))
         (when (>= (incf kk) (length (send j :joint-angle))) (setq kk 0) (incf k))
         )
        (t
-        (setq jang (deg2rad (send j :joint-angle))
-              jmax (deg2rad (send j :max-angle))
-              jmin (deg2rad (send j :min-angle)))
+        (setq jang (send j :joint-angle)
+              jmax (send j :max-angle)
+              jmin (send j :min-angle))
+        (if (vectorp (j . axis))
+            (setq jang (* 0.001 jang)
+                  jmax (* 0.001 jmax)
+                  jmin (* 0.001 jmin))
+          (setq jang (deg2rad jang)
+                jmax (deg2rad jmax)
+                jmin (deg2rad jmin)))
         (incf k)))
       (cond
        ((and (eps= jang jmax e) (eps= jang jmin e)))
@@ -1380,24 +1394,38 @@
         (setq jang (elt (send j :joint-angle) kk)
               jmax (elt (send j :max-angle) kk)
               jmin (elt (send j :min-angle) kk))
+        (if (vectorp (elt (j . axis) kk))
+            (setq jang (* 0.001 jang)
+                  jmax (* 0.001 jmax)
+                  jmin (* 0.001 jmin))
+          (setq jang (deg2rad jang)
+                jmax (deg2rad jmax)
+                jmin (deg2rad jmin)))
         (when (>= (incf kk) (length (send j :joint-angle))) (setq kk 0) (incf k))
         )
        (t
         (setq jang (send j :joint-angle)
               jmax (send j :max-angle)
               jmin (send j :min-angle))
+        (if (vectorp (j . axis))
+            (setq jang (* 0.001 jang)
+                  jmax (* 0.001 jmax)
+                  jmin (* 0.001 jmin))
+          (setq jang (deg2rad jang)
+                jmax (deg2rad jmax)
+                jmin (deg2rad jmin)))
         (incf k)))
       (cond
        ((or (eq (send j :name) :torso-waist-p)
 	    (eq (send j :name) :waist-p))
 	(setq nang (- jmin (j . min-angle)))
 	(cond
-	 ((= nang jmax) (setq nang (- jmax 1)))
-	 ((= nang jmin) (setq nang (+ jmin 1))))
+	 ((= nang jmax) (setq nang (- jmax (deg2rad 1))))
+	 ((= nang jmin) (setq nang (+ jmin (deg2rad 1)))))
 	(setf (elt res i)
 	      (if (> jang nang)
 		  (/ (- nang jang) (- jmax nang))
-		(/ (- nang jang) (* 5.0(- nang jmin))))))
+		(/ (- nang jang) (* 5.0 (- nang jmin))))))
        (t
 	(setf (elt res i) (/ (- (/ (+ jmax jmin) 2.0) jang)
 			     (/ (- jmax jmin) 2.0)))))
@@ -1415,7 +1443,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.58  2009-09-01 12:14:49  k-okada
+;;; Revision 1.59  2009-09-01 12:16:52  k-okada
+;;; fix joint-angle-limit-nspace/joint-angle-limit-weight
+;;;
+;;; Revision 1.58  2009/09/01 12:14:49  k-okada
 ;;; fix:add del-joint
 ;;;
 ;;; Revision 1.57  2009/09/01 12:14:15  k-okada
