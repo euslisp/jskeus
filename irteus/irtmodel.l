@@ -271,7 +271,7 @@
    (if i (setq inertia-tensor i)) inertia-tensor)
   (:joint (&rest args) (user::forward-message-to joint args))
   (:add-joint (j) (setq joint j))
-  (:del-joint (j) (setq joint nil))
+  (:del-joint () (setq joint nil))
 
   (:parent-link () parent-link)
   (:child-links () child-links)
@@ -1415,7 +1415,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.57  2009-09-01 12:14:15  k-okada
+;;; Revision 1.58  2009-09-01 12:14:49  k-okada
+;;; fix:add del-joint
+;;;
+;;; Revision 1.57  2009/09/01 12:14:15  k-okada
 ;;; add del-joint
 ;;;
 ;;; Revision 1.56  2009/09/01 12:13:38  k-okada
