@@ -412,7 +412,7 @@
 			paxis child-link move-target tmp-v3 tmp-v3a tmp-v3b tmp-m33))
 
      (setq pos-r (calc-dif-with-axis tmp-v3 translation-axis tmp-v0 tmp-v1 tmp-v2))
-     ;;(setq pos-r (scale 0.001 pos-r pos-r));; scale [mm] -> [m]
+     (setq pos-r (scale 0.001 pos-r pos-r));; scale [mm] -> [m]
      (dotimes (j (length pos-r)) (setf (aref fik j i) (elt pos-r j)))
      (setq pos-i (calc-dif-with-axis #f(0 0 0) rotation-axis tmp-v0 tmp-v1 tmp-v2))
      (dotimes (j (length pos-i)) (setf (aref fik (+ j (length pos-r)) i) (elt pos-i j)))
@@ -600,9 +600,6 @@
 	)
      fik))
   ;;
-  ;; calc joint angle speed from velocity vector (pos, rot)
-  ;; q = J#x + (I - J#J)y
-  ;;
   (:calc-joint-angle-speed
    (vel-pos vel-rot
     &rest args
@@ -612,6 +609,7 @@
     (rotation-axis nil) (translation-axis t)
     p-limit r-limit
     (weight (fill (instantiate float-vector (send self :calc-target-joint-dimension link-list)) 1))
+    (wmat)
     (debug-view nil)
     (tmp-pos (float-vector 0 0 0))
     (tmp-rot (float-vector 0 0 0))
@@ -695,7 +693,9 @@
        (setq I-J#J (m- tmp-mcc
 		       (m* jacobi# jacobi tmp-mcc2) tmp-mcc))
        ;; add null space
-       (v+ J#x (transform I-J#J null-space tmp-len2) J#x))
+       (if (null wmat) (setq wmat (make-matrix len len )))
+       (dotimes (i len) (setf (aref wmat i i) (aref weight i)))
+       (v+ J#x (transform wmat (transform I-J#J null-space tmp-len2) tmp-len2) J#x))
      J#x))
   (:collision-avoidance-links
    (&optional l)
@@ -749,8 +749,8 @@
    (let* ((pair-len (length pair-list))
 	  (ret (make-list pair-len))
 	  (col-list (send self :get :collision-distance))
-	  (distance-limit 1.0)
-	  (sc 0.0) np collidep pair)
+	  (distance-limit 10)
+	  (sc 0.0) np pair)
      (dotimes (i pair-len) (setf (elt ret i) (float-vector 0 0 0)))
      (when (or (null link-list) (= pair-len 0))
        (warn ";; ERROR: :link-list ~A or pair-len ~A required~%" link-list pair-len)
@@ -769,17 +769,16 @@
 	   (setq np (nconc (pqp-collision-distance (car pair) (cadr pair) :qsize 2) (list i)))
 	   (if (<= (car np) distance-limit)
 	       (progn
-		 (if warnp
+		 (if (and warnp (< (car np) 1.0))
 		     (warn ";; !!WARNING!! collision detected~%;; (~a . ~a . ~a)~%"
 			   (send (car pair) :name) (send (cadr pair) :name) np))
+                 (setf (elt np 1) (send (car pair) :centroid))
                  (setf (elt col-list i) np)
-		 (setf (elt (elt col-list i) 0) distance-limit)
-		 (setq collidep t))
+                 (setf (elt (elt col-list i) 0) distance-limit))
 	     (progn
-	       (setf (elt col-list i) np)
-	       (setq collidep nil)))
+	       (setf (elt col-list i) np)))
 	   (setf (elt ret i)
-		 (normalize-vector (v- (elt np 1) (elt np 2) (elt ret i)) (elt ret i)))
+		 (scale 0.001 (normalize-vector (v- (elt np 1) (elt np 2) (elt ret i)) (elt ret i)) (elt ret i)))
 	   ))) ;; dotimes
      (sort col-list #'<= #'(lambda (p) (car p)))
      (send self :put :collision-distance col-list)
@@ -788,7 +787,7 @@
    (pair link-list)
    (let* ((col-args-list (send self :get :collision-avoidance-args-list))
           (col-link-list (send self :link-list (car pair) (car link-list)))
-          (col-link-len (length col-link-list))
+          (col-link-len (send self :calc-target-joint-dimension link-list))
           col-args)
      (if (> col-link-len (length col-args-list))
          (setq col-args-list
@@ -857,7 +856,7 @@
           (min-distance (car np))
           (pair (elt pair-list (car (last np))))
 	  (dav-col (instantiate float-vector len))
-          drag-coords col-link-list jacobi jacobi# I-J#J ddav-col col-args
+          drag-coords col-link-list jacobi col-jacobi jacobi# I-J#J ddav-col col-args
           )
      (if (>= min-distance avoid-collision-distance)
          (return-from :collision-avoidance dav-col))
@@ -866,16 +865,16 @@
      (setq drag-coords (make-cascoords :pos (elt np 1)))
      (send (car pair) :assoc drag-coords)
      (setq col-link-list (send self :link-list (car pair) (car link-list)))
-     (setq jacobi (send* self :calc-jacobian-from-link-list
-                         col-link-list :move-target drag-coords
-                         col-args))
+     (setq col-jacobi (send* self :calc-jacobian-from-link-list
+                             col-link-list :move-target drag-coords
+                             col-args))
      (send (car pair) :dissoc drag-coords)
-     (setq ddav-col (transform (transpose jacobi) (elt ret 0)))
+     (setq ddav-col (transform (transpose col-jacobi) (elt ret 0)))
 
      (dotimes (i (length ddav-col)) (setf (elt dav-col i) (elt ddav-col i)))
-     ;;;
      (setq jacobi (send* self :calc-jacobian-from-link-list link-list args))
      (setq jacobi# (send* self :calc-inverse-jacobian jacobi args))
+     ;;;
      (unless tmp-mcc  (setq tmp-mcc (make-matrix len len)))
      (unless tmp-mcc2 (setq tmp-mcc2 (make-matrix len len)))
      (fill (array-entity tmp-mcc) 0)
@@ -965,11 +964,11 @@
 	    move-target
 	    (weight (fill (instantiate float-vector (send self :calc-target-joint-dimension link-list)) 1))
 	    (null-space)
-	    (avoid-nspace-gain 0.1)
+	    (avoid-nspace-gain 0.01)
 	    (avoid-weight-gain 1.0)
-	    (avoid-collision-distance 100)
-	    (avoid-collision-null-gain 0.1)
-	    (avoid-collision-joint-gain 0.01)
+	    (avoid-collision-distance 200)
+	    (avoid-collision-null-gain 1.0)
+	    (avoid-collision-joint-gain 1.0)
             ((:collision-avoidance-link-pair pair-list)
              (send self :collision-avoidance-link-pair-from-link-list link-list))
 	    (tmp-len) (tmp-len2) (debug-view)
@@ -1009,15 +1008,25 @@
 	       (dotimes (i (length a)) (warn "~7,1f " (elt a i)))
 	     (warn "~7,1f " a))))
 	   (warn "~%"))
-     ;; weighting joint angle weight : W(dH/dq)
-     (when (> avoid-weight-gain 0)
+     ;;
+     ;; wmat/weight: weighting joint angle weight 
+     ;; 
+     ;; w_i = 1 + | dH/dt |      if d|dH/dt| >= 0
+     ;;     = 1                  if d|dH/dt| <  0
+     ;; dH/dt = (t_max - t_min)^2 (2t - t_max - t_min)
+     ;;         / 4 (t_max - t)^2 (t - t_min)^2
+     ;;
+     ;; T. F. Chang and R.-V. Dubey: "A weighted least-norm solution based
+     ;; scheme for avoiding joint limits for redundant manipulators", in IEEE
+     ;; Trans. On Robotics and Automation, 11((2):286-292, April 1995.
+     ;;
+     (when (> avoid-weight-gain 0.0)
        (setq joint-angle-limit-weight 
 	 (scale avoid-weight-gain
 		(joint-angle-limit-weight (send-all link-list :joint) tmp-len) tmp-len))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "cost  :")
 	 (dotimes (i len) (warn "~7,3f " (elt joint-angle-limit-weight i))) (warn "~%"))
-       
        (dotimes (i len)
 	 (setf (elt weight i)
 	       (* (elt weight i) 
@@ -1031,19 +1040,44 @@
      (when (and debug-view (not (memq :no-message debug-view)))
        (warn "weight:")
        (dotimes (i  len) (warn "~7,3f " (elt weight i))) (warn "~%"))
-
-     ;; avoiding joint angle limit : a * W(dH/dq)
-     (when (> avoid-nspace-gain 0)
+     ;;
+     ;; avoid-nspace-joint-limit: avoiding joint angle limit
+     ;; 
+     ;; dH/dq = (((t_max + t_min)/2 - t) / ((t_max - t_min)/2)) ^2
+     ;;
+     (when (> avoid-nspace-gain 0.0)
        (setq joint-angle-limit-nspace (joint-angle-limit-nspace (send-all link-list :joint) tmp-len2))
        (setq null-space-joint-limit
 	 (scale avoid-nspace-gain
-		(transform wmat joint-angle-limit-nspace tmp-len2) tmp-len2))
+                joint-angle-limit-nspace tmp-len2))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "nspace:")
 	 (dotimes (i  len) (warn "~7,3f " (elt null-space-joint-limit i))) (warn "~%")))
      ;;
-     (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
-     ;; avoiding self collision
+     ;; angle-speed-collision-avoidance: avoiding self collision
+     ;;
+     ;; qca = J#t a dx + ( I - J# J ) Jt b dx
+     ;;
+     ;; dx = p                     if |p| > d_yz
+     ;;    = (dyz / |p|  - 1) p    else
+     ;;
+     ;; a : avoid-collision-joint-gain
+     ;; b : avoid-collision-null-gain
+     ;;
+     ;; implimentation issue: 
+     ;; when link and object are collide, 
+     ;;  p = (nearestpoint_on_object_surface - center_of_link )
+     ;; else
+     ;;  p =  (nearestpoint_on_object_surface - neareset_point_on_link_surface)
+     ;; 
+     ;; H. Sugiura, M. Gienger, H. Janssen, C. Goerick: "Real-Time Self
+     ;; Collision Avoidance for Humanoids by means of Nullspace Criteria
+     ;; and Task Intervals" In Humanoids 2006.
+     ;;
+     ;; H. Sugiura, M. Gienger, H. Janssen and C. Goerick : "Real-Time
+     ;; Collision Avoidance with Whole Body Motion Control for Humanoid
+     ;; Robots", In IROS 2007, 2053--2058
+     ;;
      (when (or (> avoid-collision-joint-gain 0.0)
                (> avoid-collision-null-gain 0.0))
        (setq angle-speed-collision-avoidance
@@ -1054,13 +1088,13 @@
                     :collision-avoidance-link-pair pair-list args))
        (setq min-distance (car (elt (send self :get :collision-distance) 0)))
        (setq angle-speed-collision-blending
-           (cond ((<= min-distance 10.0)
+           (cond ((< min-distance (* 0.1 avoid-collision-distance))
                   1.0)
                  ((< min-distance avoid-collision-distance)
-                  (/ (- avoid-collision-distance min-distance) avoid-collision-distance))
+                  (/ (- avoid-collision-distance min-distance) 
+                     (* 0.9 avoid-collision-distance)))
                  (t
                   0.0)))
-       (setq angle-speed-collision-blending 0.5)
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "colvel:")
 	 (dotimes (i len) (warn "~7,3f " (elt angle-speed-collision-avoidance i))) (warn "~%")))
@@ -1070,6 +1104,26 @@
                (v+ null-space
                    null-space-joint-limit
                    null-space-joint-limit)))
+     ;;
+     ;; q = f(d) qca + {1 - f(d)} qwbm
+     ;;
+     ;; f(d) = (d - da) / (db - da), if d < da
+     ;;      = 0                   , otherwise
+     ;; da : avoid-collision-distance
+     ;; db : avoid-collision-distance*0.1
+     ;;
+     ;; H. Sugiura, IROS 2007
+     ;;
+     ;; qwbm = J# x + N W y
+     ;; 
+     ;; J# = W Jt(J W Jt + kI)-1 (Weighted SR-Inverse)
+     ;; N  = E - J#J
+     ;;
+     ;; SR-inverse : 
+     ;; Y. Nakamura and H. Hanafusa : "Inverse Kinematic Solutions With
+     ;; Singularity Robustness for Robot Manipulator Control"
+     ;; J. Dyn. Sys., Meas., Control  1986. vol 108, Issue 3, pp. 163--172.
+     ;; 
      (setq ret
          (send-message* self cascaded-link
                         :move-joints vel-pos vel-rot
@@ -1443,7 +1497,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.59  2009-09-01 12:16:52  k-okada
+;;; Revision 1.60  2009-09-01 12:18:52  k-okada
+;;; update ik methods, add references
+;;;
+;;; Revision 1.59  2009/09/01 12:16:52  k-okada
 ;;; fix joint-angle-limit-nspace/joint-angle-limit-weight
 ;;;
 ;;; Revision 1.58  2009/09/01 12:14:49  k-okada
