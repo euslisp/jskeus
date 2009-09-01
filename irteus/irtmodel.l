@@ -970,7 +970,7 @@
 	    (avoid-collision-null-gain 1.0)
 	    (avoid-collision-joint-gain 1.0)
             ((:collision-avoidance-link-pair pair-list)
-             (send self :collision-avoidance-link-pair-from-link-list link-list))
+             (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args))))
 	    (tmp-len) (tmp-len2) (debug-view)
 	    &allow-other-keys)
    (let* ((len (send self :calc-target-joint-dimension link-list))
@@ -1497,7 +1497,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.60  2009-09-01 12:18:52  k-okada
+;;; Revision 1.61  2009-09-01 12:53:15  k-okada
+;;; support :obstacles
+;;;
+;;; Revision 1.60  2009/09/01 12:18:52  k-okada
 ;;; update ik methods, add references
 ;;;
 ;;; Revision 1.59  2009/09/01 12:16:52  k-okada
