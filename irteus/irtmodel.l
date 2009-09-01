@@ -117,7 +117,7 @@
                 (max (float-vector *inf* *inf* *inf*))
                 &allow-other-keys)
        (setq joint-angle (float-vector 0 0 0))
-       (setq axis :z)
+       (setq axis (list #f(1 0 0) #f(0 1 0) :z))
        (send-super* :init :min min :max max args)
        ;; set default value
        self)
@@ -150,7 +150,7 @@
                 (max (float-vector *inf* *inf* *inf*))
                 &allow-other-keys)
 	 (setq joint-angle (float-vector 0 0 0))
-	 (setq axis :z)
+         (setq axis (list #f(1 0 0) :z))
 	 (send-super* :init :min min :max max args)
 	 ;; set default value
 	 self)
@@ -179,7 +179,7 @@
                 (max (float-vector *inf* *inf* *inf*))
                 &allow-other-keys)
 	 (setq joint-angle (float-vector 0 0 0))
-         (setq axis :z)
+         (setq axis (list :z :y :x))
 	 (send-super* :init :min min :max max args)
 	 ;; set default value
 	 self)
@@ -209,7 +209,7 @@
                 (max (float-vector *inf* *inf* *inf* *inf* *inf* *inf*))
                 &allow-other-keys)
 	 (setq joint-angle (float-vector 0 0 0 0 0 0))
-         (setq axis :z)
+         (setq axis (list #f(1 0 0) #f(0 1 0) #f(0 0 1) :z :y :x))
 	 (send-super* :init :min min :max max args)
 	 ;; set default value
 	 self)
@@ -1414,7 +1414,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.55  2009-08-26 11:27:25  k-okada
+;;; Revision 1.56  2009-09-01 12:13:38  k-okada
+;;; update axis of wheel/shere/6dof
+;;;
+;;; Revision 1.55  2009/08/26 11:27:25  k-okada
 ;;; fix :collision-avoidance, use nearest joints for move-joint-avoidance
 ;;;
 ;;; Revision 1.54  2009/08/25 01:51:01  k-okada
