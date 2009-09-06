@@ -1381,7 +1381,7 @@
      n))
 
 (defun joint-angle-limit-weight (j-l &optional (res (instantiate float-vector (calc-target-joint-dimension j-l))))
-  (let (j jang jmax jmin nang wang (e (deg2rad 1)) (k 0) (kk 0) )
+  (let (j jang jmax jmin nang wang (e (deg2rad 1)) (k 0) (kk 0) r)
     (dotimes (i (calc-target-joint-dimension j-l))
       (setq j (elt j-l k))
       (cond
@@ -1497,7 +1497,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.61  2009-09-01 12:53:15  k-okada
+;;; Revision 1.62  2009-09-06 18:27:38  eus
+;;; change variable r in joint-angle-limit-weight : global -> local (nozawa)
+;;;
+;;; Revision 1.61  2009/09/01 12:53:15  k-okada
 ;;; support :obstacles
 ;;;
 ;;; Revision 1.60  2009/09/01 12:18:52  k-okada
