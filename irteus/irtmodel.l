@@ -1249,7 +1249,7 @@
 		       rotation-axis))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn ";; ~3d: dif-pos : ~a/(~a/~A), dif-rot : ~a/(~a/~A)~%"
-	       loop dif-pos (norm dif-pos) thre dif-rot (norm dif-rot) rthre))
+	       loop ndif-pos (norm ndif-pos) thre ndif-rot (norm ndif-rot) rthre))
        ;; check loop end
        (if (and (> loop (/ stop 10))
 		(if translation-axis (< (norm ndif-pos) thre) t)
@@ -1497,7 +1497,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.63  2009-09-10 13:25:26  k-okada
+;;; Revision 1.64  2009-09-10 13:27:00  k-okada
+;;; fix previous commit / support :translation-axis for dif-pos
+;;;
+;;; Revision 1.63  2009/09/10 13:25:26  k-okada
 ;;; support :translation-axis for dif-pos
 ;;;
 ;;; Revision 1.62  2009/09/06 18:27:38  eus
