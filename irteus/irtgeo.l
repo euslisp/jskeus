@@ -45,7 +45,7 @@
   (:difference-position 
    (coords &key (translation-axis t))
    (let ((dif-pos
-          (send self :inverse-transform-vector (send coords :worldpos))))
+	  (v- (send coords :worldpos) (send self :worldpos))))
      ;;(setq dif-pos (v- target-pos end-pos))
      (case
       translation-axis
@@ -325,7 +325,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.8  2009-09-10 15:24:04  k-okada
+;;; Revision 1.9  2009-09-10 16:02:39  nozawa
+;;; fix calculation of dif-pos (in :difference-position)
+;;;
+;;; Revision 1.8  2009/09/10 15:24:04  k-okada
 ;;; update :difference-translation
 ;;;
 ;;; Revision 1.7  2009/08/07 12:13:20  k-okada
