@@ -543,16 +543,14 @@
 	 ((>= l len))
        (setq j (send (elt link-list l) :joint))
        (cond ((not (derivedp (send j :child-link) bodyset-link))
-	      (setq child-reverse nil)
-	      (setq child-link (send j :child-link)))
+	      (setq child-reverse nil))
              ((and (< (+ l 1) len)
 		   (not (eq (send j :child-link)
 			    (send (elt link-list (+ l 1)) :parent-link))))
-	      (setq child-reverse t)
-	      (setq child-link (send j :parent-link)))
+	      (setq child-reverse t))
 	     (t
-	      (setq child-reverse nil)
-	      (setq child-link (send j :child-link))))
+	      (setq child-reverse nil)))
+        (setq child-link (send j :child-link))
 	(setq paxis (case (j . axis)
 		      (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1))
 		      (:xx #f(1 0 0)) (:yy #f(0 1 0)) (:zz #f(0 0 1))
@@ -1497,7 +1495,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.64  2009-09-10 13:27:00  k-okada
+;;; Revision 1.65  2009-09-10 15:08:21  nozawa
+;;; fix child-link when child-reverse (in :calc-jacobian-from-link-list)
+;;;
+;;; Revision 1.64  2009/09/10 13:27:00  k-okada
 ;;; fix previous commit / support :translation-axis for dif-pos
 ;;;
 ;;; Revision 1.63  2009/09/10 13:25:26  k-okada
