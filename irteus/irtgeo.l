@@ -43,9 +43,19 @@
 		     (:z #f(0 0 1))))
 	 )
   (:difference-position 
-   (coords)
-   ;;(setq dif-pos (v- target-pos end-pos))
-   (v- (send coords :worldpos) (send self :worldpos)))
+   (coords &key (translation-axis t))
+   (let ((dif-pos
+          (send self :inverse-transform-vector (send coords :worldpos))))
+     ;;(setq dif-pos (v- target-pos end-pos))
+     (case
+      translation-axis
+      ((:x :xx) (setf (elt dif-pos 0) 0))
+      ((:y :yy) (setf (elt dif-pos 1) 0))
+      ((:z :zz) (setf (elt dif-pos 2) 0))
+      ((:xy :yx) (setf (elt dif-pos 0) 0) (setf (elt dif-pos 1) 0))
+      ((:yz :zy) (setf (elt dif-pos 1) 0) (setf (elt dif-pos 2) 0))
+      ((:zx :xz) (setf (elt dif-pos 2) 0) (setf (elt dif-pos 0) 0)))
+     dif-pos))
   (:difference-rotation
    (coords &key (rotation-axis t))
    (let (dif-rotmatrix dif-rot a0 a1)
@@ -315,7 +325,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.7  2009-08-07 12:13:20  k-okada
+;;; Revision 1.8  2009-09-10 15:24:04  k-okada
+;;; update :difference-translation
+;;;
+;;; Revision 1.7  2009/08/07 12:13:20  k-okada
 ;;; support rotation-axis :xx :yy :zz
 ;;;
 ;;; Revision 1.6  2009/05/15 07:45:48  eus
