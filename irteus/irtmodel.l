@@ -676,6 +676,8 @@
        (dotimes (j (cadr (array-dimensions jacobi#)))
 	 (if (/= j 0) (warn "       "))
 	 (dotimes (i len) (warn "~7,3f " (aref jacobi# i j))) (warn "~%"))
+       (warn "x     :")
+       (dotimes (i (length tmp-dim)) (warn "~7,3f " (elt tmp-dim i))) (warn "~%")
        (warn "J#x   :")
        (dotimes (i len) (warn "~7,3f " (elt J#x i))) (warn "~%"))
 
@@ -1497,7 +1499,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.66  2009-09-20 03:12:53  k-okada
+;;; Revision 1.67  2009-09-20 03:13:43  k-okada
+;;; print x when :debug
+;;;
+;;; Revision 1.66  2009/09/20 03:12:53  k-okada
 ;;; if avoid-collision-distnace 0, do not call :collision-avoidance
 ;;;
 ;;; Revision 1.65  2009/09/10 15:08:21  nozawa
