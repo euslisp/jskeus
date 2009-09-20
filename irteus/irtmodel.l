@@ -1182,7 +1182,7 @@
      ret))
   ;;
   (:inverse-kinematics-args
-   (&rest args &key rotation-axis link-list translation-axis
+   (&rest args &key link-list rotation-axis translation-axis
           &allow-other-keys)
    (let* ((c (send self :calc-target-joint-dimension link-list))
           (r (send self :calc-target-axis-dimension rotation-axis translation-axis))
@@ -1250,7 +1250,7 @@
        (if (and (> loop (/ stop 10))
 		(if translation-axis (< (norm ndif-pos) thre) t)
 		(if rotation-axis (< (norm ndif-rot) rthre) t))
-	   (return-from :inverse-kinematics-loop :ik-socceed))
+	   (return-from :inverse-kinematics-loop :ik-succeed))
        ;; ik
        (when (and need-clear debug-view *viewer*)
 	 (if need-clear (send *viewer* :viewsurface :clear)))
@@ -1293,7 +1293,7 @@
            (mapcar #'(lambda (l) (send-all l :joint :joint-angle))
                    (mapcar #'(lambda (l) (send self :link-list l)) fix-targets)))
 	  (old-analysis-level (send-all link-list :analysis-level))
-          (ik-args (nconc (send* self :inverse-kinematics-args args) args))
+          (ik-args (nconc (send* self :inverse-kinematics-args :translation-axis translation-axis args) args))
 	  )
      (send-all link-list :analysis-level :coords)
      (when debug-view
@@ -1309,6 +1309,8 @@
        (setq success (send* self :inverse-kinematics-loop
                            target-coords
                            :stop stop :loop loop
+                           :translation-axis translation-axis
+                           :thre thre :rthre rthre
                            :debug-view debug-view
                            :need-clear need-clear
                            :need-flush need-flush
@@ -1528,7 +1530,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.73  2009-09-20 04:33:11  k-okada
+;;; Revision 1.74  2009-09-20 06:07:06  k-okada
+;;; fix previsous commit
+;;;
+;;; Revision 1.73  2009/09/20 04:33:11  k-okada
 ;;; add :inverse-kinmatics-loop
 ;;;
 ;;; Revision 1.72  2009/09/20 04:29:22  k-okada
