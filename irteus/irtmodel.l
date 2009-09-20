@@ -1225,6 +1225,51 @@
       :tmp-len tmp-len :tmp-len2 tmp-len2
       :tmp-pos tmp-pos :tmp-rot tmp-rot
       )))
+  (:inverse-kinematics-loop
+   (target-coords 
+    &rest args
+    &key stop link-list move-target rotation-axis translation-axis
+    look-at-target thre rthre 
+    loop debug-view need-clear need-flush ik-args
+    &allow-other-keys)
+   (let (dif-pos dif-rot ndif-pos ndif-rot success)
+       (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
+	     dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
+       (setq ndif-pos (calc-dif-with-axis
+		       (v- (send move-target :inverse-transform-vector dif-pos)
+			   (send move-target :inverse-transform-vector (float-vector 0 0 0)))
+		       translation-axis))
+       (setq ndif-rot (calc-dif-with-axis
+		       (v- (send move-target :inverse-transform-vector dif-rot)
+			   (send move-target :inverse-transform-vector (float-vector 0 0 0)))
+		       rotation-axis))
+       (when (and debug-view (not (memq :no-message debug-view)))
+	 (warn ";; ~3d: dif-pos : ~a/(~a/~A), dif-rot : ~a/(~a/~A)~%"
+	       loop ndif-pos (norm ndif-pos) thre ndif-rot (norm ndif-rot) rthre))
+       ;; check loop end
+       (if (and (> loop (/ stop 10))
+		(if translation-axis (< (norm ndif-pos) thre) t)
+		(if rotation-axis (< (norm ndif-rot) rthre) t))
+	   (return-from :inverse-kinematics-loop :ik-socceed))
+       ;; ik
+       (when (and need-clear debug-view *viewer*)
+	 (if need-clear (send *viewer* :viewsurface :clear)))
+       (setq
+        success
+        (send-message* self cascaded-link
+                       :move-joints-avoidance
+                       dif-pos dif-rot :link-list link-list
+                       :rotation-axis rotation-axis :translation-axis translation-axis
+                       :debug-view debug-view
+                       ;; buffer for calculation
+                       ik-args))
+       (when (and debug-view  *viewer*)
+	 (send target-coords :draw-on :flush nil :color #f(1 0 0))
+	 (if need-flush (send *viewer* :viewsurface :flush)))
+       (unless success (return-from :inverse-kinematics-loop :ik-failed))
+       (if look-at-target
+	   (send self :head :look-at (send target-coords :worldpos)))
+       :ik-continues))
   (:inverse-kinematics
    (target-coords &rest args 
 		  &key (stop 50)
@@ -1261,45 +1306,20 @@
 	 (push :no-flush debug-view)))
      ;; inverse kinematics loop
      (while (< (incf loop) stop)
-       (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
-	     dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
-       (setq ndif-pos (calc-dif-with-axis
-		       (v- (send move-target :inverse-transform-vector dif-pos)
-			   (send move-target :inverse-transform-vector (float-vector 0 0 0)))
-		       translation-axis))
-       (setq ndif-rot (calc-dif-with-axis
-		       (v- (send move-target :inverse-transform-vector dif-rot)
-			   (send move-target :inverse-transform-vector (float-vector 0 0 0)))
-		       rotation-axis))
-       (when (and debug-view (not (memq :no-message debug-view)))
-	 (warn ";; ~3d: dif-pos : ~a/(~a/~A), dif-rot : ~a/(~a/~A)~%"
-	       loop ndif-pos (norm ndif-pos) thre ndif-rot (norm ndif-rot) rthre))
-       ;; check loop end
-       (if (and (> loop (/ stop 10))
-		(if translation-axis (< (norm ndif-pos) thre) t)
-		(if rotation-axis (< (norm ndif-rot) rthre) t))
-	   (return nil))
-       ;; ik
-       (when (and need-clear debug-view *viewer*)
-	 (if need-clear (send *viewer* :viewsurface :clear)))
-       (setq
-        success
-        (send-message* self cascaded-link
-                       :move-joints-avoidance
-                       dif-pos dif-rot :link-list link-list
-                       :rotation-axis rotation-axis :translation-axis translation-axis
-                       :warnp warnp :debug-view debug-view
-                       :fix-targets fix-targets
-                       ;; buffer for calculation
-                       ik-args))
-       (when (and debug-view  *viewer*)
-	 (send target-coords :draw-on :flush nil :color #f(1 0 0))
-	 (if need-flush (send *viewer* :viewsurface :flush)))
-       (unless success (return nil))
-       (if look-at-target
-	   (send self :head :look-at (send target-coords :worldpos)))
+       (setq success (send* self :inverse-kinematics-loop
+                           target-coords
+                           :loop loop
+                           :debug-view debug-view
+                           :need-clear need-clear
+                           :need-flush need-flush
+                           :ik-args ik-args args))
+       (case success
+             (:ik-failed
+              (setq success nil) (return nil))
+             (:ik-succeed
+              (setq success t) (return nil)))
        )
-     ;; update difference
+        ;; update difference
      (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
 	   dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
      (setq dif-pos (calc-dif-with-axis
@@ -1508,7 +1528,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.71  2009-09-20 04:28:08  k-okada
+;;; Revision 1.72  2009-09-20 04:29:22  k-okada
+;;; add :inverse-kinematics-loop
+;;;
+;;; Revision 1.71  2009/09/20 04:28:08  k-okada
 ;;; add :debug to :collision-avoidance-link-pair-from-link-list
 ;;;
 ;;; Revision 1.70  2009/09/20 04:05:50  k-okada
