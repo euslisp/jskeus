@@ -1078,9 +1078,9 @@
      ;; Collision Avoidance with Whole Body Motion Control for Humanoid
      ;; Robots", In IROS 2007, 2053--2058
      ;;
-     (when (or (> avoid-collision-distance 0.0)
-               (> avoid-collision-joint-gain 0.0)
-               (> avoid-collision-null-gain 0.0))
+     (when (and (> avoid-collision-distance 0.0)
+                (or (> avoid-collision-joint-gain 0.0)
+                    (> avoid-collision-null-gain 0.0)))
        (setq angle-speed-collision-avoidance
              (send* self :collision-avoidance vel-pos
                     :avoid-collision-distance avoid-collision-distance
@@ -1136,9 +1136,9 @@
      ;;
      ;; done
      (when (and debug-view *viewer*)
-       (if (or (> avoid-collision-distance 0.0)
-               (> avoid-collision-null-gain 0.0)
-	       (> avoid-collision-joint-gain 0.0))
+       (if (and (> avoid-collision-distance 0.0)
+                (or (> avoid-collision-null-gain 0.0)
+                    (> avoid-collision-joint-gain 0.0)))
 	 (let ((pwidth (send *viewer* :viewsurface :line-width))
 	       (psize (send *viewer* :viewsurface :point-size))
 	       (pcolor (send *viewer* :viewsurface :color))
@@ -1499,7 +1499,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.67  2009-09-20 03:13:43  k-okada
+;;; Revision 1.68  2009-09-20 03:21:00  k-okada
+;;; fix: if avoid-collision-distnace 0, do not call :collision-avoidance
+;;;
+;;; Revision 1.67  2009/09/20 03:13:43  k-okada
 ;;; print x when :debug
 ;;;
 ;;; Revision 1.66  2009/09/20 03:12:53  k-okada
