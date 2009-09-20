@@ -1244,7 +1244,7 @@
            (mapcar #'(lambda (l) (send-all l :joint :joint-angle))
                    (mapcar #'(lambda (l) (send self :link-list l)) fix-targets)))
 	  (old-analysis-level (send-all link-list :analysis-level))
-          (ik-args (nconc (send* self :inverse-kenematics-args args) args))
+          (ik-args (nconc (send* self :inverse-kinematics-args args) args))
 	  )
      (send-all link-list :analysis-level :coords)
      (when debug-view
@@ -1504,7 +1504,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.69  2009-09-20 03:38:22  k-okada
+;;; Revision 1.70  2009-09-20 04:05:50  k-okada
+;;; fix typo :inverse-kenematics-args -> :inverse-kinematics-args
+;;;
+;;; Revision 1.69  2009/09/20 03:38:22  k-okada
 ;;; add :inverse-kinematics-args
 ;;;
 ;;; Revision 1.68  2009/09/20 03:21:00  k-okada
