@@ -701,7 +701,7 @@
    (&optional l)
    (if l (setq collision-avoidance-links l)) collision-avoidance-links)
   (:collision-avoidance-link-pair-from-link-list
-    (link-list &key obstacles ((:collision-avoidance-links collision-links) collision-avoidance-links))
+    (link-list &key obstacles ((:collision-avoidance-links collision-links) collision-avoidance-links) debug)
    (let* ((parent-links
            (mapcar
             #'(lambda (ll)
@@ -723,6 +723,10 @@
            (mapcar #'(lambda (l) (position l valid-link-list)) collision-links))
           (len (length collision-links))
           i0 ret)
+     (when debug
+       (warn "parnet-links    : ~A~%" parent-links)
+       (warn "valid-link-list : ~A~%" valid-link-list)
+       (warn "index-links     : ~A~%" index-links))
      (dotimes (i len)
        (do ((j (1+ i) (1+ j)))
            ((>= j len))
@@ -1504,7 +1508,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.70  2009-09-20 04:05:50  k-okada
+;;; Revision 1.71  2009-09-20 04:28:08  k-okada
+;;; add :debug to :collision-avoidance-link-pair-from-link-list
+;;;
+;;; Revision 1.70  2009/09/20 04:05:50  k-okada
 ;;; fix typo :inverse-kenematics-args -> :inverse-kinematics-args
 ;;;
 ;;; Revision 1.69  2009/09/20 03:38:22  k-okada
