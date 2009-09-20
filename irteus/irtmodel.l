@@ -1176,6 +1176,51 @@
 	   (send *viewer* :viewsurface :flush))
        )
      ret))
+  ;;
+  (:inverse-kinematics-args
+   (&rest args &key rotation-axis link-list translation-axis
+          &allow-other-keys)
+   (let* ((c (send self :calc-target-joint-dimension link-list))
+          (r (send self :calc-target-axis-dimension rotation-axis translation-axis))
+          (fik (make-matrix r c))
+          (ret (make-matrix c r))
+          (wmat (make-matrix c c))
+          (tmat (make-matrix c r))
+          (umat (make-matrix r r))
+          (umat2 (make-matrix r r))
+          (mat-tmp (make-matrix c r))
+          (tmp-mcc (make-matrix c c))
+          (tmp-mcc2 (make-matrix c c))
+          (tmp-mrr (make-matrix r r))
+          (tmp-mrc (make-matrix r c))
+          (tmp-v0 (instantiate float-vector 0))
+          (tmp-v1 (instantiate float-vector 1))
+          (tmp-v2 (instantiate float-vector 2))
+          (tmp-v3 (instantiate float-vector 3))
+          (tmp-v3a (instantiate float-vector 3))
+          (tmp-v3b (instantiate float-vector 3))
+          (tmp-v3c (instantiate float-vector 3))
+          (tmp-m33 (make-matrix 3 3))
+          (tmp-dim (instantiate float-vector r))
+          (tmp-len (instantiate float-vector c))
+          (tmp-len2 (instantiate float-vector c))
+          (tmp-pos (instantiate float-vector 3))
+          (tmp-rot (instantiate float-vector 3)))
+     (list
+      :dim r
+      :fik fik
+      :ret ret
+      :wmat wmat :tmat tmat :umat umat :umat2 umat2 :mat-tmp mat-tmp
+      :tmp-mcc tmp-mcc :tmp-mcc2 tmp-mcc2 :tmp-mrr tmp-mrr
+      :tmp-mrc tmp-mrc
+      :tmp-v0 tmp-v0 :tmp-v1 tmp-v1
+      :tmp-v2 tmp-v2 :tmp-v3 tmp-v3
+      :tmp-v3a tmp-v3a :tmp-v3b tmp-v3b  :tmp-v3c tmp-v3c
+      :tmp-m33 tmp-m33 
+      :tmp-dim tmp-dim
+      :tmp-len tmp-len :tmp-len2 tmp-len2
+      :tmp-pos tmp-pos :tmp-rot tmp-rot
+      )))
   (:inverse-kinematics
    (target-coords &rest args 
 		  &key (stop 50)
@@ -1193,40 +1238,13 @@
           (c0 (unless (send self :parent) (send self :copy-worldcoords)))
 	  dif-pos dif-rot need-clear need-flush
 	  ;;
-	  (c (send self :calc-target-joint-dimension link-list))
-	  (r (send self :calc-target-axis-dimension rotation-axis translation-axis))
-	  (a (max c r))
-	  (b (min c r))
-	  (ret (make-matrix c r))
-	  (wmat (make-matrix c c))
-	  (tmat (make-matrix c r))
-	  (umat (make-matrix r r))
-	  (umat2 (make-matrix r r))
-	  (mat-tmp (make-matrix c r))
-	  (tmp-mcc (make-matrix c c))
-	  (tmp-mcc2 (make-matrix c c))
-	  (tmp-mrc (make-matrix r c))
-	  (tmp-mrr (make-matrix r r))
-	  (fik (make-matrix r c))
-	  (tmp-v0 (instantiate float-vector 0))
-	  (tmp-v1 (instantiate float-vector 1))
-	  (tmp-v2 (instantiate float-vector 2))
-	  (tmp-v3 (instantiate float-vector 3))
-	  (tmp-v3a (instantiate float-vector 3))
-	  (tmp-v3b (instantiate float-vector 3))
-	  (tmp-v3c (instantiate float-vector 3))
-	  (tmp-m33 (make-matrix 3 3))
-	  (tmp-dim (instantiate float-vector r))
-	  (tmp-len (instantiate float-vector c))
-	  (tmp-len2 (instantiate float-vector c))
-	  (tmp-pos (instantiate float-vector 3))
-	  (tmp-rot (instantiate float-vector 3))
 	  ndif-pos ndif-rot
           (success t) 
           (fix-targets-av 
            (mapcar #'(lambda (l) (send-all l :joint :joint-angle))
                    (mapcar #'(lambda (l) (send self :link-list l)) fix-targets)))
 	  (old-analysis-level (send-all link-list :analysis-level))
+          (ik-args (nconc (send* self :inverse-kenematics-args args) args))
 	  )
      (send-all link-list :analysis-level :coords)
      (when debug-view
@@ -1269,20 +1287,7 @@
                        :warnp warnp :debug-view debug-view
                        :fix-targets fix-targets
                        ;; buffer for calculation
-                       :dim r
-                       :fik fik
-                       :ret ret
-                       :wmat wmat :tmat tmat :umat umat :umat2 umat2 :mat-tmp mat-tmp
-                       :tmp-mcc tmp-mcc :tmp-mcc2 tmp-mcc2 :tmp-mrr tmp-mrr
-                       :tmp-mrc tmp-mrc
-                       :tmp-v0 tmp-v0 :tmp-v1 tmp-v1
-                       :tmp-v2 tmp-v2 :tmp-v3 tmp-v3
-                       :tmp-v3a tmp-v3a :tmp-v3b tmp-v3b  :tmp-v3c tmp-v3c
-                       :tmp-m33 tmp-m33 
-                       :tmp-dim tmp-dim
-                       :tmp-len tmp-len :tmp-len2 tmp-len2
-                       :tmp-pos tmp-pos :tmp-rot tmp-rot
-                       args))
+                       ik-args))
        (when (and debug-view  *viewer*)
 	 (send target-coords :draw-on :flush nil :color #f(1 0 0))
 	 (if need-flush (send *viewer* :viewsurface :flush)))
@@ -1499,7 +1504,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.68  2009-09-20 03:21:00  k-okada
+;;; Revision 1.69  2009-09-20 03:38:22  k-okada
+;;; add :inverse-kinematics-args
+;;;
+;;; Revision 1.68  2009/09/20 03:21:00  k-okada
 ;;; fix: if avoid-collision-distnace 0, do not call :collision-avoidance
 ;;;
 ;;; Revision 1.67  2009/09/20 03:13:43  k-okada
