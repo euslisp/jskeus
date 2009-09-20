@@ -1308,7 +1308,7 @@
      (while (< (incf loop) stop)
        (setq success (send* self :inverse-kinematics-loop
                            target-coords
-                           :loop loop
+                           :stop stop :loop loop
                            :debug-view debug-view
                            :need-clear need-clear
                            :need-flush need-flush
@@ -1528,7 +1528,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.72  2009-09-20 04:29:22  k-okada
+;;; Revision 1.73  2009-09-20 04:33:11  k-okada
+;;; add :inverse-kinmatics-loop
+;;;
+;;; Revision 1.72  2009/09/20 04:29:22  k-okada
 ;;; add :inverse-kinematics-loop
 ;;;
 ;;; Revision 1.71  2009/09/20 04:28:08  k-okada
