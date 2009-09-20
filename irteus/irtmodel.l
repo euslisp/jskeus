@@ -1076,7 +1076,8 @@
      ;; Collision Avoidance with Whole Body Motion Control for Humanoid
      ;; Robots", In IROS 2007, 2053--2058
      ;;
-     (when (or (> avoid-collision-joint-gain 0.0)
+     (when (or (> avoid-collision-distance 0.0)
+               (> avoid-collision-joint-gain 0.0)
                (> avoid-collision-null-gain 0.0))
        (setq angle-speed-collision-avoidance
              (send* self :collision-avoidance vel-pos
@@ -1133,7 +1134,8 @@
      ;;
      ;; done
      (when (and debug-view *viewer*)
-       (if (or (> avoid-collision-null-gain 0.0)
+       (if (or (> avoid-collision-distance 0.0)
+               (> avoid-collision-null-gain 0.0)
 	       (> avoid-collision-joint-gain 0.0))
 	 (let ((pwidth (send *viewer* :viewsurface :line-width))
 	       (psize (send *viewer* :viewsurface :point-size))
@@ -1495,7 +1497,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.65  2009-09-10 15:08:21  nozawa
+;;; Revision 1.66  2009-09-20 03:12:53  k-okada
+;;; if avoid-collision-distnace 0, do not call :collision-avoidance
+;;;
+;;; Revision 1.65  2009/09/10 15:08:21  nozawa
 ;;; fix child-link when child-reverse (in :calc-jacobian-from-link-list)
 ;;;
 ;;; Revision 1.64  2009/09/10 13:27:00  k-okada
