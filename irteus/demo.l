@@ -24,12 +24,12 @@
      (send bc0 :set-color :green)
      (setq bc0 (instance bodyset-link :init (make-cascoords) :bodies (list bc0) :name :weist))
      (setq bc1 (make-default-robot-link 0 50 :y :torso-link0))
-     (send bc1 :locate #f(0 0 -25))
+     (send bc1 :locate #f(0 0 -12.5))
 
      (setq bc2 (make-cube 100 200 200))
      (send bc2 :locate #f(0 0 100))
      (send bc2 :set-color :green)
-     (setq bc2 (instance bodyset-link :init (make-cascoords) :bodies (list bc2) :name :torso-link1))
+     (setq bc2 (instance bodyset-link :init (make-cascoords :pos #f(0 0 -12.5)) :bodies (list bc2) :name :torso-link1))
 
      (send self :assoc bc0)
      (send bc0 :assoc bc1)
@@ -232,18 +232,17 @@
     (setq ll (send *robot* :link-list
 		   (send *robot* :larm :end-coords :parent)
 		   (send *robot* :torso :root-link)
-		   ;;(send *robot* :larm :root-link)
+		   ;(send *robot* :larm :root-link)
 		   ;;(send *robot* :lleg :end-coords :parent)
 		   ))
     (objects (list *robot*))
     ;;
     (do-until-key
-	(setq vel (send (send *robot* :larm :end-coords) :difference-position target))
+	(setq vel (send (send *robot* :larm :end-coords) :difference-position target :translation-axis t))
        (send *robot* :move-joints-avoidance
 	      vel #f(0 0 0) :link-list ll
 	      :move-target (send *robot* :larm :end-coords)
 	      :rotation-axis nil :translation-axis t
-	      :p-limit 10
 	      :debug-view :no-flush
 	      )
       (send *robot* :head :look-at (send *robot* :larm :end-coords :worldpos))
@@ -288,8 +287,10 @@
     ;;
     (do-until-key
       (send r0 :larm :inverse-kinematics (car (send b0 :handle))
+            :stop 1000 :thre 10
 	    :rotation-axis nil :debug-view nil)
       (send r0 :rarm :inverse-kinematics (cadr (send b0 :handle))
+            :stop 1000 :thre 10
 	    :rotation-axis nil :debug-view t)
       (send b0 :orient (* 0.2 (sin (/ i 10.0))) :x :world)
       (send b0 :locate (float-vector 200 (* 100 (sin (/ (incf i) 10.0))) 0) :world)
@@ -432,11 +433,11 @@
     rr))
 
 (defun test3 nil
-  (let (i r k ln (av0 #f(-10 45 -20 50 -60 -30 40)) av1 av)
+  (let (i r k ln (av0 #f(0 45 0 45 -0 -60 40)) av1 av)
     (setq h0 (instance sample-hand :init :name "sample hand"))
     (send h0 :angle-vector av0)
     (setq c0 (make-gdome (make-icosahedron 40)))
-    (send c0 :locate #f(60 0 40))
+    (send c0 :locate #f(60 0 60))
     (send c0 :set-color :green)
     (objects (list h0 c0))
     (setq i 0)
