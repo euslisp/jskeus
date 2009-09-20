@@ -210,8 +210,8 @@
 			    jll0 jll1 jll2 jll3 jll4 jll5
 			    jlr0 jlr1 jlr2 jlr3 jlr4 jlr5
 			    ))
-     (setq collision-avoidance-link-pair (list (list bal4 bc0) (list bal4 bc2)
-					       (list bar4 bc0) (list bar4 bc2)))
+     (setq collision-avoidance-links (list bc0 bc2 bal4 bar4))
+
      (send self :init-ending)
      self))
   )
