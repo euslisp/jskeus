@@ -650,20 +650,12 @@
      (if (null tmp-dim)
 	 (setq tmp-dim (instantiate float-vector (send self :calc-target-axis-dimension rotation-axis translation-axis))))
 
-     (setq vel-p (calc-dif-with-axis
-		  (v- (send move-target :inverse-transform-vector vel-pos
-			    tmp-v3 tmp-v3b tmp-m33)
-		      (send move-target :inverse-transform-vector #f(0 0 0)
-			    tmp-v3a tmp-v3b tmp-m33) tmp-v3c)
+     (setq vel-p (calc-dif-with-axis vel-pos
 		  translation-axis
 		  tmp-v0 tmp-v1 tmp-v2))
      (dotimes (i (length vel-p)) (setf (elt tmp-dim i) (elt vel-p i)))
 
-     (setq vel-r (calc-dif-with-axis
-		  (v- (send move-target :inverse-transform-vector vel-rot 
-			    tmp-v3 tmp-v3b tmp-m33)
-		      (send move-target :inverse-transform-vector #f(0 0 0)
-			    tmp-v3a tmp-v3b tmp-m33) tmp-v3)
+     (setq vel-r (calc-dif-with-axis vel-rot
 		  rotation-axis
 		  tmp-v0 tmp-v1 tmp-v2))
      (dotimes (i (length vel-r)) (setf (elt tmp-dim (+ i (length vel-p))) (elt vel-r i)))
@@ -1231,24 +1223,16 @@
     look-at-target thre rthre 
     loop debug-view need-clear need-flush ik-args
     &allow-other-keys)
-   (let (dif-pos dif-rot ndif-pos ndif-rot success)
+   (let (dif-pos dif-rot success)
        (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
 	     dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
-       (setq ndif-pos (calc-dif-with-axis
-		       (v- (send move-target :inverse-transform-vector dif-pos)
-			   (send move-target :inverse-transform-vector (float-vector 0 0 0)))
-		       translation-axis))
-       (setq ndif-rot (calc-dif-with-axis
-		       (v- (send move-target :inverse-transform-vector dif-rot)
-			   (send move-target :inverse-transform-vector (float-vector 0 0 0)))
-		       rotation-axis))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn ";; ~3d: dif-pos : ~a/(~a/~A), dif-rot : ~a/(~a/~A)~%"
-	       loop ndif-pos (norm ndif-pos) thre ndif-rot (norm ndif-rot) rthre))
+	       loop dif-pos (norm dif-pos) thre dif-rot (norm dif-rot) rthre))
        ;; check loop end
        (if (and (> loop (/ stop 10))
-		(if translation-axis (< (norm ndif-pos) thre) t)
-		(if rotation-axis (< (norm ndif-rot) rthre) t))
+		(if translation-axis (< (norm dif-pos) thre) t)
+		(if rotation-axis (< (norm dif-rot) rthre) t))
 	   (return-from :inverse-kinematics-loop :ik-succeed))
        ;; ik
        (when (and need-clear debug-view *viewer*)
@@ -1286,7 +1270,6 @@
           (c0 (unless (send self :parent) (send self :copy-worldcoords)))
 	  dif-pos dif-rot need-clear need-flush
 	  ;;
-	  ndif-pos ndif-rot
           (success t) 
           (fix-targets-av 
            (mapcar #'(lambda (l) (send-all l :joint :joint-angle))
@@ -1323,14 +1306,6 @@
         ;; update difference
      (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
 	   dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
-     (setq dif-pos (calc-dif-with-axis
-		    (v- (send move-target :inverse-transform-vector dif-pos)
-			(send move-target :inverse-transform-vector (float-vector 0 0 0)))
-		    translation-axis))
-     (setq dif-rot (calc-dif-with-axis
-		    (v- (send move-target :inverse-transform-vector dif-rot)
-			(send move-target :inverse-transform-vector (float-vector 0 0 0)))
-		    rotation-axis))
 
      (mapcar #'(lambda (l a) (send l :analysis-level a)) link-list old-analysis-level)
      ;; check solved or not
@@ -1529,7 +1504,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.75  2009-09-24 10:02:20  k-okada
+;;; Revision 1.76  2009-09-24 10:07:53  k-okada
+;;; move-avoidance-* taes local difference
+;;;
+;;; Revision 1.75  2009/09/24 10:02:20  k-okada
 ;;; do not display error when pair-list is null
 ;;;
 ;;; Revision 1.74  2009/09/20 06:07:06  k-okada
