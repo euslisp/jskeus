@@ -757,7 +757,6 @@
 	  (sc 0.0) np pair)
      (dotimes (i pair-len) (setf (elt ret i) (float-vector 0 0 0)))
      (when (or (null link-list) (= pair-len 0))
-       (warn ";; ERROR: :link-list ~A or pair-len ~A required~%" link-list pair-len)
        (return-from :collision-avoidance-calc-distance ret))
      (if (or (null col-list) (/= (length col-list) pair-len))
 	 (setq col-list (make-list pair-len)))
@@ -1082,7 +1081,7 @@
      ;; Collision Avoidance with Whole Body Motion Control for Humanoid
      ;; Robots", In IROS 2007, 2053--2058
      ;;
-     (when (and (> avoid-collision-distance 0.0)
+     (when (and pair-list (> avoid-collision-distance 0.0)
                 (or (> avoid-collision-joint-gain 0.0)
                     (> avoid-collision-null-gain 0.0)))
        (setq angle-speed-collision-avoidance
@@ -1140,7 +1139,7 @@
      ;;
      ;; done
      (when (and debug-view *viewer*)
-       (if (and (> avoid-collision-distance 0.0)
+       (if (and pair-list (> avoid-collision-distance 0.0)
                 (or (> avoid-collision-null-gain 0.0)
                     (> avoid-collision-joint-gain 0.0)))
 	 (let ((pwidth (send *viewer* :viewsurface :line-width))
@@ -1530,7 +1529,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.74  2009-09-20 06:07:06  k-okada
+;;; Revision 1.75  2009-09-24 10:02:20  k-okada
+;;; do not display error when pair-list is null
+;;;
+;;; Revision 1.74  2009/09/20 06:07:06  k-okada
 ;;; fix previsous commit
 ;;;
 ;;; Revision 1.73  2009/09/20 04:33:11  k-okada
