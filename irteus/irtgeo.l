@@ -45,8 +45,7 @@
   (:difference-position 
    (coords &key (translation-axis t))
    (let ((dif-pos
-	  (v- (send coords :worldpos) (send self :worldpos))))
-     ;;(setq dif-pos (v- target-pos end-pos))
+	  (send self :inverse-transform-vector (send coords :worldpos))))
      (case
       translation-axis
       ((:x :xx) (setf (elt dif-pos 0) 0))
@@ -59,34 +58,29 @@
   (:difference-rotation
    (coords &key (rotation-axis t))
    (let (dif-rotmatrix dif-rot a0 a1)
-     ;;(setq dif-rotmatrix (m* (transpose end-rot) target-rot))
-     ;;(setq dif-rot (matrix-log dif-rotmatrix))
-     ;;(setq dif-rot (transform end-rot dif-rot))
-     (cond
-      ((or (eq rotation-axis :x)
-	   (eq rotation-axis :y)
-	   (eq rotation-axis :z))
+     (case
+      rotation-axis
+      ((:x :y :z)
        (setq a0 (send self :axis rotation-axis)
 	     a1 (send coords :axis rotation-axis))
-       (setq dif-rot (scale (acos (v. a0 a1)) (normalize-vector (v* a0 a1))))
-       )
-      ((or (eq rotation-axis :xx)
-	   (eq rotation-axis :yy)
-	   (eq rotation-axis :zz))
+       (setq dif-rot 
+             (transform (transpose (send self :worldrot))
+                        (scale (acos (v. a0 a1)) (normalize-vector (v* a0 a1))))))
+      ((:xx :yy :zz)
        (let ((axis (case rotation-axis (:xx :x) (:yy :y) (:zz :z))) a2)
 	 (setq a0 (send self :axis axis)
 	       a1 (send coords :axis axis)
 	       a2 (v- (send coords :axis axis)))
 	 (setq a1 (scale (acos (v. a0 a1)) (normalize-vector (v* a0 a1))))
 	 (setq a2 (scale (acos (v. a0 a2)) (normalize-vector (v* a0 a2))))
-	 (if (< (norm a1) (norm a2)) (setq dif-rot a1) (setq dif-rot a2))))
+	 (if (< (norm a1) (norm a2)) (setq dif-rot a1) (setq dif-rot a2))
+         (setq dif-rot (transform (transpose (send self :worldrot)) dif-rot))))
+      (nil
+       (setq dif-rot (float-vector 0 0 0)))
       (t
        (setq dif-rotmatrix (m* (transpose (send self :worldrot)) (send coords :worldrot)))
        (setq dif-rot (user::matrix-log dif-rotmatrix))
-       (setq dif-rot (transform (send self :worldrot) dif-rot))
-       )
-      (nil
-       (setq dif-rot (float-vector 0 0 0))))
+       ))
      dif-rot))
   )
 
@@ -325,7 +319,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.9  2009-09-10 16:02:39  nozawa
+;;; Revision 1.10  2009-09-24 10:07:34  k-okada
+;;; fix differnece-position/rotation to calculate local difference
+;;;
+;;; Revision 1.9  2009/09/10 16:02:39  nozawa
 ;;; fix calculation of dif-pos (in :difference-position)
 ;;;
 ;;; Revision 1.8  2009/09/10 15:24:04  k-okada
