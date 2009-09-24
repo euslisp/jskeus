@@ -1275,7 +1275,7 @@
            (mapcar #'(lambda (l) (send-all l :joint :joint-angle))
                    (mapcar #'(lambda (l) (send self :link-list l)) fix-targets)))
 	  (old-analysis-level (send-all link-list :analysis-level))
-          (ik-args (nconc (send* self :inverse-kinematics-args :translation-axis translation-axis args) args))
+          (ik-args (nconc (send* self :inverse-kinematics-args :translation-axis translation-axis :rotation-axis rotation-axis args) args))
 	  )
      (send-all link-list :analysis-level :coords)
      (when debug-view
@@ -1291,6 +1291,7 @@
        (setq success (send* self :inverse-kinematics-loop
                            target-coords
                            :stop stop :loop loop
+                           :rotation-axis rotation-axis
                            :translation-axis translation-axis
                            :thre thre :rthre rthre
                            :debug-view debug-view
@@ -1309,7 +1310,9 @@
 
      (mapcar #'(lambda (l a) (send l :analysis-level a)) link-list old-analysis-level)
      ;; check solved or not
-     (if (and success (< (norm dif-pos) thre)  (< (norm dif-rot) rthre))
+     (if (and success 
+              (if translation-axis (< (norm dif-pos) thre) t)
+              (if rotation-axis (< (norm dif-rot) rthre) t))
          (send self :angle-vector)
        (progn
 	 (when warnp
@@ -1504,7 +1507,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.76  2009-09-24 10:07:53  k-okada
+;;; Revision 1.77  2009-09-24 11:26:59  nozawa
+;;; add rotation-axis to ik-args and inverse-kinematics-loop and fix "check solved or not"
+;;;
+;;; Revision 1.76  2009/09/24 10:07:53  k-okada
 ;;; move-avoidance-* taes local difference
 ;;;
 ;;; Revision 1.75  2009/09/24 10:02:20  k-okada
