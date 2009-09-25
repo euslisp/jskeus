@@ -1219,9 +1219,9 @@
   (:inverse-kinematics-loop
    (target-coords 
     &rest args
-    &key stop link-list move-target rotation-axis translation-axis
+    &key (stop 1) (loop 0) link-list move-target rotation-axis translation-axis
     look-at-target thre rthre 
-    loop debug-view need-clear need-flush ik-args
+    debug-view need-clear need-flush ik-args
     &allow-other-keys)
    (let (dif-pos dif-rot success)
        (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
@@ -1507,7 +1507,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.77  2009-09-24 11:26:59  nozawa
+;;; Revision 1.78  2009-09-25 09:33:33  k-okada
+;;; add default value to stop and loop in :inversekinematics-loop
+;;;
+;;; Revision 1.77  2009/09/24 11:26:59  nozawa
 ;;; add rotation-axis to ik-args and inverse-kinematics-loop and fix "check solved or not"
 ;;;
 ;;; Revision 1.76  2009/09/24 10:07:53  k-okada
