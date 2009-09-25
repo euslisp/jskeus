@@ -956,7 +956,6 @@
    (vel-pos vel-rot &rest args
 	    &key
 	    link-list
-	    move-target
 	    (weight (fill (instantiate float-vector (send self :calc-target-joint-dimension link-list)) 1))
 	    (null-space)
 	    (avoid-nspace-gain 0.01)
@@ -979,8 +978,8 @@
           angle-speed-collision-avoidance
           (angle-speed-collision-blending 0.0) min-distance
           (ret t))
-     (when (or (null link-list) (null move-target))
-       (warn ";; ERROR: :link-list or :move-target required~%")
+     (unless link-list
+       (warn ";; ERROR: :link-list required~%")
        (return-from :move-joints-avoidance t))
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
      (unless (get self :joint-angle-limit-weight-old)
@@ -1242,6 +1241,7 @@
         (send-message* self cascaded-link
                        :move-joints-avoidance
                        dif-pos dif-rot :link-list link-list
+                       :move-target move-target
                        :rotation-axis rotation-axis :translation-axis translation-axis
                        :debug-view debug-view
                        ;; buffer for calculation
@@ -1507,7 +1507,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.78  2009-09-25 09:33:33  k-okada
+;;; Revision 1.79  2009-09-25 09:54:22  k-okada
+;;; move-target does not used in move-joint-avoidance
+;;;
+;;; Revision 1.78  2009/09/25 09:33:33  k-okada
 ;;; add default value to stop and loop in :inversekinematics-loop
 ;;;
 ;;; Revision 1.77  2009/09/24 11:26:59  nozawa
