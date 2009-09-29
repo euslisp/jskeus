@@ -1245,7 +1245,7 @@
                        :rotation-axis rotation-axis :translation-axis translation-axis
                        :debug-view debug-view
                        ;; buffer for calculation
-                       ik-args))
+                       (nconc args ik-args)))
        (when (and debug-view  *viewer*)
 	 (send target-coords :draw-on :flush nil :color #f(1 0 0))
 	 (if need-flush (send *viewer* :viewsurface :flush)))
@@ -1507,7 +1507,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.79  2009-09-25 09:54:22  k-okada
+;;; Revision 1.80  2009-09-29 02:17:49  k-okada
+;;; use args and ik-args in :inverse-kinematics-loop
+;;;
+;;; Revision 1.79  2009/09/25 09:54:22  k-okada
 ;;; move-target does not used in move-joint-avoidance
 ;;;
 ;;; Revision 1.78  2009/09/25 09:33:33  k-okada
