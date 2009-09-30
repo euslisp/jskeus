@@ -897,10 +897,12 @@
     union-link-list
     angle-speed
     (angle-speed-blending 0.5)
+    (angle-speed-limit (/ pi 4)) ;; rad/sec
+    (periodic-time 0.05)         ;; sec
     (debug-view nil)
     (fix-targets)
     &allow-other-keys)
-   (let (dav dtheta j fix-target fix-targets-coords (ret t))
+   (let (dav dtheta j fix-target fix-targets-coords (ret t) (angle-speed-max 0) gain)
      (if fix-targets
          (setq fix-targets-coords (send-all fix-targets :copy-worldcoords)))
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
@@ -909,6 +911,10 @@
 
      (setq dav (send* self :calc-joint-angle-speed union-vel args))
      (if angle-speed (midpoint angle-speed-blending dav angle-speed dav))
+     (dotimes (i (length dav)) (setq angle-speed-max (max (abs (elt dav i)) angle-speed-max)))
+     (if (> (/ angle-speed-max periodic-time) angle-speed-limit)
+         (setq gain (/ angle-speed-limit (/ angle-speed-max periodic-time)))
+       (setq gain 1))
 
      ;; update body
      (do ((i 0 (1+ i))
@@ -939,6 +945,9 @@
                               (rad2deg (elt dav (incf i)))
                               (rad2deg (elt dav (incf i)))))
                ))
+       (if (float-vector-p dtheta)
+           (setq dtheta (scale gain dtheta dtheta))
+         (setq dtheta (* gain dtheta)))
        (send (elt union-link-list l) :joint :joint-angle dtheta :relative t))
      (when fix-targets
        (let ((tmp-coords (pop fix-targets-coords)))
@@ -1643,7 +1652,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.82  2009-09-30 10:18:17  nozawa
+;;; Revision 1.83  2009-09-30 13:47:09  k-okada
+;;; add angle-speed-limit
+;;;
+;;; Revision 1.82  2009/09/30 10:18:17  nozawa
 ;;; commit for dual-arm ik : main update are as follows : list of move-target,target-coords ... can be used in inverse-kinematics or so. :move-joints-avoidance requires jacobian
 ;;;
 ;;; Revision 1.81  2009/09/30 10:12:10  nozawa
