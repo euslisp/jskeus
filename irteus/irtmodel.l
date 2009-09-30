@@ -599,7 +599,7 @@
      fik))
   ;;
   (:calc-joint-angle-speed
-   (vel-pos vel-rot
+   (vel
     &rest args
     &key
     link-list
@@ -630,16 +630,6 @@
      (if (and (null translation-axis) (null rotation-axis))
 	 (return-from :calc-joint-angle-speed null-space))
 
-     ;; limit
-     (unless p-limit (setq p-limit 100.0))
-     (unless r-limit (setq r-limit 0.5))
-     (if (> (norm vel-pos) p-limit)
-	 (setq vel-pos (scale p-limit (normalize-vector vel-pos tmp-pos) tmp-pos)))
-     (if (> (norm vel-rot) r-limit)
-	 (setq vel-rot (scale r-limit (normalize-vector vel-rot tmp-rot) tmp-rot)))
-
-     (setq vel-pos (scale 0.001 vel-pos tmp-pos)) ;; scale [mm] -> [m]
-
      ;; dav = J#x + (I - J#J)y
      ;; particular : J#x
      (if (null jacobi)
@@ -647,29 +637,16 @@
      (if (null jacobi#)
 	 (setq jacobi# (send* self :calc-inverse-jacobian jacobi args)))
 
-     (if (null tmp-dim)
-	 (setq tmp-dim (instantiate float-vector (send self :calc-target-axis-dimension rotation-axis translation-axis))))
-
-     (setq vel-p (calc-dif-with-axis vel-pos
-		  translation-axis
-		  tmp-v0 tmp-v1 tmp-v2))
-     (dotimes (i (length vel-p)) (setf (elt tmp-dim i) (elt vel-p i)))
-
-     (setq vel-r (calc-dif-with-axis vel-rot
-		  rotation-axis
-		  tmp-v0 tmp-v1 tmp-v2))
-     (dotimes (i (length vel-r)) (setf (elt tmp-dim (+ i (length vel-p))) (elt vel-r i)))
-     
      (if (null tmp-len) (setq tmp-len (instantiate float-vector len)))
      (if (null tmp-len2) (setq tmp-len2 (instantiate float-vector len)))
-     (setq J#x (transform jacobi# tmp-dim tmp-len))
+     (setq J#x (transform jacobi# vel tmp-len))
      (when (and debug-view (not (memq :no-message debug-view)))
        (warn "J#t   :")
        (dotimes (j (cadr (array-dimensions jacobi#)))
 	 (if (/= j 0) (warn "       "))
 	 (dotimes (i len) (warn "~7,3f " (aref jacobi# i j))) (warn "~%"))
        (warn "x     :")
-       (dotimes (i (length tmp-dim)) (warn "~7,3f " (elt tmp-dim i))) (warn "~%")
+       (dotimes (i (length vel)) (warn "~7,3f " (elt vel i))) (warn "~%")
        (warn "J#x   :")
        (dotimes (i len) (warn "~7,3f " (elt J#x i))) (warn "~%"))
 
@@ -835,7 +812,7 @@
        (send self :put :collision-avoidance-args-list col-args-list)))
      col-args))
   (:collision-avoidance
-   (vel-pos &rest args
+   (&rest args
             &key
 	    avoid-collision-distance
 	    avoid-collision-joint-gain
@@ -883,7 +860,7 @@
      (setq dav-col (scale (- (* avoid-collision-distance (/ 1.0 min-distance)) 1) dav-col))
      dav-col))
   (:move-joints
-   (vel-pos vel-rot &rest args
+   (vel &rest args
     &key
     link-list
     move-target
@@ -899,7 +876,7 @@
      (if (and debug-view (not (equal debug-view :no-clear)) (boundp '*viewer*))
 	 (send *viewer* :viewsurface :clear))
 
-     (setq dav (send* self :calc-joint-angle-speed vel-pos vel-rot args))
+     (setq dav (send* self :calc-joint-angle-speed vel args))
      (if angle-speed (midpoint angle-speed-blending dav angle-speed dav))
 
      ;; update body
@@ -953,9 +930,10 @@
 	   (send-message move-target cascaded-link :draw-on :flush nil :size 100)))
      ret))
   (:move-joints-avoidance
-   (vel-pos vel-rot &rest args
+   (vel &rest args
 	    &key
 	    link-list
+	    move-target
 	    (weight (fill (instantiate float-vector (send self :calc-target-joint-dimension link-list)) 1))
 	    (null-space)
 	    (avoid-nspace-gain 0.01)
@@ -978,8 +956,8 @@
           angle-speed-collision-avoidance
           (angle-speed-collision-blending 0.0) min-distance
           (ret t))
-     (unless link-list
-       (warn ";; ERROR: :link-list required~%")
+     (when (or (null link-list) (null move-target))
+       (warn ";; ERROR: :link-list or :move-target required~%")
        (return-from :move-joints-avoidance t))
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
      (unless (get self :joint-angle-limit-weight-old)
@@ -1076,7 +1054,7 @@
                 (or (> avoid-collision-joint-gain 0.0)
                     (> avoid-collision-null-gain 0.0)))
        (setq angle-speed-collision-avoidance
-             (send* self :collision-avoidance vel-pos
+             (send* self :collision-avoidance
                     :avoid-collision-distance avoid-collision-distance
                     :avoid-collision-null-gain avoid-collision-null-gain
                     :avoid-collision-joint-gain avoid-collision-joint-gain
@@ -1121,7 +1099,7 @@
      ;; 
      (setq ret
          (send-message* self cascaded-link
-                        :move-joints vel-pos vel-rot
+                        :move-joints vel
                         :null-space null-space-joint-limit
                         :angle-speed angle-speed-collision-avoidance
                         :angle-speed-blending angle-speed-collision-blending
@@ -1218,11 +1196,11 @@
   (:inverse-kinematics-loop
    (target-coords 
     &rest args
-    &key (stop 1) (loop 0) link-list move-target rotation-axis translation-axis
+    &key stop link-list move-target rotation-axis translation-axis
     look-at-target thre rthre 
-    debug-view need-clear need-flush ik-args
+    loop debug-view need-clear need-flush ik-args
     &allow-other-keys)
-   (let (dif-pos dif-rot success)
+   (let (dif-pos dif-rot success dif)
        (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
 	     dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
        (when (and debug-view (not (memq :no-message debug-view)))
@@ -1236,16 +1214,16 @@
        ;; ik
        (when (and need-clear debug-view *viewer*)
 	 (if need-clear (send *viewer* :viewsurface :clear)))
+       (setq dif (send* self :calc-vel-from-dif-pos-rot
+		     dif-pos dif-rot translation-axis rotation-axis ik-args))
        (setq
         success
         (send-message* self cascaded-link
-                       :move-joints-avoidance
-                       dif-pos dif-rot :link-list link-list
-                       :move-target move-target
+                       :move-joints-avoidance dif :link-list link-list
                        :rotation-axis rotation-axis :translation-axis translation-axis
                        :debug-view debug-view
                        ;; buffer for calculation
-                       (nconc args ik-args)))
+                       ik-args))
        (when (and debug-view  *viewer*)
 	 (send target-coords :draw-on :flush nil :color #f(1 0 0))
 	 (if need-flush (send *viewer* :viewsurface :flush)))
@@ -1332,6 +1310,32 @@
          (if c0 (send self :newcoords c0))
 	 nil))
      ))
+  (:calc-vel-from-dif-pos-rot
+   (dif-pos dif-rot translation-axis rotation-axis
+    &rest args
+    &key (p-limit 100.0) (r-limit 0.5)
+         (tmp-v0 (instantiate float-vector 0))
+         (tmp-v1 (instantiate float-vector 1))
+         (tmp-v2 (instantiate float-vector 2))
+         (tmp-v3 (instantiate float-vector 3))
+         (tmp-dim (instantiate float-vector (send self :calc-target-axis-dimension rotation-axis translation-axis)))
+    &allow-other-keys)
+   (let (vel-p vel-r)
+     ;; limitation and unit system contvert
+     ;; pos
+     (if (> (norm dif-pos) p-limit)
+	 (setq dif-pos (scale p-limit (normalize-vector dif-pos tmp-v3) tmp-v3)))
+     (setq dif-pos (scale 0.001 dif-pos tmp-v3)) ;; scale [mm] -> [m]
+     (setq vel-p (calc-dif-with-axis dif-pos translation-axis
+				     tmp-v0 tmp-v1 tmp-v2))
+     (dotimes (i (length vel-p)) (setf (elt tmp-dim i) (elt vel-p i)))
+     ;; rot
+     (if (> (norm dif-rot) r-limit)
+	 (setq dif-rot (scale r-limit (normalize-vector dif-rot tmp-v3) tmp-v3)))
+     (setq vel-r (calc-dif-with-axis dif-rot rotation-axis
+				     tmp-v0 tmp-v1 tmp-v2))
+     (dotimes (i (length vel-r)) (setf (elt tmp-dim (+ i (length vel-p))) (elt vel-r i)))
+     tmp-dim))
   )
 
 (defun calc-dif-with-axis (dif axis &optional tmp-v0 tmp-v1 tmp-v2)
@@ -1507,7 +1511,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.80  2009-09-29 02:17:49  k-okada
+;;; Revision 1.81  2009-09-30 10:12:10  nozawa
+;;; integrate vel-pos and vel-rot -> vel and add :calc-vel-from-dif-pos-rot
+;;;
+;;; Revision 1.80  2009/09/29 02:17:49  k-okada
 ;;; use args and ik-args in :inverse-kinematics-loop
 ;;;
 ;;; Revision 1.79  2009/09/25 09:54:22  k-okada
