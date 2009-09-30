@@ -350,8 +350,12 @@
 (defmethod cascaded-link
   (:calc-target-axis-dimension
    (rotation-axis translation-axis)
-   (let ((dim 6))
-     (dolist (axis (list translation-axis rotation-axis))
+   ;; rotation-axis, translation-axis -> both list and atom OK.
+   (let ((dim (* 6 (if (atom rotation-axis) 1 (length rotation-axis)))))
+     (dolist (axis (append (if (atom translation-axis)
+                               (list translation-axis) translation-axis)
+                           (if (atom rotation-axis)
+                               (list rotation-axis) rotation-axis)))
        (case axis
 	     ((:x :y :z :xx :yy :zz) (decf dim 1))
 	     ((:xy :yx :yz :zy :zx :xz) (decf dim 2))
@@ -359,7 +363,14 @@
      dim))
   (:calc-target-joint-dimension
    (link-list)
-   (calc-target-joint-dimension (send-all link-list :joint)))
+   ;; link-list -> both list of link-list and atom of link-list OK.
+   (cond
+    ((atom (car link-list))
+     (calc-target-joint-dimension (send-all link-list :joint)))
+    ((= (length link-list) 1)
+     (calc-target-joint-dimension (send-all (car link-list) :joint)))
+    (t (calc-target-joint-dimension (send-all (reduce #'union link-list) :joint)))
+    ))
   (:calc-inverse-jacobian
    (jacobi &rest args
     &key
@@ -404,7 +415,7 @@
 	 (send move-target :inverse-transform-vector #f(0 0 0) tmp-v3a tmp-v3b tmp-m33)  tmp-v3))
    tmp-v3)
   (:calc-jacobian-linear-joint
-   (fik i joint paxis child-link child-reverse
+   (fik row column joint paxis child-link child-reverse
 	move-target rotation-axis translation-axis
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
@@ -413,12 +424,12 @@
 
      (setq pos-r (calc-dif-with-axis tmp-v3 translation-axis tmp-v0 tmp-v1 tmp-v2))
      (setq pos-r (scale 0.001 pos-r pos-r));; scale [mm] -> [m]
-     (dotimes (j (length pos-r)) (setf (aref fik j i) (elt pos-r j)))
+     (dotimes (j (length pos-r)) (setf (aref fik (+ j row) column) (elt pos-r j)))
      (setq pos-i (calc-dif-with-axis #f(0 0 0) rotation-axis tmp-v0 tmp-v1 tmp-v2))
-     (dotimes (j (length pos-i)) (setf (aref fik (+ j (length pos-r)) i) (elt pos-i j)))
+     (dotimes (j (length pos-i)) (setf (aref fik (+ j row (length pos-r)) column) (elt pos-i j)))
      ))
   (:calc-jacobian-rotational-joint
-   (fik i joint paxis child-link child-reverse
+   (fik row column joint paxis child-link child-reverse
 	move-target rotation-axis translation-axis
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
@@ -432,94 +443,100 @@
      
      (setq pos-r (v* tmp-v3 pos-i tmp-v3b))
      (setq pos-r (calc-dif-with-axis pos-r translation-axis tmp-v0 tmp-v1 tmp-v2))
-     (dotimes (j (length pos-r)) (setf (aref fik j i) (elt pos-r j)))
+     (dotimes (j (length pos-r)) (setf (aref fik (+ j row) column) (elt pos-r j)))
      (setq pos-i (calc-dif-with-axis tmp-v3 rotation-axis tmp-v0 tmp-v1 tmp-v2))
-     (dotimes (j (length pos-i)) (setf (aref fik (+ j (length pos-r)) i) (elt pos-i j)))
+     (dotimes (j (length pos-i)) (setf (aref fik (+ j row (length pos-r)) column) (elt pos-i j)))
      ))
   (:calc-jacobian-wheel-joint
-   (fik i joint paxis child-link child-reverse
+   (fik row column joint paxis child-link child-reverse
 	move-target rotation-axis translation-axis
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
      (send self :calc-jacobian-linear-joint
-	   fik i joint #f(1 0 0) child-link child-reverse
+	   fik row column joint #f(1 0 0) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-rotational-joint
-	   fik (+ i 1) joint #f(0 0 1) child-link child-reverse
+	   fik row (+ column 1) joint #f(0 0 1) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ;;(setf (aref fik 2 1) 0)
      ))
   (:calc-jacobian-omniwheel-joint
-   (fik i joint paxis child-link child-reverse
+   (fik row column joint paxis child-link child-reverse
 	move-target rotation-axis translation-axis
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
      (send self :calc-jacobian-linear-joint
-	   fik i joint #f(1 0 0) child-link child-reverse
+	   fik row column joint #f(1 0 0) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-linear-joint
-	   fik (+ i 1) joint #f(0 1 0) child-link child-reverse
+	   fik row (+ column 1) joint #f(0 1 0) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-rotational-joint
-	   fik (+ i 2) joint #f(0 0 1) child-link child-reverse
+	   fik row (+ column 2) joint #f(0 0 1) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
   (:calc-jacobian-sphere-joint
-   (fik i joint paxis child-link child-reverse
+   (fik row column joint paxis child-link child-reverse
 	move-target rotation-axis translation-axis
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
      (send self :calc-jacobian-rotational-joint
-	   fik i joint #f(0 0 1) child-link child-reverse
+	   fik row column joint #f(0 0 1) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-rotational-joint
-	   fik (+ i 1) joint #f(0 1 0) child-link child-reverse
+	   fik row (+ column 1) joint #f(0 1 0) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-rotational-joint
-	   fik (+ i 2) joint #f(1 0 0) child-link child-reverse
+	   fik row (+ column 2) joint #f(1 0 0) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
   (:calc-jacobian-6dof-joint
-   (fik i joint paxis child-link child-reverse
+   (fik row column joint paxis child-link child-reverse
 	move-target rotation-axis translation-axis
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
      (send self :calc-jacobian-linear-joint
-	   fik i joint #f(1 0 0) child-link child-reverse
+	   fik row column joint #f(1 0 0) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-linear-joint
-	   fik (+ i 1) joint #f(0 1 0) child-link child-reverse
+	   fik row (+ column 1) joint #f(0 1 0) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-linear-joint
-	   fik (+ i 2) joint #f(0 0 1) child-link child-reverse
+	   fik row (+ column 2) joint #f(0 0 1) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-rotational-joint
-	   fik (+ i 3) joint #f(0 0 1) child-link child-reverse
+	   fik row (+ column 3) joint #f(0 0 1) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-rotational-joint
-	   fik (+ i 4) joint #f(0 1 0) child-link child-reverse
+	   fik row (+ column 4) joint #f(0 1 0) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (send self :calc-jacobian-rotational-joint
-	   fik (+ i 5) joint #f(1 0 0) child-link child-reverse
+	   fik row (+ column 5) joint #f(1 0 0) child-link child-reverse
 	   move-target rotation-axis translation-axis
 	   pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
   (:calc-jacobian-from-link-list
    (link-list &rest args 
-	      &key move-target (rotation-axis nil) (translation-axis t)
+	      &key move-target
+	      (rotation-axis (cond 
+			      ((atom move-target) nil)
+			      (t (make-list (length move-target)))))
+	      (translation-axis (cond 
+				 ((atom move-target) t)
+				 (t (make-list (length move-target) :initial-element t))))
 	      (dim (send self :calc-target-axis-dimension rotation-axis translation-axis))
               (fik-len (send self :calc-target-joint-dimension link-list))
 	      fik
@@ -530,140 +547,144 @@
 	      (tmp-v3a (instantiate float-vector 3))
 	      (tmp-v3b (instantiate float-vector 3))
 	      (tmp-m33 (make-matrix 3 3))
-	      debug-view
 	      &allow-other-keys)
-   (let* ((len (length link-list))
+   (let* (len ul row
 	  pos-i pos-r
 	  paxis
-	  child-link child-reverse
+	  child-link child-reverse union-link-list
 	  j)
      (unless fik (setq fik (make-matrix dim fik-len)))
-     (do ((i 0 (1+ i))
-	  (l 0 (1+ l)))
-	 ((>= l len))
-       (setq j (send (elt link-list l) :joint))
-       (cond ((not (derivedp (send j :child-link) bodyset-link))
-	      (setq child-reverse nil))
-             ((and (< (+ l 1) len)
-		   (not (eq (send j :child-link)
-			    (send (elt link-list (+ l 1)) :parent-link))))
-	      (setq child-reverse t))
-	     (t
-	      (setq child-reverse nil)))
-        (setq child-link (send j :child-link))
-	(setq paxis (case (j . axis)
-		      (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1))
-		      (:xx #f(1 0 0)) (:yy #f(0 1 0)) (:zz #f(0 0 1))
-		      (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1))
-		      (t (j . axis))))
+;;
+     (cond
+      ((atom (car link-list))
+       (setq union-link-list link-list
+	     link-list (list link-list)))
+      ((= (length link-list) 1)
+       (setq union-link-list (car link-list)))
+      (t (setq union-link-list (reduce #'union link-list))))
+     (if (atom move-target) (setq move-target (list move-target)))
+     (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
+     (if (atom translation-axis) (setq translation-axis (list translation-axis)))
+;;
+     (do ((col 0 (1+ col))
+	  (i 0 (1+ i)))
+         ((>= col (send self :calc-target-joint-dimension union-link-list)))
+       (setq ul (elt union-link-list i) row 0)
+       (dotimes (m (length link-list))
+         (let ((link-list (elt link-list m))
+               (move-target (elt move-target m))
+               (rotation-axis (elt rotation-axis m))
+               (translation-axis (elt translation-axis m)) l)
+           (when (member ul link-list :test #'equal)
+             (setq len (length link-list)
+                   l (position ul link-list :test #'equal)
+                   j (send ul :joint))
+             (cond ((not (derivedp (send j :child-link) bodyset-link))
+                    (setq child-reverse nil)
+                    (setq child-link (send j :child-link)))
+                   ((and (< (+ l 1) len)
+                         (not (eq (send j :child-link)
+                                  (send (elt link-list (+ l 1)) :parent-link))))
+                    (setq child-reverse t)
+                    (setq child-link (send j :parent-link)))
+                   (t
+                    (setq child-reverse nil)
+                    (setq child-link (send j :child-link))))
+             (setq paxis (case (j . axis)
+                               (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1))
+                               (:xx #f(1 0 0)) (:yy #f(0 1 0)) (:zz #f(0 0 1))
+                               (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1))
+                               (t (j . axis))))
 
-	(cond 
-	 ((derivedp j linear-joint)
-	  (send self :calc-jacobian-linear-joint
-		fik i j paxis child-link child-reverse move-target
-		rotation-axis translation-axis pos-i pos-r
-		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33))
-	 ((derivedp j rotational-joint)
-	  (send self :calc-jacobian-rotational-joint
-		fik i j paxis child-link child-reverse move-target
-		rotation-axis translation-axis pos-i pos-r
-		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33))
-	 ((derivedp j wheel-joint)
-	  (send self :calc-jacobian-wheel-joint
-		fik i j paxis child-link child-reverse move-target
-		rotation-axis translation-axis pos-i pos-r
-		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-	  (incf i 1))
-	 ((derivedp j omniwheel-joint)
-	  (send self :calc-jacobian-omniwheel-joint
-		fik i j paxis child-link child-reverse move-target
-		rotation-axis translation-axis pos-i pos-r
-		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-	  (incf i 2))
-	 ((derivedp j sphere-joint)
-	  (send self :calc-jacobian-sphere-joint
-		fik i j paxis child-link child-reverse move-target
-		rotation-axis translation-axis pos-i pos-r
-		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-	  (incf i 2))
-	 ((derivedp j 6dof-joint)
-	  (send self :calc-jacobian-6dof-joint
-		fik i j paxis child-link child-reverse move-target
-		rotation-axis translation-axis pos-i pos-r
-		tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-	  (incf i 5))
-	 (t
-	  (warn "unknown joint type ~A~%" j)))
-	;;
-	)
+             (cond 
+              ((derivedp j linear-joint)
+               (send self :calc-jacobian-linear-joint
+                     fik row col j paxis child-link child-reverse move-target
+                     rotation-axis translation-axis pos-i pos-r
+                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33))
+              ((derivedp j rotational-joint)
+               (send self :calc-jacobian-rotational-joint
+                     fik row col j paxis child-link child-reverse move-target
+                     rotation-axis translation-axis pos-i pos-r
+                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33))
+              ((derivedp j wheel-joint)
+               (send self :calc-jacobian-wheel-joint
+                     fik row i j paxis child-link child-reverse move-target
+                     rotation-axis translation-axis pos-i pos-r
+                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+               (incf col 1))
+              ((derivedp j omniwheel-joint)
+               (send self :calc-jacobian-omniwheel-joint
+                     fik row col j paxis child-link child-reverse move-target
+                     rotation-axis translation-axis pos-i pos-r
+                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+               (incf col 2))
+              ((derivedp j sphere-joint)
+               (send self :calc-jacobian-sphere-joint
+                     fik row col j paxis child-link child-reverse move-target
+                     rotation-axis translation-axis pos-i pos-r
+                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+               (incf col 2))
+              ((derivedp j 6dof-joint)
+               (send self :calc-jacobian-6dof-joint
+                     fik row col j paxis child-link child-reverse move-target
+                     rotation-axis translation-axis pos-i pos-r
+                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+               (incf col 5))
+              (t
+               (warn "unknown joint type ~A~%" j)))
+             ) ;; when
+           (setq row (send self :calc-target-axis-dimension
+			   rotation-axis translation-axis))
+           )) ;; dotimes
+       ) ;; do
      fik))
   ;;
   (:calc-joint-angle-speed
-   (vel
+   (union-vel
     &rest args
     &key
-    link-list
-    move-target jacobi jacobi# null-space
-    (rotation-axis nil) (translation-axis t)
-    p-limit r-limit
-    (weight (fill (instantiate float-vector (send self :calc-target-joint-dimension link-list)) 1))
-    (wmat)
-    (debug-view nil)
-    (tmp-pos (float-vector 0 0 0))
-    (tmp-rot (float-vector 0 0 0))
-    (tmp-v0 (instantiate float-vector 0))
-    (tmp-v1 (instantiate float-vector 1))
-    (tmp-v2 (instantiate float-vector 2))
-    (tmp-v3 (instantiate float-vector 3))
-    (tmp-v3a (instantiate float-vector 3))
-    (tmp-v3b (instantiate float-vector 3))
-    (tmp-v3c (instantiate float-vector 3))
-    (tmp-m33 (make-matrix 3 3))
-    (tmp-dim)
-    (tmp-len) (tmp-len2)
-    (tmp-mcc) (tmp-mcc2)
+    jacobi jacobi# null-space debug-view
+    weight wmat tmp-len tmp-len2 fik-len tmp-mcc tmp-mcc2
     &allow-other-keys)
-   (let (vel-p vel-r J#x I-J#J (len (send self :calc-target-joint-dimension link-list)))
-     (when (or (null link-list) (null move-target))
-       (warn ";; ERROR: :link-list or :move-target required~%")
-       (return-from :calc-joint-angle-speed null-space))
-     (if (and (null translation-axis) (null rotation-axis))
-	 (return-from :calc-joint-angle-speed null-space))
-
+   (let (vel-p vel-r J#x I-J#J)
      ;; dav = J#x + (I - J#J)y
      ;; particular : J#x
-     (if (null jacobi)
-	 (setq jacobi (send* self :calc-jacobian-from-link-list link-list args)))
-     (if (null jacobi#)
-	 (setq jacobi# (send* self :calc-inverse-jacobian jacobi args)))
+     (when (null jacobi)
+       (warn ";; ERROR : jacobi is required in :calc-joint-angle-speed~%")
+       (return-from :calc-joint-angle-speed null-space))
+     (if (null fik-len) (setq fik-len (cadr (array-dimensions jacobi))))
+     (if (null tmp-len) (setq tmp-len (instantiate float-vector fik-len)))
+     (if (null tmp-len2) (setq tmp-len2 (instantiate float-vector fik-len)))
+     (when (null jacobi#)
+       (setq jacobi# (send* self :calc-inverse-jacobian jacobi args)))
 
-     (if (null tmp-len) (setq tmp-len (instantiate float-vector len)))
-     (if (null tmp-len2) (setq tmp-len2 (instantiate float-vector len)))
-     (setq J#x (transform jacobi# vel tmp-len))
+     (setq J#x (transform jacobi# union-vel tmp-len))
      (when (and debug-view (not (memq :no-message debug-view)))
        (warn "J#t   :")
        (dotimes (j (cadr (array-dimensions jacobi#)))
 	 (if (/= j 0) (warn "       "))
-	 (dotimes (i len) (warn "~7,3f " (aref jacobi# i j))) (warn "~%"))
+	 (dotimes (i fik-len) (warn "~7,3f " (aref jacobi# i j))) (warn "~%"))
        (warn "x     :")
-       (dotimes (i (length vel)) (warn "~7,3f " (elt vel i))) (warn "~%")
+       (dotimes (i (length union-vel)) (warn "~7,3f " (elt union-vel i))) (warn "~%")
        (warn "J#x   :")
-       (dotimes (i len) (warn "~7,3f " (elt J#x i))) (warn "~%"))
+       (dotimes (i fik-len) (warn "~7,3f " (elt J#x i))) (warn "~%"))
 
      ;; if use null space
      (when (and (vectorp null-space)
-		(= len (length null-space)))
-       (if (null tmp-mcc) (setq tmp-mcc (make-matrix len len)))
-       (if (null tmp-mcc2) (setq tmp-mcc2 (make-matrix len len)))
+		(= fik-len (length null-space)))
+       (if (null tmp-mcc) (setq tmp-mcc (make-matrix fik-len fik-len)))
+       (if (null tmp-mcc2) (setq tmp-mcc2 (make-matrix fik-len fik-len)))
+       (if (null weight) (setq weight (fill (instantiate float-vector fik-len) 1)))
        ;; projection : I - J#J
        ;; (unit-matrix (car (array-dimensions jacobi#))))
        (fill (array-entity tmp-mcc) 0)
-       (dotimes (i len) (setf (aref tmp-mcc i i) 1.0))
+       (dotimes (i fik-len) (setf (aref tmp-mcc i i) 1.0))
        (setq I-J#J (m- tmp-mcc
 		       (m* jacobi# jacobi tmp-mcc2) tmp-mcc))
        ;; add null space
-       (if (null wmat) (setq wmat (make-matrix len len )))
-       (dotimes (i len) (setf (aref wmat i i) (aref weight i)))
+       (if (null wmat) (setq wmat (make-matrix fik-len fik-len)))
+       (dotimes (i fik-len) (setf (aref wmat i i) (aref weight i)))
        (v+ J#x (transform wmat (transform I-J#J null-space tmp-len2) tmp-len2) J#x))
      J#x))
   (:collision-avoidance-links
@@ -671,6 +692,12 @@
    (if l (setq collision-avoidance-links l)) collision-avoidance-links)
   (:collision-avoidance-link-pair-from-link-list
     (link-list &key obstacles ((:collision-avoidance-links collision-links) collision-avoidance-links) debug)
+    ;; link-list -> both list and atom OK.
+    (if (not (atom (car link-list)))
+	(let ((ll (mapcar #'(lambda (x) (send self :collision-avoidance-link-pair-from-link-list x)) link-list)) ret)
+	  (setq ret (reduce #'append ll))
+	  (if (= (length link-list) 1) (car ret) ret)
+	  )
    (let* ((parent-links
            (mapcar
             #'(lambda (ll)
@@ -713,10 +740,10 @@
          (if (elt index-links i)
              (dolist (o obstacles)
                (push (list (elt collision-links i) o) ret)))))
-     ret))
+     ret)))
   (:collision-avoidance-calc-distance
    (&rest args
-	  &key link-list (warnp t)
+	  &key union-link-list (warnp t)
           ((:collision-avoidance-link-pair pair-list))
 	  &allow-other-keys)
    (let* ((pair-len (length pair-list))
@@ -725,14 +752,14 @@
 	  (distance-limit 10)
 	  (sc 0.0) np pair)
      (dotimes (i pair-len) (setf (elt ret i) (float-vector 0 0 0)))
-     (when (or (null link-list) (= pair-len 0))
+     (when (or (null union-link-list) (= pair-len 0))
        (return-from :collision-avoidance-calc-distance ret))
      (if (or (null col-list) (/= (length col-list) pair-len))
 	 (setq col-list (make-list pair-len)))
      ;; pair (part of this limb . part of another limb)
      (dotimes (i pair-len)
        (setq pair (elt pair-list i))
-       (if (not (memq (car pair) link-list)) 
+       (if (not (memq (car pair) union-link-list)) 
 	   (progn
              (warn ";; ERROR : (car pair) is not included in link-list ~A~%" (send-all pair :name))
 	     (setf (elt col-list i) nil)
@@ -757,6 +784,7 @@
      ret))
   (:collision-avoidance-args
    (pair link-list)
+   ;; link-list -> must not be list of link-list
    (let* ((col-args-list (send self :get :collision-avoidance-args-list))
           (col-link-list (send self :link-list (car pair) (car link-list)))
           (col-link-len (send self :calc-target-joint-dimension link-list))
@@ -816,22 +844,26 @@
             &key
 	    avoid-collision-distance
 	    avoid-collision-joint-gain
-	    avoid-collision-null-gain
+	    avoid-collision-null-gain	    
             ((:collision-avoidance-link-pair pair-list))
-            (link-list)
-            tmp-mcc tmp-mcc2
+	    (union-link-list) (link-list) (jacobi) (jacobi#)
+            ;; link-list -> both list and atom OK.
+	    (fik-len (send self :calc-target-joint-dimension union-link-list))
+            (tmp-mcc (make-matrix fik-len fik-len))
+	    (tmp-mcc2 (make-matrix fik-len fik-len))
             &allow-other-keys)
-   (let* ((len (send self :calc-target-joint-dimension link-list))
-          (ret (send* self :collision-avoidance-calc-distance args))
+   (let* ((ret (send* self :collision-avoidance-calc-distance args))
           (pair-len (length pair-list))
           (np (elt (send self :get :collision-distance) 0))
           (min-distance (car np))
           (pair (elt pair-list (car (last np))))
-	  (dav-col (instantiate float-vector len))
-          drag-coords col-link-list jacobi col-jacobi jacobi# I-J#J ddav-col col-args
+	  (dav-col (instantiate float-vector fik-len))
+          drag-coords col-link-list col-jacobi I-J#J ddav-col col-args
           )
      (if (>= min-distance avoid-collision-distance)
          (return-from :collision-avoidance dav-col))
+     (if (atom (car link-list)) (setq link-list (list link-list)))
+     (setq link-list (find-if #'(lambda (x) (member (car pair) x) :test #'equal) link-list))
      (setq col-args (send self :collision-avoidance-args pair link-list))
 
      (setq drag-coords (make-cascoords :pos (elt np 1)))
@@ -842,28 +874,27 @@
                              col-args))
      (send (car pair) :dissoc drag-coords)
      (setq ddav-col (transform (transpose col-jacobi) (elt ret 0)))
-
-     (dotimes (i (length ddav-col)) (setf (elt dav-col i) (elt ddav-col i)))
-     (setq jacobi (send* self :calc-jacobian-from-link-list link-list args))
-     (setq jacobi# (send* self :calc-inverse-jacobian jacobi args))
+     
+     (dotimes (i (length link-list))
+       (setf (elt dav-col (position (elt link-list i) union-link-list :test #'equal) ) (elt ddav-col i)))
+     (when (or (null jacobi) (null jacobi#))
+       (warn ";; ERROR : jacobi or jacobi# are required in :collision-avoidance~%")
+       (return-from :collision-avoidance dav-col))
+     
      ;;;
-     (unless tmp-mcc  (setq tmp-mcc (make-matrix len len)))
-     (unless tmp-mcc2 (setq tmp-mcc2 (make-matrix len len)))
      (fill (array-entity tmp-mcc) 0)
-     (dotimes (i len) (setf (aref tmp-mcc i i) 1.0))
+     (dotimes (i fik-len) (setf (aref tmp-mcc i i) 1.0))
 
      (setq I-J#J (m- tmp-mcc (m* jacobi# jacobi tmp-mcc2) tmp-mcc))
      (setq ddav-col (transform I-J#J dav-col))
-     (dotimes (i len) (setf (elt dav-col i)
+     (dotimes (i fik-len) (setf (elt dav-col i)
                             (+ (* avoid-collision-joint-gain (elt dav-col i))
                                (* avoid-collision-null-gain (elt ddav-col i)))))
-     (setq dav-col (scale (- (* avoid-collision-distance (/ 1.0 min-distance)) 1) dav-col))
-     dav-col))
+     (scale (- (* avoid-collision-distance (/ 1.0 min-distance)) 1) dav-col)))
   (:move-joints
-   (vel &rest args
+   (union-vel &rest args
     &key
-    link-list
-    move-target
+    union-link-list
     angle-speed
     (angle-speed-blending 0.5)
     (debug-view nil)
@@ -876,14 +907,14 @@
      (if (and debug-view (not (equal debug-view :no-clear)) (boundp '*viewer*))
 	 (send *viewer* :viewsurface :clear))
 
-     (setq dav (send* self :calc-joint-angle-speed vel args))
+     (setq dav (send* self :calc-joint-angle-speed union-vel args))
      (if angle-speed (midpoint angle-speed-blending dav angle-speed dav))
 
      ;; update body
      (do ((i 0 (1+ i))
 	  (l 0 (1+ l)))
-	 ((>= l (length link-list)))
-       (setq j (send (elt link-list l) :joint))
+	 ((>= l (length union-link-list)))
+       (setq j (send (elt union-link-list l) :joint))
        (setq dtheta
 	 (cond ((derivedp j linear-joint)
 		(* 1000.0 (elt dav i)))
@@ -908,7 +939,7 @@
                               (rad2deg (elt dav (incf i)))
                               (rad2deg (elt dav (incf i)))))
                ))
-       (send (elt link-list l) :joint :joint-angle dtheta :relative t))
+       (send (elt union-link-list l) :joint :joint-angle dtheta :relative t))
      (when fix-targets
        (let ((tmp-coords (pop fix-targets-coords)))
          (send tmp-coords :transform
@@ -922,59 +953,50 @@
                      :avoid-collision-null-gain 0
                      :avoid-collision-joint-gain 0)
              (setq ret nil)))))
-     ;;
-     ;; done
-     (when (and debug-view *viewer*)
-       (send *viewer* :draw-objects :clear nil :flush nil)
-       (if move-target
-	   (send-message move-target cascaded-link :draw-on :flush nil :size 100)))
      ret))
   (:move-joints-avoidance
-   (vel &rest args
-	    &key
-	    link-list
-	    move-target
-	    (weight (fill (instantiate float-vector (send self :calc-target-joint-dimension link-list)) 1))
-	    (null-space)
-	    (avoid-nspace-gain 0.01)
-	    (avoid-weight-gain 1.0)
-	    (avoid-collision-distance 200)
-	    (avoid-collision-null-gain 1.0)
-	    (avoid-collision-joint-gain 1.0)
-            ((:collision-avoidance-link-pair pair-list)
-             (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args))))
-	    (tmp-len) (tmp-len2) (debug-view)
+   (union-vel &rest args
+              &key
+              union-link-list link-list
+              (fik-len (send self :calc-target-joint-dimension union-link-list))
+              (weight (fill (instantiate float-vector fik-len) 1))
+              (null-space)
+              (avoid-nspace-gain 0.01)
+              (avoid-weight-gain 1.0)
+              (avoid-collision-distance 200)
+              (avoid-collision-null-gain 1.0)
+              (avoid-collision-joint-gain 1.0)
+              ((:collision-avoidance-link-pair pair-list)
+               (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args))))
+              (tmp-len (instantiate float-vector fik-len))
+              (tmp-len2 (instantiate float-vector fik-len))
+              (wmat (make-matrix fik-len fik-len)) (debug-view) (jacobi)
 	    &allow-other-keys)
-   (let* ((len (send self :calc-target-joint-dimension link-list))
-	  (wmat (make-matrix len len))
-	  joint-angle-limit-nspace
+   (let* (joint-angle-limit-nspace
 	  joint-angle-limit-weight
 	  joint-angle-limit-weight-old
 	  dav dtheta 
-	  (null-space-joint-limit (instantiate float-vector len))
+	  (null-space-joint-limit (instantiate float-vector fik-len))
           null-space-collision-avoidance
           angle-speed-collision-avoidance
           (angle-speed-collision-blending 0.0) min-distance
-          (ret t))
-     (when (or (null link-list) (null move-target))
-       (warn ";; ERROR: :link-list or :move-target required~%")
-       (return-from :move-joints-avoidance t))
+          (ret t) jacobi#)
+     (when (null jacobi)
+       (warn ";; ERROR : jacobi is required in :move-joints-avoidance~%")
+       (return-from :move-joints-avoidance ret))
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
      (unless (get self :joint-angle-limit-weight-old)
        (setf (get self :joint-angle-limit-weight-old) (make-hash-table)))
      (setq joint-angle-limit-weight-old
-       (gethash link-list (get self :joint-angle-limit-weight-old)))
+       (gethash union-link-list (get self :joint-angle-limit-weight-old)))
      (unless joint-angle-limit-weight-old
-       (setq joint-angle-limit-weight-old (instantiate float-vector len))
+       (setq joint-angle-limit-weight-old (instantiate float-vector fik-len))
        (fill joint-angle-limit-weight-old 1.0e+20)
-       (setf (gethash link-list (get self :joint-angle-limit-weight-old))
+      (setf (gethash union-link-list (get self :joint-angle-limit-weight-old))
 	     joint-angle-limit-weight-old))
-     (if (null tmp-len) (setq tmp-len (instantiate float-vector len)))
-     (if (null tmp-len2) (setq tmp-len2 (instantiate float-vector len)))
-
      (when (and debug-view (not (memq :no-message debug-view)))
        (warn "angle :")
-       (dolist (j (send-all link-list :joint))
+       (dolist (j (send-all union-link-list :joint))
 	 (let ((a (send j :joint-angle)))
 	   (if (vectorp a)
 	       (dotimes (i (length a)) (warn "~7,1f " (elt a i)))
@@ -995,36 +1017,37 @@
      (when (> avoid-weight-gain 0.0)
        (setq joint-angle-limit-weight 
 	 (scale avoid-weight-gain
-		(joint-angle-limit-weight (send-all link-list :joint) tmp-len) tmp-len))
+		(joint-angle-limit-weight (send-all union-link-list :joint) tmp-len) tmp-len))
+       ;; (setq joint-angle-limit-weight (instantiate float-vector fik-len))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "cost  :")
-	 (dotimes (i len) (warn "~7,3f " (elt joint-angle-limit-weight i))) (warn "~%"))
-       (dotimes (i len)
+	 (dotimes (i fik-len) (warn "~7,3f " (elt joint-angle-limit-weight i))) (warn "~%"))
+       (dotimes (i fik-len)
 	 (setf (elt weight i)
 	       (* (elt weight i) 
 		  (if (> (- (elt joint-angle-limit-weight i)
                             (elt joint-angle-limit-weight-old i)) 0.0)
 		      (/ 1.0 (+ 1.0 (elt joint-angle-limit-weight i)))
 		    1.0))))
-       (dotimes (i len) (setf (elt joint-angle-limit-weight-old i)
-			      (elt joint-angle-limit-weight i))))
-     (dotimes (i len) (setf (aref wmat i i) (aref weight i)))
+       (dotimes (i fik-len) (setf (elt joint-angle-limit-weight-old i) (elt joint-angle-limit-weight i)))
+       )
+     (dotimes (i fik-len) (setf (aref wmat i i) (aref weight i)))
      (when (and debug-view (not (memq :no-message debug-view)))
        (warn "weight:")
-       (dotimes (i  len) (warn "~7,3f " (elt weight i))) (warn "~%"))
+       (dotimes (i  fik-len) (warn "~7,3f " (elt weight i))) (warn "~%"))
      ;;
      ;; avoid-nspace-joint-limit: avoiding joint angle limit
      ;; 
      ;; dH/dq = (((t_max + t_min)/2 - t) / ((t_max - t_min)/2)) ^2
      ;;
      (when (> avoid-nspace-gain 0.0)
-       (setq joint-angle-limit-nspace (joint-angle-limit-nspace (send-all link-list :joint) tmp-len2))
+       (setq joint-angle-limit-nspace (joint-angle-limit-nspace (send-all union-link-list :joint) tmp-len2))
        (setq null-space-joint-limit
 	 (scale avoid-nspace-gain
                 joint-angle-limit-nspace tmp-len2))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "nspace:")
-	 (dotimes (i  len) (warn "~7,3f " (elt null-space-joint-limit i))) (warn "~%")))
+	 (dotimes (i fik-len) (warn "~7,3f " (elt null-space-joint-limit i))) (warn "~%")))
      ;;
      ;; angle-speed-collision-avoidance: avoiding self collision
      ;;
@@ -1049,28 +1072,30 @@
      ;; H. Sugiura, M. Gienger, H. Janssen and C. Goerick : "Real-Time
      ;; Collision Avoidance with Whole Body Motion Control for Humanoid
      ;; Robots", In IROS 2007, 2053--2058
-     ;;
+     ;;     
+     (setq jacobi# (send* self :calc-inverse-jacobian jacobi :weight weight args))
      (when (and pair-list (> avoid-collision-distance 0.0)
-                (or (> avoid-collision-joint-gain 0.0)
-                    (> avoid-collision-null-gain 0.0)))
+		(or (> avoid-collision-joint-gain 0.0)
+		    (> avoid-collision-null-gain 0.0)))
        (setq angle-speed-collision-avoidance
-             (send* self :collision-avoidance
-                    :avoid-collision-distance avoid-collision-distance
-                    :avoid-collision-null-gain avoid-collision-null-gain
-                    :avoid-collision-joint-gain avoid-collision-joint-gain
-                    :collision-avoidance-link-pair pair-list args))
+	     (send* self :collision-avoidance
+			 :jacobi# jacobi#
+			 :avoid-collision-distance avoid-collision-distance
+			 :avoid-collision-null-gain avoid-collision-null-gain
+			 :avoid-collision-joint-gain avoid-collision-joint-gain
+			 :collision-avoidance-link-pair pair-list args))
        (setq min-distance (car (elt (send self :get :collision-distance) 0)))
        (setq angle-speed-collision-blending
-           (cond ((< min-distance (* 0.1 avoid-collision-distance))
-                  1.0)
-                 ((< min-distance avoid-collision-distance)
-                  (/ (- avoid-collision-distance min-distance) 
-                     (* 0.9 avoid-collision-distance)))
-                 (t
-                  0.0)))
+	     (cond ((< min-distance (* 0.1 avoid-collision-distance))
+		    1.0)
+		   ((< min-distance avoid-collision-distance)
+		    (/ (- avoid-collision-distance min-distance) 
+		       (* 0.9 avoid-collision-distance)))
+		   (t
+		    0.0)))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "colvel:")
-	 (dotimes (i len) (warn "~7,3f " (elt angle-speed-collision-avoidance i))) (warn "~%")))
+	 (dotimes (i fik-len) (warn "~7,3f " (elt angle-speed-collision-avoidance i))) (warn "~%")))
      (if (listp null-space) (setq null-space (eval null-space)))
      (if null-space
          (setq null-space-joint-limit
@@ -1099,11 +1124,12 @@
      ;; 
      (setq ret
          (send-message* self cascaded-link
-                        :move-joints vel
+                        :move-joints union-vel
+                        :union-link-list union-link-list
                         :null-space null-space-joint-limit
                         :angle-speed angle-speed-collision-avoidance
                         :angle-speed-blending angle-speed-collision-blending
-                        :weight weight
+                        :weight weight :jacobi# jacobi#
                         args))
      ;;
      ;; done
@@ -1150,9 +1176,9 @@
      ret))
   ;;
   (:inverse-kinematics-args
-   (&rest args &key link-list rotation-axis translation-axis
+   (&rest args &key union-link-list rotation-axis translation-axis
           &allow-other-keys)
-   (let* ((c (send self :calc-target-joint-dimension link-list))
+   (let* ((c (send self :calc-target-joint-dimension union-link-list))
           (r (send self :calc-target-axis-dimension rotation-axis translation-axis))
           (fik (make-matrix r c))
           (ret (make-matrix c r))
@@ -1174,12 +1200,16 @@
           (tmp-v3c (instantiate float-vector 3))
           (tmp-m33 (make-matrix 3 3))
           (tmp-dim (instantiate float-vector r))
+          (tmp-dims)
           (tmp-len (instantiate float-vector c))
           (tmp-len2 (instantiate float-vector c))
           (tmp-pos (instantiate float-vector 3))
           (tmp-rot (instantiate float-vector 3)))
+     (dotimes (i (length rotation-axis))
+       (push (instantiate float-vector (send self :calc-target-axis-dimension (elt rotation-axis i) (elt translation-axis i))) tmp-dims))
+     (nreverse tmp-dims)
      (list
-      :dim r
+      :dim r :fik-len c
       :fik fik
       :ret ret
       :wmat wmat :tmat tmat :umat umat :umat2 umat2 :mat-tmp mat-tmp
@@ -1189,47 +1219,100 @@
       :tmp-v2 tmp-v2 :tmp-v3 tmp-v3
       :tmp-v3a tmp-v3a :tmp-v3b tmp-v3b  :tmp-v3c tmp-v3c
       :tmp-m33 tmp-m33 
-      :tmp-dim tmp-dim
+      :tmp-dim tmp-dim :tmp-dims tmp-dims
       :tmp-len tmp-len :tmp-len2 tmp-len2
       :tmp-pos tmp-pos :tmp-rot tmp-rot
       )))
   (:inverse-kinematics-loop
    (target-coords 
     &rest args
-    &key stop link-list move-target rotation-axis translation-axis
-    look-at-target thre rthre 
-    loop debug-view need-clear need-flush ik-args
+    &key (stop 1) (loop 0) link-list move-target rotation-axis translation-axis
+    look-at-target thre rthre union-link-list
+    debug-view need-clear need-flush ik-args
     &allow-other-keys)
-   (let (dif-pos dif-rot success dif)
-       (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
-	     dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
-       (when (and debug-view (not (memq :no-message debug-view)))
-	 (warn ";; ~3d: dif-pos : ~a/(~a/~A), dif-rot : ~a/(~a/~A)~%"
-	       loop dif-pos (norm dif-pos) thre dif-rot (norm dif-rot) rthre))
-       ;; check loop end
-       (if (and (> loop (/ stop 10))
-		(if translation-axis (< (norm dif-pos) thre) t)
-		(if rotation-axis (< (norm dif-rot) rthre) t))
-	   (return-from :inverse-kinematics-loop :ik-succeed))
-       ;; ik
+   ;; target-coords, move-target, rotation-axis, translation-axis, link-list
+   ;; -> both list and atom OK.
+   (let (dif-pos dif-rot tmp-dim tmp-dims (vec-count 0) (success t) jacobi
+         (method-args (nconc args ik-args)))
+       (if (null union-link-list)
+           (setq union-link-list (cond
+                                  ((atom (car link-list)) link-list)
+                                  ((= (length link-list) 1) (car link-list))
+                                  (t (reduce #'union link-list)))))
+       ;; atom -> list
+       (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
+       (if (and debug-view (not (equal debug-view :no-clear)) (boundp '*viewer*))
+	   (send *viewer* :viewsurface :clear))
+       (if (atom (car link-list)) (setq link-list (list link-list)))
+       (if (atom move-target) (setq move-target (list move-target)))
+       (if (atom target-coords) (setq target-coords (list target-coords)))
+       (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
+       (if (atom translation-axis) (setq translation-axis (list translation-axis)))       
+       ;; argument check
+       (unless (= (length translation-axis) (length rotation-axis)
+                  (length move-target) (length link-list) (length target-coords))
+         (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A target-coords ~A~%"
+               (length translation-axis) (length rotation-axis)
+               (length move-target) (length link-list) (length target-coords))
+         (return-from :inverse-kinematics-loop :ik-fail))
+
+       (if (memq :tmp-dims ik-args)
+           (setq tmp-dims (cadr (memq :tmp-dims ik-args)))
+         (progn
+           (dotimes (i (length rotation-axis))
+             (push (instantiate float-vector (send self :calc-target-axis-dimension (elt rotation-axis i) (elt translation-axis i))) tmp-dims))
+           (setq tmp-dims (nreverse tmp-dims))))
+       (if (memq :tmp-dim ik-args)
+           (setq tmp-dim (cadr (memq :tmp-dim ik-args)))
+         (setq tmp-dim (instantiate float-vector (send self :calc-target-axis-dimension rotation-axis translation-axis))))
+       
+       (setq jacobi (send* self :calc-jacobian-from-link-list link-list method-args))
+       (dotimes (i (length move-target))
+         (let ((move-target (elt move-target i))
+               (target-coords (elt target-coords i))
+               (rotation-axis (elt rotation-axis i))
+               (translation-axis (elt translation-axis i)))
+           (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
+                 dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
+           (when (and debug-view (not (memq :no-message debug-view)))
+             (warn ";; ~3d: dif-pos : ~a/(~a/~A), dif-rot : ~a/(~a/~A)~%"
+                   loop dif-pos (norm dif-pos) thre dif-rot (norm dif-rot) rthre))
+           (setq success (and success
+                              (> loop (/ stop 10))
+                              (if translation-axis (< (norm dif-pos) thre) t)
+                              (if rotation-axis (< (norm dif-rot) rthre) t)))
+           (send self :calc-vel-from-dif-pos-rot
+                 dif-pos dif-rot translation-axis rotation-axis
+                 :tmp-dim (elt tmp-dims i))
+           ))
+       (dotimes (i (length tmp-dims))
+         (dotimes (j (length (elt tmp-dims i)))
+           (setf (elt tmp-dim (+ j vec-count)) (elt (elt tmp-dims i) j)))
+         (incf vec-count (length (elt tmp-dims i))))
+       
        (when (and need-clear debug-view *viewer*)
-	 (if need-clear (send *viewer* :viewsurface :clear)))
-       (setq dif (send* self :calc-vel-from-dif-pos-rot
-		     dif-pos dif-rot translation-axis rotation-axis ik-args))
+         (if need-clear (send *viewer* :viewsurface :clear)))
+       ;; check loop end
+       (if (and (> loop (/ stop 10)) success)
+           (return-from :inverse-kinematics-loop :ik-succeed))       
        (setq
         success
         (send-message* self cascaded-link
-                       :move-joints-avoidance dif :link-list link-list
+		       :move-joints-avoidance tmp-dim
+                       :union-link-list union-link-list
                        :rotation-axis rotation-axis :translation-axis translation-axis
-                       :debug-view debug-view
+                       :jacobi jacobi :debug-view debug-view
                        ;; buffer for calculation
-                       ik-args))
+                       method-args))
        (when (and debug-view  *viewer*)
-	 (send target-coords :draw-on :flush nil :color #f(1 0 0))
+         (send *viewer* :draw-objects :clear nil :flush nil)
+         (dotimes (i (length target-coords))
+           (send-message (elt move-target i) cascaded-link :draw-on :flush nil :size 100)
+           (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0)))
 	 (if need-flush (send *viewer* :viewsurface :flush)))
        (unless success (return-from :inverse-kinematics-loop :ik-failed))
        (if look-at-target
-	   (send self :head :look-at (send target-coords :worldpos)))
+	   (send self :head :look-at (send (car target-coords) :worldpos)))
        :ik-continues))
   (:inverse-kinematics
    (target-coords &rest args 
@@ -1237,14 +1320,24 @@
 		  (link-list)
 		  (move-target)
 		  (debug-view) (warnp t)
-		  (rotation-axis t)
-		  (translation-axis t)
+                  (rotation-axis (cond
+				  ((atom move-target) t)
+				  (t (make-list (length move-target) :initial-element t))))
+                  (translation-axis (cond
+				     ((atom move-target) t)
+				     (t (make-list (length move-target) :initial-element t))))
 		  (look-at-target)
                   (fix-targets)
 		  (thre 1) (rthre (deg2rad 1))
 		  &allow-other-keys)
+   ;; target-coords, move-target, rotation-axis, translation-axis, link-list
+   ;; -> both list and atom OK.
    (let* ((loop 0)
-          (av0 (send-all (send-all link-list :joint) :joint-angle))
+          (union-link-list (cond
+			    ((atom (car link-list)) link-list)
+			    ((= (length link-list) 1) (car link-list))
+			    (t (reduce #'union link-list))))
+          (av0 (send-all (send-all union-link-list :joint) :joint-angle))
           (c0 (unless (send self :parent) (send self :copy-worldcoords)))
 	  dif-pos dif-rot need-clear need-flush
 	  ;;
@@ -1252,10 +1345,16 @@
           (fix-targets-av 
            (mapcar #'(lambda (l) (send-all l :joint :joint-angle))
                    (mapcar #'(lambda (l) (send self :link-list l)) fix-targets)))
-	  (old-analysis-level (send-all link-list :analysis-level))
-          (ik-args (nconc (send* self :inverse-kinematics-args :translation-axis translation-axis :rotation-axis rotation-axis args) args))
-	  )
-     (send-all link-list :analysis-level :coords)
+	  (old-analysis-level (send-all union-link-list :analysis-level))
+          ik-args)       
+     (send-all union-link-list :analysis-level :coords)
+     ;; argument check
+     (when (or (null link-list) (null move-target))
+       (warn ";; ERROR: :link-list or :move-target required~%")
+       (return-from :inverse-kinematics t))
+     (if (and (null translation-axis) (null rotation-axis))
+         (return-from :inverse-kinematics t))
+     ;; atom -> list
      (when debug-view
        (if (atom debug-view) (setq debug-view (list debug-view)))
        (when (not (memq :no-clear debug-view))
@@ -1264,6 +1363,23 @@
        (when (not (memq :no-flush debug-view))
 	 (setq need-flush t)
 	 (push :no-flush debug-view)))
+     (if (atom (car link-list)) (setq link-list (list link-list)))
+     (if (atom move-target) (setq move-target (list move-target)))
+     (if (atom target-coords) (setq target-coords (list target-coords)))
+     (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
+     (if (atom translation-axis) (setq translation-axis (list translation-axis)))
+     ;; argument check
+     (unless (= (length translation-axis) (length rotation-axis)
+                (length move-target) (length link-list) (length target-coords))
+       (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A target-coords ~A~%"
+             (length translation-axis) (length rotation-axis)
+             (length move-target) (length link-list) (length target-coords))
+       (return-from :inverse-kinematics t))
+     (setq ik-args (nconc (send* self :inverse-kinematics-args
+				      :translation-axis translation-axis
+				      :rotation-axis rotation-axis
+				      :union-link-list union-link-list args) args))
+     
      ;; inverse kinematics loop
      (while (< (incf loop) stop)
        (setq success (send* self :inverse-kinematics-loop
@@ -1271,6 +1387,8 @@
                            :stop stop :loop loop
                            :rotation-axis rotation-axis
                            :translation-axis translation-axis
+                           :move-target move-target
+                           :union-link-list union-link-list
                            :thre thre :rthre rthre
                            :debug-view debug-view
                            :need-clear need-clear
@@ -1283,26 +1401,40 @@
               (setq success t) (return nil)))
        )
         ;; update difference
-     (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
-	   dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
-
-     (mapcar #'(lambda (l a) (send l :analysis-level a)) link-list old-analysis-level)
+     (dotimes (i (length move-target))
+       (let ((move-target (elt move-target i))
+             (target-coords (elt target-coords i))
+             (rotation-axis (elt rotation-axis i))
+             (translation-axis (elt translation-axis i)))
+         (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
+               dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
+         (setq success (and success
+                            (if translation-axis (< (norm dif-pos) thre) t)
+                            (if rotation-axis (< (norm dif-rot) rthre) t)))
+         ))
+     (mapcar #'(lambda (l a) (send l :analysis-level a)) union-link-list old-analysis-level)
      ;; check solved or not
-     (if (and success 
-              (if translation-axis (< (norm dif-pos) thre) t)
-              (if rotation-axis (< (norm dif-rot) rthre) t))
+     (if success
          (send self :angle-vector)
        (progn
 	 (when warnp
 	   (warn ";; inverse-kinematics failed.~%")
-	   (warn ";; dif-pos : ~a/(~a/~a)~%" dif-pos (norm dif-pos) thre)
-	   (warn ";; dif-rot : ~a/(~a/~a)~%" dif-rot (norm dif-rot) rthre)
-	   (warn ";;  coords : ~a~%" 
-		 (send (let ((p self)) (while (send p :parent) (setq p (send p :parent))) p) :worldcoords))
+           (dotimes (i (length move-target))
+             (let ((move-target (elt move-target i))
+                   (target-coords (elt target-coords i))
+                   (rotation-axis (elt rotation-axis i))
+                   (translation-axis (elt translation-axis i)))
+               (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
+                     dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
+               (warn ";; dif-pos : ~a/(~a/~a)~%" dif-pos (norm dif-pos) thre)
+               (warn ";; dif-rot : ~a/(~a/~a)~%" dif-rot (norm dif-rot) rthre)
+               ))
+           (warn ";;  coords : ~a~%" 
+                 (send (let ((p self)) (while (send p :parent) (setq p (send p :parent))) p) :worldcoords))
 	   (warn ";;  angles : ~a~%" av0)
 	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   )
-	 (mapc #'(lambda (j a) (send j :joint-angle a)) (send-all link-list :joint) av0)
+	 (mapc #'(lambda (j a) (send j :joint-angle a)) (send-all union-link-list :joint) av0)
          (if fix-targets-av
              (mapcar #'(lambda (ll aa) (mapc #'(lambda (j a) (send j :joint-angle a)) (send-all ll :joint) aa))
                      (mapcar #'(lambda (l) (send self :link-list l)) fix-targets)
@@ -1511,7 +1643,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.81  2009-09-30 10:12:10  nozawa
+;;; Revision 1.82  2009-09-30 10:18:17  nozawa
+;;; commit for dual-arm ik : main update are as follows : list of move-target,target-coords ... can be used in inverse-kinematics or so. :move-joints-avoidance requires jacobian
+;;;
+;;; Revision 1.81  2009/09/30 10:12:10  nozawa
 ;;; integrate vel-pos and vel-rot -> vel and add :calc-vel-from-dif-pos-rot
 ;;;
 ;;; Revision 1.80  2009/09/29 02:17:49  k-okada
