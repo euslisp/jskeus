@@ -1290,9 +1290,9 @@
                               (> loop (/ stop 10))
                               (if translation-axis (< (norm dif-pos) thre) t)
                               (if rotation-axis (< (norm dif-rot) rthre) t)))
-           (send self :calc-vel-from-dif-pos-rot
+           (send* self :calc-vel-from-dif-pos-rot
                  dif-pos dif-rot translation-axis rotation-axis
-                 :tmp-dim (elt tmp-dims i))
+                 :tmp-dim (elt tmp-dims i) method-args)
            ))
        (dotimes (i (length tmp-dims))
          (dotimes (j (length (elt tmp-dims i)))
@@ -1652,7 +1652,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.83  2009-09-30 13:47:09  k-okada
+;;; Revision 1.84  2009-09-30 15:58:01  nozawa
+;;; use args and ik-args for :calc-vel-from-dif-pos-rot
+;;;
+;;; Revision 1.83  2009/09/30 13:47:09  k-okada
 ;;; add angle-speed-limit
 ;;;
 ;;; Revision 1.82  2009/09/30 10:18:17  nozawa
