@@ -1258,6 +1258,8 @@
        (if (atom target-coords) (setq target-coords (list target-coords)))
        (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
        (if (atom translation-axis) (setq translation-axis (list translation-axis)))       
+       (if (atom thre) (setq thre (list thre)))
+       (if (atom rthre) (setq rthre (list rthre)))
        ;; argument check
        (unless (= (length translation-axis) (length rotation-axis)
                   (length move-target) (length link-list) (length target-coords))
@@ -1281,7 +1283,8 @@
          (let ((move-target (elt move-target i))
                (target-coords (elt target-coords i))
                (rotation-axis (elt rotation-axis i))
-               (translation-axis (elt translation-axis i)))
+               (translation-axis (elt translation-axis i))
+               (thre (elt thre i)) (rthre (elt rthre i)))
            (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
                  dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
            (when (and debug-view (not (memq :no-message debug-view)))
@@ -1378,6 +1381,8 @@
      (if (atom target-coords) (setq target-coords (list target-coords)))
      (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
      (if (atom translation-axis) (setq translation-axis (list translation-axis)))
+     (if (atom thre) (setq thre (list thre)))
+     (if (atom rthre) (setq rthre (list rthre)))
      ;; argument check
      (unless (= (length translation-axis) (length rotation-axis)
                 (length move-target) (length link-list) (length target-coords))
@@ -1415,7 +1420,8 @@
        (let ((move-target (elt move-target i))
              (target-coords (elt target-coords i))
              (rotation-axis (elt rotation-axis i))
-             (translation-axis (elt translation-axis i)))
+             (translation-axis (elt translation-axis i))
+             (thre (elt thre i)) (rthre (elt rthre i)))
          (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
                dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
          (setq success (and success
@@ -1433,7 +1439,8 @@
              (let ((move-target (elt move-target i))
                    (target-coords (elt target-coords i))
                    (rotation-axis (elt rotation-axis i))
-                   (translation-axis (elt translation-axis i)))
+                   (translation-axis (elt translation-axis i))
+                   (thre (elt thre i)) (rthre (elt rthre i)))
                (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
                      dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
                (warn ";; dif-pos : ~a/(~a/~a)~%" dif-pos (norm dif-pos) thre)
@@ -1653,7 +1660,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.85  2009-10-06 13:19:27  nozawa
+;;; Revision 1.86  2009-10-06 13:32:48  nozawa
+;;; adapt thre and rthre to list or atom in :inverse-kinematics and :inverse-kinematics-loop
+;;;
+;;; Revision 1.85  2009/10/06 13:19:27  nozawa
 ;;; fix calculation of col in :calc-jacobian-from-link-list
 ;;;
 ;;; Revision 1.84  2009/09/30 15:58:01  nozawa
