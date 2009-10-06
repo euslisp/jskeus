@@ -611,32 +611,33 @@
                (send self :calc-jacobian-wheel-joint
                      fik row i j paxis child-link child-reverse move-target
                      rotation-axis translation-axis pos-i pos-r
-                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-               (incf col 1))
+                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33))
               ((derivedp j omniwheel-joint)
                (send self :calc-jacobian-omniwheel-joint
                      fik row col j paxis child-link child-reverse move-target
                      rotation-axis translation-axis pos-i pos-r
-                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-               (incf col 2))
+                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33))
               ((derivedp j sphere-joint)
                (send self :calc-jacobian-sphere-joint
                      fik row col j paxis child-link child-reverse move-target
                      rotation-axis translation-axis pos-i pos-r
-                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-               (incf col 2))
+                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33))
               ((derivedp j 6dof-joint)
                (send self :calc-jacobian-6dof-joint
                      fik row col j paxis child-link child-reverse move-target
                      rotation-axis translation-axis pos-i pos-r
-                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-               (incf col 5))
+                     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33))
               (t
                (warn "unknown joint type ~A~%" j)))
              ) ;; when
            (setq row (send self :calc-target-axis-dimension
 			   rotation-axis translation-axis))
            )) ;; dotimes
+       (cond
+        ((derivedp j wheel-joint) (incf col 1))
+        ((derivedp j omniwheel-joint) (incf col 2))
+        ((derivedp j sphere-joint) (incf col 2))
+        ((derivedp j 6dof-joint) (incf col 5)))
        ) ;; do
      fik))
   ;;
@@ -1652,7 +1653,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.84  2009-09-30 15:58:01  nozawa
+;;; Revision 1.85  2009-10-06 13:19:27  nozawa
+;;; fix calculation of col in :calc-jacobian-from-link-list
+;;;
+;;; Revision 1.84  2009/09/30 15:58:01  nozawa
 ;;; use args and ik-args for :calc-vel-from-dif-pos-rot
 ;;;
 ;;; Revision 1.83  2009/09/30 13:47:09  k-okada
