@@ -239,8 +239,8 @@
     ;;
     (do-until-key
 	(setq vel (send (send *robot* :larm :end-coords) :difference-position target :translation-axis t))
-       (send *robot* :move-joints-avoidance
-	      vel #f(0 0 0) :link-list ll
+       (send *robot* :inverse-kinematics-loop target
+              :link-list ll
 	      :move-target (send *robot* :larm :end-coords)
 	      :rotation-axis nil :translation-axis t
 	      :debug-view :no-flush
@@ -449,9 +449,10 @@
 	     #'(lambda (move-coords target-coords)
 		 (let ((vel-pos (send move-coords :difference-position target-coords))
 		       (vel-rot (send move-coords :difference-rotation target-coords :rotation-axis nil)))
-		   (send h0 :move-joints vel-pos vel-rot
+		   (send h0 :inverse-kinematics-loop target-coords
 			 :move-target move-coords
 			 :link-list (send h0 :link-list (send move-coords :parent))
+                         :collision-avoidance-link-pair nil
 			 :rotation-axis nil :translation-axis t
 			 )))
 	     (list (send h0 :thumb-end-coords)
