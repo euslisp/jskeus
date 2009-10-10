@@ -112,7 +112,7 @@
 	  (unless wrt (setq wrt :local))
 	  (send* self limb :move-end (send coords :translate pos wrt) args)))
        (:look-at
-	(let (dif-pos dif-rot target v p-dif-rot (count 0))
+	(let (dif-pos dif-rot target v p-dif-rot (count 0) link-list)
 	  (setq target (make-coords :pos (car args)))
 	  (setq v (normalize-vector (v- (send target :worldpos)
 					(send head-end-coords :worldpos))))
@@ -124,15 +124,17 @@
 	    (setq p-dif-rot dif-rot)
 	    (setq dif-pos (send head-end-coords :difference-position target)
 		  dif-rot (send head-end-coords :difference-rotation target :rotation-axis :z))
-	    (send self :move-joints #f(0 0 0) dif-rot
-		  :move-target head-end-coords
-		  :rotation-axis :z
-		  :translation-axis nil
-		  :link-list (if (memq :link-list args)
+            (setq link-list (if (memq :link-list args)
 				 (cadr (memq :link-list args))
 			       (send self :link-list
 				     (send self limb :end-coords :parent)
-				     (send self limb :root-link)))
+				     (send self limb :root-link))))
+	    (send self :inverse-kinematics-loop target
+                  :move-target head-end-coords
+                  :collision-avoidance-link-pair nil
+		  :rotation-axis :z
+		  :translation-axis nil
+		  :link-list link-list
 		  :debug-view nil))
 	  ))
        (t
@@ -179,7 +181,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.2  2009-02-17 02:04:48  k-okada
+;;; Revision 1.3  2009-10-10 12:50:17  nozawa
+;;; replace ik method, :move-joints -> :inverse-kinematics-loop
+;;;
+;;; Revision 1.2  2009/02/17 02:04:48  k-okada
 ;;; fix typo on copyright
 ;;;
 ;;; Revision 1.1  2008/09/18 18:11:01  k-okada
