@@ -51,7 +51,7 @@
   )
 
 (unless (member (pathname-name *program-name*)
-		(list "eus0" "eus1" "eus2" "eus" "eusx" "eusg" "eusgl")
+		(list "eus0" "eus1" "eus2" "eus" "eusx" "eusg" "eusgl" "euscomp")
 		:test #'string=)
   (when (substringp "eus" (pathname-name *program-name*))
     (load-irteus))
