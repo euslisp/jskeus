@@ -1180,8 +1180,6 @@
 	   (send *viewer* :viewsurface :point-size psize)
 	   (send *viewer* :viewsurface :color pcolor)
 	   ))
-       (if (not (memq :no-flush debug-view))
-	   (send *viewer* :viewsurface :flush))
        )
      ret))
   ;;
@@ -1238,7 +1236,7 @@
     &rest args
     &key (stop 1) (loop 0) link-list move-target rotation-axis translation-axis
     look-at-target thre rthre union-link-list
-    debug-view need-clear need-flush ik-args
+    debug-view ik-args
     &allow-other-keys)
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
@@ -1303,11 +1301,11 @@
            (setf (elt tmp-dim (+ j vec-count)) (elt (elt tmp-dims i) j)))
          (incf vec-count (length (elt tmp-dims i))))
        
-       (when (and need-clear debug-view *viewer*)
-         (if need-clear (send *viewer* :viewsurface :clear)))
        ;; check loop end
        (if (and (> loop (/ stop 10)) success)
-           (return-from :inverse-kinematics-loop :ik-succeed))       
+           (return-from :inverse-kinematics-loop :ik-succeed))
+       (when (and (not (memq :no-clear debug-view)) *viewer*)
+         (send *viewer* :viewsurface :clear))
        (setq
         success
         (send-message* self cascaded-link
@@ -1318,11 +1316,12 @@
                        ;; buffer for calculation
                        method-args))
        (when (and debug-view  *viewer*)
-         (send *viewer* :draw-objects :clear nil :flush nil)
+         (send *viewer* :draw-objects :clear nil :flush t)
          (dotimes (i (length target-coords))
            (send-message (elt move-target i) cascaded-link :draw-on :flush nil :size 100)
            (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0)))
-	 (if need-flush (send *viewer* :viewsurface :flush)))
+         (if (not (memq :no-flush debug-view)) (send *viewer* :viewsurface :flush))
+         )
        (unless success (return-from :inverse-kinematics-loop :ik-failed))
        (if look-at-target
 	   (send self :head :look-at (send (car target-coords) :worldpos)))
@@ -1352,7 +1351,7 @@
 			    (t (reduce #'union link-list))))
           (av0 (send-all (send-all union-link-list :joint) :joint-angle))
           (c0 (unless (send self :parent) (send self :copy-worldcoords)))
-	  dif-pos dif-rot need-clear need-flush
+	  dif-pos dif-rot
 	  ;;
           (success t) 
           (fix-targets-av 
@@ -1371,10 +1370,8 @@
      (when debug-view
        (if (atom debug-view) (setq debug-view (list debug-view)))
        (when (not (memq :no-clear debug-view))
-	 (setq need-clear t)
 	 (push :no-clear debug-view))
        (when (not (memq :no-flush debug-view))
-	 (setq need-flush t)
 	 (push :no-flush debug-view)))
      (if (atom (car link-list)) (setq link-list (list link-list)))
      (if (atom move-target) (setq move-target (list move-target)))
@@ -1406,8 +1403,6 @@
                            :union-link-list union-link-list
                            :thre thre :rthre rthre
                            :debug-view debug-view
-                           :need-clear need-clear
-                           :need-flush need-flush
                            :ik-args ik-args args))
        (case success
              (:ik-failed
@@ -1660,7 +1655,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.86  2009-10-06 13:32:48  nozawa
+;;; Revision 1.87  2009-10-23 10:57:53  k-okada
+;;; need-clear need-flush
+;;;
+;;; Revision 1.86  2009/10/06 13:32:48  nozawa
 ;;; adapt thre and rthre to list or atom in :inverse-kinematics and :inverse-kinematics-loop
 ;;;
 ;;; Revision 1.85  2009/10/06 13:19:27  nozawa
