@@ -1304,7 +1304,7 @@
        ;; check loop end
        (if (and (> loop (/ stop 10)) success)
            (return-from :inverse-kinematics-loop :ik-succeed))
-       (when (and (not (memq :no-clear debug-view)) *viewer*)
+       (when (and debug-view (not (memq :no-clear debug-view)) *viewer*)
          (send *viewer* :viewsurface :clear))
        (setq
         success
@@ -1340,7 +1340,12 @@
 				     (t (make-list (length move-target) :initial-element t))))
 		  (look-at-target)
                   (fix-targets)
-		  (thre 1) (rthre (deg2rad 1))
+		  (thre (cond
+                         ((atom move-target) 1)
+                         (t (make-list (length move-target) :initial-element 1))))
+		  (rthre (cond
+                          ((atom move-target) (deg2rad 1))
+                          (t (make-list (length move-target) :initial-element (deg2rad 1)))))
 		  &allow-other-keys)
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
@@ -1655,7 +1660,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.87  2009-10-23 10:57:53  k-okada
+;;; Revision 1.88  2009-10-26 01:38:17  nozawa
+;;; add debug-view to :no-clear in :inverse-kinematics-loop and fix default argument of thre and rthre
+;;;
+;;; Revision 1.87  2009/10/23 10:57:53  k-okada
 ;;; need-clear need-flush
 ;;;
 ;;; Revision 1.86  2009/10/06 13:32:48  nozawa
