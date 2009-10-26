@@ -864,7 +864,7 @@
      (if (>= min-distance avoid-collision-distance)
          (return-from :collision-avoidance dav-col))
      (if (atom (car link-list)) (setq link-list (list link-list)))
-     (setq link-list (find-if #'(lambda (x) (member (car pair) x) :test #'equal) link-list))
+     (setq link-list (find-if #'(lambda (x) (member (car pair) x :test #'equal)) link-list))
      (setq col-args (send self :collision-avoidance-args pair link-list))
 
      (setq drag-coords (make-cascoords :pos (elt np 1)))
@@ -1660,7 +1660,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.88  2009-10-26 01:38:17  nozawa
+;;; Revision 1.89  2009-10-26 02:38:23  eus
+;;; fix bug in :collision-avoidance(nozawa)
+;;;
+;;; Revision 1.88  2009/10/26 01:38:17  nozawa
 ;;; add debug-view to :no-clear in :inverse-kinematics-loop and fix default argument of thre and rthre
 ;;;
 ;;; Revision 1.87  2009/10/23 10:57:53  k-okada
