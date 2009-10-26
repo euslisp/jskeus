@@ -22,7 +22,7 @@
      (setq bc0 (make-cube 100 200 100))
      (send bc0 :locate #f(0 0 -75))
      (send bc0 :set-color :green)
-     (setq bc0 (instance bodyset-link :init (make-cascoords) :bodies (list bc0) :name :weist))
+     (setq bc0 (instance bodyset-link :init (make-cascoords) :bodies (list bc0) :name :waist))
      (setq bc1 (make-default-robot-link 0 50 :y :torso-link0))
      (send bc1 :locate #f(0 0 -12.5))
 
@@ -217,9 +217,10 @@
   )
 
 (defun test1
-  (&key (target (make-coords :pos (float-vector 0 0 1500))))
+  (&key (target (make-coords :pos (float-vector 0 0 1500)))
+        (use-torso t) (use-leg))
   "full body ik"
-  (let (ll dav r iik fik len a vel)
+  (let (link-list)
     ;;
     (unless (boundp '*robot*)
       (setq *robot* (instance sample-robot :init)))
@@ -229,74 +230,72 @@
     (send *robot* :arms :angle-vector #f(10 20 0 -20 10 0 0))
 
     (send *robot* :transform (send  (send *robot* :lleg :end-coords) :transformation (make-coords)))
-    (setq ll (send *robot* :link-list
-		   (send *robot* :larm :end-coords :parent)
-		   (send *robot* :torso :root-link)
-		   ;(send *robot* :larm :root-link)
-		   ;;(send *robot* :lleg :end-coords :parent)
-		   ))
+    (setq link-list (send *robot* :link-list
+                          (send *robot* :larm :end-coords :parent)
+                          (cond
+                           (use-leg (send *robot* :lleg :end-coords :parent))
+                           (use-torso (send *robot* :torso :root-link))
+                           (t (send *robot* :larm :root-link)))))
     (objects (list *robot*))
     ;;
     (do-until-key
-	(setq vel (send (send *robot* :larm :end-coords) :difference-position target :translation-axis t))
-       (send *robot* :inverse-kinematics-loop target
-              :link-list ll
-	      :move-target (send *robot* :larm :end-coords)
-	      :rotation-axis nil :translation-axis t
-	      :debug-view :no-flush
-	      )
-      (send *robot* :head :look-at (send *robot* :larm :end-coords :worldpos))
-      (send *robot* :transform
-	    (send *robot* :transformation (make-coords)))
-      (send *robot* :transform
-	    (send (send *robot* :lleg :end-coords) :transformation (make-coords)))
-      (send *irtviewer* :viewer :viewsurface :color #f(1 1 1))
-      (send *irtviewer* :viewer :viewsurface :line-width 2)
-      (send *irtviewer* :viewer :viewsurface :3d-line
-	    (send *robot* :larm :end-coords :worldpos)
-	    (send *robot* :rarm :end-coords :worldpos))
-      (send *irtviewer* :flush)
-      )
+     (send *robot* :inverse-kinematics-loop target
+                   :link-list link-list
+                   :move-target (send *robot* :larm :end-coords)
+                   :rotation-axis nil :translation-axis t
+                   :debug-view :no-flush)
+     (send *robot* :head :look-at (send *robot* :larm :end-coords :worldpos))
+     (send *robot* :transform (send (send *robot* :lleg :end-coords) :transformation (make-coords))) ;; fix-leg
+     (send *irtviewer* :viewer :viewsurface :color #f(1 1 1))
+     (send *irtviewer* :viewer :viewsurface :line-width 2)
+     (send *irtviewer* :viewer :viewsurface :3d-line
+           (send *robot* :larm :end-coords :worldpos)
+           (send *robot* :rarm :end-coords :worldpos))
+     (send *irtviewer* :flush)
+     )
     ))
 
 
 (defun test2 nil
-  (let ((i 0))
+  "dual arm ik"
+  (let ((i 0) link-list move-target target-coords b0)
     ;;
-    ;; import jsk/rbrain library
-    (provide :rbrain-basic nil)
-    (defclass robot-link :super cascaded-link)
-    (defclass articulated-link :super cascaded-link
-      :slots (analysis-level))
-    (defmethod articulated-link
-      (:vertices () (list (send self :worldpos))))
-    (defclass robot-frame :super cascaded-link)
-    (defclass robot-limb :super cascaded-link)
-    (unless (find-package "WIN32") (make-package "WIN32"))
-    (load "~/prog/euslib/rbrain/jskmapclass.l")
-    (defmethod bodyset-with-knowledge
-      (:vertices () (list (send self :worldpos))))
-    ;;
-    (setq r0 (instance sample-robot :init))
-    (setq b0 (instance broom :init :length 700 :bar-color :brown :sweep-color :red))
-    (send b0 :locate #f(200 0 0))
-
-    (objects (list  r0 ))
-    (send r0 :lleg :move-end-pos #f(0 0 50) :local :rotation-axis t)
-    (send r0 :rleg :move-end-pos #f(0 0 50) :local :rotation-axis t)
+    (unless (boundp '*robot*)
+      (setq *robot* (instance sample-robot :init)))
+    (send *robot* :angle-vector (instantiate float-vector 30))
+    (send *robot* :newcoords (make-coords))
+    (send *robot* :legs :move-end-pos #f(0 0 50) :local :rotation-axis t)
+    (send *robot* :arms :angle-vector #f(10 20 0 -20 10 0 0))
+    (setq move-target (send *robot* :arms :end-coords)
+          link-list (mapcar #'(lambda (mt) (send *robot* :link-list mt)) (send-all move-target :parent)))
+    ;; make broom model
+    (setq b0 (let ((sh 250) (sw 125) (length 700) sweep bar br)
+               (setq bar (make-cylinder 10 length))
+               (setq sweep (make-prism (list (float-vector sw (- sh) 0)
+                                             (float-vector (- sw) (- sh) 0)
+                                             (float-vector -20 0 0)
+                                             (float-vector  20 0 0)) 20))
+               (send bar :locate (float-vector 0 0 sh) :world)
+               (send sweep :rotate pi/2 :x)
+               (send sweep :locate (float-vector 0 10 sh) :world)
+               (map nil #'(lambda (obj col) (setf (get obj :face-color) col)) (list bar sweep) '(:brown :red))
+               (setq br (instance bodyset :init (make-cascoords) :bodies (list bar sweep)))
+               (map nil #'(lambda (rate) (push (make-cascoords :pos (float-vector 0 0 (+ (* rate length) sh))) target-coords)) (list 0.8 0.6))
+               (dolist (tc (append target-coords (list bar sweep))) (send br :assoc tc))
+               br))
+    (send b0 :locate #f(250 0 0))
+    (send *robot* :head :look-at (apply #'midpoint 0.5 (send-all target-coords :worldpos)))
+    (objects (list *robot* b0))
     ;;
     (do-until-key
-      (send r0 :larm :inverse-kinematics (car (send b0 :handle))
-            :stop 1000 :thre 10
-	    :rotation-axis nil :debug-view nil)
-      (send r0 :rarm :inverse-kinematics (cadr (send b0 :handle))
-            :stop 1000 :thre 10
-	    :rotation-axis nil :debug-view t)
-      (send b0 :orient (* 0.2 (sin (/ i 10.0))) :x :world)
-      (send b0 :locate (float-vector 200 (* 100 (sin (/ (incf i) 10.0))) 0) :world)
-      (incf i)
-      
-      ;(send *irtviewer* :draw-objects)
+     (send *robot* :inverse-kinematics target-coords
+              :link-list link-list :move-target move-target
+              :stop 500 :thre '(10 10)
+              :rotation-axis '(nil nil) :debug-view t)
+     (send *robot* :head :look-at (apply #'midpoint 0.5 (send-all target-coords :worldpos)))
+     (send b0 :orient (* 0.2 (sin (/ i 10.0))) :x :world)
+     (send b0 :locate (float-vector 250 (* 100 (sin (/ (incf i) 10.0))) 0) :world)
+     (incf i)
      )
     ))
 ;;;
@@ -433,7 +432,9 @@
     rr))
 
 (defun test3 nil
-  (let (i r k ln (av0 #f(0 45 0 45 -0 -60 40)) av1 av)
+  "hand grasp ik"
+  (let (i r k ln (av0 #f(0 45 0 45 -0 -60 40)) av1 av
+          move-target target-coords link-list)
     (setq h0 (instance sample-hand :init :name "sample hand"))
     (send h0 :angle-vector av0)
     (setq c0 (make-gdome (make-icosahedron 40)))
@@ -441,59 +442,50 @@
     (send c0 :set-color :green)
     (objects (list h0 c0))
     (setq i 0)
+    (setq move-target (mapcar #'(lambda (x) (send h0 x)) '(:thumb-end-coords :index-end-coords :middle-end-coords))
+          target-coords (mapcar #'(lambda (x) (send h0 x)) '(:index-end-coords :thumb-end-coords :thumb-end-coords))
+          link-list (mapcar #'(lambda (mt) (send h0 :link-list (send mt :parent))) move-target))
     (do-until-key
-	(when (= (mod i 400) 0)
-	  (setq av0 (send h0 :angle-vector))
-	  (dotimes (i 10)
-	    (mapcar
-	     #'(lambda (move-coords target-coords)
-		 (let ((vel-pos (send move-coords :difference-position target-coords))
-		       (vel-rot (send move-coords :difference-rotation target-coords :rotation-axis nil)))
-		   (send h0 :inverse-kinematics-loop target-coords
-			 :move-target move-coords
-			 :link-list (send h0 :link-list (send move-coords :parent))
-                         :collision-avoidance-link-pair nil
-			 :rotation-axis nil :translation-axis t
-			 )))
-	     (list (send h0 :thumb-end-coords)
-		   (send h0 :index-end-coords)
-		   (send h0 :middle-end-coords)
-		   )
-	     (list (send h0 :index-end-coords)
-		   (send h0 :thumb-end-coords)
-		   (send h0 :thumb-end-coords)
-	     )))
-	  (setq av1 (send h0 :angle-vector))
-	  (send *irtviewer* :draw-objects :flush t)
-	  (send h0 :angle-vector av0)
-	  (setq av (scale 0.01 (v- av1 av0)))
-	  )
-      (setq ln nil)
-      (dotimes (k (length (send h0 :joint-list)))
-	(setq j (elt (send h0 :joint-list) k))
-	(setq r
-	  (sort
-	   (mapcar #'(lambda (l)
-		       (pqp-collision-distance l c0))
-		   (flatten (link-descendants (send j :child-link))))
-	   #'<= #'car))
-	(if (evenp (/ i 200))
-	    (if (> (caar r) 5)
-		(send j :joint-angle (elt av k) :relative t))
-	  (send j :joint-angle -0.1 :relative t))
-	(push (cdar r) ln)
-	)
-      (mapcar #'(lambda (l) (warn "~7,3f " (apply #'distance l))) ln)
-      (warn "~%")
-      (send *irtviewer* :draw-objects :flush nil)
-      (send *irtviewer* :viewer :viewsurface :color #f(1 1 1))
-      (send *irtviewer* :viewer :viewsurface :line-width 4)
-      (dolist (l ln)
-	(send* *irtviewer* :viewer :draw-line l))
-      (send *irtviewer* :flush)
-      (incf i)
-      )
-  ))
+     (when (= (mod i 400) 0)
+       (setq av0 (send h0 :angle-vector))
+       (dotimes (i 10)
+         (send h0 :inverse-kinematics-loop target-coords
+                  :move-target move-target
+                  :link-list link-list
+                  :collision-avoidance-link-pair nil
+                  :rotation-axis '(nil nil nil) :translation-axis '(t t t)
+                  :thre '(1 1 1) :rthre '(0.1 0.1 0.1)))
+       (setq av1 (send h0 :angle-vector))
+       (send *irtviewer* :draw-objects :flush t)
+       (send h0 :angle-vector av0)
+       (setq av (scale 0.01 (v- av1 av0)))
+       )
+     (setq ln nil)
+     (dotimes (k (length (send h0 :joint-list)))
+       (setq j (elt (send h0 :joint-list) k))
+       (setq r
+             (sort
+              (mapcar #'(lambda (l)
+                          (pqp-collision-distance l c0))
+                      (flatten (link-descendants (send j :child-link))))
+              #'<= #'car))
+       (if (evenp (/ i 200))
+           (if (> (caar r) 5)
+               (send j :joint-angle (elt av k) :relative t))
+         (send j :joint-angle -0.1 :relative t))
+       (push (cdar r) ln)
+       )
+     (mapcar #'(lambda (l) (warn "~7,3f " (apply #'distance l))) ln)
+     (warn "~%")
+     (send *irtviewer* :draw-objects :flush nil)
+     (send *irtviewer* :viewer :viewsurface :color #f(1 1 1))
+     (send *irtviewer* :viewer :viewsurface :line-width 4)
+     (dolist (l ln)
+       (send* *irtviewer* :viewer :draw-line l))
+     (send *irtviewer* :flush)
+     (incf i)
+     )
+    ))
 
 ;;;
 ;;;
