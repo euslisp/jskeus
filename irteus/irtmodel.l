@@ -874,7 +874,7 @@
                              col-link-list :move-target drag-coords
                              col-args))
      (send (car pair) :dissoc drag-coords)
-     (setq ddav-col (transform (transpose col-jacobi) (elt ret 0)))
+     (setq ddav-col (transform (transpose col-jacobi) (elt ret (car (last np)))))
      
      (dotimes (i (length link-list))
        (setf (elt dav-col (position (elt link-list i) union-link-list :test #'equal) ) (elt ddav-col i)))
@@ -1660,7 +1660,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.89  2009-10-26 02:38:23  eus
+;;; Revision 1.90  2009-10-26 04:35:34  nozawa
+;;; fix bug in :collision-avoidance
+;;;
+;;; Revision 1.89  2009/10/26 02:38:23  eus
 ;;; fix bug in :collision-avoidance(nozawa)
 ;;;
 ;;; Revision 1.88  2009/10/26 01:38:17  nozawa
