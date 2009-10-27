@@ -380,6 +380,7 @@
      (setq force (v- force (v+ fg ext-force)) ;; [N]
            moment (v- moment (v+ (scale 0.001 (v* c (v+ fg ext-force))) ext-moment))) ;; [Nm]
 
+     ;; propagation of force and moment from child-links
      (when child-links
        (dolist (child child-links)
          (send child :inverse-dynamics)
@@ -1603,6 +1604,29 @@
 				     tmp-v0 tmp-v1 tmp-v2))
      (dotimes (i (length vel-r)) (setf (elt tmp-dim (+ i (length vel-p))) (elt vel-r i)))
      tmp-dim))
+  (:calc-torque
+   (&key (dt 0.005) ;; dt [s]
+         (debug-view nil) (av (send self :angle-vector)))
+   (let ((torque-vector (instantiate float-vector (length joint-list)))
+         pdq pl)
+     ;; joint-angle update
+     (dotimes (i (length joint-list))
+       (setq pl (send (elt joint-list i) :child-link))
+       (setq pdq (send pl :joint-velocity))
+       (send pl :joint-velocity
+             (deg2rad (/ (- (elt av i) (send (elt joint-list i) :joint-angle)) dt))) ;; [rad/s]
+       (send pl :joint-acceleration (/ (- (send pl :joint-velocity) pdq) dt)) ;; [rad/s^2]
+       (send (elt joint-list i) :joint-angle (elt av i))
+       )
+     
+     ;; recursive calculation from root-link
+     (send (car (send self :links)) :forward-all-kinematics
+           :debug-view debug-view)
+     (send (car (send self :links)) :inverse-dynamics
+           :debug-view debug-view :dt dt)
+     (dotimes (i (length torque-vector))
+       (setf (elt torque-vector i) (send (send (elt joint-list i) :child-link) :joint-torque)))
+     torque-vector))
   )
 
 (defun calc-dif-with-axis (dif axis &optional tmp-v0 tmp-v1 tmp-v2)
@@ -1778,7 +1802,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.91  2009-10-27 02:49:30  nozawa
+;;; Revision 1.92  2009-10-27 07:44:44  eus
+;;; add :calc-torque to cascaded-link (nozawa)
+;;;
+;;; Revision 1.91  2009/10/27 02:49:30  nozawa
 ;;; add dynamics parameters to bodyset-link class and create new methods for dynamics calculation (:inverse-dynamics, :forward-all-kinematics...)
 ;;;
 ;;; Revision 1.90  2009/10/26 04:35:34  nozawa
