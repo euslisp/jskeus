@@ -26,7 +26,9 @@
 
 (in-package "GEOMETRY")
 
-(export '(midcoords bodyset))
+(export '(midcoords bodyset *g-vec*))
+
+(defvar *g-vec* (float-vector 0 0 9800)) ;; [mm/s^2]
 
 (defun midcoords (p c1 c2)
   (let ()
@@ -319,7 +321,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.10  2009-09-24 10:07:34  k-okada
+;;; Revision 1.11  2009-10-27 02:45:31  nozawa
+;;; add \*g-vec\* for dynamics calculation (ref. euslib/jsk/preview.l and euslib/rbrain/dynamics.l)
+;;;
+;;; Revision 1.10  2009/09/24 10:07:34  k-okada
 ;;; fix differnece-position/rotation to calculate local difference
 ;;;
 ;;; Revision 1.9  2009/09/10 16:02:39  nozawa
