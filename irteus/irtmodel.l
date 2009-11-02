@@ -1435,7 +1435,7 @@
                        ;; buffer for calculation
                        method-args))
        (when (and debug-view  *viewer*)
-         (send *viewer* :draw-objects :clear nil :flush t)
+         (send *viewer* :draw-objects :clear nil :flush (not (memq :no-flush debug-view)))
          (dotimes (i (length target-coords))
            (send-message (elt move-target i) cascaded-link :draw-on :flush nil :size 100)
            (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0)))
@@ -1802,7 +1802,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.92  2009-10-27 07:44:44  eus
+;;; Revision 1.93  2009-11-02 11:40:34  ueda
+;;; if :debug-view has :no-flush, does not flush in draw-objects of inverse-kinematics-loop
+;;;
+;;; Revision 1.92  2009/10/27 07:44:44  eus
 ;;; add :calc-torque to cascaded-link (nozawa)
 ;;;
 ;;; Revision 1.91  2009/10/27 02:49:30  nozawa
