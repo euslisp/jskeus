@@ -47,7 +47,7 @@
 (defmethod irtviewer
   (:create
    (&rest args
-	  &key (name "IRT viewer")
+	  &key (title "IRT viewer")
 	  (hither 200.0) (yon 50000.0)
 	  (width 500) (height 500)
 	  &allow-other-keys)
@@ -56,14 +56,14 @@
 	   up-down-angle 20
 	   viewpoint (float-vector 700 400 250)
 	   viewtarget (float-vector 0 0 0))
-     (send-super* :create :width width :height height :title name 
+     (send-super* :create :width width :height height :title title
 		  :event-mask '(:configure) args)
      (setq gl::*perspective-far* yon)
      (setq gl::*perspective-near* hither)
      (setq viewer (apply #'user::view :parent self
 			 :x 0 :y 0
 			 :width width :height height 
-			 :title name args))
+			 :title title args))
      (setf (get viewer :pickviewer) self)
      (setq user::*viewer* viewer)
 
@@ -278,7 +278,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.5  2009-07-31 11:10:31  ueda
+;;; Revision 1.6  2009-11-08 09:43:12  k-okada
+;;; make-irtviewer :title works
+;;;
+;;; Revision 1.5  2009/07/31 11:10:31  ueda
 ;;; add :draw-objects to geo::viewer for (pickview :separate t)
 ;;;
 ;;; Revision 1.4  2009/02/17 02:04:48  k-okada
