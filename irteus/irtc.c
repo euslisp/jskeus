@@ -770,8 +770,9 @@ int matrix2quaternion(float *c, float *q){
     q[1] = (c[0*3+2] + c[2*3+0]) / (4 * q[3]);
     q[2] = (c[1*3+2] + c[2*3+1]) / (4 * q[3]);
   } else {
-    fprintf(stderr, ";; matrix2quaternion\n");
-    exit(1);
+    fprintf(stderr, ";; matrix2quaternion q02=%f,q12=%f,q22=%f,q32=%f\n",
+	    q02,q12,q22,q32);
+    error(E_USER,(pointer)";; matrix2quaternion\n");
   }
 }
 
@@ -936,7 +937,10 @@ pointer env;
 /// $Id$
 ///
 /// $Log$
-/// Revision 1.7  2009-08-13 16:43:37  fujimoto
+/// Revision 1.8  2009-11-08 04:08:09  inaba
+/// change exit to error for continuing debug of NaN in matrix2quaternion of irtc.c
+///
+/// Revision 1.7  2009/08/13 16:43:37  fujimoto
 /// fix pseudo-inverse2
 ///
 /// Revision 1.6  2009/08/07 11:22:38  k-okada
