@@ -63,7 +63,9 @@
      (setq viewer (apply #'user::view :parent self
 			 :x 0 :y 0
 			 :width width :height height 
-			 :title title args))
+			 :title title
+			 :name (gensym "title")
+			 args))
      (setf (get viewer :pickviewer) self)
      (setq user::*viewer* viewer)
 
@@ -278,7 +280,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.6  2009-11-08 09:43:12  k-okada
+;;; Revision 1.7  2009-11-08 10:36:17  k-okada
+;;; set :name using gensym, for (find-viewer) in send irtviewer :create
+;;;
+;;; Revision 1.6  2009/11/08 09:43:12  k-okada
 ;;; make-irtviewer :title works
 ;;;
 ;;; Revision 1.5  2009/07/31 11:10:31  ueda
