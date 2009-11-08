@@ -62,6 +62,8 @@
 	    (substringp "eusgl" (pathname-name *program-name*)))
     (load-irteusx))
   (when (substringp "eusgl" (pathname-name *program-name*))
-    (load-irteusgl)))
+    (load-irteusgl))
+  (unless (member :irt *features*) (push :irt *features*))
+  )
 
 
