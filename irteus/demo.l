@@ -522,17 +522,18 @@
     (setq r0 (instance sample-robot :init))
     (setq b0 (instance broom :init :length 700 :bar-color :brown :sweep-color :red))
     (send b0 :locate #f(200 0 0))
+    (objects (list  r0 b0))
 
     (send r0 :lleg :move-end-pos #f(0 0 50) :local :rotation-axis t)
     (send r0 :rleg :move-end-pos #f(0 0 50) :local :rotation-axis t)
+    (objects (list  r0 b0))
 
     (send r0 :larm :inverse-kinematics (car (send b0 :handle))
           :stop 1000 :thre 10
-          :rotation-axis nil :debug-view nil)
+          :rotation-axis nil :debug-view t)
     (send r0 :rarm :inverse-kinematics (cadr (send b0 :handle))
           :stop 1000 :thre 10
           :rotation-axis nil :debug-view t)
-    (objects (list  r0 b0))
     ))
 
 ;;;
