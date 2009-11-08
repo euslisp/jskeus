@@ -448,7 +448,7 @@
 
 (defun test3 nil
   "hand grasp ik"
-  (let (i r k ln (av0 #f(0 45 0 45 -0 -60 40)) av1 av
+  (let (i r k ln (av0 #f(10 45 10 45 -0 -60 40)) av1 av
           move-target target-coords link-list)
     (setq h0 (instance sample-hand :init :name "sample hand"))
     (send h0 :angle-vector av0)
@@ -461,7 +461,7 @@
           target-coords (mapcar #'(lambda (x) (send h0 x)) '(:index-end-coords :thumb-end-coords :thumb-end-coords))
           link-list (mapcar #'(lambda (mt) (send h0 :link-list (send mt :parent))) move-target))
     (do-until-key
-     (when (= (mod i 400) 0)
+     (when (= (mod i 800) 0)
        (setq av0 (send h0 :angle-vector))
        (dotimes (i 10)
          (send h0 :inverse-kinematics-loop target-coords
@@ -484,7 +484,8 @@
                           (pqp-collision-distance l c0))
                       (flatten (link-descendants (send j :child-link))))
               #'<= #'car))
-       (if (evenp (/ i 200))
+       (print r)
+       (if (evenp (/ i 400))
            (if (> (caar r) 5)
                (send j :joint-angle (elt av k) :relative t))
          (send j :joint-angle -0.1 :relative t))
