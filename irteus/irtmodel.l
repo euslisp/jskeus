@@ -840,6 +840,7 @@
           (len (length collision-links))
           i0 ret)
      (when debug
+       (warn "collision-links : ~A~%" collision-links)
        (warn "parnet-links    : ~A~%" parent-links)
        (warn "valid-link-list : ~A~%" valid-link-list)
        (warn "index-links     : ~A~%" index-links))
@@ -851,7 +852,9 @@
                     (not (eq (elt parent-links i)
                              (elt collision-links j)))
                     (not (eq (elt parent-links j)
-                             (elt collision-links i))))
+                             (elt collision-links i)))
+                    (not (eq (elt parent-links j)
+                             (elt parent-links i))))
                (push (list (elt collision-links (if i0 i j))
                            (elt collision-links (if i0 j i))) ret))))
      (when obstacles
@@ -1802,7 +1805,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.94  2009-11-02 11:52:50  eus
+;;; Revision 1.95  2009-11-08 07:52:38  k-okada
+;;; fix :collision-avoidance-link-pair-from-link-list, if two links have same parent, then never collide???
+;;;
+;;; Revision 1.94  2009/11/02 11:52:50  eus
 ;;; previous commit is mistake
 ;;;
 ;;; Revision 1.93  2009/11/02 11:40:34  ueda
