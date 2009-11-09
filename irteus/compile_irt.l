@@ -30,6 +30,7 @@
 
 (comp:compile-file-if-src-newer "irtmath.l" *objdir*)
 (comp:compile-file-if-src-newer "irtutil.l" *objdir*)
+(comp:compile-file-if-src-newer (format nil "~A/lib/llib/pgsql.l" *eusdir*) *objdir*)
 
 
 (exit 0)
@@ -39,7 +40,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.2  2009-02-17 02:04:48  k-okada
+;;; Revision 1.3  2009-11-09 02:43:00  k-okada
+;;; add pgsql
+;;;
+;;; Revision 1.2  2009/02/17 02:04:48  k-okada
 ;;; fix typo on copyright
 ;;;
 ;;; Revision 1.1  2008/09/18 18:11:00  k-okada
