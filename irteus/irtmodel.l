@@ -1233,7 +1233,8 @@
 		    0.0)))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "colvel:")
-	 (dotimes (i fik-len) (warn "~7,3f " (elt angle-speed-collision-avoidance i))) (warn "~%")))
+	 (dotimes (i fik-len) (warn "~7,3f " (elt angle-speed-collision-avoidance i))) (warn "~%")
+         (warn "belnd :~7,3f~%" angle-speed-collision-blending)))
      (if (listp null-space) (setq null-space (eval null-space)))
      (if null-space
          (setq null-space-joint-limit
@@ -1811,7 +1812,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.96  2009-11-10 05:17:33  k-okada
+;;; Revision 1.97  2009-11-10 05:53:38  k-okada
+;;; add angle-speed-collision-blending to debug-view message
+;;;
+;;; Revision 1.96  2009/11/10 05:17:33  k-okada
 ;;; add debug in :collision-avoidance
 ;;;
 ;;; Revision 1.95  2009/11/08 07:52:38  k-okada
