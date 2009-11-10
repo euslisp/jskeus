@@ -839,10 +839,10 @@
            (mapcar #'(lambda (l) (position l valid-link-list)) collision-links))
           (len (length collision-links))
           i0 ret)
-     (when debug
-       (warn "collision-links : ~A~%" collision-links)
-       (warn "parnet-links    : ~A~%" parent-links)
-       (warn "valid-link-list : ~A~%" valid-link-list)
+     (when (and debug (not (memq :no-message debug)))
+       (warn "collision-links : ~A~%" (send-all collision-links :name))
+       (warn "parnet-links    : ~A~%" (send-all parent-links :name))
+       (warn "valid-link-list : ~A~%" (send-all valid-link-list :name))
        (warn "index-links     : ~A~%" index-links))
      (dotimes (i len)
        (do ((j (1+ i) (1+ j)))
@@ -974,6 +974,7 @@
 	    (fik-len (send self :calc-target-joint-dimension union-link-list))
             (tmp-mcc (make-matrix fik-len fik-len))
 	    (tmp-mcc2 (make-matrix fik-len fik-len))
+            debug-view
             &allow-other-keys)
    (let* ((ret (send* self :collision-avoidance-calc-distance args))
           (pair-len (length pair-list))
@@ -983,6 +984,11 @@
 	  (dav-col (instantiate float-vector fik-len))
           drag-coords col-link-list col-jacobi I-J#J ddav-col col-args
           )
+     (when (and debug-view (not (memq :no-message debug-view)))
+       (let ((v (normalize-vector (v- (elt np 1) (elt np 2)))))
+         (warn "min-distance : ~7,3f #f(" min-distance)
+         (dotimes (i 3) (warn "~7,3f " (elt v i)))
+         (warn ") ~A~%" (send-all pair :name))))
      (if (>= min-distance avoid-collision-distance)
          (return-from :collision-avoidance dav-col))
      (if (atom (car link-list)) (setq link-list (list link-list)))
@@ -1099,7 +1105,7 @@
               (avoid-collision-null-gain 1.0)
               (avoid-collision-joint-gain 1.0)
               ((:collision-avoidance-link-pair pair-list)
-               (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args))))
+               (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
               (tmp-len (instantiate float-vector fik-len))
               (tmp-len2 (instantiate float-vector fik-len))
               (wmat (make-matrix fik-len fik-len)) (debug-view) (jacobi)
@@ -1805,7 +1811,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.95  2009-11-08 07:52:38  k-okada
+;;; Revision 1.96  2009-11-10 05:17:33  k-okada
+;;; add debug in :collision-avoidance
+;;;
+;;; Revision 1.95  2009/11/08 07:52:38  k-okada
 ;;; fix :collision-avoidance-link-pair-from-link-list, if two links have same parent, then never collide???
 ;;;
 ;;; Revision 1.94  2009/11/02 11:52:50  eus
