@@ -1445,7 +1445,7 @@
                        ;; buffer for calculation
                        method-args))
        (when (and debug-view  *viewer*)
-         (send *viewer* :draw-objects :clear nil :flush t)
+         (send *viewer* :draw-objects :clear nil :flush nil)
          (dotimes (i (length target-coords))
            (send-message (elt move-target i) cascaded-link :draw-on :flush nil :size 100)
            (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0)))
@@ -1503,9 +1503,9 @@
      ;; atom -> list
      (when debug-view
        (if (atom debug-view) (setq debug-view (list debug-view)))
-       (when (not (memq :no-clear debug-view))
+       (when (memq :no-clear debug-view)
 	 (push :no-clear debug-view))
-       (when (not (memq :no-flush debug-view))
+       (when (memq :no-flush debug-view)
 	 (push :no-flush debug-view)))
      (if (atom (car link-list)) (setq link-list (list link-list)))
      (if (atom move-target) (setq move-target (list move-target)))
@@ -1812,7 +1812,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.97  2009-11-10 05:53:38  k-okada
+;;; Revision 1.98  2009-11-10 13:05:45  k-okada
+;;; fix :no-clear, no-flush rules
+;;;
+;;; Revision 1.97  2009/11/10 05:53:38  k-okada
 ;;; add angle-speed-collision-blending to debug-view message
 ;;;
 ;;; Revision 1.96  2009/11/10 05:17:33  k-okada
