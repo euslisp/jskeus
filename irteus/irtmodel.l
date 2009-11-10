@@ -984,6 +984,7 @@
 	  (dav-col (instantiate float-vector fik-len))
           drag-coords col-link-list col-jacobi I-J#J ddav-col col-args
           )
+     (send self :put :collision-pair-list pair-list)
      (when (and debug-view (not (memq :no-message debug-view)))
        (let ((v (normalize-vector (v- (elt np 1) (elt np 2)))))
          (warn "min-distance : ~7,3f #f(" min-distance)
@@ -1270,46 +1271,6 @@
                         :angle-speed-blending angle-speed-collision-blending
                         :weight weight :jacobi# jacobi#
                         args))
-     ;;
-     ;; done
-     (when (and debug-view *viewer*)
-       (if (and pair-list (> avoid-collision-distance 0.0)
-                (or (> avoid-collision-null-gain 0.0)
-                    (> avoid-collision-joint-gain 0.0)))
-	 (let ((pwidth (send *viewer* :viewsurface :line-width))
-	       (psize (send *viewer* :viewsurface :point-size))
-	       (pcolor (send *viewer* :viewsurface :color))
-	       np)
-	   (send *viewer* :viewsurface :color #f(1 0 0))
-	   (dotimes (i (length pair-list))
-	     (setq np (elt (send self :get :collision-distance) i))
-	     (unless np
-               (warn ";; ERROR : could not get collision-distance ~A" (send-all pair-list :name))
-               (return))
-	     (when (<= (car np) 1.0)
-               (send *viewer* :viewsurface :line-width 1)
-               (dolist (obj (elt pair-list (car (last np))))
-                 (when (and (derivedp obj bodyset-link)
-                            (eq (send obj :analysis-level) :coords))
-                   (send-all (obj . geo::bodies) :worldcoords))
-                 (dolist (e (cdr (send obj :edges)))
-                   (send *viewer* :viewsurface :3d-line
-                         (e . pvert) (e . nvert) :depth-test t))))
-             (if (< (car np) avoid-collision-distance)
-                 (progn (send *viewer* :viewsurface :line-width 4)
-                        (send *viewer* :viewsurface :point-size 6))
-               (progn
-                 (send *viewer* :viewsurface :line-width 1)
-                 (send *viewer* :viewsurface :point-size 3)))
-	     (send *viewer* :viewsurface :3d-line (elt np 1)(elt np 2) :depth-test t)
-	     (send *viewer* :viewsurface :3d-point (elt np 1) :depth-test t)
-	     (send *viewer* :viewsurface :3d-point (elt np 2) :depth-test t)
-             (send *viewer* :viewsurface :color #f(1.0 0.0 1.0)))
-	   (send *viewer* :viewsurface :line-width pwidth)
-	   (send *viewer* :viewsurface :point-size psize)
-	   (send *viewer* :viewsurface :color pcolor)
-	   ))
-       )
      ret))
   ;;
   (:inverse-kinematics-args
@@ -1435,6 +1396,7 @@
            (return-from :inverse-kinematics-loop :ik-succeed))
        (when (and debug-view (not (memq :no-clear debug-view)) *viewer*)
          (send *viewer* :viewsurface :clear))
+       (send self :put :collision-pair-list nil)
        (setq
         success
         (send-message* self cascaded-link
@@ -1446,6 +1408,53 @@
                        method-args))
        (when (and debug-view  *viewer*)
          (send *viewer* :draw-objects :clear nil :flush nil)
+         ;;
+         ;; done
+         (when (send self :get :collision-pair-list)
+           (let ((pwidth (send *viewer* :viewsurface :line-width))
+                 (psize (send *viewer* :viewsurface :point-size))
+                 (pcolor (send *viewer* :viewsurface :color))
+                 (pair-list (send self :get :collision-pair-list))
+                 np)
+             (send *viewer* :viewsurface :color #f(1 0 0))
+             (send *viewer* :viewsurface :line-width 1)
+             (send *viewer* :viewsurface :point-size 3)
+             (dotimes (i (length pair-list))
+               (setq np (elt (send self :get :collision-distance) i))
+               (unless np
+                 (warn ";; ERROR : could not get collision-distance ~A" (send-all pair-list :name))
+                 (return))
+               (send *viewer* :viewsurface :color #f(0.7 0.0 0.7))
+               (send *viewer* :viewsurface :line-width 1)
+               (send *viewer* :viewsurface :point-size 2)
+               (send *viewer* :viewsurface :3d-point (elt np 1) :depth-test t)
+               (send *viewer* :viewsurface :3d-point (elt np 2) :depth-test t)
+               (send *viewer* :viewsurface :3d-line (elt np 1)(elt np 2) :depth-test t)
+               (if (< (car np) 200;avoid-collision-distance
+                        )
+                   (progn
+                     (send *viewer* :viewsurface :line-width 4)
+                     (send *viewer* :viewsurface :point-size 6))
+                 (progn
+                   (send *viewer* :viewsurface :line-width 2)
+                   (send *viewer* :viewsurface :point-size 3)))
+               (send *viewer* :viewsurface :color #f(1.0 0.0 1.0))
+               (send *viewer* :viewsurface :3d-line (elt np 1)(elt np 2) :depth-test nil)
+               (send *viewer* :viewsurface :3d-point (elt np 1) :depth-test nil)
+               (send *viewer* :viewsurface :3d-point (elt np 2) :depth-test nil)
+               (when (<= (car np) 1.0)
+                 (dolist (obj (elt pair-list (car (last np))))
+                   (when (and (derivedp obj bodyset-link)
+                              (eq (send obj :analysis-level) :coords))
+                     (send-all (obj . geo::bodies) :worldcoords))
+                   (dolist (e (cdr (send obj :edges)))
+                     (send *viewer* :viewsurface :3d-line
+                           (e . pvert) (e . nvert) :depth-test t))))
+               )
+             (send *viewer* :viewsurface :line-width pwidth)
+             (send *viewer* :viewsurface :point-size psize)
+             (send *viewer* :viewsurface :color pcolor)
+             ))
          (dotimes (i (length target-coords))
            (send-message (elt move-target i) cascaded-link :draw-on :flush nil :size 100)
            (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0)))
@@ -1812,7 +1821,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.98  2009-11-10 13:05:45  k-okada
+;;; Revision 1.99  2009-11-10 13:29:53  k-okada
+;;; draw collision-avoidance-result in inverse-kinematics-loop for better display
+;;;
+;;; Revision 1.98  2009/11/10 13:05:45  k-okada
 ;;; fix :no-clear, no-flush rules
 ;;;
 ;;; Revision 1.97  2009/11/10 05:53:38  k-okada
