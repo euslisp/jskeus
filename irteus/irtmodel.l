@@ -1796,7 +1796,7 @@
       (cond
        ((or (eq (send j :name) :torso-waist-p)
 	    (eq (send j :name) :waist-p))
-	(setq nang (- jmin (j . min-angle)))
+        (setq nang 0)
 	(cond
 	 ((= nang jmax) (setq nang (- jmax (deg2rad 1))))
 	 ((= nang jmin) (setq nang (+ jmin (deg2rad 1)))))
@@ -1821,7 +1821,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.99  2009-11-10 13:29:53  k-okada
+;;; Revision 1.100  2009-11-18 04:20:47  k-okada
+;;; joint-angle-limit-nspace, for wasit-y joint, neutral-angle is always 0
+;;;
+;;; Revision 1.99  2009/11/10 13:29:53  k-okada
 ;;; draw collision-avoidance-result in inverse-kinematics-loop for better display
 ;;;
 ;;; Revision 1.98  2009/11/10 13:05:45  k-okada
