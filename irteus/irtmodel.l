@@ -944,6 +944,7 @@
             (tmp-dim (instantiate float-vector r))
             (tmp-len (instantiate float-vector c))
             (tmp-len2 (instantiate float-vector c))
+            (tmp-weight (instantiate float-vector c))
             (tmp-pos (instantiate float-vector 3))
             (tmp-rot (instantiate float-vector 3))
             )
@@ -957,7 +958,7 @@
                    :tmp-v3a tmp-v3a :tmp-v3b tmp-v3b :tmp-v3c tmp-v3c
                    :tmp-m33 tmp-m33
                    :tmp-dim tmp-dim :tmp-len tmp-len :tmp-len2 tmp-len2
-                   :tmp-pos tmp-pos :tmp-rot tmp-rot
+                   :tmp-pos tmp-pos :tmp-rot tmp-rot :tmp-weight tmp-weight
                    ))
        (setf (elt col-args-list (1- col-link-len)) col-args)
        (send self :put :collision-avoidance-args-list col-args-list)))
@@ -1109,6 +1110,7 @@
                (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
               (tmp-len (instantiate float-vector fik-len))
               (tmp-len2 (instantiate float-vector fik-len))
+              (tmp-weight (instantiate float-vector fik-len))
               (debug-view) (jacobi)
 	    &allow-other-keys)
    (let* (joint-angle-limit-nspace
@@ -1153,6 +1155,7 @@
      ;; scheme for avoiding joint limits for redundant manipulators", in IEEE
      ;; Trans. On Robotics and Automation, 11((2):286-292, April 1995.
      ;;
+     (dotimes (i fik-len) (setf (elt tmp-weight i) (elt weight i)))
      (when (> avoid-weight-gain 0.0)
        (setq joint-angle-limit-weight 
 	 (scale avoid-weight-gain
@@ -1162,7 +1165,7 @@
 	 (warn "cost  :")
 	 (dotimes (i fik-len) (warn "~7,3f " (elt joint-angle-limit-weight i))) (warn "~%"))
        (dotimes (i fik-len)
-	 (setf (elt weight i)
+	 (setf (elt tmp-weight i)
 	       (* (elt weight i) 
 		  (if (> (- (elt joint-angle-limit-weight i)
                             (elt joint-angle-limit-weight-old i)) 0.0)
@@ -1211,7 +1214,7 @@
      ;; Collision Avoidance with Whole Body Motion Control for Humanoid
      ;; Robots", In IROS 2007, 2053--2058
      ;;     
-     (setq jacobi# (send* self :calc-inverse-jacobian jacobi :weight weight args))
+     (setq jacobi# (send* self :calc-inverse-jacobian jacobi :weight tmp-weight args))
      (when (and pair-list (> avoid-collision-distance 0.0)
 		(or (> avoid-collision-joint-gain 0.0)
 		    (> avoid-collision-null-gain 0.0)))
@@ -1268,7 +1271,7 @@
                         :null-space null-space-joint-limit
                         :angle-speed angle-speed-collision-avoidance
                         :angle-speed-blending angle-speed-collision-blending
-                        :weight weight :jacobi# jacobi#
+                        :weight tmp-weight :jacobi# jacobi#
                         args))
      ret))
   ;;
@@ -1300,6 +1303,7 @@
           (tmp-dims)
           (tmp-len (instantiate float-vector c))
           (tmp-len2 (instantiate float-vector c))
+          (tmp-weight (instantiate float-vector c))
           (tmp-pos (instantiate float-vector 3))
           (tmp-rot (instantiate float-vector 3)))
      (dotimes (i (length rotation-axis))
@@ -1317,7 +1321,7 @@
       :tmp-v3a tmp-v3a :tmp-v3b tmp-v3b  :tmp-v3c tmp-v3c
       :tmp-m33 tmp-m33 
       :tmp-dim tmp-dim :tmp-dims tmp-dims
-      :tmp-len tmp-len :tmp-len2 tmp-len2
+      :tmp-len tmp-len :tmp-len2 tmp-len2 :tmp-weight tmp-weight
       :tmp-pos tmp-pos :tmp-rot tmp-rot
       )))
   (:inverse-kinematics-loop
@@ -1820,7 +1824,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.101  2009-11-25 11:01:03  nozawa
+;;; Revision 1.102  2009-11-25 11:04:56  nozawa
+;;; fix bug in calcation of weight ;; weight was overwrited in :move-joints-avoidance
+;;;
+;;; Revision 1.101  2009/11/25 11:01:03  nozawa
 ;;; remove wmat <- unused in :move-joints-avoidance
 ;;;
 ;;; Revision 1.100  2009/11/18 04:20:47  k-okada
