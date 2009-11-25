@@ -1109,7 +1109,7 @@
                (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
               (tmp-len (instantiate float-vector fik-len))
               (tmp-len2 (instantiate float-vector fik-len))
-              (wmat (make-matrix fik-len fik-len)) (debug-view) (jacobi)
+              (debug-view) (jacobi)
 	    &allow-other-keys)
    (let* (joint-angle-limit-nspace
 	  joint-angle-limit-weight
@@ -1170,7 +1170,6 @@
 		    1.0))))
        (dotimes (i fik-len) (setf (elt joint-angle-limit-weight-old i) (elt joint-angle-limit-weight i)))
        )
-     (dotimes (i fik-len) (setf (aref wmat i i) (aref weight i)))
      (when (and debug-view (not (memq :no-message debug-view)))
        (warn "weight:")
        (dotimes (i  fik-len) (warn "~7,3f " (elt weight i))) (warn "~%"))
@@ -1821,7 +1820,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.100  2009-11-18 04:20:47  k-okada
+;;; Revision 1.101  2009-11-25 11:01:03  nozawa
+;;; remove wmat <- unused in :move-joints-avoidance
+;;;
+;;; Revision 1.100  2009/11/18 04:20:47  k-okada
 ;;; joint-angle-limit-nspace, for wasit-y joint, neutral-angle is always 0
 ;;;
 ;;; Revision 1.99  2009/11/10 13:29:53  k-okada
