@@ -1167,7 +1167,9 @@
 		  (if (> (- (elt joint-angle-limit-weight i)
                             (elt joint-angle-limit-weight-old i)) 0.0)
 		      (/ 1.0 (+ 1.0 (elt joint-angle-limit-weight i)))
-		    1.0))))
+		    1.0)))
+         (setf (elt weight i) (max 0.001 (elt weight i)))
+         )
        (dotimes (i fik-len) (setf (elt joint-angle-limit-weight-old i) (elt joint-angle-limit-weight i)))
        )
      (when (and debug-view (not (memq :no-message debug-view)))
@@ -1325,7 +1327,7 @@
     &rest args
     &key (stop 1) (loop 0) link-list move-target rotation-axis translation-axis
     look-at-target thre rthre union-link-list
-    debug-view ik-args
+    debug-view ik-args weight
     &allow-other-keys)
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
@@ -1347,6 +1349,8 @@
        (if (atom translation-axis) (setq translation-axis (list translation-axis)))       
        (if (atom thre) (setq thre (list thre)))
        (if (atom rthre) (setq rthre (list rthre)))
+       (if (null weight)
+           (setq weight (fill (instantiate float-vector (send self :calc-target-joint-dimension union-link-list)) 1)))
        ;; argument check
        (unless (= (length translation-axis) (length rotation-axis)
                   (length move-target) (length link-list) (length target-coords))
@@ -1483,6 +1487,7 @@
 		  (rthre (cond
                           ((atom move-target) (deg2rad 1))
                           (t (make-list (length move-target) :initial-element (deg2rad 1)))))
+                  (weight)
 		  &allow-other-keys)
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
@@ -1522,6 +1527,10 @@
      (if (atom translation-axis) (setq translation-axis (list translation-axis)))
      (if (atom thre) (setq thre (list thre)))
      (if (atom rthre) (setq rthre (list rthre)))
+     (if weight
+         (setq weight (copy-object weight))
+       (setq weight (fill (instantiate float-vector (send self :calc-target-joint-dimension union-link-list)) 1)))
+     (print weight)
      ;; argument check
      (unless (= (length translation-axis) (length rotation-axis)
                 (length move-target) (length link-list) (length target-coords))
@@ -1543,7 +1552,7 @@
                            :translation-axis translation-axis
                            :move-target move-target
                            :union-link-list union-link-list
-                           :thre thre :rthre rthre
+                           :thre thre :rthre rthre :weight weight
                            :debug-view debug-view
                            :ik-args ik-args args))
        (case success
@@ -1820,7 +1829,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.103  2009-11-27 11:25:58  k-okada
+;;; Revision 1.104  2009-11-27 12:34:14  k-okada
+;;; weight does not have side effect on :inverse-kinematics, but :inverse-kinmatics-loop changes weight
+;;;
+;;; Revision 1.103  2009/11/27 11:25:58  k-okada
 ;;; revert to 1.101
 ;;;
 ;;; Revision 1.102  2009/11/25 11:04:56  nozawa
