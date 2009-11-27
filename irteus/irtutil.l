@@ -76,6 +76,11 @@
                         (combination (cdr (member x lst)) (1- n))))
             lst)))
 
+(defun mapjoin (expr seq1 seq2)
+  (mapcan #'(lambda (arg1)
+             (mapcar #'(lambda (arg2) (funcall expr arg1 arg2))
+                     seq2))
+             seq1))
 
 (provide :irtutil "$Id$")
 
@@ -84,7 +89,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.5  2009-08-11 18:00:31  eus
+;;; Revision 1.6  2009-11-27 11:06:45  k-okada
+;;; add mapjoin
+;;;
+;;; Revision 1.5  2009/08/11 18:00:31  eus
 ;;; modify forward-message-to/to-all 's warning in case to is nil while only in *debug*
 ;;;
 ;;; Revision 1.4  2009/06/28 12:03:41  ueda
