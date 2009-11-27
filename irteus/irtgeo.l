@@ -282,6 +282,8 @@
    (t (face-to-triangle f))))
 
 (defun face-to-triangle (f)
+  (if (and (derivedp f face) (send f :holes))
+      (while (send f :holes) (setq f (face-ear-clipping f))))
   (let* ((start 0) 
 	 (poly (face-to-tessel-triangle f start)))
     (while (null poly)
@@ -304,7 +306,7 @@
 	    (return-from face-to-tessel-triangle nil))
     (let ((poly (instance polygon :init :vertices (list v0 v1 v2)))
 	  (rvers (remove v0 (remove v1 (remove v2 vers)))))
-      (if (every #'(lambda (x) (eq ':outside (send poly :insidep x))) rvers)
+      (if (every #'(lambda (x) (not (eq ':inside (send poly :insidep x)))) rvers)
 	  poly
 	nil))))
 
@@ -314,6 +316,45 @@
 	 (rvers (remove (nth (mod num len) vers) vers)))
     (instance polygon :init :vertices rvers)))
 
+(defun geo::face-ear-clipping (f)
+  (let ((hs (send f :holes))
+        d vl mind minv minh r)
+    (dolist (h hs)
+      (setq vl (mapjoin #'cons (cdr (send f :vertices)) (cdr (send h :vertices))))
+      (dolist (v vl)
+        ;; check if there are no intersection vertices
+        (setq 
+         r
+         (mapcan #'(lambda (e)
+                     (let ((p (geo::line-intersection3 (e . pvert) (e . nvert)
+                                                       (car v) (cdr v))))
+                       (when (and (<= 0.0 (car p) 1.0)
+                                  (< 0.0 (cadr p) 1.0))
+                         (list e))))
+                 (flatten (append (send-all hs :edges) (send f :edges)))))
+        (unless r
+          (if mind
+              (if (> mind (setq d (distance (car v) (cdr v))))
+                  (setq mind d minv v minh h))
+            (setq mind (distance (car v) (cdr v)) minv v minh h)))
+        ))
+    (if mind
+        (let ((fp (position (car minv) (send f :vertices)))
+              (hp (position (cdr minv) (send minh :vertices))))
+          (setq f
+                (instance face
+                          :init :vertices
+                          (nconc
+                           (subseq (send f :vertices) 0 fp)
+                           (list (copy-object (car minv)))
+                           (subseq (butlast (send minh :vertices)) hp)
+                           (subseq (send minh :vertices) 0 hp)
+                           (list (copy-object (cdr minv)))
+                           (subseq (butlast (send f :vertices)) fp))
+                          :holes (remove minh hs))))
+      (instance face :init :vertices (send f :vertices)))
+    ))
+
 (provide :irtgeo "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -321,7 +362,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.11  2009-10-27 02:45:31  nozawa
+;;; Revision 1.12  2009-11-27 11:08:59  k-okada
+;;; add face-ear-clpping, face-to-triangle supports face with hole
+;;;
+;;; Revision 1.11  2009/10/27 02:45:31  nozawa
 ;;; add \*g-vec\* for dynamics calculation (ref. euslib/jsk/preview.l and euslib/rbrain/dynamics.l)
 ;;;
 ;;; Revision 1.10  2009/09/24 10:07:34  k-okada
