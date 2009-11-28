@@ -1098,7 +1098,7 @@
               &key
               union-link-list link-list
               (fik-len (send self :calc-target-joint-dimension union-link-list))
-              (weight (fill (instantiate float-vector fik-len) 1))
+              (weight)
               (null-space)
               (avoid-nspace-gain 0.01)
               (avoid-weight-gain 1.0)
@@ -1153,6 +1153,9 @@
      ;; scheme for avoiding joint limits for redundant manipulators", in IEEE
      ;; Trans. On Robotics and Automation, 11((2):286-292, April 1995.
      ;;
+     (setq weight (if weight
+                      (copy-object weight)
+                    (fill (instantiate float-vector fik-len) 1)))
      (when (> avoid-weight-gain 0.0)
        (setq joint-angle-limit-weight 
 	 (scale avoid-weight-gain
@@ -1169,8 +1172,8 @@
 		      (/ 1.0 (+ 1.0 (elt joint-angle-limit-weight i)))
 		    1.0)))
          (setf (elt weight i) (max 0.001 (elt weight i)))
+         (setf (elt joint-angle-limit-weight-old i) (elt joint-angle-limit-weight i))
          )
-       (dotimes (i fik-len) (setf (elt joint-angle-limit-weight-old i) (elt joint-angle-limit-weight i)))
        )
      (when (and debug-view (not (memq :no-message debug-view)))
        (warn "weight:")
@@ -1327,7 +1330,7 @@
     &rest args
     &key (stop 1) (loop 0) link-list move-target rotation-axis translation-axis
     look-at-target thre rthre union-link-list
-    debug-view ik-args weight
+    debug-view ik-args
     &allow-other-keys)
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
@@ -1349,8 +1352,6 @@
        (if (atom translation-axis) (setq translation-axis (list translation-axis)))       
        (if (atom thre) (setq thre (list thre)))
        (if (atom rthre) (setq rthre (list rthre)))
-       (if (null weight)
-           (setq weight (fill (instantiate float-vector (send self :calc-target-joint-dimension union-link-list)) 1)))
        ;; argument check
        (unless (= (length translation-axis) (length rotation-axis)
                   (length move-target) (length link-list) (length target-coords))
@@ -1487,7 +1488,6 @@
 		  (rthre (cond
                           ((atom move-target) (deg2rad 1))
                           (t (make-list (length move-target) :initial-element (deg2rad 1)))))
-                  (weight)
 		  &allow-other-keys)
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
@@ -1527,10 +1527,6 @@
      (if (atom translation-axis) (setq translation-axis (list translation-axis)))
      (if (atom thre) (setq thre (list thre)))
      (if (atom rthre) (setq rthre (list rthre)))
-     (if weight
-         (setq weight (copy-object weight))
-       (setq weight (fill (instantiate float-vector (send self :calc-target-joint-dimension union-link-list)) 1)))
-     (print weight)
      ;; argument check
      (unless (= (length translation-axis) (length rotation-axis)
                 (length move-target) (length link-list) (length target-coords))
@@ -1552,7 +1548,7 @@
                            :translation-axis translation-axis
                            :move-target move-target
                            :union-link-list union-link-list
-                           :thre thre :rthre rthre :weight weight
+                           :thre thre :rthre rthre
                            :debug-view debug-view
                            :ik-args ik-args args))
        (case success
@@ -1829,7 +1825,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.104  2009-11-27 12:34:14  k-okada
+;;; Revision 1.105  2009-11-28 03:15:22  nozawa
+;;; use copy-object for weight in :move-joints-avoidance
+;;;
+;;; Revision 1.104  2009/11/27 12:34:14  k-okada
 ;;; weight does not have side effect on :inverse-kinematics, but :inverse-kinmatics-loop changes weight
 ;;;
 ;;; Revision 1.103  2009/11/27 11:25:58  k-okada
