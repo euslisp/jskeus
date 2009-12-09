@@ -1370,7 +1370,11 @@
            (setq tmp-dim (cadr (memq :tmp-dim ik-args)))
          (setq tmp-dim (instantiate float-vector (send self :calc-target-axis-dimension rotation-axis translation-axis))))
        
-       (setq jacobi (send* self :calc-jacobian-from-link-list link-list method-args))
+       (setq jacobi (send* self :calc-jacobian-from-link-list link-list
+                           :translation-axis translation-axis
+                           :rotation-axis rotation-axis
+                           :move-target move-target
+                           method-args))
        (dotimes (i (length move-target))
          (let ((move-target (elt move-target i))
                (target-coords (elt target-coords i))
@@ -1825,7 +1829,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.105  2009-11-28 03:15:22  nozawa
+;;; Revision 1.106  2009-12-09 09:39:37  nozawa
+;;; add keyword argument to :calc-jacobian-from-link-list in :inverse-kinematics-loop ;; translation-axis, rotation-axis and move-target
+;;;
+;;; Revision 1.105  2009/11/28 03:15:22  nozawa
 ;;; use copy-object for weight in :move-joints-avoidance
 ;;;
 ;;; Revision 1.104  2009/11/27 12:34:14  k-okada
