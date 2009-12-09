@@ -292,7 +292,7 @@
       (incf start)
       (setq poly (face-to-tessel-triangle f start)))
     (cons poly 
-	  (face-to-triangle-aux (face-to-triangle-rest-polygon f start)))))
+	  (face-to-triangle-aux (face-to-triangle-rest-polygon f start (send poly :edges))))))
 
 ;; return polygon if triangable ,unless return nil.
 ;; this function = sharpp + trianglable + insidep
@@ -304,17 +304,25 @@
 	 (v2 (nth (mod (1+  num) len) vers)))
     (unless (> (v. (v* (v- v1 v0) (v- v2 v1)) (send f :normal)) 0)
 	    (return-from face-to-tessel-triangle nil))
-    (let ((poly (instance polygon :init :vertices (list v0 v1 v2)))
+    (let ((poly (make-face-from-vertices
+                 (mapcar #'(lambda (v) (cons v (mapcan
+                                                #'(lambda (e) (if (memq v (send e :vertices)) (list e)))
+                                                (send f :edges)))) (list v0 v1 v2))))
 	  (rvers (remove v0 (remove v1 (remove v2 vers)))))
       (if (every #'(lambda (x) (not (eq ':inside (send poly :insidep x)))) rvers)
 	  poly
 	nil))))
 
-(defun face-to-triangle-rest-polygon (f num)
+
+(defun face-to-triangle-rest-polygon (f num edgs)
   (let* ((vers (butlast (send f :vertices)))
 	 (len (length vers))
 	 (rvers (remove (nth (mod num len) vers) vers)))
-    (instance polygon :init :vertices rvers)))
+    (make-face-from-vertices
+     (mapcar #'(lambda (v)
+                 (cons v (mapcan #'(lambda (e) (if (memq v (send e :vertices)) (list e)))
+                                 (append (send f :edges) edgs)))) rvers))
+    ))
 
 (defun geo::face-ear-clipping (f)
   (let ((hs (send f :holes))
@@ -362,7 +370,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.12  2009-11-27 11:08:59  k-okada
+;;; Revision 1.13  2009-12-09 06:03:32  k-okada
+;;; update face-to-triangle, body-to-triagles
+;;;
+;;; Revision 1.12  2009/11/27 11:08:59  k-okada
 ;;; add face-ear-clpping, face-to-triangle supports face with hole
 ;;;
 ;;; Revision 1.11  2009/10/27 02:45:31  nozawa
