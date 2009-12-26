@@ -278,6 +278,7 @@
 
 (defun face-to-triangle-aux (f)
   (cond
+   ((null f) nil)
    ((= (length (send f :edges)) 3) (list f))
    (t (face-to-triangle f))))
 
@@ -318,6 +319,7 @@
   (let* ((vers (butlast (send f :vertices)))
 	 (len (length vers))
 	 (rvers (remove (nth (mod num len) vers) vers)))
+    (if (<= (length rvers) 2) (return-from face-to-triangle-rest-polygon nil))
     (make-face-from-vertices
      (mapcar #'(lambda (v)
                  (cons v (mapcan #'(lambda (e) (if (memq v (send e :vertices)) (list e)))
@@ -370,7 +372,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.13  2009-12-09 06:03:32  k-okada
+;;; Revision 1.14  2009-12-26 15:24:24  eus
+;;; bug fix face-to-triangle 'bad face' error if triangle assigned
+;;;
+;;; Revision 1.13  2009/12/09 06:03:32  k-okada
 ;;; update face-to-triangle, body-to-triagles
 ;;;
 ;;; Revision 1.12  2009/11/27 11:08:59  k-okada
