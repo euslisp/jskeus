@@ -129,7 +129,7 @@
 			       (send self :link-list
 				     (send self limb :end-coords :parent)
 				     (send self limb :root-link))))
-	    (send self :inverse-kinematics-loop target
+	    (send self :inverse-kinematics-loop dif-pos dif-rot
                   :move-target head-end-coords
                   :collision-avoidance-link-pair nil
 		  :rotation-axis :z
@@ -181,7 +181,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.3  2009-10-10 12:50:17  nozawa
+;;; Revision 1.4  2009-12-27 08:46:18  ueda
+;;; IMPORTANT commit. change arguments of inverse-kinematics-loop from coordinates to position and rotation velicity
+;;;
+;;; Revision 1.3  2009/10/10 12:50:17  nozawa
 ;;; replace ik method, :move-joints -> :inverse-kinematics-loop
 ;;;
 ;;; Revision 1.2  2009/02/17 02:04:48  k-okada

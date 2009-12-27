@@ -1376,15 +1376,16 @@
         ))
     )
   (:inverse-kinematics-loop
-   (target-coords 
+   (dif-pos dif-rot
     &rest args
     &key (stop 1) (loop 0) link-list move-target rotation-axis translation-axis
     look-at-target thre rthre union-link-list
+    target-coords                 ;required for look-at and debug-view
     debug-view ik-args
     &allow-other-keys)
-   ;; target-coords, move-target, rotation-axis, translation-axis, link-list
+   ;; dif-pos, dif-rot, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
-   (let (dif-pos dif-rot tmp-dim tmp-dims (vec-count 0) (success t) jacobi
+   (let (tmp-dim tmp-dims (vec-count 0) (success t) jacobi
          (method-args (nconc args ik-args)))
        (if (null union-link-list)
            (setq union-link-list (cond
@@ -1398,16 +1399,20 @@
        (if (atom (car link-list)) (setq link-list (list link-list)))
        (if (atom move-target) (setq move-target (list move-target)))
        (if (atom target-coords) (setq target-coords (list target-coords)))
+       (if (atom dif-pos) (setq dif-pos (list dif-pos)))
+       (if (atom dif-rot) (setq dif-rot (list dif-rot)))
        (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
        (if (atom translation-axis) (setq translation-axis (list translation-axis)))       
        (if (atom thre) (setq thre (list thre)))
        (if (atom rthre) (setq rthre (list rthre)))
        ;; argument check
        (unless (= (length translation-axis) (length rotation-axis)
-                  (length move-target) (length link-list) (length target-coords))
-         (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A target-coords ~A~%"
+                  (length move-target) (length link-list)
+                  (length dif-pos) (length dif-rot))
+         (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A dif-pos ~A dif-rot ~A~%"
                (length translation-axis) (length rotation-axis)
-               (length move-target) (length link-list) (length target-coords))
+               (length move-target) (length link-list)
+               (length dif-pos) (length dif-rot))
          (return-from :inverse-kinematics-loop :ik-fail))
 
        (if (memq :tmp-dims ik-args)
@@ -1427,15 +1432,15 @@
                            method-args))
        (dotimes (i (length move-target))
          (let ((move-target (elt move-target i))
-               (target-coords (elt target-coords i))
+               (dif-pos (elt dif-pos i))
+               (dif-rot (elt dif-rot i))
                (rotation-axis (elt rotation-axis i))
                (translation-axis (elt translation-axis i))
                (thre (elt thre i)) (rthre (elt rthre i)))
-           (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
-                 dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
            (when (and debug-view (not (memq :no-message debug-view)))
              (warn ";; ~3d: dif-pos : ~a/(~a/~A), dif-rot : ~a/(~a/~A)~%"
-                   loop dif-pos (norm dif-pos) thre dif-rot (norm dif-rot) rthre))
+                   loop dif-pos (norm dif-pos) thre dif-rot
+                   (norm dif-rot) rthre))
            (setq success (and success
                               (> loop (/ stop 10))
                               (if translation-axis (< (norm dif-pos) thre) t)
@@ -1460,7 +1465,8 @@
         (send-message* self cascaded-link
 		       :move-joints-avoidance tmp-dim
                        :union-link-list union-link-list
-                       :rotation-axis rotation-axis :translation-axis translation-axis
+                       :rotation-axis rotation-axis
+                       :translation-axis translation-axis
                        :jacobi jacobi :debug-view debug-view
                        ;; buffer for calculation
                        method-args))
@@ -1469,13 +1475,14 @@
          ;;
          ;; done
          (send self :draw-collision-debug-view)
-         (dotimes (i (length target-coords))
-           (send-message (elt move-target i) cascaded-link :draw-on :flush nil :size 100)
-           (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0)))
+         (when (car target-coords)
+           (dotimes (i (length target-coords))
+             (send-message (elt move-target i) cascaded-link :draw-on :flush nil :size 100)
+             (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0))))
          (if (not (memq :no-flush debug-view)) (send *viewer* :viewsurface :flush))
          )
        (unless success (return-from :inverse-kinematics-loop :ik-failed))
-       (if look-at-target
+       (if (and (car target-coords) look-at-target)
 	   (send self :head :look-at (send (car target-coords) :worldpos)))
        :ik-continues))
   (:inverse-kinematics
@@ -1551,22 +1558,33 @@
      
      ;; inverse kinematics loop
      (while (< (incf loop) stop)
-       (setq success (send* self :inverse-kinematics-loop
-                           target-coords
-                           :stop stop :loop loop
-                           :rotation-axis rotation-axis
-                           :translation-axis translation-axis
-                           :move-target move-target
-                           :union-link-list union-link-list
-                           :thre thre :rthre rthre
-                           :debug-view debug-view
-                           :ik-args ik-args args))
-       (case success
-             (:ik-failed
-              (setq success nil) (return nil))
-             (:ik-succeed
-              (setq success t) (return nil)))
-       )
+       (let ((dif-pos
+              (mapcar #'(lambda (mv tc trans-axis)
+                          (send mv :difference-position tc
+                                :translation-axis trans-axis))
+                      move-target target-coords translation-axis))
+             (dif-rot
+              (mapcar #'(lambda (mv tc rot-axis)
+                          (send mv :difference-rotation tc
+                                :rotation-axis rot-axis))
+                      move-target target-coords rotation-axis)))
+         (setq success (send* self :inverse-kinematics-loop
+                              dif-pos dif-rot
+                              :target-coords target-coords
+                              :stop stop :loop loop
+                              :rotation-axis rotation-axis
+                              :translation-axis translation-axis
+                              :move-target move-target
+                              :union-link-list union-link-list
+                              :thre thre :rthre rthre
+                              :debug-view debug-view
+                              :ik-args ik-args args))
+         (case success
+           (:ik-failed
+             (setq success nil) (return nil))
+           (:ik-succeed
+             (setq success t) (return nil)))
+         ))
         ;; update difference
      (dotimes (i (length move-target))
        (let ((move-target (elt move-target i))
@@ -1835,6 +1853,9 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
+;;; Revision 1.108  2009-12-27 08:46:18  ueda
+;;; IMPORTANT commit. change arguments of inverse-kinematics-loop from coordinates to position and rotation velicity
+;;;
 ;;; Revision 1.107  2009-12-27 08:15:04  ueda
 ;;; make :draw-collision-debug-view method. because debug drawing in :inverse-kinematics-loop is too long and ugly.
 ;;;

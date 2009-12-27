@@ -1,3 +1,4 @@
+(load "irtmodel.l")
 (defclass sample-robot
   :super robot-model
   :slots ())
@@ -220,8 +221,6 @@
   (&key (target (make-coords :pos (float-vector 0 0 1500)))
         (use-torso t) (use-leg))
   "full body ik"
-  (let (link-list)
-    ;;
     (unless (boundp '*robot*)
       (setq *robot* (instance sample-robot :init)))
     (send *robot* :angle-vector (instantiate float-vector 30))
@@ -230,30 +229,38 @@
     (send *robot* :arms :angle-vector #f(10 20 0 -20 10 0 0))
 
     (send *robot* :transform (send  (send *robot* :lleg :end-coords) :transformation (make-coords)))
-    (setq link-list (send *robot* :link-list
-                          (send *robot* :larm :end-coords :parent)
-                          (cond
-                           (use-leg (send *robot* :lleg :end-coords :parent))
-                           (use-torso (send *robot* :torso :root-link))
-                           (t (send *robot* :larm :root-link)))))
-    (objects (list *robot*))
-    ;;
-    (do-until-key
-     (send *robot* :inverse-kinematics-loop target
-                   :link-list link-list
-                   :move-target (send *robot* :larm :end-coords)
-                   :rotation-axis nil :translation-axis t
-                   :debug-view :no-flush)
-     (send *robot* :head :look-at (send *robot* :larm :end-coords :worldpos))
-     (send *robot* :transform (send (send *robot* :lleg :end-coords) :transformation (make-coords))) ;; fix-leg
-     (send *irtviewer* :viewer :viewsurface :color #f(1 1 1))
-     (send *irtviewer* :viewer :viewsurface :line-width 2)
-     (send *irtviewer* :viewer :viewsurface :3d-line
-           (send *robot* :larm :end-coords :worldpos)
-           (send *robot* :rarm :end-coords :worldpos))
-     (send *irtviewer* :flush)
-     )
-    ))
+    (let* ((move-target (send *robot* :larm :end-coords))
+           (link-list (send *robot* :link-list
+                            (send move-target :parent)
+                            (cond
+                             (use-leg (send *robot* :lleg :end-coords :parent))
+                             (use-torso (send *robot* :torso :root-link))
+                             (t (send *robot* :larm :root-link))))))
+      (objects (list *robot*))
+      ;;
+      (do-until-key
+       (let ((dif-pos (send move-target :difference-position target
+                            :translation-axis t))
+             (dif-rot (send move-target :difference-rotation target
+                            :rotation-axis nil)))
+         (send *robot* :inverse-kinematics-loop dif-pos dif-rot
+               :link-list link-list
+               :target-coords target
+               :move-target (send *robot* :larm :end-coords)
+               :rotation-axis nil :translation-axis t
+               :debug-view :no-flush))
+       (send *robot* :head :look-at
+             (send *robot* :larm :end-coords :worldpos))
+       (send *robot* :transform (send (send *robot* :lleg :end-coords)
+                                      :transformation (make-coords))) ;fix-leg
+       (send *irtviewer* :viewer :viewsurface :color #f(1 1 1))
+       (send *irtviewer* :viewer :viewsurface :line-width 2)
+       (send *irtviewer* :viewer :viewsurface :3d-line
+             (send *robot* :larm :end-coords :worldpos)
+             (send *robot* :rarm :end-coords :worldpos))
+       (send *irtviewer* :flush)
+       )
+      ))
 
 
 (defun test2 nil
@@ -306,7 +313,8 @@
             :link-list link-list :move-target move-target
             :stop 500 :thre '(10 10)
             :rotation-axis '(nil nil) :debug-view nil)
-      (send *robot* :head :look-at (apply #'midpoint 0.5 (send-all target-coords :worldpos)))
+      (send *robot* :head :look-at
+            (apply #'midpoint 0.5 (send-all target-coords :worldpos)))
       (send b0 :orient (* 0.2 (sin (/ i 10.0))) :x :world)
       (send b0 :locate (float-vector 250 (* 250 (sin (/ (incf i) 10.0))) 0) :world)
       (send *irtviewer* :draw-objects)
@@ -464,12 +472,21 @@
      (when (= (mod i 800) 0)
        (setq av0 (send h0 :angle-vector))
        (dotimes (i 10)
-         (send h0 :inverse-kinematics-loop target-coords
-                  :move-target move-target
-                  :link-list link-list
-                  :collision-avoidance-link-pair nil
-                  :rotation-axis '(nil nil nil) :translation-axis '(t t t)
-                  :thre '(1 1 1) :rthre '(0.1 0.1 0.1)))
+         (let ((dif-pos (mapcar #'(lambda (x y z)
+                                    (send x :difference-position y
+                                          :translation-axis z))
+                                move-target target-coords '(t t t)))
+               (dif-rot (mapcar #'(lambda (x y z)
+                                    (send x :difference-rotation y
+                                          :rotation-axis z))
+                                move-target target-coords '(nil nil nil))))
+           (send h0 :inverse-kinematics-loop dif-pos dif-rot
+                 :move-target move-target
+                 :link-list link-list
+                 :target-coords target-coords
+                 :collision-avoidance-link-pair nil
+                 :rotation-axis '(nil nil nil) :translation-axis '(t t t)
+                 :thre '(1 1 1) :rthre '(0.1 0.1 0.1))))
        (setq av1 (send h0 :angle-vector))
        (send *irtviewer* :draw-objects :flush t)
        (send h0 :angle-vector av0)
