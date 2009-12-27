@@ -1820,6 +1820,62 @@
       (setf (elt res i) r))
     res))
 
+(defmacro with-difference-position-and-rotation
+  (params &rest args)
+  ;; params := (dif-pos dif-rot move-target
+  ;;            target-coords :translation-axis x :rotation-axis x)
+  (let ((move-target (gensym))
+        (target-coords (gensym))
+        (rotation-axis (gensym))
+        (translation-axis (gensym)))
+    `(let ((,move-target ,(caddr params))
+           (,target-coords ,(cadddr params))
+           (,translation-axis ,(if (member :translation-axis params)
+                                   (cadr (member :translation-axis params))
+                                 t))
+           (,rotation-axis ,(if (member :rotation-axis params)
+                                   (cadr (member :rotation-axis params))
+                              t)))
+       (let ((,(car params) (send ,move-target :difference-position
+                                  ,target-coords :translation-axis
+                                  ,translation-axis))
+             (,(cadr params) (send ,move-target :difference-rotation
+                                   ,target-coords :rotation-axis
+                                   ,rotation-axis)))
+         ,@args))
+    ))
+
+(defmacro with-difference-positions-and-rotations
+  (params &rest args)
+  ;; params := (dif-pos dif-rot move-target
+  ;;            target-coords :translation-axis x :rotation-axis x)
+  (let ((move-target (gensym))
+        (target-coords (gensym))
+        (rotation-axis (gensym))
+        (translation-axis (gensym)))
+    `(let ((,move-target ,(caddr params))
+           (,target-coords ,(cadddr params))
+           (,translation-axis ,(if (member :translation-axis params)
+                                   (cadr (member :translation-axis params))
+                                 (make-list (length (caddr params))
+                                            :initial-element t)))
+           (,rotation-axis ,(if (member :rotation-axis params)
+                                   (cadr (member :rotation-axis params))
+                              (make-list (length (caddr params))
+                                            :initial-element t))))
+       (let ((,(car params)
+              (mapcar #'(lambda (m tc ta)
+                          (send m :difference-position
+                                tc :translation-axis ta))
+                      ,move-target ,target-coords ,translation-axis))
+             (,(cadr params)
+              (mapcar #'(lambda (m tc ra)
+                          (send m :difference-rotation
+                                tc :rotation-axis ra))
+                      ,move-target ,target-coords ,rotation-axis)))
+         ,@args))
+    ))
+
 (in-package "GEOMETRY")
 
 (provide :irtmodel "$Id$")
@@ -1829,6 +1885,9 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
+;;; Revision 1.111  2009-12-27 09:13:41  ueda
+;;; add utility macro with-difference-position-and-rotation and with-difference-positions-and-rotations
+;;;
 ;;; Revision 1.110  2009-12-27 08:56:03  ueda
 ;;; remove fix-targets support...
 ;;;
