@@ -1030,11 +1030,8 @@
     (angle-speed-limit (/ pi 4)) ;; rad/sec
     (periodic-time 0.05)         ;; sec
     (debug-view nil)
-    (fix-targets)
     &allow-other-keys)
-   (let (dav dtheta j fix-target fix-targets-coords (ret t) (angle-speed-max 0) gain)
-     (if fix-targets
-         (setq fix-targets-coords (send-all fix-targets :copy-worldcoords)))
+   (let (dav dtheta j (ret t) (angle-speed-max 0) gain)
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
      (if (and debug-view (not (equal debug-view :no-clear)) (boundp '*viewer*))
 	 (send *viewer* :viewsurface :clear))
@@ -1079,19 +1076,6 @@
            (setq dtheta (scale gain dtheta dtheta))
          (setq dtheta (* gain dtheta)))
        (send (elt union-link-list l) :joint :joint-angle dtheta :relative t))
-     (when fix-targets
-       (let ((tmp-coords (pop fix-targets-coords)))
-         (send tmp-coords :transform
-               (send (pop fix-targets) :transformation self))
-         (send self :newcoords tmp-coords)
-         (while (setq fix-target (pop fix-targets))
-           (unless
-               (send self :inverse-kinematics (pop fix-targets-coords)
-                     :move-target fix-target
-                     :link-list (send self :link-list fix-target)
-                     :avoid-collision-null-gain 0
-                     :avoid-collision-joint-gain 0)
-             (setq ret nil)))))
      ret))
   (:move-joints-avoidance
    (union-vel &rest args
@@ -1496,7 +1480,6 @@
 				     ((atom move-target) t)
 				     (t (make-list (length move-target) :initial-element t))))
 		  (look-at-target)
-                  (fix-targets)
 		  (thre (cond
                          ((atom move-target) 1)
                          (t (make-list (length move-target) :initial-element 1))))
@@ -1516,9 +1499,6 @@
 	  dif-pos dif-rot
 	  ;;
           (success t) 
-          (fix-targets-av 
-           (mapcar #'(lambda (l) (send-all l :joint :joint-angle))
-                   (mapcar #'(lambda (l) (send self :link-list l)) fix-targets)))
 	  (old-analysis-level (send-all union-link-list :analysis-level))
           ik-args)       
      (send-all union-link-list :analysis-level :coords)
@@ -1622,10 +1602,6 @@
 	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   )
 	 (mapc #'(lambda (j a) (send j :joint-angle a)) (send-all union-link-list :joint) av0)
-         (if fix-targets-av
-             (mapcar #'(lambda (ll aa) (mapc #'(lambda (j a) (send j :joint-angle a)) (send-all ll :joint) aa))
-                     (mapcar #'(lambda (l) (send self :link-list l)) fix-targets)
-                     fix-targets-av))
          (if c0 (send self :newcoords c0))
 	 nil))
      ))
@@ -1853,6 +1829,9 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
+;;; Revision 1.110  2009-12-27 08:56:03  ueda
+;;; remove fix-targets support...
+;;;
 ;;; Revision 1.109  2009-12-27 08:52:45  ueda
 ;;; remove look-at-target from inverse-kinematics-loop and add :look-at codes to :inverse-kinematics for compatibility
 ;;;
