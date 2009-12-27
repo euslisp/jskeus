@@ -1379,7 +1379,7 @@
    (dif-pos dif-rot
     &rest args
     &key (stop 1) (loop 0) link-list move-target rotation-axis translation-axis
-    look-at-target thre rthre union-link-list
+    thre rthre union-link-list
     target-coords                 ;required for look-at and debug-view
     debug-view ik-args
     &allow-other-keys)
@@ -1482,8 +1482,6 @@
          (if (not (memq :no-flush debug-view)) (send *viewer* :viewsurface :flush))
          )
        (unless success (return-from :inverse-kinematics-loop :ik-failed))
-       (if (and (car target-coords) look-at-target)
-	   (send self :head :look-at (send (car target-coords) :worldpos)))
        :ik-continues))
   (:inverse-kinematics
    (target-coords &rest args 
@@ -1579,6 +1577,8 @@
                               :thre thre :rthre rthre
                               :debug-view debug-view
                               :ik-args ik-args args))
+         (if look-at-target
+             (send self :head :look-at (send (car target-coords) :worldpos)))
          (case success
            (:ik-failed
              (setq success nil) (return nil))
@@ -1853,6 +1853,9 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
+;;; Revision 1.109  2009-12-27 08:52:45  ueda
+;;; remove look-at-target from inverse-kinematics-loop and add :look-at codes to :inverse-kinematics for compatibility
+;;;
 ;;; Revision 1.108  2009-12-27 08:46:18  ueda
 ;;; IMPORTANT commit. change arguments of inverse-kinematics-loop from coordinates to position and rotation velicity
 ;;;
