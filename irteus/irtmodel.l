@@ -1325,6 +1325,56 @@
       :tmp-len tmp-len :tmp-len2 tmp-len2
       :tmp-pos tmp-pos :tmp-rot tmp-rot
       )))
+  (:draw-collision-debug-view
+    ()
+    (when (send self :get :collision-pair-list)
+      (let ((pwidth (send *viewer* :viewsurface :line-width))
+            (psize (send *viewer* :viewsurface :point-size))
+            (pcolor (send *viewer* :viewsurface :color))
+            (pair-list (send self :get :collision-pair-list))
+            np)
+        (send *viewer* :viewsurface :color #f(1 0 0))
+        (send *viewer* :viewsurface :line-width 1)
+        (send *viewer* :viewsurface :point-size 3)
+        (dotimes (i (length pair-list))
+          (setq np (elt (send self :get :collision-distance) i))
+          (unless np
+            (warn ";; ERROR : could not get collision-distance ~A"
+                  (send-all pair-list :name))
+            (return))
+          (send *viewer* :viewsurface :color #f(0.7 0.0 0.7))
+          (send *viewer* :viewsurface :line-width 1)
+          (send *viewer* :viewsurface :point-size 2)
+          (send *viewer* :viewsurface :3d-point (elt np 1) :depth-test t)
+          (send *viewer* :viewsurface :3d-point (elt np 2) :depth-test t)
+          (send *viewer* :viewsurface :3d-line (elt np 1) (elt np 2)
+                :depth-test t)
+          (if (< (car np) 200);avoid-collision-distance
+              (progn
+                (send *viewer* :viewsurface :line-width 4)
+                (send *viewer* :viewsurface :point-size 6))
+            (progn
+              (send *viewer* :viewsurface :line-width 2)
+              (send *viewer* :viewsurface :point-size 3)))
+          (send *viewer* :viewsurface :color #f(1.0 0.0 1.0))
+          (send *viewer* :viewsurface :3d-line (elt np 1)(elt np 2)
+                :depth-test nil)
+          (send *viewer* :viewsurface :3d-point (elt np 1) :depth-test nil)
+          (send *viewer* :viewsurface :3d-point (elt np 2) :depth-test nil)
+          (when (<= (car np) 1.0)
+            (dolist (obj (elt pair-list (car (last np))))
+              (when (and (derivedp obj bodyset-link)
+                         (eq (send obj :analysis-level) :coords))
+                (send-all (obj . geo::bodies) :worldcoords))
+              (dolist (e (cdr (send obj :edges)))
+                (send *viewer* :viewsurface :3d-line
+                      (e . pvert) (e . nvert) :depth-test t))))
+          )
+        (send *viewer* :viewsurface :line-width pwidth)
+        (send *viewer* :viewsurface :point-size psize)
+        (send *viewer* :viewsurface :color pcolor)
+        ))
+    )
   (:inverse-kinematics-loop
    (target-coords 
     &rest args
@@ -1418,51 +1468,7 @@
          (send *viewer* :draw-objects :clear nil :flush nil)
          ;;
          ;; done
-         (when (send self :get :collision-pair-list)
-           (let ((pwidth (send *viewer* :viewsurface :line-width))
-                 (psize (send *viewer* :viewsurface :point-size))
-                 (pcolor (send *viewer* :viewsurface :color))
-                 (pair-list (send self :get :collision-pair-list))
-                 np)
-             (send *viewer* :viewsurface :color #f(1 0 0))
-             (send *viewer* :viewsurface :line-width 1)
-             (send *viewer* :viewsurface :point-size 3)
-             (dotimes (i (length pair-list))
-               (setq np (elt (send self :get :collision-distance) i))
-               (unless np
-                 (warn ";; ERROR : could not get collision-distance ~A" (send-all pair-list :name))
-                 (return))
-               (send *viewer* :viewsurface :color #f(0.7 0.0 0.7))
-               (send *viewer* :viewsurface :line-width 1)
-               (send *viewer* :viewsurface :point-size 2)
-               (send *viewer* :viewsurface :3d-point (elt np 1) :depth-test t)
-               (send *viewer* :viewsurface :3d-point (elt np 2) :depth-test t)
-               (send *viewer* :viewsurface :3d-line (elt np 1)(elt np 2) :depth-test t)
-               (if (< (car np) 200;avoid-collision-distance
-                        )
-                   (progn
-                     (send *viewer* :viewsurface :line-width 4)
-                     (send *viewer* :viewsurface :point-size 6))
-                 (progn
-                   (send *viewer* :viewsurface :line-width 2)
-                   (send *viewer* :viewsurface :point-size 3)))
-               (send *viewer* :viewsurface :color #f(1.0 0.0 1.0))
-               (send *viewer* :viewsurface :3d-line (elt np 1)(elt np 2) :depth-test nil)
-               (send *viewer* :viewsurface :3d-point (elt np 1) :depth-test nil)
-               (send *viewer* :viewsurface :3d-point (elt np 2) :depth-test nil)
-               (when (<= (car np) 1.0)
-                 (dolist (obj (elt pair-list (car (last np))))
-                   (when (and (derivedp obj bodyset-link)
-                              (eq (send obj :analysis-level) :coords))
-                     (send-all (obj . geo::bodies) :worldcoords))
-                   (dolist (e (cdr (send obj :edges)))
-                     (send *viewer* :viewsurface :3d-line
-                           (e . pvert) (e . nvert) :depth-test t))))
-               )
-             (send *viewer* :viewsurface :line-width pwidth)
-             (send *viewer* :viewsurface :point-size psize)
-             (send *viewer* :viewsurface :color pcolor)
-             ))
+         (send self :draw-collision-debug-view)
          (dotimes (i (length target-coords))
            (send-message (elt move-target i) cascaded-link :draw-on :flush nil :size 100)
            (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0)))
@@ -1829,7 +1835,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.106  2009-12-09 09:39:37  nozawa
+;;; Revision 1.107  2009-12-27 08:15:04  ueda
+;;; make :draw-collision-debug-view method. because debug drawing in :inverse-kinematics-loop is too long and ugly.
+;;;
+;;; Revision 1.106  2009/12/09 09:39:37  nozawa
 ;;; add keyword argument to :calc-jacobian-from-link-list in :inverse-kinematics-loop ;; translation-axis, rotation-axis and move-target
 ;;;
 ;;; Revision 1.105  2009/11/28 03:15:22  nozawa
