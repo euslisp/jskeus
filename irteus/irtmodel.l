@@ -749,7 +749,7 @@
               (t
                (warn "unknown joint type ~A~%" j)))
              ) ;; when
-           (setq row (send self :calc-target-axis-dimension
+           (incf row (send self :calc-target-axis-dimension
 			   rotation-axis translation-axis))
            )) ;; dotimes
        (cond
@@ -1885,7 +1885,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.111  2009-12-27 09:13:41  ueda
+;;; Revision 1.112  2009-12-31 14:33:28  nozawa
+;;; fix count of row in :calc-jacobian-from-link-list ;; in previous revision r1.111, link-list which length is over 3 doesn't work
+;;;
+;;; Revision 1.111  2009/12/27 09:13:41  ueda
 ;;; add utility macro with-difference-position-and-rotation and with-difference-positions-and-rotations
 ;;;
 ;;; Revision 1.110  2009-12-27 08:56:03  ueda
