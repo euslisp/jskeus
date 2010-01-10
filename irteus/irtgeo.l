@@ -330,7 +330,8 @@
   (let ((hs (send f :holes))
         d vl mind minv minh r)
     (dolist (h hs)
-      (setq vl (mapjoin #'cons (cdr (send f :vertices)) (cdr (send h :vertices))))
+      (setq vl (user::mapjoin #'cons
+                 (cdr (send f :vertices)) (cdr (send h :vertices))))s
       (dolist (v vl)
         ;; check if there are no intersection vertices
         (setq 
@@ -372,7 +373,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.14  2009-12-26 15:24:24  eus
+;;; Revision 1.15  2010-01-10 10:57:05  ueda
+;;; fix to write mapjoin's package
+;;;
+;;; Revision 1.14  2009/12/26 15:24:24  eus
 ;;; bug fix face-to-triangle 'bad face' error if triangle assigned
 ;;;
 ;;; Revision 1.13  2009/12/09 06:03:32  k-okada
