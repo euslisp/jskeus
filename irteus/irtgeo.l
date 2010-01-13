@@ -330,8 +330,7 @@
   (let ((hs (send f :holes))
         d vl mind minv minh r)
     (dolist (h hs)
-      (setq vl (user::mapjoin #'cons
-                 (cdr (send f :vertices)) (cdr (send h :vertices))))s
+      (setq vl (user::mapjoin #'cons (cdr (send f :vertices)) (cdr (send h :vertices))))
       (dolist (v vl)
         ;; check if there are no intersection vertices
         (setq 
@@ -373,7 +372,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.15  2010-01-10 10:57:05  ueda
+;;; Revision 1.16  2010-01-13 01:43:47  k-okada
+;;; fix typo, check with cvs -r 1.14 1.14 irtgeo.l
+;;;
+;;; Revision 1.15  2010/01/10 10:57:05  ueda
 ;;; fix to write mapjoin's package
 ;;;
 ;;; Revision 1.14  2009/12/26 15:24:24  eus
