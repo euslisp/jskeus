@@ -812,12 +812,6 @@
    (if l (setq collision-avoidance-links l)) collision-avoidance-links)
   (:collision-avoidance-link-pair-from-link-list
     (link-list &key obstacles ((:collision-avoidance-links collision-links) collision-avoidance-links) debug)
-    ;; link-list -> both list and atom OK.
-    (if (not (atom (car link-list)))
-	(let ((ll (mapcar #'(lambda (x) (send self :collision-avoidance-link-pair-from-link-list x)) link-list)) ret)
-	  (setq ret (reduce #'append ll))
-	  (if (= (length link-list) 1) (car ret) ret)
-	  )
    (let* ((parent-links
            (mapcar
             #'(lambda (ll)
@@ -863,7 +857,7 @@
          (if (elt index-links i)
              (dolist (o obstacles)
                (push (list (elt collision-links i) o) ret)))))
-     ret)))
+     ret))
   (:collision-avoidance-calc-distance
    (&rest args
 	  &key union-link-list (warnp t)
@@ -1107,7 +1101,7 @@
               (avoid-collision-null-gain 1.0)
               (avoid-collision-joint-gain 1.0)
               ((:collision-avoidance-link-pair pair-list)
-               (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
+               (send self :collision-avoidance-link-pair-from-link-list union-link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
               (tmp-len (instantiate float-vector fik-len))
               (tmp-len2 (instantiate float-vector fik-len))
               (debug-view) (jacobi)
@@ -1901,7 +1895,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.120  2010-01-14 11:47:59  k-okada
+;;; Revision 1.121  2010-01-14 12:06:18  k-okada
+;;; fix :collision-avoidance-link-pair-from-link-list
+;;;
+;;; Revision 1.120  2010/01/14 11:47:59  k-okada
 ;;; fix global variables
 ;;;
 ;;; Revision 1.119  2010/01/14 11:45:42  k-okada
