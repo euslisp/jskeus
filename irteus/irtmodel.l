@@ -1017,6 +1017,12 @@
 
      (setq I-J#J (m- tmp-mcc (m* jacobi# jacobi tmp-mcc2) tmp-mcc))
      (setq ddav-col (transform I-J#J dav-col))
+     (when (and debug-view (not (memq :no-message debug-view)))
+       (warn "coljnt:")
+       (dotimes (i fik-len) (warn "~7,3f " (elt dav-col i))) (warn "~%")
+       (warn "colnul:")
+       (dotimes (i fik-len) (warn "~7,3f " (elt ddav-col i))) (warn "~%"))
+
      (dotimes (i fik-len) (setf (elt dav-col i)
                             (+ (* avoid-collision-joint-gain (elt dav-col i))
                                (* avoid-collision-null-gain (elt ddav-col i)))))
@@ -1882,7 +1888,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.114  2010-01-14 08:49:47  k-okada
+;;; Revision 1.115  2010-01-14 09:17:43  k-okada
+;;; add debug message
+;;;
+;;; Revision 1.114  2010/01/14 08:49:47  k-okada
 ;;; add calc-union-link-list
 ;;;
 ;;; Revision 1.113  2010/01/14 08:27:54  k-okada
