@@ -820,53 +820,57 @@
    (&optional l)
    (if l (setq collision-avoidance-links l)) collision-avoidance-links)
   (:collision-avoidance-link-pair-from-link-list
-    (link-list &key obstacles ((:collision-avoidance-links collision-links) collision-avoidance-links) debug)
-   (let* ((parent-links
-           (mapcar
-            #'(lambda (ll)
-                (let ((l ll))
-                  (while (and l (send l :parent-link)
-                              (eps= (distance (send ll :worldpos)
-                                              (send (send l :parent-link) :worldpos)) 0))
-                    (setq l (send l :parent-link)))
-                  (send l :parent-link)))
-            collision-links))
-          (valid-link-list
-           (subseq
-            link-list
-            (let ((i 1))
-              (while (eps= (distance (send (elt link-list 0) :worldpos)
-                                     (send (elt link-list i) :worldpos)) 0.0)
-                (incf i)) i)))
-          (index-links
-           (mapcar #'(lambda (l) (position l valid-link-list)) collision-links))
-          (len (length collision-links))
-          i0 ret)
-     (when (and debug (not (memq :no-message debug)))
-       (warn "collision-links : ~A~%" (send-all collision-links :name))
-       (warn "parnet-links    : ~A~%" (send-all parent-links :name))
-       (warn "valid-link-list : ~A~%" (send-all valid-link-list :name))
-       (warn "index-links     : ~A~%" index-links))
-     (dotimes (i len)
-       (do ((j (1+ i) (1+ j)))
-           ((>= j len))
-           (if (and (or (setq i0 (elt index-links i))
-                        (elt index-links j))
-                    (not (eq (elt parent-links i)
-                             (elt collision-links j)))
-                    (not (eq (elt parent-links j)
-                             (elt collision-links i)))
-                    (not (eq (elt parent-links j)
-                             (elt parent-links i))))
-               (push (list (elt collision-links (if i0 i j))
-                           (elt collision-links (if i0 j i))) ret))))
-     (when obstacles
-       (if (atom obstacles) (setq obstacles (list obstacles)))
-       (dotimes (i len)
-         (if (elt index-links i)
-             (dolist (o obstacles)
-               (push (list (elt collision-links i) o) ret)))))
-     ret))
+    (link-lists &key obstacles ((:collision-avoidance-links collision-links) collision-avoidance-links) debug)
+    (let* ((parent-links
+            (mapcar
+             #'(lambda (ll)
+                 (let ((l ll))
+                   (while (and l (send l :parent-link)
+                               (eps= (distance (send ll :worldpos)
+                                               (send (send l :parent-link) :worldpos)) 0))
+                     (setq l (send l :parent-link)))
+                   (send l :parent-link)))
+             collision-links))
+           link-list valid-link-list index-links
+           (len (length collision-links))
+           i0 ret)
+      (if (atom (car link-lists)) (setq link-lists (list link-lists)))
+      (when (and debug (not (memq :no-message debug)))
+        (warn "collision-links : ~A~%" (send-all collision-links :name))
+        (warn "parnet-links    : ~A~%" (send-all parent-links :name)))
+      (dolist (link-list link-lists)
+        (setq valid-link-list
+              (subseq
+               link-list
+               (let ((i 1))
+                 (while (eps= (distance (send (elt link-list 0) :worldpos)
+                                        (send (elt link-list i) :worldpos)) 0.0)
+                   (incf i)) i)))
+        (setq index-links
+              (mapcar #'(lambda (l) (position l valid-link-list)) collision-links))
+        (when (and debug (not (memq :no-message debug)))
+          (warn "valid-link-list : ~A~%" (send-all valid-link-list :name))
+          (warn "index-links     : ~A~%" index-links))
+        (dotimes (i len)
+          (do ((j (1+ i) (1+ j)))
+              ((>= j len))
+              (if (and (or (setq i0 (elt index-links i))
+                           (elt index-links j))
+                       (not (eq (elt parent-links i)
+                                (elt collision-links j)))
+                       (not (eq (elt parent-links j)
+                                (elt collision-links i)))
+                       (not (eq (elt parent-links j)
+                                (elt parent-links i))))
+                  (push (list (elt collision-links (if i0 i j))
+                              (elt collision-links (if i0 j i))) ret))))
+        (when obstacles
+          (if (atom obstacles) (setq obstacles (list obstacles)))
+          (dotimes (i len)
+            (if (elt index-links i)
+                (dolist (o obstacles)
+                  (push (list (elt collision-links i) o) ret))))))
+      ret))
   (:collision-avoidance-calc-distance
    (&rest args
 	  &key union-link-list (warnp t)
@@ -1107,7 +1111,7 @@
               (avoid-collision-null-gain 1.0)
               (avoid-collision-joint-gain 1.0)
               ((:collision-avoidance-link-pair pair-list)
-               (send self :collision-avoidance-link-pair-from-link-list union-link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
+               (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
               (tmp-len (instantiate float-vector fik-len))
               (tmp-len2 (instantiate float-vector fik-len))
               (debug-view) (jacobi)
@@ -1901,7 +1905,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.122  2010-01-14 12:10:00  k-okada
+;;; Revision 1.123  2010-01-14 13:51:19  k-okada
+;;; fix :collision-avoidance-link-pair-from-link-list
+;;;
+;;; Revision 1.122  2010/01/14 12:10:00  k-okada
 ;;; change :  q = f(d) qca + {1-f(d)} J# b + N W y
 ;;;
 ;;; Revision 1.121  2010/01/14 12:06:18  k-okada
