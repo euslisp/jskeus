@@ -1019,9 +1019,13 @@
      (setq ddav-col (transform I-J#J dav-col))
      (when (and debug-view (not (memq :no-message debug-view)))
        (warn "coljnt:")
-       (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt dav-col i)))) (warn "~%")
+       (dotimes (i fik-len) 
+         (warn "~7,3f " (rad2deg (* avoid-collision-joint-gain  (elt dav-col i)))))
+       (warn "~%")
        (warn "colnul:")
-       (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt ddav-col i)))) (warn "~%"))
+       (dotimes (i fik-len)
+         (warn "~7,3f " (rad2deg (* avoid-collision-null-gain (elt ddav-col i)))))
+       (warn "~%"))
 
      (dotimes (i fik-len) (setf (elt dav-col i)
                             (+ (* avoid-collision-joint-gain (elt dav-col i))
@@ -1888,7 +1892,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.116  2010-01-14 09:22:56  k-okada
+;;; Revision 1.117  2010-01-14 09:40:12  k-okada
+;;; update debug message
+;;;
+;;; Revision 1.116  2010/01/14 09:22:56  k-okada
 ;;; use [deg] unit for debug message
 ;;;
 ;;; Revision 1.115  2010/01/14 09:17:43  k-okada
