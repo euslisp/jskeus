@@ -1333,6 +1333,7 @@
             (psize (send *viewer* :viewsurface :point-size))
             (pcolor (send *viewer* :viewsurface :color))
             (pair-list (send self :get :collision-pair-list))
+            (min-distance (car (elt (send self :get :collision-distance) 0)))
             np)
         (send *viewer* :viewsurface :color #f(1 0 0))
         (send *viewer* :viewsurface :line-width 1)
@@ -1357,7 +1358,8 @@
             (progn
               (send *viewer* :viewsurface :line-width 2)
               (send *viewer* :viewsurface :point-size 3)))
-          (send *viewer* :viewsurface :color #f(1.0 0.0 1.0))
+          (send *viewer* :viewsurface :color
+                (if (eps= min-distance (car np) 1.0) #f(1.0 0.0 0.0) #f(1.0 0.0 1.0)))
           (send *viewer* :viewsurface :3d-line (elt np 1)(elt np 2)
                 :depth-test nil)
           (send *viewer* :viewsurface :3d-point (elt np 1) :depth-test nil)
@@ -1899,7 +1901,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.118  2010-01-14 11:42:15  k-okada
+;;; Revision 1.119  2010-01-14 11:45:42  k-okada
+;;; draw min-distance collision-pair in red
+;;;
+;;; Revision 1.118  2010/01/14 11:42:15  k-okada
 ;;; add col-dav when twe collision-link-pair has same min-distance
 ;;;
 ;;; Revision 1.117  2010/01/14 09:40:12  k-okada
