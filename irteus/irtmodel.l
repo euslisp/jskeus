@@ -1440,18 +1440,21 @@
                (dif-rot (elt dif-rot i))
                (rotation-axis (elt rotation-axis i))
                (translation-axis (elt translation-axis i))
-               (thre (elt thre i)) (rthre (elt rthre i)))
+               (thre (elt thre i)) (rthre (elt rthre i))
+               (tmp-dim (instantiate float-vector (send self :calc-target-axis-dimension rotation-axis translation-axis)))
+               vel-p vel-r)
+           (setq vel-p (send self :calc-vel-from-pos dif-pos translation-axis))
+           (setq vel-r (send self :calc-vel-from-rot dif-rot rotation-axis))
            (when (and debug-view (not (memq :no-message debug-view)))
-             (warn ";; ~3d: dif-pos : ~a/(~a/~A), dif-rot : ~a/(~a/~A)~%"
-                   loop dif-pos (norm dif-pos) thre dif-rot
-                   (norm dif-rot) rthre))
+             (warn ";; ~3d: vel-pos : ~a/(~a/~A), vel-rot : ~a/(~a/~A)~%"
+                   loop (scale 1000.0 vel-p) (* 1000.0 (norm vel-p)) thre vel-r (norm vel-r) rthre))
            (setq success (and success
-                              (> loop (/ stop 10))
-                              (if translation-axis (< (norm dif-pos) thre) t)
-                              (if rotation-axis (< (norm dif-rot) rthre) t)))
-           (send* self :calc-vel-from-dif-pos-rot
-                 dif-pos dif-rot translation-axis rotation-axis
-                 :tmp-dim (elt tmp-dims i) method-args)
+                              (>= loop (/ stop 10))
+                              (if translation-axis (< (* 1000.0 (norm vel-p)) thre) t)
+                              (if rotation-axis (< (norm vel-r) rthre) t)))
+           (setq tmp-dim (elt tmp-dims i))
+           (dotimes (i (length vel-p)) (setf (elt tmp-dim i) (elt vel-p i)))
+           (dotimes (i (length vel-r)) (setf (elt tmp-dim (+ i (length vel-p))) (elt vel-r i)))
            ))
        (dotimes (i (length tmp-dims))
          (dotimes (j (length (elt tmp-dims i)))
@@ -1459,7 +1462,7 @@
          (incf vec-count (length (elt tmp-dims i))))
        
        ;; check loop end
-       (if (and (> loop (/ stop 10)) success)
+       (if success
            (return-from :inverse-kinematics-loop :ik-succeed))
        (when (and debug-view (not (memq :no-clear debug-view)) *viewer*)
          (send *viewer* :viewsurface :clear))
@@ -1625,17 +1628,16 @@
          (if c0 (send self :newcoords c0))
 	 nil))
      ))
-  (:calc-vel-from-dif-pos-rot
-   (dif-pos dif-rot translation-axis rotation-axis
+  (:calc-vel-from-pos
+   (dif-pos translation-axis
     &rest args
-    &key (p-limit 100.0) (r-limit 0.5)
+    &key (p-limit 100.0)
          (tmp-v0 (instantiate float-vector 0))
          (tmp-v1 (instantiate float-vector 1))
          (tmp-v2 (instantiate float-vector 2))
          (tmp-v3 (instantiate float-vector 3))
-         (tmp-dim (instantiate float-vector (send self :calc-target-axis-dimension rotation-axis translation-axis)))
     &allow-other-keys)
-   (let (vel-p vel-r)
+   (let (vel-p)
      ;; limitation and unit system contvert
      ;; pos
      (if (> (norm dif-pos) p-limit)
@@ -1643,14 +1645,24 @@
      (setq dif-pos (scale 0.001 dif-pos tmp-v3)) ;; scale [mm] -> [m]
      (setq vel-p (calc-dif-with-axis dif-pos translation-axis
 				     tmp-v0 tmp-v1 tmp-v2))
-     (dotimes (i (length vel-p)) (setf (elt tmp-dim i) (elt vel-p i)))
+     vel-p))
+  (:calc-vel-from-rot
+   (dif-rot rotation-axis
+    &rest args
+    &key (r-limit 0.5)
+         (tmp-v0 (instantiate float-vector 0))
+         (tmp-v1 (instantiate float-vector 1))
+         (tmp-v2 (instantiate float-vector 2))
+         (tmp-v3 (instantiate float-vector 3))
+    &allow-other-keys)
+   (let (vel-r)
+     ;; limitation and unit system contvert
      ;; rot
      (if (> (norm dif-rot) r-limit)
 	 (setq dif-rot (scale r-limit (normalize-vector dif-rot tmp-v3) tmp-v3)))
      (setq vel-r (calc-dif-with-axis dif-rot rotation-axis
 				     tmp-v0 tmp-v1 tmp-v2))
-     (dotimes (i (length vel-r)) (setf (elt tmp-dim (+ i (length vel-p))) (elt vel-r i)))
-     tmp-dim))
+     vel-r))
   (:calc-torque
    (&key (dt 0.005) ;; dt [s]
          (debug-view nil) (av (send self :angle-vector)))
@@ -1905,7 +1917,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.123  2010-01-14 13:51:19  k-okada
+;;; Revision 1.124  2010-01-14 15:07:14  k-okada
+;;; :calc-vel-from-dif-pos-rot -> calc-vel-from-dif/calc-vel-from-rot
+;;;
+;;; Revision 1.123  2010/01/14 13:51:19  k-okada
 ;;; fix :collision-avoidance-link-pair-from-link-list
 ;;;
 ;;; Revision 1.122  2010/01/14 12:10:00  k-okada
