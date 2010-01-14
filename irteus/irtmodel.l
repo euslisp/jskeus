@@ -783,7 +783,7 @@
        (warn "x     :")
        (dotimes (i (length union-vel)) (warn "~7,3f " (elt union-vel i))) (warn "~%")
        (warn "J#x   :")
-       (dotimes (i fik-len) (warn "~7,3f " (elt J#x i))) (warn "~%"))
+       (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt J#x i)))) (warn "~%"))
 
      ;; if use null space
      (when (and (vectorp null-space)
@@ -803,9 +803,9 @@
        (v+ J#x (transform wmat (transform I-J#J null-space tmp-len2) tmp-len2) J#x)
        (when (and debug-view (not (memq :no-message debug-view)))
          (warn "Ny    :")
-         (dotimes (i fik-len) (warn "~7,3f " (elt tmp-len2 i))) (warn "~%")
+         (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt tmp-len2 i)))) (warn "~%")
          (warn "dav   :")
-         (dotimes (i fik-len) (warn "~7,3f " (elt J#x i))) (warn "~%")))
+         (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt J#x i)))) (warn "~%")))
      J#x))
   (:collision-avoidance-links
    (&optional l)
@@ -1019,9 +1019,9 @@
      (setq ddav-col (transform I-J#J dav-col))
      (when (and debug-view (not (memq :no-message debug-view)))
        (warn "coljnt:")
-       (dotimes (i fik-len) (warn "~7,3f " (elt dav-col i))) (warn "~%")
+       (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt dav-col i)))) (warn "~%")
        (warn "colnul:")
-       (dotimes (i fik-len) (warn "~7,3f " (elt ddav-col i))) (warn "~%"))
+       (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt ddav-col i)))) (warn "~%"))
 
      (dotimes (i fik-len) (setf (elt dav-col i)
                             (+ (* avoid-collision-joint-gain (elt dav-col i))
@@ -1180,7 +1180,7 @@
                 joint-angle-limit-nspace tmp-len2))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "nspace:")
-	 (dotimes (i fik-len) (warn "~7,3f " (elt null-space-joint-limit i))) (warn "~%")))
+	 (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt null-space-joint-limit i)))) (warn "~%")))
      ;;
      ;; angle-speed-collision-avoidance: avoiding self collision
      ;;
@@ -1228,7 +1228,7 @@
 		    0.0)))
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "colvel:")
-	 (dotimes (i fik-len) (warn "~7,3f " (elt angle-speed-collision-avoidance i))) (warn "~%")
+	 (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt angle-speed-collision-avoidance i)))) (warn "~%")
          (warn "blend :~7,3f~%" angle-speed-collision-blending)))
      (if (listp null-space) (setq null-space (eval null-space)))
      (if null-space
@@ -1888,7 +1888,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.115  2010-01-14 09:17:43  k-okada
+;;; Revision 1.116  2010-01-14 09:22:56  k-okada
+;;; use [deg] unit for debug message
+;;;
+;;; Revision 1.115  2010/01/14 09:17:43  k-okada
 ;;; add debug message
 ;;;
 ;;; Revision 1.114  2010/01/14 08:49:47  k-okada
