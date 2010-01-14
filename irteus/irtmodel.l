@@ -480,16 +480,16 @@
 	     ((:xy :yx :yz :zy :zx :xz) (decf dim 2))
 	     (nil (decf dim 3))))
      dim))
+  (:calc-union-link-list
+   (link-list)
+   (cond
+    ((atom (car link-list))   link-list)
+    ((= (length link-list) 1) (car link-list))
+    (t                        (reduce #'union link-list))))
   (:calc-target-joint-dimension
    (link-list)
    ;; link-list -> both list of link-list and atom of link-list OK.
-   (cond
-    ((atom (car link-list))
-     (calc-target-joint-dimension (send-all link-list :joint)))
-    ((= (length link-list) 1)
-     (calc-target-joint-dimension (send-all (car link-list) :joint)))
-    (t (calc-target-joint-dimension (send-all (reduce #'union link-list) :joint)))
-    ))
+   (calc-target-joint-dimension (send-all (send self :calc-union-link-list link-list) :joint)))
   (:calc-inverse-jacobian
    (jacobi &rest args
     &key
@@ -674,13 +674,8 @@
 	  j)
      (unless fik (setq fik (make-matrix dim fik-len)))
 ;;
-     (cond
-      ((atom (car link-list))
-       (setq union-link-list link-list
-	     link-list (list link-list)))
-      ((= (length link-list) 1)
-       (setq union-link-list (car link-list)))
-      (t (setq union-link-list (reduce #'union link-list))))
+     (setq union-link-list (send self :calc-union-link-list link-list))
+     (if (atom (car link-list)) (setq link-list (list link-list)))
      (if (atom move-target) (setq move-target (list move-target)))
      (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
      (if (atom translation-axis) (setq translation-axis (list translation-axis)))
@@ -1377,10 +1372,7 @@
    (let (tmp-dim tmp-dims (vec-count 0) (success t) jacobi
          (method-args (nconc args ik-args)))
        (if (null union-link-list)
-           (setq union-link-list (cond
-                                  ((atom (car link-list)) link-list)
-                                  ((= (length link-list) 1) (car link-list))
-                                  (t (reduce #'union link-list)))))
+           (setq union-link-list (send self :calc-union-link-list link-list)))
        ;; atom -> list
        (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
        (if (and debug-view (not (equal debug-view :no-clear)) (boundp '*viewer*))
@@ -1890,7 +1882,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.113  2010-01-14 08:27:54  k-okada
+;;; Revision 1.114  2010-01-14 08:49:47  k-okada
+;;; add calc-union-link-list
+;;;
+;;; Revision 1.113  2010/01/14 08:27:54  k-okada
 ;;; add debug message
 ;;;
 ;;; Revision 1.112  2009/12/31 14:33:28  nozawa
