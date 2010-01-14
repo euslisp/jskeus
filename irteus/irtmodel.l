@@ -805,7 +805,12 @@
        ;; add null space
        (if (null wmat) (setq wmat (make-matrix fik-len fik-len)))
        (dotimes (i fik-len) (setf (aref wmat i i) (aref weight i)))
-       (v+ J#x (transform wmat (transform I-J#J null-space tmp-len2) tmp-len2) J#x))
+       (v+ J#x (transform wmat (transform I-J#J null-space tmp-len2) tmp-len2) J#x)
+       (when (and debug-view (not (memq :no-message debug-view)))
+         (warn "Ny    :")
+         (dotimes (i fik-len) (warn "~7,3f " (elt tmp-len2 i))) (warn "~%")
+         (warn "dav   :")
+         (dotimes (i fik-len) (warn "~7,3f " (elt J#x i))) (warn "~%")))
      J#x))
   (:collision-avoidance-links
    (&optional l)
@@ -987,7 +992,7 @@
      (send self :put :collision-pair-list pair-list)
      (when (and debug-view (not (memq :no-message debug-view)))
        (let ((v (normalize-vector (v- (elt np 1) (elt np 2)))))
-         (warn "min-distance : ~7,3f #f(" min-distance)
+         (warn "min-distance : ~7,3f(<~7,3f) #f(" min-distance avoid-collision-distance)
          (dotimes (i 3) (warn "~7,3f " (elt v i)))
          (warn ") ~A~%" (send-all pair :name))))
      (if (>= min-distance avoid-collision-distance)
@@ -1223,7 +1228,7 @@
        (when (and debug-view (not (memq :no-message debug-view)))
 	 (warn "colvel:")
 	 (dotimes (i fik-len) (warn "~7,3f " (elt angle-speed-collision-avoidance i))) (warn "~%")
-         (warn "belnd :~7,3f~%" angle-speed-collision-blending)))
+         (warn "blend :~7,3f~%" angle-speed-collision-blending)))
      (if (listp null-space) (setq null-space (eval null-space)))
      (if null-space
          (setq null-space-joint-limit
@@ -1885,7 +1890,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.112  2009-12-31 14:33:28  nozawa
+;;; Revision 1.113  2010-01-14 08:27:54  k-okada
+;;; add debug message
+;;;
+;;; Revision 1.112  2009/12/31 14:33:28  nozawa
 ;;; fix count of row in :calc-jacobian-from-link-list ;; in previous revision r1.111, link-list which length is over 3 doesn't work
 ;;;
 ;;; Revision 1.111  2009/12/27 09:13:41  ueda
