@@ -978,7 +978,7 @@
             &allow-other-keys)
    (let* ((ret (send* self :collision-avoidance-calc-distance args))
           (pair-len (length pair-list))
-          (n 0) j
+          (n 0) j np pair
           (min-distance (car (elt (send self :get :collision-distance) n)))
 	  (dav-col (instantiate float-vector fik-len))
           drag-coords a-link-list col-link-list col-jacobi I-J#J ddav-col col-args
@@ -1901,7 +1901,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.119  2010-01-14 11:45:42  k-okada
+;;; Revision 1.120  2010-01-14 11:47:59  k-okada
+;;; fix global variables
+;;;
+;;; Revision 1.119  2010/01/14 11:45:42  k-okada
 ;;; draw min-distance collision-pair in red
 ;;;
 ;;; Revision 1.118  2010/01/14 11:42:15  k-okada
