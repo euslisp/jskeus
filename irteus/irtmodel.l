@@ -759,6 +759,8 @@
    (union-vel
     &rest args
     &key
+    angle-speed
+    (angle-speed-blending 0.5)
     jacobi jacobi# null-space debug-view
     weight wmat tmp-len tmp-len2 fik-len tmp-mcc tmp-mcc2
     &allow-other-keys)
@@ -784,6 +786,13 @@
        (dotimes (i (length union-vel)) (warn "~7,3f " (elt union-vel i))) (warn "~%")
        (warn "J#x   :")
        (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt J#x i)))) (warn "~%"))
+     (when angle-speed
+       (setq J#x (midpoint angle-speed-blending J#x angle-speed J#x))
+       (when (and debug-view (not (memq :no-message debug-view)))
+         (warn "aspeed:")
+         (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt angle-speed i)))) (warn "~%")
+         (warn "J#x   :")
+         (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt J#x i)))) (warn "~%")))
 
      ;; if use null space
      (when (and (vectorp null-space)
@@ -1036,8 +1045,6 @@
    (union-vel &rest args
     &key
     union-link-list
-    angle-speed
-    (angle-speed-blending 0.5)
     (angle-speed-limit (/ pi 4)) ;; rad/sec
     (periodic-time 0.05)         ;; sec
     (debug-view nil)
@@ -1048,7 +1055,6 @@
 	 (send *viewer* :viewsurface :clear))
 
      (setq dav (send* self :calc-joint-angle-speed union-vel args))
-     (if angle-speed (midpoint angle-speed-blending dav angle-speed dav))
      (dotimes (i (length dav)) (setq angle-speed-max (max (abs (elt dav i)) angle-speed-max)))
      (if (> (/ angle-speed-max periodic-time) angle-speed-limit)
          (setq gain (/ angle-speed-limit (/ angle-speed-max periodic-time)))
@@ -1895,7 +1901,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.121  2010-01-14 12:06:18  k-okada
+;;; Revision 1.122  2010-01-14 12:10:00  k-okada
+;;; change :  q = f(d) qca + {1-f(d)} J# b + N W y
+;;;
+;;; Revision 1.121  2010/01/14 12:06:18  k-okada
 ;;; fix :collision-avoidance-link-pair-from-link-list
 ;;;
 ;;; Revision 1.120  2010/01/14 11:47:59  k-okada
