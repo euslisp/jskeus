@@ -978,35 +978,42 @@
             &allow-other-keys)
    (let* ((ret (send* self :collision-avoidance-calc-distance args))
           (pair-len (length pair-list))
-          (np (elt (send self :get :collision-distance) 0))
-          (min-distance (car np))
-          (pair (elt pair-list (car (last np))))
+          (n 0) j
+          (min-distance (car (elt (send self :get :collision-distance) n)))
 	  (dav-col (instantiate float-vector fik-len))
-          drag-coords col-link-list col-jacobi I-J#J ddav-col col-args
+          drag-coords a-link-list col-link-list col-jacobi I-J#J ddav-col col-args
           )
      (send self :put :collision-pair-list pair-list)
-     (when (and debug-view (not (memq :no-message debug-view)))
-       (let ((v (normalize-vector (v- (elt np 1) (elt np 2)))))
-         (warn "min-distance : ~7,3f(<~7,3f) #f(" min-distance avoid-collision-distance)
-         (dotimes (i 3) (warn "~7,3f " (elt v i)))
-         (warn ") ~A~%" (send-all pair :name))))
-     (if (>= min-distance avoid-collision-distance)
-         (return-from :collision-avoidance dav-col))
      (if (atom (car link-list)) (setq link-list (list link-list)))
-     (setq link-list (find-if #'(lambda (x) (member (car pair) x :test #'equal)) link-list))
-     (setq col-args (send self :collision-avoidance-args pair link-list))
+     (while (and (eps= min-distance (car (elt (send self :get :collision-distance) n)) 1.0)
+                 (< n pair-len))
+       (setq np (elt (send self :get :collision-distance) n))
+       (setq pair (elt pair-list (car (last np))))
+       (incf n)
+       (when (and debug-view (not (memq :no-message debug-view)))
+         (let ((v (normalize-vector (v- (elt np 1) (elt np 2)))))
+           (warn "min-distance : ~7,3f(<~7,3f) #f(" min-distance avoid-collision-distance)
+           (dotimes (i 3) (warn "~7,3f " (elt v i)))
+           (warn ") ~A~%" (send-all pair :name))))
+       (if (>= min-distance avoid-collision-distance)
+           (return-from :collision-avoidance dav-col))
+       
+       (setq a-link-list (find-if #'(lambda (x) (member (car pair) x :test #'equal)) link-list))
+       (setq col-args (send self :collision-avoidance-args pair a-link-list))
 
-     (setq drag-coords (make-cascoords :pos (elt np 1)))
-     (send (car pair) :assoc drag-coords)
-     (setq col-link-list (send self :link-list (car pair) (car link-list)))
-     (setq col-jacobi (send* self :calc-jacobian-from-link-list
-                             col-link-list :move-target drag-coords
-                             col-args))
-     (send (car pair) :dissoc drag-coords)
-     (setq ddav-col (transform (transpose col-jacobi) (elt ret (car (last np)))))
+       (setq drag-coords (make-cascoords :pos (elt np 1)))
+       (send (car pair) :assoc drag-coords)
+       (setq col-link-list (send self :link-list (car pair) (car a-link-list)))
+       (setq col-jacobi (send* self :calc-jacobian-from-link-list
+                               col-link-list :move-target drag-coords
+                               col-args))
+       (send (car pair) :dissoc drag-coords)
+       (setq ddav-col (transform (transpose col-jacobi) (elt ret (car (last np)))))
      
-     (dotimes (i (length link-list))
-       (setf (elt dav-col (position (elt link-list i) union-link-list :test #'equal) ) (elt ddav-col i)))
+       (dotimes (i (length a-link-list))
+         (setq j (position (elt a-link-list i) union-link-list :test #'equal) )
+         (setf (elt dav-col j) (+ (elt dav-col j) (elt ddav-col i))))
+       )
      (when (or (null jacobi) (null jacobi#))
        (warn ";; ERROR : jacobi or jacobi# are required in :collision-avoidance~%")
        (return-from :collision-avoidance dav-col))
@@ -1892,7 +1899,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.117  2010-01-14 09:40:12  k-okada
+;;; Revision 1.118  2010-01-14 11:42:15  k-okada
+;;; add col-dav when twe collision-link-pair has same min-distance
+;;;
+;;; Revision 1.117  2010/01/14 09:40:12  k-okada
 ;;; update debug message
 ;;;
 ;;; Revision 1.116  2010/01/14 09:22:56  k-okada
