@@ -1513,10 +1513,7 @@
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
    (let* ((loop 0)
-          (union-link-list (cond
-			    ((atom (car link-list)) link-list)
-			    ((= (length link-list) 1) (car link-list))
-			    (t (reduce #'union link-list))))
+          (union-link-list (send self :calc-union-link-list link-list))
           (av0 (send-all (send-all union-link-list :joint) :joint-angle))
           (c0 (unless (send self :parent) (send self :copy-worldcoords)))
 	  dif-pos dif-rot
@@ -1917,7 +1914,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.124  2010-01-14 15:07:14  k-okada
+;;; Revision 1.125  2010-01-15 01:33:43  k-okada
+;;; use :calc-union-link-list in :inverse-kinematics
+;;;
+;;; Revision 1.124  2010/01/14 15:07:14  k-okada
 ;;; :calc-vel-from-dif-pos-rot -> calc-vel-from-dif/calc-vel-from-rot
 ;;;
 ;;; Revision 1.123  2010/01/14 13:51:19  k-okada
