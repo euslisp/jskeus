@@ -1053,7 +1053,7 @@
     (periodic-time 0.05)         ;; sec
     (debug-view nil)
     &allow-other-keys)
-   (let (dav dtheta j (ret t) (angle-speed-max 0) gain)
+   (let (dav dtheta j (angle-speed-max 0) gain)
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
      (if (and debug-view (not (equal debug-view :no-clear)) (boundp '*viewer*))
 	 (send *viewer* :viewsurface :clear))
@@ -1097,7 +1097,7 @@
            (setq dtheta (scale gain dtheta dtheta))
          (setq dtheta (* gain dtheta)))
        (send (elt union-link-list l) :joint :joint-angle dtheta :relative t))
-     ret))
+     t))
   (:move-joints-avoidance
    (union-vel &rest args
               &key
@@ -1124,10 +1124,10 @@
           null-space-collision-avoidance
           angle-speed-collision-avoidance
           (angle-speed-collision-blending 0.0) min-distance
-          (ret t) jacobi#)
+          jacobi#)
      (when (null jacobi)
        (warn ";; ERROR : jacobi is required in :move-joints-avoidance~%")
-       (return-from :move-joints-avoidance ret))
+       (return-from :move-joints-avoidance t))
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
      (unless (get self :joint-angle-limit-weight-old)
        (setf (get self :joint-angle-limit-weight-old) (make-hash-table)))
@@ -1271,16 +1271,15 @@
      ;; Singularity Robustness for Robot Manipulator Control"
      ;; J. Dyn. Sys., Meas., Control  1986. vol 108, Issue 3, pp. 163--172.
      ;; 
-     (setq ret
-         (send-message* self cascaded-link
-                        :move-joints union-vel
-                        :union-link-list union-link-list
-                        :null-space null-space-joint-limit
-                        :angle-speed angle-speed-collision-avoidance
-                        :angle-speed-blending angle-speed-collision-blending
-                        :weight weight :jacobi# jacobi#
-                        args))
-     ret))
+     (send-message* self cascaded-link
+		    :move-joints union-vel
+		    :union-link-list union-link-list
+		    :null-space null-space-joint-limit
+		    :angle-speed angle-speed-collision-avoidance
+		    :angle-speed-blending angle-speed-collision-blending
+		    :weight weight :jacobi# jacobi#
+		    args)
+     t))
   ;;
   (:inverse-kinematics-args
    (&rest args &key union-link-list rotation-axis translation-axis
@@ -1429,7 +1428,7 @@
                (length translation-axis) (length rotation-axis)
                (length move-target) (length link-list)
                (length dif-pos) (length dif-rot))
-         (return-from :inverse-kinematics-loop :ik-fail))
+         (return-from :inverse-kinematics-loop :ik-continues))
 
        (if (memq :tmp-dims ik-args)
            (setq tmp-dims (cadr (memq :tmp-dims ik-args)))
@@ -1479,16 +1478,14 @@
        (when (and debug-view (not (memq :no-clear debug-view)) *viewer*)
          (send *viewer* :viewsurface :clear))
        (send self :put :collision-pair-list nil)
-       (setq
-        success
-        (send-message* self cascaded-link
-		       :move-joints-avoidance tmp-dim
-                       :union-link-list union-link-list
-                       :rotation-axis rotation-axis
-                       :translation-axis translation-axis
-                       :jacobi jacobi :debug-view debug-view
-                       ;; buffer for calculation
-                       method-args))
+       (send-message* self cascaded-link
+		      :move-joints-avoidance tmp-dim
+		      :union-link-list union-link-list
+		      :rotation-axis rotation-axis
+		      :translation-axis translation-axis
+		      :jacobi jacobi :debug-view debug-view
+		      ;; buffer for calculation
+		      method-args)
        (when (and debug-view  *viewer*)
          (send *viewer* :draw-objects :clear nil :flush nil)
          ;;
@@ -1500,7 +1497,6 @@
              (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0))))
          (if (not (memq :no-flush debug-view)) (send *viewer* :viewsurface :flush))
          )
-       (unless success (return-from :inverse-kinematics-loop :ik-failed))
        :ik-continues))
   (:inverse-kinematics
    (target-coords &rest args 
@@ -1591,11 +1587,8 @@
                               :ik-args ik-args args))
          (if look-at-target
              (send self :head :look-at (send (car target-coords) :worldpos)))
-         (case success
-           (:ik-failed
-             (setq success nil) (return nil))
-           (:ik-succeed
-             (setq success t) (return nil)))
+         (when (eq success :ik-succeed)
+	   (setq success t) (return nil))
          ))
         ;; update difference
      (dotimes (i (length move-target))
@@ -1926,7 +1919,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.126  2010-01-15 07:11:06  nozawa
+;;; Revision 1.127  2010-01-15 09:03:35  nozawa
+;;; remove unused mode :ik-failed and replace unused return-value ret -> t in :move-joints-avoidance and :move-joints
+;;;
+;;; Revision 1.126  2010/01/15 07:11:06  nozawa
 ;;; add default value for thre, rthre, rotation-axis and translation-axis
 ;;;
 ;;; Revision 1.125  2010/01/15 01:33:43  k-okada
