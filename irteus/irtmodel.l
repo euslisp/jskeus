@@ -1385,8 +1385,20 @@
   (:inverse-kinematics-loop
    (dif-pos dif-rot
     &rest args
-    &key (stop 1) (loop 0) link-list move-target rotation-axis translation-axis
-    thre rthre union-link-list
+    &key (stop 1) (loop 0) link-list move-target
+    (rotation-axis (cond
+		    ((atom move-target) t)
+                    (t (make-list (length move-target) :initial-element t))))
+    (translation-axis (cond
+                       ((atom move-target) t)
+                       (t (make-list (length move-target) :initial-element t))))
+    (thre (cond
+           ((atom move-target) 1)
+           (t (make-list (length move-target) :initial-element 1))))
+    (rthre (cond
+            ((atom move-target) (deg2rad 1))
+            (t (make-list (length move-target) :initial-element (deg2rad 1)))))
+    union-link-list
     target-coords                 ;required for look-at and debug-view
     debug-view ik-args
     &allow-other-keys)
@@ -1914,7 +1926,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.125  2010-01-15 01:33:43  k-okada
+;;; Revision 1.126  2010-01-15 07:11:06  nozawa
+;;; add default value for thre, rthre, rotation-axis and translation-axis
+;;;
+;;; Revision 1.125  2010/01/15 01:33:43  k-okada
 ;;; use :calc-union-link-list in :inverse-kinematics
 ;;;
 ;;; Revision 1.124  2010/01/14 15:07:14  k-okada
