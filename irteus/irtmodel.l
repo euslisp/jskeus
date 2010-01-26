@@ -992,8 +992,8 @@
           )
      (send self :put :collision-pair-list pair-list)
      (if (atom (car link-list)) (setq link-list (list link-list)))
-     (while (and (eps= min-distance (car (elt (send self :get :collision-distance) n)) 1.0)
-                 (< n pair-len))
+     (while (and (< n pair-len)
+                 (eps= min-distance (car (elt (send self :get :collision-distance) n)) 1.0))
        (setq np (elt (send self :get :collision-distance) n))
        (setq pair (elt pair-list (car (last np))))
        (incf n)
@@ -1919,7 +1919,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.127  2010-01-15 09:03:35  nozawa
+;;; Revision 1.128  2010-01-26 17:29:24  eus
+;;; :collision-avoidance fix if sentence
+;;;
+;;; Revision 1.127  2010/01/15 09:03:35  nozawa
 ;;; remove unused mode :ik-failed and replace unused return-value ret -> t in :move-joints-avoidance and :move-joints
 ;;;
 ;;; Revision 1.126  2010/01/15 07:11:06  nozawa
