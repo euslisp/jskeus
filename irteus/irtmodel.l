@@ -1172,8 +1172,8 @@
        (dotimes (i fik-len)
 	 (setf (elt weight i)
 	       (* (elt weight i) 
-		  (if (> (- (elt joint-angle-limit-weight i)
-                            (elt joint-angle-limit-weight-old i)) 0.0)
+		  (if (>=  (- (elt joint-angle-limit-weight i)
+			      (elt joint-angle-limit-weight-old i)) 0.0)
 		      (/ 1.0 (+ 1.0 (elt joint-angle-limit-weight i)))
 		    1.0)))
          (setf (elt weight i) (max 0.001 (elt weight i)))
@@ -1919,7 +1919,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.128  2010-01-26 17:29:24  eus
+;;; Revision 1.129  2010-02-03 08:45:53  nozawa
+;;; fix > to >= ;; original paper is if d|dH/dt| >= 0
+;;;
+;;; Revision 1.128  2010/01/26 17:29:24  eus
 ;;; :collision-avoidance fix if sentence
 ;;;
 ;;; Revision 1.127  2010/01/15 09:03:35  nozawa
