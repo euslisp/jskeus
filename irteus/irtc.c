@@ -35,10 +35,10 @@ static register_irtc()
                       elmtypeof(p->c.ary.entity)==ELM_FLOAT))
 
 /* copy from nr.c */
-static float_t sqrarg;
+static eusfloat_t sqrarg;
 #define SQR(a) ((sqrarg=(a)) == 0.0 ? 0.0 : sqrarg*sqrarg)
 
-static float_t maxarg1, maxarg2;
+static eusfloat_t maxarg1, maxarg2;
 #define FMAX(a,b) (maxarg1=(a),maxarg2=(b),(maxarg1) > (maxarg2) ? (maxarg1) : (maxarg2))
 
 static int iminarg1, iminarg2;
@@ -56,26 +56,26 @@ void nrerror(char error_text[])
   fprintf(stderr,"...now existing to system...\n");
 }
 
-float_t *nr_vector(int nl, int nh)
+eusfloat_t *nr_vector(int nl, int nh)
 {
-  float_t *v;
-  v =(float_t *)malloc((size_t)((nh-nl+1+NR_END)*sizeof(float_t)));
-  if (!v) {nrerror("allocation failure in nr_vector()"); return (float_t*)NULL;}
+  eusfloat_t *v;
+  v =(eusfloat_t *)malloc((size_t)((nh-nl+1+NR_END)*sizeof(eusfloat_t)));
+  if (!v) {nrerror("allocation failure in nr_vector()"); return (eusfloat_t*)NULL;}
   return v-nl+NR_END;
 }
 
-float_t **nr_matrix(int nrl, int nrh, int ncl, int nch)
+eusfloat_t **nr_matrix(int nrl, int nrh, int ncl, int nch)
 {
   int i, nrow=nrh-nrl+1,ncol=nch-ncl+1;
-  float_t **m;
+  eusfloat_t **m;
   
-  m = (float_t **)malloc((size_t)((nrow+NR_END)*sizeof(float_t *)));
-  if (!m) {nrerror("allocation failure 1 in nr_matrix()"); return (float_t**)NULL;}
+  m = (eusfloat_t **)malloc((size_t)((nrow+NR_END)*sizeof(eusfloat_t *)));
+  if (!m) {nrerror("allocation failure 1 in nr_matrix()"); return (eusfloat_t**)NULL;}
   m += NR_END;
   m -= nrl;
 
-  m[nrl]=(float_t *)malloc((size_t)((nrow*ncol+NR_END)*sizeof(float_t)));
-  if (!m[nrl]) {nrerror("allocation failure 2 in nr_matrix()"); return (float_t**)NULL;}
+  m[nrl]=(eusfloat_t *)malloc((size_t)((nrow*ncol+NR_END)*sizeof(eusfloat_t)));
+  if (!m[nrl]) {nrerror("allocation failure 2 in nr_matrix()"); return (eusfloat_t**)NULL;}
   m[nrl] += NR_END;
   m[nrl] -= ncl;
 
@@ -84,12 +84,12 @@ float_t **nr_matrix(int nrl, int nrh, int ncl, int nch)
   return m;
 }
 
-void free_nr_vector(float_t *v, int nl, int nh)
+void free_nr_vector(eusfloat_t *v, int nl, int nh)
 {
   free((FREE_ARG)(v+nl-NR_END));
 }
 
-void free_nr_matrix(float_t **m, int nrl, int nrh, int ncl, int nch)
+void free_nr_matrix(eusfloat_t **m, int nrl, int nrh, int ncl, int nch)
 {
   free((FREE_ARG)(m[nrl]+ncl-NR_END));
   free((FREE_ARG)(m+nrl-NR_END));
@@ -99,19 +99,19 @@ static copymat(dest,src,size)
 pointer dest,src;
 register int size;
 { register int i;
-  register float_t *rv=dest->c.ary.entity->c.fvec.fv;
-  register float_t *mv=src->c.ary.entity->c.fvec.fv;
+  register eusfloat_t *rv=dest->c.ary.entity->c.fvec.fv;
+  register eusfloat_t *mv=src->c.ary.entity->c.fvec.fv;
   size=size*size;
   for (i=0; i<size; i++) rv[i]=mv[i]; }
 
 
 #define TINY 1.0e-20
-void lubksb(float_t **a, int n, int *indx, float_t b[]);
-int  ludcmp(float_t **a, int n, int *indx, float_t *d);
+void lubksb(eusfloat_t **a, int n, int *indx, eusfloat_t b[]);
+int  ludcmp(eusfloat_t **a, int n, int *indx, eusfloat_t *d);
 
-void lubksb(float_t **a, int n, int *indx, float_t b[]) {
+void lubksb(eusfloat_t **a, int n, int *indx, eusfloat_t b[]) {
   int i,ii=0,ip,j;
-  float_t sum;
+  eusfloat_t sum;
 
   for (i=1;i<=n;i++) {
     ip=indx[i];
@@ -129,10 +129,10 @@ void lubksb(float_t **a, int n, int *indx, float_t b[]) {
   }
 }
 
-int ludcmp(float_t **a, int n, int *indx, float_t *d) {
+int ludcmp(eusfloat_t **a, int n, int *indx, eusfloat_t *d) {
   int i,imax,j,k;
-  float_t big,dum,sum,temp;
-  float_t *vv;
+  eusfloat_t big,dum,sum,temp;
+  eusfloat_t *vv;
 
   vv=nr_vector(1,n);
   *d=1.0;
@@ -180,14 +180,14 @@ int ludcmp(float_t **a, int n, int *indx, float_t *d) {
   return 0;
 }
 
-int svdsolve(float_t **a, int m, int n, float_t *b, float_t *x);
-void svbksb(float_t **u, float_t *w, float_t **v, int m, int n, float_t *b, float_t *x);
-int svdcmp(float_t **a, int m, int n, float_t *w, float_t **v);
+int svdsolve(eusfloat_t **a, int m, int n, eusfloat_t *b, eusfloat_t *x);
+void svbksb(eusfloat_t **u, eusfloat_t *w, eusfloat_t **v, int m, int n, eusfloat_t *b, eusfloat_t *x);
+int svdcmp(eusfloat_t **a, int m, int n, eusfloat_t *w, eusfloat_t **v);
 
-int svdsolve(float_t **a, int m, int n, float_t *b, float_t *x)
+int svdsolve(eusfloat_t **a, int m, int n, eusfloat_t *b, eusfloat_t *x)
 {
   int j;
-  float_t **v, *w, wmax, wmin;
+  eusfloat_t **v, *w, wmax, wmin;
   v = nr_matrix(1,n,1,n);
   w = nr_vector(1,n);
   if ( svdcmp(a,m,n,w,v) < 0 ) {
@@ -205,10 +205,10 @@ int svdsolve(float_t **a, int m, int n, float_t *b, float_t *x)
   return 1;
 }
 
-void svbksb(float_t **u, float_t w[], float_t **v, int m, int n, float_t b[], float_t x[])
+void svbksb(eusfloat_t **u, eusfloat_t w[], eusfloat_t **v, int m, int n, eusfloat_t b[], eusfloat_t x[])
 {
   int jj,j,i;
-  float_t s, *tmp;
+  eusfloat_t s, *tmp;
 
   tmp = nr_vector(1,n);
   for (j=1;j<=n;j++){
@@ -227,11 +227,11 @@ void svbksb(float_t **u, float_t w[], float_t **v, int m, int n, float_t b[], fl
   free_nr_vector(tmp,1,n);
 }
 
-int svdcmp(float_t **a, int m, int n, float_t w[], float_t **v)
+int svdcmp(eusfloat_t **a, int m, int n, eusfloat_t w[], eusfloat_t **v)
 {
-  float_t pythag(float_t a, float_t b);
+  eusfloat_t pythag(eusfloat_t a, eusfloat_t b);
   int flag,i,its,j,jj,k,l,nm;
-  float_t anorm,c,f,g,h,s,scale,x,y,z,*rv1;
+  eusfloat_t anorm,c,f,g,h,s,scale,x,y,z,*rv1;
   
   rv1=nr_vector(1,n);
   g=scale=anorm=0.0;
@@ -316,11 +316,11 @@ int svdcmp(float_t **a, int m, int n, float_t w[], float_t **v)
       flag =1;
       for (l=k;l>=1;l--){
 	nm=l-1;
-	if ((float_t)(fabs(rv1[l])+anorm) == anorm){
+	if ((eusfloat_t)(fabs(rv1[l])+anorm) == anorm){
 	  flag=0;
 	  break;
 	}
-	if ((float_t)(fabs(w[nm])+anorm)==anorm) break;
+	if ((eusfloat_t)(fabs(w[nm])+anorm)==anorm) break;
       }
       if (flag){
 	c=0.0;
@@ -328,7 +328,7 @@ int svdcmp(float_t **a, int m, int n, float_t w[], float_t **v)
 	for (i=l;i<=k;i++){
 	  f=s*rv1[i];
 	  rv1[i]=c*rv1[i];
-	  if ((float_t)(fabs(f)+anorm)==anorm) break;
+	  if ((eusfloat_t)(fabs(f)+anorm)==anorm) break;
 	  g=w[i];
 	  h=pythag(f,g);
 	  w[i]=h;
@@ -406,9 +406,9 @@ int svdcmp(float_t **a, int m, int n, float_t w[], float_t **v)
   return 1;
 }
 
-float_t pythag(float_t a, float_t b)
+eusfloat_t pythag(eusfloat_t a, eusfloat_t b)
 {
-  float_t absa, absb;
+  eusfloat_t absa, absb;
   absa=fabs(a);
   absb=fabs(b);
   if (absa > absb) return absa*sqrt(1.0+SQR(absb/absa));
@@ -428,7 +428,7 @@ pointer argv[];
 /* (SV_SOLVE mat vec &optional ret) */
 { 
   pointer a,b,x;
-  float_t **aa, *bb, *xx;
+  eusfloat_t **aa, *bb, *xx;
   int i, j, s;
 
   ckarg2(2,3);
@@ -475,7 +475,7 @@ pointer argv[];
 /* (SV_DECOMPOSE mat) */
 { 
   pointer a,ru,rv,rw, rr;
-  float_t **u, **v, *w, y;
+  eusfloat_t **u, **v, *w, y;
   int c, r, i, j, *idx, k, pc=0;;
 
   ckarg(1);
@@ -549,7 +549,7 @@ pointer argv[];
 /* (LU-SOLVE mat perm bvector [result]) */
 { pointer a,p,b,x;
   int i, j, s;
-  float_t **aa, *cols;
+  eusfloat_t **aa, *cols;
   int *indx;
 
   ckarg2(3,4);
@@ -587,7 +587,7 @@ int n;
 pointer argv[];
 /* (LU-DECOMPOSE mat [result] [tmp-vector]) */
 { pointer a,result,pv;
-  float_t **aa, d;
+  eusfloat_t **aa, d;
   int i, j, s, stat, *indx;
 
   ckarg2(1,3);
@@ -634,7 +634,7 @@ int n;
 pointer argv[];
 { pointer a,result;
   numunion nu;
-  float_t **aa, d;
+  eusfloat_t **aa, d;
   int i, j, s, stat, *indx;
 
   ckarg2(1,2);
@@ -742,8 +742,8 @@ pointer argv[];
  *
  */
 
-int matrix2quaternion(float_t *c, float_t *q){
-  float_t q02, q12, q22, q32;
+int matrix2quaternion(eusfloat_t *c, eusfloat_t *q){
+  eusfloat_t q02, q12, q22, q32;
   q02 = (1 + c[0*3+0] + c[1*3+1] + c[2*3+2]) / 4;
   q12 = (1 + c[0*3+0] - c[1*3+1] - c[2*3+2]) / 4;
   q22 = (1 - c[0*3+0] + c[1*3+1] - c[2*3+2]) / 4;
@@ -776,8 +776,8 @@ int matrix2quaternion(float_t *c, float_t *q){
   }
 }
 
-int quaternion2matrix(float_t *q, float_t *c){
-  float_t q0 = q[0], q1 = q[1], q2 = q[2], q3 = q[3];
+int quaternion2matrix(eusfloat_t *q, eusfloat_t *c){
+  eusfloat_t q0 = q[0], q1 = q[1], q2 = q[2], q3 = q[3];
   // (+ (* q0 q0) (* q1 q1) (- (* q2 q2)) (- (* q3 q3)))
   c[0*3+0] = q0*q0 + q1*q1 - q2*q2 - q3*q3;
   // (* 2 (- (* q1 q2) (* q0 q3)))
@@ -799,9 +799,9 @@ int quaternion2matrix(float_t *q, float_t *c){
 }
 
 
-int quaternion_multiply(float_t *q1, float_t *q2, float_t *q3){
-  float_t q10 = q1[0], q11 = q1[1], q12 = q1[2], q13 = q1[3];
-  float_t q20 = q2[0], q21 = q2[1], q22 = q2[2], q23 = q2[3];
+int quaternion_multiply(eusfloat_t *q1, eusfloat_t *q2, eusfloat_t *q3){
+  eusfloat_t q10 = q1[0], q11 = q1[1], q12 = q1[2], q13 = q1[3];
+  eusfloat_t q20 = q2[0], q21 = q2[1], q22 = q2[2], q23 = q2[3];
   // (+ (* q10 q20) (- (* q11 q21)) (- (* q12 q22)) (- (* q13 q23)))
   q3[0] = q10*q20 - q11*q21 - q12*q22 - q13*q23;
   // (+ (* q10 q21)    (* q11 q20)     (* q12 q23)  (- (* q13 q22)))
@@ -819,8 +819,8 @@ pointer MATTIMES3(ctx,n,argv)
 {
   register int i;
   register pointer p,result;
-  float_t *c1,*c2,*c3;
-  float_t q1[4], q2[4], q3[4], q;
+  eusfloat_t *c1,*c2,*c3;
+  eusfloat_t q1[4], q2[4], q3[4], q;
   
   ckarg2(2,3);
   c1 = argv[0]->c.ary.entity->c.fvec.fv;
@@ -853,7 +853,7 @@ pointer MATPLUS(ctx,n,argv)
 {
   register int i, j, row, col;
   register pointer p,result;
-  float_t *c1,*c2,*c3;
+  eusfloat_t *c1,*c2,*c3;
   
   ckarg2(2,3);
   if (!ismatrix(argv[0]) || !ismatrix(argv[1])) error(E_NOVECTOR);
@@ -887,7 +887,7 @@ pointer MATMINUS(ctx,n,argv)
 {
   register int i, j, row, col;
   register pointer p,result;
-  float_t *c1,*c2,*c3;
+  eusfloat_t *c1,*c2,*c3;
   
   ckarg2(2,3);
   if (!ismatrix(argv[0]) || !ismatrix(argv[1])) error(E_NOVECTOR);
@@ -937,7 +937,10 @@ pointer env;
 /// $Id$
 ///
 /// $Log$
-/// Revision 1.9  2010-02-02 09:50:35  k-okada
+/// Revision 1.10  2010-02-03 07:36:06  k-okada
+/// float_t->eusfloat_t, integer_t->eusinteger_t
+///
+/// Revision 1.9  2010/02/02 09:50:35  k-okada
 /// fix for 64bit eus float->float_t
 ///
 /// Revision 1.8  2009/11/08 04:08:09  inaba
