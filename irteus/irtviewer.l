@@ -193,6 +193,7 @@
    (send self :draw-objects))
   (:draw-objects
    (&rest args)
+   (send viewer :viewsurface :makecurrent)
    (apply #'gl::draw-globjects viewer draw-things args))
   (:objects
    (&rest args)
@@ -280,7 +281,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.7  2009-11-08 10:36:17  k-okada
+;;; Revision 1.8  2010-02-04 01:23:30  k-okada
+;;; :make-current before gl::draw-globjects in irtviewer
+;;;
+;;; Revision 1.7  2009/11/08 10:36:17  k-okada
 ;;; set :name using gensym, for (find-viewer) in send irtviewer :create
 ;;;
 ;;; Revision 1.6  2009/11/08 09:43:12  k-okada
