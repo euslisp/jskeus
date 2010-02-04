@@ -82,6 +82,17 @@
                      seq2))
              seq1))
 
+;; thread pool functions
+(defun need-thread (n &optional (lsize (* 512 1024)) (csize lsize))
+ (let (num thrs)
+   (setq num (- n (length (sys::free-threads))))
+   (when (> num 0)
+     (dotimes (i num)
+       (sys:make-thread 1 lsize csize)
+       (push (sys:thread #'(lambda ())) thrs))
+     (dolist (thr thrs) (sys:wait-thread thr)))))
+
+
 (provide :irtutil "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -89,7 +100,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.6  2009-11-27 11:06:45  k-okada
+;;; Revision 1.7  2010-02-04 02:28:06  k-okada
+;;; define need-thread in irtutil.l
+;;;
+;;; Revision 1.6  2009/11/27 11:06:45  k-okada
 ;;; add mapjoin
 ;;;
 ;;; Revision 1.5  2009/08/11 18:00:31  eus
