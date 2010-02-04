@@ -92,6 +92,56 @@
        (push (sys:thread #'(lambda ())) thrs))
      (dolist (thr thrs) (sys:wait-thread thr)))))
 
+;; thread
+(defun eus-server (&optional (port 6666) &key host)
+  (let ((sp (make-socket-port
+	     (make-socket-address
+	      :host (or host (unix:gethostname))
+	      :domain af_inet
+	      :port port))))
+    (cond
+     ((derivedp sp socket-port)
+      (send *top-selector* :add-port sp
+	    '(lambda (s)
+	       (let ((strm (make-server-socket-stream s)))
+		 (send *top-selector* :add-port strm
+		       '(lambda (s)
+			  (let ((c (read-char s nil nil)))
+			    (cond
+			     ((null c)
+			      (send *top-selector* :remove-port s)
+			      (close s))
+			     (t
+			      (unread-char c s)
+			      (funcall 'lisp::repsel s
+				       ;;"eus-server"
+				       (gensym) nil nil)
+			      ))))
+		       strm)))
+	    sp))
+     (t
+      (error "eus-server")
+      )
+     )
+    ))
+
+(defun connect-server-until-success (host port)
+  (let (s max-port (p port))
+    (setq max-port (+ port 20))
+    (while (and (not (streamp (setq s (connect-server host port))))
+		(< port max-port))
+      (incf port))
+    (cond ((< port max-port)
+	   (warn ";;; Connected server: ~c[31m~a@~a~c[m~%"
+                 #x1b host port #x1b)
+	   s)
+	  (t
+	   (warn ";;; Can't connect server (~c[31m~a@~a-~a~c[m).~%"
+                 #x1b host p (- max-port 1) #x1b
+                 )
+	   nil))
+    ))
+
 
 (provide :irtutil "$Id$")
 
@@ -100,7 +150,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.7  2010-02-04 02:28:06  k-okada
+;;; Revision 1.8  2010-02-04 05:18:40  k-okada
+;;; move from jsk.l to irtutil.l, eus-server, connect-server-until-sucess
+;;;
+;;; Revision 1.7  2010/02/04 02:28:06  k-okada
 ;;; define need-thread in irtutil.l
 ;;;
 ;;; Revision 1.6  2009/11/27 11:06:45  k-okada
