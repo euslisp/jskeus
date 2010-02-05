@@ -125,9 +125,8 @@
      )
     ))
 
-(defun connect-server-until-success (host port)
-  (let (s max-port (p port))
-    (setq max-port (+ port 20))
+(defun connect-server-until-success (host port &key (max-port (+ port 20)))
+  (let (s (p port))
     (while (and (not (streamp (setq s (connect-server host port))))
 		(< port max-port))
       (incf port))
@@ -150,7 +149,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.8  2010-02-04 05:18:40  k-okada
+;;; Revision 1.9  2010-02-05 13:33:28  ueda
+;;; add :max-port keyword to connect-server-until-success
+;;;
+;;; Revision 1.8  2010/02/04 05:18:40  k-okada
 ;;; move from jsk.l to irtutil.l, eus-server, connect-server-until-sucess
 ;;;
 ;;; Revision 1.7  2010/02/04 02:28:06  k-okada
