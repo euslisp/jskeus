@@ -125,7 +125,10 @@
      )
     ))
 
-(defun connect-server-until-success (host port &key (max-port (+ port 20)))
+(defun connect-server-until-success (host port
+                                     &key
+                                     (max-port (+ port 20))
+                                     (return-with-port nil))
   (let (s (p port))
     (while (and (not (streamp (setq s (connect-server host port))))
 		(< port max-port))
@@ -133,7 +136,9 @@
     (cond ((< port max-port)
 	   (warn ";;; Connected server: ~c[31m~a@~a~c[m~%"
                  #x1b host port #x1b)
-	   s)
+           (if return-with-port
+               (list s port)
+             s))
 	  (t
 	   (warn ";;; Can't connect server (~c[31m~a@~a-~a~c[m).~%"
                  #x1b host p (- max-port 1) #x1b
@@ -149,7 +154,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.9  2010-02-05 13:33:28  ueda
+;;; Revision 1.10  2010-02-05 13:34:33  ueda
+;;; add :return-with-port keyword to connect-server-until-success
+;;;
+;;; Revision 1.9  2010/02/05 13:33:28  ueda
 ;;; add :max-port keyword to connect-server-until-success
 ;;;
 ;;; Revision 1.8  2010/02/04 05:18:40  k-okada
