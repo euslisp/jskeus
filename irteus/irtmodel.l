@@ -1839,6 +1839,7 @@
        ((or (eq (send j :name) :torso-waist-p)
 	    (eq (send j :name) :waist-p))
         (setq nang 0)
+        (setq jmax (* 0.1 jmax))
 	(cond
 	 ((= nang jmax) (setq nang (- jmax (deg2rad 1))))
 	 ((= nang jmin) (setq nang (+ jmin (deg2rad 1)))))
@@ -1919,7 +1920,10 @@
 ;;; $Id$
 ;;;
 ;;; $Log$
-;;; Revision 1.129  2010-02-03 08:45:53  nozawa
+;;; Revision 1.130  2010-03-09 15:28:35  k-okada
+;;; special value for :waist-p
+;;;
+;;; Revision 1.129  2010/02/03 08:45:53  nozawa
 ;;; fix > to >= ;; original paper is if d|dH/dt| >= 0
 ;;;
 ;;; Revision 1.128  2010/01/26 17:29:24  eus
