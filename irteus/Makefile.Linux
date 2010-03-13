@@ -34,7 +34,7 @@ ARCH=Linux
 ESFX=
 #SOFLAGS=-g -falign-functions=4 -Xlinker --export-all-symbols --unresolved-symbols=ignore-all
 SOFLAGS=-g -falign-functions=4 -Xlinker --unresolved-symbols=ignore-all
-IMPLIB=-L$(EUSDIR)/$(ARCH)/lib -leusgeo
+IMPLIB=-L$(EUSDIR)/$(ARCH)/lib -leusgeo -lnr
 IMPLIBGL=-L$(EUSDIR)/$(ARCH)/lib -leusgl -L/usr/X11R6/lib -lGLU -lGL -lXext
 IMPLIBJPG=-ljpeg
 EXPLIB=

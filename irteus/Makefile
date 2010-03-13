@@ -39,11 +39,13 @@ IRTEUS=irtmath irtutil pgsql
 IRTEUSG=irtgeo pqp irtmodel irtrobot
 IRTEUSX=irtx eusjpeg
 IRTEUSGL=irtgl irtglrgb irtviewer
+NR=nr
 
 LIBIRTEUS=$(LIBDIR)/$(LPFX)irteus.$(LSFX)
 LIBIRTEUSG=$(LIBDIR)/$(LPFX)irteusg.$(LSFX)
 LIBIRTEUSX=$(LIBDIR)/$(LPFX)irteusx.$(LSFX)
 LIBIRTEUSGL=$(LIBDIR)/$(LPFX)irteusgl.$(LSFX)
+LIBNR=$(LIBDIR)/$(LPFX)nr.$(LSFX)
 
 IRTEUS_OSFX=$(addsuffix .$(OSFX),$(IRTEUS))
 IRTEUS_LSFX=$(addsuffix .$(LSFX),$(IRTEUS))
@@ -75,8 +77,9 @@ IRTEUSGL_H=$(addsuffix .h,$(IRTEUSGL))
 
 IRTCOBJECTS=$(OBJDIR)/irtc.$(OSFX) 
 IRTGCOBJECTS=$(OBJDIR)/CPQP.$(OSFX) $(OBJDIR)/euspqp.$(OSFX)
+NROBJECTS=$(OBJDIR)/nr.$(OSFX)
 
-all: $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSGL) make-link install-irtext.l
+all: $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSGL) $(LIBNR) make-link install-irtext.l
 
 $(LIBIRTEUS): $(IRTEUSOBJS) $(IRTCOBJECTS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUS) $(IRTEUSOBJS) \
@@ -110,6 +113,9 @@ $(IRTEUSGLOBJS):
 
 PQP/$(ARCHDIR)/libPQP-static.a:
 	make -C PQP
+
+$(LIBNR): $(NROBJECTS)
+	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBNR) $(NROBJECTS)
 
 BINS=$(BINDIR)/irteus$(ESFX) $(BINDIR)/irteusgl$(ESFX)
 make-link: $(BINS)
@@ -152,6 +158,8 @@ $(OBJDIR)/CPQP.$(OSFX): CPQP.C
 	$(CXX) $(CXXFLAGS) -c CPQP.C $(OBJOPT)$(OBJDIR)/CPQP.$(OSFX)
 $(OBJDIR)/euspqp.$(OSFX): euspqp.c
 	$(CC) $(CFLAGS) -c euspqp.c $(OBJOPT)$(OBJDIR)/euspqp.$(OSFX)
+$(OBJDIR)/nr.$(OSFX): nr.c
+	$(CC) $(CFLAGS) -c nr.c $(OBJOPT)$(OBJDIR)/nr.$(OSFX)
 
 $(LIBDIR)/jpegmemcd.$(LSFX): $(EUSDIR)/lisp/image/jpeg/jpegmemcd.c
 	(cd $(EUSDIR)/lisp/image/jpeg/;make)
