@@ -79,7 +79,7 @@
     ))
 
 (defun outer-product-matrix (v &optional (ret (unit-matrix 3)))
-  ;; ³°ÀÑ¤Î¹ÔÎó¤òºî¤ë
+  ;; å¤–ç©ã®è¡Œåˆ—ã‚’ä½œã‚‹
   ;; matrix(a) v = a * v 
   ;;  0 -w2 w1
   ;;  w2 0 -w0

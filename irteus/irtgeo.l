@@ -261,7 +261,7 @@
      (send coords :copy-worldcoords self)
      (setq bodies bs)
      (when bodies
-       ;; ¥â¥Ç¥ê¥ó¥°¤Ë¤ª¤±¤ëÀ©Ìó¡§bodies¤ÎÀèÆ¬¤Ë¤Ï¥Ä¥ê¡¼¤Î¥ë¡¼¥È¤òÆş¤ì¤Æ¤ª¤¯
+       ;; ãƒ¢ãƒ‡ãƒªãƒ³ã‚°ã«ãŠã‘ã‚‹åˆ¶ç´„ï¼šbodiesã®å…ˆé ­ã«ã¯ãƒ„ãƒªãƒ¼ã®ãƒ«ãƒ¼ãƒˆã‚’å…¥ã‚Œã¦ãŠã
        (send self :assoc (car bodies)))
      (send self :worldcoords)
      self))
