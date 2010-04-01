@@ -59,31 +59,44 @@
      dif-pos))
   (:difference-rotation
    (coords &key (rotation-axis t))
-   (let (dif-rotmatrix dif-rot a0 a1)
-     (case
-      rotation-axis
-      ((:x :y :z)
-       (setq a0 (send self :axis rotation-axis)
-	     a1 (send coords :axis rotation-axis))
-       (setq dif-rot 
-             (transform (transpose (send self :worldrot))
-                        (scale (acos (v. a0 a1)) (normalize-vector (v* a0 a1))))))
-      ((:xx :yy :zz)
-       (let ((axis (case rotation-axis (:xx :x) (:yy :y) (:zz :z))) a2)
-	 (setq a0 (send self :axis axis)
-	       a1 (send coords :axis axis)
-	       a2 (v- (send coords :axis axis)))
-	 (setq a1 (scale (acos (v. a0 a1)) (normalize-vector (v* a0 a1))))
-	 (setq a2 (scale (acos (v. a0 a2)) (normalize-vector (v* a0 a2))))
-	 (if (< (norm a1) (norm a2)) (setq dif-rot a1) (setq dif-rot a2))
-         (setq dif-rot (transform (transpose (send self :worldrot)) dif-rot))))
-      (nil
-       (setq dif-rot (float-vector 0 0 0)))
-      (t
-       (setq dif-rotmatrix (m* (transpose (send self :worldrot)) (send coords :worldrot)))
-       (setq dif-rot (user::matrix-log dif-rotmatrix))
-       ))
-     dif-rot))
+   (labels
+    ((need-mirror-for-nearest-axis
+      (coords0 coords1 axis)
+      (let* ((a0 (send coords0 :axis axis))
+             (a1 (send coords1 :axis axis))
+             (a1m (v- a1))
+             (dr1 (scale (acos (v. a0 a1)) (normalize-vector (v* a0 a1))))
+             (dr1m (scale (acos (v. a0 a1m)) (normalize-vector (v* a0 a1m)))))
+        (< (norm dr1) (norm dr1m)))))
+    (let (dif-rotmatrix dif-rot a0 a1)
+      (case
+       rotation-axis
+       ((:x :y :z)
+        (setq a0 (send self :axis rotation-axis)
+              a1 (send coords :axis rotation-axis))
+        (setq dif-rot 
+              (transform (transpose (send self :worldrot))
+                         (scale (acos (v. a0 a1)) (normalize-vector (v* a0 a1))))))
+       ((:xx :yy :zz)
+        (let ((axis (case rotation-axis (:xx :x) (:yy :y) (:zz :z))) a2)
+          (setq a2 (send coords :axis axis))
+          (unless (need-mirror-for-nearest-axis self coords axis) (setq a2 (v- a2)))
+          (setq dif-rot (transform (transpose (send self :worldrot))
+                                   (scale (acos (v. a0 a2)) (normalize-vector (v* a0 a2)))))))
+       ((:xm :ym :zm)
+        (let ((rot (send coords :worldrot)))
+          (unless (need-mirror-for-nearest-axis self coords (case rotation-axis (:xm :y) (:ym :z) (:zm :x)))
+            (setq rot (rotate-matrix rot pi (case rotation-axis (:xm :x) (:ym :y) (:zm :z)))))
+          (setq dif-rotmatrix (m* (transpose (send self :worldrot)) rot))
+          (setq dif-rot (user::matrix-log dif-rotmatrix))
+          ))
+       (nil
+        (setq dif-rot (float-vector 0 0 0)))
+       (t
+        (setq dif-rotmatrix (m* (transpose (send self :worldrot)) (send coords :worldrot)))
+        (setq dif-rot (user::matrix-log dif-rotmatrix))
+        ))
+      dif-rot)))
   )
 
 

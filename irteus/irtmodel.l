@@ -1729,6 +1729,8 @@
 	       tmp-v1)
 	   (float-vector (elt dif 1))))
 	(nil (if tmp-v0 tmp-v0 (float-vector)))
+        ((:xm :ym :zm)
+         dif)
 	(t dif)))
 
 (defun calc-target-joint-dimension (joint-list)
