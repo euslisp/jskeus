@@ -82,6 +82,23 @@
                      seq2))
              seq1))
 
+(defun find-extreams (datum &key (key #'identity) (identity #'=) (bigger #'>))
+  "returns the elementS of datum which maximizes key function"
+  (let* ((max-value (funcall key (car datum)))
+         (max-element (car datum))
+         (results (list max-element)))
+    (dolist (d (cdr datum))
+      (let ((tmp (funcall key d)))
+        (cond ((funcall bigger tmp max-value)
+               (setq results (list d))
+               (setf max-value tmp)
+               (setf max-element d))
+              ((funcall identity tmp max-value)
+               (push d results)))))
+    results))
+
+
+
 ;; thread pool functions
 (defun need-thread (n &optional (lsize (* 512 1024)) (csize lsize))
  (let (num thrs)
