@@ -19,23 +19,22 @@
   (apply #'format-org strm format-string (convert-to-relocatable-vector args)))
 
 (defun dump-irtrobot-link (robot ulinks name &optional (ostrm t))
-  (let (link rl ob i)
-    (when name
-      (setq link (find-if #'(lambda (x) (eq name (assoc2 :name x))) ulinks))
-      (setq rl (find-if #'(lambda (x) (eq (send x :name) (assoc2 :name link))) (send robot :links)))
+  (when name
+    (let* ((link (find-if #'(lambda (x) (eq name (assoc2 :name x))) ulinks))
+	   (rl (find-if #'(lambda (x) (eq (send x :name) (assoc2 :name link)))
+			(send robot :links))))
       (when rl
-	
 	(format ostrm "     ;; definition of ~A~%" (send rl :name))
 	(format ostrm "     (setq bc (list~%" )
 	(dolist (b (send rl :bodies))
 	  (format ostrm "       (instance faceset :init :faces (list~%")
 	  (dolist (f (send b :faces))
 	    (format ostrm "         (instance face :init :vertices ~A"
-		    (flatten (or (mapcar #'(lambda (p) 
+		    (flatten (or (mapcar #'(lambda (p)
 					     (send rl :inverse-transform-vector p))
 					 (cdr (send f :vertices)))
 				 (send rl :vertices)
-				 )			     			     
+				 )
 			     ))
 	    (when (send f :holes)
 	      (format ostrm "~%                              :holes (list~%")
@@ -53,46 +52,43 @@
 	  )
 	(format ostrm "       ))~%")
 	(format ostrm "     (dolist (b (cdr bc)) (send (car bc) :assoc b))~%" )
-	(setq i 0)
-	(dolist (b (send rl :bodies))
-	  (format ostrm "     (send (elt bc ~A) :set-color ~A)~%"
-		  i
-		  (cond ((symbolp (get b :face-color))
-			 (get b :face-color))
-			((send (get b :face-color) :name)
-			 (send (get b :face-color) :name))
-			(t
-			 (send (gl::find-color (send (get b :face-color) :ambient)) :name))))
-	  (incf i))
-	(format ostrm "     (setq blink~A (instance bodyset-link :init (make-cascoords) :bodies bc :name ~A :weight ~A :centroid ~A :inertia-tensor ~A))~%"
-		(assoc2 :id link) (send rl :name)
-		(send rl :weight) (send rl :get :centroid) (send rl :get :inertia-tensor))
-	(format ostrm "~%")
-	(dump-irtrobot-link robot ulinks (assoc2 :child link) ostrm)
-	(dump-irtrobot-link robot ulinks (assoc2 :sister link) ostrm)
+	(let ((i 0))
+	  (dolist (b (send rl :bodies))
+	    (format ostrm "     (send (elt bc ~A) :set-color ~A)~%"
+		    i
+		    (cond ((symbolp (get b :face-color))
+			   (get b :face-color))
+			  ((send (get b :face-color) :name)
+			   (send (get b :face-color) :name))
+			  (t
+			   (send (gl::find-color (send (get b :face-color) :ambient)) :name))))
+	    (incf i))
+	  (format ostrm "     (setq blink~A (instance bodyset-link :init (make-cascoords) :bodies bc :name ~A :weight ~A :centroid ~A :inertia-tensor ~A))~%"
+		  (assoc2 :id link) (send rl :name)
+		  (send rl :weight) (send rl :get :centroid) (send rl :get :inertia-tensor))
+	  (format ostrm "~%")
+	  (dump-irtrobot-link robot ulinks (assoc2 :child link) ostrm)
+	  (dump-irtrobot-link robot ulinks (assoc2 :sister link) ostrm)
+	  )
 	)
-      )
-    ))
+      )))
 
 (defun push-assoc-code (robot ulinks name)
-  (let (link rl)
-    (if name
-	(progn 
-	  (setq link (find-if #'(lambda (x) (eq name (assoc2 :name x))) ulinks))
-	  (setq parent-link (find-if #'(lambda (x) (eq (assoc2 :mother link) (assoc2 :name x))) ulinks))
-	  (setq rl (find-if #'(lambda (x) (eq (send x :name) (assoc2 :name link))) (send robot :links)))
-	  (setq prl (find-if #'(lambda (x) (eq (send x :name) (assoc2 :name parent-link))) (send robot :links)))
-	  (when rl
-	    (when parent-link	  
-	      (push (format nil "     (send blink~A :assoc blink~A)~%" (assoc2 :id parent-link) (assoc2 :id link)) ret)
-	      (push (format nil "     (send blink~A :translate ~A :world)~%" (assoc2 :id link) (assoc2 :b link)) ret)
-	      )
-	    (push-assoc-code robot ulinks (assoc2 :sister link))
-	    (push-assoc-code robot ulinks (assoc2 :child link))
+  (if name
+      (let* ((link (find-if #'(lambda (x) (eq name (assoc2 :name x))) ulinks))
+	     (parent-link (find-if #'(lambda (x) (eq (assoc2 :mother link) (assoc2 :name x))) ulinks))
+	     (rl (find-if #'(lambda (x) (eq (send x :name) (assoc2 :name link))) (send robot :links)))
+	     (prl (find-if #'(lambda (x) (eq (send x :name) (assoc2 :name parent-link))) (send robot :links))))
+	(when rl
+	  (when parent-link
+	    (push (format nil "     (send blink~A :assoc blink~A)~%" (assoc2 :id parent-link) (assoc2 :id link)) ret)
+	    (push (format nil "     (send blink~A :translate ~A :world)~%" (assoc2 :id link) (assoc2 :b link)) ret)
 	    )
+	  (push-assoc-code robot ulinks (assoc2 :sister link))
+	  (push-assoc-code robot ulinks (assoc2 :child link))
 	  )
-      )
-    ))
+	))
+  )
 
 (defun dump-irtrobot-assoc (robot ulinks name &optional (ostrm t))
   (setq ret nil)
@@ -103,10 +99,9 @@
   )
 
 (defun dump-irtrobot-joint (robot ulinks &optional (ostrm t))
-  (let (parent-link child-link)
-    (dolist (j (send robot :joint-list)) 
-      (setq child-link (find-if #'(lambda (x) (eq (send (send j :child-link) :name) (assoc2 :name x))) ulinks))
-      (setq parent-link (find-if #'(lambda (x) (eq (send (send j :parent-link) :name) (assoc2 :name x))) ulinks))
+  (dolist (j (send robot :joint-list)) 
+    (let ((child-link (find-if #'(lambda (x) (eq (send (send j :child-link) :name) (assoc2 :name x))) ulinks))
+	  (parent-link (find-if #'(lambda (x) (eq (send (send j :parent-link) :name) (assoc2 :name x))) ulinks)))
       (format ostrm "     ;; definition of ~A~%" (send j :name))
       (format ostrm "     (setq joint~A (instance ~A-joint :init
 			     :parent-link blink~d :child-link blink~d :name ~10A :axis ~3A
@@ -128,10 +123,9 @@
     ))
 
 (defun dump-irtrobot-end-coords (ulinks offsets &optional (ostrm t))
-  (let (parent-link limb-name)
-    (dolist (o offsets)
-      (setq limb-name (string-left-trim ":" (format nil "~A" (assoc2 :name o))))
-      (setq parent-link (find-if #'(lambda (x) (eq (assoc2 :parent-name o) (assoc2 :name x))) ulinks))
+  (dolist (o offsets)
+    (let ((limb-name (string-left-trim ":" (format nil "~A" (assoc2 :name o))))
+	  (parent-link (find-if #'(lambda (x) (eq (assoc2 :parent-name o) (assoc2 :name x))) ulinks)))
       (format ostrm "     ;; definition of ~A-end-coords~%" limb-name)
       (format ostrm "     (setq ~A-end-coords
        (make-cascoords
@@ -168,12 +162,11 @@
     ))
 
 (defun dump-irtrobot-sensor-coords (ulinks offsets &optional (ostrm t))
-  (let (parent-link limb-name o sensor-type)
-    (dotimes (i (length offsets))
-      (setq o (elt offsets i))
-      (setq sensor-type (reg-replace "_" "-" (assoc2 :sensor-type o)))
-      (setq parent-link (find-if #'(lambda (x) (eq (assoc2 :parent-name o) (assoc2 :name x))) ulinks))
-      (setq limb-name (string-downcase (assoc2 :limb parent-link)))
+  (dotimes (i (length offsets))
+    (let* ((o (elt offsets i))
+	   (sensor-type (reg-replace "_" "-" (assoc2 :sensor-type o)))
+	   (parent-link (find-if #'(lambda (x) (eq (assoc2 :parent-name o) (assoc2 :name x))) ulinks))
+	   (limb-name (string-downcase (assoc2 :limb parent-link))))
       (format ostrm "     ;; definition of ~A ~A-coords~%" limb-name sensor-type)
       (format ostrm "     (setq sensor~d
        (make-cascoords
@@ -188,15 +181,14 @@
 	      limb-name sensor-type (assoc2 :no o)
 	      (assoc2 :id parent-link) i)
       (format ostrm "~%")
-      )
+      ))
     (format ostrm "     (setq sensors (list")
     (dotimes (i (length offsets)) (format ostrm " sensor~d" i))
     (format ostrm "))~%")
-    ))
+    )
 
 (defun jskrobot-to-irtrobot (robot ulinks offsets pairs sensors &optional (ostrm t))
-  (let (i cl check pstate)
-    (setq pstate (send robot :state))
+  (let ((pstate (send robot :state)))
     (format ostrm "(defclass ~A-robot~%" (string-downcase (send robot :name)))
     (format ostrm "  :super robot-model~%")
     (format ostrm "  :slots (sensors))~%")
