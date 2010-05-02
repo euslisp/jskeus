@@ -64,7 +64,9 @@
 			(t
 			 (send (gl::find-color (send (get b :face-color) :ambient)) :name))))
 	  (incf i))
-	(format ostrm "     (setq blink~A (instance bodyset-link :init (make-cascoords) :bodies bc :name ~A))~%" (assoc2 :id link) (send rl :name))
+	(format ostrm "     (setq blink~A (instance bodyset-link :init (make-cascoords) :bodies bc :name ~A :weight ~A :centroid ~A :inertia-tensor ~A))~%"
+		(assoc2 :id link) (send rl :name)
+		(send rl :weight) (send rl :get :centroid) (send rl :get :inertia-tensor))
 	(format ostrm "~%")
 	(dump-irtrobot-link robot ulinks (assoc2 :child link) ostrm)
 	(dump-irtrobot-link robot ulinks (assoc2 :sister link) ostrm)
