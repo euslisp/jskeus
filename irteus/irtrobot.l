@@ -63,6 +63,8 @@
 	  larm-root-link rarm-root-link
 	  lleg-root-link rleg-root-link
 	  head-root-link torso-root-link
+	  larm-collision-avoidance-links
+	  rarm-collision-avoidance-links
 	  larm rarm lleg rleg torso head))
 
 (defmethod robot-model
@@ -89,16 +91,20 @@
 	  (coerce (mapcar #'(lambda (l) (send l :joint :joint-angle))
 			  (send self limb)) float-vector)))
        (:inverse-kinematics
-	(send* self :inverse-kinematics (car args)
-	       :move-target (if (memq :move-target args)
-			      (cadr (memq :move-target args))
-			      (send self limb :end-coords))
-	       :link-list (if (memq :link-list args)
+	 (let ((link-list (if (memq :link-list args)
 			      (cadr (memq :link-list args))
 			    (send self :link-list
 				  (send self limb :end-coords :parent)
-				  (send self limb :root-link)))
-	       (cdr args)))
+				  (send self limb :root-link)))))
+	   (send* self :inverse-kinematics (car args)
+		  :move-target (if (memq :move-target args)
+				   (cadr (memq :move-target args))
+				 (send self limb :end-coords))
+		  :collision-avoidance-link-pair
+		  (send self :collision-avoidance-link-pair-from-link-list link-list
+			:collision-avoidance-links (send self limb :collision-avoidance-links))
+		  :link-list link-list
+		  (cdr args))))
        (:move-end
 	(send* self limb :inverse-kinematics args))
        (:move-end-rot
@@ -137,6 +143,11 @@
 		  :link-list link-list
 		  :debug-view nil))
 	  ))
+       (:collision-avoidance-links
+	 (user::forward-message-to
+	   (cdr (assoc (intern (format nil "~A-COLLISION-AVOIDANCE-LINKS"
+				       (string-upcase limb))) (send self :slots)))
+	   args))
        (t
 	(cond
 	 ((or (null method) (send bodyset-link :method method))
