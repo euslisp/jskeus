@@ -1096,7 +1096,8 @@
        (if (float-vector-p dtheta)
            (setq dtheta (scale gain dtheta dtheta))
          (setq dtheta (* gain dtheta)))
-       (send (elt union-link-list l) :joint :joint-angle dtheta :relative t))
+       (send* (elt union-link-list l) :joint :joint-angle dtheta :relative t
+	      (if (derivedp j 6dof-joint) args)))
      t))
   (:move-joints-avoidance
    (union-vel &rest args
