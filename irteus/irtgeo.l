@@ -297,7 +297,7 @@
 
 (defun face-to-triangle (f)
   (if (and (derivedp f face) (send f :holes))
-      (while (send f :holes) (setq f (face-ear-clipping f))))
+      (when (send f :holes) (setq f (geo::face-to-triangle-make-simple f))))
   (let* ((start 0) 
 	 (poly (face-to-tessel-triangle f start)))
     (while (null poly)
@@ -315,15 +315,31 @@
 	 (len (length (cdr vers)))
 	 (v0 (nth (mod (1- (+ num len)) len) vers))
 	 (v1 (nth (mod num len) vers))
-	 (v2 (nth (mod (1+  num) len) vers)))
+	 (v2 (nth (mod (1+  num) len) vers)) )
     (unless (> (v. (v* (v- v1 v0) (v- v2 v1)) (send f :normal)) 0)
 	    (return-from face-to-tessel-triangle nil))
     (let ((poly (make-face-from-vertices
                  (mapcar #'(lambda (v) (cons v (mapcan
                                                 #'(lambda (e) (if (memq v (send e :vertices)) (list e)))
                                                 (send f :edges)))) (list v0 v1 v2))))
-	  (rvers (remove v0 (remove v1 (remove v2 vers)))))
-      (if (every #'(lambda (x) (not (eq ':inside (send poly :insidep x)))) rvers)
+	  (rvers (remove v0 (remove v1 (remove v2 vers)))) not-intersectp)
+      (setq not-intersectp
+            (and (every #'(lambda (x) (not (eq ':inside (send poly :insidep x)))) rvers)
+                 (if (> (length rvers) 3)
+                     (every #'(lambda (e)
+                                ;; if not intersect return t;
+                                (let* ((e02 (make-line v0 v2))
+                                       (r (send e :intersect-line e02)))
+                                  (or (null r)
+                                      (eq r :parallel)
+                                      (eq r :outside)
+                                      (and (consp r)
+                                           (eq (car r) :intersect)
+                                           (not (eps-in-range 0.0 (elt r 1) 1.0 -0.001))
+                                           (not (eps-in-range 0.0 (elt r 2) 1.0 -0.001))))))
+                            (send (instance face :init :vertices (butlast rvers)) :edges))
+                   t)))
+      (if not-intersectp
 	  poly
 	nil))))
 
@@ -339,45 +355,53 @@
                                  (append (send f :edges) edgs)))) rvers))
     ))
 
-(defun geo::face-ear-clipping (f)
-  (let ((hs (send f :holes))
-        d vl mind minv minh r)
-    (dolist (h hs)
-      (setq vl (user::mapjoin #'cons (cdr (send f :vertices)) (cdr (send h :vertices))))
-      (dolist (v vl)
-        ;; check if there are no intersection vertices
-        (setq 
-         r
-         (mapcan #'(lambda (e)
-                     (let ((p (geo::line-intersection3 (e . pvert) (e . nvert)
-                                                       (car v) (cdr v))))
-                       (when (and (<= 0.0 (car p) 1.0)
-                                  (< 0.0 (cadr p) 1.0))
-                         (list e))))
-                 (flatten (append (send-all hs :edges) (send f :edges)))))
-        (unless r
-          (if mind
-              (if (> mind (setq d (distance (car v) (cdr v))))
-                  (setq mind d minv v minh h))
-            (setq mind (distance (car v) (cdr v)) minv v minh h)))
-        ))
-    (if mind
-        (let ((fp (position (car minv) (send f :vertices)))
-              (hp (position (cdr minv) (send minh :vertices))))
-          (setq f
-                (instance face
-                          :init :vertices
-                          (nconc
-                           (subseq (send f :vertices) 0 fp)
-                           (list (copy-object (car minv)))
-                           (subseq (butlast (send minh :vertices)) hp)
-                           (subseq (send minh :vertices) 0 hp)
-                           (list (copy-object (cdr minv)))
-                           (subseq (butlast (send f :vertices)) fp))
-                          :holes (remove minh hs))))
-      (instance face :init :vertices (send f :vertices)))
-    ))
-
+;;;
+;;; Make Simple function in Triangulatio by Ear Clipping by David Eberly
+;;; http://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf
+;;;
+(defun geo::face-to-triangle-make-simple (f)
+  (let (hs d vl mind minv minh r)
+    (while (setq hs (send f :holes))
+      (setq mind nil)
+      (dolist (h hs)
+        ;; f: outer polyugon, h: inner polygon
+        (setq vl (user::mapjoin #'cons (cdr (send f :vertices)) (cdr (send h :vertices))))
+        ;; finding mutually visible vertices
+        (dolist (v vl)
+          ;; check if there are no intersection vertices
+          (setq
+           r
+           (mapcan #'(lambda (e)
+                       (let ((p (geo::line-intersection3 (e . pvert) (e . nvert)
+                                                         (car v) (cdr v))))
+                         (when (and (<= 0.0 (car p) 1.0)
+                                    (< 0.0 (cadr p) 1.0))
+                           (list e))))
+                   (flatten (append (send-all hs :edges) (send f :edges)))))
+          (unless r
+            ;; r is mutually visible vertices
+            (if mind
+                (if (> mind (setq d (distance (car v) (cdr v))))
+                    (setq mind d minv v minh h))
+              (setq mind (distance (car v) (cdr v)) minv v minh h)))
+          ))
+      (if mind
+          (let ((fp (position (car minv) (send f :vertices)))
+                (hp (position (cdr minv) (send minh :vertices))))
+            (setq f
+                  (instance face
+                            :init :vertices
+                            (nconc
+                             (subseq (send f :vertices) 0 fp)
+                             (list (copy-object (car minv)))
+                             (subseq (butlast (send minh :vertices)) hp)
+                             (subseq (send minh :vertices) 0 hp)
+                             (list (copy-object (cdr minv)))
+                             (subseq (butlast (send f :vertices)) fp))
+                            :holes (remove minh hs))))
+        (warn ";; geo::face-ear-clipping could not find `mutually visible vertices'"))
+      )
+    f))
 (provide :irtgeo "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
