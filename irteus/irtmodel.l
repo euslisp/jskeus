@@ -1842,7 +1842,6 @@
        ((or (eq (send j :name) :torso-waist-p)
 	    (eq (send j :name) :waist-p))
         (setq nang 0)
-        (setq jmax (* 0.1 jmax))
 	(cond
 	 ((= nang jmax) (setq nang (- jmax (deg2rad 1))))
 	 ((= nang jmin) (setq nang (+ jmin (deg2rad 1)))))
