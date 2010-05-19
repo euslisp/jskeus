@@ -1643,7 +1643,9 @@
 	   (warn ";;  angles : ~a~%" av0)
 	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   )
-	 (mapc #'(lambda (j a) (send j :joint-angle a)) (send-all union-link-list :joint) av0)
+	 (mapc #'(lambda (j a) (send* j :joint-angle a
+                                      (if (derivedp j 6dof-joint) args)))
+               (send-all union-link-list :joint) av0)
          (if c0 (send self :newcoords c0))
 	 nil))
      ))
