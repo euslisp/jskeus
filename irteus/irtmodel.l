@@ -778,21 +778,14 @@
 
      (setq J#x (transform jacobi# union-vel tmp-len))
      (when (and debug-view (not (memq :no-message debug-view)))
-       (warn "J#t   :")
-       (dotimes (j (cadr (array-dimensions jacobi#)))
-	 (if (/= j 0) (warn "       "))
-	 (dotimes (i fik-len) (warn "~7,3f " (aref jacobi# i j))) (warn "~%"))
-       (warn "x     :")
-       (dotimes (i (length union-vel)) (warn "~7,3f " (elt union-vel i))) (warn "~%")
-       (warn "J#x   :")
-       (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt J#x i)))) (warn "~%"))
+       (format-array (transpose jacobi#) "J#t   :")
+       (format-array union-vel "x     :")
+       (format-array (map float-vector #'rad2deg J#x) "J#x   :"))
      (when angle-speed
        (setq J#x (midpoint angle-speed-blending J#x angle-speed J#x))
        (when (and debug-view (not (memq :no-message debug-view)))
-         (warn "aspeed:")
-         (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt angle-speed i)))) (warn "~%")
-         (warn "J#x   :")
-         (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt J#x i)))) (warn "~%")))
+         (format-array (map float-vector #'rad2deg angle-speed) "aspeed:")
+         (format-array (map float-vector #'rad2deg J#x) "J#x   :")))
 
      ;; if use null space
      (when (and (vectorp null-space)
@@ -811,10 +804,8 @@
        (dotimes (i fik-len) (setf (aref wmat i i) (aref weight i)))
        (v+ J#x (transform wmat (transform I-J#J null-space tmp-len2) tmp-len2) J#x)
        (when (and debug-view (not (memq :no-message debug-view)))
-         (warn "Ny    :")
-         (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt tmp-len2 i)))) (warn "~%")
-         (warn "dav   :")
-         (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt J#x i)))) (warn "~%")))
+         (format-array (map float-vector #'rad2deg tmp-len2) "Ny    :")
+         (format-array (map float-vector #'rad2deg J#x) "dav   :")))
      J#x))
   (:collision-avoidance-links
    (&optional l)
@@ -1032,14 +1023,8 @@
      (setq I-J#J (m- tmp-mcc (m* jacobi# jacobi tmp-mcc2) tmp-mcc))
      (setq ddav-col (transform I-J#J dav-col))
      (when (and debug-view (not (memq :no-message debug-view)))
-       (warn "coljnt:")
-       (dotimes (i fik-len) 
-         (warn "~7,3f " (rad2deg (* avoid-collision-joint-gain  (elt dav-col i)))))
-       (warn "~%")
-       (warn "colnul:")
-       (dotimes (i fik-len)
-         (warn "~7,3f " (rad2deg (* avoid-collision-null-gain (elt ddav-col i)))))
-       (warn "~%"))
+       (format-array (scale avoid-collision-joint-gain (map float-vector #'rad2deg dav-col)) "coljnt:")
+       (format-array (scale avoid-collision-joint-gain (map float-vector #'rad2deg ddav-col)) "colnul:"))
 
      (dotimes (i fik-len) (setf (elt dav-col i)
                             (+ (* avoid-collision-joint-gain (elt dav-col i))
@@ -1168,8 +1153,7 @@
 		(joint-angle-limit-weight (send-all union-link-list :joint) tmp-len) tmp-len))
        ;; (setq joint-angle-limit-weight (instantiate float-vector fik-len))
        (when (and debug-view (not (memq :no-message debug-view)))
-	 (warn "cost  :")
-	 (dotimes (i fik-len) (warn "~7,3f " (elt joint-angle-limit-weight i))) (warn "~%"))
+         (format-array joint-angle-limit-weight "cost  :"))
        (dotimes (i fik-len)
 	 (setf (elt weight i)
 	       (* (elt weight i) 
@@ -1198,8 +1182,7 @@
            (incf w-cnt w-len)
            )))
      (when (and debug-view (not (memq :no-message debug-view)))
-       (warn "weight:")
-       (dotimes (i  fik-len) (warn "~7,3f " (elt weight i))) (warn "~%"))
+       (format-array weight "weight:"))
      ;;
      ;; avoid-nspace-joint-limit: avoiding joint angle limit
      ;; 
@@ -1211,8 +1194,7 @@
 	 (scale avoid-nspace-gain
                 joint-angle-limit-nspace tmp-len2))
        (when (and debug-view (not (memq :no-message debug-view)))
-	 (warn "nspace:")
-	 (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt null-space-joint-limit i)))) (warn "~%")))
+         (format-array (map float-vector #'rad2deg null-space-joint-limit) "nspace:")))
      ;;
      ;; angle-speed-collision-avoidance: avoiding self collision
      ;;
@@ -1259,8 +1241,7 @@
 		   (t
 		    0.0)))
        (when (and debug-view (not (memq :no-message debug-view)))
-	 (warn "colvel:")
-	 (dotimes (i fik-len) (warn "~7,3f " (rad2deg (elt angle-speed-collision-avoidance i)))) (warn "~%")
+         (format-array (map float-vector #'rad2deg angle-speed-collision-avoidance) "colvel:")
          (warn "blend :~7,3f~%" angle-speed-collision-blending)))
      (if (listp null-space) (setq null-space (eval null-space)))
      (if null-space
@@ -1462,6 +1443,9 @@
                            :rotation-axis rotation-axis
                            :move-target move-target
                            method-args))
+       (when (and debug-view (not (memq :no-message debug-view)))
+         (warn "loop: ~3d~%" loop)
+         (warn "union-link-list: ~A~%" (send-all union-link-list :name)))
        (dotimes (i (length move-target))
          (let ((move-target (elt move-target i))
                (dif-pos (elt dif-pos i))
@@ -1474,8 +1458,10 @@
            (setq vel-p (send self :calc-vel-from-pos dif-pos translation-axis))
            (setq vel-r (send self :calc-vel-from-rot dif-rot rotation-axis))
            (when (and debug-view (not (memq :no-message debug-view)))
-             (warn ";; ~3d: vel-pos : ~a/(~a/~A), vel-rot : ~a/(~a/~A)~%"
-                   loop (scale 1000.0 vel-p) (* 1000.0 (norm vel-p)) thre vel-r (norm vel-r) rthre))
+             (format-array (scale 1000.0 vel-p) "vel-pos :")
+             (format-array vel-r "vel-rot :")
+             (warn "vel-pos-norm : ~7,3f/~7,3f~%vel-rot-norm : ~7,3f/~7,3f~%"
+                   (* 1000.0 (norm vel-p)) thre (norm vel-r) rthre))
            (setq success (and success
                               (>= loop (/ stop 10))
                               (if translation-axis (< (* 1000.0 (norm vel-p)) thre) t)

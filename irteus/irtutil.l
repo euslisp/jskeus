@@ -163,6 +163,26 @@
 	   nil))
     ))
 
+(defun format-array (arr &optional (header "") (in 7) (fl 3) (strm *error-output*))
+  "arr &optional (header \"\") (in 7) (fl 3) (strm *error-output*);; for format-print array"
+  (let* ((val-format (case (send arr :element-type)
+                           (:integer (format nil "~~~dd " in))
+                           (:float (format nil "~~~d,~df " in fl))))
+         (str-format (format nil "~~~AA" in))
+         (str-l (list (format nil str-format header))))
+    (cond
+     ((derivedp arr vector)
+      (dotimes (i (length arr))
+        (push (format nil val-format (elt arr i)) str-l))
+      (push "~%" str-l))
+     ((derivedp arr array)
+      (dotimes (j (car (array-dimensions arr)))
+        (if (/= j 0) (push (format nil str-format " ") str-l))
+        (dotimes (i (cadr (array-dimensions arr)))
+          (push (format nil val-format (aref arr j i)) str-l))
+        (push "~%" str-l))))
+    (format strm (apply #'concatenate string (nreverse str-l)))
+    arr))
 
 (provide :irtutil "$Id$")
 
