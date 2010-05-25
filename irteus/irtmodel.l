@@ -1402,7 +1402,9 @@
    ;; dif-pos, dif-rot, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
    (let (tmp-dim tmp-dims (vec-count 0) (success t) jacobi
-         (method-args (nconc args ik-args)))
+         (method-args (nconc args ik-args))
+         (p-limit (cadr (memq :p-limit args)))
+         (r-limit (cadr (memq :r-limit args))))
        (if (null union-link-list)
            (setq union-link-list (send self :calc-union-link-list link-list)))
        ;; atom -> list
@@ -1447,16 +1449,17 @@
          (warn "loop: ~3d~%" loop)
          (warn "union-link-list: ~A~%" (send-all union-link-list :name)))
        (dotimes (i (length move-target))
-         (let ((move-target (elt move-target i))
-               (dif-pos (elt dif-pos i))
-               (dif-rot (elt dif-rot i))
-               (rotation-axis (elt rotation-axis i))
-               (translation-axis (elt translation-axis i))
-               (thre (elt thre i)) (rthre (elt rthre i))
-               (tmp-dim (instantiate float-vector (send self :calc-target-axis-dimension rotation-axis translation-axis)))
-               vel-p vel-r)
-           (setq vel-p (send self :calc-vel-from-pos dif-pos translation-axis))
-           (setq vel-r (send self :calc-vel-from-rot dif-rot rotation-axis))
+         (let* ((move-target (elt move-target i))
+                (dif-pos (elt dif-pos i))
+                (dif-rot (elt dif-rot i))
+                (rotation-axis (elt rotation-axis i))
+                (translation-axis (elt translation-axis i))
+                (thre (elt thre i)) (rthre (elt rthre i))
+                (tmp-dim (instantiate float-vector (send self :calc-target-axis-dimension rotation-axis translation-axis)))
+                (vel-p (send* self :calc-vel-from-pos dif-pos translation-axis
+                              (if p-limit (list :p-limit p-limit))))
+                (vel-r (send* self :calc-vel-from-rot dif-rot rotation-axis
+                              (if r-limit (list :r-limit r-limit)))))
            (when (and debug-view (not (memq :no-message debug-view)))
              (format-array (scale 1000.0 vel-p) "vel-pos :")
              (format-array vel-r "vel-rot :")
