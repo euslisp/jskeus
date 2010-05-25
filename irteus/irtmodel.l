@@ -1467,8 +1467,8 @@
                    (* 1000.0 (norm vel-p)) thre (norm vel-r) rthre))
            (setq success (and success
                               (>= loop (/ stop 10))
-                              (if translation-axis (< (* 1000.0 (norm vel-p)) thre) t)
-                              (if rotation-axis (< (norm vel-r) rthre) t)))
+                              (if translation-axis (< (norm dif-pos) thre) t)
+                              (if rotation-axis (< (norm dif-rot) rthre) t)))
            (setq tmp-dim (elt tmp-dims i))
            (dotimes (i (length vel-p)) (setf (elt tmp-dim i) (elt vel-p i)))
            (dotimes (i (length vel-r)) (setf (elt tmp-dim (+ i (length vel-p))) (elt vel-r i)))
