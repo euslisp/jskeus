@@ -185,17 +185,16 @@
 	 self)
   (:joint-angle
    (&optional v &key relative)
-   (let ()
-     (when v
-       (if relative (setq v (v+ v joint-angle)))
-       (setq v (vmax v min-angle))
-       (setq v (vmin v max-angle))
-       (setq joint-angle v)
-       (send child-link :replace-coords default-coords)
-       (send child-link :rotate (deg2rad (elt joint-angle 0)) :z)
-       (send child-link :rotate (deg2rad (elt joint-angle 1)) :y)
-       (send child-link :rotate (deg2rad (elt joint-angle 2)) :x))
-     joint-angle))
+   (when v
+     (if relative (setq v (v+ v joint-angle)))
+     (setq v (vmax v min-angle))
+     (setq v (vmin v max-angle))
+     (setq joint-angle v)
+     (send child-link :replace-coords default-coords)
+     (send child-link :rotate (deg2rad (elt joint-angle 0)) :z)
+     (send child-link :rotate (deg2rad (elt joint-angle 1)) :y)
+     (send child-link :rotate (deg2rad (elt joint-angle 2)) :x))
+   joint-angle)
   )
 
 (defclass 6dof-joint
@@ -214,19 +213,18 @@
 	 ;; set default value
 	 self)
   (:joint-angle
-   (&optional v &key relative)
-   (let ()
-     (when v
-       (if relative (setq v (v+ v joint-angle)))
-       (setq v (vmax v min-angle))
-       (setq v (vmin v max-angle))
-       (setq joint-angle v)
-       (send child-link :replace-coords default-coords)
-       (send child-link :translate (subseq joint-angle 0 3))
-       (send child-link :rotate (deg2rad (elt joint-angle 3)) :z)
-       (send child-link :rotate (deg2rad (elt joint-angle 4)) :y)
-       (send child-link :rotate (deg2rad (elt joint-angle 5)) :x))
-     joint-angle))
+   (&optional v &rest args &key relative &allow-other-keys)
+   (when v
+     (if relative (setq v (v+ v joint-angle)))
+     (setq v (vmax v min-angle))
+     (setq v (vmin v max-angle))
+     (setq joint-angle v)
+     (send child-link :replace-coords default-coords)
+     (send child-link :translate (subseq joint-angle 0 3))
+     (send child-link :rotate (deg2rad (elt joint-angle 3)) :z)
+     (send child-link :rotate (deg2rad (elt joint-angle 4)) :y)
+     (send child-link :rotate (deg2rad (elt joint-angle 5)) :x))
+   joint-angle)
   )
 
 ;;;
