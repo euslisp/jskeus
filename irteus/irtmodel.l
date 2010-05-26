@@ -1005,10 +1005,23 @@
                                col-args))
        (send (car pair) :dissoc drag-coords)
        (setq ddav-col (transform (transpose col-jacobi) (elt ret (car (last np)))))
-     
-       (dotimes (i (length a-link-list))
-         (setq j (position (elt a-link-list i) union-link-list :test #'equal) )
-         (setf (elt dav-col j) (+ (elt dav-col j) (elt ddav-col i))))
+
+       (dolist (al a-link-list)
+         (labels ((calc-target-joint-dimension-from-subseq
+                   (alink alinklist)
+                   (calc-target-joint-dimension
+                    (send-all (subseq alinklist 0 (position alink alinklist :test #'equal))
+                              :joint))))
+           ;; dav-col-idx -> counter for dav-col
+           ;; ddav-col-idx -> counter for ddav-col
+           (let ((dav-col-idx (calc-target-joint-dimension-from-subseq
+                               al union-link-list))
+                 (ddav-col-idx (calc-target-joint-dimension-from-subseq
+                                al a-link-list)))
+             (dotimes (i (calc-target-joint-dimension (list (send al :joint))))
+               (setf (elt dav-col (+ i dav-col-idx))
+                     (+ (elt dav-col (+ i dav-col-idx)) (elt ddav-col (+ ddav-col-idx i)))))
+             )))
        )
      (when (or (null jacobi) (null jacobi#))
        (warn ";; ERROR : jacobi or jacobi# are required in :collision-avoidance~%")
@@ -1168,12 +1181,7 @@
          (let* ((dup (count-if
                       #'(lambda (x) (member l x))
                       link-list))
-                (w-len (cond
-                        ((derivedp (send l :joint) wheel-joint) 2)
-                        ((derivedp (send l :joint) omniwheel-joint) 3)
-                        ((derivedp (send l :joint) sphere-joint) 3)
-                        ((derivedp (send l :joint) 6dof-joint) 6)
-                        (t 1))))
+                (w-len (calc-target-joint-dimension (list (send l :joint)))))
            (when (> dup 1)
              (dotimes (i w-len)
                (setf (elt weight (+ w-cnt i)) (/ (elt weight (+ w-cnt i)) dup))))
