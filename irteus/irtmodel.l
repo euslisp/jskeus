@@ -1249,7 +1249,9 @@
        (when (and debug-view (not (memq :no-message debug-view)))
          (format-array (map float-vector #'rad2deg angle-speed-collision-avoidance) "colvel:")
          (warn "blend :~7,3f~%" angle-speed-collision-blending)))
-     (if (listp null-space) (setq null-space (eval null-space)))
+     (cond
+      ((functionp null-space) (setq null-space (funcall null-space)))
+      ((listp null-space) (setq null-space (eval null-space))))
      (if null-space
          (setq null-space-joint-limit
                (v+ null-space
