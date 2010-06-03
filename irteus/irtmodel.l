@@ -32,7 +32,8 @@
   :slots (parent-link child-link joint-angle min-angle max-angle default-coords))
 
 (defmethod joint
-  (:init (&key (name :joint) ((:child-link clink)) ((:parent-link plink))
+  (:init (&key (name (gensym "joint"))
+               ((:child-link clink)) ((:parent-link plink))
 	       (min -90) (max 90) &allow-other-keys)
 	 (send self :name name)
 	 (setq parent-link plink child-link clink
