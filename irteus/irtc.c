@@ -290,7 +290,7 @@ int n;
 pointer argv[];
 { pointer a,result;
   numunion nu;
-  float **u, **v, *w, y;
+  eusfloat_t **u, **v, *w, y;
   int c, r, i, j, k, *idx;
 
   ckarg2(1,2);
