@@ -51,20 +51,6 @@
   (defforeign gluTessEndContour glu-lib "gluTessEndContour" () :integer)
   )
 
-#+:x86_64
-(progn
-  (unless (fboundp 'glxchoosevisual-for-wrap)
-    (setf (symbol-function 'glxchoosevisual-for-wrap)
-          (symbol-function 'glxchoosevisual)))
-  (defun glxchoosevisual (display screen attr)
-    (let (ret)
-      (setq ret 
-            (funcall #'glxchoosevisual-for-wrap
-                     display screen (user::ivector2istring attr)))
-      ;; (pprint (list 'gl:glxchoosevisual (list display screen attr) ret))
-      ret))
-  )
-
 (unless (assoc :color-org (send glviewsurface :methods))
   (rplaca (assoc :color (send glviewsurface :methods)) :color-org))
 (defmethod glviewsurface

@@ -182,28 +182,6 @@
     (format strm (apply #'concatenate string (nreverse str-l)))
     arr))
 
-#+:x86_64
-(defun ivector2istring (iv &optional (str))
-  ;; convert integer-vector to string of int *
-  (let ((ret (if (and str (>= (length str) (* 4 (length iv))))
-                 str (make-string (* 4 (length iv))))
-             ))
-    (dotimes (i (length iv))
-      (sys:poke (elt iv i) ret (* i 4) :integer))
-    ret))
-#+:x86_64
-(defun istring2ivector (str &optional (iv))
-  ;; convert string of int * to integer-vector
-  (let ((ret (if (and iv (>= (length iv) (/ (length str) 4)))
-                 iv
-               (make-array (/ (length str) 4) :element-type integer-vector))
-             ))
-    (dotimes (i (/ (length str) 4))
-      (setf (elt ret i)
-            (sys:peek str (* i 4) :integer))
-      )
-    ret))
-
 (provide :irtutil "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
