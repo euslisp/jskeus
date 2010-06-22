@@ -1173,7 +1173,6 @@
 			      (elt joint-angle-limit-weight-old i)) 0.0)
 		      (/ 1.0 (+ 1.0 (elt joint-angle-limit-weight i)))
 		    1.0)))
-         (setf (elt weight i) (max 0.001 (elt weight i)))
          (setf (elt joint-angle-limit-weight-old i) (elt joint-angle-limit-weight i))
          )
        )
