@@ -45,7 +45,7 @@
   (:parent-link (&rest args) (user::forward-message-to parent-link args))
   (:child-link (&rest args) (user::forward-message-to child-link args))
   (:joint-dof () (warn "subclass's respoinsibility (send ~s :joint-dof)~%" self))
-  (:speed-to-angle () (warn "subclass's respoinsibility (send ~s :speed-to-angle)~%" self))
+  (:speed-to-angle (&rest args) (warn "subclass's respoinsibility (send ~s :speed-to-angle)~%" self))
   (:calc-jacobian (&rest args) (warn "subclass's respoinsibility (send ~s :calc-jacobian)~%" self))
   )
 
