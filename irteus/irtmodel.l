@@ -105,7 +105,6 @@
 	 (if (null max-angle) (setq max-angle (+ 180.0 min-angle)))
 	 self)
   (:joint-angle
-   ;(&rest args &optional v &key relative &allow-other-keys)
    (&optional v &key relative &allow-other-keys)
    (let ()
      (when v
