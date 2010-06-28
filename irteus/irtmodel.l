@@ -141,7 +141,7 @@
 	 (if (null max-angle) (setq max-angle  90.0))
 	 self)
   (:joint-angle
-   (&optional v &key relative)
+   (&optional v &key relative &allow-other-keys)
    (let ()
      (when v
        (if relative (setq v (+ v joint-angle)))
@@ -174,7 +174,7 @@
 	 ;; set default value
 	 self)
   (:joint-angle
-   (&optional v &key relative)
+   (&optional v &key relative &allow-other-keys)
    (let (relvel relang)
      (unless relative
        (if v (warn "wheel-joint does not support non-relative mode??~%"))
@@ -221,7 +221,7 @@
        ;; set default value
        self)
   (:joint-angle
-   (&optional v &key relative)
+   (&optional v &key relative &allow-other-keys)
    (let (relang relx rely)
      (unless relative
        (if v (warn "wheel-joint does not support non-relative mode??~%"))
@@ -277,7 +277,7 @@
 	 ;; set default value
 	 self)
   (:joint-angle
-   (&optional v &key relative)
+   (&optional v &key relative &allow-other-keys)
    (when v
      (if relative (setq v (v+ v joint-angle)))
      (setq v (vmax v min-angle))
