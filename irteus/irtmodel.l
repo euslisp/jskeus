@@ -2017,6 +2017,38 @@
          ,@args))
     ))
 
+;; macro for IK with move-target and link-list
+(defmacro with-move-target-link-list
+  (params &rest bodies)
+  ;; params := (move-target link-list robot limbs;; necessary parameter
+  ;;            :move-target _move-target) ;; additional parameter
+  ;; if use :move-target option, _move-target is used.
+  ;; otherwise, :end-coords is used.
+  (let ((move-target (gensym))
+        (link-list (gensym))
+        (robot (gensym))
+        (limbs (gensym)))
+    `(let* ((,robot ,(caddr params))
+            (,limbs (if (atom ,(cadddr params))
+                        (list ,(cadddr params))
+                      ,(cadddr params)))
+            (,move-target (cond
+                           (,(cadr (member :move-target params))
+                            (if (atom ,(cadr (member :move-target params)))
+                                (list ,(cadr (member :move-target params)))
+                              ,(cadr (member :move-target params))))
+                           (t
+                            (mapcar #'(lambda (_limb) (send ,robot _limb :end-coords)) ,limbs))))
+            (,link-list (mapcar
+                         #'(lambda (_move-target)
+                             (send ,robot :link-list
+                                   (send _move-target :parent)))
+                         ,move-target)))
+       (let ((,(car params) ,move-target)
+             (,(cadr params) ,link-list))
+         ,@bodies)
+       )))
+
 (in-package "GEOMETRY")
 
 (provide :irtmodel "$Id$")
