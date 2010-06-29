@@ -988,13 +988,11 @@
           ((:collision-avoidance-link-pair pair-list))
 	  &allow-other-keys)
    (let* ((pair-len (length pair-list))
-	  (ret (make-list pair-len))
 	  (col-list (send self :get :collision-distance))
 	  (distance-limit 10)
 	  (sc 0.0) np pair)
-     (dotimes (i pair-len) (setf (elt ret i) (float-vector 0 0 0)))
      (when (or (null union-link-list) (= pair-len 0))
-       (return-from :collision-avoidance-calc-distance ret))
+       (return-from :collision-avoidance-calc-distance nil))
      (if (or (null col-list) (/= (length col-list) pair-len))
 	 (setq col-list (make-list pair-len)))
      ;; pair (part of this limb . part of another limb)
@@ -1006,7 +1004,7 @@
 	     (setf (elt col-list i) nil)
 	     )
 	 (progn
-	   (setq np (nconc (pqp-collision-distance (car pair) (cadr pair) :qsize 2) (list i)))
+	   (setq np (nconc (pqp-collision-distance (car pair) (cadr pair) :qsize 2) (list (float-vector 0 0 0) i)))
 	   (if (<= (car np) distance-limit)
 	       (progn
 		 (if (and warnp (< (car np) 1.0))
@@ -1017,12 +1015,11 @@
                  (setf (elt (elt col-list i) 0) distance-limit))
 	     (progn
 	       (setf (elt col-list i) np)))
-	   (setf (elt ret i)
-		 (scale 0.001 (normalize-vector (v- (elt np 1) (elt np 2) (elt ret i)) (elt ret i)) (elt ret i)))
+           (scale 0.001 (normalize-vector (v- (elt np 1) (elt np 2) (elt np 3)) (elt np 3)) (elt np 3))
 	   ))) ;; dotimes
      (sort col-list #'<= #'(lambda (p) (car p)))
      (send self :put :collision-distance col-list)
-     ret))
+     t))
   (:collision-avoidance-args
    (pair link-list)
    ;; link-list -> must not be list of link-list
@@ -1094,8 +1091,8 @@
 	    (tmp-mcc2 (make-matrix fik-len fik-len))
             debug-view
             &allow-other-keys)
-   (let ((ret (send* self :collision-avoidance-calc-distance args))
-         (pair-len (length pair-list)) (n 0)
+   (send* self :collision-avoidance-calc-distance args)
+   (let ((pair-len (length pair-list)) (n 0)
          (min-distance (car (elt (send self :get :collision-distance) 0)))
          (dav-col (instantiate float-vector fik-len)))
      (send self :put :collision-pair-list pair-list)
@@ -1121,7 +1118,7 @@
            (let* ((col-jacobi (send* self :calc-jacobian-from-link-list
                                      col-link-list :move-target drag-coords
                                      col-args))
-                  (ddav-col (transform (transpose col-jacobi) (elt ret (car (last np))))))
+                  (ddav-col (transform (transpose col-jacobi) (elt np 3))))
              (send (car pair) :dissoc drag-coords)
              (dolist (al a-link-list)
                (labels ((calc-target-joint-dimension-from-subseq
