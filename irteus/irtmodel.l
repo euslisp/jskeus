@@ -1854,111 +1854,115 @@
      n))
 
 (defun joint-angle-limit-weight (j-l &optional (res (instantiate float-vector (calc-target-joint-dimension j-l))))
-  (let (j jang jmax jmin nang wang (e (deg2rad 1)) (k 0) (kk 0) r)
+  (let (j jang jmax jmin (e (deg2rad 1)) (k 0) (kk 0))
     (dotimes (i (calc-target-joint-dimension j-l))
       (setq j (elt j-l k))
+      ;; fix unit system ;; [mm] -> [m], [deg] -> [rad]
       (cond
-       ((vectorp (send j :joint-angle))
+       ((vectorp (send j :joint-angle)) ;; multi-dof joint such as sphere-joint, *wheel-joint and 6dof-joint
         (setq jang (elt (send j :joint-angle) kk)
               jmax (elt (send j :max-angle) kk)
               jmin (elt (send j :min-angle) kk))
         (if (vectorp (elt (j . axis) kk))
             (setq jang (* 0.001 jang)
                   jmax (* 0.001 jmax)
-                  jmin (* 0.001 jmin))
+                  jmin (* 0.001 jmin)) ;; translation component
           (setq jang (deg2rad jang)
                 jmax (deg2rad jmax)
-                jmin (deg2rad jmin)))
+                jmin (deg2rad jmin))) ;; rotation component
         (when (>= (incf kk) (length (send j :joint-angle))) (setq kk 0) (incf k))
         )
-       (t
+       (t ;; 1-dof joint such as rotational-joint and linear-joint
         (setq jang (send j :joint-angle)
               jmax (send j :max-angle)
               jmin (send j :min-angle))
         (if (vectorp (j . axis))
             (setq jang (* 0.001 jang)
                   jmax (* 0.001 jmax)
-                  jmin (* 0.001 jmin))
+                  jmin (* 0.001 jmin)) ;; translation component
           (setq jang (deg2rad jang)
                 jmax (deg2rad jmax)
-                jmin (deg2rad jmin)))
+                jmin (deg2rad jmin))) ;; rotation component
         (incf k)))
+      ;; limitation
       (cond
        ((and (eps= jang jmax e) (eps= jang jmin e)))
        ((eps= jang jmax e)
 	(setq jang (- jmax e)))
        ((eps= jang jmin e)
 	(setq jang (+ jmin e))))
+      ;; calculate weight
       (cond
        ((or (eq (send j :name) :torso-waist-p)
 	    (eq (send j :name) :waist-p))
-	(setq nang 0.0)
-	(cond
-	 ((= nang jmax) (setq nang (- jmax (deg2rad 1))))
-	 ((= nang jmin) (setq nang (+ jmin (deg2rad 1)))))
-	(if (> jang nang) (setq wang (abs jmax)) (setq wang (abs jmin)))
-	(setf (elt res i)
-	      (abs (/ (* (expt (* 2 wang) 2) (* 2 (- jang nang)))
-		      (* 4 (expt (- (* wang wang) (* jang jang)) 2))))))
+        (let* ((nang (cond
+                      ((= 0.0 jmax) (- jmax e))
+                      ((= 0.0 jmin) (+ jmin e))
+                      (t 0.0)))
+               (wang (if (> jang nang) (abs jmax) (abs jmin))))
+          (setf (elt res i)
+                (abs (/ (* (expt (* 2 wang) 2) (* 2 (- jang nang)))
+                        (* 4 (expt (- (* wang wang) (* jang jang)) 2)))))))
        ((and (eps= jang jmax e) (eps= jang jmin e))
         (setf (elt res i) *inf*))
        (t
-	(setq r
-	      (abs (/ (* (expt (- jmax jmin) 2) (- (* 2 jang) jmax jmin))
-		      (* 4 (expt (- jmax jang) 2) (expt (- jang jmin) 2)))))
-	(if (and (< r 0.0) (> r 0.0)) (setq r 0.0))
-	(setf (elt res i) r))
-       )
-      )
+	(let ((r (abs (/ (* (expt (- jmax jmin) 2) (- (* 2 jang) jmax jmin))
+                         (* 4 (expt (- jmax jang) 2) (expt (- jang jmin) 2))))))
+          (if (eq r *nan*) (setq r 0.0)) ;; nan check
+          (setf (elt res i) r))))
+      ) ;; dotimes
     res))
 
 (defun joint-angle-limit-nspace (j-l &optional (res (instantiate float-vector (calc-target-joint-dimension j-l))))
-  (let (j jang jmax jmin nang (k 0) (kk 0) r)
+  (let (j jang jmax jmin (e (deg2rad 1)) (k 0) (kk 0))
     (dotimes (i (calc-target-joint-dimension j-l))
       (setq j (elt j-l k))
+      ;; fix unit system ;; [mm] -> [m], [deg] -> [rad]
       (cond
-       ((vectorp (send j :joint-angle))
+       ((vectorp (send j :joint-angle)) ;; multi-dof joint such as sphere-joint, *wheel-joint and 6dof-joint
         (setq jang (elt (send j :joint-angle) kk)
               jmax (elt (send j :max-angle) kk)
               jmin (elt (send j :min-angle) kk))
         (if (vectorp (elt (j . axis) kk))
             (setq jang (* 0.001 jang)
                   jmax (* 0.001 jmax)
-                  jmin (* 0.001 jmin))
+                  jmin (* 0.001 jmin)) ;; translation component
           (setq jang (deg2rad jang)
                 jmax (deg2rad jmax)
-                jmin (deg2rad jmin)))
+                jmin (deg2rad jmin))) ;; rotation component
         (when (>= (incf kk) (length (send j :joint-angle))) (setq kk 0) (incf k))
         )
-       (t
+       (t ;; 1-dof joint such as rotational-joint and linear-joint
         (setq jang (send j :joint-angle)
               jmax (send j :max-angle)
               jmin (send j :min-angle))
         (if (vectorp (j . axis))
             (setq jang (* 0.001 jang)
                   jmax (* 0.001 jmax)
-                  jmin (* 0.001 jmin))
+                  jmin (* 0.001 jmin)) ;; translation component
           (setq jang (deg2rad jang)
                 jmax (deg2rad jmax)
-                jmin (deg2rad jmin)))
+                jmin (deg2rad jmin))) ;; rotation component
         (incf k)))
+      ;; calculate weight
       (cond
        ((or (eq (send j :name) :torso-waist-p)
 	    (eq (send j :name) :waist-p))
-        (setq nang 0)
-	(cond
-	 ((= nang jmax) (setq nang (- jmax (deg2rad 1))))
-	 ((= nang jmin) (setq nang (+ jmin (deg2rad 1)))))
-	(setf (elt res i)
-	      (if (> jang nang)
-		  (/ (- nang jang) (- jmax nang))
-		(/ (- nang jang) (* 5.0 (- nang jmin))))))
+        (let* ((nang (cond
+                      ((= 0.0 jmax) (- jmax e))
+                      ((= 0.0 jmin) (+ jmin e))
+                      (t 0.0))))
+          (setf (elt res i)
+                (if (> jang nang)
+                    (/ (- nang jang) (- jmax nang))
+                  (/ (- nang jang) (* 5.0 (- nang jmin)))))))
        (t
 	(setf (elt res i) (/ (- (/ (+ jmax jmin) 2.0) jang)
 			     (/ (- jmax jmin) 2.0)))))
-      (setq r (* (if (plusp (elt res i)) 1 -1) (expt (elt res i) 2)))
-      (if (or (eq r *nan*) (eq r *inf*) (eq r *-inf*)) (setq r 0.0))
-      (setf (elt res i) r))
+      (let ((r (* (if (plusp (elt res i)) 1 -1) (expt (elt res i) 2))))
+        (if (or (eq r *nan*) (eq r *inf*) (eq r *-inf*)) (setq r 0.0))
+        (setf (elt res i) r))
+      ) ;; dotimes
     res))
 
 (defmacro with-difference-position-and-rotation
