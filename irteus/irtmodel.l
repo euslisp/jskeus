@@ -1894,7 +1894,7 @@
        (t
 	(let ((r (abs (/ (* (expt (- jmax jmin) 2) (- (* 2 jang) jmax jmin))
                          (* 4 (expt (- jmax jang) 2) (expt (- jang jmin) 2))))))
-          (if (eq r *nan*) (setq r 0.0)) ;; nan check
+          (if (and (> r 0) (< r 0)) (setq r 0.0)) ;; nan check
           (setf (elt res i) r))))
       ) ;; dotimes
     res))
@@ -1946,7 +1946,7 @@
 	(setf (elt res i) (/ (- (/ (+ jmax jmin) 2.0) jang)
 			     (/ (- jmax jmin) 2.0)))))
       (let ((r (* (if (plusp (elt res i)) 1 -1) (expt (elt res i) 2))))
-        (if (or (eq r *nan*) (eq r *inf*) (eq r *-inf*)) (setq r 0.0))
+        (if (or (and (> r 0) (< r 0)) (eq r *inf*) (eq r *-inf*)) (setq r 0.0))
         (setf (elt res i) r))
       ) ;; dotimes
     res))
