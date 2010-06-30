@@ -881,22 +881,21 @@
     &key
     angle-speed
     (angle-speed-blending 0.5)
-    jacobi jacobi# null-space debug-view
-    weight wmat tmp-len tmp-len2 fik-len tmp-mcc tmp-mcc2
+    jacobi jacobi# null-space I-J#J debug-view
+    weight wmat tmp-len tmp-len2 fik-len
     &allow-other-keys)
-   (let (vel-p vel-r J#x I-J#J)
-     ;; dav = J#x + (I - J#J)y
-     ;; particular : J#x
-     (when (null jacobi)
-       (warn ";; ERROR : jacobi is required in :calc-joint-angle-speed~%")
-       (return-from :calc-joint-angle-speed null-space))
-     (if (null fik-len) (setq fik-len (cadr (array-dimensions jacobi))))
-     (if (null tmp-len) (setq tmp-len (instantiate float-vector fik-len)))
-     (if (null tmp-len2) (setq tmp-len2 (instantiate float-vector fik-len)))
-     (when (null jacobi#)
-       (setq jacobi# (send* self :calc-inverse-jacobian jacobi args)))
+   ;; dav = J#x + (I - J#J)y
+   ;; particular : J#x
+   (when (null jacobi)
+     (warn ";; ERROR : jacobi is required in :calc-joint-angle-speed~%")
+     (return-from :calc-joint-angle-speed null-space))
+   (if (null fik-len) (setq fik-len (cadr (array-dimensions jacobi))))
+   (if (null tmp-len) (setq tmp-len (instantiate float-vector fik-len)))
+   (if (null tmp-len2) (setq tmp-len2 (instantiate float-vector fik-len)))
+   (when (null jacobi#)
+     (setq jacobi# (send* self :calc-inverse-jacobian jacobi args)))
 
-     (setq J#x (transform jacobi# union-vel tmp-len))
+   (let ((J#x (transform jacobi# union-vel tmp-len)))
      (when (and debug-view (not (memq :no-message debug-view)))
        (format-array (transpose jacobi#) "J#t   :")
        (format-array union-vel "x     :")
@@ -909,16 +908,9 @@
 
      ;; if use null space
      (when (and (vectorp null-space)
-		(= fik-len (length null-space)))
-       (if (null tmp-mcc) (setq tmp-mcc (make-matrix fik-len fik-len)))
-       (if (null tmp-mcc2) (setq tmp-mcc2 (make-matrix fik-len fik-len)))
+		(= fik-len (length null-space))
+                I-J#J)
        (if (null weight) (setq weight (fill (instantiate float-vector fik-len) 1)))
-       ;; projection : I - J#J
-       ;; (unit-matrix (car (array-dimensions jacobi#))))
-       (fill (array-entity tmp-mcc) 0)
-       (dotimes (i fik-len) (setf (aref tmp-mcc i i) 1.0))
-       (setq I-J#J (m- tmp-mcc
-		       (m* jacobi# jacobi tmp-mcc2) tmp-mcc))
        ;; add null space
        (if (null wmat) (setq wmat (make-matrix fik-len fik-len)))
        (dotimes (i fik-len) (setf (aref wmat i i) (aref weight i)))
@@ -1084,11 +1076,9 @@
 	    avoid-collision-joint-gain
 	    avoid-collision-null-gain	    
             ((:collision-avoidance-link-pair pair-list))
-	    (union-link-list) (link-list) (jacobi) (jacobi#)
+	    (union-link-list) (link-list) (jacobi) (jacobi#) (I-J#J)
             ;; link-list -> both list and atom OK.
 	    (fik-len (send self :calc-target-joint-dimension union-link-list))
-            (tmp-mcc (make-matrix fik-len fik-len))
-	    (tmp-mcc2 (make-matrix fik-len fik-len))
             debug-view
             &allow-other-keys)
    (send* self :collision-avoidance-calc-distance args)
@@ -1138,15 +1128,11 @@
                    )))
              ))
          ))
-     (when (or (null jacobi) (null jacobi#))
-       (warn ";; ERROR : jacobi or jacobi# are required in :collision-avoidance~%")
+     (when (or (null jacobi) (null jacobi#) (null I-J#J))
+       (warn ";; ERROR : jacobi or jacobi# or I-J#J are required in :collision-avoidance~%")
        (return-from :collision-avoidance dav-col))
 
-     (fill (array-entity tmp-mcc) 0)
-     (dotimes (i fik-len) (setf (aref tmp-mcc i i) 1.0))
-
-     (let* ((I-J#J (m- tmp-mcc (m* jacobi# jacobi tmp-mcc2) tmp-mcc))
-            (ddav-col (transform I-J#J dav-col)))
+     (let ((ddav-col (transform I-J#J dav-col)))
        (when (and debug-view (not (memq :no-message debug-view)))
          (format-array (scale avoid-collision-joint-gain (map float-vector #'rad2deg dav-col)) "coljnt:")
          (format-array (scale avoid-collision-joint-gain (map float-vector #'rad2deg ddav-col)) "colnul:"))
@@ -1201,6 +1187,8 @@
                (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
               (tmp-len (instantiate float-vector fik-len))
               (tmp-len2 (instantiate float-vector fik-len))
+              (tmp-mcc (make-matrix fik-len fik-len))
+              (tmp-mcc2 (make-matrix fik-len fik-len))
               (debug-view) (jacobi)
 	    &allow-other-keys)
    (let* (joint-angle-limit-nspace
@@ -1211,7 +1199,7 @@
           null-space-collision-avoidance
           angle-speed-collision-avoidance
           (angle-speed-collision-blending 0.0) min-distance
-          jacobi#)
+          jacobi# I-J#J)
      (when (null jacobi)
        (warn ";; ERROR : jacobi is required in :move-joints-avoidance~%")
        (return-from :move-joints-avoidance t))
@@ -1290,6 +1278,14 @@
                 joint-angle-limit-nspace tmp-len2))
        (when (and debug-view (not (memq :no-message debug-view)))
          (format-array (map float-vector #'rad2deg null-space-joint-limit) "nspace:")))
+
+     ;; calc inverse jacobian and projection jacobian
+     (setq jacobi# (send* self :calc-inverse-jacobian jacobi :weight weight args))
+     (fill (array-entity tmp-mcc) 0)
+     (dotimes (i fik-len) (setf (aref tmp-mcc i i) 1.0))
+     (setq I-J#J (m- tmp-mcc
+                     (m* jacobi# jacobi tmp-mcc2) tmp-mcc))
+
      ;;
      ;; angle-speed-collision-avoidance: avoiding self collision
      ;;
@@ -1315,13 +1311,12 @@
      ;; Collision Avoidance with Whole Body Motion Control for Humanoid
      ;; Robots", In IROS 2007, 2053--2058
      ;;     
-     (setq jacobi# (send* self :calc-inverse-jacobian jacobi :weight weight args))
      (when (and pair-list (> avoid-collision-distance 0.0)
 		(or (> avoid-collision-joint-gain 0.0)
 		    (> avoid-collision-null-gain 0.0)))
        (setq angle-speed-collision-avoidance
 	     (send* self :collision-avoidance
-			 :jacobi# jacobi#
+			 :jacobi# jacobi# :I-J#J I-J#J
 			 :avoid-collision-distance avoid-collision-distance
 			 :avoid-collision-null-gain avoid-collision-null-gain
 			 :avoid-collision-joint-gain avoid-collision-joint-gain
@@ -1372,7 +1367,7 @@
 		    :null-space null-space-joint-limit
 		    :angle-speed angle-speed-collision-avoidance
 		    :angle-speed-blending angle-speed-collision-blending
-		    :weight weight :jacobi# jacobi#
+		    :weight weight :jacobi# jacobi# :I-J#J I-J#J
 		    args)
      t))
   ;;
