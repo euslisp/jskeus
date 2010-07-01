@@ -884,22 +884,23 @@
     jacobi jacobi# null-space I-J#J debug-view
     weight wmat tmp-len tmp-len2 fik-len
     &allow-other-keys)
-   ;; dav = J#x + (I - J#J)y
-   ;; particular : J#x
-   (when (null jacobi)
-     (warn ";; ERROR : jacobi is required in :calc-joint-angle-speed~%")
+   ;; argument check
+   (when (or (null jacobi) (null jacobi#))
+     (warn ";; ERROR : jacobi or jacobi# is required in :calc-joint-angle-speed~%")
      (return-from :calc-joint-angle-speed null-space))
    (if (null fik-len) (setq fik-len (cadr (array-dimensions jacobi))))
    (if (null tmp-len) (setq tmp-len (instantiate float-vector fik-len)))
    (if (null tmp-len2) (setq tmp-len2 (instantiate float-vector fik-len)))
-   (when (null jacobi#)
-     (setq jacobi# (send* self :calc-inverse-jacobian jacobi args)))
 
+   ;; dav = J#x + (I - J#J)y
+   ;; calculate J#x
    (let ((J#x (transform jacobi# union-vel tmp-len)))
      (when (and debug-view (not (memq :no-message debug-view)))
        (format-array (transpose jacobi#) "J#t   :")
        (format-array union-vel "x     :")
        (format-array (map float-vector #'rad2deg J#x) "J#x   :"))
+
+     ;; add angle-speed to J#x using angle-speed-blending
      (when angle-speed
        (setq J#x (midpoint angle-speed-blending J#x angle-speed J#x))
        (when (and debug-view (not (memq :no-message debug-view)))
@@ -1076,7 +1077,7 @@
 	    avoid-collision-joint-gain
 	    avoid-collision-null-gain	    
             ((:collision-avoidance-link-pair pair-list))
-	    (union-link-list) (link-list) (jacobi) (jacobi#) (I-J#J)
+	    (union-link-list) (link-list) (jacobi) (I-J#J)
             ;; link-list -> both list and atom OK.
 	    (fik-len (send self :calc-target-joint-dimension union-link-list))
             debug-view
@@ -1128,8 +1129,8 @@
                    )))
              ))
          ))
-     (when (or (null jacobi) (null jacobi#) (null I-J#J))
-       (warn ";; ERROR : jacobi or jacobi# or I-J#J are required in :collision-avoidance~%")
+     (when (or (null jacobi) (null I-J#J))
+       (warn ";; ERROR : jacobi or I-J#J are required in :collision-avoidance~%")
        (return-from :collision-avoidance dav-col))
 
      (let ((ddav-col (transform I-J#J dav-col)))
@@ -1316,7 +1317,7 @@
 		    (> avoid-collision-null-gain 0.0)))
        (setq angle-speed-collision-avoidance
 	     (send* self :collision-avoidance
-			 :jacobi# jacobi# :I-J#J I-J#J
+                         :I-J#J I-J#J
 			 :avoid-collision-distance avoid-collision-distance
 			 :avoid-collision-null-gain avoid-collision-null-gain
 			 :avoid-collision-joint-gain avoid-collision-joint-gain
