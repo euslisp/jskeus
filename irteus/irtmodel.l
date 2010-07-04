@@ -1609,7 +1609,7 @@
                   (translation-axis (cond
 				     ((atom move-target) t)
 				     (t (make-list (length move-target) :initial-element t))))
-		  (look-at-target)
+		  (look-at-target) (joint-args)
 		  (thre (cond
                          ((atom move-target) 1)
                          (t (make-list (length move-target) :initial-element 1))))
@@ -1725,8 +1725,7 @@
 	   (warn ";;  angles : ~a~%" av0)
 	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   )
-	 (mapc #'(lambda (j a) (send* j :joint-angle a
-                                      (if (derivedp j 6dof-joint) args)))
+	 (mapc #'(lambda (j a) (send* j :joint-angle a joint-args))
                (send-all union-link-list :joint) av0)
          (if c0 (send self :newcoords c0))
 	 nil))
