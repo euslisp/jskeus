@@ -1117,7 +1117,7 @@
                                      col-args))
                   (ddav-col (transform (transpose col-jacobi) (elt np 3))))
              (send (car pair) :dissoc drag-coords)
-             (dolist (al a-link-list)
+             (dolist (al col-link-list)
                (labels ((calc-target-joint-dimension-from-subseq
                          (alink alinklist)
                          (calc-target-joint-dimension
@@ -1128,7 +1128,7 @@
                  (let ((dav-col-idx (calc-target-joint-dimension-from-subseq
                                      al union-link-list))
                        (ddav-col-idx (calc-target-joint-dimension-from-subseq
-                                      al a-link-list)))
+                                      al col-link-list)))
                    (dotimes (i (calc-target-joint-dimension (list (send al :joint))))
                      (setf (elt dav-col (+ i dav-col-idx))
                            (+ (elt dav-col (+ i dav-col-idx)) (elt ddav-col (+ ddav-col-idx i)))))
