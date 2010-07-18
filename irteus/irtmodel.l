@@ -1101,6 +1101,12 @@
          (if (>= min-distance avoid-collision-distance)
              (return-from :collision-avoidance dav-col))
 
+         ;; extract a-link-list from link-list
+         ;;   link-list = (list link-list0 link-list1 .. )
+         ;;   a-link-list = extract a list of links including (car pair) from link-list
+         ;;   col-javobi = jacobian derived from a-link-list instead of union-link-list
+         ;;   ddav-col = joint velocities derived from a-link-list instead of union-link-list
+         ;;   dav-col = joint velocities union-link-list
          (let* ((a-link-list (find-if #'(lambda (x) (member (car pair) x :test #'equal)) link-list))
                 (col-args (send self :collision-avoidance-args pair a-link-list))
                 (drag-coords (make-cascoords :pos (elt np 1)))
@@ -1133,13 +1139,13 @@
        (warn ";; ERROR : jacobi or I-J#J are required in :collision-avoidance~%")
        (return-from :collision-avoidance dav-col))
 
-     (let ((ddav-col (transform I-J#J dav-col)))
+     (let ((dav-col-null (transform I-J#J dav-col)))
        (when (and debug-view (not (memq :no-message debug-view)))
          (format-array (scale avoid-collision-joint-gain (map float-vector #'rad2deg dav-col)) "coljnt:")
-         (format-array (scale avoid-collision-joint-gain (map float-vector #'rad2deg ddav-col)) "colnul:"))
+         (format-array (scale avoid-collision-joint-gain (map float-vector #'rad2deg dav-col-null)) "colnul:"))
        (dotimes (i fik-len) (setf (elt dav-col i)
                                   (+ (* avoid-collision-joint-gain (elt dav-col i))
-                                     (* avoid-collision-null-gain (elt ddav-col i))))))
+                                     (* avoid-collision-null-gain (elt dav-col-null i))))))
      (scale (- (* avoid-collision-distance (/ 1.0 min-distance)) 1) dav-col)))
   (:move-joints
    (union-vel &rest args
