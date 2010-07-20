@@ -1077,7 +1077,7 @@
 	    avoid-collision-joint-gain
 	    avoid-collision-null-gain	    
             ((:collision-avoidance-link-pair pair-list))
-	    (union-link-list) (link-list) (jacobi) (I-J#J)
+	    (union-link-list) (link-list) (jacobi) (I-J#J) (weight)
             ;; link-list -> both list and atom OK.
 	    (fik-len (send self :calc-target-joint-dimension union-link-list))
             debug-view
@@ -1131,7 +1131,10 @@
                                       al col-link-list)))
                    (dotimes (i (calc-target-joint-dimension (list (send al :joint))))
                      (setf (elt dav-col (+ i dav-col-idx))
-                           (+ (elt dav-col (+ i dav-col-idx)) (elt ddav-col (+ ddav-col-idx i)))))
+                           (+ (elt dav-col (+ i dav-col-idx))
+                              (* (elt ddav-col (+ ddav-col-idx i))
+                                 (elt weight (+ i dav-col-idx)))))
+                     )
                    )))
              ))
          ))
@@ -1327,6 +1330,7 @@
 			 :avoid-collision-distance avoid-collision-distance
 			 :avoid-collision-null-gain avoid-collision-null-gain
 			 :avoid-collision-joint-gain avoid-collision-joint-gain
+                         :weight weight
 			 :collision-avoidance-link-pair pair-list args))
        (setq min-distance (car (elt (send self :get :collision-distance) 0)))
        (setq angle-speed-collision-blending
