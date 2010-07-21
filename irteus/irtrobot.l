@@ -125,7 +125,7 @@
 	  (send target :rotate
 		(acos (v. (matrix-column (send target :worldrot) 2) v))
 		(v* (matrix-column (send target :worldrot) 2) v))
-	  (while (and (< (incf count) 10)
+	  (while (and (< (incf count) 30)
 		      (if p-dif-rot (> (norm (v- p-dif-rot dif-rot)) 1e-3) t))
 	    (setq p-dif-rot dif-rot)
 	    (setq dif-pos (send head-end-coords :difference-position target)
@@ -141,7 +141,8 @@
 		  :rotation-axis :z
 		  :translation-axis nil
 		  :link-list link-list
-		  :debug-view nil))
+		  :loop count
+		  :debug-view (cadr (memq :debug-view args))))
 	  ))
        (:collision-avoidance-links
 	 (user::forward-message-to
