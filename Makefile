@@ -1,4 +1,4 @@
-all: eus-installed irteus-installed show-env
+all: eus-installed irteus-installed bashrc.eus
 
 SVN_EUSURL=https://euslisp.svn.sourceforge.net/svnroot/euslisp/trunk/EusLisp
 SVN_IRTEUSURL=https://jskeus.svn.sourceforge.net/svnroot/jskeus/trunk/irteus
@@ -23,12 +23,18 @@ endif
 
 export EUSDIR=$(shell pwd)/eus
 
-show-env:
-	@echo ";;\n;; environment variable for euslisp\n;;"
-	@echo "export EUSDIR=$(EUSDIR)"
-	@echo "export ARCHDIR=$(ARCHDIR)"
-	@echo "export PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$PATH"
-	@echo "export LD_LIBRARY_PATHPATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH"
+bashrc.eus:
+	@echo ";\
+;; bashrc.eus : environment variable for euslisp \n\
+export EUSDIR=$(EUSDIR) \n\
+export ARCHDIR=$(ARCHDIR) \n\
+export PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$PATH \n\
+export LD_LIBRARY_PATHPATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
+" > bashrc.eus
+	@bash -c 'echo -e "\e[1;31m## generate `pwd`/bashrc.eus\e[m"'
+	@bash -c 'echo -e "\e[1;31m## Please move `pwd`/bashrc.eus to ~/bashrc.eus\e[m"'
+	@bash -c 'echo -e "\e[1;31m##   and include \"source bashrc.eus\" in your .bashrc file\e[m"'
+	@cat bashrc.eus
 
 eus:
 	svn co -N $(SVN_EUSURL) eus
