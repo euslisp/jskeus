@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
-;;; $Id$
+;;; $Id: compile_irtimg.l $
 ;;;
 ;;; Copyright (c) 1987- JSK, The University of Tokyo.  All Rights Reserved.
 ;;;
@@ -27,20 +27,14 @@
   (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
   )
 
-(in-package "X")
-(comp:compile-file-if-src-newer "irtx.l" user::*objdir*)
+(in-package "IMAGE")
+(comp:compile-file-if-src-newer (format nil "~A/lisp/image/jpeg/eusjpeg.l" *eusdir*) user::*objdir*)
 
 (exit 0)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
-;;; $Id$
+;;; $Id: compile_irtimg.l $
 ;;;
 ;;; $Log$
-;;; Revision 1.2  2009-02-17 02:04:48  k-okada
-;;; fix typo on copyright
-;;;
-;;; Revision 1.1  2008/09/18 18:11:00  k-okada
-;;; add irteus
-;;;
 ;;;

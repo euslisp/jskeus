@@ -39,8 +39,12 @@
   (load-library
    (format nil "~A~A/lib/libirteusx"
 	   *eusdir* (unix:getenv "ARCHDIR"))
-   '("irtx" "eusjpeg"))
+   '("irtx"))
   (in-package "USER")
+  (load-library
+   (format nil "~A~A/lib/libirteusimg"
+	   *eusdir* (unix:getenv "ARCHDIR"))
+   '("eusjpeg"))
   )
 (defun load-irteusgl ()
   (in-package "GL")

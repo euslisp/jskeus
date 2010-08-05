@@ -37,13 +37,15 @@ EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 
 IRTEUS=irtmath irtutil pgsql
 IRTEUSG=irtgeo pqp irtmodel irtrobot
-IRTEUSX=irtx eusjpeg
+IRTEUSX=irtx
+IRTEUSIMG=eusjpeg
 IRTEUSGL=irtgl irtglrgb irtviewer
 NR=nr
 
 LIBIRTEUS=$(LIBDIR)/$(LPFX)irteus.$(LSFX)
 LIBIRTEUSG=$(LIBDIR)/$(LPFX)irteusg.$(LSFX)
 LIBIRTEUSX=$(LIBDIR)/$(LPFX)irteusx.$(LSFX)
+LIBIRTEUSIMG=$(LIBDIR)/$(LPFX)irteusimg.$(LSFX)
 LIBIRTEUSGL=$(LIBDIR)/$(LPFX)irteusgl.$(LSFX)
 LIBNR=$(LIBDIR)/$(LPFX)nr.$(LSFX)
 
@@ -68,6 +70,13 @@ IRTEUSXDLLS=$(addprefix $(OBJDIR)/,$(IRTEUSX_LSFX))
 IRTEUSX_C=$(addsuffix .c,$(IRTEUSX))
 IRTEUSX_H=$(addsuffix .h,$(IRTEUSX))
 
+IRTEUSIMG_OSFX=$(addsuffix .$(OSFX),$(IRTEUSIMG))
+IRTEUSIMG_LSFX=$(addsuffix .$(LSFX),$(IRTEUSIMG))
+IRTEUSIMGOBJS=$(addprefix $(OBJDIR)/,$(IRTEUSIMG_OSFX))
+IRTEUSIMGDLLS=$(addprefix $(OBJDIR)/,$(IRTEUSIMG_LSFX))
+IRTEUSIMG_C=$(addsuffix .c,$(IRTEUSIMG))
+IRTEUSIMG_H=$(addsuffix .h,$(IRTEUSIMG))
+
 IRTEUSGL_OSFX=$(addsuffix .$(OSFX),$(IRTEUSGL))
 IRTEUSGL_LSFX=$(addsuffix .$(LSFX),$(IRTEUSGL))
 IRTEUSGLOBJS=$(addprefix $(OBJDIR)/,$(IRTEUSGL_OSFX))
@@ -79,7 +88,7 @@ IRTCOBJECTS=$(OBJDIR)/irtc.$(OSFX)
 IRTGCOBJECTS=$(OBJDIR)/CPQP.$(OSFX) $(OBJDIR)/euspqp.$(OSFX)
 NROBJECTS=$(OBJDIR)/nr.$(OSFX)
 
-all: $(LIBNR) $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSGL) make-link install-irtext.l
+all: $(LIBNR) $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSIMG) $(LIBIRTEUSGL) make-link install-irtext.l
 
 $(LIBIRTEUS): $(IRTEUSOBJS) $(IRTCOBJECTS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUS) $(IRTEUSOBJS) \
@@ -92,6 +101,9 @@ $(LIBIRTEUSG): $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a
 $(LIBIRTEUSX): $(IRTEUSXOBJS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSX) $(IRTEUSXOBJS) $(IMPLIB)
 
+$(LIBIRTEUSIMG): $(IRTEUSIMGOBJS)
+	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSIMG) $(IRTEUSIMGOBJS) $(IMPLIB)
+
 $(LIBIRTEUSGL): $(IRTEUSGLOBJS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSGL) $(IRTEUSGLOBJS) $(IMPLIB)
 
@@ -103,9 +115,13 @@ $(IRTEUSGOBJS):
 	$(BINDIR)/eusg$(ESFX) < ./compile_irtg.l
 	-rm -f $(IRTEUSG_C) $(IRTEUSG_H)
 
-$(IRTEUSXOBJS) $(LIBDIR)/eusjpg.$(LSFX): $(LIBDIR)/jpegmemcd.$(LSFX)
+$(IRTEUSXOBJS) :
 	$(BINDIR)/eusx$(ESFX) < ./compile_irtx.l
 	-rm -f $(IRTEUSX_C) $(IRTEUSX_H)
+
+$(IRTEUSIMGOBJS) : $(LIBDIR)/jpegmemcd.$(LSFX)
+	$(BINDIR)/eusx$(ESFX) < ./compile_irtimg.l
+	-rm -f $(IRTEUSIMG_C) $(IRTEUSIMG_H)
 
 $(IRTEUSGLOBJS):
 	$(BINDIR)/eusgl$(ESFX) < ./compile_irtgl.l
@@ -128,13 +144,14 @@ $(EUSDIR)/lib/irtext.l: irtext.l
 	-cp -f irtext.l $(EUSDIR)/lib
 
 clean:
-	-rm -f $(IRTCOBJECTS) $(IRTGCOBJECTS) $(LIBDIR)/eusjpeg.$(LSFX)
-	-rm -f $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSGL) $(LIBIRTEUSX)
+	-rm -f $(IRTCOBJECTS) $(IRTGCOBJECTS)
+	-rm -f $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSGL) $(LIBIRTEUSX) $(LIBIRTEUSIMG)
 	-rm -f $(IRTEUSOBJS) $(IRTEUSDLLS) $(IRTEUS_C) $(IRTEUS_H)
 	-rm -f $(IRTEUSGOBJS) $(IRTEUSGDLLS) $(IRTEUSG_C) $(IRTEUSG_H)
 	-rm -f $(IRTEUSXOBJS) $(IRTEUSXDLLS) $(IRTEUSX_C) $(IRTEUSX_H)
+	-rm -f $(IRTEUSIMGOBJS) $(IRTEUSIMGDLLS) $(IRTEUSIMG_C) $(IRTEUSIMG_H)
 	-rm -f $(IRTEUSGLOBJS) $(IRTEUSGLDLLS) $(IRTEUSGL_C) $(IRTEUSGL_H)
-	-rm -f $(LIBDIR)/jpegmemcd.$(LSFX)
+	-rm -f $(LIBDIR)/jpegmemcd.$(LSFX) $(LIBNR) $(NROBJECTS)
 	-rm -f *~ *.stackdump
 	chmod a-x Makefile* *.l *.c
 	(cd PQP;make clean)
@@ -151,6 +168,7 @@ $(OBJDIR)/irtglrgb.$(OSFX): irtglrgb.l
 $(OBJDIR)/irtviewer.$(OSFX): irtviewer.l
 $(OBJDIR)/pqp.$(OSFX): pqp.l
 $(OBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l
+$(OBJDIR)/eusjpeg.$(OSFX): $(EUSDIR)/lisp/image/jpeg/eusjpeg.l
 
 $(OBJDIR)/irtc.$(OSFX): irtc.c
 	$(CC) $(CFLAGS) -c irtc.c $(OBJOPT)$(OBJDIR)/irtc.$(OSFX)
