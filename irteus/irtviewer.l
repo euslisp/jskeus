@@ -43,7 +43,8 @@
 	  left-right-angle
 	  up-down-angle
 	  viewpoint
-	  viewtarget))
+	  viewtarget
+	  drawmode))
 (defmethod irtviewer
   (:create
    (&rest args
@@ -209,6 +210,18 @@
 	 ))
    (setq draw-things (draw-things objects))
    objects)
+  (:select-drawmode
+   (mode)
+   (when (not (eq mode drawmode))
+     (dolist (obj draw-things)
+       (setf (get obj :GL-DISPLAYLIST-ID) nil)
+       (case mode
+         (user::hid
+          (setf (get obj :gl-hiddenline) (list (cons nil t))))
+         (t
+          (setf (get obj :gl-hiddenline) nil)))))
+   (setq drawmode mode)
+   drawmode)
   (:flush () (if viewer (send viewer :viewsurface :glflush)))
   )
    

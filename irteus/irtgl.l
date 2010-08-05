@@ -49,6 +49,15 @@
   (defforeign gluTessEndPolygon glu-lib "gluTessEndPolygon" () :integer)
   (defforeign gluTessBeginContour glu-lib "gluTessBeginContour" () :integer)
   (defforeign gluTessEndContour glu-lib "gluTessEndContour" () :integer)
+  (defforeign glPolygonOffset glu-lib "glPolygonOffset" () :integer)
+  (defconstant GL_POLYGON_OFFSET_UNITS		#x2a00)
+  (defconstant GL_POLYGON_OFFSET_POINT		#x2a01)
+  (defconstant GL_POLYGON_OFFSET_LINE		#x2a02)
+  (defconstant GL_POLYGON_OFFSET_FILL		#x8037)
+  (defconstant GL_POLYGON_OFFSET_FACTOR		#x8038)
+  (defconstant GL_POLYGON_OFFSET_EXT		#x8037)
+  (defconstant GL_POLYGON_OFFSET_FACTOR_EXT	#x8038)
+  (defconstant GL_POLYGON_OFFSET_BIAS_EXT	#x8039)
   )
 
 (unless (assoc :color-org (send glviewsurface :methods))
@@ -147,6 +156,7 @@
 (defun draw-glbody (vwr abody)
   (let* (glcon
 	 (lis (cdr (assq glcon (get abody :GL-DISPLAYLIST-ID))))
+	 (hid (cdr (assq glcon (get abody :gl-hiddenline))))
 	 (col (get abody :face-color)))
     (unless col (setq col (float-vector 0.5 0.5 0.5)))
     (unless (vectorp col)
@@ -160,6 +170,42 @@
 	(glMultMatrixf (array-entity (transpose mat *temp-matrix*)))
 	(glCallList lis)
 	(glPopMatrix)))
+     (hid
+      (let ((newlis (glGenLists 1)))
+	(glNewList newlis gl_compile)
+        (glPushAttrib GL_ALL_ATTRIB_BITS)
+
+        (glDepthFunc GL_DEPTH_TEST)
+        (glDisable GL_LIGHTING)
+        (glColor3fv #f(1 1 1))
+	(dolist (aface (send abody :faces))
+          (glBegin GL_LINE_STRIP)
+          (dolist (p (send aface :vertices))
+            (glVertex3fv (send abody :inverse-transform-vector p)))
+          (glEnd))
+        ;;
+        (glEnable GL_POLYGON_OFFSET_FILL)
+        (glPolygonMode GL_FRONT_AND_BACK GL_FILL)
+        (glPolygonOffset 1.0 1.0)
+
+        (glColor3fv #f(0 0 0))
+        (glEnable GL_CULL_FACE)
+        (glCullFace GL_FRONT)
+
+        (mapc #'(lambda (aface)
+                  (draw-face aface nil nil))
+              (send abody :faces))
+
+        (glDisable GL_CULL_FACE)
+        (glDisable GL_POLYGON_OFFSET_FILL)
+        (glEnable GL_LIGHTING)
+        (glPopAttrib)
+
+	(glEndList)
+	(setf (get abody :GL-DISPLAYLIST-ID)
+	      (cons (cons glcon newlis) (get abody :GL-DISPLAYLIST-ID)))
+	(draw-glbody vwr abody)
+        ))
      (t
       (let ((newlis (glGenLists 1))
 	    (transp (and (= (length col) 4) (< (elt col 3) 1.0)))
