@@ -26,6 +26,33 @@
 
 (in-package "GL")
 
+(let (gl-lib)
+#+:cygwin
+  (progn
+    (cond
+     ((probe-file "/usr/bin/cygGL-1.dll")
+      (setq gl-lib ( load-foreign "/usr/bin/cygGL-1.dll")))
+     (t
+      (setq gl-lib ( load-foreign "/usr/X11R6/bin/cygGL-1.dll")))))
+#+:linux
+  (progn
+    (setq gl-lib
+	  (cond ((member :ia32 *features*)
+		 (load-foreign "/usr/lib32/libGL.so"))
+                ((probe-file "/usr/lib/nvidia-current/libGL.so")
+                 (load-foreign "/usr/lib/nvidia-current/libGL.so"))
+                (t
+                 (load-foreign "/usr/lib/libGL.so")))))
+  (defforeign glPolygonOffset gl-lib "glPolygonOffset" () :integer)
+  (defconstant GL_POLYGON_OFFSET_UNITS		#x2a00)
+  (defconstant GL_POLYGON_OFFSET_POINT		#x2a01)
+  (defconstant GL_POLYGON_OFFSET_LINE		#x2a02)
+  (defconstant GL_POLYGON_OFFSET_FILL		#x8037)
+  (defconstant GL_POLYGON_OFFSET_FACTOR		#x8038)
+  (defconstant GL_POLYGON_OFFSET_EXT		#x8037)
+  (defconstant GL_POLYGON_OFFSET_FACTOR_EXT	#x8038)
+  (defconstant GL_POLYGON_OFFSET_BIAS_EXT	#x8039)
+  )
 (let (glu-lib)
 #+:cygwin
   (progn
@@ -48,15 +75,6 @@
   (defforeign gluTessEndPolygon glu-lib "gluTessEndPolygon" () :integer)
   (defforeign gluTessBeginContour glu-lib "gluTessBeginContour" () :integer)
   (defforeign gluTessEndContour glu-lib "gluTessEndContour" () :integer)
-  (defforeign glPolygonOffset glu-lib "glPolygonOffset" () :integer)
-  (defconstant GL_POLYGON_OFFSET_UNITS		#x2a00)
-  (defconstant GL_POLYGON_OFFSET_POINT		#x2a01)
-  (defconstant GL_POLYGON_OFFSET_LINE		#x2a02)
-  (defconstant GL_POLYGON_OFFSET_FILL		#x8037)
-  (defconstant GL_POLYGON_OFFSET_FACTOR		#x8038)
-  (defconstant GL_POLYGON_OFFSET_EXT		#x8037)
-  (defconstant GL_POLYGON_OFFSET_FACTOR_EXT	#x8038)
-  (defconstant GL_POLYGON_OFFSET_BIAS_EXT	#x8039)
   )
 
 (unless (assoc :color-org (send glviewsurface :methods))
