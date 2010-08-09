@@ -28,17 +28,19 @@
 
 (defun read-png-file (fname)
   (if (probe-file fname)
-      (let (ret width height byte-depth image)
-        (setq ret (png-read-image fname image))
+      (let (ret width height byte-depth image img)
+        (setq ret (png-read-image fname))
         (setq width (elt ret 0) height (elt ret 1)
               byte-depth (elt ret 2) image (elt ret 3))
         (case byte-depth
           (1
-           (instance grayscale-image :init width height image))
+           (setq img (instance grayscale-image :init width height image)))
           (3
-           (instance color-image24 :init width height image))
+           (setq img (instance color-image24 :init width height image)))
           (t
-           (error ";; read-png-file: unsupported image byte-depth ~A" byte-depth))))
+           (error ";; read-png-file: unsupported image byte-depth ~A" byte-depth)))
+        (send img :name fname)
+        img)
     nil))
 
 (defun write-png-file (fname img)

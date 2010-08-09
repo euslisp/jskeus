@@ -35,7 +35,7 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
 {
   char *file_name;
   pointer ret, image_ptr;
-  ckarg(2);
+  ckarg(1);
   if (isstring(argv[0])) file_name = argv[0]->c.str.chars;
   else error(E_NOSTRING);
 
