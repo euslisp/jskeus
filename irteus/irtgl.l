@@ -382,7 +382,7 @@
    (let (img ow oh od tw th)
      (cond 
       ((probe-file file)
-       (setq img (user::read-jpeg-file file)))
+       (setq img (user::read-image-file file)))
       (t (warn ";; Could not find file ~A~%" file)
 	 (return-from :paste-texture-to-face nil)))
      (setq ow (send img :width) oh (send img :height)
