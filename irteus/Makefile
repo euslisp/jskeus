@@ -38,7 +38,7 @@ EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 IRTEUS=irtmath irtutil pgsql
 IRTEUSG=irtgeo pqp irtmodel irtrobot
 IRTEUSX=irtx
-IRTEUSIMG=eusjpeg png
+IRTEUSIMG=irtimage eusjpeg png
 IRTEUSGL=irtgl irtglrgb irtviewer
 NR=nr
 
@@ -167,6 +167,7 @@ $(OBJDIR)/irtx.$(OSFX): irtx.l
 $(OBJDIR)/irtgl.$(OSFX): irtgl.l
 $(OBJDIR)/irtglrgb.$(OSFX): irtglrgb.l
 $(OBJDIR)/irtviewer.$(OSFX): irtviewer.l
+$(OBJDIR)/irtimage.$(OSFX): irtimage.l
 $(OBJDIR)/pqp.$(OSFX): pqp.l
 $(OBJDIR)/png.$(OSFX): png.l
 $(OBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l

@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
-;;; $Id: compile_irtimg.l $
+;;; $Id: irtimage.l $
 ;;;
 ;;; Copyright (c) 1987- JSK, The University of Tokyo.  All Rights Reserved.
 ;;;
@@ -22,21 +22,31 @@
 ;;; above copyright notice remains intact.  
 ;;;
 
-
-(setq *objdir*
-  (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
-  )
-
 (in-package "IMAGE")
-(comp:compile-file-if-src-newer (format nil "irtimage.l" *eusdir*) user::*objdir*)
-(comp:compile-file-if-src-newer (format nil "~A/lisp/image/jpeg/eusjpeg.l" *eusdir*) user::*objdir*)
-(comp:compile-file-if-src-newer (format nil "png.l" *eusdir*) user::*objdir*)
 
-(exit 0)
+(export '(read-image-file write-image-file))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; $Id: compile_irtimg.l $
-;;;
-;;; $Log$
-;;;
+(defun read-image-file (fname)
+  (cond
+   ((probe-file fname)
+    (cond ((or (string= (pathname-type fname) "jpg")
+               (string= (pathname-type fname) "jpeg"))
+           (read-jpeg-file fname))
+          ((string= (pathname-type fname) "png")
+           (read-png-file fname))
+          (t
+           (read-pnm-file fname))))
+   (t (warn ";; Could not find file ~A~%" fname)
+      (return-from read-image-file nil))))
+
+(defun write-image-file (fname img)
+  (cond
+   ((or (string= (pathname-type fname) "jpg")
+        (string= (pathname-type fname) "jpeg"))
+    (write-jpeg-file fname img))
+   ((string= (pathname-type fname) "png")
+    (write-png-file fname img))
+   (t
+    (write-pnm-file fname img))))
+
+(provide :irtimage "@(#)$Id$")
