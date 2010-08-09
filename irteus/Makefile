@@ -38,7 +38,7 @@ EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 IRTEUS=irtmath irtutil pgsql
 IRTEUSG=irtgeo pqp irtmodel irtrobot
 IRTEUSX=irtx
-IRTEUSIMG=eusjpeg
+IRTEUSIMG=eusjpeg png
 IRTEUSGL=irtgl irtglrgb irtviewer
 NR=nr
 
@@ -85,7 +85,8 @@ IRTEUSGL_C=$(addsuffix .c,$(IRTEUSGL))
 IRTEUSGL_H=$(addsuffix .h,$(IRTEUSGL))
 
 IRTCOBJECTS=$(OBJDIR)/irtc.$(OSFX) 
-IRTGCOBJECTS=$(OBJDIR)/CPQP.$(OSFX) $(OBJDIR)/euspqp.$(OSFX)
+IRTGCOBJECTS=$(OBJDIR)/CPQP.$(OSFX) $(OBJDIR)/pqp.$(OSFX)
+IRTIMGCOBJECTS=$(OBJDIR)/euspng.$(OSFX)
 NROBJECTS=$(OBJDIR)/nr.$(OSFX)
 
 all: $(LIBNR) $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSIMG) $(LIBIRTEUSGL) make-link install-irtext.l
@@ -101,8 +102,8 @@ $(LIBIRTEUSG): $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a
 $(LIBIRTEUSX): $(IRTEUSXOBJS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSX) $(IRTEUSXOBJS) $(IMPLIB)
 
-$(LIBIRTEUSIMG): $(IRTEUSIMGOBJS)
-	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSIMG) $(IRTEUSIMGOBJS) $(IMPLIB)
+$(LIBIRTEUSIMG): $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(LIBDIR)/jpegmemcd.$(LSFX)
+	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSIMG) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IMPLIB) $(IMPLIBIMG)
 
 $(LIBIRTEUSGL): $(IRTEUSGLOBJS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSGL) $(IRTEUSGLOBJS) $(IMPLIB)
@@ -119,7 +120,7 @@ $(IRTEUSXOBJS) :
 	$(BINDIR)/eusx$(ESFX) < ./compile_irtx.l
 	-rm -f $(IRTEUSX_C) $(IRTEUSX_H)
 
-$(IRTEUSIMGOBJS) : $(LIBDIR)/jpegmemcd.$(LSFX)
+$(IRTEUSIMGOBJS) :
 	$(BINDIR)/eusx$(ESFX) < ./compile_irtimg.l
 	-rm -f $(IRTEUSIMG_C) $(IRTEUSIMG_H)
 
@@ -167,6 +168,7 @@ $(OBJDIR)/irtgl.$(OSFX): irtgl.l
 $(OBJDIR)/irtglrgb.$(OSFX): irtglrgb.l
 $(OBJDIR)/irtviewer.$(OSFX): irtviewer.l
 $(OBJDIR)/pqp.$(OSFX): pqp.l
+$(OBJDIR)/png.$(OSFX): png.l
 $(OBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l
 $(OBJDIR)/eusjpeg.$(OSFX): $(EUSDIR)/lisp/image/jpeg/eusjpeg.l
 
@@ -176,6 +178,8 @@ $(OBJDIR)/CPQP.$(OSFX): CPQP.C
 	$(CXX) $(CXXFLAGS) -c CPQP.C $(OBJOPT)$(OBJDIR)/CPQP.$(OSFX)
 $(OBJDIR)/euspqp.$(OSFX): euspqp.c
 	$(CC) $(CFLAGS) -c euspqp.c $(OBJOPT)$(OBJDIR)/euspqp.$(OSFX)
+$(OBJDIR)/euspng.$(OSFX): euspng.c
+	$(CC) $(CFLAGS) -c euspng.c $(OBJOPT)$(OBJDIR)/euspng.$(OSFX)
 $(OBJDIR)/nr.$(OSFX): nr.c
 	$(CC) $(CFLAGS) -c nr.c $(OBJOPT)$(OBJDIR)/nr.$(OSFX)
 

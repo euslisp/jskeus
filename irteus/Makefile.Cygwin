@@ -35,7 +35,7 @@ ESFX=.exe
 SOFLAGS=-g -falign-functions=4 -Xlinker --export-all-symbols --unresolved-symbols=ignore-all
 IMPLIB=$(EUSDIR)/$(ARCH)/bin/eusgl.a $(EUSDIR)/$(ARCH)/lib/libnr.$(LSFX)
 IMPLIBGL=$(EUSDIR)/$(ARCH)/bin/eusgl.a -L/usr/X11R6/lib -lGLU -lGL -lXext
-IMPLIBJPG=-ljpeg
+IMPLIBIMG=-ljpeg -lpng
 EXPLIB=
 RAPID=-LRAPID/$(ARCHDIR) -lRAPID-static
 RAPIDLIB=RAPID/$(ARCHDIR)/$(LPFX)RAPID-static.a

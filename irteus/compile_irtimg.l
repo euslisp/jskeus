@@ -29,6 +29,7 @@
 
 (in-package "IMAGE")
 (comp:compile-file-if-src-newer (format nil "~A/lisp/image/jpeg/eusjpeg.l" *eusdir*) user::*objdir*)
+(comp:compile-file-if-src-newer (format nil "png.l" *eusdir*) user::*objdir*)
 
 (exit 0)
 
