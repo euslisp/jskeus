@@ -2048,6 +2048,43 @@
          ,@bodies)
        )))
 
+(defmacro with-append-root-joint (params &rest bodies)
+  (let ((robot (gensym))
+        (link-list (gensym))
+        (vlink (gensym))
+        (rlink (gensym))
+        (joint-args (gensym)))
+    `(progn
+       (let ((,robot ,(cadr params))
+             (,link-list
+              (if (atom (car ,(caddr  params)))
+                  (list ,(caddr  params))
+                ,(caddr  params)))
+	     (,joint-args ,(cadr (member :joint-args params))))
+         (let ((,vlink (instance bodyset-link :init (make-cascoords)
+                                         :bodies (list (make-cube 150 10 400))
+                                         :name 'virtual-link
+					 :weight 0 :centroid (float-vector 0 0 0)
+					 :inertia-tensor (make-matrix 3 3)))
+               (,rlink (car (send ,robot :links))))
+           (send-message ,rlink bodyset-link :add-joint
+             (instance* ,(or (cadr (member :joint-class params)) 6dof-joint) :init
+                            :child-link ,robot
+                            :parent-link ,vlink
+			    ,joint-args))
+           (send ,rlink :add-parent-link ,vlink)
+           (send ,vlink :add-child-links ,rlink)
+           (send ,robot :assoc ,vlink)
+           (unwind-protect
+               (let ((,(car params) (mapcar #'(lambda (l)
+                                                (cons ,rlink l))
+                                            ,link-list)))
+                 ,@bodies)
+             (send ,robot :dissoc ,vlink)
+             (send ,rlink :del-joint)
+             (send ,rlink :del-parent-link)
+             (send ,vlink :del-child-link ,rlink)))))))
+
 (in-package "GEOMETRY")
 
 (provide :irtmodel "$Id$")
