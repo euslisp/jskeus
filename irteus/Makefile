@@ -157,6 +157,7 @@ clean:
 	chmod a-x Makefile* *.l *.c
 	(cd PQP;make clean)
 	(cd $(EUSDIR)/lisp/image/jpeg/; make clean)
+	-rm $(EUSDIR)/lib/llib/pgsql.c $(EUSDIR)/lib/llib/pgsql.h
 
 $(OBJDIR)/irtmath.$(OSFX): irtmath.l
 $(OBJDIR)/irtutil.$(OSFX): irtutil.l
