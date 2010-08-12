@@ -1,4 +1,5 @@
 (load "irtmodel.l")
+(load "irtdyna.l")
 (defclass sample-robot
   :super robot-model
   :slots ())
@@ -199,6 +200,11 @@
 	   rleg (list blr1 blr2 blr3 blr4 blr5 blr6)
 	   head (list bh1 bh2)
 	   torso (list bc1 bc2))
+     (dolist (l (append (list bc0) torso))
+       (send l :weight 100.0))
+     (dolist (l (append larm rarm lleg rleg head))
+       (send l :weight 7.0))
+
      (setq links (list bc0 bc1 bc2 bh0 bh1 bh2
 		       bal1 bal2 bal3 bal4 bal5 bal6 bal7
 		       bar1 bar2 bar3 bar4 bar5 bar6 bar7
@@ -553,6 +559,77 @@
           :rotation-axis nil :debug-view t)
     ))
 
+(defun test5
+  ()
+  "full body ik"
+  (unless (boundp '*robot*)
+    (setq *robot* (instance sample-robot :init)))
+  (send *robot* :angle-vector (instantiate float-vector 30))
+  (send *robot* :newcoords (make-coords))
+  (send *robot* :legs :angle-vector #f(0 0 -15 30 0 -15 0))
+  (send *robot* :arms :angle-vector #f(-20 20 0 -50 10 0 0))
+  (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (make-coords)))
+
+  (labels ((make-crank ()
+             (let* ((b0 (make-cylinder 10 50))
+		    (b1 (make-cylinder 10 70))
+		    (b2 (make-cube 30 120 10)))
+	       (send b2 :translate (float-vector 0 -50 55))
+	       (send b1 :translate (float-vector 0 -100 60))
+	       (send b0 :assoc b1) (send b0 :assoc b2)
+	       (let ((br (instance bodyset :init (make-cascoords)
+				   :bodies (list b0 b1 b2))))
+		 (send br :put :handle
+		       (make-cascoords :coords
+		            (send (send b1 :copy-worldcoords) :translate (float-vector 0 0 50))))
+		 (send br :assoc (send br :get :handle))
+		 br))))
+     (let* ((move-target (send *robot* :larm :end-coords))
+	    (cog-target-pos (apply #'midpoint 0.5 (send *robot* :legs :end-coords :worldpos)))
+	    (fix-leg-coords (send *robot* :legs :end-coords :copy-worldcoords))
+	    (link-list (send *robot* :link-list (send move-target :parent)))
+	    (crank (make-crank)))
+       (send crank :locate #f(350 100 500) :world)
+       (objects (list crank *robot*))
+       ;;
+       (with-append-root-joint
+	(ll *robot* link-list
+	    :joint-class 6dof-joint
+	    :joint-args
+	    (list :min (float-vector -300 -300 -300 -15 -15 -10)
+		  :max (float-vector  300  300  300  15  15  10)))
+	(do-until-key
+	 (send crank :rotate (deg2rad 15) :z)
+	 (let* ((target (send crank :get :handle)))
+	   (send *robot* :inverse-kinematics target
+		 :link-list (car ll) :move-target move-target
+		 :look-at-target t :thre 15
+		 :rotation-axis nil :translation-axis t
+		 :null-space ;; for balancing
+		 #'(lambda ()
+		     (send *robot* :cog-jacobian-balance-nspace (car ll)
+			   :target-centroid-pos cog-target-pos :cog-gain 1.5))
+		 :debug-view :no-flush)
+	   ;; leg inverse kinematics
+	   (mapcar #'(lambda (l tc)
+		       (send *robot* :inverse-kinematics tc
+			     :move-target (send *robot* l :end-coords)
+			     :link-list (send *robot* l)))
+		   '(:lleg :rleg) fix-leg-coords)
+	   ;; draw
+	   (send *irtviewer* :draw-objects :flush nil)
+	   (mapcar #'(lambda (act ref)
+		       (send act :draw-on :flush nil :size 100)
+		       (send ref :draw-on :flush nil :color #f(1 0 0)))
+		   (list (let ((ac (send (car (send *robot* :links)) :get :c-til)))
+			   (setf (elt ac 2) 0) ac)
+			 (send move-target :worldpos))
+		   (list cog-target-pos target))
+	   (send *irtviewer* :flush)
+	   ))
+	))
+     ))
+
 ;;;
 ;;;
 
@@ -560,6 +637,7 @@
 (warn "(test2) for tool usage~%")
 (warn "(test3) for hand model~%")
 (warn "(test4) for using jsk/hand model~%")
+(warn "(test5) for fullbody motion~%")
 
 (unless (boundp '*irtviewer*) (make-irtviewer))
 #+:jsk

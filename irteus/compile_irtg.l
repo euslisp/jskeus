@@ -31,6 +31,7 @@
 (comp:compile-file-if-src-newer "irtgeo.l" *objdir*)
 (comp:compile-file-if-src-newer "pqp.l" *objdir*)
 (comp:compile-file-if-src-newer "irtmodel.l" *objdir*)
+(comp:compile-file-if-src-newer "irtdyna.l" *objdir*)
 (comp:compile-file-if-src-newer "irtrobot.l" *objdir*)
 
 (exit 0)

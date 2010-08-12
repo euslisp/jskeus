@@ -33,7 +33,7 @@
   (load-library
    (format nil "~A~A/lib/libirteusg"
 	   *eusdir* (unix:getenv "ARCHDIR"))
-   '("irtgeo" "euspqp" "pqp" "irtmodel" "irtrobot")))
+   '("irtgeo" "euspqp" "pqp" "irtmodel" "irtdyna" "irtrobot")))
 (defun load-irteusx ()
   (in-package "X")
   (load-library
