@@ -60,7 +60,7 @@ irteus-installed: irteus irteus-update
 	touch irteus-installed
 
 clean:
-	-rm *-installed *-update
+	-rm *-installed *-update bashrc.eus
 	if [ -e irteus ]; then cd irteus; make clean ; fi
 	if [ -e eus/lisp ]; then cd eus/lisp; make clean ; fi
 
