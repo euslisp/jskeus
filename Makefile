@@ -24,16 +24,16 @@ endif
 export EUSDIR=$(shell pwd)/eus
 
 bashrc.eus:
-	@echo ";\
-;; bashrc.eus : environment variable for euslisp \n\
+	@echo "#\n\
+# bashrc.eus : environment variable for euslisp \n#\n\
 export EUSDIR=$(EUSDIR) \n\
 export ARCHDIR=$(ARCHDIR) \n\
 export PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$PATH \n\
 export LD_LIBRARY_PATHPATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
 " > bashrc.eus
-	@bash -c 'echo -e "\e[1;31m## generate `pwd`/bashrc.eus\e[m"'
-	@bash -c 'echo -e "\e[1;31m## Please move `pwd`/bashrc.eus to ~/bashrc.eus\e[m"'
-	@bash -c 'echo -e "\e[1;31m##   and include \"source bashrc.eus\" in your .bashrc file\e[m"'
+	@bash -c 'echo -e "\e[1;31m;; generate `pwd`/bashrc.eus\e[m"'
+	@bash -c 'echo -e "\e[1;31m;; Please move `pwd`/bashrc.eus to ~/bashrc.eus\e[m"'
+	@bash -c 'echo -e "\e[1;31m;;   and include \"source bashrc.eus\" in your .bashrc file\e[m"'
 	@cat bashrc.eus
 
 eus:
