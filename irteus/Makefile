@@ -156,7 +156,7 @@ clean:
 	-rm -f *~ *.stackdump
 	chmod a-x Makefile* *.l *.c
 	(cd PQP;make clean)
-	(cd $(EUSDIR)/lisp/image/jpeg/; rm -f *.o)
+	(cd $(EUSDIR)/lisp/image/jpeg/; make clean)
 
 $(OBJDIR)/irtmath.$(OSFX): irtmath.l
 $(OBJDIR)/irtutil.$(OSFX): irtutil.l
