@@ -173,8 +173,6 @@
      (send blr1 :translate #f(0 -75 -150) :world)
      (send bc0 :assoc blr1)
 
-     (send bc0 :locate #f(0 0 700))
-
      (setq jll0 (instance rotational-joint :init :parent-link bc0 :child-link bll1 :name :lleg-crotch-y :axis :z))
      (setq jll1 (instance rotational-joint :init :parent-link bll1 :child-link bll2 :name :lleg-crotch-r :axis :x))
      (setq jll2 (instance rotational-joint :init :parent-link bll2 :child-link bll3 :name :lleg-crotch-p :axis :y))
@@ -233,8 +231,8 @@
     (send *robot* :newcoords (make-coords))
     (send *robot* :legs :angle-vector #f(0 0 -10 20 -10 0 0))
     (send *robot* :arms :angle-vector #f(10 20 0 -20 10 0 0))
-
     (send *robot* :transform (send  (send *robot* :lleg :end-coords) :transformation (make-coords)))
+    (send *robot* :update-descendants)
     (let* ((move-target (send *robot* :larm :end-coords))
            (link-list (send *robot* :link-list
                             (send move-target :parent)
@@ -300,6 +298,8 @@
      (send *robot* :newcoords (make-coords))
      (send *robot* :legs :move-end-pos #f(0 0 50) :local :rotation-axis t)
      (send *robot* :arms :angle-vector #f(10 20 0 -20 10 0 0))
+     (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (send *robot* :worldcoords)))
+     (send *robot* :update-descendants)
      ;;
      ;; make broom model
      (setq b0 (make-sweep))
@@ -543,9 +543,10 @@
     (defmethod bodyset-with-knowledge
       (:vertices () (list (send self :worldpos))))
     (setq r0 (instance sample-robot :init))
+    (send r0 :transform (send (apply #'midcoords 0.5 (send r0 :legs :end-coords)) :transformation (send r0 :worldcoords)))
+    (send r0 :update-descendants)
     (setq b0 (instance broom :init :length 700 :bar-color :brown :sweep-color :red))
     (send b0 :locate #f(200 0 0))
-    (objects (list  r0 b0))
 
     (send r0 :lleg :move-end-pos #f(0 0 50) :local :rotation-axis t)
     (send r0 :rleg :move-end-pos #f(0 0 50) :local :rotation-axis t)
@@ -569,6 +570,7 @@
   (send *robot* :legs :angle-vector #f(0 0 -15 30 0 -15 0))
   (send *robot* :arms :angle-vector #f(-20 20 0 -50 10 0 0))
   (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (make-coords)))
+  (send *robot* :update-descendants)
 
   (labels ((make-crank ()
              (let* ((b0 (make-cylinder 10 50))
