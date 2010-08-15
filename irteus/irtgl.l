@@ -398,6 +398,7 @@
 	 (setq img (instance img:color-image24 :init tw th b))))
      (setf (get aface :gl-textureimage) img)
      (setf (get aface :gl-texturecoords) (make-hash-table :test #'equal))
+     (setf (get self :GL-DISPLAYLIST-ID) nil)
      ;;
      (let ((tmp-coords
 	    (list (float-vector 0 0) (float-vector 0 1)
