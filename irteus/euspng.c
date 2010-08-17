@@ -58,20 +58,43 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
   }
 
   png_init_io(png_ptr, fp);
-  png_set_sig_bytes(png_ptr, 0);
-  png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, png_voidp_NULL);
+  png_read_info(png_ptr, info_ptr);
   int width = info_ptr->width;
   int height = info_ptr->height;
   int bit_depth = info_ptr->bit_depth;
   int channels = info_ptr->channels;
-  png_bytep * row_pointers = png_get_rows(png_ptr, info_ptr);
-  int y, byte_per_scanline = png_get_rowbytes(png_ptr, info_ptr);
+  int color_type = info_ptr->color_type;
+  //fprintf(stderr, "bit_depth = %d, channels %d, color_type =%d (pal:%d,gray:%d,rgb:%d,rgba:%d)\n", bit_depth, channels, color_type, PNG_COLOR_TYPE_PALETTE,PNG_COLOR_TYPE_GRAY,PNG_COLOR_TYPE_RGB,PNG_COLOR_TYPE_RGB_ALPHA);
+  switch (color_type) {
+  case PNG_COLOR_TYPE_PALETTE:
+    png_set_palette_to_rgb(png_ptr);
+    break;
+  case PNG_COLOR_TYPE_GRAY:
+    if ( bit_depth < 8) png_set_gray_1_2_4_to_8(png_ptr);
+    break;
+  case PNG_COLOR_TYPE_RGB:
+    png_set_bgr(png_ptr);
+    break;
+  case PNG_COLOR_TYPE_RGB_ALPHA:
+    png_set_strip_alpha(png_ptr);
+    png_set_bgr(png_ptr);
+    break;
+  }
+  png_read_update_info(png_ptr, info_ptr);
+  width = info_ptr->width; height = info_ptr->height;
+  bit_depth = info_ptr->bit_depth; channels = info_ptr->channels;
+  color_type = info_ptr->color_type;
 
+  png_bytep * row_pointers = (png_bytep *)malloc(height*sizeof(png_bytep));
+  int y, byte_per_scanline = png_get_rowbytes(png_ptr, info_ptr);
   image_ptr = makestring((char *)(row_pointers[0]),height*byte_per_scanline);
   vpush(image_ptr);
   for(y=0;y<height;y++){
-    memcpy(&(image_ptr->c.str.chars[y*byte_per_scanline]), row_pointers[y], byte_per_scanline);
+    row_pointers[y] = image_ptr->c.str.chars+y*byte_per_scanline;
   }
+  png_read_image(png_ptr, row_pointers);
+  free(row_pointers);
+  png_read_end(png_ptr,info_ptr);
   png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
   fclose(fp);
 
