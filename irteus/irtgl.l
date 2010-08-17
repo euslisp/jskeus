@@ -236,14 +236,17 @@
 	  (cond
 	   ;; normal face
 	   ((and (send aface :convexp) (not (send aface :holes)))
-	    (let ((texture-img (get aface :GL-TEXTUREIMAGE))
-		  (texture-coords (get aface :GL-TEXTURECOORDS)))
+	    (let* ((texture-img (get aface :GL-TEXTUREIMAGE))
+                   (texture-coords (get aface :GL-TEXTURECOORDS))
+                   (pixelformat
+                    (cond ((derivedp texture-img img::color-image24) GL_RGB)
+                          ((derivedp texture-img img::grayscale-image) GL_LUMINANCE))))
 	      (when texture-img
-		(glTexImage2D 
+		(glTexImage2D
 		 GL_TEXTURE_2D
-		 0 (/ (send texture-img :depth) 8)
+		 0 GL_RGB
 		 (send texture-img :width) (send texture-img :height)
-		 0 GL_RGB GL_UNSIGNED_BYTE (send texture-img :entity))
+		 0 pixelformat GL_UNSIGNED_BYTE (send texture-img :entity))
 		(glTexEnvi GL_TEXTURE_ENV GL_TEXTURE_ENV_MODE GL_DECAL)
 		(glEnable GL_TEXTURE_2D))
 	      (glBegin GL_POLYGON)
@@ -386,16 +389,24 @@
       (t (warn ";; Could not find file ~A~%" file)
 	 (return-from :paste-texture-to-face nil)))
      (setq ow (send img :width) oh (send img :height)
-	   od (/ (send img :depth) 8)
 	   tw (ash 1 (ceiling (log ow 2)))
 	   th (ash 1 (ceiling (log oh 2))))
-     (when (not (= od 3)) (error "not supported depth"))
      (when (not (and (= ow tw) (= oh th)))
        ;; rescale to boundary
-       (let ((b (make-string (* tw th od))))
-	 (gluScaleImage GL_RGB ow oh GL_UNSIGNED_BYTE (send img :entity)
-			    tw th GL_UNSIGNED_BYTE b)
-	 (setq img (instance img:color-image24 :init tw th b))))
+       (let (b od pixelformat)
+         (cond ((derivedp img img::color-image24)
+                (setq od (/ (send img :depth) 8)
+                      pixelformat GL_RGB)
+                (when (not (= od 3)) (error "not supported depth")))
+               ((derivedp img img::grayscale-image)
+                (setq od 1
+                      pixelformat GL_LUMINANCE))
+               (t
+                (error "unsupported image type ~A"  img)))
+         (setq b (make-string (* tw th od)))
+	 (gluScaleImage pixelformat ow oh GL_UNSIGNED_BYTE (send img :entity)
+                        tw th GL_UNSIGNED_BYTE b)
+	 (setq img (instance (class img) :init tw th b))))
      (setf (get aface :gl-textureimage) img)
      (setf (get aface :gl-texturecoords) (make-hash-table :test #'equal))
      (setf (get self :GL-DISPLAYLIST-ID) nil)
