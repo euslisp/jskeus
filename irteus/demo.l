@@ -219,6 +219,8 @@
 
      (send self :init-ending)
      self))
+  (:reset-pose ()
+    (send self :angle-vector #f(0.0 0.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 0.0 0.0 -15.0 30.0 0.0 -15.0 0.0 0.0 -15.0 30.0 0.0 -15.0)))
   )
 
 (defun test1
@@ -227,11 +229,12 @@
   "full body ik"
     (unless (boundp '*robot*)
       (setq *robot* (instance sample-robot :init)))
-    (send *robot* :angle-vector (instantiate float-vector 30))
-    (send *robot* :newcoords (make-coords))
-    (send *robot* :legs :angle-vector #f(0 0 -10 20 -10 0 0))
-    (send *robot* :arms :angle-vector #f(10 20 0 -20 10 0 0))
-    (send *robot* :transform (send  (send *robot* :lleg :end-coords) :transformation (make-coords)))
+    (send *robot* :reset-pose)
+    (if (= (length (car (send *robot* :legs))) 6)
+	(send *robot* :legs :angle-vector #f(0 0 -10 20 -10 0 0)))
+    (if (send *robot* :lleg)
+	(send *robot* :transform (send (send *robot* :lleg :end-coords) :transformation (make-coords)))
+      (send *robot* :newcoords (make-coords)))
     (send *robot* :update-descendants)
     (let* ((move-target (send *robot* :larm :end-coords))
            (link-list (send *robot* :link-list
@@ -255,8 +258,10 @@
                :debug-view :no-flush))
        (send *robot* :head :look-at
              (send *robot* :larm :end-coords :worldpos))
-       (send *robot* :transform (send (send *robot* :lleg :end-coords)
-                                      :transformation (make-coords))) ;fix-leg
+       (if (send *robot* :lleg)
+	   (send *robot* :transform (send (send *robot* :lleg :end-coords)
+					  :transformation (make-coords))) ;fix-leg
+	 (send *robot* :newcoords (make-coords)))
        (send *irtviewer* :viewer :viewsurface :color #f(1 1 1))
        (send *irtviewer* :viewer :viewsurface :line-width 2)
        (send *irtviewer* :viewer :viewsurface :3d-line
@@ -294,11 +299,12 @@
      ;;
      (unless (boundp '*robot*)
        (setq *robot* (instance sample-robot :init)))
-     (send *robot* :angle-vector (instantiate float-vector 30))
-     (send *robot* :newcoords (make-coords))
-     (send *robot* :legs :move-end-pos #f(0 0 50) :local :rotation-axis t)
-     (send *robot* :arms :angle-vector #f(10 20 0 -20 10 0 0))
-     (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (send *robot* :worldcoords)))
+     (send *robot* :reset-pose)
+     (if (= (length (car (send *robot* :arms))) 7)
+	 (send *robot* :arms :angle-vector #f(10 20 0 -20 10 0 0)))
+     (if (some #'null (send *robot* :legs))
+	 (send *robot* :newcoords (make-coords))
+       (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (make-coords))))
      (send *robot* :update-descendants)
      ;;
      ;; make broom model
@@ -565,11 +571,12 @@
   "full body ik"
   (unless (boundp '*robot*)
     (setq *robot* (instance sample-robot :init)))
-  (send *robot* :angle-vector (instantiate float-vector 30))
-  (send *robot* :newcoords (make-coords))
-  (send *robot* :legs :angle-vector #f(0 0 -15 30 0 -15 0))
-  (send *robot* :arms :angle-vector #f(-20 20 0 -50 10 0 0))
-  (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (make-coords)))
+  (send *robot* :reset-pose)
+  (if (= (length (car (send *robot* :arms))) 6)
+      (send *robot* :arms :angle-vector #f(-20 20 0 -50 10 0 0)))
+  (if (some #'null (send *robot* :legs))
+      (send *robot* :newcoords (make-coords))
+    (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (make-coords))))
   (send *robot* :update-descendants)
 
   (labels ((make-crank ()
@@ -587,8 +594,13 @@
 		 (send br :assoc (send br :get :handle))
 		 br))))
      (let* ((move-target (send *robot* :larm :end-coords))
-	    (cog-target-pos (apply #'midpoint 0.5 (send *robot* :legs :end-coords :worldpos)))
-	    (fix-leg-coords (send *robot* :legs :end-coords :copy-worldcoords))
+	    (cog-target-pos
+	     (if (some #'null (send *robot* :legs))
+		 (send (car (send *robot* :links)) :worldpos)
+	       (apply #'midpoint 0.5 (send *robot* :legs :end-coords :worldpos))))
+	    (fix-leg-coords
+	     (unless (some #'null (send *robot* :legs))
+		 (send *robot* :legs :end-coords :copy-worldcoords)))
 	    (link-list (send *robot* :link-list (send move-target :parent)))
 	    (crank (make-crank)))
        (send crank :locate #f(350 100 500) :world)
@@ -613,11 +625,12 @@
 			   :target-centroid-pos cog-target-pos :cog-gain 1.5))
 		 :debug-view :no-flush)
 	   ;; leg inverse kinematics
-	   (mapcar #'(lambda (l tc)
-		       (send *robot* :inverse-kinematics tc
-			     :move-target (send *robot* l :end-coords)
-			     :link-list (send *robot* l)))
-		   '(:lleg :rleg) fix-leg-coords)
+	   (unless (some #'null (send *robot* :legs))
+	     (mapcar #'(lambda (l tc)
+			 (send *robot* :inverse-kinematics tc
+			       :move-target (send *robot* l :end-coords)
+			       :link-list (send *robot* l)))
+		     '(:lleg :rleg) fix-leg-coords))
 	   ;; draw
 	   (send *irtviewer* :draw-objects :flush nil)
 	   (mapcar #'(lambda (act ref)
