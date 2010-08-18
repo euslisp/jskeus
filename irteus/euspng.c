@@ -104,7 +104,6 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
   fclose(fp);
 
   ret=cons(ctx,image_ptr,NIL);
-  vpush(ret);
   ret=cons(ctx,makeint(channels),ret);
   ret=cons(ctx,makeint(height),ret);
   ret=cons(ctx,makeint(width),ret);
