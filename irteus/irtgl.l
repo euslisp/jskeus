@@ -383,7 +383,11 @@
   (:paste-texture-to-face
    (aface &key file)
    (let (img ow oh od tw th)
-     (cond 
+     (cond
+      ((member file (send-all (get self :gl-textureimage) :name) :test #'equal)
+       (setq img (car (member file (get self :gl-textureimage)
+                              :test #'equal
+                              :key #'(lambda (x) (send x :name))))))
       ((probe-file file)
        (setq img (user::read-image-file file)))
       (t (warn ";; Could not find file ~A~%" file)
@@ -411,6 +415,9 @@
 	 (setq img (instance (class img) :init tw th b))
 	 (send img :name name)))
      (setf (get aface :gl-textureimage) img)
+     (if (not (memq img (get self :gl-textureimage)))
+         (setf (get self :gl-textureimage)
+               (append (get self :gl-textureimage) (list img))))
      (setf (get aface :gl-texturecoords) (make-hash-table :test #'equal))
      (setf (get self :GL-DISPLAYLIST-ID) nil)
      ;;
