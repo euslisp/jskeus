@@ -47,7 +47,7 @@
 	(xflush))
    )
 
-(when (and lisp::*use-top-selector* (not (eq *display* 0)))
+(when (and lisp::*use-top-selector* *display* (not (eq *display* 0)))
   (send *top-selector* :remove-port (display-fd))
   (send *top-selector* :add-port (display-fd) #'window-main-one))
 
