@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
-;;; $Id: png.l $
+;;; $Id$
 ;;;
 ;;; Copyright (c) 1987- JSK, The University of Tokyo.  All Rights Reserved.
 ;;;
