@@ -393,7 +393,7 @@
 	   th (ash 1 (ceiling (log oh 2))))
      (when (not (and (= ow tw) (= oh th)))
        ;; rescale to boundary
-       (let (b od pixelformat)
+       (let (b od pixelformat (name (send img :name)))
          (cond ((derivedp img img::color-image24)
                 (setq od (/ (send img :depth) 8)
                       pixelformat GL_RGB)
@@ -406,7 +406,8 @@
          (setq b (make-string (* tw th od)))
 	 (gluScaleImage pixelformat ow oh GL_UNSIGNED_BYTE (send img :entity)
                         tw th GL_UNSIGNED_BYTE b)
-	 (setq img (instance (class img) :init tw th b))))
+	 (setq img (instance (class img) :init tw th b))
+	 (send img :name name)))
      (setf (get aface :gl-textureimage) img)
      (setf (get aface :gl-texturecoords) (make-hash-table :test #'equal))
      (setf (get self :GL-DISPLAYLIST-ID) nil)
