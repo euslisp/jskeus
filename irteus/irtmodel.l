@@ -163,10 +163,10 @@
 (defmethod wheel-joint
   (:init (&rest args
                 &key
-                (min (float-vector *-inf* *-inf* *-inf*))
-                (max (float-vector *inf* *inf* *inf*))
+                (min (float-vector *-inf* *-inf*))
+                (max (float-vector *inf* *inf*))
                 &allow-other-keys)
-	 (setq joint-angle (float-vector 0 0 0))
+	 (setq joint-angle (float-vector 0 0))
          (setq axis (list #f(1 0 0) :z))
 	 (send-super* :init :min min :max max args)
 	 ;; set default value
