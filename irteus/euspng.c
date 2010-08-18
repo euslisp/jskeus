@@ -76,8 +76,14 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
     png_set_bgr(png_ptr);
     break;
   case PNG_COLOR_TYPE_RGB_ALPHA:
-    png_set_strip_alpha(png_ptr);
-    png_set_bgr(png_ptr);
+    png_set_invert_alpha(png_ptr);
+    //png_set_bgr(png_ptr);
+    //png_set_strip_alpha(png_ptr);
+    // RGBA -> rgb , GA -> g
+    png_color_16 my_background = {0xff, 0xff, 0xff, 0xff, 0xff};
+    png_set_background(png_ptr, &my_background,
+                       PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
+
     break;
   }
   png_read_update_info(png_ptr, info_ptr);
