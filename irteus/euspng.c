@@ -93,8 +93,7 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
 
   png_bytep * row_pointers = (png_bytep *)malloc(height*sizeof(png_bytep));
   int y, byte_per_scanline = png_get_rowbytes(png_ptr, info_ptr);
-  image_ptr = makestring((char *)(row_pointers[0]),height*byte_per_scanline);
-  vpush(image_ptr);
+  image_ptr = makebuffer(height*byte_per_scanline);
   for(y=0;y<height;y++){
     row_pointers[y] = image_ptr->c.str.chars+y*byte_per_scanline;
   }
@@ -105,10 +104,10 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
   fclose(fp);
 
   ret=cons(ctx,image_ptr,NIL);
+  vpush(ret);
   ret=cons(ctx,makeint(channels),ret);
   ret=cons(ctx,makeint(height),ret);
   ret=cons(ctx,makeint(width),ret);
-
   return (ret);
 }
 
