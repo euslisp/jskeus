@@ -393,7 +393,7 @@
 	   th (ash 1 (ceiling (log oh 2))))
      (when (not (and (= ow tw) (= oh th)))
        ;; rescale to boundary
-       (let (b od pixelformat (name (send img :name)))
+       (let (b od pixelformat (name (send img :name)) scale)
          (cond ((derivedp img img::color-image24)
                 (setq od (/ (send img :depth) 8)
                       pixelformat GL_RGB)
@@ -403,6 +403,8 @@
                       pixelformat GL_LUMINANCE))
                (t
                 (error "unsupported image type ~A"  img)))
+         (if (> (setq scale (round (sqrt (/ (* tw th) (* 256 256))))) 1)
+             (setq tw (/ tw scale) th (/ th scale)))
          (setq b (make-string (* tw th od)))
 	 (gluScaleImage pixelformat ow oh GL_UNSIGNED_BYTE (send img :entity)
                         tw th GL_UNSIGNED_BYTE b)
