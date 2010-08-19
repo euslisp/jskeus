@@ -42,25 +42,21 @@ eus:
 eus-update:
 	cd eus; svn up lisp
 	cd eus; svn up -N lib; svn up -N lib/llib
-	touch eus-update
 
 eus-installed: eus eus-update
 	cd eus/lisp && ln -sf $(MAKEFILE) Makefile && make eus0 eus1 eus2 eusg eusx eusgl eus
-	touch eus-installed
 
 irteus:
 	svn co $(SVN_IRTEUSURL) irteus
 
 irteus-update:
 	cd irteus; svn up
-	touch irteus-update
 
 irteus-installed: irteus irteus-update
 	cd irteus; make
-	touch irteus-installed
 
 clean:
-	-rm *-installed *-update bashrc.eus
+	-rm bashrc.eus
 	if [ -e irteus ]; then cd irteus; make clean ; fi
 	if [ -e eus/lisp ]; then cd eus/lisp; make clean ; fi
 
