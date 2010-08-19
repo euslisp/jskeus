@@ -163,10 +163,10 @@
 (defmethod wheel-joint
   (:init (&rest args
                 &key
-                (min (float-vector *-inf* *-inf* *-inf*))
-                (max (float-vector *inf* *inf* *inf*))
+                (min (float-vector *-inf* *-inf*))
+                (max (float-vector *inf* *inf*))
                 &allow-other-keys)
-	 (setq joint-angle (float-vector 0 0 0))
+	 (setq joint-angle (float-vector 0 0))
          (setq axis (list #f(1 0 0) :z))
 	 (send-super* :init :min min :max max args)
 	 ;; set default value
@@ -220,20 +220,13 @@
        self)
   (:joint-angle
    (&optional v &key relative &allow-other-keys)
-   (let (relang relx rely)
-     (unless relative
-       (if v (warn "wheel-joint does not support non-relative mode??~%"))
-       (return-from :joint-angle joint-angle))
-     (when v
-       (if relative (setq v (v+ v joint-angle)))
-       (setq relx   (- (elt v 0) (elt joint-angle 0))
-	     rely   (- (elt v 1) (elt joint-angle 1))
-	     relang (- (elt v 2) (elt joint-angle 2))
-	     joint-angle v)
-       (send child-link :translate (float-vector relx rely 0))
-       (send child-link :rotate (deg2rad relang) :z))
-     joint-angle
-     ))
+   (when v
+     (if relative (setq v (v+ v joint-angle)))
+     (setq joint-angle (vmin (vmax v min-angle) max-angle))
+     (send child-link :replace-coords default-coords)
+     (send child-link :translate (float-vector (elt joint-angle 0) (elt joint-angle 1) 0))
+     (send child-link :rotate (deg2rad (elt joint-angle 2)) :z))
+   joint-angle)
   (:joint-dof () 3)
   (:speed-to-angle (dav i)
                    (float-vector (* 1000 (elt dav i))
