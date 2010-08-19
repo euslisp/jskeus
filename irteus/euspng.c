@@ -73,7 +73,7 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
     if ( bit_depth < 8) png_set_gray_1_2_4_to_8(png_ptr);
     break;
   case PNG_COLOR_TYPE_RGB:
-    png_set_bgr(png_ptr);
+    //png_set_bgr(png_ptr);
     break;
   case PNG_COLOR_TYPE_RGB_ALPHA:
     png_set_invert_alpha(png_ptr);
