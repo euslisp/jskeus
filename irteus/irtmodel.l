@@ -238,15 +238,15 @@
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
      (calc-jacobian-linear
-      fik row column joint (send child-link :rotate-vector #f(1 0 0)) child-link child-reverse
+      fik row column joint (send default-coords :rotate-vector #f(1 0 0)) child-link child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-linear
-      fik row (+ column 1) joint (send child-link :rotate-vector #f(0 1 0)) child-link child-reverse
+      fik row (+ column 1) joint (send default-coords :rotate-vector #f(0 1 0)) child-link child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 2) joint (send child-link :rotate-vector #f(0 0 1)) child-link child-reverse
+      fik row (+ column 2) joint (send default-coords :rotate-vector #f(0 0 1)) child-link child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
@@ -290,15 +290,15 @@
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
      (calc-jacobian-rotational
-      fik row column joint (send child-link :rotate-vector #f(0 0 1)) child-link child-reverse
+      fik row column joint (send default-coords :rotate-vector #f(0 0 1)) child-link child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 1) joint (send child-link :rotate-vector #f(0 1 0)) child-link child-reverse
+      fik row (+ column 1) joint (send default-coords :rotate-vector #f(0 1 0)) child-link child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 2) joint (send child-link :rotate-vector #f(1 0 0)) child-link child-reverse
+      fik row (+ column 2) joint (send default-coords :rotate-vector #f(1 0 0)) child-link child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
@@ -346,27 +346,27 @@
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
      (calc-jacobian-linear
-      fik row column joint #f(1 0 0) child-link child-reverse
+      fik row column joint (send default-coords :rotate-vector #f(1 0 0)) child-link child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-linear
-      fik row (+ column 1) joint #f(0 1 0) child-link child-reverse
+      fik row (+ column 1) joint (send default-coords :rotate-vector #f(0 1 0)) child-link child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-linear
-      fik row (+ column 2) joint #f(0 0 1) child-link child-reverse
+      fik row (+ column 2) joint (send default-coords :rotate-vector #f(0 0 1)) child-link child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 3) joint #f(0 0 1) child-link child-reverse
+      fik row (+ column 3) joint (send default-coords :rotate-vector #f(0 0 1)) child-link child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 4) joint #f(0 1 0) child-link child-reverse
+      fik row (+ column 4) joint (send default-coords :rotate-vector #f(0 1 0)) child-link child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 5) joint #f(1 0 0) child-link child-reverse
+      fik row (+ column 5) joint (send default-coords :rotate-vector #f(1 0 0)) child-link child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
