@@ -381,9 +381,18 @@
      ))
   ;;
   (:paste-texture-to-face
-   (aface &key file)
+   (aface &key file image
+          (tex-coords
+           (list
+            (float-vector 0 0)
+            (float-vector 0 1)
+            (float-vector 1 1)
+            (float-vector 1 0)))
+          )
    (let (img ow oh od tw th)
      (cond
+      (image
+       (setq img image))
       ((member file (send-all (get self :gl-textureimage) :name) :test #'equal)
        (setq img (car (member file (get self :gl-textureimage)
                               :test #'equal
@@ -421,12 +430,9 @@
      (setf (get aface :gl-texturecoords) (make-hash-table :test #'equal))
      (setf (get self :GL-DISPLAYLIST-ID) nil)
      ;;
-     (let ((tmp-coords
-	    (list (float-vector 0 0) (float-vector 0 1)
-		  (float-vector 1 1) (float-vector 1 0))))
-       (dolist (p (butlast (send aface :vertices)))
-	 (setf (gethash p (get aface :gl-texturecoords))
-	       (pop tmp-coords))))
+     (dolist (p (butlast (send aface :vertices)))
+       (setf (gethash p (get aface :gl-texturecoords))
+             (pop tex-coords)))
      ))
   )
 
