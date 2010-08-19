@@ -74,8 +74,10 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
     break;
   case PNG_COLOR_TYPE_RGB:
     //png_set_bgr(png_ptr);
+    if (bit_depth == 16) png_set_strip_16(png_ptr); // 16bit -> 8bit
     break;
   case PNG_COLOR_TYPE_RGB_ALPHA:
+    if (bit_depth == 16) png_set_strip_16(png_ptr); // 16bit -> 8bit
     png_set_invert_alpha(png_ptr);
     //png_set_bgr(png_ptr);
     //png_set_strip_alpha(png_ptr);
