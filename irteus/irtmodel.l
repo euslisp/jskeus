@@ -49,21 +49,21 @@
   (:calc-jacobian (&rest args) (warn "subclass's respoinsibility (send ~s :calc-jacobian)~%" self))
   )
 
-(defun calc-jacobian-child-rotate-vector
-  (paxis child-link child-reverse move-target tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+(defun calc-jacobian-default-rotate-vector
+  (paxis world-default-coords child-reverse move-target tmp-v3 tmp-v3a tmp-v3b tmp-m33)
   (setq tmp-v3 (scale (if child-reverse -1.0 1.0)
-		      (normalize-vector (send child-link :rotate-vector paxis tmp-v3) tmp-v3) tmp-v3))
+		      (normalize-vector (send world-default-coords :rotate-vector paxis tmp-v3) tmp-v3) tmp-v3))
   (setq tmp-v3
         (v- (send move-target :inverse-transform-vector tmp-v3 tmp-v3 tmp-v3b tmp-m33)
             (send move-target :inverse-transform-vector #f(0 0 0) tmp-v3a tmp-v3b tmp-m33)  tmp-v3))
   tmp-v3)
 
 (defun calc-jacobian-rotational
-  (fik row column joint paxis child-link child-reverse
+  (fik row column joint paxis child-link world-default-coords child-reverse
        move-target rotation-axis translation-axis
        pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-  (setq tmp-v3 (calc-jacobian-child-rotate-vector
-		paxis child-link child-reverse move-target tmp-v3 tmp-v3a tmp-v3b tmp-m33))
+  (setq tmp-v3 (calc-jacobian-default-rotate-vector
+		paxis world-default-coords child-reverse move-target tmp-v3 tmp-v3a tmp-v3b tmp-m33))
 
   (setq pos-i (scale -0.001 ;; scale [mm] -> [m] and vector child-link -> move-target
 		     (send move-target :inverse-transform-vector
@@ -76,11 +76,11 @@
   )
 
 (defun calc-jacobian-linear
-  (fik row column joint paxis child-link child-reverse
+  (fik row column joint paxis child-link world-default-coords child-reverse
        move-target rotation-axis translation-axis
        pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-  (setq tmp-v3 (calc-jacobian-child-rotate-vector
-		paxis child-link child-reverse move-target tmp-v3 tmp-v3a tmp-v3b tmp-m33))
+  (setq tmp-v3 (calc-jacobian-default-rotate-vector
+		paxis world-default-coords child-reverse move-target tmp-v3 tmp-v3a tmp-v3b tmp-m33))
 
   (setq pos-r (calc-dif-with-axis tmp-v3 translation-axis tmp-v0 tmp-v1 tmp-v2))
   (setq pos-r (scale 0.001 pos-r pos-r)) ;; scale [mm] -> [m]
@@ -188,16 +188,16 @@
                    (float-vector (* 1000 (elt dav i))
                                  (rad2deg (elt dav (incf i)))))
   (:calc-jacobian
-   (fik row column joint paxis child-link child-reverse
+   (fik row column joint paxis child-link world-default-coords child-reverse
 	move-target rotation-axis translation-axis
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
      (calc-jacobian-linear
-      fik row column joint #f(1 0 0) child-link child-reverse
+      fik row column joint #f(1 0 0) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 1) joint #f(0 0 1) child-link child-reverse
+      fik row (+ column 1) joint #f(0 0 1) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
@@ -233,20 +233,20 @@
                                  (* 1000 (elt dav (incf i)))
                                  (rad2deg (elt dav (incf i)))))
   (:calc-jacobian
-   (fik row column joint paxis child-link child-reverse
+   (fik row column joint paxis child-link world-default-coords child-reverse
 	move-target rotation-axis translation-axis
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
      (calc-jacobian-linear
-      fik row column joint #f(1 0 0) child-link child-reverse
+      fik row column joint #f(1 0 0) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-linear
-      fik row (+ column 1) joint #f(0 1 0) child-link child-reverse
+      fik row (+ column 1) joint #f(0 1 0) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 2) joint #f(0 0 1) child-link child-reverse
+      fik row (+ column 2) joint #f(0 0 1) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
@@ -285,20 +285,20 @@
                                  (rad2deg (elt dav (incf i)))
                                  (rad2deg (elt dav (incf i)))))
   (:calc-jacobian
-   (fik row column joint paxis child-link child-reverse
+   (fik row column joint paxis child-link world-default-coords child-reverse
 	move-target rotation-axis translation-axis
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
      (calc-jacobian-rotational
-      fik row column joint #f(0 0 1) child-link child-reverse
+      fik row column joint #f(0 0 1) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 1) joint #f(0 1 0) child-link child-reverse
+      fik row (+ column 1) joint #f(0 1 0) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 2) joint #f(1 0 0) child-link child-reverse
+      fik row (+ column 2) joint #f(1 0 0) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
@@ -341,32 +341,32 @@
                                  (rad2deg (elt dav (incf i)))
                                  (rad2deg (elt dav (incf i)))))
   (:calc-jacobian
-   (fik row column joint paxis child-link child-reverse
+   (fik row column joint paxis child-link world-default-coords child-reverse
 	move-target rotation-axis translation-axis
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
      (calc-jacobian-linear
-      fik row column joint #f(1 0 0) child-link child-reverse
+      fik row column joint #f(1 0 0) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-linear
-      fik row (+ column 1) joint #f(0 1 0) child-link child-reverse
+      fik row (+ column 1) joint #f(0 1 0) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-linear
-      fik row (+ column 2) joint #f(0 0 1) child-link child-reverse
+      fik row (+ column 2) joint #f(0 0 1) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 3) joint #f(0 0 1) child-link child-reverse
+      fik row (+ column 3) joint #f(0 0 1) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 4) joint #f(0 1 0) child-link child-reverse
+      fik row (+ column 4) joint #f(0 1 0) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 5) joint #f(1 0 0) child-link child-reverse
+      fik row (+ column 5) joint #f(1 0 0) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
@@ -814,8 +814,7 @@
 	      &allow-other-keys)
    (let* (len ul row
 	  pos-i pos-r
-	  paxis
-	  child-link child-reverse union-link-list
+	  child-reverse union-link-list
 	  j)
      (unless fik (setq fik (make-matrix dim fik-len)))
 ;;
@@ -849,18 +848,21 @@
                                    (send move-target :parent)))))
                     (setq child-reverse t))
                    (t (setq child-reverse nil)))
-	     (setq child-link (send j :child-link))
-             (setq paxis (case (j . axis)
-                               (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1))
-                               (:xx #f(1 0 0)) (:yy #f(0 1 0)) (:zz #f(0 0 1))
-                               (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1))
-                               (t (j . axis))))
-
-             (send j :calc-jacobian
-                   fik row col j paxis child-link child-reverse move-target
-                   rotation-axis translation-axis pos-i pos-r
-                   tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
-             ) ;; when
+	     (let* ((paxis (case (j . axis)
+			     (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1))
+			     (:xx #f(1 0 0)) (:yy #f(0 1 0)) (:zz #f(0 0 1))
+			     (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1))
+			     (t (j . axis))))
+		    (child-link (send j :child-link))
+		    (parent-link (send j :parent-link))
+		    (default-coords (j . default-coords))
+		    (world-default-coords (send (send parent-link :copy-worldcoords)
+						:transform default-coords)))
+	       (send j :calc-jacobian
+		     fik row col j paxis child-link world-default-coords child-reverse move-target
+		     rotation-axis translation-axis pos-i pos-r
+		     tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+	       )) ;; when
            (incf row (send self :calc-target-axis-dimension
 			   rotation-axis translation-axis))
            )) ;; dotimes
