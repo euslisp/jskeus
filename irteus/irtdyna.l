@@ -124,13 +124,13 @@
 	 translation-axis rotation-axis
 	 tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
-     mat row column #f(0 0 1) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row column #f(1 0 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
      mat row (+ column 1) #f(0 1 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
-     mat row (+ column 2) #f(1 0 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row (+ column 2) #f(0 0 1) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     )
   )
@@ -151,13 +151,13 @@
      mat row (+ column 2) #f(0 0 1) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
-     mat row (+ column 3) #f(0 0 1) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row (+ column 3) #f(1 0 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
      mat row (+ column 4) #f(0 1 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
-     mat row (+ column 5) #f(1 0 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row (+ column 5) #f(0 0 1) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     )
   )

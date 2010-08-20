@@ -258,27 +258,48 @@
 
 (defmethod sphere-joint
   (:init (&rest args
-                &key
-                (min (float-vector *-inf* *-inf* *-inf*))
-                (max (float-vector *inf* *inf* *inf*))
-                &allow-other-keys)
-	 (setq joint-angle (float-vector 0 0 0))
-         (setq axis (list :z :y :x))
-	 (send-super* :init :min min :max max args)
-	 ;; set default value
-	 self)
+		&key
+		;; min/max are defined as a region of anguler velocity
+		(min (float-vector *-inf* *-inf* *-inf*))
+		(max (float-vector *inf* *inf* *inf*))
+		&allow-other-keys)
+    (setq axis (list :x :y :z))
+    (send-super* :init :min min :max max args)
+    ;; joint-angle is defined as anguler velocity equivalent to orthogonal orientation matrix
+    (setq joint-angle (float-vector 0 0 0)) ;; [deg]
+    self)
   (:joint-angle
-   (&optional v &key relative &allow-other-keys)
-   (when v
-     (if relative (setq v (v+ v joint-angle)))
-     (setq v (vmax v min-angle))
-     (setq v (vmin v max-angle))
-     (setq joint-angle v)
-     (send child-link :replace-coords default-coords)
-     (send child-link :rotate (deg2rad (elt joint-angle 0)) :z)
-     (send child-link :rotate (deg2rad (elt joint-angle 1)) :y)
-     (send child-link :rotate (deg2rad (elt joint-angle 2)) :x))
-   joint-angle)
+    (&optional v &key relative)
+    ;; v is anguler velocity [deg]
+    (when v
+      ;; if relative nil
+      ;; v is equivalent to orthogonal orientation matrix calculated from (send (send world-default-coords :transformation child-link) :worldrot)
+      (unless relative (setq joint-angle v))
+      (let* ((drot (matrix-exponent (map float-vector #'deg2rad joint-angle))))
+	(if relative
+	    ;; if relative t
+	    ;; v is calculated from difference-rotation or jacobian
+	    (let ((vec (map float-vector #'deg2rad v)))
+	      (unless (eps= (rad2deg (norm vec)) 0.0)
+		(m* (rotation-matrix (norm vec) (normalize-vector vec)) drot drot))))
+	;; min max check
+	(let* ((dr (map float-vector #'rad2deg (matrix-log drot))))
+	  (setq joint-angle (vmin (vmax dr min-angle) max-angle)))
+	;; update child-link
+	(send child-link :replace-coords default-coords)
+	(send child-link :transform
+	      (make-coords :rot (matrix-exponent (map float-vector #'deg2rad joint-angle))))))
+    joint-angle)
+  (:joint-angle-rpy ;; v and return-value -> [deg] and (float-vector yaw roll pitch)
+    (&optional v &key relative)
+    (when v
+      (let ((ja (if relative
+		    (v+ (map float-vector #'deg2rad v)
+			(coerce (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad joint-angle))))
+				float-vector))
+		  (map float-vector #'deg2rad v))))
+	(send self :joint-angle (map cons #'rad2deg (matrix-log (rpy-matrix (elt ja 0) (elt ja 1) (elt ja 2)))))))
+    (map float-vector #'rad2deg (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad joint-angle))))))
   (:joint-dof () 3)
   (:speed-to-angle (dav i)
                    (float-vector (rad2deg (elt dav i))
@@ -290,7 +311,7 @@
 	pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
    (let ()
      (calc-jacobian-rotational
-      fik row column joint #f(0 0 1) child-link world-default-coords child-reverse
+      fik row column joint #f(1 0 0) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
@@ -298,7 +319,7 @@
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 2) joint #f(1 0 0) child-link world-default-coords child-reverse
+      fik row (+ column 2) joint #f(0 0 1) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
@@ -309,29 +330,58 @@
   :slots (axis))
 
 (defmethod 6dof-joint
+  ;; translation (3dof) and rotation (3dof) -> 6dof
+  ;;   about rotation component -> please see sphere-joint declaration
   (:init (&rest args
                 &key
                 (min (float-vector *-inf* *-inf* *-inf* *-inf* *-inf* *-inf*))
                 (max (float-vector *inf* *inf* *inf* *inf* *inf* *inf*))
                 &allow-other-keys)
-	 (setq joint-angle (float-vector 0 0 0 0 0 0))
-         (setq axis (list #f(1 0 0) #f(0 1 0) #f(0 0 1) :z :y :x))
-	 (send-super* :init :min min :max max args)
-	 ;; set default value
-	 self)
+    (setq axis (list #f(1 0 0) #f(0 1 0) #f(0 0 1) :x :y :z))
+    (send-super* :init :min min :max max args)
+    (setq joint-angle (float-vector 0 0 0 0 0 0)) ;; [mm] [deg]
+    self)
   (:joint-angle
-   (&optional v &rest args &key relative &allow-other-keys)
-   (when v
-     (if relative (setq v (v+ v joint-angle)))
-     (setq v (vmax v min-angle))
-     (setq v (vmin v max-angle))
-     (setq joint-angle v)
-     (send child-link :replace-coords default-coords)
-     (send child-link :translate (subseq joint-angle 0 3))
-     (send child-link :rotate (deg2rad (elt joint-angle 3)) :z)
-     (send child-link :rotate (deg2rad (elt joint-angle 4)) :y)
-     (send child-link :rotate (deg2rad (elt joint-angle 5)) :x))
-   joint-angle)
+    (&optional v &key relative) ;; v [mm] [deg]
+    (when v
+      (let (dp drot)
+	;; translation
+	(setq dp (if relative
+		     (v+ (subseq joint-angle 0 3) (subseq v 0 3))
+		   (subseq v 0 3)))
+	(setq dp (vmin (vmax dp (subseq min-angle 0 3)) (subseq max-angle 0 3)))
+	;; rotation
+	(unless relative (dotimes (i 3) (setf (elt joint-angle (+ i 3)) (elt v (+ i 3)))))
+	(setq drot (matrix-exponent (map float-vector #'deg2rad (subseq joint-angle 3 6))))
+	(if relative
+	    (let ((vec (map float-vector #'deg2rad (subseq v 3 6))))
+	      (unless (eps= (rad2deg (norm vec)) 0.0)
+		(m* (rotation-matrix (norm vec) (normalize-vector vec)) drot drot))))
+	;; min max check
+	(let* ((dr (map float-vector #'rad2deg (matrix-log drot))))
+	  (setq dr (vmin (vmax dr (subseq min-angle 3 6)) (subseq max-angle 3 6)))
+	  (dotimes (i 3)
+	    (setf (elt joint-angle i) (elt dp i))
+	    (setf (elt joint-angle (+ i 3)) (elt dr i)))
+	  ;; update child-link
+	  (send child-link :replace-coords default-coords)
+	  (send child-link :transform
+		(make-coords :rot (matrix-exponent (map float-vector #'deg2rad dr)) :pos dp)))))
+    joint-angle)
+  (:joint-angle-rpy ;; v and return-value -> [deg] and (float-vector yaw roll pitch)
+    (&optional v &key relative)
+    (when v
+      (let ((ja (if relative
+		    (v+ (map float-vector #'deg2rad (subseq v 3 6))
+			(coerce (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad (subseq joint-angle 3 6)))))
+				float-vector))
+		  (map float-vector #'deg2rad (subseq v 3 6)))))
+	(send self :joint-angle (concatenate float-vector
+					     (subseq v 0 3)
+					     (map cons #'rad2deg (matrix-log (rpy-matrix (elt ja 0) (elt ja 1) (elt ja 2))))))))
+    (concatenate float-vector
+		 (subseq joint-angle 0 3)
+		 (map float-vector #'rad2deg (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad (subseq joint-angle 3 6))))))))
   (:joint-dof () 6)
   (:speed-to-angle (dav i)
                    (float-vector (* 1000 (elt dav i))
@@ -358,7 +408,7 @@
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 3) joint #f(0 0 1) child-link world-default-coords child-reverse
+      fik row (+ column 3) joint #f(1 0 0) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
@@ -366,7 +416,7 @@
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      (calc-jacobian-rotational
-      fik row (+ column 5) joint #f(1 0 0) child-link world-default-coords child-reverse
+      fik row (+ column 5) joint #f(0 0 1) child-link world-default-coords child-reverse
       move-target rotation-axis translation-axis
       pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
