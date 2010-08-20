@@ -1917,13 +1917,11 @@
 			    ,joint-args))
            (send ,rlink :add-parent-link ,vlink)
            (send ,vlink :add-child-links ,rlink)
-           (send ,robot :assoc ,vlink)
            (unwind-protect
                (let ((,(car params) (mapcar #'(lambda (l)
                                                 (cons ,rlink l))
                                             ,link-list)))
                  ,@bodies)
-             (send ,robot :dissoc ,vlink)
              (send ,rlink :del-joint)
              (send ,rlink :del-parent-link)
              (send ,vlink :del-child-link ,rlink)))))))
