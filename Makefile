@@ -1,4 +1,4 @@
-all: eus-installed irteus-installed bashrc.eus
+all: eus-installed irteus-installed bashrc.eusmanual.pdf jmanual.pdf
 
 SVN_EUSURL=https://euslisp.svn.sourceforge.net/svnroot/euslisp/trunk/EusLisp
 SVN_IRTEUSURL=https://jskeus.svn.sourceforge.net/svnroot/jskeus/trunk/irteus
@@ -23,6 +23,12 @@ endif
 
 export EUSDIR=$(shell pwd)/eus
 
+manual.pdf:
+	wget http://euslisp.svn.sourceforge.net/viewvc/euslisp/trunk/EusLisp/doc/latex/manual.pdf -O manual.pdf
+
+jmanual.pdf:
+	wget http://euslisp.svn.sourceforge.net/viewvc/euslisp/trunk/EusLisp/doc/jlatex/jmanual.pdf -O jmanual.pdf
+
 bashrc.eus:
 	@echo "#\n\
 # bashrc.eus : environment variable for euslisp \n#\n\
@@ -31,15 +37,15 @@ export ARCHDIR=$(ARCHDIR) \n\
 export PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$PATH \n\
 export LD_LIBRARY_PATHPATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
 " > bashrc.eus
-	@bash -c 'echo -e "\e[1;31m;; generate `pwd`/bashrc.eus\e[m"'
-	@bash -c 'echo -e "\e[1;31m;; Please move `pwd`/bashrc.eus to ~/bashrc.eus\e[m"'
-	@bash -c 'echo -e "\e[1;31m;;   and include \"source bashrc.eus\" in your .bashrc file\e[m"'
+	@bash -c 'echo -e "\e[1;32m;; generating bashrc.eus ...\n;;\e[m"'
+	@bash -c 'echo -e "\e[1;32m;; Please move bashrc.eus to ~/bashrc.eus\e[m"'
+	@bash -c 'echo -e "\e[1;32m;;   and include \"source bashrc.eus\" in your .bashrc file\e[m"'
 	@cat bashrc.eus
 
 eus:
 	# 'svn propget svn:externals .' to see the details
 	mkdir eus
-	svn co -N $(SVN_EUSURL)/lisp eus/lisp
+	svn co $(SVN_EUSURL)/lisp eus/lisp
 	svn co -N $(SVN_EUSURL)/lib eus/lib; cd eus/lib; svn up llib
 
 rm-lib-dir:
@@ -59,7 +65,7 @@ irteus-installed: irteus
 	cd irteus; make
 
 clean:
-	-rm bashrc.eus
+	-rm bashrc.eus manual.pdf jmanual.pdf
 	if [ -e irteus ]; then cd irteus; make clean ; fi
 	if [ -e eus/lisp ]; then cd eus/lisp; make clean ; fi
 
