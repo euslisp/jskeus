@@ -38,10 +38,10 @@
 
 (defun calc-inertia-matrix-rotational
   (mat row column ;; output matrix
-       paxis m-til c-til I-til axis-for-angular child-link
+       paxis m-til c-til I-til axis-for-angular child-link world-default-coords
        translation-axis rotation-axis
        tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m) ;; buffer
-  (let* ((ax (normalize-vector (send child-link :rotate-vector paxis tmp-va) tmp-va))
+  (let* ((ax (normalize-vector (send world-default-coords :rotate-vector paxis tmp-va) tmp-va))
 	 (mt (* 1e-3 m-til)) ;; [g] -> [kg]
 	 (ct (scale 1e-3 c-til tmp-vb)) ;; [mm] -> [m]
 	 (It (scale-matrix 1e-9 I-til tmp-m)) ;; [g mm^2] -> [kg m^2]
@@ -58,10 +58,10 @@
 
 (defun calc-inertia-matrix-linear
   (mat row column ;; output matrix
-       paxis m-til c-til I-til axis-for-angular child-link
+       paxis m-til c-til I-til axis-for-angular child-link world-default-coords
        translation-axis rotation-axis
        tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m) ;; buffer
-  (let* ((ax (normalize-vector (send child-link :rotate-vector paxis tmp-va) tmp-va))
+  (let* ((ax (normalize-vector (send world-default-coords :rotate-vector paxis tmp-va) tmp-va))
 	 (mt (* 1e-3 m-til)) ;; [g] -> [kg]
 	 (ct (scale 1e-3 c-til tmp-vb)) ;; [mm] -> [m]
 	 (It (scale-matrix 1e-9 I-til tmp-m)) ;; [g mm^2] -> [kg m^2]
@@ -76,12 +76,12 @@
 (defmethod rotational-joint
   (:calc-inertia-matrix
     (mat row column ;; output matrix
-	 paxis m-til c-til I-til axis-for-angular
+	 paxis m-til c-til I-til axis-for-angular world-default-coords
 	 translation-axis rotation-axis
 	 tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
      mat row column
-     paxis m-til c-til I-til axis-for-angular child-link
+     paxis m-til c-til I-til axis-for-angular child-link world-default-coords
      translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m))
   )
@@ -89,12 +89,12 @@
 (defmethod linear-joint
   (:calc-inertia-matrix
     (mat row column ;; output matrix
-	 paxis m-til c-til I-til axis-for-angular
+	 paxis m-til c-til I-til axis-for-angular world-default-coords
 	 translation-axis rotation-axis
 	 tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-linear
      mat row column
-     paxis m-til c-til I-til axis-for-angular child-link
+     paxis m-til c-til I-til axis-for-angular child-link world-default-coords
      translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m))
   )
@@ -102,17 +102,20 @@
 (defmethod omniwheel-joint
   (:calc-inertia-matrix
     (mat row column ;; output matrix
-	 paxis m-til c-til I-til axis-for-angular
+	 paxis m-til c-til I-til axis-for-angular world-default-coords
 	 translation-axis rotation-axis
 	 tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-linear
-     mat row column #f(1 0 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row column #f(1 0 0) m-til c-til I-til axis-for-angular
+     child-link world-default-coords translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-linear
-     mat row (+ column 1) #f(0 1 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row (+ column 1) #f(0 1 0) m-til c-til I-til axis-for-angular
+     child-link world-default-coords translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
-     mat row (+ column 2) #f(0 0 1) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row (+ column 2) #f(0 0 1) m-til c-til I-til axis-for-angular
+     child-link world-default-coords translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     )
   )
@@ -120,17 +123,20 @@
 (defmethod sphere-joint
   (:calc-inertia-matrix
     (mat row column ;; output matrix
-	 paxis m-til c-til I-til axis-for-angular
+	 paxis m-til c-til I-til axis-for-angular world-default-coords
 	 translation-axis rotation-axis
 	 tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
-     mat row column #f(1 0 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row column #f(1 0 0) m-til c-til I-til axis-for-angular
+     child-link world-default-coords translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
-     mat row (+ column 1) #f(0 1 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row (+ column 1) #f(0 1 0) m-til c-til I-til axis-for-angular
+     child-link world-default-coords translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
-     mat row (+ column 2) #f(0 0 1) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row (+ column 2) #f(0 0 1) m-til c-til I-til axis-for-angular
+     child-link world-default-coords translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     )
   )
@@ -138,26 +144,32 @@
 (defmethod 6dof-joint
   (:calc-inertia-matrix
     (mat row column ;; output matrix
-	 paxis m-til c-til I-til axis-for-angular
+	 paxis m-til c-til I-til axis-for-angular world-default-coords
 	 translation-axis rotation-axis
 	 tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-linear
-     mat row column #f(1 0 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row column #f(1 0 0) m-til c-til I-til axis-for-angular
+     child-link world-default-coords translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-linear
-     mat row (+ column 1) #f(0 1 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row (+ column 1) #f(0 1 0) m-til c-til I-til axis-for-angular
+     child-link world-default-coords translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-linear
-     mat row (+ column 2) #f(0 0 1) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row (+ column 2) #f(0 0 1) m-til c-til I-til axis-for-angular
+     child-link world-default-coords translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
-     mat row (+ column 3) #f(1 0 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row (+ column 3) #f(1 0 0) m-til c-til I-til axis-for-angular
+     child-link world-default-coords translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
-     mat row (+ column 4) #f(0 1 0) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row (+ column 4) #f(0 1 0) m-til c-til I-til axis-for-angular
+     child-link world-default-coords translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     (calc-inertia-matrix-rotational
-     mat row (+ column 5) #f(0 0 1) m-til c-til I-til axis-for-angular child-link translation-axis rotation-axis
+     mat row (+ column 5) #f(0 0 1) m-til c-til I-til axis-for-angular
+     child-link world-default-coords translation-axis rotation-axis
      tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m)
     )
   )
@@ -244,10 +256,12 @@
 		       (:y (float-vector 0 1 0)) (:-y (float-vector 0 -1 0))
 		       (:z (float-vector 0 0 1)) (:-z (float-vector 0 0 -1))
 		       (t (joint . axis))))
-	  (row 0))
+	  (row 0)
+	  (world-default-coords (send (send (send joint :parent-link) :copy-worldcoords)
+				      :transform (joint . default-coords))))
      (send joint :calc-inertia-matrix im row column
 	   paxis (send self :get :m-til) (send self :get :c-til) (send self :get :I-til)
-	   axis-for-angular translation-axis rotation-axis
+	   axis-for-angular world-default-coords translation-axis rotation-axis
 	   tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-ma))
    t)
   )
