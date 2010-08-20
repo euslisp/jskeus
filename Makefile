@@ -37,22 +37,16 @@ export LD_LIBRARY_PATHPATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
 	@cat bashrc.eus
 
 eus:
-	svn co -N $(SVN_EUSURL) eus
+	# 'svn propget svn:externals .' to see the details
+	svn up
 
-eus-update:
-	cd eus; svn up lisp
-	cd eus; svn up -N lib; svn up -N lib/llib
-
-eus-installed: eus eus-update
+eus-installed: eus
 	cd eus/lisp && ln -sf $(MAKEFILE) Makefile && make eus0 eus1 eus2 eusg eusx eusgl eus
 
 irteus:
-	svn co $(SVN_IRTEUSURL) irteus
+	svn up irteus
 
-irteus-update:
-	cd irteus; svn up
-
-irteus-installed: irteus irteus-update
+irteus-installed: irteus
 	cd irteus; make
 
 clean:
@@ -62,3 +56,4 @@ clean:
 
 wipe: clean
 	-rm -fr eus irteus
+
