@@ -42,7 +42,14 @@ eus:
 	svn co -N $(SVN_EUSURL)/lisp eus/lisp
 	svn co -N $(SVN_EUSURL)/lib eus/lib; cd eus/lib; svn up llib
 
-eus-installed: eus
+rm-lib-dir:
+	# remove unsupported directories
+	@if [ -e eus/lib/clib -o -e eus/lib/demo -o -e eus/lib/bitmaps ]; then\
+		svn up -q --set-depth files eus/lib/; \
+		svn up -q eus/lib/llib; \
+	fi
+
+eus-installed: eus rm-lib-dir
 	cd eus/lisp && ln -sf $(MAKEFILE) Makefile && make eus0 eus1 eus2 eusg eusx eusgl eus
 
 irteus:
