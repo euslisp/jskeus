@@ -38,7 +38,9 @@ export LD_LIBRARY_PATHPATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
 
 eus:
 	# 'svn propget svn:externals .' to see the details
-	svn up
+	mkdir eus
+	svn co -N $(SVN_EUSURL)/lisp eus/lisp
+	svn co -N $(SVN_EUSURL)/lib eus/lib; cd eus/lib; svn up llib
 
 eus-installed: eus
 	cd eus/lisp && ln -sf $(MAKEFILE) Makefile && make eus0 eus1 eus2 eusg eusx eusgl eus
