@@ -1,4 +1,4 @@
-all: eus-installed irteus-installed bashrc.eusmanual.pdf jmanual.pdf
+all: eus-installed irteus-installed bashrc.eus manuals
 
 SVN_EUSURL=https://euslisp.svn.sourceforge.net/svnroot/euslisp/trunk/EusLisp
 SVN_IRTEUSURL=https://jskeus.svn.sourceforge.net/svnroot/jskeus/trunk/irteus
@@ -23,6 +23,7 @@ endif
 
 export EUSDIR=$(shell pwd)/eus
 
+manuals: manual.pdf jmanual.pdf
 manual.pdf:
 	wget http://euslisp.svn.sourceforge.net/viewvc/euslisp/trunk/EusLisp/doc/latex/manual.pdf -O manual.pdf
 
