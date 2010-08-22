@@ -279,6 +279,7 @@
 	  (inertia-matrix
 	   (make-matrix axis-dim (send self :calc-target-joint-dimension link-list)))
 	  (debug-view nil)
+	  (update-mass-properties t)
           ;; buffers for calculation
 	  (tmp-v0 (instantiate float-vector 0))
 	  (tmp-v1 (instantiate float-vector 1))
@@ -291,20 +292,21 @@
 	  (tmp-mb (make-matrix 3 3))
 	  (tmp-mc (make-matrix 3 3))
      &allow-other-keys)
-    ;; parameter initialization
-    (dolist (l (send self :links))
-      (send l :put :m-til 0)
-      (if (send l :get :c-til)
-	  (dotimes (i 3)
-	    (setf (elt (send l :get :c-til) i) 0.0))
-	(send l :put :c-til (float-vector 0 0 0)))
-      (if (send l :get :I-til)
-	  (dotimes (j 3)
+    (when update-mass-properties 
+      ;; parameter initialization
+      (dolist (l (send self :links))
+	(send l :put :m-til 0)
+	(if (send l :get :c-til)
 	    (dotimes (i 3)
-	      (setf (aref (send l :get :I-til) i j) 0.0)))
-	(send l :put :I-til (make-matrix 3 3))))
-    ;; calc all links' mass properties
-    (send* (car (send self :links)) :propagate-mass-properties args)
+	      (setf (elt (send l :get :c-til) i) 0.0))
+	  (send l :put :c-til (float-vector 0 0 0)))
+	(if (send l :get :I-til)
+	    (dotimes (j 3)
+	      (dotimes (i 3)
+		(setf (aref (send l :get :I-til) i j) 0.0)))
+	  (send l :put :I-til (make-matrix 3 3))))
+      ;; calc all links' mass properties
+      (send* (car (send self :links)) :propagate-mass-properties args))
     ;; calc inertia matrix
     (let ((j))
       (do ((column 0 (+ column (send j :joint-dof)))
