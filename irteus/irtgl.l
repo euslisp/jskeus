@@ -226,12 +226,17 @@
      (t
       (let ((newlis (glGenLists 1))
 	    (transp (and (= (length col) 4) (< (elt col 3) 1.0)))
+            (textures
+             (if (get abody :GL-TEXTUREIMAGE)
+                 (instantiate integer-vector (length (get abody :GL-TEXTUREIMAGE)))))
+
 	    p2)
 	(glNewList newlis gl_compile)
 	(when transp
 	  (glEnable GL_BLEND)
 	  (glBlendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA))
 	(glMaterialfv GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE col)
+        (if (> (length textures) 0) (glGenTexturesEXT (length textures) textures))
 	(dolist (aface (send abody :faces))
 	  (cond
 	   ;; normal face
@@ -242,13 +247,27 @@
                     (cond ((derivedp texture-img img::color-image24) GL_RGB)
                           ((derivedp texture-img img::grayscale-image) GL_LUMINANCE))))
 	      (when texture-img
-		(glTexImage2D
-		 GL_TEXTURE_2D
-		 0 GL_RGB
-		 (send texture-img :width) (send texture-img :height)
-		 0 pixelformat GL_UNSIGNED_BYTE (send texture-img :entity))
-		(glTexEnvi GL_TEXTURE_ENV GL_TEXTURE_ENV_MODE GL_DECAL)
-		(glEnable GL_TEXTURE_2D))
+                (unless (get texture-img :GL-BIND-TEXTURE)
+                  (let ((texture-id
+                         (elt textures (position texture-img (get abody :GL-TEXTUREIMAGE)))))
+                    (glBindTextureEXT GL_TEXTURE_2D texture-id)
+                    (glTexImage2D
+                     GL_TEXTURE_2D
+                     0 GL_RGB
+                     (send texture-img :width) (send texture-img :height)
+                     0 pixelformat GL_UNSIGNED_BYTE (send texture-img :entity))
+                    (setf (get texture-img :GL-BIND-TEXTURE) texture-id)
+                    ))
+                ;; texturemap stuff...  glviewsurface :create in glview.l
+                (glPixelStorei GL_UNPACK_ALIGNMENT 1)
+                (glTexParameteri GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_REPEAT)
+                (glTexParameteri GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_REPEAT)
+                (glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_NEAREST)
+                (glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_NEAREST)
+                (glTexEnvi GL_TEXTURE_ENV GL_TEXTURE_ENV_MODE GL_DECAL)
+                (glEnable GL_TEXTURE_2D)
+                (glBindTextureEXT GL_TEXTURE_2D (get texture-img :GL-BIND-TEXTURE))
+                )
 	      (glBegin GL_POLYGON)
 	      (glNormal3fv (send aface :normal))
 	      (dolist (p (cdr (send aface :vertices)))
@@ -258,7 +277,8 @@
 		(glVertex3fv (send abody :inverse-transform-vector p)))
 	      (glEnd)
 	      (when texture-img
-		(glDisable GL_TEXTURE_2D))
+		(glDisable GL_TEXTURE_2D)
+		(glBindTextureEXT GL_TEXTURE_2D 0))
 	      ))
 	   ;; holed face
 	   (t
