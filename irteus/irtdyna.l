@@ -66,7 +66,7 @@
 	 (ct (scale 1e-3 c-til tmp-vb)) ;; [mm] -> [m]
 	 (It (scale-matrix 1e-9 I-til tmp-m)) ;; [g mm^2] -> [kg m^2]
 	 (mj (scale mt ax tmp-va))
-	 (hj (v- (v* ct mj tmp-vc) (v* axis-for-angular mj tmp-vd) tmp-vb)))
+	 (hj (v- (v* ct mj tmp-vc) (v* (scale 1e-3 axis-for-angular tmp-vb) mj tmp-vd) tmp-vb)))
     (let ((tv (calc-dif-with-axis mj translation-axis tmp-v0 tmp-v1 tmp-v2)))
       (dotimes (i (length tv)) (setf (aref mat (+ row i) column) (elt tv i)))
       (let ((rv (calc-dif-with-axis hj rotation-axis tmp-v0 tmp-v1 tmp-v2)))
