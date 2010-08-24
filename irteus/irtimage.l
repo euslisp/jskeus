@@ -34,8 +34,10 @@
            (read-jpeg-file fname))
           ((string= (pathname-type fname) "png")
            (read-png-file fname))
+          ((member (pathname-type fname) (list "pbm" "pgm" "ppm") :test #'string=)
+           (read-pnm-file fname))
           (t
-           (read-pnm-file fname))))
+           (warn ";; Unknown file format ~A~%" fname))))
    (t (warn ";; Could not find file ~A~%" fname)
       (return-from read-image-file nil))))
 
