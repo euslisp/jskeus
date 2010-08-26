@@ -548,6 +548,13 @@ pointer env;
   defun(ctx,"LU-DECOMPOSE2",mod,LU_DECOMPOSE2);
   defun(ctx,"MATRIX-DETERMINANT",mod,MATRIX_DETERMINANT);
   defun(ctx,"PSEUDO-INVERSE2",mod,PSEUDO_INVERSE2);
+
+  /* irteus-version */
+  extern pointer QVERSION;
+  pointer p, v = speval(QVERSION);
+  p=cons(ctx,makestring(SVNVERSION,strlen(SVNVERSION)),NIL);
+  vpush(v); vpush(p);
+  v=NCONC(ctx,2,ctx->vsp-2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
