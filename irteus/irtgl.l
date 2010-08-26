@@ -248,14 +248,37 @@
                           ((derivedp texture-img img::grayscale-image) GL_LUMINANCE))))
 	      (when texture-img
                 (unless (get texture-img :GL-BIND-TEXTURE)
-                  (let ((texture-id
-                         (elt textures (position texture-img (get abody :GL-TEXTUREIMAGE)))))
+                  (let* ((texture-id
+                          (elt textures (position texture-img (get abody :GL-TEXTUREIMAGE))))
+                         (ow (send texture-img :width))
+                         (oh (send texture-img :height))
+                         (tw (ash 1 (ceiling (log ow 2))))
+                         (th (ash 1 (ceiling (log oh 2))))
+                         (img texture-img)) ;; img might be scaled image
+                    (when (not (and (= ow tw) (= oh th)))
+                      ;; rescale to boundary
+                      (let (b od (name (send img :name)) scale)
+                        (cond
+                         ((= pixelformat GL_RGB)
+                          (setq od (/ (send img :depth) 8))
+                          (when (not (= od 3)) (error "not supported depth")))
+                         ((= pixelformat GL_LUMINANCE)
+                          (setq od 1))
+                         (t
+                          (error "unsupported image type ~A in ~A" pixelformat img)))
+                        (if (> (setq scale (round (sqrt (/ (* tw th) (* 256 256))))) 1)
+                            (setq tw (/ tw scale) th (/ th scale)))
+                        (setq b (make-string (* tw th od)))
+                        (gluScaleImage pixelformat ow oh GL_UNSIGNED_BYTE (send img :entity)
+                                       tw th GL_UNSIGNED_BYTE b)
+                        (setq img (instance (class img) :init tw th b))
+                        (send img :name name)))
                     (glBindTextureEXT GL_TEXTURE_2D texture-id)
                     (glTexImage2D
                      GL_TEXTURE_2D
                      0 GL_RGB
-                     (send texture-img :width) (send texture-img :height)
-                     0 pixelformat GL_UNSIGNED_BYTE (send texture-img :entity))
+                     (send img :width) (send img :height)
+                     0 pixelformat GL_UNSIGNED_BYTE (send img :entity))
                     (setf (get texture-img :GL-BIND-TEXTURE) texture-id)
                     ))
                 ;; texturemap stuff...  glviewsurface :create in glview.l
@@ -421,28 +444,6 @@
        (setq img (user::read-image-file file)))
       (t (warn ";; Could not find file ~A~%" file)
 	 (return-from :paste-texture-to-face nil)))
-     (setq ow (send img :width) oh (send img :height)
-	   tw (ash 1 (ceiling (log ow 2)))
-	   th (ash 1 (ceiling (log oh 2))))
-     (when (not (and (= ow tw) (= oh th)))
-       ;; rescale to boundary
-       (let (b od pixelformat (name (send img :name)) scale)
-         (cond ((derivedp img img::color-image24)
-                (setq od (/ (send img :depth) 8)
-                      pixelformat GL_RGB)
-                (when (not (= od 3)) (error "not supported depth")))
-               ((derivedp img img::grayscale-image)
-                (setq od 1
-                      pixelformat GL_LUMINANCE))
-               (t
-                (error "unsupported image type ~A"  img)))
-         (if (> (setq scale (round (sqrt (/ (* tw th) (* 256 256))))) 1)
-             (setq tw (/ tw scale) th (/ th scale)))
-         (setq b (make-string (* tw th od)))
-	 (gluScaleImage pixelformat ow oh GL_UNSIGNED_BYTE (send img :entity)
-                        tw th GL_UNSIGNED_BYTE b)
-	 (setq img (instance (class img) :init tw th b))
-	 (send img :name name)))
      (setf (get aface :gl-textureimage) img)
      (if (not (memq img (get self :gl-textureimage)))
          (setf (get self :gl-textureimage)
