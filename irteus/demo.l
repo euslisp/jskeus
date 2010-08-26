@@ -625,7 +625,7 @@
 #+:jsk
 (defun objects (&rest args) (apply #'irt-objects args))
 
-#:+jsk
+#+:jsk
 (defun test-j1 nil
   (let (r0 b0)
     ;; demo program for using jsk/hand model in irteus
