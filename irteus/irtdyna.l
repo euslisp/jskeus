@@ -472,13 +472,11 @@
    (send-all child-links :forward-all-kinematics :debug-view debug-view :tmp-va tmp-va)
    )
   (:inverse-dynamics
-   (&key (debug-view nil) (dt 0.005) ;; [s]
+   (&key (debug-view nil)
 	 ;; buffers for computation
 	 (tmp-va (float-vector 0 0 0))
 	 (tmp-vb (float-vector 0 0 0))
 	 (tmp-vc (float-vector 0 0 0))
-	 (tmp-vd (float-vector 0 0 0))
-	 (tmp-ve (float-vector 0 0 0))
 	 (tmp-ma (make-matrix 3 3))
 	 (tmp-mb (make-matrix 3 3))
 	 (tmp-mc (make-matrix 3 3))
@@ -491,32 +489,25 @@
 			(scale-matrix 1e-9 (send self :inertia-tensor) tmp-ma) tmp-mb)
 		    (transpose (send self :worldrot) tmp-mc) tmp-ma)) ;; [g mm^2] -> [kg m^2]
 	  (c-hat (outer-product-matrix c tmp-mb)) ;; [m]
-	  (I (m+ iner (scale-matrix w (m* c-hat (transpose c-hat tmp-mc) tmp-md) tmp-mb) tmp-mb)) ;; [kg m^2]
-	  (P (scale w (v+ spacial-velocity (v* angular-velocity c tmp-vc) tmp-vc) tmp-vc)) ;; [kg m/s]
-	  (L (v+ (scale w (v* c spacial-velocity tmp-vd) tmp-vd) (transform I angular-velocity tmp-ve) tmp-vd))) ;; [kg m^2/s]
-     (setq momentum-velocity
-	   (scale (/ 1.0 dt) (v- P momentum tmp-ve) momentum-velocity) ;; [kg m/s^2]
-	   angular-momentum-velocity
-	   (scale (/ 1.0 dt) (v- L angular-momentum tmp-ve) angular-momentum-velocity)) ;; [kg m^2/s^2]
-     (dotimes (i 3)
-       (setf (elt momentum i) (elt P i)) ;; [kg m/s]
-       (setf (elt angular-momentum i) (elt L i))) ;; [kg m^2/s]
-     (setq force (v+ (scale w (v+ spacial-acceleration
-				  (v* angular-acceleration c tmp-ve) tmp-ve) force)
-		     (v* angular-velocity P tmp-ve) force) ;; [N]
-           moment (v+ (v+ (v+ (scale w (v* c spacial-acceleration tmp-ve) moment)
-			      (transform I angular-acceleration tmp-ve) moment)
-			  (v* spacial-velocity P tmp-ve) moment)
-		      (v* angular-velocity L tmp-ve) moment)) ;; [N/m]
+	  (I (m+ iner (scale-matrix w (m* c-hat (transpose c-hat tmp-mc) tmp-md) tmp-mb) tmp-mb))) ;; [kg m^2]
+     (setq momentum (scale w (v+ spacial-velocity (v* angular-velocity c tmp-vc) tmp-vc) momentum) ;; [kg m/s]
+	   angular-velocity (v+ (scale w (v* c spacial-velocity tmp-vc) angular-momentum)
+				(transform I angular-velocity tmp-vc) angular-momentum) ;; [kg m^2/s]
+	   force (v+ (scale w (v+ spacial-acceleration
+				  (v* angular-acceleration c tmp-vc) force) force)
+		     (v* angular-velocity momentum tmp-vc) force) ;; [N]
+           moment (v+ (v+ (v+ (scale w (v* c spacial-acceleration tmp-vc) moment)
+			      (transform I angular-acceleration tmp-vc) moment)
+			  (v* spacial-velocity momentum tmp-vc) moment)
+		      (v* angular-velocity angular-momentum tmp-vc) moment)) ;; [N/m]
      (setq force (v- force (v+ fg ext-force tmp-vc) force) ;; [N]
-           moment (v- moment (v+ (v* c (v+ fg ext-force tmp-vc) tmp-vd) ext-moment tmp-vd) moment))) ;; [Nm]
+           moment (v- moment (v+ (v* c (v+ fg ext-force tmp-vc) tmp-va) ext-moment tmp-va) moment))) ;; [Nm]
 
    ;; propagation of force and moment from child-links
    (dolist (child child-links)
      (send child :inverse-dynamics :debug-view debug-view
 	   :tmp-va tmp-va :tmp-vb tmp-vb :tmp-vc tmp-vc
-	   :tmp-vd tmp-vd :tmp-ve tmp-ve
-	   :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc)
+	   :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc :tmp-md tmp-md)
      (setq force (v+ force (send child :force) force)
 	   moment (v+ moment (send child :moment) moment)))
 
@@ -534,8 +525,6 @@
 	 (tmp-va (float-vector 0 0 0))
 	 (tmp-vb (float-vector 0 0 0))
 	 (tmp-vc (float-vector 0 0 0))
-	 (tmp-vd (float-vector 0 0 0))
-	 (tmp-ve (float-vector 0 0 0))
 	 (tmp-ma (make-matrix 3 3))
 	 (tmp-mb (make-matrix 3 3))
 	 (tmp-mc (make-matrix 3 3))
@@ -559,10 +548,9 @@
      (send (car (send self :links)) :forward-all-kinematics
            :debug-view debug-view :tmp-va tmp-va)
      (send (car (send self :links)) :inverse-dynamics
-           :debug-view debug-view :dt dt
+           :debug-view debug-view
 	   :tmp-va tmp-va :tmp-vb tmp-vb :tmp-vc tmp-vc
-	   :tmp-vd tmp-vd :tmp-ve tmp-ve
-	   :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc)
+	   :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc :tmp-md tmp-md)
      (dotimes (i (length torque-vector))
        (setf (elt torque-vector i) (send (send (elt joint-list i) :child-link) :joint-torque)))
      torque-vector))
