@@ -363,12 +363,12 @@
          joint-torque 0 ;; [Nm]
          angular-velocity (float-vector 0 0 0) ;; [rad/s]
          angular-acceleration (float-vector 0 0 0) ;; [rad/s^2]
-         spacial-velocity (float-vector 0 0 0) ;; [mm/s]
-         spacial-acceleration (float-vector 0 0 0) ;; [mm/s^2]
-         angular-momentum (float-vector 0 0 0) ;; [kg mm^2/s]
-         momentum (float-vector 0 0 0) ;; [kg mm/s]
-         angular-momentum-velocity (float-vector 0 0 0) ;; [kg mm^2/s^2]
-         momentum-velocity (float-vector 0 0 0) ;; [kg mm^2/s^2]
+         spacial-velocity (float-vector 0 0 0) ;; [m/s]
+         spacial-acceleration (float-vector 0 0 0) ;; [m/s^2]
+         angular-momentum (float-vector 0 0 0) ;; [kg m^2/s]
+         momentum (float-vector 0 0 0) ;; [kg m/s]
+         angular-momentum-velocity (float-vector 0 0 0) ;; [kg m^2/s^2]
+         momentum-velocity (float-vector 0 0 0) ;; [kg m^2/s^2]
          force (float-vector 0 0 0) ;; [N] = [kg m/s^2]
          moment (float-vector 0 0 0) ;; [Nm] = [kg m^2/s^2]
          ext-force (float-vector 0 0 0) ;; [N] = [kg m/s^2]
@@ -397,20 +397,22 @@
                          (:xx #f(1 0 0)) (:yy #f(0 1 0)) (:zz #f(0 0 1))
                          (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1))
                          (t (joint . axis))))
-       (setq sw (send parent-link :rotate-vector paxis)
-             sv (v* (send self :worldpos) sw)
-             angular-velocity (v+ (send parent-link :angular-velocity) (scale joint-velocity sw))
-             spacial-velocity (v+ (send parent-link :spacial-velocity) (scale joint-velocity sv)))
+       (setq sw (normalize-vector (send parent-link :rotate-vector paxis)) ;; []
+             sv (v* (scale 1e-3 (send self :worldpos)) sw) ;; [m]
+             angular-velocity (v+ (send parent-link :angular-velocity) ;; [rad/s]
+				  (scale joint-velocity sw)) ;; [rad/s]
+             spacial-velocity (v+ (send parent-link :spacial-velocity) ;; [m/s]
+				  (scale joint-velocity sv))) ;; [m/s]
        
-       (setq dsv (v+ (v* (send parent-link :angular-velocity) sv)
-                     (v* (send parent-link :spacial-velocity) sw))
-             dsw (v* (send parent-link :angular-velocity) sw)
-             angular-acceleration (v+ (v+ (send parent-link :angular-acceleration)
-                                          (scale joint-velocity dsw))
-                                      (scale joint-acceleration sw))
-             spacial-acceleration (v+ (v+ (send parent-link :spacial-acceleration)
-                                          (scale joint-velocity dsv))
-                                      (scale joint-acceleration sv)))
+       (setq dsv (v+ (v* (send parent-link :angular-velocity) sv) ;; [m/s]
+                     (v* (send parent-link :spacial-velocity) sw)) ;; [m/s]
+             dsw (v* (send parent-link :angular-velocity) sw) ;; [rad/s]
+             angular-acceleration (v+ (v+ (send parent-link :angular-acceleration) ;; [rad/s^2]
+                                          (scale joint-velocity dsw)) ;; [rad/s^2]
+                                      (scale joint-acceleration sw)) ;; [rad/s^2]
+             spacial-acceleration (v+ (v+ (send parent-link :spacial-acceleration) ;; [m/s^2]
+                                          (scale joint-velocity dsv)) ;; [m/s^2]
+                                      (scale joint-acceleration sv))) ;; [m/s^2]
        ))
    (send-all child-links :forward-all-kinematics)
    )
@@ -421,30 +423,30 @@
      (return-from :inverse-dynamics nil))
    (if debug-view (format t ";; inverse-dynamics link = ~A~%" (send self :name)))
    (let (child sister c I c-hat P L fg w iner)
-     (setq w (* 0.001 (send self :weight)) ;; [g] -> [kg]
-           iner (scale-matrix 0.001 (send self :inertia-tensor)) ;; [g mm^2] -> [kg mm^2]
-           fg (scale (* -1.0 w 0.001) *g-vec*) ;; [N]
-           c (send self :centroid) ;; [mm]
-           I (m* (m* (send self :worldrot) iner) (transpose (send self :worldrot))) ;; [kg mm^2]
-           c-hat (outer-product-matrix c) ;; [mm]
-           I (m+ I (scale-matrix w (m* c-hat (transpose c-hat)))) ;; [kg mm^2]
-           P (scale w (v+ spacial-velocity (v* angular-velocity c))) ;; [kg mm/s]
-           L (v+ (scale w (v* c spacial-velocity)) (transform I angular-velocity))) ;; [kg mm^2/s]
+     (setq w (* 1e-3 (send self :weight)) ;; [g] -> [kg]
+           iner (scale-matrix 1e-9 (send self :inertia-tensor)) ;; [g mm^2] -> [kg m^2]
+           fg (scale (* -1.0 w 1e-3) *g-vec*) ;; [N]
+           c (scale 1e-3 (send self :centroid)) ;; [m]
+           I (m* (m* (send self :worldrot) iner) (transpose (send self :worldrot))) ;; [kg m^2]
+           c-hat (outer-product-matrix c) ;; [m]
+           I (m+ I (scale-matrix w (m* c-hat (transpose c-hat)))) ;; [kg m^2]
+           P (scale w (v+ spacial-velocity (v* angular-velocity c))) ;; [kg m/s]
+           L (v+ (scale w (v* c spacial-velocity)) (transform I angular-velocity))) ;; [kg m^2/s]
      
-     (setq momentum-velocity (scale (/ 1.0 dt) (v- P momentum)) ;; [kg mm/s^2]
-           angular-momentum-velocity (scale (/ 1.0 dt) (v- L angular-momentum))) ;; [kg mm^2/s^2]
+     (setq momentum-velocity (scale (/ 1.0 dt) (v- P momentum)) ;; [kg m/s^2]
+           angular-momentum-velocity (scale (/ 1.0 dt) (v- L angular-momentum))) ;; [kg m^2/s^2]
 
-     (setq momentum P angular-momentum L ;; [kg mm/s], [kg mm^2/s]
-           force (scale 0.001 (v+ (scale w (v+ spacial-acceleration
-                                               (v* angular-acceleration c)))
-                                  (v* angular-velocity P))) ;; [N]
-           moment (scale 1e-6 (v+ (v+ (v+ (scale w (v* c spacial-acceleration))
-                                          (transform I angular-acceleration))
-                                      (v* spacial-velocity P))
-                                  (v* angular-velocity L)))) ;; [N]
+     (setq momentum P angular-momentum L ;; [kg m/s], [kg m^2/s]
+           force (v+ (scale w (v+ spacial-acceleration
+				  (v* angular-acceleration c)))
+		     (v* angular-velocity P)) ;; [N]
+           moment (v+ (v+ (v+ (scale w (v* c spacial-acceleration))
+			      (transform I angular-acceleration))
+			  (v* spacial-velocity P))
+		      (v* angular-velocity L))) ;; [N/m]
      
      (setq force (v- force (v+ fg ext-force)) ;; [N]
-           moment (v- moment (v+ (scale 0.001 (v* c (v+ fg ext-force))) ext-moment))) ;; [Nm]
+           moment (v- moment (v+ (v* c (v+ fg ext-force)) ext-moment))) ;; [Nm]
 
      ;; propagation of force and moment from child-links
      (when child-links
@@ -463,9 +465,9 @@
                            (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1))
                            (t (joint . axis))))
          (setq sw (send parent-link :rotate-vector paxis)
-               sv (v* (send self :worldpos) sw))
-         ;; [Nm] = 0.001 * [mm] [N] or 0.001 * [rad] [Nm]
-         (setq joint-torque (+ (* 0.001 (v. sv force)) (v. sw moment)))
+               sv (v* (scale 1e-3 (send self :worldpos)) sw))
+         ;; [Nm] = [m] [N] or 0.001 * [rad] [Nm]
+         (setq joint-torque (+ (v. sv force) (v. sw moment)))
          ))
      ))
   )
