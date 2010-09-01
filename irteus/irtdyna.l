@@ -450,18 +450,18 @@
 	       (v+ (v+ (send parent-link :spacial-acceleration)
 		       (scale joint-velocity saj))
 		   (scale joint-acceleration svj))))))
-   (send-all child-links :forward-all-kinematics)
+   (send-all child-links :forward-all-kinematics :debug-view debug-view)
    )
   (:inverse-dynamics
    (&key (dt 0.005) (debug-view nil)) ;; dt:[s]
    (if debug-view (format t ";; inverse-dynamics link = ~A~%" (send self :name)))
    (let* ((w (* 1e-3 (send self :weight))) ;; [g] -> [kg]
-	  (iner (scale-matrix 1e-9 (send self :inertia-tensor))) ;; [g mm^2] -> [kg m^2]
           (fg (scale (* -1.0 w 1e-3) *g-vec*)) ;; [N]
 	  (c (scale 1e-3 (send self :centroid))) ;; [m]
-	  (I (m* (m* (send self :worldrot) iner) (transpose (send self :worldrot)))) ;; [kg m^2]
+	  (iner (m* (m* (send self :worldrot) (scale-matrix 1e-9 (send self :inertia-tensor)))
+		 (transpose (send self :worldrot)))) ;; [g mm^2] -> [kg m^2]
 	  (c-hat (outer-product-matrix c)) ;; [m]
-	  (I (m+ I (scale-matrix w (m* c-hat (transpose c-hat))))) ;; [kg m^2]
+	  (I (m+ iner (scale-matrix w (m* c-hat (transpose c-hat))))) ;; [kg m^2]
 	  (P (scale w (v+ spacial-velocity (v* angular-velocity c)))) ;; [kg m/s]
 	  (L (v+ (scale w (v* c spacial-velocity)) (transform I angular-velocity)))) ;; [kg m^2/s]
      (setq momentum-velocity (scale (/ 1.0 dt) (v- P momentum)) ;; [kg m/s^2]
@@ -479,7 +479,7 @@
 
    ;; propagation of force and moment from child-links
    (dolist (child child-links)
-     (send child :inverse-dynamics)
+     (send child :inverse-dynamics :debug-view debug-view)
      (setq force (v+ force (send child :force))
 	   moment (v+ moment (send child :moment))))
 
