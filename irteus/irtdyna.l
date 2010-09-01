@@ -355,6 +355,44 @@
   )
 
 ;; recursive computation for inverse-dynamics
+(defmethod joint
+  (:calc-spacial-velocity-jacobian
+    (ax)
+    (warn "subclass's respoinsibility (send ~s :calc-spacial-velocity-jacobian)~%" self))
+  (:calc-angular-velocity-jacobian
+    (ax)
+    (warn "subclass's respoinsibility (send ~s :calc-angular-velocity-jacobian)~%" self))
+  (:calc-spacial-acceleration-jacobian
+    (svj avj)
+    (warn "subclass's respoinsibility (send ~s :calc-spacial-acceleration-jacobian)~%" self))
+  (:calc-angular-acceleration-jacobian
+    (avj)
+    (warn "subclass's respoinsibility (send ~s :calc-angular-acceleration-jacobian)~%" self))
+  )
+
+(defmethod rotational-joint
+  (:calc-spacial-velocity-jacobian
+    (ax)
+    (v* (scale 0.001 (send child-link :worldpos)) ax)) ;; [m]
+  (:calc-angular-velocity-jacobian (ax) ax) ;; []
+  (:calc-spacial-acceleration-jacobian
+    (svj avj)
+    (v+ (v* (send parent-link :angular-velocity) svj)
+	(v* (send parent-link :spacial-velocity) avj))) ;; [m/s]
+  (:calc-angular-acceleration-jacobian
+    (avj)
+    (v* (send parent-link :angular-velocity) avj)) ;; [rad/s]
+  )
+
+(defmethod linear-joint
+  (:calc-spacial-velocity-jacobian (ax) ax) ;; []
+  (:calc-angular-velocity-jacobian (ax) #f(0 0 0)) ;; []
+  (:calc-spacial-acceleration-jacobian
+    (svj avj)
+    (v* (send parent-link :angular-velocity) svj)) ;; [rad/s]
+  (:calc-angular-acceleration-jacobian (avj) #f(0 0 0)) ;; []
+  )
+
 (defmethod bodyset-link
   (:reset-dynamics
    ()
@@ -386,56 +424,48 @@
   (:joint-torque () joint-torque)
   (:forward-all-kinematics
    (&key (debug-view nil))
-   (when (and joint (not (derivedp joint rotational-joint)))
-     (warn ";; forward-all-kinematics of ~A is not implemented~%" (send (class joint) :name))
-     (return-from :forward-all-kinematics nil))
    (if debug-view (format t ";; forward-all-kinematics link = ~A~%" (send self :name)))
    (when (and parent-link (derivedp joint rotational-joint))
-     (let (sw sv dsv dsw paxis)
-       (setq paxis (case (joint . axis)
-                         (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1))
-                         (:xx #f(1 0 0)) (:yy #f(0 1 0)) (:zz #f(0 0 1))
-                         (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1))
-                         (t (joint . axis))))
-       (setq sw (normalize-vector (send parent-link :rotate-vector paxis)) ;; []
-             sv (v* (scale 1e-3 (send self :worldpos)) sw) ;; [m]
-             angular-velocity (v+ (send parent-link :angular-velocity) ;; [rad/s]
-				  (scale joint-velocity sw)) ;; [rad/s]
-             spacial-velocity (v+ (send parent-link :spacial-velocity) ;; [m/s]
-				  (scale joint-velocity sv))) ;; [m/s]
-       
-       (setq dsv (v+ (v* (send parent-link :angular-velocity) sv) ;; [m/s]
-                     (v* (send parent-link :spacial-velocity) sw)) ;; [m/s]
-             dsw (v* (send parent-link :angular-velocity) sw) ;; [rad/s]
-             angular-acceleration (v+ (v+ (send parent-link :angular-acceleration) ;; [rad/s^2]
-                                          (scale joint-velocity dsw)) ;; [rad/s^2]
-                                      (scale joint-acceleration sw)) ;; [rad/s^2]
-             spacial-acceleration (v+ (v+ (send parent-link :spacial-acceleration) ;; [m/s^2]
-                                          (scale joint-velocity dsv)) ;; [m/s^2]
-                                      (scale joint-acceleration sv))) ;; [m/s^2]
-       ))
+     (let* ((paxis (case (joint . axis)
+		     (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1))
+		     (:xx #f(1 0 0)) (:yy #f(0 1 0)) (:zz #f(0 0 1))
+		     (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1))
+		     (t (joint . axis))))
+	    (ax (normalize-vector (send parent-link :rotate-vector paxis))) ;; []
+	    (svj (send joint :calc-spacial-velocity-jacobian ax))
+	    (avj (send joint :calc-angular-velocity-jacobian ax)))
+       (send self :put :spacial-velocity-jacobian svj)
+       (send self :put :angular-velocity-jacobian avj)
+       (setq angular-velocity ;; [rad/s]
+	     (v+ (send parent-link :angular-velocity) (scale joint-velocity avj))
+	     spacial-velocity ;; [m/s]
+	     (v+ (send parent-link :spacial-velocity) (scale joint-velocity svj)))
+       (let* ((saj (send joint :calc-spacial-acceleration-jacobian svj avj))
+	      (aaj (send joint :calc-angular-acceleration-jacobian avj)))
+	 (setq angular-acceleration ;; [rad/s^2]
+	       (v+ (v+ (send parent-link :angular-acceleration)
+		       (scale joint-velocity aaj))
+		   (scale joint-acceleration avj))
+	       spacial-acceleration ;; [m/s^2]
+	       (v+ (v+ (send parent-link :spacial-acceleration)
+		       (scale joint-velocity saj))
+		   (scale joint-acceleration svj))))))
    (send-all child-links :forward-all-kinematics)
    )
   (:inverse-dynamics
    (&key (dt 0.005) (debug-view nil)) ;; dt:[s]
-   (when (and joint (not (derivedp joint rotational-joint)))
-     (warn ";; inverse-dynamics of ~A is not implemented~%" (send (class joint) :name))
-     (return-from :inverse-dynamics nil))
    (if debug-view (format t ";; inverse-dynamics link = ~A~%" (send self :name)))
-   (let (child sister c I c-hat P L fg w iner)
-     (setq w (* 1e-3 (send self :weight)) ;; [g] -> [kg]
-           iner (scale-matrix 1e-9 (send self :inertia-tensor)) ;; [g mm^2] -> [kg m^2]
-           fg (scale (* -1.0 w 1e-3) *g-vec*) ;; [N]
-           c (scale 1e-3 (send self :centroid)) ;; [m]
-           I (m* (m* (send self :worldrot) iner) (transpose (send self :worldrot))) ;; [kg m^2]
-           c-hat (outer-product-matrix c) ;; [m]
-           I (m+ I (scale-matrix w (m* c-hat (transpose c-hat)))) ;; [kg m^2]
-           P (scale w (v+ spacial-velocity (v* angular-velocity c))) ;; [kg m/s]
-           L (v+ (scale w (v* c spacial-velocity)) (transform I angular-velocity))) ;; [kg m^2/s]
-     
+   (let* ((w (* 1e-3 (send self :weight))) ;; [g] -> [kg]
+	  (iner (scale-matrix 1e-9 (send self :inertia-tensor))) ;; [g mm^2] -> [kg m^2]
+          (fg (scale (* -1.0 w 1e-3) *g-vec*)) ;; [N]
+	  (c (scale 1e-3 (send self :centroid))) ;; [m]
+	  (I (m* (m* (send self :worldrot) iner) (transpose (send self :worldrot)))) ;; [kg m^2]
+	  (c-hat (outer-product-matrix c)) ;; [m]
+	  (I (m+ I (scale-matrix w (m* c-hat (transpose c-hat))))) ;; [kg m^2]
+	  (P (scale w (v+ spacial-velocity (v* angular-velocity c)))) ;; [kg m/s]
+	  (L (v+ (scale w (v* c spacial-velocity)) (transform I angular-velocity)))) ;; [kg m^2/s]
      (setq momentum-velocity (scale (/ 1.0 dt) (v- P momentum)) ;; [kg m/s^2]
            angular-momentum-velocity (scale (/ 1.0 dt) (v- L angular-momentum))) ;; [kg m^2/s^2]
-
      (setq momentum P angular-momentum L ;; [kg m/s], [kg m^2/s]
            force (v+ (scale w (v+ spacial-acceleration
 				  (v* angular-acceleration c)))
@@ -444,32 +474,19 @@
 			      (transform I angular-acceleration))
 			  (v* spacial-velocity P))
 		      (v* angular-velocity L))) ;; [N/m]
-     
      (setq force (v- force (v+ fg ext-force)) ;; [N]
-           moment (v- moment (v+ (v* c (v+ fg ext-force)) ext-moment))) ;; [Nm]
+           moment (v- moment (v+ (v* c (v+ fg ext-force)) ext-moment)))) ;; [Nm]
 
-     ;; propagation of force and moment from child-links
-     (when child-links
-       (dolist (child child-links)
-         (send child :inverse-dynamics)
-         (setq force (v+ force (send child :force))
-               moment (v+ moment (send child :moment)))
-         )
-       )
-     
-     (when (and joint parent-link)
-       (let (sw sv tau paxis)
-         (setq paxis (case (joint . axis)
-                           (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1))
-                           (:xx #f(1 0 0)) (:yy #f(0 1 0)) (:zz #f(0 0 1))
-                           (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1))
-                           (t (joint . axis))))
-         (setq sw (send parent-link :rotate-vector paxis)
-               sv (v* (scale 1e-3 (send self :worldpos)) sw))
-         ;; [Nm] = [m] [N] or 0.001 * [rad] [Nm]
-         (setq joint-torque (+ (v. sv force) (v. sw moment)))
-         ))
-     ))
+   ;; propagation of force and moment from child-links
+   (dolist (child child-links)
+     (send child :inverse-dynamics)
+     (setq force (v+ force (send child :force))
+	   moment (v+ moment (send child :moment))))
+
+   (when (and joint parent-link)
+     (setq joint-torque (+ (v. (send self :get :spacial-velocity-jacobian) force)
+			   (v. (send self :get :angular-velocity-jacobian) moment))))
+   )
   )
 
 (defmethod cascaded-link
