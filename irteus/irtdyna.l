@@ -408,10 +408,7 @@
 (defmethod bodyset-link
   (:reset-dynamics
    ()
-   (setq joint-velocity 0 ;; [rad/s]
-         joint-acceleration 0 ;; [rad/s^2]
-         joint-torque 0 ;; [Nm]
-         angular-velocity (float-vector 0 0 0) ;; [rad/s]
+   (setq angular-velocity (float-vector 0 0 0) ;; [rad/s]
          angular-acceleration (float-vector 0 0 0) ;; [rad/s^2]
          spacial-velocity (float-vector 0 0 0) ;; [m/s]
          spacial-acceleration (float-vector 0 0 0) ;; [m/s^2]
@@ -423,8 +420,6 @@
          moment (float-vector 0 0 0) ;; [Nm] = [kg m^2/s^2]
          ext-force (float-vector 0 0 0) ;; [N] = [kg m/s^2]
          ext-moment (float-vector 0 0 0))) ;; [Nm] = [kg m^2/s^2]
-  (:joint-velocity (&optional jv) (if jv (setq joint-velocity jv) joint-velocity))
-  (:joint-acceleration (&optional ja) (if ja (setq joint-acceleration ja) joint-acceleration))
   (:angular-velocity () angular-velocity)
   (:angular-acceleration () angular-acceleration)
   (:spacial-velocity () spacial-velocity)
@@ -433,7 +428,6 @@
   (:moment () moment)
   (:ext-force (&optional f) (if f (setq ext-force f) ext-force))
   (:ext-moment (&optional m) (if m (setq ext-moment m) ext-moment))
-  (:joint-torque () joint-torque)
   (:forward-all-kinematics
    (&key (debug-view nil)
 	 ;; buffers for calculation
@@ -453,21 +447,21 @@
 		       (send self :get :angular-velocity-jacobian))))
        (setq angular-velocity ;; [rad/s]
 	     (v+ (send parent-link :angular-velocity)
-		 (scale joint-velocity avj tmp-va) angular-velocity)
+		 (scale (send joint :joint-velocity) avj tmp-va) angular-velocity)
 	     spacial-velocity ;; [m/s]
 	     (v+ (send parent-link :spacial-velocity)
-		 (scale joint-velocity svj tmp-va) spacial-velocity))
+		 (scale (send joint :joint-velocity) svj tmp-va) spacial-velocity))
 
        (let* ((saj (send joint :calc-spacial-acceleration-jacobian svj avj tmp-va spacial-acceleration)))
 	 (setq spacial-acceleration ;; [m/s^2]
 	       (v+ (v+ (send parent-link :spacial-acceleration)
-		       (scale joint-velocity saj tmp-va) tmp-va)
-		   (scale joint-acceleration svj spacial-acceleration) spacial-acceleration)))
+		       (scale (send joint :joint-velocity) saj tmp-va) tmp-va)
+		   (scale (send joint :joint-acceleration) svj spacial-acceleration) spacial-acceleration)))
        (let ((aaj (send joint :calc-angular-acceleration-jacobian avj tmp-va)))
 	 (setq angular-acceleration ;; [rad/s^2]
 	       (v+ (v+ (send parent-link :angular-acceleration)
-		       (scale joint-velocity aaj tmp-va) tmp-va)
-		   (scale joint-acceleration avj angular-acceleration) angular-acceleration)))
+		       (scale (send joint :joint-velocity) aaj tmp-va) tmp-va)
+		   (scale (send joint :joint-acceleration) avj angular-acceleration) angular-acceleration)))
        ))
    (send-all child-links :forward-all-kinematics :debug-view debug-view :tmp-va tmp-va)
    )
@@ -512,8 +506,9 @@
 	   moment (v+ moment (send child :moment) moment)))
 
    (when (and joint parent-link)
-     (setq joint-torque (+ (v. (send self :get :spacial-velocity-jacobian) force)
-			   (v. (send self :get :angular-velocity-jacobian) moment))))
+     (send joint :joint-torque
+	   (+ (v. (send self :get :spacial-velocity-jacobian) force)
+	      (v. (send self :get :angular-velocity-jacobian) moment))))
    )
   )
 
@@ -529,21 +524,21 @@
 	 (tmp-mb (make-matrix 3 3))
 	 (tmp-mc (make-matrix 3 3))
 	 (tmp-md (make-matrix 3 3)))
-   (let ((torque-vector (instantiate float-vector (length joint-list)))
-         pdq pl)
+   (let ((torque-vector (instantiate float-vector (length joint-list))))
      (dolist (l links)
        (send l :put :spacial-velocity-jacobian (float-vector 0 0 0))
        (send l :put :angular-velocity-jacobian (float-vector 0 0 0)))
      ;; joint-angle update
      (dotimes (i (length joint-list))
-       (setq pl (send (elt joint-list i) :child-link))
-       (setq pdq (send pl :joint-velocity))
-       (send pl :joint-velocity
-             (deg2rad (/ (- (elt av i) (send (elt joint-list i) :joint-angle)) dt))) ;; [rad/s]
-       (send pl :joint-acceleration (/ (- (send pl :joint-velocity) pdq) dt)) ;; [rad/s^2]
-       (send (elt joint-list i) :joint-angle (elt av i))
-       )
-     
+       (let* ((jnt (elt joint-list i))
+	      (pdq (send jnt :joint-velocity)))
+	 (send jnt :joint-velocity
+	       (deg2rad (/ (- (elt av i) (send (elt joint-list i) :joint-angle)) dt)))
+	 (send jnt :joint-acceleration
+	       (/ (- (send jnt :joint-velocity) pdq) dt))
+	 (send jnt :joint-angle (elt av i))
+	 ))
+
      ;; recursive calculation from root-link
      (send (car (send self :links)) :forward-all-kinematics
            :debug-view debug-view :tmp-va tmp-va)
@@ -552,7 +547,7 @@
 	   :tmp-va tmp-va :tmp-vb tmp-vb :tmp-vc tmp-vc
 	   :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc :tmp-md tmp-md)
      (dotimes (i (length torque-vector))
-       (setf (elt torque-vector i) (send (send (elt joint-list i) :child-link) :joint-torque)))
+       (setf (elt torque-vector i) (send (elt joint-list i) :joint-torque)))
      torque-vector))
   )
 

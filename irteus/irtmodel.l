@@ -29,7 +29,8 @@
 
 (defclass joint
   :super propertied-object
-  :slots (parent-link child-link joint-angle min-angle max-angle default-coords))
+  :slots (parent-link child-link joint-angle min-angle max-angle default-coords
+		      joint-velocity joint-acceleration joint-torque))
 
 (defmethod joint
   (:init (&key (name (gensym "joint"))
@@ -47,6 +48,9 @@
   (:joint-dof () (warn "subclass's respoinsibility (send ~s :joint-dof)~%" self))
   (:speed-to-angle (&rest args) (warn "subclass's respoinsibility (send ~s :speed-to-angle)~%" self))
   (:calc-jacobian (&rest args) (warn "subclass's respoinsibility (send ~s :calc-jacobian)~%" self))
+  (:joint-velocity (&optional jv) (if jv (setq joint-velocity jv) joint-velocity))
+  (:joint-acceleration (&optional ja) (if ja (setq joint-acceleration ja) joint-acceleration))
+  (:joint-torque (&optional jt) (if jt (setq joint-torque jt) joint-torque))
   )
 
 (defun calc-jacobian-default-rotate-vector
@@ -101,6 +105,9 @@
 	 ;; set default value
 	 (if (null min-angle) (setq min-angle -90.0))
 	 (if (null max-angle) (setq max-angle (+ 180.0 min-angle)))
+	 (send self :joint-velocity 0.0) ;; [rad/s]
+	 (send self :joint-acceleration 0.0) ;; [rad/s^2]
+	 (send self :joint-torque 0.0) ;; [Nm]
 	 self)
   (:joint-angle
    (&optional v &key relative &allow-other-keys)
@@ -137,6 +144,9 @@
 	 ;; set default value
 	 (if (null min-angle) (setq min-angle -90.0))
 	 (if (null max-angle) (setq max-angle  90.0))
+	 (send self :joint-velocity 0.0) ;; [m/s]
+	 (send self :joint-acceleration 0.0) ;; [m/s^2]
+	 (send self :joint-torque 0.0) ;; [N]
 	 self)
   (:joint-angle
    (&optional v &key relative &allow-other-keys)
@@ -430,7 +440,6 @@
   :slots (joint parent-link child-links analysis-level default-coords
                 weight acentroid inertia-tensor
                 angular-velocity angular-acceleration
-                joint-velocity joint-acceleration joint-torque
                 spacial-velocity spacial-acceleration
                 momentum-velocity angular-momentum-velocity
                 momentum angular-momentum
