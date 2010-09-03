@@ -421,9 +421,9 @@
          ext-force (float-vector 0 0 0) ;; [N] = [kg m/s^2]
          ext-moment (float-vector 0 0 0))) ;; [Nm] = [kg m^2/s^2]
   (:angular-velocity () angular-velocity)
-  (:angular-acceleration () angular-acceleration)
+  (:angular-acceleration (&optional aa) (if aa (setq angular-acceleration aa) angular-acceleration))
   (:spacial-velocity () spacial-velocity)
-  (:spacial-acceleration () spacial-acceleration)
+  (:spacial-acceleration (&optional sa) (if sa (setq spacial-acceleration sa) spacial-acceleration))
   (:force () force)
   (:moment () moment)
   (:ext-force (&optional f) (if f (setq ext-force f) ext-force))
