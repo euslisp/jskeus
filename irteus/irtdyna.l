@@ -439,7 +439,9 @@
 		     (:xx #f(1 0 0)) (:yy #f(0 1 0)) (:zz #f(0 0 1))
 		     (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1))
 		     (t (joint . axis))))
-	    (ax (normalize-vector (send parent-link :rotate-vector paxis tmp-va)
+	    (ax (normalize-vector (send (send (send parent-link :copy-worldcoords) :transform
+					      (joint . default-coords))
+					:rotate-vector paxis tmp-va)
 				  (send self :get :angular-velocity-jacobian))) ;; []
 	    (svj (send joint :calc-spacial-velocity-jacobian ax tmp-va
 		       (send self :get :spacial-velocity-jacobian)))
