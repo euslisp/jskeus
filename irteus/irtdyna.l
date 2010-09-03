@@ -496,8 +496,11 @@
 			      (transform I angular-acceleration tmp-vc) moment)
 			  (v* spacial-velocity momentum tmp-vc) moment)
 		      (v* angular-velocity angular-momentum tmp-vc) moment)) ;; [N/m]
+     ;; use ext-force and ext-moment
+     ;; user must add moment around the origin caused by ext-force to ext-moment
+     ;; i.e. ext-moment (in this method) <- ext-moment (user defined) + pos_{ext-force} x ext-force
      (setq force (v- force (v+ fg ext-force tmp-vc) force) ;; [N]
-           moment (v- moment (v+ (v* c (v+ fg ext-force tmp-vc) tmp-va) ext-moment tmp-va) moment))) ;; [Nm]
+           moment (v- moment (v+ (v* c fg tmp-vc) ext-moment tmp-va) moment))) ;; [Nm]
 
    ;; propagation of force and moment from child-links
    (dolist (child child-links)
