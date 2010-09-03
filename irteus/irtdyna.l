@@ -487,7 +487,7 @@
 	  (c-hat (outer-product-matrix c tmp-mb)) ;; [m]
 	  (I (m+ iner (scale-matrix w (m* c-hat (transpose c-hat tmp-mc) tmp-md) tmp-mb) tmp-mb))) ;; [kg m^2]
      (setq momentum (scale w (v+ spacial-velocity (v* angular-velocity c tmp-vc) tmp-vc) momentum) ;; [kg m/s]
-	   angular-velocity (v+ (scale w (v* c spacial-velocity tmp-vc) angular-momentum)
+	   angular-momentum (v+ (scale w (v* c spacial-velocity tmp-vc) angular-momentum)
 				(transform I angular-velocity tmp-vc) angular-momentum) ;; [kg m^2/s]
 	   force (v+ (scale w (v+ spacial-acceleration
 				  (v* angular-acceleration c tmp-vc) force) force)
