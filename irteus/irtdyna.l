@@ -296,15 +296,11 @@
       ;; parameter initialization
       (dolist (l (send self :links))
 	(send l :put :m-til 0)
-	(if (send l :get :c-til)
-	    (dotimes (i 3)
-	      (setf (elt (send l :get :c-til) i) 0.0))
-	  (send l :put :c-til (float-vector 0 0 0)))
-	(if (send l :get :I-til)
-	    (dotimes (j 3)
-	      (dotimes (i 3)
-		(setf (aref (send l :get :I-til) i j) 0.0)))
-	  (send l :put :I-til (make-matrix 3 3))))
+	(dotimes (i 3)
+	  (setf (elt (send l :get :c-til) i) 0.0))
+	(dotimes (j 3)
+	  (dotimes (i 3)
+	    (setf (aref (send l :get :I-til) i j) 0.0))))
       ;; calc all links' mass properties
       (send* (car (send self :links)) :propagate-mass-properties args))
     ;; calc inertia matrix
@@ -408,6 +404,9 @@
 (defmethod bodyset-link
   (:reset-dynamics
    ()
+   (send self :put :m-til 0)
+   (send self :put :c-til (float-vector 0 0 0))
+   (send self :put :I-til (make-matrix 3 3))
    (setq angular-velocity (float-vector 0 0 0) ;; [rad/s]
          angular-acceleration (float-vector 0 0 0) ;; [rad/s^2]
          spacial-velocity (float-vector 0 0 0) ;; [m/s]
