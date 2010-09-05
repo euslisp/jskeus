@@ -208,6 +208,7 @@
 	((atom (car args))
 	 (setq objects (append args objects)))
 	 ))
+   (send-all objects :worldcoords)
    (setq draw-things (draw-things objects))
    objects)
   (:select-drawmode
