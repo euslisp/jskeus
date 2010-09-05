@@ -292,7 +292,7 @@
                 (glBindTextureEXT GL_TEXTURE_2D (get texture-img :GL-BIND-TEXTURE))
                 )
 	      (glBegin GL_POLYGON)
-	      (glNormal3fv (send aface :normal))
+	      (glNormal3fv (transform (transpose (send abody :worldrot)) (send aface :normal)))
 	      (dolist (e (send aface :edges))
 		(if (and texture-coords
 			 (setq p2 (gethash e texture-coords)))
