@@ -100,6 +100,7 @@
 	   :motionnotify-left :move-coords-event self)
 
      (send self :look1)
+     (send self :draw-objects)
      self))
   (:viewer (&rest args) (user::forward-message-to viewer args))
   (:redraw () (send self :draw-objects))
