@@ -293,11 +293,11 @@
                 )
 	      (glBegin GL_POLYGON)
 	      (glNormal3fv (send aface :normal))
-	      (dolist (p (cdr (send aface :vertices)))
+	      (dolist (e (send aface :edges))
 		(if (and texture-coords
-			 (setq p2 (gethash p texture-coords)))
+			 (setq p2 (gethash e texture-coords)))
 		    (glTexCoord2fv p2))
-		(glVertex3fv (send abody :inverse-transform-vector p)))
+		(glVertex3fv (send abody :inverse-transform-vector (send e :pvertex aface))))
 	      (glEnd)
 	      (when texture-img
 		(glDisable GL_TEXTURE_2D)
@@ -451,8 +451,8 @@
      (setf (get aface :gl-texturecoords) (make-hash-table :test #'equal))
      (setf (get self :GL-DISPLAYLIST-ID) nil)
      ;;
-     (dolist (p (butlast (send aface :vertices)))
-       (setf (gethash p (get aface :gl-texturecoords))
+     (dolist (e (send aface :edges))
+       (setf (gethash e (get aface :gl-texturecoords))
              (pop tex-coords)))
      ))
   )
