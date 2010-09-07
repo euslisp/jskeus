@@ -1451,7 +1451,9 @@
    ;; -> both list and atom OK.
    (let* ((loop 0)
           (union-link-list (send self :calc-union-link-list link-list))
-          (av0 (send-all (send-all union-link-list :joint) :joint-angle))
+          (av0 (send-all (remove-duplicates
+			  (append (send-all union-link-list :joint) joint-list))
+                         :joint-angle))
           (c0 (unless (send self :parent) (send self :copy-worldcoords)))
 	  dif-pos dif-rot
 	  ;;
@@ -1556,7 +1558,8 @@
 	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   )
 	 (mapc #'(lambda (j a) (send* j :joint-angle a joint-args))
-               (send-all union-link-list :joint) av0)
+	       (remove-duplicates
+		(append (send-all union-link-list :joint) joint-list)) av0)
          (if c0 (send self :newcoords c0))
 	 nil))
      ))
