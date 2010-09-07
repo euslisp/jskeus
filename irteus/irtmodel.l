@@ -762,12 +762,14 @@
         (warn "parnet-links    : ~A~%" (send-all parent-links :name)))
       (dolist (link-list link-lists)
         (setq valid-link-list
-              (subseq
-               link-list
-               (let ((i 1))
-                 (while (eps= (distance (send (elt link-list 0) :worldpos)
-                                        (send (elt link-list i) :worldpos)) 0.0)
-                   (incf i)) i)))
+	      (if (= (length link-list) 1)
+		  link-list
+		(subseq
+		 link-list
+		 (let ((i 1))
+		   (while (eps= (distance (send (elt link-list 0) :worldpos)
+					  (send (elt link-list i) :worldpos)) 0.0)
+		     (incf i)) i))))
         (setq index-links
               (mapcar #'(lambda (l) (position l valid-link-list)) collision-links))
         (when (and debug (not (memq :no-message debug)))
