@@ -144,9 +144,9 @@
 	 (scale
 	  (/ (apply #'max (coerce (send bbox :diagonal) cons))
 	     (* 0.5 (tan (send self :viewer :viewing :view-angle))))
-	  (normalize-vector (v- viewpoint vt))))
+	  (normalize-vector (v- viewpoint viewtarget))))
        (send self :viewtarget vt)
-       (send self :viewpoint vp)
+       (send self :viewpoint (v+ vt vp))
        ))
    (send self :look1)
    (send self :draw-objects))
