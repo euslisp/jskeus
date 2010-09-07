@@ -179,8 +179,8 @@
         (dotimes (i (cadr (array-dimensions arr)))
           (push (format nil val-format (aref arr j i)) str-l))
         (push "~%" str-l))))
-    (format strm (apply #'concatenate string (nreverse str-l)))
-    arr))
+    (let ((ret (format strm (apply #'concatenate string (nreverse str-l)))))
+      (if strm arr ret))))
 
 (provide :irtutil "$Id$")
 
