@@ -136,7 +136,12 @@
 	 (send self :viewer :viewing :look viewpoint vt view-up))
      ))
   (:look-all
-   (&optional (bbox (geo::make-bounding-box (flatten (send-all x::draw-things :vertices)))))
+   (&optional bbox)
+   (cond ((derivedp bbox geo::bounding-box))
+         ((null bbox)
+          (setq bbox (geo::make-bounding-box (flatten (send-all x::draw-things :vertices)))))
+         (bbox
+          (setq bbox (geo::make-bounding-box (flatten (send-all (x::draw-things bbox) :vertices))))))
    (when bbox
      (let (vt vp)
        (setq vt (send bbox :center))
