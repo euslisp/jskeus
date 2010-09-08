@@ -164,15 +164,18 @@
 	(setq left-right-angle (- left-right-angle dx))
 	(setq up-down-angle (+ up-down-angle dy)))
        ((or (> x (- (send vwr :viewsurface :width) 60)) (< y 60))
-	(send self :viewpoint
-	      (v+ viewpoint
-		  (scale (- (* 10 (if (< y 60) dx dy)))
-			 (normalize-vector (v- viewtarget viewpoint))))))
+        (let* ((vtp (v- viewpoint viewtarget)))
+          (send self :viewpoint
+                (v+ viewpoint
+                    (scale (* 0.01 (if (< y 60) dx dy) (1+ (norm vtp)))
+                           (normalize-vector vtp))))))
        ((or (> y (- (send vwr :viewsurface :height) 60)) (< x 60))
-	(let* ((v (send vwr :viewing :transform-vector
-			 (if (< x 60)
-			     (float-vector 0 (* 2 dy) 0)
-			   (float-vector (* -2 dx) 0 0))))
+	(let* ((vtp (v- viewpoint viewtarget))
+               (v (send vwr :viewing :transform-vector
+                        (scale (* 0.001 (norm vtp))
+                               (if (< x 60)
+                                   (float-vector 0 dy 0)
+                                 (float-vector (* -1 dx) 0 0)))))
 	       (tp (send self :viewtarget))
 	       (dv (v- v viewpoint)))
 	  (send self :viewpoint v)
