@@ -147,8 +147,10 @@
        (setq vt (send bbox :center))
        (setq vp
 	 (scale
-	  (/ (apply #'max (coerce (send bbox :diagonal) cons))
-	     (* 0.5 (tan (send self :viewer :viewing :view-angle))))
+          (max
+           (* gl::*perspective-near* 1.5)
+           (/ (apply #'max (coerce (send bbox :diagonal) cons))
+              (* 0.5 (tan (send self :viewer :viewing :view-angle)))))
 	  (normalize-vector (v- viewpoint viewtarget))))
        (send self :viewtarget vt)
        (send self :viewpoint (v+ vt vp))
