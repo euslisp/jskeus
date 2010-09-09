@@ -267,7 +267,8 @@
                          (t
                           (error "unsupported image type ~A in ~A" pixelformat img)))
                         (if (> (setq scale (round (sqrt (/ (* tw th) (* 256 256))))) 1)
-                            (setq tw (/ tw scale) th (/ th scale)))
+                            (setq tw (ash 1 (ceiling (log (/ tw scale) 2)))
+                                  th (ash 1 (ceiling (log (/ th scale) 2)))))
                         (setq b (make-string (* tw th od)))
                         (gluScaleImage pixelformat ow oh GL_UNSIGNED_BYTE (send img :entity)
                                        tw th GL_UNSIGNED_BYTE b)
