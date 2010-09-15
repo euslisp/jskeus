@@ -33,6 +33,11 @@ PQP_Model *PQP_MakeModel()
     return new PQP_Model();
 }
 
+void PQP_DeleteModel(PQP_Model *m)
+{
+    delete(m);
+}
+
 int PQP_BeginModel(PQP_Model* m)
 {
     return m->BeginModel();

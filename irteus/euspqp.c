@@ -40,6 +40,13 @@ pointer PQPMAKEMODEL(register context *ctx, int n, register pointer *argv)
     return makeint(addr);
 }
 
+pointer PQPDELETEMODEL(register context *ctx, int n, register pointer *argv)
+{
+    eusinteger_t m = intval(argv[0]);
+    PQP_DeleteModel(m);
+    return(NIL);
+}
+
 pointer PQPBEGINMODEL(register context *ctx, int n, register pointer *argv)
 {
     eusinteger_t m = intval(argv[0]);
@@ -159,6 +166,7 @@ pointer ___euspqp(register context *ctx, int n, register pointer *argv)
     pointer mod=argv[0];
 
     defun(ctx, "PQPMAKEMODEL", mod, PQPMAKEMODEL);
+    defun(ctx, "PQPDELETEMODEL", mod, PQPDELETEMODEL);
     defun(ctx, "PQPBEGINMODEL", mod, PQPBEGINMODEL);
     defun(ctx, "PQPENDMODEL", mod, PQPENDMODEL);
     defun(ctx, "PQPADDTRI", mod, PQPADDTRI);
