@@ -1000,12 +1000,87 @@
          (setq dtheta (* gain dtheta)))
        (send* (elt union-link-list l) :joint :joint-angle dtheta :relative t joint-args))
      t))
+  ;; calc weight according to joint limit
+  ;;  this method should be called from :calc-inverse-kinematics-weight
+  (:calc-weight-from-joint-limit
+    (avoid-weight-gain fik-len link-list union-link-list
+                       debug-view weight tmp-weight tmp-len)
+    (let (joint-angle-limit-weight-old joint-angle-limit-weight)
+      (unless (get self :joint-angle-limit-weight-old)
+        (setf (get self :joint-angle-limit-weight-old) (make-hash-table)))
+      (setq joint-angle-limit-weight-old
+            (gethash union-link-list (get self :joint-angle-limit-weight-old)))
+      (unless joint-angle-limit-weight-old
+        (setq joint-angle-limit-weight-old (instantiate float-vector fik-len))
+        (fill joint-angle-limit-weight-old 1.0e+20)
+        (setf (gethash union-link-list (get self :joint-angle-limit-weight-old))
+              joint-angle-limit-weight-old))
+      ;;
+      ;; wmat/weight: weighting joint angle weight 
+      ;; 
+      ;; w_i = 1 + | dH/dt |      if d|dH/dt| >= 0
+      ;;     = 1                  if d|dH/dt| <  0
+      ;; dH/dt = (t_max - t_min)^2 (2t - t_max - t_min)
+      ;;         / 4 (t_max - t)^2 (t - t_min)^2
+      ;;
+      ;; T. F. Chang and R.-V. Dubey: "A weighted least-norm solution based
+      ;; scheme for avoiding joint limits for redundant manipulators", in IEEE
+      ;; Trans. On Robotics and Automation, 11((2):286-292, April 1995.
+      ;;
+      (when (> avoid-weight-gain 0.0)
+        (setq joint-angle-limit-weight 
+              (scale avoid-weight-gain
+                     (joint-angle-limit-weight (send-all union-link-list :joint) tmp-len) tmp-len))
+        (when (and debug-view (not (memq :no-message debug-view)))
+          (format-array joint-angle-limit-weight "cost  :"))
+        (dotimes (i fik-len)
+          (setf (elt tmp-weight i)
+                (if (>=  (- (elt joint-angle-limit-weight i)
+                            (elt joint-angle-limit-weight-old i)) 0.0)
+                    (/ 1.0 (+ 1.0 (elt joint-angle-limit-weight i)))
+                  1.0))
+          (setf (elt joint-angle-limit-weight-old i) (elt joint-angle-limit-weight i))
+          ))
+      (when (= avoid-weight-gain 0.0)
+        (dotimes (i fik-len) (setf (elt tmp-weight i) (elt weight i))))
+      (let ((w-cnt 0))
+        (dolist (l union-link-list)
+          (let* ((dup (count-if
+                       #'(lambda (x) (member l x))
+                       link-list))
+                 (w-len (calc-target-joint-dimension (list (send l :joint)))))
+            (when (> dup 1)
+              (dotimes (i w-len)
+                (setf (elt tmp-weight (+ w-cnt i)) (/ (elt tmp-weight (+ w-cnt i)) dup))))
+            (incf w-cnt w-len)
+            )))
+      tmp-weight))
+  ;; calc all weight
+  ;;   weight -> additional weight which user can set
+  (:calc-inverse-kinematics-weight-from-link-list
+    (link-list
+     &key (avoid-weight-gain 1.0)
+          (union-link-list (send self :calc-union-link-list link-list))
+          (fik-len (send self :calc-target-joint-dimension union-link-list))
+          (weight (fill (instantiate float-vector fik-len) 1)) ;; additional weight
+          (debug-view)
+          (tmp-weight (instantiate float-vector fik-len))
+          (tmp-len (instantiate float-vector fik-len)))
+    (setq tmp-weight
+          (send self :calc-weight-from-joint-limit
+                avoid-weight-gain fik-len link-list union-link-list
+                debug-view weight tmp-weight tmp-len))
+    (dotimes (i fik-len)
+      (setf (elt tmp-weight i) (* (elt weight i) (elt tmp-weight i))))
+    (when (and debug-view (not (memq :no-message debug-view)))
+      (format-array tmp-weight "weight:"))
+    tmp-weight)
   (:move-joints-avoidance
    (union-vel &rest args
               &key
               union-link-list link-list
               (fik-len (send self :calc-target-joint-dimension union-link-list))
-              (weight)
+              (weight (fill (instantiate float-vector fik-len) 1))
               (null-space)
               (avoid-nspace-gain 0.01)
               (avoid-weight-gain 1.0)
@@ -1021,9 +1096,8 @@
               (debug-view) (jacobi)
 	    &allow-other-keys)
    (let* (joint-angle-limit-nspace
-	  joint-angle-limit-weight
-	  joint-angle-limit-weight-old
 	  dav dtheta 
+          (tmp-weight (instantiate float-vector fik-len))
 	  (null-space-joint-limit (instantiate float-vector fik-len))
           null-space-collision-avoidance
           angle-speed-collision-avoidance
@@ -1033,15 +1107,6 @@
        (warn ";; ERROR : jacobi is required in :move-joints-avoidance~%")
        (return-from :move-joints-avoidance t))
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
-     (unless (get self :joint-angle-limit-weight-old)
-       (setf (get self :joint-angle-limit-weight-old) (make-hash-table)))
-     (setq joint-angle-limit-weight-old
-       (gethash union-link-list (get self :joint-angle-limit-weight-old)))
-     (unless joint-angle-limit-weight-old
-       (setq joint-angle-limit-weight-old (instantiate float-vector fik-len))
-       (fill joint-angle-limit-weight-old 1.0e+20)
-      (setf (gethash union-link-list (get self :joint-angle-limit-weight-old))
-	     joint-angle-limit-weight-old))
      (when (and debug-view (not (memq :no-message debug-view)))
        (warn "angle :")
        (dolist (j (send-all union-link-list :joint))
@@ -1050,51 +1115,11 @@
 	       (dotimes (i (length a)) (warn "~7,1f " (elt a i)))
 	     (warn "~7,1f " a))))
 	   (warn "~%"))
-     ;;
-     ;; wmat/weight: weighting joint angle weight 
-     ;; 
-     ;; w_i = 1 + | dH/dt |      if d|dH/dt| >= 0
-     ;;     = 1                  if d|dH/dt| <  0
-     ;; dH/dt = (t_max - t_min)^2 (2t - t_max - t_min)
-     ;;         / 4 (t_max - t)^2 (t - t_min)^2
-     ;;
-     ;; T. F. Chang and R.-V. Dubey: "A weighted least-norm solution based
-     ;; scheme for avoiding joint limits for redundant manipulators", in IEEE
-     ;; Trans. On Robotics and Automation, 11((2):286-292, April 1995.
-     ;;
-     (setq weight (if weight
-                      (copy-object weight)
-                    (fill (instantiate float-vector fik-len) 1)))
-     (when (> avoid-weight-gain 0.0)
-       (setq joint-angle-limit-weight 
-	 (scale avoid-weight-gain
-		(joint-angle-limit-weight (send-all union-link-list :joint) tmp-len) tmp-len))
-       ;; (setq joint-angle-limit-weight (instantiate float-vector fik-len))
-       (when (and debug-view (not (memq :no-message debug-view)))
-         (format-array joint-angle-limit-weight "cost  :"))
-       (dotimes (i fik-len)
-	 (setf (elt weight i)
-	       (* (elt weight i) 
-		  (if (>=  (- (elt joint-angle-limit-weight i)
-			      (elt joint-angle-limit-weight-old i)) 0.0)
-		      (/ 1.0 (+ 1.0 (elt joint-angle-limit-weight i)))
-		    1.0)))
-         (setf (elt joint-angle-limit-weight-old i) (elt joint-angle-limit-weight i))
-         )
-       )
-     (let ((w-cnt 0))
-       (dolist (l union-link-list)
-         (let* ((dup (count-if
-                      #'(lambda (x) (member l x))
-                      link-list))
-                (w-len (calc-target-joint-dimension (list (send l :joint)))))
-           (when (> dup 1)
-             (dotimes (i w-len)
-               (setf (elt weight (+ w-cnt i)) (/ (elt weight (+ w-cnt i)) dup))))
-           (incf w-cnt w-len)
-           )))
-     (when (and debug-view (not (memq :no-message debug-view)))
-       (format-array weight "weight:"))
+     (setq weight ;; copied to tmp-weight
+           (send self :calc-inverse-kinematics-weight-from-link-list
+                 link-list :weight weight :fik-len fik-len
+                 :avoid-weight-gain avoid-weight-gain :union-link-list union-link-list
+                 :debug-view debug-view :tmp-len tmp-len :tmp-weight tmp-weight))
      ;;
      ;; avoid-nspace-joint-limit: avoiding joint angle limit
      ;; 
