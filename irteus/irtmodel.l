@@ -897,7 +897,7 @@
 	    avoid-collision-joint-gain
 	    avoid-collision-null-gain	    
             ((:collision-avoidance-link-pair pair-list))
-	    (union-link-list) (link-list) (jacobi) (I-J#J) (weight)
+	    (union-link-list) (link-list) (I-J#J) (weight)
             ;; link-list -> both list and atom OK.
 	    (fik-len (send self :calc-target-joint-dimension union-link-list))
             debug-view
@@ -957,14 +957,14 @@
                    )))
              ))
          ))
-     (when (or (null jacobi) (null I-J#J))
-       (warn ";; ERROR : jacobi or I-J#J are required in :collision-avoidance~%")
+     (when (null I-J#J)
+       (warn ";; ERROR : I-J#J is required in :collision-avoidance~%")
        (return-from :collision-avoidance dav-col))
 
      (let ((dav-col-null (transform I-J#J dav-col)))
        (when (and debug-view (not (memq :no-message debug-view)))
          (format-array (scale avoid-collision-joint-gain (map float-vector #'rad2deg dav-col)) "coljnt:")
-         (format-array (scale avoid-collision-joint-gain (map float-vector #'rad2deg dav-col-null)) "colnul:"))
+         (format-array (scale avoid-collision-null-gain (map float-vector #'rad2deg dav-col-null)) "colnul:"))
        (dotimes (i fik-len) (setf (elt dav-col i)
                                   (+ (* avoid-collision-joint-gain (elt dav-col i) (elt weight i))
                                      (* avoid-collision-null-gain (elt dav-col-null i) (elt weight i))))))
