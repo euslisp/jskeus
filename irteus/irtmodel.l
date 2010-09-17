@@ -1075,6 +1075,41 @@
     (when (and debug-view (not (memq :no-message debug-view)))
       (format-array tmp-weight "weight:"))
     tmp-weight)
+  ;; calc nspace according to joint limit
+  ;;  this method should be called from :calc-inverse-kinematics-nspace-from-link-list
+  (:calc-nspace-from-joint-limit
+    (avoid-nspace-gain union-link-list debug-view tmp-nspace)
+    ;;
+    ;; avoid-nspace-joint-limit: avoiding joint angle limit
+    ;; 
+    ;; dH/dq = (((t_max + t_min)/2 - t) / ((t_max - t_min)/2)) ^2
+    ;;
+    (when (> avoid-nspace-gain 0.0)
+      (setq tmp-nspace
+            (scale avoid-nspace-gain
+                   (joint-angle-limit-nspace (send-all union-link-list :joint) tmp-nspace) tmp-nspace))
+      (when (and debug-view (not (memq :no-message debug-view)))
+        (format-array (map float-vector #'rad2deg tmp-nspace) "nspace:")))
+    tmp-nspace)
+  ;; calc all nspace
+  ;;   null-space -> additional null space vector which user can set
+  (:calc-inverse-kinematics-nspace-from-link-list
+    (link-list
+     &key (avoid-nspace-gain 0.01)
+          (union-link-list (send self :calc-union-link-list link-list))
+          (fik-len (send self :calc-target-joint-dimension union-link-list))
+          (null-space) (debug-view)
+          (tmp-nspace (instantiate float-vector fik-len)))
+    (setq tmp-nspace
+          (send self :calc-nspace-from-joint-limit
+                avoid-nspace-gain union-link-list debug-view tmp-nspace))
+    (cond
+     ((functionp null-space) (setq null-space (funcall null-space)))
+     ((listp null-space) (setq null-space (eval null-space))))
+    (if null-space
+        (setq tmp-nspace
+              (v+ null-space tmp-nspace tmp-nspace)))
+    tmp-nspace)
   (:move-joints-avoidance
    (union-vel &rest args
               &key
@@ -1098,7 +1133,7 @@
    (let* (joint-angle-limit-nspace
 	  dav dtheta 
           (tmp-weight (instantiate float-vector fik-len))
-	  (null-space-joint-limit (instantiate float-vector fik-len))
+	  (tmp-nspace (instantiate float-vector fik-len))
           null-space-collision-avoidance
           angle-speed-collision-avoidance
           (angle-speed-collision-blending 0.0) min-distance
@@ -1120,18 +1155,6 @@
                  link-list :weight weight :fik-len fik-len
                  :avoid-weight-gain avoid-weight-gain :union-link-list union-link-list
                  :debug-view debug-view :tmp-len tmp-len :tmp-weight tmp-weight))
-     ;;
-     ;; avoid-nspace-joint-limit: avoiding joint angle limit
-     ;; 
-     ;; dH/dq = (((t_max + t_min)/2 - t) / ((t_max - t_min)/2)) ^2
-     ;;
-     (when (> avoid-nspace-gain 0.0)
-       (setq joint-angle-limit-nspace (joint-angle-limit-nspace (send-all union-link-list :joint) tmp-len2))
-       (setq null-space-joint-limit
-	 (scale avoid-nspace-gain
-                joint-angle-limit-nspace tmp-len2))
-       (when (and debug-view (not (memq :no-message debug-view)))
-         (format-array (map float-vector #'rad2deg null-space-joint-limit) "nspace:")))
 
      ;; calc inverse jacobian and projection jacobian
      (setq jacobi# (send* self :calc-inverse-jacobian jacobi :weight weight args))
@@ -1188,14 +1211,11 @@
        (when (and debug-view (not (memq :no-message debug-view)))
          (format-array (map float-vector #'rad2deg angle-speed-collision-avoidance) "colvel:")
          (warn "blend :~7,3f~%" angle-speed-collision-blending)))
-     (cond
-      ((functionp null-space) (setq null-space (funcall null-space)))
-      ((listp null-space) (setq null-space (eval null-space))))
-     (if null-space
-         (setq null-space-joint-limit
-               (v+ null-space
-                   null-space-joint-limit
-                   null-space-joint-limit)))
+     (setq tmp-nspace
+           (send self :calc-inverse-kinematics-nspace-from-link-list
+                 link-list :union-link-list union-link-list
+                 :avoid-nspace-gain avoid-nspace-gain :debug-view debug-view
+                 :fik-len fik-len :null-space null-space :tmp-nspace tmp-nspace))
      ;;
      ;; q = f(d) qca + {1 - f(d)} qwbm
      ;;
@@ -1219,7 +1239,7 @@
      (send-message* self cascaded-link
 		    :move-joints union-vel
 		    :union-link-list union-link-list
-		    :null-space null-space-joint-limit
+		    :null-space tmp-nspace
 		    :angle-speed angle-speed-collision-avoidance
 		    :angle-speed-blending angle-speed-collision-blending
 		    :weight weight :jacobi# jacobi# :I-J#J I-J#J
