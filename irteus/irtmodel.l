@@ -1364,11 +1364,12 @@
             (t (make-list (length move-target) :initial-element (deg2rad 1)))))
     union-link-list
     target-coords                 ;required for look-at and debug-view
+    (jacobi)
     debug-view ik-args
     &allow-other-keys)
    ;; dif-pos, dif-rot, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
-   (let (tmp-dim tmp-dims (vec-count 0) (success t) jacobi
+   (let (tmp-dim tmp-dims (vec-count 0) (success t)
          (method-args (nconc args ik-args))
          (p-limit (cadr (memq :p-limit args)))
          (r-limit (cadr (memq :r-limit args))))
@@ -1407,11 +1408,13 @@
            (setq tmp-dim (cadr (memq :tmp-dim ik-args)))
          (setq tmp-dim (instantiate float-vector (send self :calc-target-axis-dimension rotation-axis translation-axis))))
        
-       (setq jacobi (send* self :calc-jacobian-from-link-list link-list
-                           :translation-axis translation-axis
-                           :rotation-axis rotation-axis
-                           :move-target move-target
-                           method-args))
+       (if (functionp jacobi) (setq jacobi (funcall jacobi)))
+       (unless jacobi
+         (setq jacobi (send* self :calc-jacobian-from-link-list link-list
+                             :translation-axis translation-axis
+                             :rotation-axis rotation-axis
+                             :move-target move-target
+                             method-args)))
        (when (and debug-view (not (memq :no-message debug-view)))
          (warn "loop: ~3d~%" loop)
          (warn "union-link-list: ~A~%" (send-all union-link-list :name)))
@@ -1490,11 +1493,12 @@
 		  (rthre (cond
                           ((atom move-target) (deg2rad 1))
                           (t (make-list (length move-target) :initial-element (deg2rad 1)))))
+                  (union-link-list)
 		  &allow-other-keys)
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
    (let* ((loop 0)
-          (union-link-list (send self :calc-union-link-list link-list))
+          (union-link-list (if union-link-list union-link-list (send self :calc-union-link-list link-list)))
           (av0 (send-all (remove-duplicates
 			  (append (send-all union-link-list :joint) joint-list))
                          :joint-angle))
