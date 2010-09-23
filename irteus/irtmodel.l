@@ -33,7 +33,7 @@
 		      joint-velocity joint-acceleration joint-torque))
 
 (defmethod joint
-  (:init (&key (name (gensym "joint"))
+  (:init (&key (name (intern (format nil "joint~A" (sys::address self)) "KEYWORD"))
                ((:child-link clink)) ((:parent-link plink))
 	       (min -90) (max 90) &allow-other-keys)
 	 (send self :name name)
