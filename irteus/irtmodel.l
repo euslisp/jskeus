@@ -54,24 +54,22 @@
   )
 
 (defun calc-jacobian-default-rotate-vector
-  (paxis world-default-coords child-reverse move-target tmp-v3 tmp-v3a tmp-v3b tmp-m33)
+  (paxis world-default-coords child-reverse move-target tmp-v3 tmp-m33)
   (setq tmp-v3 (scale (if child-reverse -1.0 1.0)
-		      (normalize-vector (send world-default-coords :rotate-vector paxis tmp-v3) tmp-v3) tmp-v3))
-  (setq tmp-v3
-        (v- (send move-target :inverse-transform-vector tmp-v3 tmp-v3 tmp-v3b tmp-m33)
-            (send move-target :inverse-transform-vector #f(0 0 0) tmp-v3a tmp-v3b tmp-m33)  tmp-v3))
-  tmp-v3)
+                      (normalize-vector (send world-default-coords :rotate-vector paxis tmp-v3) tmp-v3) tmp-v3))
+  (transform (transpose (send move-target :worldrot) tmp-m33) tmp-v3 tmp-v3))
 
 (defun calc-jacobian-rotational
   (fik row column joint paxis child-link world-default-coords child-reverse
        move-target rotation-axis translation-axis
        pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
   (setq tmp-v3 (calc-jacobian-default-rotate-vector
-		paxis world-default-coords child-reverse move-target tmp-v3 tmp-v3a tmp-v3b tmp-m33))
+		paxis world-default-coords child-reverse move-target tmp-v3 tmp-m33))
 
-  (setq pos-i (scale -0.001 ;; scale [mm] -> [m] and vector child-link -> move-target
-		     (send move-target :inverse-transform-vector
-			   (send child-link :worldpos) tmp-v3a tmp-v3b tmp-m33) tmp-v3a))
+  (setq pos-i (scale 1e-3 ;; scale [mm] -> [m]
+                     (transform (transpose (send move-target :worldrot) tmp-m33)
+                                (v- (send move-target :worldpos) (send child-link :worldpos) tmp-v3a)
+                                tmp-v3a) tmp-v3a))
   (setq pos-r (v* tmp-v3 pos-i tmp-v3b))
   (setq pos-r (calc-dif-with-axis pos-r translation-axis tmp-v0 tmp-v1 tmp-v2))
   (dotimes (j (length pos-r)) (setf (aref fik (+ j row) column) (elt pos-r j)))
@@ -84,7 +82,7 @@
        move-target rotation-axis translation-axis
        pos-i pos-r tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
   (setq tmp-v3 (calc-jacobian-default-rotate-vector
-		paxis world-default-coords child-reverse move-target tmp-v3 tmp-v3a tmp-v3b tmp-m33))
+		paxis world-default-coords child-reverse move-target tmp-v3 tmp-m33))
 
   (setq pos-r (calc-dif-with-axis tmp-v3 translation-axis tmp-v0 tmp-v1 tmp-v2))
   (setq pos-r (scale 0.001 pos-r pos-r)) ;; scale [mm] -> [m]
