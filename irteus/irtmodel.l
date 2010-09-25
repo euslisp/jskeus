@@ -1809,57 +1809,53 @@
   (params &rest args)
   ;; params := (dif-pos dif-rot move-target
   ;;            target-coords :translation-axis x :rotation-axis x)
-  (let ((move-target (gensym))
-        (target-coords (gensym))
-        (rotation-axis (gensym))
-        (translation-axis (gensym)))
-    `(let ((,move-target ,(caddr params))
-           (,target-coords ,(cadddr params))
-           (,translation-axis ,(if (member :translation-axis params)
-                                   (cadr (member :translation-axis params))
-                                 t))
-           (,rotation-axis ,(if (member :rotation-axis params)
-                                   (cadr (member :rotation-axis params))
-                              t)))
-       (let ((,(car params) (send ,move-target :difference-position
-                                  ,target-coords :translation-axis
-                                  ,translation-axis))
-             (,(cadr params) (send ,move-target :difference-rotation
-                                   ,target-coords :rotation-axis
-                                   ,rotation-axis)))
-         ,@args))
-    ))
+  (with-gensyms
+   (move-target target-coords rotation-axis translation-axis)
+   `(let ((,move-target ,(caddr params))
+          (,target-coords ,(cadddr params))
+          (,translation-axis ,(if (member :translation-axis params)
+                                  (cadr (member :translation-axis params))
+                                t))
+          (,rotation-axis ,(if (member :rotation-axis params)
+                               (cadr (member :rotation-axis params))
+                             t)))
+      (let ((,(car params) (send ,move-target :difference-position
+                                 ,target-coords :translation-axis
+                                 ,translation-axis))
+            (,(cadr params) (send ,move-target :difference-rotation
+                                  ,target-coords :rotation-axis
+                                  ,rotation-axis)))
+        ,@args))
+   ))
 
 (defmacro with-difference-positions-and-rotations
   (params &rest args)
   ;; params := (dif-pos dif-rot move-target
   ;;            target-coords :translation-axis x :rotation-axis x)
-  (let ((move-target (gensym))
-        (target-coords (gensym))
-        (rotation-axis (gensym))
-        (translation-axis (gensym)))
-    `(let* ((,move-target ,(caddr params))
-            (,target-coords ,(cadddr params))
-            (,translation-axis (if ,(cadr (member :translation-axis params))
-				   ,(cadr (member :translation-axis params))
-				 (make-list (length ,(caddr params))
-					    :initial-element t)))
-            (,rotation-axis (if ,(cadr (member :rotation-axis params))
-				,(cadr (member :rotation-axis params))
-			      (make-list (length ,(caddr params))
-					 :initial-element t))))
-       (let ((,(car params)
-              (mapcar #'(lambda (m tc ta)
-                          (send m :difference-position
-                                tc :translation-axis ta))
-                      ,move-target ,target-coords ,translation-axis))
-             (,(cadr params)
-              (mapcar #'(lambda (m tc ra)
-                          (send m :difference-rotation
-                                tc :rotation-axis ra))
-                      ,move-target ,target-coords ,rotation-axis)))
-         ,@args))
-    ))
+  (with-gensyms
+   (move-target target-coords rotation-axis translation-axis)
+   `(let* ((,move-target ,(caddr params))
+           (,target-coords ,(cadddr params))
+           (,translation-axis (if ,(cadr (member :translation-axis params))
+                                  ,(cadr (member :translation-axis params))
+                                (make-list (length ,(caddr params))
+                                           :initial-element t)))
+           (,rotation-axis (if ,(cadr (member :rotation-axis params))
+                               ,(cadr (member :rotation-axis params))
+                             (make-list (length ,(caddr params))
+                                        :initial-element t))))
+      (let ((,(car params)
+             (mapcar #'(lambda (m tc ta)
+                         (send m :difference-position
+                               tc :translation-axis ta))
+                     ,move-target ,target-coords ,translation-axis))
+            (,(cadr params)
+             (mapcar #'(lambda (m tc ra)
+                         (send m :difference-rotation
+                               tc :rotation-axis ra))
+                     ,move-target ,target-coords ,rotation-axis)))
+        ,@args))
+   ))
 
 ;; macro for IK with move-target and link-list
 (defmacro with-move-target-link-list
@@ -1868,65 +1864,60 @@
   ;;            :move-target _move-target) ;; additional parameter
   ;; if use :move-target option, _move-target is used.
   ;; otherwise, :end-coords is used.
-  (let ((move-target (gensym))
-        (link-list (gensym))
-        (robot (gensym))
-        (limbs (gensym)))
-    `(let* ((,robot ,(caddr params))
-            (,limbs (if (atom ,(cadddr params))
-                        (list ,(cadddr params))
-                      ,(cadddr params)))
-            (,move-target (cond
-                           (,(cadr (member :move-target params))
-                            (if (atom ,(cadr (member :move-target params)))
-                                (list ,(cadr (member :move-target params)))
-                              ,(cadr (member :move-target params))))
-                           (t
-                            (mapcar #'(lambda (_limb) (send ,robot _limb :end-coords)) ,limbs))))
-            (,link-list (mapcar
-                         #'(lambda (_move-target)
-                             (send ,robot :link-list
-                                   (send _move-target :parent)))
-                         ,move-target)))
-       (let ((,(car params) ,move-target)
-             (,(cadr params) ,link-list))
-         ,@bodies)
-       )))
+  (with-gensyms
+   (move-target link-list robot limbs)
+   `(let* ((,robot ,(caddr params))
+           (,limbs (if (atom ,(cadddr params))
+                       (list ,(cadddr params))
+                     ,(cadddr params)))
+           (,move-target (cond
+                          (,(cadr (member :move-target params))
+                           (if (atom ,(cadr (member :move-target params)))
+                               (list ,(cadr (member :move-target params)))
+                             ,(cadr (member :move-target params))))
+                          (t
+                           (mapcar #'(lambda (_limb) (send ,robot _limb :end-coords)) ,limbs))))
+           (,link-list (mapcar
+                        #'(lambda (_move-target)
+                            (send ,robot :link-list
+                                  (send _move-target :parent)))
+                        ,move-target)))
+      (let ((,(car params) ,move-target)
+            (,(cadr params) ,link-list))
+        ,@bodies)
+      )))
 
 (defmacro with-append-root-joint (params &rest bodies)
-  (let ((robot (gensym))
-        (link-list (gensym))
-        (vlink (gensym))
-        (rlink (gensym))
-        (joint-args (gensym)))
-    `(progn
-       (let ((,robot ,(cadr params))
-             (,link-list
-              (if (atom (car ,(caddr  params)))
-                  (list ,(caddr  params))
-                ,(caddr  params)))
-	     (,joint-args ,(cadr (member :joint-args params))))
-         (let ((,vlink (instance bodyset-link :init (make-cascoords)
-                                         :bodies (list (make-cube 150 10 400))
-                                         :name 'virtual-link
-					 :weight 0 :centroid (float-vector 0 0 0)
-					 :inertia-tensor (make-matrix 3 3)))
-               (,rlink (car (send ,robot :links))))
-           (send-message ,rlink bodyset-link :add-joint
-             (instance* ,(or (cadr (member :joint-class params)) 6dof-joint) :init
-                            :child-link ,robot
-                            :parent-link ,vlink
-			    ,joint-args))
-           (send ,rlink :add-parent-link ,vlink)
-           (send ,vlink :add-child-links ,rlink)
-           (unwind-protect
-               (let ((,(car params) (mapcar #'(lambda (l)
-                                                (cons ,rlink l))
-                                            ,link-list)))
-                 ,@bodies)
-             (send ,rlink :del-joint)
-             (send ,rlink :del-parent-link)
-             (send ,vlink :del-child-link ,rlink)))))))
+  (with-gensyms
+   (robot link-list vlink rlink joint-args)
+   `(progn
+      (let ((,robot ,(cadr params))
+            (,link-list
+             (if (atom (car ,(caddr  params)))
+                 (list ,(caddr  params))
+               ,(caddr  params)))
+            (,joint-args ,(cadr (member :joint-args params))))
+        (let ((,vlink (instance bodyset-link :init (make-cascoords)
+                                :bodies (list (make-cube 150 10 400))
+                                :name 'virtual-link
+                                :weight 0 :centroid (float-vector 0 0 0)
+                                :inertia-tensor (make-matrix 3 3)))
+              (,rlink (car (send ,robot :links))))
+          (send-message ,rlink bodyset-link :add-joint
+                        (instance* ,(or (cadr (member :joint-class params)) 6dof-joint) :init
+                                   :child-link ,robot
+                                   :parent-link ,vlink
+                                   ,joint-args))
+          (send ,rlink :add-parent-link ,vlink)
+          (send ,vlink :add-child-links ,rlink)
+          (unwind-protect
+              (let ((,(car params) (mapcar #'(lambda (l)
+                                               (cons ,rlink l))
+                                           ,link-list)))
+                ,@bodies)
+            (send ,rlink :del-joint)
+            (send ,rlink :del-parent-link)
+            (send ,vlink :del-child-link ,rlink)))))))
 
 ;; macro for append virtual obj joint for dual arm manipulation
 ;; arguments are (ll ul ot link-list target-coords robot)
