@@ -79,6 +79,7 @@
      (setq bal7 (make-default-robot-link 50 50 :y :larm-link6))
      (setq larm-end-coords (make-cascoords))
      (send larm-end-coords :locate #f(0 0 -50))
+     (send larm-end-coords :rotate pi/2 :y)
      (send bal7 :assoc larm-end-coords)
      (send bal6 :assoc bal7)
      (send bal5 :assoc bal6)
@@ -100,6 +101,7 @@
      (setq bar7 (make-default-robot-link 50 50 :y :rarm-link6))
      (setq rarm-end-coords (make-cascoords))
      (send rarm-end-coords :locate #f(0 0 -50))
+     (send rarm-end-coords :rotate pi/2 :y)
      (send bar7 :assoc rarm-end-coords)
      (send bar6 :assoc bar7)
      (send bar5 :assoc bar6)
@@ -611,6 +613,72 @@
 	))
      ))
 
+(defun test5
+  (&rest args)
+  "dual-armed object manipulation"
+  ;; initialize robot
+  (unless (boundp '*robot*)
+    (setq *robot* (instance sample-robot :init)))
+  (send *robot* :newcoords (make-coords))
+  (send *robot* :reset-pose)
+  ;; fix leg
+  (if (some #'null (send *robot* :legs))
+      (send *robot* :newcoords (make-coords))
+    (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (make-coords))))
+  (send *robot* :update-descendants)
+  ;; generate object model
+  (setq *obj* (make-cube 30 160 100))
+  (dolist (l '(:rarm :larm))
+    (send *obj* :put l ;; generate target coords
+          (make-cascoords :coords
+                          (send (send (send *obj* :copy-worldcoords) :rotate (case l (:rarm pi/2) (:larm -pi/2)) :z)
+                                :translate (float-vector -75 0 0))))
+    (send *obj* :assoc (send *obj* :get l)))
+  (send *obj* :newcoords (make-coords :pos #f(300 0 700)))
+  (send *obj* :put :face-color :blue)
+  (send *robot* :head :look-at (send *obj* :worldpos))
+  (objects (list *obj* *robot*))
+  ;; ik codes
+  (let ((i 0))
+    (do-until-key
+     ;; rotate target coords
+     (when (/= i 0)
+       (let ((l (cond
+                 ((or (= (mod i 4) 1) (= (mod i 4) 2)) :rarm)
+                 ((or (= (mod i 4) 3) (= (mod i 4) 0)) :larm)))
+             (rot (if (oddp (mod i 4)) (* (case (mod i 4) (1 1) (3 -1)) (deg2rad 90))))
+             (trs (float-vector (* (expt -1 (mod i 2)) 50) 0 0)))
+         (send *obj* :dissoc (send *obj* :get l))
+         (send *obj* :assoc (send *obj* :get l))
+         (if (oddp (mod i 4))
+             (send (send *obj* :get l) :rotate rot :x))
+         (send (send *obj* :get l) :translate trs)))
+     ;; solve inverse kinematics
+     (with-move-target-link-list
+      (mt robot-ll *robot* '(:rarm :larm))
+      (with-append-virtual-obj-joint ;; add 6dof for target-coords
+       (ll ul ot robot-ll
+           (mapcar #'(lambda (l) (send *obj* :get l)) '(:rarm :larm))
+           *robot* :assoc-obj *obj*)
+       (let* ((rotation-axis (cond
+                              ((= (mod i 4) 1) '(:x t))
+                              ((= (mod i 4) 3) '(t :x))
+                              (t '(t t)))))
+         (send* *robot* :inverse-kinematics ot
+                :union-link-list ul :link-list ll :move-target mt
+                :rotation-axis rotation-axis
+                :jacobi #'(lambda ()
+                            (calc-jacobian-from-link-list-including-robot-and-obj-virtual-joint
+                             ll mt ot *robot* :rotation-axis rotation-axis))
+                ;;:debug-view t
+                :debug-view :no-message
+                (append (if (= i 0) '(:stop 100)) args))
+         )))
+     (incf i)
+     (send *robot* :head :look-at (send *obj* :worldpos))
+     )
+    ))
+
 ;;;
 ;;;
 
@@ -620,6 +688,7 @@
 (warn "(test2) for tool usage~%")
 (warn "(test3) for hand model~%")
 (warn "(test4) for fullbody motion~%")
+(warn "(test5) for dual-armed object manipulation~%")
 
 (unless (boundp '*irtviewer*) (make-irtviewer))
 #+:jsk
