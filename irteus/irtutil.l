@@ -182,6 +182,13 @@
     (let ((ret (format strm (apply #'concatenate string (nreverse str-l)))))
       (if strm arr ret))))
 
+;; with-gensyms
+(defmacro with-gensyms (syms &rest bodies)
+  `(let ,(mapcar #'(lambda (s)
+                     `(,s (gensym)))
+                 syms)
+     ,@bodies))
+
 (provide :irtutil "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
