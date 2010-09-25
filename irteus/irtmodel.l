@@ -624,6 +624,7 @@
 	      (translation-axis (cond 
 				 ((atom move-target) t)
 				 (t (make-list (length move-target) :initial-element t))))
+              (col-offset 0)
 	      (dim (send self :calc-target-axis-dimension rotation-axis translation-axis))
               (fik-len (send self :calc-target-joint-dimension link-list))
 	      fik
@@ -647,9 +648,9 @@
      (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
      (if (atom translation-axis) (setq translation-axis (list translation-axis)))
 ;;
-     (do ((col 0 (+ col (send j :joint-dof)))
+     (do ((col col-offset (+ col (send j :joint-dof)))
 	  (i 0 (1+ i)))
-         ((>= col (send self :calc-target-joint-dimension union-link-list)))
+         ((>= col (+ col-offset (send self :calc-target-joint-dimension union-link-list))))
        (setq ul (elt union-link-list i) row 0)
        (dotimes (m (length link-list))
          (let ((link-list (elt link-list m))
