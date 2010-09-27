@@ -1366,6 +1366,7 @@
     union-link-list
     target-coords                 ;required for look-at and debug-view
     (jacobi)
+    (additional-check) ;; to add optional convergence conditions
     debug-view ik-args
     &allow-other-keys)
    ;; dif-pos, dif-rot, move-target, rotation-axis, translation-axis, link-list
@@ -1444,6 +1445,8 @@
            (dotimes (i (length vel-p)) (setf (elt tmp-dim i) (elt vel-p i)))
            (dotimes (i (length vel-r)) (setf (elt tmp-dim (+ i (length vel-p))) (elt vel-r i)))
            ))
+       (if (and additional-check success)
+           (setq success (and success (funcall additional-check))))
        (dotimes (i (length tmp-dims))
          (dotimes (j (length (elt tmp-dims i)))
            (setf (elt tmp-dim (+ j vec-count)) (elt (elt tmp-dims i) j)))
