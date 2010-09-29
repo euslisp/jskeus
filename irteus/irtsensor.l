@@ -34,8 +34,9 @@
   (:read () data)
   (:draw-sensor (v) (warn ":draw-sensor should be defined in lower class~%"));; virtual method
   (:init
-   (shape)
+   (shape &key name)
    (replace-object self shape)
+   (send self :name name)
    shape))
 
 (defclass bumper
@@ -101,6 +102,8 @@
                       ))
      (send self :assoc viewing)
      self))
+  (:pwidth () pwidth)
+  (:pwidth () pheight)
   (:screen-point
    (pos)
    (let (v w cx cy)
