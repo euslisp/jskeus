@@ -80,7 +80,7 @@
   (:init
    (b &rest args
           &key
-          ((:pwidth pw) 320) ((:pheight ph) 240)
+          ((:width pw) 320) ((:height ph) 240)
           (view-up #f(-1 0 0))
           (viewdistance 5.0)
           (hither 100.0)
@@ -102,8 +102,8 @@
                       ))
      (send self :assoc viewing)
      self))
-  (:pwidth () pwidth)
-  (:pwidth () pheight)
+  (:width () pwidth)
+  (:width () pheight)
   (:screen-point
    (pos)
    (let (v w cx cy)
