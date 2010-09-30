@@ -24,10 +24,10 @@
 
 (in-package "USER")
 
-(defclass sensor
+(defclass sensor-model
   :super body
   :slots (data profile))
-(defmethod sensor
+(defmethod sensor-model
   (:profile (&optional p) (if p (setq profile p)) profile)
   (:signal (rawinfo) (warn ":signal should be defined in lower class~%"))
   (:simulate (model) (warn ":simulate should be defined in lower class~%"))
@@ -40,7 +40,7 @@
    shape))
 
 (defclass bumper
-  :super sensor
+  :super sensor-model
   :slots (bumper-threshold))
 (defmethod bumper
   (:init
@@ -70,7 +70,7 @@
   )
 
 (defclass camera
-  :super sensor
+  :super sensor-model
   :slots ((viewing :forward
                    (:projection :newprojection
                     :view :viewpoint :view-direction :viewdistance
