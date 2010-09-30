@@ -31,6 +31,23 @@
     c))
 
 (defmethod geo::viewer
+  (:draw-circle (c &key (radius 50) (flush nil) (arrow nil) (arc 2pi))
+    (let* ((s 16) (sr (/ arc s)) p0 p1)
+      (dotimes (i s)
+	(setq p1 
+	  (send c :transform-vector
+		(float-vector (* radius (sin (* i sr)))
+			      (* radius (cos (* i sr))) 0)))
+	(if p0 (send self :draw-line p0 p1))
+	(setq p0 p1))
+      (setq p1 (send c :transform-vector
+		     (float-vector (* radius (sin (* s sr)))
+				   (* radius (cos (* s sr))) 0)))
+      (if arrow
+	  (send self :draw-arrow p0 p1)
+	(send self :draw-line p0 p1))
+      (if flush (send self :flush))
+      ))
   (:draw-objects
     (&rest args)
     (send* (get self :pickviewer) :draw-objects args)))
