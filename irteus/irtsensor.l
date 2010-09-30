@@ -119,7 +119,7 @@
              (cx (aref proj 0 2)) (cy (aref proj 1 2))
              (tx (aref proj 0 3)) (ty (aref proj 1 3)))
      (setq xx (- x cx tx) yy (- y cy ty))
-     (normalize-vector (send viewing :ray xx (- yy)))))
+     (send self :rotate-vector (send viewing :ray xx (- yy)))))
   (:draw-sensor
    (vwer)
    (let* ((yon (send self :yon)) (hither (send self :hither))
