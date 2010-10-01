@@ -119,7 +119,7 @@
              (cx (aref proj 0 2)) (cy (aref proj 1 2))
              (tx (aref proj 0 3)) (ty (aref proj 1 3)))
      (setq xx (- x cx tx) yy (- y cy ty))
-     (send viewing :ray (/ xx (float pwidth)) (/ (- yy) (float pheight)))))
+     (send viewing :ray (/ xx ( / pwidth 2.0)) (/ (- yy) (/ pheight 2.0)))))
   (:draw-sensor
    (vwer)
    (let* ((yon (send self :yon)) (hither (send self :hither))
