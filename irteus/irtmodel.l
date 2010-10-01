@@ -1791,15 +1791,17 @@
         (fik (make-matrix ;; result is copied to fik
               (send robot :calc-target-axis-dimension rotation-axis translation-axis)
               (send robot :calc-target-joint-dimension link-list))))
-  (let* ((robot-ll (mapcar #'(lambda (l) (subseq l 0 (1- (length l)))) link-list))
+  (let* ((robot-ll (mapcar #'(lambda (l) ;; link-list for object link
+                               (remove-if-not #'(lambda (x) (member x (send robot :links))) l))
+                           link-list))
+         (obj-ll (mapcar #'(lambda (l) ;; link-list for robot link
+                             (remove-if #'(lambda (x) (member x (send robot :links))) l))
+                         link-list))
          (robot-ll-len (send robot :calc-target-joint-dimension robot-ll)))
-    ;; calc obj jacobi
     (send robot :calc-jacobian-from-link-list
-          (mapcar #'(lambda (l) (last l)) link-list)
+          obj-ll :col-offset robot-ll-len :fik fik
           :transform-coords move-target :move-target obj-move-target
-          :col-offset robot-ll-len :fik fik
           :rotation-axis rotation-axis :translation-axis translation-axis)
-    ;; calc robot jacobi
     (send robot :calc-jacobian-from-link-list
           robot-ll :move-target move-target :fik fik
           :rotation-axis rotation-axis :translation-axis translation-axis)
@@ -1807,6 +1809,86 @@
       (dotimes (j (- (cadr (array-dimensions fik)) robot-ll-len))
         (setf (aref fik i (+ robot-ll-len j)) (* -1.0 (aref fik i (+ robot-ll-len j))))))
     fik))
+
+;; function for append virtual obj joint for object manipulation
+;; arguments are (ll ul ot link-list target-coords robot)
+;; in detail
+;;   link-list, target-coords -> original link-list and target-coords
+;;   joint-class, joint-args -> joint class and argument for joint's :init
+;;   vplink -> parent-link for virtual joint
+;;   vplink-coords, vclink-coords -> initial coords for virtual links
+;; return
+;;   link-list with object virtual link and move-target associated with virtual link
+;; example formulation
+;;   [\dot{x}_{arm1}]   [ J_{arm1}        0  J_{obj1} ][\dot{\theta}_{arm1}]
+;;   [\dot{x}_{arm2}] = [        0 J_{arm2}  J_{obj2} ][\dot{\theta}_{arm2}]
+;;                                                     [ \dot{\theta}_{obj}]
+(defun append-obj-virtual-joint
+  (link-list target-coords
+             &key (joint-class 6dof-joint)
+                  (joint-args) (vplink) (vplink-coords) (vclink-coords))
+  (labels ((make-virtual-link
+            (name coords)
+            (instance bodyset-link :init (make-cascoords :coords coords)
+                      :bodies (list (make-cube 10 10 10))
+                      :name name :weight 0
+                      :centroid #f(0 0 0) :inertia-tensor (make-matrix 3 3))))
+    (let* (;; vclink's move-target
+           ;; robot's end-effectors servoes obj-move-target and obj-move-target servoes robot's end-effectors
+           (move-target
+            (mapcar #'(lambda (_tc)
+                        (make-cascoords
+                         :coords (send _tc :copy-worldcoords)))
+                    target-coords))
+           ;; virtual link in order to drive target-coords, which is parent for 6dof-joint
+           (vplink
+            (if vplink
+                vplink
+              (make-virtual-link 'virtual-parent-link
+                                 (if vplink-coords
+                                     vplink-coords
+                                     (if (= 1 (length target-coords))
+                                         (send (car move-target) :copy-worldcoords)
+                                       (apply #'midcoords 0.5 move-target))
+                                     ))))
+           ;; virtual link in order to drive target-coords, which is child for 6dof-joint
+           (vclink (make-virtual-link 'virtual-child-link
+                                      (if vclink-coords
+                                          vclink-coords
+                                        (send vplink :copy-worldcoords)))))
+      (dolist (omt move-target) (send vclink :assoc omt))
+      (send vplink :assoc vclink)
+      (send-message vclink bodyset-link :add-joint
+                    (instance* joint-class :init
+                               :child-link vclink
+                               :parent-link vplink
+                               joint-args))
+      (send vclink :add-parent-link vplink)
+      (send vplink :add-child-links vclink)
+      (list (mapcar #'(lambda (l) (append l (list vclink))) link-list)
+            move-target))))
+
+;; for multiple constraint
+(defun append-multiple-obj-virtual-joint
+  (link-list target-coords
+   &key (joint-class '(6dof-joint))
+        (joint-args '(nil))
+        (vplink) (vplink-coords) (vclink-coords))
+  (let ((ll link-list) (pl vplink) (pc vplink-coords) (ret))
+    (mapcar
+     #'(lambda (jc ja)
+         (setq ret
+               (append-obj-virtual-joint
+                ll target-coords
+                :joint-class jc
+                :joint-args ja
+                :vplink pl
+                :vplink-coords pc
+                :vclink-coords vclink-coords))
+         (setq ll (car ret)
+               pl (car (last (caar ret)))))
+     joint-class joint-args)
+     ret))
 
 (defmacro with-difference-position-and-rotation
   (params &rest args)
@@ -1921,69 +2003,6 @@
             (send ,rlink :del-joint)
             (send ,rlink :del-parent-link)
             (send ,vlink :del-child-link ,rlink)))))))
-
-;; macro for append virtual obj joint for dual arm manipulation
-;; arguments are (ll ul ot link-list target-coords robot)
-;; in detail
-;;   ll ul -> object virtual joint is appended
-;;   ot -> target-coords for a robot (move-target for an object)
-;;   link-list target-coords robot -> robot's original parameter
-;;  :joint-class joint-class :assoc-obj assoc-obj -> optional parameters
-;; example formulation
-;;   [\dot{x}_{arm1}]   [ J_{arm1}        0  J_{obj1} ][\dot{\theta}_{arm1}]
-;;   [\dot{x}_{arm2}] = [        0 J_{arm2}  J_{obj2} ][\dot{\theta}_{arm2}]
-;;                                                     [ \dot{\theta}_{obj}]
-(defmacro with-append-virtual-obj-joint
-  (params &rest bodies)
-  (with-gensyms
-   (link-list target-coords robot
-    assoc-obj vplink vclink joint-args)
-   `(labels ((make-virtual-link
-	     (name coords)
-	     (instance bodyset-link :init (make-cascoords :coords coords)
-		       :bodies (list (make-cube 10 10 10))
-		       :name name :weight 0
-		       :centroid #f(0 0 0) :inertia-tensor (make-matrix 3 3))))
-      (let* ((,link-list ,(elt params 3))
-	     (,target-coords ,(elt params 4))
-             (,robot ,(elt params 5))
-	     (,assoc-obj ,(cadr (memq :assoc-obj params)))
-	     ;; vclink's move-target
-	     ;; robot's end-effectors servoes obj-move-target and obj-move-target servoes robot's end-effectors
-             (,(elt params 2)
-	      (mapcar #'(lambda (_tc)
-			  (make-cascoords
-			   :coords (send _tc :copy-worldcoords)))
-		      ,target-coords))
-	     ;; virtual link in order to drive target-coords, which is parent for 6dof-joint
-	     (,vplink (make-virtual-link 'virtual-parent-link
-                                         (make-coords :pos (send (apply #'midcoords 0.5 ,(elt params 2)) :worldpos))))
-	     ;; virtual link in order to drive target-coords, which is child for 6dof-joint
-	     (,vclink (make-virtual-link 'virtual-child-link
-                                         (make-coords :pos (send (apply #'midcoords 0.5 ,(elt params 2)) :worldpos)))))
-	(dolist (omt ,(elt params 2)) (send ,vclink :assoc omt))
-	(if ,assoc-obj (send ,vclink :assoc ,assoc-obj))
-	(send-message ,vclink bodyset-link :add-joint
-		      (instance* ,(or (cadr (member :joint-class params)) 6dof-joint) :init
-				 :child-link ,vclink
-				 :parent-link ,vplink
-				 ,(cadr (member :joint-args params))))
-	(send ,vclink :add-parent-link ,vplink)
-	(send ,vplink :add-child-links ,vclink)
-	(unwind-protect
-	    (let ((,(car params) (mapcar #'(lambda (l)
-                                             (append l (list ,vclink)))
-                                         ,link-list))
-                  (,(cadr params)
-                   (append (send ,robot :calc-union-link-list ,link-list) (list ,vclink))))
-	      ,@bodies)
-	  (send ,vclink :del-joint)
-	  (send ,vclink :del-parent-link)
-	  (send ,vplink :del-child-link ,vclink)
-	  (dolist (omt ,(elt params 2)) (send ,vclink :dissoc omt))
-	  (if ,assoc-obj (send ,vclink :dissoc ,assoc-obj))
-	  ))))
-  )
 
 (in-package "GEOMETRY")
 

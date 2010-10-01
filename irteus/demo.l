@@ -656,24 +656,35 @@
      ;; solve inverse kinematics
      (with-move-target-link-list
       (mt robot-ll *robot* '(:rarm :larm))
-      (with-append-virtual-obj-joint ;; add 6dof for target-coords
-       (ll ul ot robot-ll
-           (mapcar #'(lambda (l) (send *obj* :get l)) '(:rarm :larm))
-           *robot* :assoc-obj *obj*)
-       (let* ((rotation-axis (cond
-                              ((= (mod i 4) 1) '(:x t))
-                              ((= (mod i 4) 3) '(t :x))
-                              (t '(t t)))))
-         (send* *robot* :inverse-kinematics ot
-                :union-link-list ul :link-list ll :move-target mt
-                :rotation-axis rotation-axis
-                :jacobi #'(lambda ()
-                            (calc-jacobian-from-link-list-including-robot-and-obj-virtual-joint
-                             ll mt ot *robot* :rotation-axis rotation-axis))
-                ;;:debug-view t
-                :debug-view :no-message
-                (append (if (= i 0) '(:stop 100)) args))
-         )))
+      (let* ((ret
+              (append-obj-virtual-joint
+               robot-ll (mapcar #'(lambda (l) (send *obj* :get l)) '(:rarm :larm))
+               :joint-class 6dof-joint))
+             (ll (car ret)) (ot (cadr ret))
+             (ul (apply #'append
+                        (mapcar
+                         #'(lambda (f)
+                             (send *robot* :calc-union-link-list
+                                   (mapcar #'(lambda (l)
+                                               (funcall f #'(lambda (x) (member x (send *robot* :links))) l))
+                                           ll)))
+                         (list #'remove-if-not #'remove-if))))
+             (rotation-axis (cond
+                             ((= (mod i 4) 1) '(:x t))
+                             ((= (mod i 4) 3) '(t :x))
+                             (t '(t t)))))
+        (send (car (last ul)) :assoc *obj*)
+        (send* *robot* :inverse-kinematics ot
+               :union-link-list ul :link-list ll :move-target mt
+               :rotation-axis rotation-axis
+               :jacobi #'(lambda ()
+                           (calc-jacobian-from-link-list-including-robot-and-obj-virtual-joint
+                            ll mt ot *robot* :rotation-axis rotation-axis))
+               ;;:debug-view t
+               :debug-view :no-message
+               (append (if (= i 0) '(:stop 100)) args))
+        (send (car (last ul)) :dissoc *obj*)
+        ))
      (incf i)
      (send *robot* :head :look-at (send *obj* :worldpos))
      )
