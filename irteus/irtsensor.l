@@ -103,7 +103,7 @@
      (send self :assoc viewing)
      self))
   (:width () pwidth)
-  (:width () pheight)
+  (:height () pheight)
   (:screen-point
    (pos)
    (let (v w cx cy)
