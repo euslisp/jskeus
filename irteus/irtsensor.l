@@ -81,7 +81,7 @@
    (b &rest args
           &key
           ((:width pw) 320) ((:height ph) 240)
-          (view-up #f(-1 0 0))
+          (view-up #f(0 -1 0))
           (viewdistance 5.0)
           (hither 100.0)
           (yon 10000.0)
