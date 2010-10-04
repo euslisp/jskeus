@@ -106,9 +106,9 @@
   (:height () pheight)
   (:screen-point
    (pos)
-   (let (v w cx cy)
-     (setq v (send self :view (transform #2f((1 0 0)(0 -1 0)(0 0 1)) pos)))
-     (setq w (- (aref v 3)))
+   (let (v w)
+     (setq v (send viewing :project3 (send self :inverse-transform-vector pos)))
+     (setq w (aref v 3))
      (setf (aref v 0) (/ (aref v 0) w))
      (setf (aref v 1) (/ (aref v 1) w))
      (return-from :screen-point (subseq v 0 2))))
