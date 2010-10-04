@@ -81,7 +81,7 @@
    (b &rest args
           &key
           ((:width pw) 320) ((:height ph) 240)
-          (view-up #f(0 -1 0))
+          (view-up #f(0 1 0))
           (viewdistance 5.0)
           (hither 100.0)
           (yon 10000.0)
@@ -93,7 +93,7 @@
            (instance* perspective-viewing :init
                       :pos (send self :worldpos)
                       :target (send self :transform-vector
-                                    (matrix-column (send self :worldrot) 2))
+                                    (v- (matrix-column (send self :worldrot) 2)))
                       :view-up view-up
                       :viewdistance viewdistance
                       :hither hither :yon yon
@@ -107,19 +107,25 @@
   (:screen-point
    (pos)
    (let (v w)
-     (setq v (send viewing :project3 (send self :inverse-transform-vector pos)))
-     (setq w (aref v 3))
+     (setq v (send viewing :project3 (send viewing :inverse-transform-vector pos)))
+     (setq w (aref v 2))
      (setf (aref v 0) (/ (aref v 0) w))
      (setf (aref v 1) (/ (aref v 1) w))
      (return-from :screen-point (subseq v 0 2))))
   (:ray
    (x y)
-   (let* (xx yy
+   (let* (xx yy u v
              (proj (send viewing :projection))
              (cx (aref proj 0 2)) (cy (aref proj 1 2))
-             (tx (aref proj 0 3)) (ty (aref proj 1 3)))
-     (setq xx (- x cx tx) yy (- y cy ty))
-     (send viewing :ray (/ xx ( / pwidth 2.0)) (/ (- yy) (/ pheight 2.0)))))
+             (tx (aref proj 0 3)) (ty (aref proj 1 3))
+             (viewdistance (send viewing :viewdistance))
+             (screen (send viewing :screen)))
+     (setq xx (- x cx) yy (- y cy))
+     (setq u (/ xx ( / pwidth 2.0)) v (/ yy (/ pheight 2.0)))
+     (normalize-vector
+	(send self :rotate-vector
+		(float-vector (* (elt screen 0) u) (* (elt screen 1) v)
+                              viewdistance)))))
   (:draw-sensor
    (vwer)
    (let* ((yon (send self :yon)) (hither (send self :hither))
