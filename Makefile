@@ -45,9 +45,9 @@ export LD_LIBRARY_PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
 
 eus:
 	# 'svn propget svn:externals .' to see the details
-	mkdir eus
-	svn co $(SVN_EUSURL)/lisp eus/lisp
-	svn co -N $(SVN_EUSURL)/lib eus/lib; cd eus/lib; svn up llib
+	svn co -N $(SVN_EUSURL) eus
+	svn co -N $(SVN_EUSURL)/lib eus/lib
+	cd eus; svn up lisp lib/llib
 
 rm-lib-dir:
 	# remove unsupported directories
