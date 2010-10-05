@@ -1,4 +1,4 @@
-all: eus-installed irteus-installed bashrc.eus manuals
+all: eus-installed irteus-installed manuals bashrc.eus
 
 SVN_EUSURL=https://euslisp.svn.sourceforge.net/svnroot/euslisp/trunk/EusLisp
 SVN_IRTEUSURL=https://jskeus.svn.sourceforge.net/svnroot/jskeus/trunk/irteus
@@ -36,7 +36,7 @@ bashrc.eus:
 export EUSDIR=$(EUSDIR) \n\
 export ARCHDIR=$(ARCHDIR) \n\
 export PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$PATH \n\
-export LD_LIBRARY_PATHPATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
+export LD_LIBRARY_PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
 " > bashrc.eus
 	@bash -c 'echo -e "\e[1;32m;; generating bashrc.eus ...\n;;\e[m"'
 	@bash -c 'echo -e "\e[1;32m;; Please move bashrc.eus to ~/bashrc.eus\e[m"'
