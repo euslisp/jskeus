@@ -47,7 +47,7 @@ eus:
 	# 'svn propget svn:externals .' to see the details
 	svn co -N $(SVN_EUSURL) eus
 	svn co -N $(SVN_EUSURL)/lib eus/lib
-	cd eus; svn up lisp lib/llib
+	cd eus; svn up lisp lib/llib || svn up lisp lib/llib
 
 rm-lib-dir:
 	# remove unsupported directories
@@ -60,7 +60,7 @@ eus-installed: eus rm-lib-dir
 	cd eus/lisp && ln -sf $(MAKEFILE) Makefile && make eus0 eus1 eus2 eusg eusx eusgl eus
 
 irteus:
-	svn up irteus
+	svn up irteus || svn up irteus
 
 irteus-installed: irteus
 	cd irteus; make
