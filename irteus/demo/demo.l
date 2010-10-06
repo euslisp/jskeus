@@ -1,5 +1,5 @@
-;;(load "irtmodel.l")
-;;(load "irtdyna.l")
+;;(load "irteus/irtmodel.l")
+;;(load "irteus/irtdyna.l")
 (defclass sample-robot
   :super robot-model
   :slots ())
