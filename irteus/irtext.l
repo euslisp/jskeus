@@ -71,4 +71,5 @@
   (unless (member :irt *features*) (push :irt *features*))
   )
 
+;; add extra *load-path* for jskeus
 
