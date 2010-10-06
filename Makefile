@@ -39,8 +39,9 @@ export PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$PATH \n\
 export LD_LIBRARY_PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
 " > bashrc.eus
 	@bash -c 'echo -e "\e[1;32m;; generating bashrc.eus ...\n;;\e[m"'
-	@bash -c 'echo -e "\e[1;32m;; Please move bashrc.eus to ~/bashrc.eus\e[m"'
-	@bash -c 'echo -e "\e[1;32m;;   and include \"source bashrc.eus\" in your .bashrc file\e[m"'
+	@bash -c 'echo -e "\e[1;32m;;   mv bashrc.eus ~/bashrc.eus\e[m"'
+	@bash -c 'echo -e "\e[1;32m;;   echo \"source bashrc.eus\" >> ~/.bashrc\e[m"'
+	@bash -c 'echo -e "\e[1;32m;;   source ~/.bashrc\e[m"'
 	@cat bashrc.eus
 
 eus:
