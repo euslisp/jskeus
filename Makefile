@@ -31,13 +31,13 @@ jmanual.pdf:
 	wget http://euslisp.svn.sourceforge.net/viewvc/euslisp/trunk/EusLisp/doc/jlatex/jmanual.pdf -O jmanual.pdf
 
 bashrc.eus:
-	@echo "#\n\
+	@bash -c 'echo -e "#\n\
 # bashrc.eus : environment variable for euslisp \n#\n\
 export EUSDIR=$(EUSDIR) \n\
 export ARCHDIR=$(ARCHDIR) \n\
 export PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$PATH \n\
 export LD_LIBRARY_PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
-" > bashrc.eus
+"' > bashrc.eus
 	@bash -c 'echo -e "\e[1;32m;; generating bashrc.eus ...\n;;\e[m"'
 	@bash -c 'echo -e "\e[1;32m;;   mv bashrc.eus ~/bashrc.eus\e[m"'
 	@bash -c 'echo -e "\e[1;32m;;   echo \"source bashrc.eus\" >> ~/.bashrc\e[m"'
