@@ -142,7 +142,7 @@ $(BINS):
 
 install-irtext.l: $(EUSDIR)/lib/irtext.l
 $(EUSDIR)/lib/irtext.l: irtext.l
-	echo "\n#+:irt\n(pushnew \"$(shell cd ..;pwd)/\" *load-path* :test #'equal)\n" | cat irtext.l - > $(EUSDIR)/lib/irtext.l
+	bash -c 'echo -e "\n#+:irt\n(pushnew \"$(shell cd ..;pwd)/\" *load-path* :test #\047equal)\n"' | cat irtext.l - > $(EUSDIR)/lib/irtext.l
 
 clean:
 	-rm -f $(IRTCOBJECTS) $(IRTGCOBJECTS)
