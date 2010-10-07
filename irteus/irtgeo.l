@@ -400,7 +400,7 @@
                              (list (copy-object (cdr minv)))
                              (subseq (butlast (send f :vertices)) fp))
                             :holes (remove minh hs))))
-        (warn ";; geo::face-ear-clipping could not find `mutually visible vertices'"))
+        (warn ";; geo::face-ear-clipping could not find `mutually visible vertices'~%"))
       )
     f))
 (provide :irtgeo "$Id$")
