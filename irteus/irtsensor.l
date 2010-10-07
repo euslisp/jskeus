@@ -76,7 +76,7 @@
                     :view :viewpoint :view-direction :viewdistance
                     :yon :hither))
           pwidth pheight))
-(defmethod camera
+(defmethod camera-model
   (:init
    (b &rest args
           &key
