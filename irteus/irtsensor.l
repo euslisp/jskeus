@@ -71,7 +71,7 @@
 
 (defclass camera-model
   :super sensor-model
-  :slots ((viewing :forward
+  :slots ((vwing :forward
                    (:projection :newprojection
                     :view :viewpoint :view-direction :viewdistance
                     :yon :hither))
@@ -89,7 +89,7 @@
    (let ()
      (send-super :init b)
      (setq pwidth pw pheight ph)
-     (setq viewing
+     (setq vwing
            (instance* perspective-viewing :init
                       :pos (send self :worldpos)
                       :target (send self :transform-vector
@@ -100,14 +100,14 @@
                       :screen 1.0
                       args
                       ))
-     (send self :assoc viewing)
+     (send self :assoc vwing)
      self))
   (:width () pwidth)
   (:height () pheight)
   (:screen-point
    (pos)
    (let (v w)
-     (setq v (send viewing :project3 (send viewing :inverse-transform-vector pos)))
+     (setq v (send vwing :project3 (send vwing :inverse-transform-vector pos)))
      (setq w (aref v 2))
      (setf (aref v 0) (/ (aref v 0) w))
      (setf (aref v 1) (/ (aref v 1) w))
@@ -115,11 +115,11 @@
   (:ray
    (x y)
    (let* (xx yy u v
-             (proj (send viewing :projection))
+             (proj (send vwing :projection))
              (cx (aref proj 0 2)) (cy (aref proj 1 2))
              (tx (aref proj 0 3)) (ty (aref proj 1 3))
-             (viewdistance (send viewing :viewdistance))
-             (screen (send viewing :screen)))
+             (viewdistance (send vwing :viewdistance))
+             (screen (send vwing :screen)))
      (setq xx (- x cx) yy (- y cy))
      (setq u (/ xx ( / pwidth 2.0)) v (/ yy (/ pheight 2.0)))
      (normalize-vector
