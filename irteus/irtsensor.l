@@ -39,10 +39,10 @@
    (send self :name name)
    shape))
 
-(defclass bumper
+(defclass bumper-model
   :super sensor-model
   :slots (bumper-threshold))
-(defmethod bumper
+(defmethod bumper-model
   (:init
    (&rest args &key ((:bumper-threshold bt) 20))
    (setq data 0)
@@ -69,7 +69,7 @@
    )
   )
 
-(defclass camera
+(defclass camera-model
   :super sensor-model
   :slots ((viewing :forward
                    (:projection :newprojection
