@@ -135,14 +135,16 @@ $(LIBNR): $(NROBJECTS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBNR) $(NROBJECTS)
 
 BINS=$(BINDIR)/irteus$(ESFX) $(BINDIR)/irteusgl$(ESFX)
-make-link: $(BINS)
+make-link: $(BINS) $(EUSDIR)/irteus
 $(BINS):
 	ln -sf eus$(ESFX) $(BINDIR)/irteus$(ESFX)
 	ln -sf eusgl$(ESFX) $(BINDIR)/irteusgl$(ESFX)
+$(EUSDIR)/irteus:
+	ln -sf `pwd` $(EUSDIR)/irteus
 
 install-irtext.l: $(EUSDIR)/lib/irtext.l
 $(EUSDIR)/lib/irtext.l: irtext.l
-	bash -c 'echo -e "\n#+:irt\n(pushnew \"$(shell cd ..;pwd)/\" *load-path* :test #\047equal)\n"' | cat irtext.l - > $(EUSDIR)/lib/irtext.l
+	-cp -f irtext.l $(EUSDIR)/lib
 
 clean:
 	-rm -f $(IRTCOBJECTS) $(IRTGCOBJECTS)
@@ -154,6 +156,7 @@ clean:
 	-rm -f $(IRTEUSGLOBJS) $(IRTEUSGLDLLS) $(IRTEUSGL_C) $(IRTEUSGL_H)
 	-rm -f $(LIBDIR)/jpegmemcd.$(LSFX) $(LIBNR) $(NROBJECTS)
 	-rm -f *~ *.stackdump
+	-rm -f $(EUSDIR)/irteus
 	chmod a-x Makefile* *.l *.c
 	(cd PQP;make clean)
 	(cd $(EUSDIR)/lisp/image/jpeg/; make clean)
