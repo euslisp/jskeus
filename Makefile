@@ -15,10 +15,12 @@ ifeq ($(OS),Linux)
   export ARCHDIR=Linux
   export MAKEFILE=Makefile.Linux.thread
  endif
-endif
-ifeq ($(OS),CYGWIN_NT-6.1)
+else ifeq ($(OS),CYGWIN_NT-6.1)
  export ARCHDIR=Cygwin
  export MAKEFILE=Makefile.Cygwin
+else ifeq ($(OS),Darwin)
+ export ARCHDIR=Darwin
+ export MAKEFILE=Makefile.Darwin
 endif
 
 export EUSDIR=$(shell pwd)/eus
