@@ -214,5 +214,14 @@
 	(remove 'particle-update *timer-job*))
   nil)
 ;;;
-(format t "(init) (test) (sim-start) (sim-stop) (all-status)~%")
-;;;
+
+(defun particle ()
+  (format t "(init) (test) (sim-start) (sim-stop) (all-status)~%")
+  (init)
+  (test)
+  (sim-start)
+  (sim-stop)
+  (all-status))
+
+(warn "(particle) for particle simulation~%")
+
