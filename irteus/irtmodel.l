@@ -734,7 +734,7 @@
        ;; add null space
        (if (null wmat) (setq wmat (make-matrix fik-len fik-len)))
        (dotimes (i fik-len) (setf (aref wmat i i) (aref weight i)))
-       (v+ J#x (transform wmat (transform I-J#J null-space tmp-len2) tmp-len2) J#x)
+       (v+ J#x (transform I-J#J null-space tmp-len2) J#x)
        (when (and debug-view (not (memq :no-message debug-view)))
          (format-array (map float-vector #'rad2deg tmp-len2) "Ny    :")
          (format-array (map float-vector #'rad2deg J#x) "dav   :")))
@@ -1079,7 +1079,7 @@
   ;; calc nspace according to joint limit
   ;;  this method should be called from :calc-inverse-kinematics-nspace-from-link-list
   (:calc-nspace-from-joint-limit
-    (avoid-nspace-gain union-link-list debug-view tmp-nspace)
+    (avoid-nspace-gain union-link-list weight debug-view tmp-nspace)
     ;;
     ;; avoid-nspace-joint-limit: avoiding joint angle limit
     ;; 
@@ -1089,6 +1089,8 @@
       (setq tmp-nspace
             (scale avoid-nspace-gain
                    (joint-angle-limit-nspace (send-all union-link-list :joint) tmp-nspace) tmp-nspace))
+      (dotimes (i (length weight))
+        (setf (elt tmp-nspace i) (* (elt tmp-nspace i) (elt weight i))))
       (when (and debug-view (not (memq :no-message debug-view)))
         (format-array (map float-vector #'rad2deg tmp-nspace) "nspace:")))
     tmp-nspace)
@@ -1100,10 +1102,11 @@
           (union-link-list (send self :calc-union-link-list link-list))
           (fik-len (send self :calc-target-joint-dimension union-link-list))
           (null-space) (debug-view)
+          (weight (fill (instantiate float-vector fik-len) 1.0))
           (tmp-nspace (instantiate float-vector fik-len)))
     (setq tmp-nspace
           (send self :calc-nspace-from-joint-limit
-                avoid-nspace-gain union-link-list debug-view tmp-nspace))
+                avoid-nspace-gain union-link-list weight debug-view tmp-nspace))
     (cond
      ((functionp null-space) (setq null-space (funcall null-space)))
      ((listp null-space) (setq null-space (eval null-space))))
@@ -1216,7 +1219,7 @@
            (send self :calc-inverse-kinematics-nspace-from-link-list
                  link-list :union-link-list union-link-list
                  :avoid-nspace-gain avoid-nspace-gain :debug-view debug-view
-                 :fik-len fik-len :null-space null-space :tmp-nspace tmp-nspace))
+                 :weight weight :fik-len fik-len :null-space null-space :tmp-nspace tmp-nspace))
      ;;
      ;; q = f(d) qca + {1 - f(d)} qwbm
      ;;
