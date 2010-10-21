@@ -376,7 +376,7 @@
                        (let ((p (geo::line-intersection3 (e . pvert) (e . nvert)
                                                          (car v) (cdr v))))
                          (when (and (<= 0.0 (car p) 1.0)
-                                    (< 0.0 (cadr p) 1.0 *vertex-neighborhood-threshold*))
+                                    (< 0.0 (cadr p) 1.0))
                            (list e))))
                    (flatten (append (send-all hs :edges) (send f :edges)))))
           (unless r
