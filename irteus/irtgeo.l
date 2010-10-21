@@ -376,7 +376,7 @@
                        (let ((p (geo::line-intersection3 (e . pvert) (e . nvert)
                                                          (car v) (cdr v))))
                          (when (and (<= 0.0 (car p) 1.0)
-                                    (< 0.0 (cadr p) 1.0))
+                                    (< 0.0 (cadr p) 1.0 *vertex-neighborhood-threshold*))
                            (list e))))
                    (flatten (append (send-all hs :edges) (send f :edges)))))
           (unless r
@@ -400,7 +400,9 @@
                              (list (copy-object (cdr minv)))
                              (subseq (butlast (send f :vertices)) fp))
                             :holes (remove minh hs))))
-        (warn ";; geo::face-ear-clipping could not find `mutually visible vertices'~%"))
+        (progn
+          (warn ";; geo::face-ear-clipping could not find `mutually visible vertices' for ~A~%" f)
+          (return)))
       )
     f))
 (provide :irtgeo "$Id$")
