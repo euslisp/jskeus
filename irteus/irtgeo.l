@@ -319,6 +319,7 @@
 	 (v2 (nth (mod (1+  num) len) vers)) )
     (unless (> (v. (v* (v- v1 v0) (v- v2 v1)) (send f :normal)) 0)
 	    (return-from face-to-tessel-triangle nil))
+    (if (< (send f :area) 0.001) (return-from face-to-tessel-triangle nil))
     (let ((poly (make-face-from-vertices
                  (mapcar #'(lambda (v) (cons v (mapcan
                                                 #'(lambda (e) (if (memq v (send e :vertices)) (list e)))
@@ -350,6 +351,7 @@
 	 (len (length vers))
 	 (rvers (remove (nth (mod num len) vers) vers)))
     (if (<= (length rvers) 2) (return-from face-to-triangle-rest-polygon nil))
+    (if (< (send f :area) 0.001) (return-from face-to-triangle-rest-polygon nil))
     (make-face-from-vertices
      (mapcar #'(lambda (v)
                  (cons v (mapcan #'(lambda (e) (if (memq v (send e :vertices)) (list e)))
