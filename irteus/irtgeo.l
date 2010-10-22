@@ -26,7 +26,7 @@
 
 (in-package "GEOMETRY")
 
-(export '(midcoords bodyset *g-vec*))
+(export '(body-to-triangles midcoords bodyset *g-vec*))
 
 (defvar *g-vec* (float-vector 0 0 9800)) ;; [mm/s^2]
 
@@ -405,6 +405,58 @@
           (return)))
       )
     f))
+
+;;
+;; body-to-triangles
+;;
+(defun body-to-triangles (abody &optional (limit 50))
+  (let (fs)
+    (setq *triangle-points* nil)
+    (setq *triangle-edges* nil)
+    (dolist (f (send abody :faces))
+      (setq fs
+            (nconc
+             fs
+             (mapcan #'(lambda (f)
+                         (geo::triangle-to-triangle f limit))
+                     (geo::face-to-triangle f)))))
+    (instance faceset :init :faces fs)))
+
+(defun triangle-to-triangle (aface &optional (limit 50))
+  (let (max-edge vs v vm vp vn v/2 f)
+    (dolist (e (send aface :edges)) (push e *triangle-edges*))
+    (labels
+     ((make-vertex-edge-list
+       (p) (cons p (mapcan #'(lambda (e) (if (memq p (send e :vertices)) (list e))) *triangle-edges*))))
+     (setq max-edge (find-extream (send aface :edges)
+                                  #'(lambda (e) (send e :length)) #'>=))
+     (if (or (null limit) (< (send max-edge :length) limit))
+         (progn
+           (return-from triangle-to-triangle (list aface)))
+       (progn
+         (setq vs (set-exclusive-or (send max-edge :vertices)
+                                    (cdr (send aface :vertices)) :test #'v=))
+         (unless (= (length vs) 1) (warn ";; Error wrong vs ~A~%" vs))
+         (setq v  (make-vertex-edge-list (car vs))
+               vp (make-vertex-edge-list (send max-edge :pvertex aface))
+               vn (make-vertex-edge-list (send max-edge :nvertex aface))
+               v/2 (send max-edge :point 0.5))
+
+         (if (member v/2 *triangle-points* :test #'equal)
+             (setq v/2 (car (member v/2 *triangle-points* :test #'equal))))
+
+         (push v/2 *triangle-points*)
+         (setq vm (make-vertex-edge-list v/2))
+
+         (nconc
+          (triangle-to-triangle
+           (make-face-from-vertices (list vp vm v))
+           limit)
+          (triangle-to-triangle
+           (make-face-from-vertices (list vn v vm))
+           limit))))
+     )))
+
 (provide :irtgeo "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
