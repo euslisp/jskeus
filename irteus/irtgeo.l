@@ -26,7 +26,7 @@
 
 (in-package "GEOMETRY")
 
-(export '(body-to-triangles midcoords bodyset *g-vec*))
+(export '(body-to-faces body-to-triangles midcoords bodyset *g-vec*))
 
 (defvar *g-vec* (float-vector 0 0 9800)) ;; [mm/s^2]
 
@@ -409,6 +409,8 @@
 ;;
 ;; body-to-triangles
 ;;
+(defun body-to-faces (abody)
+  (body-to-triangles abody nil))
 (defun body-to-triangles (abody &optional (limit 50))
   (let (fs)
     (setq *triangle-points* nil)
@@ -418,7 +420,9 @@
             (nconc
              fs
              (mapcan #'(lambda (f)
-                         (geo::triangle-to-triangle f limit))
+                         (if limit
+                             (geo::triangle-to-triangle f limit)
+                           (list f)))
                      (geo::face-to-triangle f)))))
     (instance faceset :init :faces fs)))
 
