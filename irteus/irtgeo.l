@@ -256,7 +256,9 @@
    (v &optional v3a v3b m33)
    (send (send self :worldcoords) :inverse-transform-vector v v3a v3b m33)))
 
-
+;;
+;; bodyset class
+;;
 (defclass bodyset
   :super cascaded-coords
   :slots 
@@ -290,6 +292,9 @@
   (:draw-on (&rest args) (dolist (b bodies) (send* b :draw-on args)))
   )
 
+;;
+;; body->triangle
+;;
 (defun face-to-triangle-aux (f)
   (cond
    ((null f) nil)
@@ -460,6 +465,43 @@
            (make-face-from-vertices (list vn v vm))
            limit))))
      )))
+
+;;
+;; make-* functions
+;;
+(defun make-sphere (r &rest args)
+  (let ((obj (make-gdome (make-icosahedron r))))
+    (send obj :newcoords (apply #'make-coords args))
+    (send obj :worldpos)
+    (send obj :csg '((:sphere r)))
+    obj))
+
+;;
+;; accessor to primitive bodies
+;;
+(defun x-of-cube (cub)
+  (let ((csg (send cub :csg)))
+    (car (cdr (assoc :cube csg)))))
+
+(defun y-of-cube (cub)
+  (let ((csg (send cub :csg)))
+    (cadr (cdr (assoc :cube csg)))))
+
+(defun z-of-cube (cub)
+  (let ((csg (send cub :csg)))
+    (caddr (cdr (assoc :cube csg)))))
+
+(defun height-of-cylinder (cyl)
+  (let ((csg (send cyl :csg)))
+    (caddr (assoc :cylinder csg))))
+
+(defun radius-of-cylinder (cyl)
+  (let ((csg (send cyl :csg)))
+    (cadr (assoc :cylinder csg))))
+
+(defun radius-of-sphere (sp)
+  (let ((csg (send sp :csg)))
+    (cadr (assoc :sphere csg))))
 
 (provide :irtgeo "$Id$")
 
