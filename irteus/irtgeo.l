@@ -26,7 +26,9 @@
 
 (in-package "GEOMETRY")
 
-(export '(body-to-faces body-to-triangles midcoords bodyset *g-vec*))
+(export '(body-to-faces body-to-triangles midcoords bodyset *g-vec*
+                        make-sphere x-of-cube y-of-cube z-of-cube
+                        height-of-cylinder radius-of-cylinder radius-of-sphere))
 
 (defvar *g-vec* (float-vector 0 0 9800)) ;; [mm/s^2]
 
