@@ -475,7 +475,7 @@
   (let ((obj (make-gdome (make-icosahedron r))))
     (send obj :newcoords (apply #'make-coords args))
     (send obj :worldpos)
-    (send obj :csg '((:sphere r)))
+    (send obj :csg `((:sphere ,r)))
     obj))
 
 ;;
