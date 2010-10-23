@@ -52,11 +52,13 @@
   (send *top-selector* :add-port (display-fd) #'window-main-one))
 
 (let (x-lib pname)
+#+:darwin
+  (setq pname "/usr/X11/lib/libX11.dylib")
 #+:cygwin
   (if (probe-file "/usr/bin/cygX11-6.dll")
       (setq pname "/usr/bin/cygX11-6.dll")
     (setq pname "/usr/X11R6/bin/cygX11-6.dll"))
-#+:linux 
+#+(and :linux  (not :darwin))
   (cond ((member :ia32 *features*)
 	 (setq pname "/usr/lib32/libX11.so"))
 	((probe-file "/usr/lib/libX11.so")

@@ -27,6 +27,8 @@
 (in-package "GL")
 
 (let (gl-lib)
+#+:darwin
+  (setq gl-lib ( load-foreign "/usr/X11/lib/libGL.dylib"))
 #+:cygwin
   (progn
     (cond
@@ -34,7 +36,7 @@
       (setq gl-lib ( load-foreign "/usr/bin/cygGL-1.dll")))
      (t
       (setq gl-lib ( load-foreign "/usr/X11R6/bin/cygGL-1.dll")))))
-#+:linux
+#+(and :linux  (not :darwin))
   (progn
     (setq gl-lib
 	  (cond ((member :ia32 *features*)
@@ -54,6 +56,8 @@
   (defconstant GL_POLYGON_OFFSET_BIAS_EXT	#x8039)
   )
 (let (glu-lib)
+#+:darwin
+  (setq glu-lib ( load-foreign "/usr/X11/lib/libGLU.dylib"))
 #+:cygwin
   (progn
     (cond
@@ -61,7 +65,7 @@
       (setq glu-lib ( load-foreign "/usr/bin/cygGLU-1.dll")))
      (t
       (setq glu-lib ( load-foreign "/usr/X11R6/bin/cygGLU-1.dll")))))
-#+:linux 
+#+(and :linux  (not :darwin))
   (progn
     (setq glu-lib
 	  (cond ((member :ia32 *features*)
