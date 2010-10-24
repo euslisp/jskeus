@@ -55,31 +55,6 @@
   (defconstant GL_POLYGON_OFFSET_FACTOR_EXT	#x8038)
   (defconstant GL_POLYGON_OFFSET_BIAS_EXT	#x8039)
   )
-(let (glu-lib)
-#+:darwin
-  (setq glu-lib ( load-foreign "/usr/X11/lib/libGLU.dylib"))
-#+:cygwin
-  (progn
-    (cond
-     ((probe-file "/usr/bin/cygGLU-1.dll")
-      (setq glu-lib ( load-foreign "/usr/bin/cygGLU-1.dll")))
-     (t
-      (setq glu-lib ( load-foreign "/usr/X11R6/bin/cygGLU-1.dll")))))
-#+(and :linux  (not :darwin))
-  (progn
-    (setq glu-lib
-	  (cond ((member :ia32 *features*)
-		 (load-foreign "/usr/lib32/libGLU.so"))
-		((probe-file "/usr/lib/libGLU.so")
-		 (load-foreign "/usr/lib/libGLU.so"))
-		((probe-file "/usr/X11R6/lib/libGLU.so")
-		 (load-foreign "/usr/X11R6/lib/libGLU.so"))
-		(t (warn ";; libGLU.so not found")))))
-  (defforeign gluTessBeginPolygon glu-lib "gluTessBeginPolygon" () :integer)
-  (defforeign gluTessEndPolygon glu-lib "gluTessEndPolygon" () :integer)
-  (defforeign gluTessBeginContour glu-lib "gluTessBeginContour" () :integer)
-  (defforeign gluTessEndContour glu-lib "gluTessEndContour" () :integer)
-  )
 
 (unless (assoc :color-org (send glviewsurface :methods))
   (rplaca (assoc :color (send glviewsurface :methods)) :color-org))
