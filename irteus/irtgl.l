@@ -28,7 +28,7 @@
 
 (let (gl-lib)
 #+:darwin
-  (setq gl-lib ( load-foreign "/usr/X11/lib/libGL.dylib"))
+  (setq gl-lib ( load-foreign "/opt/local/lib/libGL.dylib"))
 #+:cygwin
   (progn
     (cond
