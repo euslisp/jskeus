@@ -34,6 +34,8 @@ extern pointer ___euspqp();
 static register_euspqp()
 { add_module_initializer("___euspqp", ___euspqp);}
 
+eusinteger_t PQP_MakeModel();
+
 pointer PQPMAKEMODEL(register context *ctx, int n, register pointer *argv)
 {
     eusinteger_t addr = PQP_MakeModel();
