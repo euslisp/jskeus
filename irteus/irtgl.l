@@ -320,8 +320,6 @@
 	      (gluTessBeginContour *tess-obj*)
 	      (glNormal3fv (send aface :normal))
 	      (mapc #'(lambda (i) (gluTessVertex *tess-obj* i i)) l-tessinfo)
-	      (gluTessEndContour *tess-obj*)
-	      (gluTessBeginContour *tess-obj*)
 	      ;; holes
 	      (when holes
 		(dolist (hole holes)
