@@ -147,11 +147,15 @@
 		    )))
     ))
 
-(defun matrix-log (m)
+(defun matrix-log (m) ;; matrix-log retuns [-pi, pi]
  (let* ((qq (matrix2quaternion m))
         (q0 (elt qq 0))
         (q (subseq qq 1 4))
         (th (* 2.0 (atan (norm q) q0))))
+   (cond ((> th pi)
+          (setq th (- th 2pi)))
+         ((< th -pi)
+          (setq th (+ th 2pi))))
   (scale th (normalize-vector q))))
 
 (defun matrix-exponent (omega &optional (p 1.0))
