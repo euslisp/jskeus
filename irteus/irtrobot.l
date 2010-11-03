@@ -118,36 +118,37 @@
 	  (unless wrt (setq wrt :local))
 	  (send* self limb :move-end (send coords :translate pos wrt) args)))
        (:look-at
-	(let (dif-pos dif-rot target v p-dif-rot (count 0) link-list
-                      (move-target
-                       (if (memq :move-target args)
-                           (cadr (memq :move-target args))
-                         head-end-coords)))
-	  (while (and (< (incf count) 30)
+	(let* ((move-target
+                (if (memq :move-target args)
+                    (cadr (memq :move-target args))
+                  (send self limb :end-coords)))
+               (link-list (if (memq :link-list args)
+                              (cadr (memq :link-list args))
+                            (send self :link-list
+                                  (send move-target :parent)
+                                  (send self limb :root-link))))
+               (stop (if (memq :stop args) (cadr (mqme :stop args)) 30))
+               dif-pos dif-rot p-dif-rot (count 0))
+	  (while (and (< (incf count) stop)
 		      (if p-dif-rot (> (norm (v- p-dif-rot dif-rot)) 1e-3) t))
-	    (setq target (make-coords :pos (car args)))
-	    (setq v (normalize-vector (v- (send target :worldpos)
-					  (send move-target :worldpos))))
-	    (send target :rotate
-		  (acos (v. (matrix-column (send target :worldrot) 2) v))
-		  (v* (matrix-column (send target :worldrot) 2) v))
-	    (setq p-dif-rot dif-rot)
-	    (setq dif-pos (send move-target :difference-position target)
-		  dif-rot (send move-target :difference-rotation target :rotation-axis :z))
-            (setq link-list (if (memq :link-list args)
-				 (cadr (memq :link-list args))
-			       (send self :link-list
-				     (send self limb :end-coords :parent)
-				     (send self limb :root-link))))
-	    (send self :inverse-kinematics-loop dif-pos dif-rot
-                  :move-target move-target
-                  :collision-avoidance-link-pair nil
-		  :rotation-axis :z
-		  :translation-axis nil
-		  :link-list link-list
-		  :loop count
-		  :debug-view (cadr (memq :debug-view args))))
-	  ))
+	    (let* ((target-coords (make-coords :pos (car args)))
+                   (v (normalize-vector (v- (send target-coords :worldpos)
+                                            (send move-target :worldpos))))
+                   (z (matrix-column (send target-coords :worldrot) 2)))
+              (if (< -1.0 (v. v z) 1.0)
+                  (send target-coords :rotate (acos (v. z v)) (v* z v) :world))
+              (setq p-dif-rot dif-rot
+                    dif-pos (send move-target :difference-position target-coords :translation-axis nil)
+                    dif-rot (send move-target :difference-rotation target-coords :rotation-axis :z))
+              (send self :inverse-kinematics-loop dif-pos dif-rot
+                    :move-target move-target
+                    :collision-avoidance-link-pair nil
+                    :rotation-axis :z
+                    :translation-axis nil
+                    :link-list link-list
+                    :loop count :stop stop ;;:thre nil
+                    :debug-view (cadr (memq :debug-view args))))
+            )))
        (:collision-avoidance-links
 	 (user::forward-message-to
 	   (cdr (assoc (intern (format nil "~A-COLLISION-AVOIDANCE-LINKS"

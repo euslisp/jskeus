@@ -532,13 +532,17 @@
    angle-vector)
   ;;
   (:find-link-route
-   (to &optional from)
-   (let ((pl (send to :parent-link)))
-     (cond
-      ((and pl (not (eq to from)))
-       (append (send self :find-link-route pl from) (list to)))
-      ((and pl (eq to from))
-       (list from)))))
+    (to &optional from)
+    (let ((pl (send to :parent-link)))
+      (cond
+       ((and pl (not (eq to from)))
+        (append (send self :find-link-route pl from) (list to)))
+       ((and pl (eq to from))
+        (list from))
+       ;; if parent-link is not prepared adequately, trace parent
+       ((and (not pl) (derivedp (send to :parent) bodyset-link))
+        (send self :find-link-route (send to :parent) from)
+        ))))
   (:link-list
    (to &optional from)
    (let (ret1 ret2)
