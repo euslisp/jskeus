@@ -26,15 +26,22 @@
 
 #include "eus.h"
 
-double PQP_Distance(double R1[3][3], double T1[3], void *PQP_Model1,
-		    double R2[3][3], double T2[3], void *PQP_Model2,
-		    double *P1, double *P2, int qsize);
-
 extern pointer ___euspqp();
 static register_euspqp()
 { add_module_initializer("___euspqp", ___euspqp);}
 
-eusinteger_t PQP_MakeModel();
+extern eusinteger_t PQP_MakeModel();
+extern void PQP_DeleteModel(eusinteger_t m);
+extern int PQP_BeginModel(eusinteger_t m);
+extern int PQP_EndModel(eusinteger_t m);
+extern int PQP_AddTri(eusinteger_t m, double p1[], double p2[], double p3[],
+                      int flag);
+extern int PQP_Collide(double R1[3][3], double T1[3], eusinteger_t PQP_Model1,
+                       double R2[3][3], double T2[3], eusinteger_t PQP_Model2,
+                       int flag);
+extern double PQP_Distance(double R1[3][3], double T1[3], eusinteger_t* PQP_Model1,
+                           double R2[3][3], double T2[3], eusinteger_t* PQP_Model2,
+                           double *P1, double *P2, int qsize);
 
 pointer PQPMAKEMODEL(register context *ctx, int n, register pointer *argv)
 {
