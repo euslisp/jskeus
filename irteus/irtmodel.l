@@ -84,7 +84,6 @@
                  paxis world-default-coords child-reverse transform-coords tmp-v3 tmp-m33))
          (j-rot #f(0 0 0)))
     (setq j-trs (calc-dif-with-axis j-trs translation-axis tmp-v0 tmp-v1 tmp-v2)) ;; copied to tmp-v3, tmp-v0, tmp-v1 or tmp-v2
-    (setq j-trs (scale 1e-3 j-trs j-trs)) ;; scale [mm] -> [m]
     (dotimes (j (length j-trs)) (setf (aref fik (+ j row) column) (elt j-trs j)))
     (setq j-rot (calc-dif-with-axis j-rot rotation-axis tmp-v0 tmp-v1 tmp-v2)) ;; copied to j-rot, tmp-v0, tmp-v1 or tmp-v2
     (dotimes (j (length j-rot)) (setf (aref fik (+ j row (length j-trs)) column) (elt j-rot j)))
