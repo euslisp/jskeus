@@ -59,10 +59,14 @@
              (rotation-axis (cond
                              ((= (mod i 4) 1) '(:x t))
                              ((= (mod i 4) 3) '(t :x))
-                             (t '(t t)))))
+                             (t '(t t))))
+             (weight (fill (instantiate float-vector (send *robot* :calc-target-joint-dimension ll)) 1.0)))
+        (dotimes (i 3)
+          (setf (elt weight (+ (- (send *robot* :calc-target-joint-dimension ll) 6) i)) 0.001))
         (send (car (last ul)) :assoc *obj*)
         (send* *robot* :inverse-kinematics ot
                :union-link-list ul :link-list ll :move-target mt
+               :weight weight
                :rotation-axis rotation-axis
                :jacobi #'(lambda ()
                            (calc-jacobian-from-link-list-including-robot-and-obj-virtual-joint
