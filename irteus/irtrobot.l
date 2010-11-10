@@ -186,7 +186,25 @@
   (:arms (&rest args) (list (send* self :larm args) (send* self :rarm args)))
   (:legs (&rest args) (list (send* self :lleg args) (send* self :rleg args)))
   (:look-at-hand (l/r) (send self :head :look-at (send self l/r :end-coords :worldpos)))
-		 
+  ;; override inverse-kinematics methods for look-at method
+  (:inverse-kinematics
+   (target-coords &rest args &key look-at-target &allow-other-keys)
+   (if (atom target-coords) (setq target-coords (list target-coords)))
+   (let ((ret (send-super* :inverse-kinematics target-coords args)))
+     (if look-at-target
+         (send self :head :look-at (send (car target-coords) :worldpos)))
+     ret))
+  (:inverse-kinematics-loop
+   (dif-pos dif-rot &rest args
+            &key target-coords debug-view look-at-target
+            &allow-other-keys)
+   (if (atom target-coords) (setq target-coords (list target-coords)))
+   (let ((ret
+          (send-super* :inverse-kinematics-loop dif-pos dif-rot
+                       :target-coords target-coords args)))
+     (if (and debug-view look-at-target)
+         (send self :head :look-at (send (car target-coords) :worldpos)))
+     ret))
   )
 
 (in-package "GEOMETRY")

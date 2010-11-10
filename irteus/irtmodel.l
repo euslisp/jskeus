@@ -1374,7 +1374,7 @@
             ((atom move-target) (deg2rad 1))
             (t (make-list (length move-target) :initial-element (deg2rad 1)))))
     union-link-list
-    target-coords                 ;required for look-at and debug-view
+    target-coords                 ;required for debug-view
     (jacobi)
     (additional-check) ;; to add optional convergence conditions
     debug-view ik-args
@@ -1500,7 +1500,7 @@
                   (translation-axis (cond
 				     ((atom move-target) t)
 				     (t (make-list (length move-target) :initial-element t))))
-		  (look-at-target) (joint-args)
+                  (joint-args)
 		  (thre (cond
                          ((atom move-target) 1)
                          (t (make-list (length move-target) :initial-element 1))))
@@ -1578,8 +1578,6 @@
                               :thre thre :rthre rthre
                               :debug-view debug-view
                               :ik-args ik-args args))
-         (if look-at-target
-             (send self :head :look-at (send (car target-coords) :worldpos)))
          (when (eq success :ik-succeed)
 	   (setq success t) (return nil))
          ))
