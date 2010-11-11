@@ -43,7 +43,13 @@ FFTW=-L/usr/local/lib -lfftw -lrfftw
 SVNVERSION=\"$(shell svnversion)\"
 
 ARCH=Darwin
-MACHINE=x86_64
+# copy from eus/lisp/Makefile.Darwin
+OS_VERSION=$(shell sw_vers -productVersion | sed s/\.[^.]*$$//)
+ifeq ($(OS_VERSION), 10.5) 
+ MACHINE=i386
+else
+ MACHINE=x86_64
+endif
 THREAD= -DTHREADED -DPTHREAD
 
 CFLAGS=-O2 -D$(MACHINE) -D$(ARCH) -DLinux -D_REENTRANT -DGCC -I/opt/local/include -I$(EUSDIR)/include $(THREAD)  -DSVNVERSION=$(SVNVERSION)
