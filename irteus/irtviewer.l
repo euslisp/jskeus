@@ -115,6 +115,8 @@
 	   :buttonpress :set-cursor-pos-event self)
      (send viewer :viewsurface :set-event-proc
 	   :motionnotify-left :move-coords-event self)
+     (send viewer :viewsurface :set-event-proc
+	   :motionnotify-middle :move-coords-event self)
 
      (send self :look1)
      (send self :draw-objects)
@@ -164,11 +166,13 @@
        (setq vt (send bbox :center))
        (setq vp
 	 (scale
-          (max
-           (* gl::*perspective-near* 1.5)
-           (/ (apply #'max (coerce (send bbox :diagonal) cons))
-              (* 0.5 (tan (send self :viewer :viewing :view-angle)))))
-	  (normalize-vector (v- viewpoint viewtarget))))
+          (min
+           (* gl::*perspective-far* 0.8)
+           (max
+            (* gl::*perspective-near* 1.5)
+            (/ (apply #'max (coerce (send bbox :diagonal) cons))
+               (* 0.5 (tan (send self :viewer :viewing :view-angle))))))
+          (normalize-vector (v- viewpoint viewtarget))))
        (send self :viewtarget vt)
        (send self :viewpoint (v+ vt vp))
        ))
@@ -177,9 +181,19 @@
   (:move-viewing-around-viewtarget
    (event x y dx dy vwr)
    (cond
-       ((or (event-right event)       
+       ((event-middle event)
+	(let* ((vtp (v- viewpoint viewtarget))
+               (v (send vwr :viewing :transform-vector
+                        (scale (* 0.001 (norm vtp))
+                               (float-vector (* -1 dx) dy 0))))
+	       (tp (send self :viewtarget))
+	       (dv (v- v viewpoint)))
+	  (send self :viewpoint v)
+	  (send self :viewtarget (v+ tp dv))))
+       ((or (event-right event)
 	    (and (< 60 x (- (send vwr :viewsurface :width) 60))
-		 (< 60 y (- (send vwr :viewsurface :height) 60))))
+		 (< 60 y (- (send vwr :viewsurface :height) 60))
+                 (event-left event)))
 	(setq left-right-angle (- left-right-angle dx))
 	(setq up-down-angle (+ up-down-angle dy)))
        ((or (> x (- (send vwr :viewsurface :width) 60)) (< y 60))
