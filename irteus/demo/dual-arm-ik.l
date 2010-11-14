@@ -2,6 +2,7 @@
 
 (defun dual-arm-ik nil
   "dual arm ik"
+  (send *irtviewer* :title "dual-arm-ik")
   (let ((i 0) link-list move-target target-coords b0)
     (labels
      ((make-sweep

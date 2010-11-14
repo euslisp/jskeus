@@ -46,6 +46,7 @@
 
 ;; sarm sample
 (defun hanoi-arm nil
+  (send *irtviewer* :title "hanoi-arm")
   (setq *sarm* (instance sarmclass :init))
   (send *sarm* :reset-pose)
   (objects (list *sarm*))

@@ -156,6 +156,7 @@
 (defun init (&optional (a 400))
   (unless (boundp '*irtviewer*)
     (make-irtviewer :hither 10))
+  (send *irtviewer* :title "particle")
   (setq *space-box* (make-cube a a a))
   (send *space-box* :set-color :yellow)
   (gl::transparent *space-box* 0.2)

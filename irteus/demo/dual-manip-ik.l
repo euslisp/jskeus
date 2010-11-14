@@ -4,6 +4,7 @@
   (&rest args)
   "dual-armed object manipulation"
   ;; initialize robot
+  (send *irtviewer* :title "dual-manip-ik")
   (unless (boundp '*robot*)
     (setq *robot* (instance sample-robot :init)))
   (send *robot* :newcoords (make-coords))

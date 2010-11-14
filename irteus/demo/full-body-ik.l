@@ -4,6 +4,7 @@
   (&key (target (make-coords :pos (float-vector 0 0 1500)))
         (use-torso t) (use-leg))
   "full body ik"
+    (send *irtviewer* :title "full-body-ik")
     (unless (boundp '*robot*)
       (setq *robot* (instance sample-robot :init)))
     (send *robot* :reset-pose)

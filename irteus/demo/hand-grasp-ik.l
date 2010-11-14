@@ -12,6 +12,7 @@
 
 (defun hand-grasp nil
   "hand grasp ik"
+  (send *irtviewer* :title "hand-grasp-ik")
   (let (i r k ln (av0 #f(10 45 10 45 -0 -60 40)) av1 av
           move-target target-coords link-list)
     (setq h0 (instance sample-hand :init :name "sample hand"))

@@ -3,6 +3,7 @@
 (defun crank-motion
   ()
   "crank motion using full body ik"
+  (send *irtviewer* :title "crank-motion")
   (unless (boundp '*robot*)
     (setq *robot* (instance sample-robot :init)))
   (send *robot* :reset-pose)
