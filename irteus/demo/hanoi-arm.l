@@ -34,7 +34,7 @@
               to :rotation-axis :z
               :obstacles
               (remove-if #'(lambda (x) (< (norm (send x :difference-position to :translation-axis :z)) 50)) *tables*)
-              :stop 300
+              :stop 500
 ;; collision free motion generation stucks...
 ;              :avoid-collision-distance   200 ;; 200 
               :avoid-collision-joint-gain 2.0 ;; 1.0
@@ -50,7 +50,7 @@
   (send *sarm* :reset-pose)
   (objects (list *sarm*))
 
-  (send *sarm* :angle-vector #f(0.0 0.0 90.0 0.0 0.0 0.0 0.0 0.0))
+  (send *sarm* :reset-pose)
   (send *irtviewer* :draw-objects)
   (send *sarm* :solve-ik (make-cascoords :pos #f(500 0 100))
         :avoid-collision-null-gain  0.0 ;; 1.0
