@@ -236,28 +236,28 @@
 (defun make-sarm-l6 nil
   (let ((b (make-prism
             (list
-             (float-vector -15 -20 35)
-             (float-vector -15 -20 80)
-             (float-vector -15  20 80)
-             (float-vector -15  20 35)
+             (float-vector -20 -15 35)
+             (float-vector  20 -15 35)
+             (float-vector  20 -15 80)
+             (float-vector -20 -15 80)
              )
-            (float-vector 30 0 0)))
+            (float-vector 0 30 0)))
         (b1 (make-prism
              (list
-              (float-vector -13 -55  75)
-              (float-vector -13 -55 100)
-              (float-vector -13  55 100)
-              (float-vector -13  55  75)
+              (float-vector -55 -13  75)
+              (float-vector  55 -13  75)
+              (float-vector  55 -13 100)
+              (float-vector -55 -13 100)
               )
-             (float-vector 26 0 0)))
+             (float-vector 0 26 0)))
         (b2 (make-prism
              (list
-              (float-vector -12 -53  78)
-              (float-vector -12 -53 110)
-              (float-vector -12  53 110)
-              (float-vector -12  53  78)
+              (float-vector -53 -12  78)
+              (float-vector  53 -12  78)
+              (float-vector  53 -12 110)
+              (float-vector -53 -12 110)
               )
-             (float-vector 24 0 0)))
+             (float-vector 0 24 0)))
         )
     (setq b (body+ b b1))
     (setq b (body- b b2))
@@ -334,10 +334,10 @@
 
      (send sarm-fr :transform
            (make-coords :pos #f(0 0 75)
-                        :rot (rotation-matrix pi/2 :x)))
+                        :rpy (float-vector pi/2 0 pi/2)))
      (send sarm-fl :transform
            (make-coords :pos #f(0 0 75)
-                        :rot (rotation-matrix pi/2 :x)))
+                        :rpy (float-vector pi/2 0 pi/2)))
 
      (setq end-coords (make-cascoords :pos #f(0 0 140) :rpy (float-vector pi pi 0)))
 
@@ -389,8 +389,8 @@
      (setq joint3 (instance rotational-joint :init :parent-link sarm-b3 :child-link sarm-b4 :name :joint3 :axis :z :min -165 :max 165))
      (setq joint4 (instance rotational-joint :init :parent-link sarm-b4 :child-link sarm-b5 :name :joint4 :axis :-z :min -90 :max 90))
      (setq joint5 (instance rotational-joint :init :parent-link sarm-b5 :child-link sarm-b6 :name :joint5 :axis :z :min -180 :max 180))
-     (setq joint-fl (instance linear-joint :init :parent-link sarm-b6 :child-link sarm-fr :name :joint-fl :axis :-z :min 0 :max 50))
-     (setq joint-fr (instance linear-joint :init :parent-link sarm-b6 :child-link sarm-fl :name :joint-fr :axis :z :min 0 :max 50))
+     (setq joint-fl (instance linear-joint :init :parent-link sarm-b6 :child-link sarm-fr :name :joint-fl :axis :-z :min 0 :max 42))
+     (setq joint-fr (instance linear-joint :init :parent-link sarm-b6 :child-link sarm-fl :name :joint-fr :axis :z :min 0 :max 42))
 
      (setq links (list ;;sarm-x sarm-y sarm-z
                   sarm-b0 sarm-b1 sarm-b2 sarm-b3 sarm-b4 sarm-b5 sarm-b6
@@ -413,7 +413,7 @@
   (:end-coords (&rest args) (forward-message-to end-coords args))
   (:reset-pose
    ()
-   (send self :angle-vector #f(0.0 0.0 90.0 0.0 90.0 90.0 0.0 0.0))
+   (send self :angle-vector #f(0.0 0.0 90.0 0.0 90.0 0.0 0.0 0.0))
    )
   (:move-fingers
    (l)
