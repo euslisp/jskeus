@@ -339,7 +339,7 @@
            (make-coords :pos #f(0 0 75)
                         :rpy (float-vector pi/2 0 pi/2)))
 
-     (setq end-coords (make-cascoords :pos #f(0 0 140) :rpy (float-vector pi pi 0)))
+     (setq end-coords (make-cascoords :pos #f(0 0 150) :rpy (float-vector pi pi 0)))
 
      (send sarm-b6 :assoc end-coords)
      (send sarm-b6 :assoc sarm-fr)
