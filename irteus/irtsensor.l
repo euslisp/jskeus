@@ -44,10 +44,11 @@
   :slots (bumper-threshold))
 (defmethod bumper-model
   (:init
-   (&rest args &key ((:bumper-threshold bt) 20))
+   (b &rest args &key ((:bumper-threshold bt) 20))
    (setq data 0)
    (setq bumper-threshold bt)
-   (send-super* :init args))
+   (print args)
+   (send-super* :init b args))
   (:simulate
    (objs)
    (let (r)
