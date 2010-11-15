@@ -328,7 +328,7 @@
 	    (return-from face-to-tessel-triangle nil))
     (let ((poly (make-face-from-vertices
                  (mapcar #'(lambda (v) (cons v (mapcan
-                                                #'(lambda (e) (if (memq v (send e :vertices)) (list e)))
+                                                #'(lambda (e) (if (memq v (send e :vertices)) (list (copy-object e))))
                                                 (send f :edges)))) (list v0 v1 v2))))
 	  (rvers (remove v0 (remove v1 (remove v2 vers)))) not-intersectp)
       (setq not-intersectp
@@ -360,7 +360,7 @@
     (make-face-from-vertices
      (mapcar #'(lambda (v)
                  (cons v (mapcan #'(lambda (e) (if (memq v (send e :vertices)) (list e)))
-                                 (append (send f :edges) edgs)))) rvers))
+                                 (copy-object (append (send f :edges) edgs))))) rvers))
     ))
 
 ;;;
