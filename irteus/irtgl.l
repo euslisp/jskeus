@@ -270,7 +270,7 @@
                 (glTexEnvi GL_TEXTURE_ENV GL_TEXTURE_ENV_MODE GL_DECAL)
                 (glEnable GL_TEXTURE_2D)
                 (glBindTextureEXT GL_TEXTURE_2D (get texture-img :GL-BIND-TEXTURE))
-                )
+                ) ;; when texture-img
 	      (glBegin GL_POLYGON)
 	      (glNormal3fv (transform (transpose (send abody :worldrot)) (send aface :normal)))
 	      (dolist (e (send aface :edges))
