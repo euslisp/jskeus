@@ -105,6 +105,7 @@
      self))
   (:width () pwidth)
   (:height () pheight)
+  (:viewing (&rest args) (forward-message-to vwing args))
   (:screen-point
    (pos)
    (let (v w)
