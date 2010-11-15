@@ -114,6 +114,22 @@
      (setf (aref v 0) (/ (aref v 0) w))
      (setf (aref v 1) (/ (aref v 1) w))
      (return-from :screen-point (subseq v 0 2))))
+  (:3d-point
+   (x y d)
+   (let* ((proj (send vwing :projection))
+          (cx (aref proj 0 2)) (cy (aref proj 1 2))
+          (f  (aref proj 0 0))
+          (tx (/ (aref proj 0 3) f))
+          (q (make-matrix 4 4
+                          (list
+                           (list 1 0           0 (- cx))
+                           (list 0 1           0 (- cy))
+                           (list 0 0           0 f)
+                           (list 0 0 (/ -1.0 tx) 0))))
+          r w)
+     (setq r (transform q (float-vector x y d 1)))
+     (setq w (elt r 3))
+     (scale (/ 1.0 w) (subseq r 0 3))))
   (:ray
    (x y)
    (let* (xx yy u v
