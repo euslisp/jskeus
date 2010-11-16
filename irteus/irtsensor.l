@@ -47,7 +47,6 @@
    (b &rest args &key ((:bumper-threshold bt) 20))
    (setq data 0)
    (setq bumper-threshold bt)
-   (print args)
    (send-super* :init b args))
   (:simulate
    (objs)
