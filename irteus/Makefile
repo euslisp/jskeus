@@ -179,7 +179,7 @@ $(OBJDIR)/png.$(OSFX): png.l
 $(OBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l
 $(OBJDIR)/eusjpeg.$(OSFX): $(EUSDIR)/lisp/image/jpeg/eusjpeg.l
 
-$(OBJDIR)/irtc.$(OSFX): irtc.c
+$(OBJDIR)/irtc.$(OSFX): irtc.c $(IRTEUSOBJS) $(IRTCOBJECTS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(LIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS)
 	$(CC) $(CFLAGS) -c irtc.c $(OBJOPT)$(OBJDIR)/irtc.$(OSFX)
 $(OBJDIR)/CPQP.$(OSFX): CPQP.C
 	$(CXX) $(CXXFLAGS) -c CPQP.C $(OBJOPT)$(OBJDIR)/CPQP.$(OSFX)
