@@ -106,6 +106,9 @@
   (:width () pwidth)
   (:height () pheight)
   (:viewing (&rest args) (forward-message-to vwing args))
+  (:fovy ()
+   (let ((proj (send vwing :projection)))
+     (* 2 (atan2 (/ pwidth 2.0) (aref proj 0 0)))))
   (:screen-point
    (pos)
    (let (v w)
@@ -174,6 +177,52 @@
      (send vwer :viewsurface :line-width pwidth)
      (send vwer :viewsurface :color pcolor)
      (gl::draw-glbody vwer self)))
+  (:draw-objects
+   (vwr objs)
+   (let* (pcurrent pcolor (draw-things (x::draw-things objs))
+                   viewpoint viewtarget
+                   (proj (send vwing :projection))
+                   (cx (aref proj 0 2)) (cy (aref proj 1 2))
+                   (f  (aref proj 0 0)))
+     (send vwr :viewsurface :makecurrent)
+     ;;(resetperspective (send vwr :viewing) (send vwr :viewsurface))
+     (gl::glMatrixMode gl::GL_PROJECTION)
+     (gl::glLoadIdentity)
+     ;; the following should get aspect ration from viewport
+     (gl::gluPerspectivefv (float-vector (rad2deg (send self :fovy))
+                                         1.0
+                                         (send self :viewing :hither)
+                                         (send self :viewing :yon)))
+     (setq viewpoint
+           (v+ (send self :worldpos) ;; for right camera
+               (send self :viewing :rotate-vector
+                     (scale 1000.0 (float-vector (/ (- (/  pwidth 2.0) cx) f)
+                                                 (/ (- (/ pheight 2.0) cy) f)
+                                                 0)))))
+     (print viewpoint)
+     ;; glview define view-directoin to oppsite direction
+     (setq viewtarget
+           (v- viewpoint (send self :viewing :view-direction) ))
+     (gl::gluLookAtfv (concatenate vector viewpoint viewtarget
+                                   (v- (send self :viewing :view-up))))
+     (gl::glMatrixMode gl::GL_MODELVIEW)
+
+     (send vwr :viewsurface :clear)
+     (setq pcolor (send vwr :viewsurface :color))
+     (send vwr :viewsurface :color pcolor)
+
+     (dolist (abody draw-things)
+      ;; draw body
+      (cond
+       ((find-method abody :draw)
+	(send abody :draw vwr))
+       ((derivedp abody faceset)
+	(gl::draw-glbody vwr abody))
+       ((find-method abody :draw-on)
+	(send abody :draw-on :viewer vwr))
+       (t (warn "Unknown body to draw ~A~%" abody)))
+       )
+     (send vwr :viewsurface :flush)))
   )
 
 (in-package "GEOMETRY")
