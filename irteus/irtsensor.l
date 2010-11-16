@@ -199,7 +199,6 @@
                      (scale 1000.0 (float-vector (/ (- (/  pwidth 2.0) cx) f)
                                                  (/ (- (/ pheight 2.0) cy) f)
                                                  0)))))
-     (print viewpoint)
      ;; glview define view-directoin to oppsite direction
      (setq viewtarget
            (v- viewpoint (send self :viewing :view-direction) ))
