@@ -191,7 +191,8 @@
   (dolist (o *particles*)
     (send o :new-position)
     (send o :new-velocity)
-    (send *irtviewer* :draw-objects)))
+    (send *irtviewer* :draw-objects)
+    (x::window-main-one)))
 
 (defun add-motor (r m)
   (send r :set-color :yellow)
