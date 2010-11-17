@@ -231,6 +231,8 @@
                           (elt textures (position texture-img (get abody :GL-TEXTUREIMAGE))))
                          (ow (send texture-img :width))
                          (oh (send texture-img :height))
+                         (mw (or (get texture-img :texture-max-width) 256))
+                         (mh (or (get texture-img :texture-max-height) 256))
                          (tw (ash 1 (ceiling (log ow 2))))
                          (th (ash 1 (ceiling (log oh 2))))
                          (img texture-img)) ;; img might be scaled image
@@ -245,7 +247,7 @@
                           (setq od 1))
                          (t
                           (error "unsupported image type ~A in ~A" pixelformat img)))
-                        (if (> (setq scale (round (sqrt (/ (* tw th) (* 256 256))))) 1)
+                        (if (> (setq scale (round (sqrt (/ (* tw th) (* mw mh))))) 1)
                             (setq tw (ash 1 (ceiling (log (/ tw scale) 2)))
                                   th (ash 1 (ceiling (log (/ th scale) 2)))))
                         (setq b (make-string (* tw th od)))
