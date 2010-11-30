@@ -426,6 +426,9 @@
        (setq img (user::read-image-file file)))
       ((probe-file (format nil "~A/img/~A" *eusdir* file))
        (setq img (user::read-image-file (format nil "~A/img/~A" *eusdir* file))))
+      ((probe-file (format nil "~A/~A" *eusdir* file))
+       (setq img (user::read-image-file (format nil "~A/~A" *eusdir* file))))
+
       (t (warn ";; Could not find file ~A~%" file)
 	 (return-from :paste-texture-to-face nil)))
      (setf (get aface :gl-textureimage) img)
