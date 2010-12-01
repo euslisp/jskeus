@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
-;;; $Id$
+;;; $Id: $
 ;;;
 ;;; Copyright (c) 1987- JSK, The University of Tokyo.  All Rights Reserved.
 ;;;
@@ -22,31 +22,36 @@
 ;;; above copyright notice remains intact.  
 ;;;
 
-(in-package "GEOMETRY")
+(in-package "USER")
 
-(setq *objdir*
-  (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
+(defclass scene-model
+  :super cascaded-coords
+  :slots (name objs))
+
+(defmethod scene-model
+  (:init
+   (&rest args &key ((:name n) "scene") ((:objects o)))
+   (send-super* :init args)
+   (setq name :name)
+   (setq objs o)
+   (dolist (obj objs)
+     (when (eq (class obj) cascaded-coords)
+       (setf (get obj :width) 2)
+       (setf (get obj :color) #f(0.294118 0.572549 0.858823))
+       (setf (get obj :size) 300)))
+   self)
+  (:objects () objs)
+  (:find-object
+   (name)
+   (mapcan #'(lambda (o)
+               (if (string= name (send o :name)) (list o)))
+           objs))
+  (:spot
+   (&optional name)
+   (if name
+       (find cascaded-coords (send self :find-object name) :key #'class)
+     (mapcan #'(lambda (o) (if (eq (class o) cascaded-coords) (list o))) objs)))
+  ;;
+  (:bodies () (flatten (send-all objs :bodies)))
   )
 
-(comp:compile-file-if-src-newer "irtgeo.l" *objdir*)
-(comp:compile-file-if-src-newer "pqp.l" *objdir*)
-(comp:compile-file-if-src-newer "irtscene.l" *objdir*)
-(comp:compile-file-if-src-newer "irtmodel.l" *objdir*)
-(comp:compile-file-if-src-newer "irtsensor.l" *objdir*)
-(comp:compile-file-if-src-newer "irtdyna.l" *objdir*)
-(comp:compile-file-if-src-newer "irtrobot.l" *objdir*)
-
-(exit 0)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; $Id$
-;;;
-;;; $Log$
-;;; Revision 1.2  2009-02-17 02:04:48  k-okada
-;;; fix typo on copyright
-;;;
-;;; Revision 1.1  2008/09/18 18:11:00  k-okada
-;;; add irteus
-;;;
-;;;
