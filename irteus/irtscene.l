@@ -55,3 +55,13 @@
   (:bodies () (flatten (send-all objs :bodies)))
   )
 
+
+(in-package "GEOMETRY")
+
+(provide :irtscene "$Id: $")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; $Id: $
+;;;
+;;; $Log$
