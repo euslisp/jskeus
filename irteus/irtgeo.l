@@ -505,6 +505,16 @@
   (let ((csg (send sp :csg)))
     (cadr (assoc :sphere csg))))
 
+(defun make-faceset-from-vertices (vs)
+  (let ((fs))
+    (while vs
+      (print (list (elt vs 0) (elt vs 1) (elt vs 2)))
+      (push (make-face-from-vertices (list (pop vs)(pop vs) (pop vs))) fs)
+      )
+    (instance faceset :init :faces fs)
+    ))
+
+
 (provide :irtgeo "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
