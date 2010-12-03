@@ -311,10 +311,9 @@
 
 (defun objects (&optional (objs t) vw)
   (when
-      (and objs (not (boundp '*viewer*)) (null vw))
-    (warn "do (make-viewer) beforehand or use (objects objs {viewer})~%")
-    (warn "or use (send your-viewer :objects your-objects)~%")
-    (return-from objects nil))
+      (and objs (not (boundp '*irtviewer*)) (null vw))
+    (warn ";; (make-irtviewer) executed~%")
+    (make-irtviewer))
   (if (null vw) (setq vw *irtviewer*))
   (let (objects)
   (if (eq objs t) (setq objects (send vw :objects))
