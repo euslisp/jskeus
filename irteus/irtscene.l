@@ -52,7 +52,9 @@
        (find cascaded-coords (send self :find-object name) :key #'class)
      (mapcan #'(lambda (o) (if (eq (class o) cascaded-coords) (list o))) objs)))
   ;;
-  (:bodies () (flatten (send-all objs :bodies)))
+  (:bodies
+   ()
+   (flatten (mapcar #'(lambda (x) (if (find-method x :bodies) (send x :bodies) x)) objs)))
   )
 
 
