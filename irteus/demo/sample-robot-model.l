@@ -42,9 +42,7 @@
      ;;
      ;;
 
-     (setq bh0 (make-default-robot-link 0 50 :z :head-link0))
-
-     (setq bh1 (make-default-robot-link 0 50 :y :head-link1))
+     (setq bh0 (make-default-robot-link 0 50 :y :head-link0))
 
      (setq bh2 (make-cube 120 100 150))
      (send bh2 :locate #f(0 0 80))
@@ -54,17 +52,16 @@
      (send bh2e :locate #f(60 0 70) :world)
      (send bh2e :set-color :green)
      (send bh2 :assoc bh2e)
-     (setq bh2 (instance bodyset-link :init (make-cascoords) :bodies (list bh2 bh2e) :name :head))
+     (setq bh1 (instance bodyset-link :init (make-cascoords) :bodies (list bh2 bh2e) :name :head-link1))
 
      (setq head-end-coords (make-cascoords :pos #f(60 0 100) :rpy (float-vector 0 pi/2 0)))
-     (send bh2 :assoc head-end-coords)
-     (send bh1 :assoc bh2)
+     (send bh1 :assoc head-end-coords)
      (send bh0 :assoc bh1)
      (send bh0 :locate #f(0 0 225))
      (send bc2 :assoc bh0)
      
-     (setq jh0 (instance rotational-joint :init :parent-link bh0 :child-link bh1 :name :head-neck-y :axis :z))
-     (setq jh1 (instance rotational-joint :init :parent-link bh1 :child-link bh2 :name :head-neck-p :axis :y))
+     (setq jh0 (instance rotational-joint :init :parent-link bc2 :child-link bh0 :name :head-neck-y :axis :z))
+     (setq jh1 (instance rotational-joint :init :parent-link bh0 :child-link bh1 :name :head-neck-p :axis :y))
 
      ;;
      ;;
@@ -192,19 +189,19 @@
      ;;;
      (setq larm-root-link bal1 rarm-root-link bar1
 	   lleg-root-link bll1 rleg-root-link blr1
-	   torso-root-link bc1 head-root-link bh1)
+	   torso-root-link bc1 head-root-link bh0)
      (setq larm (list bal1 bal2 bal3 bal4 bal5 bal6 bal7)
 	   rarm (list bar1 bar2 bar3 bar4 bar5 bar6 bar7)
 	   lleg (list bll1 bll2 bll3 bll4 bll5 bll6)
 	   rleg (list blr1 blr2 blr3 blr4 blr5 blr6)
-	   head (list bh1 bh2)
+	   head (list bh0 bh1)
 	   torso (list bc1 bc2))
      (dolist (l (append (list bc0) torso))
        (send l :weight 100.0))
      (dolist (l (append larm rarm lleg rleg head))
        (send l :weight 7.0))
 
-     (setq links (list bc0 bc1 bc2 bh0 bh1 bh2
+     (setq links (list bc0 bc1 bc2 bh0 bh1
 		       bal1 bal2 bal3 bal4 bal5 bal6 bal7
 		       bar1 bar2 bar3 bar4 bar5 bar6 bar7
 		       bll1 bll2 bll3 bll4 bll5 bll6
