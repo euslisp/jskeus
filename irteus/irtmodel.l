@@ -521,14 +521,22 @@
    (send-all links :worldcoords))
 
   (:angle-vector
-   (&optional vec 
-	      (angle-vector (instantiate float-vector (length joint-list))))
-   (dotimes (i (length angle-vector))
-     (setf (elt angle-vector i)
-	   (if vec
-	       (send (elt joint-list i) :joint-angle (elt vec i))
-	     (send (elt joint-list i) :joint-angle))))
-   angle-vector)
+   (&optional vec
+              (angle-vector (instantiate float-vector (calc-target-joint-dimension joint-list))))
+   (let ((i 0))
+     (dolist (j joint-list)
+       (if vec
+           (case (send j :joint-dof)
+             (1 (send j :joint-angle (elt vec i)))
+             (t (send j :joint-angle (subseq vec i (+ i (send j :joint-dof)))))
+             ))
+       (dotimes (k (send j :joint-dof))
+         (setf (elt angle-vector i)
+	       (case (send j :joint-dof)
+		 (1 (send j :joint-angle))
+		 (t (elt (send j :joint-angle) k))))
+         (incf i)))
+     angle-vector))
   ;;
   (:find-link-route
     (to &optional from)
