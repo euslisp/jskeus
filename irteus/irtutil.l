@@ -108,10 +108,10 @@
      (dolist (thr thrs) (sys:wait-thread thr)))))
 
 ;; thread
-(defun eus-server (&optional (port 6666) &key host)
+(defun eus-server (&optional (port 6666) &key (host (unix:gethostname)))
   (let ((sp (make-socket-port
 	     (make-socket-address
-	      :host (or host (unix:gethostname))
+	      :host host
 	      :domain af_inet
 	      :port port))))
     (cond
@@ -135,7 +135,7 @@
 		       strm)))
 	    sp))
      (t
-      (error "eus-server")
+      (error (format nil "eus-server; port:~A host:~A" port host))
       )
      )
     ))
