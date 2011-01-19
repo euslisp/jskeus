@@ -127,7 +127,7 @@
                             (send self :link-list
                                   (send move-target :parent)
                                   (send self limb :root-link))))
-               (stop (if (memq :stop args) (cadr (mqme :stop args)) 30))
+               (stop (if (memq :stop args) (cadr (memq :stop args)) 100))
                dif-pos dif-rot p-dif-rot (count 0))
 	  (while (and (< (incf count) stop)
 		      (if p-dif-rot (> (norm (v- p-dif-rot dif-rot)) 1e-3) t))
