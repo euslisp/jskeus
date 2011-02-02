@@ -1145,14 +1145,14 @@
                (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
               (tmp-len (instantiate float-vector fik-len))
               (tmp-len2 (instantiate float-vector fik-len))
+	      (tmp-weight (instantiate float-vector fik-len))
+	      (tmp-nspace (instantiate float-vector fik-len))
               (tmp-mcc (make-matrix fik-len fik-len))
               (tmp-mcc2 (make-matrix fik-len fik-len))
               (debug-view) (jacobi)
 	    &allow-other-keys)
    (let* (joint-angle-limit-nspace
 	  dav dtheta 
-          (tmp-weight (instantiate float-vector fik-len))
-	  (tmp-nspace (instantiate float-vector fik-len))
           null-space-collision-avoidance
           angle-speed-collision-avoidance
           (angle-speed-collision-blending 0.0) min-distance
