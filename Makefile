@@ -29,10 +29,10 @@ export EUSDIR=$(shell pwd)/eus
 
 manuals: manual.pdf jmanual.pdf
 manual.pdf:
-	wget http://euslisp.svn.sourceforge.net/viewvc/euslisp/trunk/EusLisp/doc/latex/manual.pdf -O manual.pdf
+	wget http://euslisp.svn.sourceforge.net/svnroot/euslisp/trunk/EusLisp/doc/latex/manual.pdf -O manual.pdf
 
 jmanual.pdf:
-	wget http://euslisp.svn.sourceforge.net/viewvc/euslisp/trunk/EusLisp/doc/jlatex/jmanual.pdf -O jmanual.pdf
+	wget http://euslisp.svn.sourceforge.net/svnroot/euslisp/trunk/EusLisp/doc/jlatex/jmanual.pdf -O jmanual.pdf
 
 bashrc.eus:
 	@bash -c 'echo -e "#\n\
