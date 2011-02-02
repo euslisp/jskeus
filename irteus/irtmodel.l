@@ -30,27 +30,33 @@
 (defclass joint
   :super propertied-object
   :slots (parent-link child-link joint-angle min-angle max-angle default-coords
-		      joint-velocity joint-acceleration joint-torque))
+		      joint-velocity joint-acceleration joint-torque
+		      max-joint-velocity))
 
 (defmethod joint
   (:init (&key (name (intern (format nil "joint~A" (sys::address self)) "KEYWORD"))
                ((:child-link clink)) ((:parent-link plink))
-	       (min -90) (max 90) &allow-other-keys)
+	       (min -90) (max 90)
+	       ((:max-joint-velocity mjv))
+	       &allow-other-keys)
 	 (send self :name name)
 	 (setq parent-link plink child-link clink
 	       min-angle min max-angle max)
+	 (send self :max-joint-velocity mjv)
 	 (setq default-coords (send child-link :copy-coords))
 	 self)
   (:min-angle (&optional v) (if v (setq min-angle v)) min-angle)
   (:max-angle (&optional v) (if v (setq max-angle v)) max-angle)
   (:parent-link (&rest args) (user::forward-message-to parent-link args))
   (:child-link (&rest args) (user::forward-message-to child-link args))
+  (:calc-dav-gain (dav i periodic-time) (warn "subclass's respoinsibility (send ~s :calc-dav-gain)~%" self))
   (:joint-dof () (warn "subclass's respoinsibility (send ~s :joint-dof)~%" self))
   (:speed-to-angle (&rest args) (warn "subclass's respoinsibility (send ~s :speed-to-angle)~%" self))
   (:calc-jacobian (&rest args) (warn "subclass's respoinsibility (send ~s :calc-jacobian)~%" self))
   (:joint-velocity (&optional jv) (if jv (setq joint-velocity jv) joint-velocity))
   (:joint-acceleration (&optional ja) (if ja (setq joint-acceleration ja) joint-acceleration))
   (:joint-torque (&optional jt) (if jt (setq joint-torque jt) joint-torque))
+  (:max-joint-velocity (&optional mjv) (if mjv (setq max-joint-velocity mjv) max-joint-velocity))
   )
 
 (defun calc-jacobian-default-rotate-vector
@@ -89,15 +95,38 @@
     (dotimes (j (length j-rot)) (setf (aref fik (+ j row (length j-trs)) column) (elt j-rot j)))
     ))
 
+;; calculate angle-speed gain used in :move-joints method
+;; calc-angle-speed-gain-scalar -> for rotational-joint and linear-joint
+(defun calc-angle-speed-gain-scalar
+  (j dav i periodic-time)
+  (let ((dav-gain
+	 (/ (send j :max-joint-velocity)
+	    (/ (abs (elt dav i)) periodic-time))))
+    (if (< dav-gain 1.0) dav-gain 1.0)))
+
+;; calc-angle-speed-gain-vector -> for wheel-joint, omniwheel-joint, sphere-joint and 6dof-joint
+(defun calc-angle-speed-gain-vector
+  (j dav i periodic-time)
+  (let ((dav-gain 1.0))
+    (dotimes (ii (send j :joint-dof))
+      (let ((tmp-gain
+	     (/ (elt (send j :max-joint-velocity) ii)
+		(/ (abs (elt dav (+ ii i))) periodic-time))))
+	(if (< tmp-gain dav-gain) (setq dav-gain tmp-gain))))
+    dav-gain))
+
 (defclass rotational-joint
   :super joint
   :slots (axis))
 
 (defmethod rotational-joint
-  (:init (&rest args &key ((:axis ax) :z) &allow-other-keys)
+  (:init (&rest args
+          &key ((:axis ax) :z)
+               ((:max-joint-velocity mjv) (/ pi 4)) ;; [rad/s]
+          &allow-other-keys)
 	 (setq axis ax)
 	 (setq joint-angle 0.0)
-	 (send-super* :init args)
+	 (send-super* :init :max-joint-velocity mjv args)
 	 ;; set default value
 	 (if (null min-angle) (setq min-angle -90.0))
 	 (if (null max-angle) (setq max-angle (+ 180.0 min-angle)))
@@ -119,6 +148,7 @@
        (send child-link :rotate (deg2rad joint-angle) axis))
      joint-angle))
   (:joint-dof () 1)
+  (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-scalar self dav i periodic-time))
   (:speed-to-angle (dav i) (rad2deg (elt dav i)))
   (:calc-jacobian (&rest args) (apply #'calc-jacobian-rotational args))
   )
@@ -128,7 +158,10 @@
   :slots (axis))
 
 (defmethod linear-joint
-  (:init (&rest args &key ((:axis ax) :z) &allow-other-keys)
+  (:init (&rest args
+          &key ((:axis ax) :z)
+               ((:max-joint-velocity mjv) (/ pi 4)) ;; [m/s]
+          &allow-other-keys)
 	 (setq axis 
 	   (if (float-vector-p ax) 
 	       ax
@@ -136,7 +169,7 @@
 		   (:y (float-vector 0 1 0)) (:-y (float-vector 0 -1 0))
 		   (:z (float-vector 0 0 1)) (:-z (float-vector 0 0 -1)))))
 	 (setq joint-angle 0.0)
-	 (send-super* :init args)
+	 (send-super* :init :max-joint-velocity mjv args)
 	 ;; set default value
 	 (if (null min-angle) (setq min-angle -90.0))
 	 (if (null max-angle) (setq max-angle  90.0))
@@ -158,6 +191,7 @@
        (send child-link :translate (scale joint-angle axis)))
      joint-angle))
   (:joint-dof () 1)
+  (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-scalar self dav i periodic-time))
   (:speed-to-angle (dav i) (* 1000.0 (elt dav i)))
   (:calc-jacobian (&rest args) (apply #'calc-jacobian-linear args))
   )
@@ -171,10 +205,13 @@
                 &key
                 (min (float-vector *-inf* *-inf*))
                 (max (float-vector *inf* *inf*))
+		((:max-joint-velocity mjv)
+		 (float-vector (/ 0.08 0.05) ;; [m/s]
+			       (/ pi 4))) ;; [rad/s]
                 &allow-other-keys)
 	 (setq joint-angle (float-vector 0 0))
          (setq axis (list #f(1 0 0) :z))
-	 (send-super* :init :min min :max max args)
+	 (send-super* :init :min min :max max :max-joint-velocity mjv args)
 	 ;; set default value
 	 self)
   (:joint-angle
@@ -190,6 +227,7 @@
        )
      joint-angle))
   (:joint-dof () 2)
+  (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
   (:speed-to-angle (dav i)
                    (float-vector (* 1000 (elt dav i))
                                  (rad2deg (elt dav (incf i)))))
@@ -218,10 +256,13 @@
                 &key
                 (min (float-vector *-inf* *-inf* *-inf*))
                 (max (float-vector *inf* *inf* *inf*))
+		((:max-joint-velocity mjv)
+		 (float-vector (/ 0.08 0.05) (/ 0.08 0.05) ;; [m/s]
+			       (/ pi 4))) ;; [rad/s]
                 &allow-other-keys)
        (setq joint-angle (float-vector 0 0 0))
        (setq axis (list #f(1 0 0) #f(0 1 0) :z))
-       (send-super* :init :min min :max max args)
+       (send-super* :init :min min :max max :max-joint-velocity mjv args)
        ;; set default value
        self)
   (:joint-angle
@@ -234,6 +275,7 @@
      (send child-link :rotate (deg2rad (elt joint-angle 2)) :z))
    joint-angle)
   (:joint-dof () 3)
+  (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
   (:speed-to-angle (dav i)
                    (float-vector (* 1000 (elt dav i))
                                  (* 1000 (elt dav (incf i)))
@@ -268,9 +310,11 @@
 		;; min/max are defined as a region of anguler velocity
 		(min (float-vector *-inf* *-inf* *-inf*))
 		(max (float-vector *inf* *inf* *inf*))
+		((:max-joint-velocity mjv)
+		 (float-vector (/ pi 4) (/ pi 4) (/ pi 4))) ;; [rad/s]
 		&allow-other-keys)
     (setq axis (list :x :y :z))
-    (send-super* :init :min min :max max args)
+    (send-super* :init :min min :max max :max-joint-velocity mjv args)
     ;; joint-angle is defined as anguler velocity equivalent to orthogonal orientation matrix
     (setq joint-angle (float-vector 0 0 0)) ;; [deg]
     self)
@@ -307,6 +351,7 @@
 	(send self :joint-angle (map cons #'rad2deg (matrix-log (rpy-matrix (elt ja 0) (elt ja 1) (elt ja 2)))))))
     (map float-vector #'rad2deg (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad joint-angle))))))
   (:joint-dof () 3)
+  (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
   (:speed-to-angle (dav i)
                    (float-vector (rad2deg (elt dav i))
                                  (rad2deg (elt dav (incf i)))
@@ -342,9 +387,12 @@
                 &key
                 (min (float-vector *-inf* *-inf* *-inf* *-inf* *-inf* *-inf*))
                 (max (float-vector *inf* *inf* *inf* *inf* *inf* *inf*))
+		((:max-joint-velocity mjv)
+		 (float-vector (/ 0.08 0.05) (/ 0.08 0.05) (/ 0.08 0.05) ;; [m/s]
+			       (/ pi 4) (/ pi 4) (/ pi 4))) ;; [rad/s]
                 &allow-other-keys)
     (setq axis (list #f(1 0 0) #f(0 1 0) #f(0 0 1) :x :y :z))
-    (send-super* :init :min min :max max args)
+    (send-super* :init :min min :max max :max-joint-velocity mjv args)
     (setq joint-angle (float-vector 0 0 0 0 0 0)) ;; [mm] [deg]
     self)
   (:joint-angle
@@ -389,6 +437,7 @@
 		 (subseq joint-angle 0 3)
 		 (map float-vector #'rad2deg (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad (subseq joint-angle 3 6))))))))
   (:joint-dof () 6)
+  (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
   (:speed-to-angle (dav i)
                    (float-vector (* 1000 (elt dav i))
                                  (* 1000 (elt dav (incf i)))
@@ -730,6 +779,7 @@
    ;; calculate J#x
    (let ((J#x (transform jacobi# union-vel tmp-len)))
      (when (and debug-view (not (memq :no-message debug-view)))
+       (format-array jacobi "J     :")
        (format-array (transpose jacobi#) "J#t   :")
        (format-array union-vel "x     :")
        (format-array (map float-vector #'rad2deg J#x) "J#x   :"))
@@ -989,21 +1039,25 @@
    (union-vel &rest args
     &key
     union-link-list
-    (angle-speed-limit (/ pi 4)) ;; rad/sec
     (periodic-time 0.05)         ;; sec
     (joint-args)
     (debug-view nil)
     &allow-other-keys)
-   (let (dav dtheta j (angle-speed-max 0) gain)
+   (let (dav dtheta j (gain 1.0))
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
      (if (and debug-view (not (equal debug-view :no-clear)) (boundp '*viewer*))
 	 (send *viewer* :viewsurface :clear))
 
      (setq dav (send* self :calc-joint-angle-speed union-vel args))
-     (dotimes (i (length dav)) (setq angle-speed-max (max (abs (elt dav i)) angle-speed-max)))
-     (if (> (/ angle-speed-max periodic-time) angle-speed-limit)
-         (setq gain (/ angle-speed-limit (/ angle-speed-max periodic-time)))
-       (setq gain 1))
+     (do ((i 0 (+ i (send j :joint-dof)))
+	  (l 0 (1+ l)))
+	 ((>= l (length union-link-list)))
+       (setq j (send (elt union-link-list l) :joint))
+       (let ((tmp-gain
+	      (send (send (elt union-link-list l) :joint)
+		    :calc-angle-speed-gain dav i periodic-time)))
+	 (if (< tmp-gain gain) (setq gain tmp-gain))))
+     (setq dav (scale gain dav dav))
 
      ;; update body
      (do ((i 0 (+ i (send j :joint-dof)))
@@ -1011,9 +1065,6 @@
 	 ((>= l (length union-link-list)))
        (setq j (send (elt union-link-list l) :joint))
        (setq dtheta (send j :speed-to-angle dav i))
-       (if (float-vector-p dtheta)
-           (setq dtheta (scale gain dtheta dtheta))
-         (setq dtheta (* gain dtheta)))
        (send* (elt union-link-list l) :joint :joint-angle dtheta :relative t joint-args))
      t))
   ;; calc weight according to joint limit
