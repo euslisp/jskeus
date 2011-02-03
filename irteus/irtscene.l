@@ -46,11 +46,25 @@
    (mapcan #'(lambda (o)
                (if (string= name (send o :name)) (list o)))
            objs))
-  (:spot
+  (:spots
    (&optional name)
-   (if name
-       (find cascaded-coords (send self :find-object name) :key #'class)
-     (mapcan #'(lambda (o) (if (eq (class o) cascaded-coords) (list o))) objs)))
+   (mapcan #'(lambda (o) (if (eq (class o) cascaded-coords) (list o)))
+	   (if name (send self :find-object name) (send self :objects))))
+  ;;
+  (:object
+   (name)
+   (let ((r (send self :find-object name)))
+     (case (length r)
+       (0 (warning-message 1 "could not found object(~A)" name) nil)
+       (1 (car r))
+       (t (warning-message 1 "found multiple object ~A for given name(~A)" r name) (car r)))))
+  (:spot
+   (name)
+   (let ((r (send self :spots name)))
+     (case (length r)
+       (0 (warning-message 1 "could not found spot(~A)" name) nil)
+       (1 (car r))
+       (t (warning-message 1 "found multiple spot ~A for given name(~A)" r name) (car r)))))
   ;;
   (:bodies
    ()
