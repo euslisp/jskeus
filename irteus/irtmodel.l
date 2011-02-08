@@ -1133,6 +1133,9 @@
           (debug-view)
           (tmp-weight (instantiate float-vector fik-len))
           (tmp-len (instantiate float-vector fik-len)))
+    (cond
+     ((functionp weight) (setq weight (funcall weight)))
+     ((listp weight) (setq weight (eval weight))))
     (setq tmp-weight
           (send self :calc-weight-from-joint-limit
                 avoid-weight-gain fik-len link-list union-link-list
