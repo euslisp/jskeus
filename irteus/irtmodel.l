@@ -319,7 +319,7 @@
     (setq joint-angle (float-vector 0 0 0)) ;; [deg]
     self)
   (:joint-angle
-    (&optional v &key relative)
+    (&optional v &key relative &allow-other-keys)
     ;; v is anguler velocity [deg]
     (when v
       ;; if relative nil
@@ -396,7 +396,7 @@
     (setq joint-angle (float-vector 0 0 0 0 0 0)) ;; [mm] [deg]
     self)
   (:joint-angle
-    (&optional v &key relative) ;; v [mm] [deg]
+    (&optional v &key relative &allow-other-keys) ;; v [mm] [deg]
     (when v
       (let (dp drot)
 	;; translation
