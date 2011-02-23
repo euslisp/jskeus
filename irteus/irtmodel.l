@@ -2097,7 +2097,7 @@
       (unwind-protect
           (let ((,(car params) ,new-move-target)) ,@bodies)
         (mapcar #'(lambda (tmp-move-target)
-                    (send (send tmp-move-target :parent) :dissoc _move-target))
+                    (send (send tmp-move-target :parent) :dissoc tmp-move-target))
                 ,new-move-target)
         ))))
 
