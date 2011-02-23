@@ -2074,6 +2074,33 @@
             (send ,rlink :del-parent-link)
             (send ,vlink :del-child-link ,rlink)))))))
 
+;; macro for IK with associating move-target
+;; usage
+;;  (with-assoc-move-target (mt :move-taget ... :parent-link ...) (ik-codes... :move-target mt))
+;;  mt is symbol name for move-target variable
+(defmacro with-assoc-move-target (params &rest bodies)
+  (with-gensyms
+   (new-move-target parent-link)
+   `(let ((,new-move-target (if (atom ,(cadr (member :move-target params)))
+                                (list ,(cadr (member :move-target params)))
+                              ,(cadr (member :move-target params))))
+          (,parent-link (if (atom ,(cadr (member :parent-link params)))
+                            (list ,(cadr (member :parent-link params)))
+                          ,(cadr (member :parent-link params)))))
+      (setq ,new-move-target
+            (mapcar #'(lambda (x)
+                        (make-cascoords :coords
+                                        (send x :copy-worldcoords)))
+                    ,new-move-target))
+      (mapcar #'(lambda (pl nmt)
+                  (send pl :assoc nmt)) ,parent-link ,new-move-target)
+      (unwind-protect
+          (let ((,(car params) ,new-move-target)) ,@bodies)
+        (mapcar #'(lambda (mt)
+                    (send (send mt :parent) :dissoc mt))
+                ,new-move-target)
+        ))))
+
 (in-package "GEOMETRY")
 
 (provide :irtmodel "$Id$")
