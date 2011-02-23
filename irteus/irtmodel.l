@@ -2088,16 +2088,16 @@
                             (list ,(cadr (member :parent-link params)))
                           ,(cadr (member :parent-link params)))))
       (setq ,new-move-target
-            (mapcar #'(lambda (_new-move-target)
+            (mapcar #'(lambda (tmp-new-move-target)
                         (make-cascoords :coords
-                                        (send _new-move-target :copy-worldcoords)))
+                                        (send tmp-new-move-target :copy-worldcoords)))
                     ,new-move-target))
-      (mapcar #'(lambda (_parent-link _new-move-target)
-                  (send _parent-link :assoc _new-move-target)) ,parent-link ,new-move-target)
+      (mapcar #'(lambda (tmp-parent-link tmp-new-move-target)
+                  (send tmp-parent-link :assoc tmp-new-move-target)) ,parent-link ,new-move-target)
       (unwind-protect
           (let ((,(car params) ,new-move-target)) ,@bodies)
-        (mapcar #'(lambda (_move-target)
-                    (send (send _move-target :parent) :dissoc _move-target))
+        (mapcar #'(lambda (tmp-move-target)
+                    (send (send tmp-move-target :parent) :dissoc _move-target))
                 ,new-move-target)
         ))))
 
