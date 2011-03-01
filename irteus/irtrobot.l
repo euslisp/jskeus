@@ -154,6 +154,8 @@
 	   (cdr (assoc (intern (format nil "~A-COLLISION-AVOIDANCE-LINKS"
 				       (string-upcase limb))) (send self :slots)))
 	   args))
+       (:links (send self :limb limb nil))
+       (:joint-list (send-all (send self :limb limb :links) :joint))
        (t
 	(cond
 	 ((or (null method) (send bodyset-link :method method))
