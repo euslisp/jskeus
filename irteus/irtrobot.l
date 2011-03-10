@@ -147,6 +147,7 @@
                     :translation-axis nil
                     :link-list link-list
                     :loop count :stop stop ;;:thre nil
+                    :target-coords target-coords ;; for debug-view
                     :debug-view (cadr (memq :debug-view args))))
             )))
        (:collision-avoidance-links
