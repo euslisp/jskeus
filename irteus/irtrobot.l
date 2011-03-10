@@ -128,6 +128,7 @@
                                   (send move-target :parent)
                                   (send self limb :root-link))))
                (stop (if (memq :stop args) (cadr (memq :stop args)) 100))
+               (warnp (if (memq :warnp args) (cadr (memq :warnp args)) t))
                dif-pos dif-rot p-dif-rot (count 0))
 	  (while (and (< (incf count) stop)
 		      (if p-dif-rot (> (norm (v- p-dif-rot dif-rot)) 1e-3) t))
@@ -149,7 +150,19 @@
                     :loop count :stop stop ;;:thre nil
                     :target-coords target-coords ;; for debug-view
                     :debug-view (cadr (memq :debug-view args))))
-            )))
+            )
+	  (if (and p-dif-rot (<= (norm (v- p-dif-rot dif-rot)) 1e-3))
+	      (send self :angle-vector)
+	    (when warnp
+	      (warn ";; :look-at failed.~%")
+	      (warn ";;     count : ~a~%" count)
+	      (when p-dif-rot
+		(warn ";; p-dif-rot : ~a/(~a)~%" p-dif-rot (norm p-dif-rot))
+		(warn ";;   dif-rot : ~a/(~a)~%" dif-rot (norm dif-rot))
+		(warn ";;      diff : ~a < ~A~%" (norm (v- p-dif-rot dif-rot)) 1e-3)
+		))
+	    nil)
+	  ))
        (:collision-avoidance-links
 	 (user::forward-message-to
 	   (cdr (assoc (intern (format nil "~A-COLLISION-AVOIDANCE-LINKS"
