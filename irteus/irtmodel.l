@@ -1499,7 +1499,7 @@
                 (rotation-axis (elt rotation-axis i))
                 (translation-axis (elt translation-axis i))
                 (thre (elt thre i)) (rthre (elt rthre i))
-                (tmp-dim (instantiate float-vector (send self :calc-target-axis-dimension rotation-axis translation-axis)))
+                (tmp-dim (elt tmp-dims i))
                 (vel-p (send* self :calc-vel-from-pos dif-pos translation-axis
                               (if p-limit (list :p-limit p-limit))))
                 (vel-r (send* self :calc-vel-from-rot dif-rot rotation-axis
@@ -1513,9 +1513,8 @@
                               (>= loop (/ stop 10))
                               (if translation-axis (< (norm dif-pos) thre) t)
                               (if rotation-axis (< (norm dif-rot) rthre) t)))
-           (setq tmp-dim (elt tmp-dims i))
-           (dotimes (i (length vel-p)) (setf (elt tmp-dim i) (elt vel-p i)))
-           (dotimes (i (length vel-r)) (setf (elt tmp-dim (+ i (length vel-p))) (elt vel-r i)))
+           (dotimes (j (length vel-p)) (setf (elt tmp-dim j) (elt vel-p j)))
+           (dotimes (j (length vel-r)) (setf (elt tmp-dim (+ j (length vel-p))) (elt vel-r j)))
            ))
        (if (and additional-check success)
            (setq success (and success (funcall additional-check))))
