@@ -51,7 +51,7 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
   info_ptr = png_create_info_struct(png_ptr);
 
   if (setjmp(png_jmpbuf(png_ptr))) {
-    png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+    png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
     fclose(fp);
     error(E_EOF);
     return(NIL);
@@ -70,7 +70,11 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
     png_set_palette_to_rgb(png_ptr);
     break;
   case PNG_COLOR_TYPE_GRAY:
+    #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
+    if ( bit_depth < 8) png_set_gray_to_rgb(png_ptr);
+    #else
     if ( bit_depth < 8) png_set_gray_1_2_4_to_8(png_ptr);
+    #endif
     break;
   case PNG_COLOR_TYPE_RGB:
     //png_set_bgr(png_ptr);
@@ -102,7 +106,7 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
   png_read_image(png_ptr, row_pointers);
   free(row_pointers);
   png_read_end(png_ptr,info_ptr);
-  png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+  png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
   fclose(fp);
 
   ret=cons(ctx,image_ptr,NIL);
@@ -153,7 +157,7 @@ pointer PNG_WRITE_IMAGE(register context *ctx, int n, register pointer *argv)
   }
   png_set_rows(png_ptr, info_ptr, row_pointers);
 
-  png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, png_voidp_NULL);
+  png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, (png_voidp)NULL);
   png_write_end(png_ptr, info_ptr);
 
   free(row_pointers);
