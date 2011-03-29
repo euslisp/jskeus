@@ -20,6 +20,10 @@ ifeq ($(OS),CYGWIN_NT-6.1)
  export ARCHDIR=Cygwin
  export MAKEFILE=Makefile.Cygwin
 endif
+ifeq ($(OS),CYGWIN_NT-6.1-WOW64)
+ export ARCHDIR=Cygwin
+ export MAKEFILE=Makefile.Cygwin
+endif
 ifeq ($(OS),Darwin)
  export ARCHDIR=Darwin
  export MAKEFILE=Makefile.Darwin
