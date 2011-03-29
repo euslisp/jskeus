@@ -519,7 +519,9 @@
 (defmethod cascaded-link
   (:calc-torque
    (&key (dt 0.005) ;; dt [s]
-         (debug-view nil) (av (send self :angle-vector))
+         (debug-view nil)
+	 (jvv (instantiate float-vector (length joint-list))) ;; [rad/s] or [m/s]
+	 (jav (instantiate float-vector (length joint-list))) ;; [rad/s^2] or [m/s^2]
 	 ;; buffers for computation
 	 (tmp-va (float-vector 0 0 0))
 	 (tmp-vb (float-vector 0 0 0))
@@ -534,13 +536,9 @@
        (send l :put :angular-velocity-jacobian (float-vector 0 0 0)))
      ;; joint-angle update
      (dotimes (i (length joint-list))
-       (let* ((jnt (elt joint-list i))
-	      (pdq (send jnt :joint-velocity)))
-	 (send jnt :joint-velocity
-	       (deg2rad (/ (- (elt av i) (send (elt joint-list i) :joint-angle)) dt)))
-	 (send jnt :joint-acceleration
-	       (/ (- (send jnt :joint-velocity) pdq) dt))
-	 (send jnt :joint-angle (elt av i))
+       (let* ((jnt (elt joint-list i)))
+	 (send jnt :joint-velocity (elt jvv i))
+	 (send jnt :joint-acceleration (elt jav i))
 	 ))
 
      ;; recursive calculation from root-link
@@ -553,6 +551,82 @@
      (dotimes (i (length torque-vector))
        (setf (elt torque-vector i) (send (elt joint-list i) :joint-torque)))
      torque-vector))
+
+  ;; calculate Zero Moment Point based on Inverse Dynamics
+  ;;   necessary arguments -> av and root-coords
+  (:calc-zmp
+    (&optional (av (send self :angle-vector))
+               (root-coords (send (car (send self :links)) :copy-worldcoords))
+     &key (pZMPz 0.0) ;; ZMP height [mm]
+          (dt 0.005) ;; dt [s]
+          (update t) (debug-view)
+          (calc-torque-method :calc-torque)
+          (calc-torque-args))
+    (unless update (return-from :calc-zmp (send self :get :zmp)))
+
+    ;; under no external forces and moments
+    (dolist (l links)
+      (send l :put :ext-force (float-vector 0 0 0))
+      (send l :put :ext-moment (float-vector 0 0 0)))
+
+    ;; set spacial-acceleration and angular-acceleration of root-link
+    (let* ((dt-1 (/ 1.0 dt))
+           (proot-coords
+            (if (send self :get :prev-root-coords)
+                (send self :get :prev-root-coords)
+              root-coords))
+           (rv (scale (* 1e-3 dt-1) (v- (send root-coords :worldpos) (send proot-coords :worldpos)))) ;; [m/s]
+           (rw (scale dt-1 (send proot-coords :rotate-vector (send proot-coords :difference-rotation root-coords)))) ;; [rad/s]
+           (prv (if (send self :get :prev-root-v)
+                    (send self :get :prev-root-v)
+                  rv)) ;; [m/s]
+           (prw (if (send self :get :prev-root-w)
+                    (send self :get :prev-root-w)
+                  rw)) ;; [rad/s]
+           (rva (scale dt-1 (v- rv prv))) ;; [m/s^2]
+           (rwa (scale dt-1 (v- rw prw)))) ;; [rad/s^2]
+      (send (car (send self :links)) :spacial-acceleration ;; [m/s^2]
+            (v- rva (v+ (v* rwa (scale 1e-3 (send root-coords :worldpos))) ;; [rad/s^2] * [m]
+                        (v* rw rv)))) ;; [rad/s] * [m/s]
+      (send (car (send self :links)) :angular-acceleration rwa) ;; [rad/s^2]
+      (send self :put :prev-root-coords root-coords)
+      (send self :put :prev-root-v rv)
+      (send self :put :prev-root-w rw))
+
+    ;; set joint velocities and joint accelerations
+    (let* ((dt-1 (/ 1.0 dt))
+           (pav (if (send self :get :prev-av)
+                    (send self :get :prev-av)
+                  av))
+           (jvv (scale dt-1 (map float-vector #'deg2rad (v- av pav)))) ;; [rad/s]
+           (pjvv (if (send self :get :prev-jvv)
+                     (send self :get :prev-jvv)
+                   jvv)) ;; [rad/s]
+           (jav (scale dt-1 (v- jvv pjvv)))) ;; [rad/s^2]
+      (send* self calc-torque-method
+             :dt dt :jvv jvv :jav jav
+             :debug-view debug-view
+             calc-torque-args)
+      (send self :put :prev-av av)
+      (send self :put :prev-jvv jvv))
+
+    ;; calculate ZMP from force and moment of root-link
+    (let* ((f0 (send (car (send self :links)) :force)) ;; [N]
+           (n0 (send (car (send self :links)) :moment)) ;; [Nm], this moment is around the world origin, not around root link's origin.
+           (f0x (elt f0 0)) (f0y (elt f0 1)) (f0z (elt f0 2))
+           (n0x (elt n0 0)) (n0y (elt n0 1)) (n0z (elt n0 2))
+           (pZMPz (* 1e-3 pZMPz)) ;; [m]
+           (zmp (float-vector
+                 (/ (+ (- n0y) (* pZMPz f0x)) f0z)
+                 (/ (+ n0x (* pZMPz f0y)) f0z)
+                 pZMPz))) ;; [m]
+      (send self :put :zmp (scale 1e3 zmp))
+      (send self :put :zmp-moment ;; yaw moment
+            (float-vector 0 0
+                          (+ n0z
+                             (* (elt (send self :get :zmp) 0) f0y -1.0)
+                             (* (elt (send self :get :zmp) 1) f0x)))))
+    (send self :get :zmp))
   )
 
 (in-package "GEOMETRY")
