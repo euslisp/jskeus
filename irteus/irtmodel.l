@@ -374,6 +374,46 @@
       move-target transform-coords rotation-axis translation-axis
       tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33)
      ))
+  ;;
+  (:joint-euler-angle
+   (&key (axis-order '(:z :y :x)))
+   (let ((m (send child-link :rot)))
+     (map cons #'rad2deg
+	  (case (length axis-order)
+	    (1
+	     (case (elt axis-order 0)
+	       (:y
+		(list (atan2 (- (aref m 2 0)) (aref m 2 2))))
+	       (:x
+		(list (atan2 (aref m 2 1) (aref m 2 2))))
+	       (:z
+		(list (atan2 (aref m 1 0) (aref m 1 1))))))
+	    (2
+	     (case (elt axis-order 0)
+	       (:y
+		(case (elt axis-order 1)
+		  (:x (list (atan2 (- (aref m 2 0)) (aref m 0 0))
+			    (atan2 (- (aref m 1 2)) (aref m 1 1))))
+		  (:z (list (atan2 (aref m 0 2) (aref m 2 2))
+			    (atan2 (aref m 1 0) (aref m 1 1))))
+		  (:y (list 0 (atan2 (aref m 0 2) (aref m 0 0))))))
+		(:x
+		 (case (elt axis-order 1)
+		  (:y (list (atan2 (aref m 2 1) (aref m 1 1))
+			    (atan2 (aref m 0 2) (aref m 0 0))))
+		  (:z (list (atan2 (- (aref m 1 2)) (aref m 2 2))
+			    (atan2 (- (aref m 0 1)) (aref m 0 0))))
+		  (:x (list 0 (atan2 (aref m 2 1) (aref m 2 2))))))
+		(:z
+		 (case (elt axis-order 1)
+		  (:y (list (atan2 (- (aref m 0 1)) (aref m 1 1))
+			    (atan2 (- (aref m 2 0)) (aref m 2 2))))
+		  (:x (list (atan2 (aref m 1 0) (aref m 0 0))
+			    (atan2 (aref m 2 1) (aref m 2 2))))
+		  (:z (list 0 (atan2 (aref m 1 0) (aref m 1 1))))))))
+	    (3
+	     (matrix-to-euler-angle m axis-order)))
+	  )))
   )
 
 (defclass 6dof-joint
