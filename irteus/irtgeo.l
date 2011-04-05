@@ -28,7 +28,8 @@
 
 (export '(body-to-faces body-to-triangles midcoords bodyset *g-vec*
                         make-sphere x-of-cube y-of-cube z-of-cube
-                        height-of-cylinder radius-of-cylinder radius-of-sphere))
+                        height-of-cylinder radius-of-cylinder radius-of-sphere
+			matrix-to-euler-angle))
 
 (defvar *g-vec* (float-vector 0 0 9800)) ;; [mm/s^2]
 
@@ -514,6 +515,136 @@
     (instance faceset :init :faces fs)
     ))
 
+;;
+;; matrix-to-euler-angle
+;;
+(defun matrix-to-euler-angle (m axis-order)
+  (let (a0 a1 a2 (eps 1.0e-6))
+    (case (elt axis-order 0)
+      (:x
+       (case (elt axis-order 2)
+	 (:x
+	  (setq a1 (acos (aref m 0 0)))
+	  (cond
+	   ((eps= (aref m 0 0)  1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 2 1) (aref m 1 1))))
+	   ((eps= (aref m 0 0) -1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 2 1) (- (aref m 1 1)))))
+	   (t
+	    (case (elt axis-order 1)
+	      (:z ;; x-z-x
+	       (setq a0 (user::atan2 (aref m 2 0) (aref m 1 0)))
+	       (setq a2 (user::atan2 (- (aref m 0 2)) (aref m 0 1))))
+	      (:y ;; x-y-x
+	       (setq a0 (user::atan2 (- (aref m 1 0)) (aref m 2 0)))
+	       (setq a2 (user::atan2 (aref m 0 1) (aref m 0 2))))
+	      (t (error ""))))))
+	 (:y ;; x-z-y
+	  (unless (eq (elt axis-order 1) :z) (error ""))
+	  (setq a1 (- (asin (aref m 0 1))))
+	  (cond
+	   ((eps= (aref m 0 1)  1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 1 2) (aref m 1 0))))
+	   ((eps= (aref m 0 1) -1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 1 2) (aref m 2 2))))
+	   (t
+	    (setq a0 (user::atan2 (aref m 2 1) (aref m 1 1)))
+	    (setq a2 (user::atan2 (aref m 0 2) (aref m 0 0))))))
+	 (:z ;; x-y-z
+	  (unless (eq (elt axis-order 1) :y) (error ""))
+	  (setq a1 (asin (aref m 0 2)))
+	  (cond
+	   ((eps= (aref m 0 2)  1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 1 0) (aref m 1 1))))
+	   ((eps= (aref m 0 2) -1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 1 0) (aref m 2 0))))
+	   (t
+	    (setq a0 (user::atan2 (- (aref m 1 2)) (aref m 2 2)))
+	    (setq a2 (user::atan2 (- (aref m 0 1)) (aref m 0 0)))))
+	  )))
+      (:y
+       (case (elt axis-order 2)
+	 (:y
+	  (setq a1 (acos (aref m 1 1)))
+	  (cond
+	   ((eps= (aref m 1 1)  1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 0 2) (aref m 0 0))))
+	   ((eps= (aref m 1 1) -1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 2 0) (aref m 0 0))))
+	   (t
+	    (case (elt axis-order 1)
+	      (:x ;; y-x-y
+	       (setq a0 (user::atan2 (aref m 0 1) (aref m 2 1)))
+	       (setq a2 (user::atan2 (- (aref m 1 0)) (aref m 1 2))))
+	      (:z ;; y-z-y
+	       (setq a0 (user::atan2 (- (aref m 2 1)) (aref m 0 1)))
+	       (setq a2 (user::atan2 (aref m 1 2) (aref m 1 0))))
+	      (t (error ""))))))
+	 (:z ;; y-x-z
+	  (unless (eq (elt axis-order 1) :x) (error ""))
+	  (setq a1 (- (asin (aref m 1 2))))
+	  (cond
+	   ((eps= (aref m 1 2)  1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 0 1) (aref m 2 1))))
+	   ((eps= (aref m 1 2) -1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 2 0) (aref m 0 0))))
+	   (t
+	    (setq a0 (user::atan2 (aref m 0 2) (aref m 2 2)))
+	    (setq a2 (user::atan2 (aref m 1 0) (aref m 1 1))))))
+	 (:x ;; y-z-x
+	  (unless (eq (elt axis-order 1) :z) (error ""))
+	  (setq a1 (asin (aref m 1 0)))
+	  (cond
+	   ((eps= (aref m 1 0)  1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 0 2) (aref m 2 2))))
+	   ((eps= (aref m 1 0) -1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 2 1) (aref m 2 2))))
+	   (t
+	    (setq a0 (user::atan2 (- (aref m 2 0)) (aref m 0 0)))
+	    (setq a2 (user::atan2 (- (aref m 1 2)) (aref m 1 1)))))
+	  )))
+      (:z
+       (case (elt axis-order 2)
+	 (:z
+	  (setq a1 (acos (aref m 2 2)))
+	  (cond
+	   ((eps= (aref m 2 2)  1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 1 0) (aref m 0 0))))
+	   ((eps= (aref m 2 2) -1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 1 0) (aref m 1 1))))
+	   (t
+	    (case (elt axis-order 1)
+	      (:y ;; z-y-z
+	       (setq a0 (user::atan2 (aref m 1 2) (aref m 0 2)))
+	       (setq a2 (user::atan2 (- (aref m 2 1)) (aref m 2 0))))
+	      (:x ;; z-x-z
+	       (setq a0 (user::atan2 (- (aref m 0 2)) (aref m 1 2)))
+	       (setq a2 (user::atan2 (aref m 2 0) (aref m 2 1))))
+	      (t (error ""))))))
+	 (:x ;; z-y-x
+	  (unless (eq (elt axis-order 1) :y) (error ""))
+	  (setq a1 (- (asin (aref m 2 0))))
+	  (cond
+	   ((eps= (aref m 2 0)  1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 1 2) (aref m 0 2))))
+	   ((eps= (aref m 2 0) -1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 0 1) (aref m 0 2))))
+	   (t
+	    (setq a0 (user::atan2 (aref m 1 0) (aref m 0 0)))
+	    (setq a2 (user::atan2 (aref m 2 1) (aref m 2 2))))))
+	 (:y ;; z-x-y
+	  (unless (eq (elt axis-order 1) :x) (error ""))
+	  (setq a1 (asin (aref m 2 1)))
+	  (cond
+	   ((eps= (aref m 2 1)  1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 0 2) (aref m 0 0))))
+	   ((eps= (aref m 2 1) -1.0 eps)
+	    (setq a0 0 a2 (user::atan2 (aref m 0 2) (aref m 0 0))))
+	   (t
+	    (setq a0 (user::atan2 (- (aref m 0 1)) (aref m 1 1)))
+	    (setq a2 (user::atan2 (- (aref m 2 0)) (aref m 2 2)))))
+	  ))))
+    (list a0 a1 a2)))
 
 (provide :irtgeo "$Id$")
 
