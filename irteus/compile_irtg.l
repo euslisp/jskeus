@@ -35,6 +35,7 @@
 (comp:compile-file-if-src-newer "irtsensor.l" *objdir*)
 (comp:compile-file-if-src-newer "irtdyna.l" *objdir*)
 (comp:compile-file-if-src-newer "irtrobot.l" *objdir*)
+(comp:compile-file-if-src-newer "irtbvh.l" *objdir*)
 
 (exit 0)
 
