@@ -621,11 +621,11 @@
                  (/ (+ n0x (* pZMPz f0y)) f0z)
                  pZMPz))) ;; [m]
       (send self :put :zmp (scale 1e3 zmp))
-      (send self :put :zmp-moment ;; yaw moment
+      (send self :put :zmp-moment ;; yaw moment [Nm]
             (float-vector 0 0
                           (+ n0z
-                             (* (elt (send self :get :zmp) 0) f0y -1.0)
-                             (* (elt (send self :get :zmp) 1) f0x)))))
+                             (* (* 1e-3 (elt (send self :get :zmp) 0)) f0y -1.0)
+                             (* (* 1e-3 (elt (send self :get :zmp) 1)) f0x)))))
     (send self :get :zmp))
   )
 
