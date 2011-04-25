@@ -6,21 +6,19 @@ SVN_IRTEUSURL=https://jskeus.svn.sourceforge.net/svnroot/jskeus/trunk/irteus
 EUSC_PATCH=eus.c_CUSTUM_EUSDIR.patch
 
 MACHINE=$(shell uname -m)
-MACHINE=i386
 OS=$(shell uname -s)
 ifeq ($(OS),Linux)
  ifeq ($(MACHINE),x86_64)
-  ifeq ($(ARCHDIR),Linux)
-    export ARCHDIR=Linux
-    export MAKEFILE=Makefile.Linux.thread
-  else
-    export ARCHDIR=Linux64
-    export MAKEFILE=Makefile.Linux64
-  endif
+  export ARCHDIR=Linux64
+  export MAKEFILE=Makefile.Linux64
  else
   export ARCHDIR=Linux
   export MAKEFILE=Makefile.Linux.thread
  endif
+endif
+ifeq ($(OS),Linux32)
+ export ARCHDIR=Linux
+ export MAKEFILE=Makefile.Linux.thread
 endif
 ifeq ($(OS),CYGWIN_NT-6.1)
  export ARCHDIR=Cygwin
