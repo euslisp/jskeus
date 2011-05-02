@@ -1594,7 +1594,7 @@
 		  &key (stop 50)
 		  (link-list)
 		  (move-target)
-		  (debug-view) (warnp t)
+		  (debug-view) (warnp t) (revert-if-fail t)
                   (rotation-axis (cond
 				  ((atom move-target) t)
 				  (t (make-list (length move-target) :initial-element t))))
@@ -1697,7 +1697,7 @@
          ))
      (mapcar #'(lambda (l a) (send l :analysis-level a)) union-link-list old-analysis-level)
      ;; check solved or not
-     (if success
+     (if (or success (not revert-if-fail))
          (send self :angle-vector)
        (progn
 	 (when warnp
