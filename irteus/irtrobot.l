@@ -104,7 +104,6 @@
 		  (send self :collision-avoidance-link-pair-from-link-list link-list
 			:collision-avoidance-links (send self limb :collision-avoidance-links))
 		  :link-list link-list
-		  :move-arm limb ;; tell this was invoked by limb :angle-vector
 		  (cdr args))))
        (:move-end
 	(send* self limb :inverse-kinematics args))
