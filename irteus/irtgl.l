@@ -113,6 +113,43 @@
    (send self :glflush)
    (send-super :flush)
    )
+
+  ;;
+  (:write-to-image-file
+   (file &key (x 0) (y 0)
+	 (width x::width)
+	 (height x::height))
+   (let* ((glimg (send self :getglimage
+		       :x x :y y :width (1- width) :height height)))
+     (image::write-image-file file glimg)
+     ))
+  (:getglimage
+   (&key (x 0) (y 0)
+	 (width x::width)
+	 (height x::height)
+	 ((:imagebuf imgbuf) (make-string (* width height 3)))
+         (depthbuf))
+   (let ()
+     (send self :makecurrent)
+     (glReadBuffer GL_BACK)
+     (glPixelStorei GL_PACK_ALIGNMENT 1)
+     (glReadPixels x y width height GL_RGB GL_UNSIGNED_BYTE imgbuf)
+     #-:x86_64
+     (if depthbuf (glReadPixels x y width height GL_DEPTH_COMPONENT GL_FLOAT depthbuf))
+     #+:x86_64
+     (when depthbuf
+       (let ((fv (user::dvector2float-bytestring depthbuf)))
+	 (glReadPixels x y width height GL_DEPTH_COMPONENT GL_FLOAT fv)
+	 (user::float-bytestring2dvector fv depthbuf)))
+     ;; transpose
+     (let ((b (make-string (* width height 3))))
+       (dotimes (x width)
+	 (dotimes (y height)
+	   (dotimes (z 3)
+	     (setf (elt b (+ (* (- height y 1) width 3) (* x 3) z))
+		   (elt imgbuf (+ (* y width 3) (* x 3) z))))))
+       (instance image::color-image24 :init width height b))
+     ))
   )
 
 (defun draw-globjects (vwr draw-things &key (clear t) (flush t))
