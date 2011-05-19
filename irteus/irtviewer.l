@@ -158,6 +158,7 @@
    (&optional bbox)
    (cond ((derivedp bbox geo::bounding-box))
          ((null bbox)
+	  (send-all x::draw-things :worldcoords)
           (setq bbox (geo::make-bounding-box (flatten (send-all x::draw-things :vertices)))))
          (bbox
           (setq bbox (geo::make-bounding-box (flatten (send-all (x::draw-things bbox) :vertices))))))
