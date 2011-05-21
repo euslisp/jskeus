@@ -1,11 +1,11 @@
 (defclass sample-hand
   :super cascaded-link
-  :slots (thumb-end-coords middle-end-coords inedex-end-cords))
+  :slots (thumb-end-coords middle-end-coords index-end-coords
+                           j00 j01 j10 j11 j20 j21 j22))
 (defmethod sample-hand
   (:init
    (&rest args)
-   (let (b0 b00 b01 b10 b11 b20 b21
-	    j00 j01 j10 j11 j2 j22)
+   (let (b0 b00 b01 b10 b11 b20 b21 b22)
      (send-super* :init args)
      (setq b0 (make-cube 40 75 114))
      (setq b0 (instance bodyset-link :init (make-cascoords) 
@@ -116,4 +116,13 @@
   (:index-end-coords () index-end-coords)
   )
 
-
+;; user-defined joint
+(defmethod sample-hand
+  (:j00 (&rest args) (forward-message-to j00 args))
+  (:j01 (&rest args) (forward-message-to j01 args))
+  (:j10 (&rest args) (forward-message-to j10 args))
+  (:j11 (&rest args) (forward-message-to j11 args))
+  (:j10 (&rest args) (forward-message-to j20 args))
+  (:j11 (&rest args) (forward-message-to j21 args))
+  (:j11 (&rest args) (forward-message-to j22 args))
+  )
