@@ -1,7 +1,11 @@
 
 (defclass sample-robot
   :super robot-model
-  :slots ())
+  :slots (jc0 jc1 jh0 jh1
+              jal0 jal1 jal2 jal3 jal4 jal5 jal6
+              jar0 jar1 jar2 jar3 jar4 jar5 jar6
+              jll0 jll1 jll2 jll3 jll4 jll5
+              jlr0 jlr1 jlr2 jlr3 jlr4 jlr5))
 (defmethod sample-robot
   (:init 
    (&rest args)
@@ -9,12 +13,8 @@
 	   bar1 bar2 bar3 bar4 bar5 bar6 bar7
 	   bll1 bll2 bll3 bll4 bll5 bll6 bll6b
 	   blr1 blr2 blr3 blr4 blr5 blr6 blr6b
-	   jal0 jal1 jal2 jal3 jal4 jal5 jal6
-	   jar0 jar1 jar2 jar3 jar4 jar5 jar6
-	   jll0 jll1 jll2 jll3 jll4 jll5
-	   jlr0 jlr1 jlr2 jlr3 jlr4 jlr5
-	   bc0 bc1 bc2 jc0 jc1
-	   bh0 bh1 bh2 jh0 jh1
+	   bc0 bc1 bc2
+	   bh0 bh1 bh2
 	   bh2e
 	   )
      (send-super* :init args)
@@ -221,3 +221,36 @@
     (send self :angle-vector #f(0.0 0.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 0.0 0.0 -15.0 30.0 0.0 -15.0 0.0 0.0 -15.0 30.0 0.0 -15.0)))
   )
 
+;; user-defined joint
+(defmethod sample-robot
+  (:torso-waist-y (&rest args) (forward-message-to jc0 args))
+  (:torso-waist-p (&rest args) (forward-message-to jc1 args))
+  (:head-neck-y (&rest args) (forward-message-to jh0 args))
+  (:head-neck-p (&rest args) (forward-message-to jh1 args))
+  (:larm-shoulder-p (&rest args) (forward-message-to jal0 args))
+  (:larm-shoulder-r (&rest args) (forward-message-to jal1 args))
+  (:larm-shoulder-y (&rest args) (forward-message-to jal2 args))
+  (:larm-elbow-p (&rest args) (forward-message-to jal3 args))
+  (:larm-wrist-y (&rest args) (forward-message-to jal4 args))
+  (:larm-wrist-r (&rest args) (forward-message-to jal5 args))
+  (:larm-wrist-p (&rest args) (forward-message-to jal6 args))
+  (:rarm-shoulder-p (&rest args) (forward-message-to jar0 args))
+  (:rarm-shoulder-r (&rest args) (forward-message-to jar1 args))
+  (:rarm-shoulder-y (&rest args) (forward-message-to jar2 args))
+  (:rarm-elbow-p (&rest args) (forward-message-to jar3 args))
+  (:rarm-wrist-y (&rest args) (forward-message-to jar4 args))
+  (:rarm-wrist-r (&rest args) (forward-message-to jar5 args))
+  (:rarm-wrist-p (&rest args) (forward-message-to jar6 args))
+  (:lleg-crotch-y (&rest args) (forward-message-to jll0 args))
+  (:lleg-crotch-r (&rest args) (forward-message-to jll1 args))
+  (:lleg-crotch-p (&rest args) (forward-message-to jll2 args))
+  (:lleg-knee-p (&rest args) (forward-message-to jll3 args))
+  (:lleg-ankle-p (&rest args) (forward-message-to jll4 args))
+  (:lleg-ankle-r (&rest args) (forward-message-to jll5 args))
+  (:rleg-crotch-y (&rest args) (forward-message-to jlr0 args))
+  (:rleg-crotch-r (&rest args) (forward-message-to jlr1 args))
+  (:rleg-crotch-p (&rest args) (forward-message-to jlr2 args))
+  (:rleg-kneep-p (&rest args) (forward-message-to jlr3 args))
+  (:rleg-ankle-p (&rest args) (forward-message-to jlr4 args))
+  (:rleg-ankle-r (&rest args) (forward-message-to jlr5 args))
+  )
