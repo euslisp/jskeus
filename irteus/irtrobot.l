@@ -177,12 +177,7 @@
 	      (send-all (cdr (assoc (intern (string-upcase limb)) (send self :slots))) method)
 	    (cdr (assoc (intern (string-upcase limb)) (send self :slots)))))
 	 (t
-	  (setq ret (or (member (format nil "~A-~A" (string limb) (string method))
-				(send-all (cdr (assoc (intern (string-upcase limb))
-						      (send self :slots))) :joint)
-				:key #'(lambda (a) (symbol-name (send a :name)))
-				:test #'string=)
-			(list (send self (intern (format nil "~A-~A" (string-upcase limb) (string-upcase method)) *keyword-package*)))))
+	  (setq ret (list (send self (intern (format nil "~A-~A" (string-upcase limb) (string-upcase method)) *keyword-package*))))
 	  (if ret (user::forward-message-to (car ret) args)
 	    (progn (warn ";; error: cannot find method ~A~%" method)))
 	  )))
