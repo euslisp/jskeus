@@ -1,3 +1,4 @@
+#!/usr/bin/env irteusgl
 ;;(load "irteus/irtmodel.l")
 ;;(load "irteus/irtdyna.l")
 
