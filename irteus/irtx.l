@@ -58,17 +58,12 @@
   (if (probe-file "/usr/bin/cygX11-6.dll")
       (setq pname "/usr/bin/cygX11-6.dll")
     (setq pname "/usr/X11R6/bin/cygX11-6.dll"))
-#+(and :linux  (not :darwin))
-  (cond ((member :ia32 *features*)
-	 (setq pname "/usr/lib32/libX11.so"))
-	((probe-file "/usr/lib/libX11.so")
-	 (setq pname "/usr/lib/libX11.so"))
-	(t (setq pname "/usr/X11R6/lib/libX11.so")))
+
   ;; for receiving Window Manager Messages
-  (when (probe-file pname)
-    (setq x-lib (load-foreign pname))
-    (defforeign SetWMProtocols x-lib "XSetWMProtocols" () :integer))
-  )
+  (if (probe-file pname)
+      (setq x-lib (load-foreign pname))
+    (setq x-lib (sys::sysmod)))
+  (defforeign SetWMProtocols x-lib "XSetWMProtocols" () :integer))
 
 (unless (assoc :create-org (send Xwindow :methods))
   (rplaca (assoc :create (send Xwindow :methods)) :create-org))

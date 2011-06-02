@@ -36,15 +36,9 @@
       (setq gl-lib ( load-foreign "/usr/bin/cygGL-1.dll")))
      (t
       (setq gl-lib ( load-foreign "/usr/X11R6/bin/cygGL-1.dll")))))
-#+(and :linux  (not :darwin))
-  (progn
-    (setq gl-lib
-	  (cond ((member :ia32 *features*)
-		 (load-foreign "/usr/lib32/libGL.so"))
-                ((probe-file "/usr/lib/nvidia-current/libGL.so")
-                 (load-foreign "/usr/lib/nvidia-current/libGL.so"))
-                (t
-                 (load-foreign "/usr/lib/libGL.so")))))
+#+(and :linux (not :darwin))
+  (setq gl-lib (sys::sysmod))
+
   (defforeign glPolygonOffset gl-lib "glPolygonOffset" () :integer)
   (defconstant GL_POLYGON_OFFSET_UNITS		#x2a00)
   (defconstant GL_POLYGON_OFFSET_POINT		#x2a01)
