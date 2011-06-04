@@ -81,8 +81,10 @@
   (let (wmname xatom)
     (send* self :create-org args)
     (setq wmname "WM_DELETE_WINDOW")
-    (setq xatom (integer-vector (InternAtom *display* (+ 8 (sys:address wmname)) 1)))
-    (SetWMProtocols *display* drawable (+ 8 (sys:address xatom)) 1)
+    (setq xatom (integer-vector (InternAtom *display* (+ lisp::sizeof-header-offset
+                                                         (sys:address wmname)) 1)))
+    (SetWMProtocols *display* drawable (+ lisp::sizeof-header-offset
+                                          (sys:address xatom)) 1)
     self))
   (:event-notify
    (type event)
