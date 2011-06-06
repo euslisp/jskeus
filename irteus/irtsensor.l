@@ -146,23 +146,25 @@
 	(send self :rotate-vector
 		(float-vector (* (elt screen 0) u) (* (elt screen 1) v)
                               viewdistance)))))
+  (:draw-on
+   (&rest args &key ((:viewer vwer) user::*viewer*) &allow-other-keys)
+   (send* self :draw-sensor vwer args))
   (:draw-sensor
-   (vwer)
+   (vwer &key flush (width 1) (color (float-vector 1 1 1)))
    (let* ((yon (send self :yon)) (hither (send self :hither))
           (viewdistance (send self :viewdistance))
           (pwidth (send vwer :viewsurface :line-width))
           (pcolor (send vwer :viewsurface :color))
-          (color (float-vector 1 1 1))
           (vp (send self :viewpoint))
           (r (/ hither viewdistance))
           (rr (/ yon viewdistance))
           (screenx 1.0) (screeny 1.0))
-     (send vwer :viewsurface :line-width 1)
+     (send vwer :viewsurface :line-width width)
      (send vwer :viewsurface :color color)
      (gl::glDisable gl::GL_DEPTH_TEST)
      (send vwer :viewsurface :3d-line
            (send self :viewpoint)
-           (v+ (send self :viewpoint) (scale 200 (send self :view-direction))))
+           (v+ (send self :viewpoint) (scale -200 (send self :view-direction))))
      (dolist (s (list (cons screenx screeny)
                       (cons screenx (- screeny))
                       (cons (- screenx) screeny)
@@ -175,7 +177,8 @@
      (gl::glEnable gl::GL_DEPTH_TEST)
      (send vwer :viewsurface :line-width pwidth)
      (send vwer :viewsurface :color pcolor)
-     (gl::draw-glbody vwer self)))
+     (gl::draw-glbody vwer self)
+     (if flush (send vwer :viewsurface :flush))))
   (:draw-objects
    (vwr objs)
    (let* (pcurrent pcolor (draw-things (x::draw-things objs))
@@ -222,6 +225,28 @@
        )
      (send vwr :viewsurface :flush)))
   )
+
+;; utility functions
+(defun make-camera-from-param (&key pwidth pheight fx fy cx cy (tx 0) (ty 0) parent-coords)
+  (let* ((b (body+ (make-cube 40 30 30)
+                   (send (make-cylinder 2 30) :rotate pi/2 :x)
+                   (make-cylinder 13 25)))
+	 c (vd 1.0))
+    (setq c (instance camera-model :init b :width pwidth :height pheight
+                      :viewdistance vd))
+    (send (c . vwing) :screen (/ (* vd pwidth 0.5) fx) (/ (* vd pheight 0.5) fy))
+    (send c :newprojection
+          (make-matrix 4 4
+                       (list (float-vector fx  0 cx (* fx tx))
+                             (float-vector  0 fy cy (* fy ty))
+                             (float-vector  0  0  1  0)
+                             (float-vector  0  0  0  1))))
+    (send c :newcoords (send parent-coords :copy-worldcoords))
+    (send c :translate (float-vector (- tx) (- ty) 0))
+    (send (c . vwing) :translate (float-vector tx ty 0))
+    (send parent-coords :assoc c)
+    c))
+
 
 (in-package "GEOMETRY")
 
