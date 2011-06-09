@@ -517,6 +517,18 @@
   )
 
 (defmethod cascaded-link
+  (:max-torque-vector
+   ()
+   (let ((ret (instantiate float-vector (calc-target-joint-dimension joint-list)))
+         (i 0))
+     (dolist (j joint-list)
+       (dotimes (k (send j :joint-dof))
+         (setf (elt ret i)
+	       (case (send j :joint-dof)
+		 (1 (send j :max-joint-torque))
+		 (t (elt (send j :max-joint-torque) k))))
+         (incf i)))
+     ret))
   (:calc-torque
    (&key (dt 0.005) ;; dt [s]
          (debug-view nil)
