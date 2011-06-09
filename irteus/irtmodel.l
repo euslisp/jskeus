@@ -31,18 +31,20 @@
   :super propertied-object
   :slots (parent-link child-link joint-angle min-angle max-angle default-coords
 		      joint-velocity joint-acceleration joint-torque
-		      max-joint-velocity))
+		      max-joint-velocity max-joint-torque))
 
 (defmethod joint
   (:init (&key (name (intern (format nil "joint~A" (sys::address self)) "KEYWORD"))
                ((:child-link clink)) ((:parent-link plink))
 	       (min -90) (max 90)
 	       ((:max-joint-velocity mjv))
+               ((:max-joint-torque mjt))
 	       &allow-other-keys)
 	 (send self :name name)
 	 (setq parent-link plink child-link clink
 	       min-angle min max-angle max)
 	 (send self :max-joint-velocity mjv)
+	 (send self :max-joint-torque mjt)
 	 (setq default-coords (send child-link :copy-coords))
 	 self)
   (:min-angle (&optional v) (if v (setq min-angle v)) min-angle)
@@ -57,6 +59,7 @@
   (:joint-acceleration (&optional ja) (if ja (setq joint-acceleration ja) joint-acceleration))
   (:joint-torque (&optional jt) (if jt (setq joint-torque jt) joint-torque))
   (:max-joint-velocity (&optional mjv) (if mjv (setq max-joint-velocity mjv) max-joint-velocity))
+  (:max-joint-torque (&optional mjt) (if mjt (setq max-joint-torque mjt) max-joint-torque))
   )
 
 (defun calc-jacobian-default-rotate-vector
@@ -123,10 +126,14 @@
   (:init (&rest args
           &key ((:axis ax) :z)
                ((:max-joint-velocity mjv) (/ pi 4)) ;; [rad/s]
+               ((:max-joint-torque mjt) 100) ;; [Nm]
           &allow-other-keys)
 	 (setq axis ax)
 	 (setq joint-angle 0.0)
-	 (send-super* :init :max-joint-velocity mjv args)
+	 (send-super* :init
+                      :max-joint-velocity mjv
+                      :max-joint-torque mjt
+                      args)
 	 ;; set default value
 	 (if (null min-angle) (setq min-angle -90.0))
 	 (if (null max-angle) (setq max-angle (+ 180.0 min-angle)))
@@ -166,7 +173,8 @@
 (defmethod linear-joint
   (:init (&rest args
           &key ((:axis ax) :z)
-               ((:max-joint-velocity mjv) (/ pi 4)) ;; [m/s]
+          ((:max-joint-velocity mjv) (/ pi 4)) ;; [m/s]
+          ((:max-joint-torque mjt) 100) ;; [N]
           &allow-other-keys)
 	 (setq axis 
 	   (if (float-vector-p ax) 
@@ -175,7 +183,10 @@
 		   (:y (float-vector 0 1 0)) (:-y (float-vector 0 -1 0))
 		   (:z (float-vector 0 0 1)) (:-z (float-vector 0 0 -1)))))
 	 (setq joint-angle 0.0)
-	 (send-super* :init :max-joint-velocity mjv args)
+	 (send-super* :init
+                      :max-joint-velocity mjv
+                      :max-joint-torque mjt
+                      args)
 	 ;; set default value
 	 (if (null min-angle) (setq min-angle -90.0))
 	 (if (null max-angle) (setq max-angle  90.0))
@@ -214,10 +225,15 @@
 		((:max-joint-velocity mjv)
 		 (float-vector (/ 0.08 0.05) ;; [m/s]
 			       (/ pi 4))) ;; [rad/s]
+                ((:max-joint-torque mjt)
+		 (float-vector 100 100)) ;; [N] [Nm]
                 &allow-other-keys)
 	 (setq joint-angle (float-vector 0 0))
          (setq axis (list #f(1 0 0) :z))
-	 (send-super* :init :min min :max max :max-joint-velocity mjv args)
+	 (send-super* :init :min min :max max
+                      :max-joint-velocity mjv
+                      :max-joint-torque mjt
+                      args)
 	 ;; set default value
 	 self)
   (:joint-angle
@@ -265,10 +281,15 @@
 		((:max-joint-velocity mjv)
 		 (float-vector (/ 0.08 0.05) (/ 0.08 0.05) ;; [m/s]
 			       (/ pi 4))) ;; [rad/s]
+                ((:max-joint-torque mjt)
+		 (float-vector 100 100 100)) ;; [N] [N] [Nm]
                 &allow-other-keys)
        (setq joint-angle (float-vector 0 0 0))
        (setq axis (list #f(1 0 0) #f(0 1 0) :z))
-       (send-super* :init :min min :max max :max-joint-velocity mjv args)
+       (send-super* :init :min min :max max
+                    :max-joint-velocity mjv
+                    :max-joint-torque mjt
+                    args)
        ;; set default value
        self)
   (:joint-angle
@@ -318,9 +339,14 @@
 		(max (float-vector *inf* *inf* *inf*))
 		((:max-joint-velocity mjv)
 		 (float-vector (/ pi 4) (/ pi 4) (/ pi 4))) ;; [rad/s]
+                ((:max-joint-torque mjt)
+                 (float-vector 100 100 100)) ;; [Nm] [Nm] [Nm]
 		&allow-other-keys)
     (setq axis (list :x :y :z))
-    (send-super* :init :min min :max max :max-joint-velocity mjv args)
+    (send-super* :init :min min :max max
+                 :max-joint-velocity mjv
+                 :max-joint-torque mjt
+                 args)
     ;; joint-angle is defined as anguler velocity equivalent to orthogonal orientation matrix
     (setq joint-angle (float-vector 0 0 0)) ;; [deg]
     self)
@@ -436,9 +462,14 @@
 		((:max-joint-velocity mjv)
 		 (float-vector (/ 0.08 0.05) (/ 0.08 0.05) (/ 0.08 0.05) ;; [m/s]
 			       (/ pi 4) (/ pi 4) (/ pi 4))) ;; [rad/s]
+                ((:max-joint-mjt mjt)
+		 (float-vector 100 100 100 100 100 100)) ;; [N] [N] [N] [Nm] [Nm] [Nm]
                 &allow-other-keys)
     (setq axis (list #f(1 0 0) #f(0 1 0) #f(0 0 1) :x :y :z))
-    (send-super* :init :min min :max max :max-joint-velocity mjv args)
+    (send-super* :init :min min :max max
+                 :max-joint-velocity mjv
+                 :max-joint-torque mjt
+                 args)
     (setq joint-angle (float-vector 0 0 0 0 0 0)) ;; [mm] [deg]
     self)
   (:joint-angle
