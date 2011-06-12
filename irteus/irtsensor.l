@@ -241,10 +241,10 @@
                              (float-vector  0 fy cy (* fy ty))
                              (float-vector  0  0  1  0)
                              (float-vector  0  0  0  1))))
-    (send c :newcoords (send parent-coords :copy-worldcoords))
+    (if parent-coords (send c :newcoords (send parent-coords :copy-worldcoords)))
     (send c :translate (float-vector (- tx) (- ty) 0))
     (send (c . vwing) :translate (float-vector tx ty 0))
-    (send parent-coords :assoc c)
+    (if parent-coords (send parent-coords :assoc c))
     c))
 
 
