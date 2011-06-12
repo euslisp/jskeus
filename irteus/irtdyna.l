@@ -639,6 +639,16 @@
                              (* (* 1e-3 (elt (send self :get :zmp) 0)) f0y -1.0)
                              (* (* 1e-3 (elt (send self :get :zmp) 1)) f0x)))))
     (send self :get :zmp))
+
+  ;; method to calculate fullbody mass properties
+  (:weight ;; total weight
+   (&optional (update-mass-properties t))
+   (if update-mass-properties (send self :calc-inertia-matrix-from-link-list))
+   (send (car (send self :links)) :get :m-til))
+  (:centroid ;; total centroid
+   (&optional (update-mass-properties t))
+   (if update-mass-properties (send self :calc-inertia-matrix-from-link-list))
+   (send (car (send self :links)) :get :c-til))
   )
 
 (in-package "GEOMETRY")
