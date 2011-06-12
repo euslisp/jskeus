@@ -217,6 +217,51 @@
      (if (and debug-view look-at-target)
          (send self :head :look-at (send (car target-coords) :worldpos)))
      ret))
+  (:torque-vector
+   (&key (force-list) (moment-list) (target-coords)
+         (dt 0.005) ;; dt [s]
+         (debug-view nil)
+	 (jvv (instantiate float-vector (calc-target-joint-dimension joint-list))) ;; [rad/s] or [m/s]
+	 (jav (instantiate float-vector (calc-target-joint-dimension joint-list)))) ;; [rad/s^2] or [m/s^2]
+   ;; set default external force and moment at the end-effectors
+   (if (every #'null (send self :legs)) ;; for not legged robot
+       (let ((fv (float-vector 0 0 (* (send self :weight) 0.0098)))) ;; for non-legged robot
+         (send (car (send self :links)) :ext-force fv)
+         (let* ((c (send (car (send self :links)) :centroid))
+                (moment-offset (v* (scale 1e-3 (send (car (send self :links)) :worldpos)) fv)))
+           (send (car (send self :links)) :ext-moment moment-offset)
+           ))
+     (progn ;; for legged robot
+       (unless target-coords
+         (dolist (limb '(:rleg :lleg))
+           (push (send self limb :end-coords) target-coords)))
+       (unless force-list ;; force [N]
+         (dolist (limb '(:rleg :lleg))
+           (push (float-vector 0.0 0.0 (case limb
+                                         ((:rleg :lleg) (* (send self :weight) 0.0098 0.5))
+                                         (t 0.0))) force-list)))
+       (unless moment-list ;; moment [Nm]
+         (dolist (limb '(:rleg :lleg))
+           (push (float-vector 0.0 0.0 0.0) moment-list)))
+       (unless (= (length force-list) (length moment-list)
+                  (length target-coords))
+         (warn ";; ERROR : list length differ : force-list ~A moment-list ~A target-coords ~A~%"
+               (length force-list) (length moment-list) (length target-coords))
+         (return-from :torque-vector jvv))
+       (mapcar #'(lambda (fv mv tc)
+                   (send (send tc :parent) :ext-force fv)
+                   ;; calc moment-offset caused by fv ;
+                   ;; current irtdyna.l's requires moment around the origin
+                   (let* ((c (send (send tc :parent) :centroid))
+                          (moment-offset (v* (scale 1e-3 (send tc :worldpos)) fv)))
+                     (send (send tc :parent) :ext-moment (v+ mv moment-offset))))
+               force-list moment-list target-coords)
+       )
+     )
+   (send-super :calc-torque :dt dt
+               :debug-view debug-view
+               :jvv jvv :jav jav)
+   )
   )
 
 (in-package "GEOMETRY")
