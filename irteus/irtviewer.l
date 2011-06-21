@@ -163,16 +163,20 @@
          (bbox
           (setq bbox (geo::make-bounding-box (flatten (send-all (x::draw-things bbox) :vertices))))))
    (when bbox
-     (let (vt vp)
+     (let (vt vp sc)
        (setq vt (send bbox :center))
+       (setq sc (/ (apply #'max (coerce (send bbox :diagonal) cons))
+		   (* 0.5 (tan (send self :viewer :viewing :view-angle)))))
+       (when (or (> (/ sc gl::*perspective-far*) 10)
+		 (< (/ sc gl::*perspective-far*) 0.1))
+	 (warning-message 2 "Detect very large/small objects, change perspective~%")
+	 (setq gl::*perspective-near* (* (/ sc gl::*perspective-far*) gl::*perspective-near*)
+	       gl::*perspective-far*  (* (/ sc gl::*perspective-far*) gl::*perspective-far*)))
        (setq vp
 	 (scale
           (min
            (* gl::*perspective-far* 0.8)
-           (max
-            (* gl::*perspective-near* 1.5)
-            (/ (apply #'max (coerce (send bbox :diagonal) cons))
-               (* 0.5 (tan (send self :viewer :viewing :view-angle))))))
+           (max (* gl::*perspective-near* 1.5) sc))
           (normalize-vector (v- viewpoint viewtarget))))
        (send self :viewtarget vt)
        (send self :viewpoint (v+ vt vp))
