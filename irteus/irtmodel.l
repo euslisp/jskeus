@@ -1356,8 +1356,8 @@
 			 :collision-avoidance-link-pair pair-list args))
        (setq min-distance (car (elt (send self :get :collision-distance) 0)))
        (setq angle-speed-collision-blending
-	     (cond ((<= avoid-collision-joint-gain 0.0)
-		    (< min-distance (* 0.1 avoid-collision-distance))
+	     (cond ((<= avoid-collision-joint-gain 0.0) 0.0)
+		   ((< min-distance (* 0.1 avoid-collision-distance))
 		    1.0)
 		   ((< min-distance avoid-collision-distance)
 		    (/ (- avoid-collision-distance min-distance) 
