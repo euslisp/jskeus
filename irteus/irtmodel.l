@@ -1104,14 +1104,17 @@
        (warn ";; ERROR : I-J#J is required in :collision-avoidance~%")
        (return-from :collision-avoidance dav-col))
 
-     (let ((dav-col-null (transform I-J#J dav-col)))
+     (let ((distance-gain
+	    (- (/ avoid-collision-distance min-distance) 1)))
+       (dotimes (i fik-len) (setf (elt dav-col i) (* (elt dav-col i) (elt weight i))))
+       (send self :put :collision-avoidance-null-vector
+	     (scale (* distance-gain avoid-collision-null-gain) dav-col))
+       (send self :put :collision-avoidance-joint-vector
+	     (scale (* distance-gain avoid-collision-joint-gain) dav-col))
        (when (and debug-view (not (memq :no-message debug-view)))
-         (format-array (scale avoid-collision-joint-gain (map float-vector #'rad2deg dav-col)) "coljnt:")
-         (format-array (scale avoid-collision-null-gain (map float-vector #'rad2deg dav-col-null)) "colnul:"))
-       (dotimes (i fik-len) (setf (elt dav-col i)
-                                  (+ (* avoid-collision-joint-gain (elt dav-col i) (elt weight i))
-                                     (* avoid-collision-null-gain (elt dav-col-null i) (elt weight i))))))
-     (scale (- (* avoid-collision-distance (/ 1.0 min-distance)) 1) dav-col)))
+         (format-array (map float-vector #'rad2deg (send self :get :collision-avoidance-joint-vector)) "coljnt:")
+         (format-array (map float-vector #'rad2deg (send self :get :collision-avoidance-null-vector)) "colnul:")))
+     (send self :get :collision-avoidance-joint-vector)))
   (:move-joints
    (union-vel &rest args
     &key
@@ -1338,6 +1341,8 @@
      ;; Collision Avoidance with Whole Body Motion Control for Humanoid
      ;; Robots", In IROS 2007, 2053--2058
      ;;     
+     (send self :put :collision-avoidance-null-vector nil)
+     (send self :put :collision-avoidance-joint-vector nil)
      (when (and pair-list (> avoid-collision-distance 0.0)
 		(or (> avoid-collision-joint-gain 0.0)
 		    (> avoid-collision-null-gain 0.0)))
@@ -1351,7 +1356,8 @@
 			 :collision-avoidance-link-pair pair-list args))
        (setq min-distance (car (elt (send self :get :collision-distance) 0)))
        (setq angle-speed-collision-blending
-	     (cond ((< min-distance (* 0.1 avoid-collision-distance))
+	     (cond ((<= avoid-collision-joint-gain 0.0)
+		    (< min-distance (* 0.1 avoid-collision-distance))
 		    1.0)
 		   ((< min-distance avoid-collision-distance)
 		    (/ (- avoid-collision-distance min-distance) 
@@ -1366,6 +1372,8 @@
                  link-list :union-link-list union-link-list
                  :avoid-nspace-gain avoid-nspace-gain :debug-view debug-view
                  :weight weight :fik-len fik-len :null-space null-space :tmp-nspace tmp-nspace))
+     (if (send self :get :collision-avoidance-null-vector)
+	 (v+ tmp-nspace (send self :get :collision-avoidance-null-vector) tmp-nspace))
      ;;
      ;; q = f(d) qca + {1 - f(d)} qwbm
      ;;
