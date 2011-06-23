@@ -110,6 +110,7 @@
        (:move-end-rot
 	(let ((coords (send self limb :end-coords :copy-worldcoords))
 	      (angle (pop args)) (axis (pop args)) (wrt (pop args)))
+	  (unless wrt (setq wrt :local))
 	  (send* self limb :move-end
 		 (send coords :rotate (deg2rad angle) axis wrt) args)))
        (:move-end-pos
