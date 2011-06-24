@@ -175,6 +175,7 @@
   )
 
 (defmethod bodyset-link
+  ;; user shuold not call :append-weight-no-update, :append-centroid-no-update, and :append-inertia-no-update directly because these methods are for :append-mass-properties
   (:append-weight-no-update
    (additional-weights
     &key (len (length additional-weights)))
@@ -185,49 +186,58 @@
   (:append-centroid-no-update
    (additional-weights
     additional-centroids
-    new-weight
+    self-centroid new-weight
     &key (tmp-va (float-vector 0 0 0))
+         (tmp-vb (float-vector 0 0 0))
          (len (length additional-weights)))
    (scale
     (/ 1.0 new-weight)
-    (let ((ret (scale (send self :weight) (send self :centroid))))
+    (let ((ret (scale (send self :weight) self-centroid tmp-vb)))
       (dotimes (i len)
 	(v+ ret (scale (elt additional-weights i) (elt additional-centroids i) tmp-va) ret))
-      ret)))
+      ret)
+    tmp-vb))
   (:append-inertia-no-update
    (additional-weights
     additional-centroids
     additional-inertias
-    new-centroid
+    self-centroid new-centroid
     &key (tmp-ma (make-matrix 3 3))
          (tmp-mb (make-matrix 3 3))
          (tmp-mc (make-matrix 3 3))
+	 (tmp-md (make-matrix 3 3))
+	 (tmp-va (float-vector 0 0 0))
          (len (length additional-weights)))
    (labels
        ((DD (r)
 	    (let ((r2 (outer-product-matrix r tmp-ma)))
 	      (m* (transpose r2 tmp-mb) r2 tmp-mc))))
      (let ((ret (m* (m* (send self :worldrot) (send self :inertia-tensor) tmp-ma)
-		    (transpose (send self :worldrot) tmp-mb))))
-       (m+ ret
-	   (scale-matrix
+		    (transpose (send self :worldrot) tmp-mb)
+		    tmp-md)))
+       (m+ (scale-matrix
 	    (send self :weight)
-	    (DD (v- (send self :centroid) new-centroid)) tmp-ma)
-	   ret)
+	    (DD (v- self-centroid new-centroid tmp-va)) tmp-ma)
+	   ret ret)
        (dotimes (i len)
 	 (m+ (elt additional-inertias i) ret ret)
 	 (m+ (scale-matrix (elt additional-weights i)
-			   (DD (v- (elt additional-centroids i) new-centroid))
+			   (DD (v- (elt additional-centroids i) new-centroid tmp-va))
 			   tmp-ma)
 	     ret ret))
        ret)))
+  ;; append mass properties of additional-links to self link
   (:append-mass-properties
    (additional-links
-    &key (update t)
+    &key (update t) ;; if update is nil, mass properties of self link is not updated.
+         ;; buffers
          (tmp-va (float-vector 0 0 0))
+         (tmp-vb (float-vector 0 0 0))
          (tmp-ma (make-matrix 3 3))
          (tmp-mb (make-matrix 3 3))
          (tmp-mc (make-matrix 3 3))
+	 (tmp-md (make-matrix 3 3))
+	 ;;   centroid and inertia-tensor : world
          (additional-weights
 	  (send-all additional-links :weight))
 	 (additional-centroids
@@ -236,18 +246,21 @@
 	  (mapcar #'(lambda (x)
 		      (m* (m* (send x :worldrot) (send x :inertia-tensor) tmp-ma)
 			  (transpose (send x :worldrot) tmp-mb)))
-		  additional-links)))
+		  additional-links))
+	 (self-centroid (send self :centroid)))
    (let* ((len (length additional-links))
 	  (new-weight
 	   (send self :append-weight-no-update additional-weights :len len))
-	  (new-centroid
+	  (new-centroid ;; <- tmp-vb's buffer
 	   (send self :append-centroid-no-update additional-weights additional-centroids
-		 new-weight :tmp-va tmp-va :len len))
-	  (new-inertia
+		 self-centroid new-weight :tmp-va tmp-va :tmp-vb tmp-vb :len len))
+	  (new-inertia ;; <- tmp-md's buffer
 	   (send self :append-inertia-no-update
 		 additional-weights additional-centroids
-		 additional-inertias new-centroid
-		 :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc :len len)))
+		 additional-inertias self-centroid new-centroid
+		 :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc :tmp-md tmp-md :tmp-va tmp-va :len len)))
+     ;; update mass properties of self links
+     ;;   centroid and inertia-tensor : world -> local
      (when update
        (send self :weight new-weight)
        (setq acentroid (send self :inverse-transform-vector new-centroid acentroid tmp-va tmp-ma))
@@ -255,8 +268,7 @@
 	     (m* (m* (transpose (send self :worldrot) tmp-ma) new-inertia tmp-mb)
 		 (send self :worldrot)
 		 (send self :inertia-tensor))))
-     (list new-weight new-centroid new-inertia)
-     ))
+     (list new-weight new-centroid new-inertia)))
   ;; propagate mass properties
   ;;   unit system ;; [g] [mm]
   ;;   m-til -> the mass of all link structure driven by joint of this bodyset-link.
@@ -270,35 +282,30 @@
 	  (tmp-mb (make-matrix 3 3))
 	  (tmp-mc (make-matrix 3 3))
     &allow-other-keys)
-    (let ((cen (send self :centroid)) ;; [mm]
-	  (wei (send self :weight)) ;; [g]
-	  (iner (m* (m* (send self :worldrot) (send self :inertia-tensor) tmp-ma)
-		    (transpose (send self :worldrot) tmp-mb)
-		    (send self :get :I-til)))) ;; [g mm^2]
-      (if child-links
-	  (progn
-	    ;; propagation of m-til and c-til from children
-	    (dolist (child child-links)
-	      (send child :propagate-mass-properties :debug-view debug-view
-		    :tmp-va tmp-va :tmp-vb tmp-vb
-		    :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc))
-	    (let ((ret
-		   (send self :append-mass-properties
-			 child-links
-			 :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc
-			 :tmp-va tmp-va
-			 :additional-weights (send-all child-links :get :m-til)
-			 :additional-centroids (send-all child-links :get :c-til)
-			 :additional-inertias (send-all child-links :get :i-til)
-			 :update nil)))
-	      (send self :put :m-til (car ret))
-	      (send self :put :c-til (cadr ret))
-	      (send self :put :i-til (caddr ret))
-	      ))
-	(progn ;; if end-link
-	  (dotimes (i 3) (setf (elt (send self :get :c-til) i) (elt cen i)))
-	  (send self :put :m-til wei)
+    ;; weight [g], centroid [mm], inertia [g mm^2]
+    (if child-links
+	(progn
+	  ;; propagation of m-til and c-til from children
+	  (dolist (child child-links)
+	    (send child :propagate-mass-properties :debug-view debug-view
+		  :tmp-va tmp-va :tmp-vb tmp-vb
+		  :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc))
+	  ;; update m-til, c-til, and i-til
+	  ;;  c-til and i-til are arleady copied by using tmp-vb and tmp-md buffer
+	  (send self :put :m-til
+		(car (send self :append-mass-properties
+			   child-links
+			   :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc :tmp-md (send self :get :i-til)
+			   :tmp-va tmp-va :tmp-vb (send self :get :c-til)
+			   :additional-weights (send-all child-links :get :m-til)
+			   :additional-centroids (send-all child-links :get :c-til)
+			   :additional-inertias (send-all child-links :get :i-til)
+			   :self-centroid (send self :centroid) :update nil)))
 	  )
+      ;; if end-link
+      (let ((cen (send self :centroid)))
+	(dotimes (i 3) (setf (elt (send self :get :c-til) i) (elt cen i)))
+	(send self :put :m-til (send self :weight))
 	))
     (if debug-view
 	(warn ";; joint = ~A ;; m-til = ~A[g], c-til = ~A[mm]~%"
