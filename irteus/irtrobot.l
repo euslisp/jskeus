@@ -285,7 +285,7 @@
 		   (v* (float-vector 0 0 (if (> rtorque 0.0) 1.0 -1.0)) paxis))))
 	       (default-width width) (default-color color))
 	  (when (and torque-threshold (> (abs rtorque) torque-threshold))
-	    (setq width (* 2 width) color warnig-color))
+	    (setq width (* 2 width) color warning-color))
 	  (send vwer :viewsurface :line-width width)
 	  (send vwer :viewsurface :color color)
 	  (send vwer :draw-circle
