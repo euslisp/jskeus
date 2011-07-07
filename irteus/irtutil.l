@@ -161,7 +161,7 @@
 	   nil))
     ))
 
-(defun format-array (arr &optional (header "") (in 7) (fl 3) (strm *error-output*))
+(defun format-array (arr &optional (header "") (in 7) (fl 3) (strm *error-output*) (use-line-break t))
   "arr &optional (header \"\") (in 7) (fl 3) (strm *error-output*);; for format-print array"
   (let* ((val-format (case (send arr :element-type)
                            (:integer (format nil "~~~dd " in))
@@ -172,13 +172,13 @@
      ((derivedp arr vector)
       (dotimes (i (length arr))
         (push (format nil val-format (elt arr i)) str-l))
-      (push "~%" str-l))
+      (if use-line-break (push "~%" str-l)))
      ((derivedp arr array)
       (dotimes (j (car (array-dimensions arr)))
         (if (/= j 0) (push (format nil str-format " ") str-l))
         (dotimes (i (cadr (array-dimensions arr)))
           (push (format nil val-format (aref arr j i)) str-l))
-        (push "~%" str-l))))
+        (if use-line-break (push "~%" str-l)))))
     (let ((ret (format strm (apply #'concatenate string (nreverse str-l)))))
       (if strm arr ret))))
 
