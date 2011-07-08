@@ -125,7 +125,7 @@
 (defmethod rotational-joint
   (:init (&rest args
           &key ((:axis ax) :z)
-               ((:max-joint-velocity mjv) (/ pi 4)) ;; [rad/s]
+               ((:max-joint-velocity mjv) 5) ;; [rad/s]
                ((:max-joint-torque mjt) 100) ;; [Nm]
           &allow-other-keys)
 	 (setq axis ax)
