@@ -948,7 +948,7 @@
     (format nil "~A.~A" (pathname-name p) (pathname-type p))))
 
 (defun convert-irtmodel-to-collada
-  (model-file &optional (output-full-dir (send (truename "./") :namestring)) (model-name))
+  (model-file &optional (output-full-dir (send (truename "./") :namestring)) (model-name) (exit-p t))
   "convert irtmodel to collada model. (convert-irtmodel-to-collada irtmodel-file-path &optional (output-full-dir (send (truename \"./\") :namestring)) (model-name))"
   (format t "convert ~A and output to ~A~%" model-file output-full-dir)
 
@@ -960,7 +960,7 @@
     (let ((model (instance (eval (intern model-class-name)) :init)))
       (if model-name (send model :name model-name))
       (eus2collada model output-full-dir)))
-  (exit))
+  (if exit-p (exit)))
 
 (in-package "GEOMETRY")
 ;;(import '(collada::convert-irtmodel-to-collada))
