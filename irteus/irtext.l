@@ -29,11 +29,12 @@
 	   *eusdir* (unix:getenv "ARCHDIR"))
    '("irtmath" "irtutil" "irtc" "pgsql")))
 (defun load-irteusg ()
+  (unless (find-package "COLLADA") (make-package "COLLADA"))
   (in-package "GEOMETRY")
   (load-library
    (format nil "~A~A/lib/libirteusg"
 	   *eusdir* (unix:getenv "ARCHDIR"))
-   '("irtgeo" "euspqp" "pqp" "irtscene" "irtmodel" "irtdyna" "irtrobot" "irtsensor" "irtbvh")))
+   '("irtgeo" "euspqp" "pqp" "irtscene" "irtmodel" "irtdyna" "irtrobot" "irtsensor" "irtbvh" "irtcollada")))
 (defun load-irteusx ()
   (in-package "X")
   (load-library
