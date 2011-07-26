@@ -948,8 +948,8 @@
     (format nil "~A.~A" (pathname-name p) (pathname-type p))))
 
 (defun convert-irtmodel-to-collada
-  (model-file &optional (output-full-dir "package://euscollada") (model-name))
-  "convert irtmodel to collada model. (convert-irtmodel-to-collada irtmodel-file-path &optional (output-full-dir \"package://euscollada\") (model-name))"
+  (model-file &optional (output-full-dir (send (truename "./") :namestring)) (model-name))
+  "convert irtmodel to collada model. (convert-irtmodel-to-collada irtmodel-file-path &optional (output-full-dir (send (truename \"./\") :namestring)) (model-name))"
   (format t "convert ~A and output to ~A~%" model-file output-full-dir)
 
   (format t "loading ~A~%" model-file)
