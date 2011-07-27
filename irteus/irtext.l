@@ -22,6 +22,7 @@
 ;;; above copyright notice remains intact.  
 ;;;
 
+(unless (find-package "COLLADA") (make-package "COLLADA")) ;; define collad package to import collada function
 (defun load-irteus ()
   (in-package "USER")
   (load-library
@@ -29,12 +30,13 @@
 	   *eusdir* (unix:getenv "ARCHDIR"))
    '("irtmath" "irtutil" "irtc" "pgsql")))
 (defun load-irteusg ()
-  (unless (find-package "COLLADA") (make-package "COLLADA"))
   (in-package "GEOMETRY")
   (load-library
    (format nil "~A~A/lib/libirteusg"
 	   *eusdir* (unix:getenv "ARCHDIR"))
-   '("irtgeo" "euspqp" "pqp" "irtscene" "irtmodel" "irtdyna" "irtrobot" "irtsensor" "irtbvh" "irtcollada")))
+   '("irtgeo" "euspqp" "pqp" "irtscene" "irtmodel" "irtdyna" "irtrobot" "irtsensor" "irtbvh" "irtcollada"))
+  (in-package "USER")
+  (import '(collada::convert-irtmodel-to-collada)))
 (defun load-irteusx ()
   (in-package "X")
   (load-library
