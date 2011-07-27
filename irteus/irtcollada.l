@@ -287,9 +287,7 @@
 
 (defun setup-collada-filesystem (obj-name base-dir)
   (if (not (eq (probe-file base-dir) :directory))
-      (error "~A must be a directory" base-dir)
-    (progn
-      (unix::mkdir (format nil "~A/collada" base-dir)))))
+      (error "~A must be a directory" base-dir)))
 
 (defun range2 (n)
   (if (= n 0)
@@ -306,8 +304,8 @@
     (let ((descrpition (eusmodel-description obj)))
       (let ((sxml (eusmodel-description->collada
                    name descrpition :scale scale)))
-        (setup-collada-filesystem name full-root-dir) ;mkdir for collada
-        (let ((xml-file (format nil "~Acollada/~A.dae" full-root-dir name))
+        (setup-collada-filesystem name full-root-dir) ;only check directory existence
+        (let ((xml-file (format nil "~A/~A.dae" full-root-dir name))
               (xml (sxml->xml sxml)))
           (with-open-file (f xml-file :direction :output)
             (format f "<?xml version=\"1.0\"?>~%")
