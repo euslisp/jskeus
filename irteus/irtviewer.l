@@ -318,7 +318,7 @@
 (defun objects (&optional (objs t) vw)
   (when (or (null x::*display*) (= x::*display* 0))
     (if (not (eq objs t))
-	(setq *irtviewer-objects* nil))
+	(setq *irtviewer-objects* objs))
     (warning-message 1 ";; (objects ~A) was called, but no display is found.~%" (if (eq objs t) "" objs))
     (return-from objects *irtviewer-objects*))
   (when
