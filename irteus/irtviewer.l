@@ -314,13 +314,13 @@
 
 (in-package "USER")
 
-(setq *irtiewer-objects* nil)
+(setq *irtviewer-objects* nil)
 (defun objects (&optional (objs t) vw)
   (when (or (null x::*display*) (= x::*display* 0))
     (if (not (eq objs t))
-	(setq *irtiewer-objects* nil))
+	(setq *irtviewer-objects* nil))
     (warning-message 1 ";; (objects ~A) was called, but no display is found.~%" (if (eq objs t) "" objs))
-    (return-from objects *irtiewer-objects*))
+    (return-from objects *irtviewer-objects*))
   (when
       (and objs (not (boundp '*irtviewer*)) (null vw))
     (warn ";; (make-irtviewer) executed~%")
