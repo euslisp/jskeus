@@ -314,7 +314,13 @@
 
 (in-package "USER")
 
+(setq *irtiewer-objects* nil)
 (defun objects (&optional (objs t) vw)
+  (when (or (null x::*display*) (= x::*display* 0))
+    (if (not (eq objs t))
+	(setq *irtiewer-objects* nil))
+    (warning-message 1 ";; (objects ~A) was called, but no display is found.~%" (if (eq objs t) "" objs))
+    (return-from objects *irtiewer-objects*))
   (when
       (and objs (not (boundp '*irtviewer*)) (null vw))
     (warn ";; (make-irtviewer) executed~%")
@@ -330,6 +336,9 @@
 ;;
 (proclaim '(special *irtviewer*))
 (defun make-irtviewer (&rest args)
+  (when (or (null x::*display*) (= x::*display* 0))
+    (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")
+    (return-from make-irtviewer nil))
   (setq *irtviewer* (send-lexpr (instantiate x::irtviewer) :create args)))
 
 (in-package "GL")
