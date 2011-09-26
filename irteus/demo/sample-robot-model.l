@@ -196,10 +196,6 @@
 	   rleg (list blr1 blr2 blr3 blr4 blr5 blr6)
 	   head (list bh0 bh1)
 	   torso (list bc1 bc2))
-     (dolist (l (append (list bc0) torso))
-       (send l :weight 100.0))
-     (dolist (l (append larm rarm lleg rleg head))
-       (send l :weight 7.0))
 
      (setq links (list bc0 bc1 bc2 bh0 bh1
 		       bal1 bal2 bal3 bal4 bal5 bal6 bal7
@@ -214,6 +210,21 @@
 			    jlr0 jlr1 jlr2 jlr3 jlr4 jlr5
 			    ))
      (setq collision-avoidance-links (list bc0 bc2 bal4 bar4))
+     ;; set mass properties
+     (dolist (l (append (list bc0) torso))
+       (send l :weight 100.0))
+     (dolist (l (append larm rarm lleg rleg head))
+       (send l :weight 7.0))
+     (dolist (l (list bc0 bc2 bh1))
+       (let* ((valid-bodies (remove-if #'(lambda (x)
+					   (and (> (send x :volume) 0) (< (send x :volume) 0))) ;; nan check
+				       (send l :bodies))))
+	 (send l :centroid
+	       (if (= (length valid-bodies) 1)
+		   (send (car valid-bodies) :centroid)
+		 (scale (/ 1.0 (reduce #'+ (mapcar #'(lambda (x) (send x :volume)) valid-bodies)))
+			(reduce #'v+ (mapcar #'(lambda (x) (scale (send x :volume) (send x :centroid))) valid-bodies)))))
+	 ))
 
      (send self :init-ending)
      self))
