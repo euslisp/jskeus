@@ -27,7 +27,7 @@
 (require :irtmodel)
 
 (defun make-default-robot-link (len radius axis name &optional extbody)
-  (let (bs b0 b1 c a l (r/2 (/ radius 2)))
+  (let (bs b0 b1 c a (r/2 (/ radius 2)))
     (setq b0 (make-cylinder r/2 radius))
     (setq b1 (make-cube r/2 r/2 len))
 
@@ -52,8 +52,18 @@
     (when extbody 
       (dolist (b extbody) (send b1 :assoc b))
       (setq bs (append bs extbody)))
-    (setq l (instance bodyset-link :init (make-cascoords) :bodies bs :name name))
-    l))
+    ;; set a mass center of default-robot-link as a volume center
+    (let* ((valid-bodies (remove-if #'(lambda (x)
+					(and (> (send x :volume) 0) (< (send x :volume) 0))) ;; nan check
+				    bs))
+	   (bodies-centroid
+	    (if (= (length valid-bodies) 1)
+		(send (car valid-bodies) :centroid)
+	      (scale (/ 1.0 (reduce #'+ (mapcar #'(lambda (x) (send x :volume)) valid-bodies)))
+		     (reduce #'v+ (mapcar #'(lambda (x) (scale (send x :volume) (send x :centroid))) valid-bodies))))))
+      (instance bodyset-link :init (make-cascoords)
+		:bodies bs :name name :centroid bodies-centroid)
+      )))
 
 (defclass robot-model
   :super cascaded-link
