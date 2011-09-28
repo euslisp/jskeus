@@ -9,16 +9,15 @@
 (defmethod sample-robot
   (:init 
    (&rest args)
-   (let (c bal1 bal2 bal3 bal4 bal5 bal6 bal7
-	   bar1 bar2 bar3 bar4 bar5 bar6 bar7
-	   bll1 bll2 bll3 bll4 bll5 bll6 bll6b
-	   blr1 blr2 blr3 blr4 blr5 blr6 blr6b
-	   bc0 bc1 bc2
-	   bh0 bh1 bh2
-	   bh2e
-	   )
+   (let (bal1 bal2 bal3 bal4 bal5 bal6 bal7
+	 bar1 bar2 bar3 bar4 bar5 bar6 bar7
+	 bll1 bll2 bll3 bll4 bll5 bll6 bll6b
+	 blr1 blr2 blr3 blr4 blr5 blr6 blr6b
+	 bc0 bc1 bc2
+	 bh0 bh1 bh2
+	 bh2e
+	 )
      (send-super* :init args)
-     (setq c (make-coords :pos #f(0 100 0) :rpy (float-vector pi/2 pi/2 0)))
 
      (setq bc0 (make-cube 100 200 100))
      (send bc0 :locate #f(0 0 -75))
