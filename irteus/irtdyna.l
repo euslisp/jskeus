@@ -640,6 +640,9 @@
            :debug-view debug-view
 	   :tmp-va tmp-va :tmp-vb tmp-vb :tmp-vc tmp-vc
 	   :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc :tmp-md tmp-md)
+     ;; reset ext force and ext moment
+     (send-all (send self :links) :ext-force (float-vector 0 0 0))
+     (send-all (send self :links) :ext-moment (float-vector 0 0 0))
      (dotimes (i (length torque-vector))
        (setf (elt torque-vector i) (send (elt joint-list i) :joint-torque)))
      torque-vector))
