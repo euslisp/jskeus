@@ -146,7 +146,7 @@
        (setq jar1 (instance rotational-joint :init :parent-link (elt rarm 0) :child-link (elt rarm 1) :name :rarm-shoulder-r :axis :-x :min -30 :max 180))
        (setq jar2 (instance rotational-joint :init :parent-link (elt rarm 1) :child-link (elt rarm 2) :name :rarm-shoulder-y :axis :-z))
        (setq jar3 (instance rotational-joint :init :parent-link (elt rarm 2) :child-link (elt rarm 3) :name :rarm-elbow-p :axis :y :min -180 :max 0))
-       (setq jar4 (instance rotational-joint :init :parent-link (elt rarm 3) :child-link (elt rarm 4) :name :rarm-wrist-y :axis :z))
+       (setq jar4 (instance rotational-joint :init :parent-link (elt rarm 3) :child-link (elt rarm 4) :name :rarm-wrist-y :axis :-z))
        (setq jar5 (instance rotational-joint :init :parent-link (elt rarm 4) :child-link (elt rarm 5) :name :rarm-wrist-r :axis :-x))
        (setq jar6 (instance rotational-joint :init :parent-link (elt rarm 5) :child-link (elt rarm 6) :name :rarm-wrist-p :axis :y))
 
