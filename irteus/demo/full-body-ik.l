@@ -9,7 +9,7 @@
       (setq *robot* (instance sample-robot :init)))
     (send *robot* :reset-pose)
     (if (= (length (car (send *robot* :legs))) 6)
-	(send *robot* :legs :angle-vector #f(0 0 -10 20 -10 0 0)))
+	(send *robot* :legs :angle-vector #f(0 0 -10 20 0 -10)))
     (if (send *robot* :lleg)
 	(send *robot* :transform (send (send *robot* :lleg :end-coords) :transformation (make-coords)))
       (send *robot* :newcoords (make-coords)))

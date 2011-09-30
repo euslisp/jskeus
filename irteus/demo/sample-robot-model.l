@@ -154,15 +154,15 @@
        (setq jll1 (instance rotational-joint :init :parent-link (elt lleg 0) :child-link (elt lleg 1) :name :lleg-crotch-r :axis :x))
        (setq jll2 (instance rotational-joint :init :parent-link (elt lleg 1) :child-link (elt lleg 2) :name :lleg-crotch-p :axis :y))
        (setq jll3 (instance rotational-joint :init :parent-link (elt lleg 2) :child-link (elt lleg 3) :name :lleg-knee-p :axis :y :min 0))
-       (setq jll4 (instance rotational-joint :init :parent-link (elt lleg 3) :child-link (elt lleg 4) :name :lleg-ankle-p :axis :x))
-       (setq jll5 (instance rotational-joint :init :parent-link (elt lleg 4) :child-link (elt lleg 5) :name :lleg-ankle-r :axis :y))
+       (setq jll4 (instance rotational-joint :init :parent-link (elt lleg 3) :child-link (elt lleg 4) :name :lleg-ankle-p :axis :y))
+       (setq jll5 (instance rotational-joint :init :parent-link (elt lleg 4) :child-link (elt lleg 5) :name :lleg-ankle-r :axis :x))
 
        (setq jlr0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt rleg 0) :name :rleg-crotch-y :axis :-z))
        (setq jlr1 (instance rotational-joint :init :parent-link (elt rleg 0) :child-link (elt rleg 1) :name :rleg-crotch-r :axis :-x))
        (setq jlr2 (instance rotational-joint :init :parent-link (elt rleg 1) :child-link (elt rleg 2) :name :rleg-crotch-p :axis :y))
        (setq jlr3 (instance rotational-joint :init :parent-link (elt rleg 2) :child-link (elt rleg 3) :name :rleg-knee-p :axis :y :min 0))
-       (setq jlr4 (instance rotational-joint :init :parent-link (elt rleg 3) :child-link (elt rleg 4) :name :rleg-ankle-p :axis :-x))
-       (setq jlr5 (instance rotational-joint :init :parent-link (elt rleg 4) :child-link (elt rleg 5) :name :rleg-ankle-r :axis :y))
+       (setq jlr4 (instance rotational-joint :init :parent-link (elt rleg 3) :child-link (elt rleg 4) :name :rleg-ankle-p :axis :y))
+       (setq jlr5 (instance rotational-joint :init :parent-link (elt rleg 4) :child-link (elt rleg 5) :name :rleg-ankle-r :axis :-x))
 
        ;; define other parameters
        (setq larm-root-link (car larm) rarm-root-link (car rarm)
@@ -196,7 +196,7 @@
        (send self :init-ending)
        self)))
   (:reset-pose ()
-    (send self :angle-vector #f(0.0 0.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 0.0 0.0 -15.0 30.0 0.0 -15.0 0.0 0.0 -15.0 30.0 0.0 -15.0)))
+    (send self :angle-vector #f(0.0 0.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0)))
   )
 
 ;; user-defined joint
