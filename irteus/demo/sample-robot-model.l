@@ -160,7 +160,7 @@
        (setq jlr0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt rleg 0) :name :rleg-crotch-y :axis :-z))
        (setq jlr1 (instance rotational-joint :init :parent-link (elt rleg 0) :child-link (elt rleg 1) :name :rleg-crotch-r :axis :-x))
        (setq jlr2 (instance rotational-joint :init :parent-link (elt rleg 1) :child-link (elt rleg 2) :name :rleg-crotch-p :axis :y))
-       (setq jlr3 (instance rotational-joint :init :parent-link (elt rleg 2) :child-link (elt rleg 3) :name :rleg-kneep-p :axis :y :min 0))
+       (setq jlr3 (instance rotational-joint :init :parent-link (elt rleg 2) :child-link (elt rleg 3) :name :rleg-knee-p :axis :y :min 0))
        (setq jlr4 (instance rotational-joint :init :parent-link (elt rleg 3) :child-link (elt rleg 4) :name :rleg-ankle-p :axis :-x))
        (setq jlr5 (instance rotational-joint :init :parent-link (elt rleg 4) :child-link (elt rleg 5) :name :rleg-ankle-r :axis :y))
 
@@ -228,7 +228,7 @@
   (:rleg-crotch-y (&rest args) (forward-message-to jlr0 args))
   (:rleg-crotch-r (&rest args) (forward-message-to jlr1 args))
   (:rleg-crotch-p (&rest args) (forward-message-to jlr2 args))
-  (:rleg-kneep-p (&rest args) (forward-message-to jlr3 args))
+  (:rleg-knee-p (&rest args) (forward-message-to jlr3 args))
   (:rleg-ankle-p (&rest args) (forward-message-to jlr4 args))
   (:rleg-ankle-r (&rest args) (forward-message-to jlr5 args))
   )
