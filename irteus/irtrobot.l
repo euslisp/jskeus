@@ -249,13 +249,22 @@
          (dolist (limb '(:rleg :lleg))
            (push (send self limb :end-coords) target-coords)))
        (unless force-list ;; force [N]
-         (dolist (limb '(:rleg :lleg))
-           (push (float-vector 0.0 0.0 (case limb
-                                         ((:rleg :lleg) (* (send self :weight) 0.0098 0.5))
-                                         (t 0.0))) force-list)))
+	 (let ((total-force/2 (* (send self :weight) 1e-3 9.8 0.5)))
+	   ;; hypothesis : lleg force = rleg force, lleg force + rleg force + gravity force = 0
+	   (dolist (limb '(:rleg :lleg))
+	     (push (float-vector 0.0 0.0 (case limb
+					   ((:rleg :lleg) total-force/2)
+					   (t 0.0))) force-list))
+	   ))
        (unless moment-list ;; moment [Nm]
-         (dolist (limb '(:rleg :lleg))
-           (push (float-vector 0.0 0.0 0.0) moment-list)))
+	 (let ((total-moment (v* (scale 1e-3
+					(v- (send self :centroid nil)
+					    (apply #'midpoint 0.5 (send-all target-coords :worldpos))))
+				 (float-vector 0 0 (* 1e-3 (send self :weight nil) 9.8)))))
+	   ;; hypothesis : gravity force moment + rleg moment + lleg moment = 0, minimal internal moments <-> pseudo-inverse <-> lleg moment = rleg moment
+	   (dolist (limb '(:rleg :lleg))
+	     (push (scale 0.5 total-moment) moment-list))
+	   ))
        (unless (= (length force-list) (length moment-list)
                   (length target-coords))
          (warn ";; ERROR : list length differ : force-list ~A moment-list ~A target-coords ~A~%"
