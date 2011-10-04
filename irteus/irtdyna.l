@@ -610,8 +610,7 @@
          (incf i)))
      ret))
   (:calc-torque
-   (&key (dt 0.005) ;; dt [s]
-         (debug-view nil)
+   (&key (debug-view nil)
 	 (jvv (instantiate float-vector (length joint-list))) ;; [rad/s] or [m/s]
 	 (jav (instantiate float-vector (length joint-list))) ;; [rad/s^2] or [m/s^2]
 	 ;; buffers for computation

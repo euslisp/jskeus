@@ -232,7 +232,6 @@
      ret))
   (:torque-vector
    (&key (force-list) (moment-list) (target-coords)
-         (dt 0.005) ;; dt [s]
          (debug-view nil)
 	 (jvv (instantiate float-vector (calc-target-joint-dimension joint-list))) ;; [rad/s] or [m/s]
 	 (jav (instantiate float-vector (calc-target-joint-dimension joint-list)))) ;; [rad/s^2] or [m/s^2]
@@ -280,7 +279,7 @@
                force-list moment-list target-coords)
        )
      )
-   (send-super :calc-torque :dt dt
+   (send-super :calc-torque
                :debug-view debug-view
                :jvv jvv :jav jav)
    )
