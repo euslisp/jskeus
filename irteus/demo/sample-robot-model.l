@@ -100,7 +100,7 @@
 		  (send bl6 :assoc rleg-end-coords))
 		 (:lleg
 		  (setq lleg-end-coords (make-cascoords))
-		  (send rleg-end-coords :locate (float-vector 0 0 (- (+ ankle-length (/ foot-thickness 2.0)))))
+		  (send lleg-end-coords :locate (float-vector 0 0 (- (+ ankle-length (/ foot-thickness 2.0)))))
 		  (send bl6 :assoc lleg-end-coords)))
 	       (send bl5 :assoc bl6)
 	       (send bl5 :translate (float-vector 0 0 (- lower-leg-length)) :world)
