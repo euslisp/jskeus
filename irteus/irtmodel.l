@@ -1707,16 +1707,16 @@
                (mapcar #'(lambda (x)
                            (if (functionp x) (funcall x) x))
                        target-coords))
-             (dif-pos
-              (mapcar #'(lambda (mv tc trans-axis)
-                          (send mv :difference-position tc
-                                :translation-axis trans-axis))
-                      move-target target-coords translation-axis))
-             (dif-rot
-              (mapcar #'(lambda (mv tc rot-axis)
-                          (send mv :difference-rotation tc
-                                :rotation-axis rot-axis))
-                      move-target target-coords rotation-axis)))
+              (dif-pos
+               (mapcar #'(lambda (mv tc trans-axis)
+                           (send mv :difference-position tc
+                                 :translation-axis trans-axis))
+                       move-target target-coords translation-axis))
+              (dif-rot
+               (mapcar #'(lambda (mv tc rot-axis)
+                           (send mv :difference-rotation tc
+                                 :rotation-axis rot-axis))
+                       move-target target-coords rotation-axis)))
          (setq success (send* self :inverse-kinematics-loop
                               dif-pos dif-rot
                               :target-coords target-coords
