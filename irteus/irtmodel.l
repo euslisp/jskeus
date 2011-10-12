@@ -1703,7 +1703,11 @@
      
      ;; inverse kinematics loop
      (while (< (incf loop) stop)
-       (let ((dif-pos
+       (let* ((target-coords
+               (mapcar #'(lambda (x)
+                           (if (functionp x) (funcall x) x))
+                       target-coords))
+             (dif-pos
               (mapcar #'(lambda (mv tc trans-axis)
                           (send mv :difference-position tc
                                 :translation-axis trans-axis))
@@ -1730,7 +1734,9 @@
         ;; update difference
      (dotimes (i (length move-target))
        (let ((move-target (elt move-target i))
-             (target-coords (elt target-coords i))
+             (target-coords (if (functionp (elt target-coords i))
+                                (funcall (elt target-coords i))
+                              (elt target-coords i)))
              (rotation-axis (elt rotation-axis i))
              (translation-axis (elt translation-axis i))
              (thre (elt thre i)) (rthre (elt rthre i)))
