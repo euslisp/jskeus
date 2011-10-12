@@ -26,7 +26,7 @@
 
 (in-package "GEOMETRY")
 
-(export '(body-to-faces body-to-triangles midcoords bodyset *g-vec*
+(export '(body-to-faces body-to-triangles midcoords orient-coords-to-axis bodyset *g-vec*
                         make-sphere x-of-cube y-of-cube z-of-cube
                         height-of-cylinder radius-of-cylinder radius-of-sphere
 			matrix-to-euler-angle))
@@ -258,6 +258,23 @@
   (:inverse-transform-vector
    (v &optional v3a v3b m33)
    (send (send self :worldcoords) :inverse-transform-vector v v3a v3b m33)))
+
+
+;; orient-coords-to-axis
+;;   orient "axis" in "target-coords" to the direction specified by "v" destructively.
+;;   "v" must be non-zero vector.
+(defun orient-coords-to-axis (target-coords v &optional (axis :z))
+  (let* ((nv (normalize-vector v))
+         (ax (send target-coords :rotate-vector
+                   (case axis
+                     (:x #f(1 0 0))
+                     (:y #f(0 1 0))
+                     (:z #f(0 0 1))
+                     (t axis))))
+         (vcr (v* ax nv)))
+    (if (not (eps= (norm vcr) 0.0)) ;; check vcr ;; if vcr is zero-vector, it is unnecessary to rotate target-coords.
+        (send target-coords :rotate (acos (v. nv ax)) vcr :world))
+    target-coords))
 
 ;;
 ;; bodyset class

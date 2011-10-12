@@ -143,12 +143,10 @@
                dif-pos dif-rot p-dif-rot (count 0))
 	  (while (and (< (incf count) stop)
 		      (if p-dif-rot (> (norm (v- p-dif-rot dif-rot)) 1e-3) t))
-	    (let* ((target-coords (make-coords :pos (car args)))
-                   (v (normalize-vector (v- (send target-coords :worldpos)
-                                            (send move-target :worldpos))))
-                   (z (matrix-column (send target-coords :worldrot) 2)))
-              (if (< -1.0 (v. v z) 1.0)
-                  (send target-coords :rotate (acos (v. z v)) (v* z v) :world))
+	    (let* ((target-coords
+                    (orient-coords-to-axis ;; orient target-coords to look-at direction
+                     (make-coords :pos (car args))
+                     (v- (car args) (send move-target :worldpos)))))
               (setq p-dif-rot dif-rot
                     dif-pos (send move-target :difference-position target-coords :translation-axis nil)
                     dif-rot (send move-target :difference-rotation target-coords :rotation-axis :z))
