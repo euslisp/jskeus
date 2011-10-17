@@ -44,13 +44,24 @@
   (:objects () objs)
   (:find-object
    (name)
-   (mapcan #'(lambda (o)
-               (if (string= name (send o :name)) (list o)))
-           objs))
+   (append
+    (mapcan
+     #'(lambda(x)(if (derivedp x scene-model) (send x :find-object name) nil))
+     objs)
+    (mapcan #'(lambda (o)
+		(if (string= name (send o :name)) (list o)))
+	    objs)))
   (:spots
    (&optional name)
-   (mapcan #'(lambda (o) (if (eq (class o) cascaded-coords) (list o)))
-	   (if name (send self :find-object name) (send self :objects))))
+   (append
+    (mapcan
+     #'(lambda(x)(if (derivedp x scene-model) (send x :spots name) nil))
+     objs)
+    (mapcan #'(lambda (o)
+		(if (and (eq (class o) cascaded-coords)
+			 (or (null name) (string= name (send o :name))))
+		    (list o)))
+	    objs)))
   ;;
   (:object
    (name)
