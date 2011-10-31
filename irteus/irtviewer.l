@@ -168,7 +168,7 @@
        (setq sc (/ (apply #'max (coerce (send bbox :diagonal) cons))
 		   (* 0.5 (tan (send self :viewer :viewing :view-angle)))))
        (when (or (> (/ sc gl::*perspective-far*) 2)
-		 (< (/ sc gl::*perspective-far*) 0.01))
+		 (< (/ sc gl::*perspective-far*) 0.001))
 	 (warning-message 2 "Detect very large/small objects(~A), change perspective~%" (/ sc gl::*perspective-far*) )
 	 (setq gl::*perspective-near* (* (/ sc gl::*perspective-far*) gl::*perspective-near*)
 	       gl::*perspective-far*  (* (/ sc gl::*perspective-far*) gl::*perspective-far*)))
