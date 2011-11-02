@@ -265,15 +265,30 @@
 ;;   "v" must be non-zero vector.
 (defun orient-coords-to-axis (target-coords v &optional (axis :z))
   (let* ((nv (normalize-vector v))
-         (ax (send target-coords :rotate-vector
+         (ax (send target-coords :rotate-vector ;; axis in the worldcoords
                    (case axis
-                     (:x #f(1 0 0))
-                     (:y #f(0 1 0))
-                     (:z #f(0 0 1))
+                     (:x #f(1 0 0)) (:-x #f(-1 0 0))
+                     (:y #f(0 1 0)) (:-y #f(0 -1 0))
+                     (:z #f(0 0 1)) (:-z #f(0 0 -1))
                      (t axis))))
-         (vcr (v* ax nv)))
-    (if (not (eps= (norm vcr) 0.0)) ;; check vcr ;; if vcr is zero-vector, it is unnecessary to rotate target-coords.
-        (send target-coords :rotate (acos (v. nv ax)) vcr :world))
+         (rot-axis (v* ax nv)) ;; axis to rotate ax -> nv
+         (rot-angle-cos (v. nv ax))) ;; angle to rotate ax -> nv
+    ;; check rot-angle-cos
+    (cond
+     ;; if th = 0[deg] -> no need to rotate target-coords
+     ((eps= rot-angle-cos 1.0)
+      (return-from orient-coords-to-axis target-coords))
+     ;; if th = 180[deg] -> previous rot-axis = 0 vector and rot-axis is ambiguous. overwrite rot-axis by the axis orthogonal to ax
+     ((eps= rot-angle-cos -1.0)
+      (block :calc-for-th-180
+        (dolist (rot-axis2 (list #f(1 0 0) #f(0 1 0)))
+          (let ((rot-angle-cos2 (v. ax rot-axis2)))
+            (unless (eps= (abs rot-angle-cos2) 1.0)
+              (setq rot-axis (v- rot-axis2 (scale rot-angle-cos2 ax))) ;; use only vertical component of rot-axis2 by removing parallel component of rot-axis2
+              (return-from :calc-for-th-180 nil))
+            ))))
+     (t ))
+    (send target-coords :rotate (acos rot-angle-cos) rot-axis :world)
     target-coords))
 
 ;;
