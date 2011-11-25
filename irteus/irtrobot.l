@@ -233,9 +233,10 @@
          (debug-view nil)
 	 (jvv (instantiate float-vector (calc-target-joint-dimension joint-list))) ;; [rad/s] or [m/s]
 	 (jav (instantiate float-vector (calc-target-joint-dimension joint-list)))) ;; [rad/s^2] or [m/s^2]
+   (let ((weight-force (* (send self :weight) 1e-6 (elt *g-vec* 2)))) ;; weight[g] * 1e-6 * gvec[mm/s^2] = force[N]
    ;; set default external force and moment at the end-effectors
    (if (every #'null (send self :legs)) ;; for not legged robot
-       (let ((fv (float-vector 0 0 (* (send self :weight) 0.0098)))) ;; for non-legged robot
+       (let ((fv (float-vector 0 0 weight-force))) ;; for non-legged robot
          (send (car (send self :links)) :ext-force fv)
          (let* ((c (send (car (send self :links)) :centroid))
                 (moment-offset (v* (scale 1e-3 (send (car (send self :links)) :worldpos)) fv)))
@@ -246,7 +247,7 @@
          (dolist (limb '(:rleg :lleg))
            (push (send self limb :end-coords) target-coords)))
        (unless force-list ;; force [N]
-	 (let ((total-force/2 (* (send self :weight) 1e-3 9.8 0.5)))
+	 (let ((total-force/2 (* weight-force 0.5)))
 	   ;; hypothesis : lleg force = rleg force, lleg force + rleg force + gravity force = 0
 	   (dolist (limb '(:rleg :lleg))
 	     (push (float-vector 0.0 0.0 (case limb
@@ -257,7 +258,7 @@
 	 (let ((total-moment (v* (scale 1e-3
 					(v- (send self :centroid nil)
 					    (apply #'midpoint 0.5 (send-all target-coords :worldpos))))
-				 (float-vector 0 0 (* 1e-3 (send self :weight nil) 9.8)))))
+				 (float-vector 0 0 weight-force))))
 	   ;; hypothesis : gravity force moment + rleg moment + lleg moment = 0, minimal internal moments <-> pseudo-inverse <-> lleg moment = rleg moment
 	   (dolist (limb '(:rleg :lleg))
 	     (push (scale 0.5 total-moment) moment-list))
@@ -276,7 +277,7 @@
                      (send (send tc :parent) :ext-moment (v+ mv moment-offset))))
                force-list moment-list target-coords)
        )
-     )
+     ))
    (send-super :calc-torque
                :debug-view debug-view
                :jvv jvv :jav jav)
