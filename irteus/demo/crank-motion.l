@@ -67,7 +67,7 @@
 		    :link-list ll :move-target move-target
 		    :look-at-target t :thre thre :rotation-axis rotation-axis
 		    :weight weight
-		    :cog-gain 1.0 :target-centroid-pos fp :cog-thre 10.0
+		    :cog-gain 1.0 :target-centroid-pos fp :centroid-thre 10.0
 		    :debug-view :no-flush)
 	      ;; draw
 	      (send *irtviewer* :draw-objects :flush nil)

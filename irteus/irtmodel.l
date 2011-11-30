@@ -1537,7 +1537,7 @@
     target-coords                 ;required for debug-view
     (jacobi)
     (additional-check) ;; to add optional convergence conditions
-    (cog-thre 1.0) (target-centroid-pos) (centroid-offset-func)
+    (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func)
     debug-view ik-args
     &allow-other-keys)
    ;; dif-pos, dif-rot, move-target, rotation-axis, translation-axis, link-list
@@ -1597,7 +1597,7 @@
 	     (send self :ik-convergence-check
 		   (>= loop (/ stop 10)) dif-pos dif-rot
 		   rotation-axis translation-axis thre rthre
-		   cog-thre target-centroid-pos centroid-offset-func))
+		   centroid-thre target-centroid-pos centroid-offset-func))
        (if (and additional-check success)
            (setq success (and success (funcall additional-check))))
 
@@ -1667,7 +1667,7 @@
                           ((atom move-target) (deg2rad 1))
                           (t (make-list (length move-target) :initial-element (deg2rad 1)))))
                   (union-link-list)
-		  (cog-thre 1.0) (target-centroid-pos) (centroid-offset-func)
+		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func)
 		  &allow-other-keys)
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
@@ -1759,7 +1759,7 @@
 	     (send self :ik-convergence-check
 		   success dif-pos dif-rot
 		   rotation-axis translation-axis thre rthre
-		   cog-thre target-centroid-pos centroid-offset-func)))
+		   centroid-thre target-centroid-pos centroid-offset-func)))
         ;; update difference
      (mapcar #'(lambda (l a) (send l :analysis-level a)) union-link-list old-analysis-level)
      ;; check solved or not
@@ -1773,7 +1773,7 @@
 	     (warn ";; dif-rot : ~a/(~a/~a)~%" (elt dif-rot i) (norm (elt dif-rot i)) (elt rthre i)))
            (if target-centroid-pos
                (let ((dif-cog (send self :difference-cog-position target-centroid-pos centroid-offset-func)))
-                 (warn ";; cog-dif : ~a/(~a/~a)~%" dif-cog (norm dif-cog) cog-thre)))
+                 (warn ";; cog-dif : ~a/(~a/~a)~%" dif-cog (norm dif-cog) centroid-thre)))
            (warn ";;  coords : ~a~%" 
                  (send (let ((p self)) (while (send p :parent) (setq p (send p :parent))) p) :worldcoords))
 	   (warn ";;  angles : ~a~%" av0)
@@ -1788,13 +1788,13 @@
   (:ik-convergence-check
    (success dif-pos dif-rot
     rotation-axis translation-axis thre rthre
-    cog-thre target-centroid-pos centroid-offset-func)
+    centroid-thre target-centroid-pos centroid-offset-func)
    (dotimes (i (length dif-pos))
      (setq success (and success
 			(if (elt translation-axis i) (< (norm (elt dif-pos i)) (elt thre i)) t)
 			(if (elt rotation-axis i) (< (norm (elt dif-rot i)) (elt rthre i)) t))))
    (if target-centroid-pos
-       (setq success (and success (send self :cog-convergence-check cog-thre target-centroid-pos centroid-offset-func))))
+       (setq success (and success (send self :cog-convergence-check centroid-thre target-centroid-pos centroid-offset-func))))
    success)
   (:calc-vel-from-pos
    (dif-pos translation-axis
