@@ -68,10 +68,7 @@
                    :link-list ll :move-target move-target
                    :look-at-target t :thre thre :rotation-axis rotation-axis
                    :weight weight
-                   :null-space ;; for balancing
-                   #'(lambda ()
-                       (send *robot* :cog-jacobian-balance-nspace (send *robot* :calc-union-link-list ll)
-                             :target-centroid-pos cog-target-pos :cog-gain 1.5))
+		   :cog-gain 1.0 :cog-target-pos fp
                    :additional-check
                    #'(lambda ()
                        (> 10.0
