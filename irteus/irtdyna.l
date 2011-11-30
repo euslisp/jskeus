@@ -428,6 +428,11 @@
 				translation-axis))
      )
     )
+  (:cog-convergence-check
+   (centroid-thre target-centroid-pos)
+   (> centroid-thre
+      (norm
+       (subseq (v- target-centroid-pos (send self :centroid)) 0 2))))
   )
 
 ;; recursive computation for inverse-dynamics

@@ -1251,8 +1251,8 @@
           (union-link-list (send self :calc-union-link-list link-list))
           (fik-len (send self :calc-target-joint-dimension union-link-list))
           (null-space) (debug-view)
-	  ;; if user wants to use cog-jacobian as null-space, please set cog-gain(> 0.0) and cog-target-pos
-	  (cog-gain 0.0) (cog-target-pos)
+	  ;; if user wants to use cog-jacobian as null-space, please set cog-gain(> 0.0) and target-centroid-pos
+	  (cog-gain 0.0) (target-centroid-pos)
           (weight (fill (instantiate float-vector fik-len) 1.0))
           (tmp-nspace (instantiate float-vector fik-len)))
     ;; calc null-space from joint-limit
@@ -1260,11 +1260,11 @@
           (send self :calc-nspace-from-joint-limit
                 avoid-nspace-gain union-link-list weight debug-view tmp-nspace))
     ;; add null-space from cog-jacobian
-    (if (and (> cog-gain 0.0) cog-target-pos)
+    (if (and (> cog-gain 0.0) target-centroid-pos)
 	(setq tmp-nspace
 	      (v+ (send self :cog-jacobian-balance-nspace union-link-list
 			:weight weight
-			:target-centroid-pos cog-target-pos :cog-gain cog-gain)
+			:target-centroid-pos target-centroid-pos :cog-gain cog-gain)
 		  tmp-nspace tmp-nspace)))
     ;; add null-space from arguments
     (cond
@@ -1288,7 +1288,7 @@
               (avoid-collision-joint-gain 1.0)
               ((:collision-avoidance-link-pair pair-list)
                (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
-	      (cog-gain 0.0) (cog-target-pos)
+	      (cog-gain 0.0) (target-centroid-pos)
               (tmp-len (instantiate float-vector fik-len))
               (tmp-len2 (instantiate float-vector fik-len))
 	      (tmp-weight (instantiate float-vector fik-len))
@@ -1383,7 +1383,7 @@
            (send self :calc-inverse-kinematics-nspace-from-link-list
                  link-list :union-link-list union-link-list
                  :avoid-nspace-gain avoid-nspace-gain :debug-view debug-view
-		 :cog-gain cog-gain :cog-target-pos cog-target-pos
+		 :cog-gain cog-gain :target-centroid-pos target-centroid-pos
                  :weight weight :fik-len fik-len :null-space null-space :tmp-nspace tmp-nspace))
      (if (send self :get :collision-avoidance-null-vector)
 	 (v+ tmp-nspace (send self :get :collision-avoidance-null-vector) tmp-nspace))
@@ -1537,6 +1537,7 @@
     target-coords                 ;required for debug-view
     (jacobi)
     (additional-check) ;; to add optional convergence conditions
+    (cog-thre 1.0) (target-centroid-pos)
     debug-view ik-args
     &allow-other-keys)
    ;; dif-pos, dif-rot, move-target, rotation-axis, translation-axis, link-list
@@ -1614,6 +1615,8 @@
            (dotimes (j (length vel-p)) (setf (elt tmp-dim j) (elt vel-p j)))
            (dotimes (j (length vel-r)) (setf (elt tmp-dim (+ j (length vel-p))) (elt vel-r j)))
            ))
+       (if target-centroid-pos
+	   (setq success (and success (send self :cog-convergence-check cog-thre target-centroid-pos))))
        (if (and additional-check success)
            (setq success (and success (funcall additional-check))))
        (dotimes (i (length tmp-dims))

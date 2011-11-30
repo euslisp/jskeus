@@ -68,12 +68,7 @@
                    :link-list ll :move-target move-target
                    :look-at-target t :thre thre :rotation-axis rotation-axis
                    :weight weight
-		   :cog-gain 1.0 :cog-target-pos fp
-                   :additional-check
-                   #'(lambda ()
-                       (> 10.0
-                          (norm
-                           (subseq (v- fp (send (car (send *robot* :links)) :get :c-til)) 0 2))))
+		   :cog-gain 1.0 :target-centroid-pos fp :cog-thre 10.0
                    :debug-view :no-flush)
              ;; draw
              (send *irtviewer* :draw-objects :flush nil)
