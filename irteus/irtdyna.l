@@ -416,6 +416,7 @@
      &key (cog-gain 1.0)
           (translation-axis :z)
           (target-centroid-pos (send (car (send self :links)) :get :c-til))
+	  (centroid-offset-func)
      &allow-other-keys)
     (transform
      (send* self :calc-inverse-jacobian
@@ -424,15 +425,22 @@
 		   :translation-axis translation-axis args)
 	    args)
      (scale (* 0.001 cog-gain) ;; [mm] -> [m]
-	    (calc-dif-with-axis (v- target-centroid-pos (send (car (send self :links)) :get :c-til))
-				translation-axis))
+	    (calc-dif-with-axis
+	     (v- target-centroid-pos
+		 (if (functionp centroid-offset-func)
+		     (funcall centroid-offset-func)
+		   (send (car (send self :links)) :get :c-til)))
+	     translation-axis))
      )
     )
   (:cog-convergence-check
-   (centroid-thre target-centroid-pos)
+   (centroid-thre target-centroid-pos &optional centroid-offset-func)
    (> centroid-thre
       (norm
-       (subseq (v- target-centroid-pos (send self :centroid)) 0 2))))
+       (subseq (v- target-centroid-pos
+		   (if (functionp centroid-offset-func)
+		       (funcall centroid-offset-func)
+		     (send self :centroid))) 0 2))))
   )
 
 ;; recursive computation for inverse-dynamics
