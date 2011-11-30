@@ -1591,34 +1591,32 @@
        (when (and debug-view (not (memq :no-message debug-view)))
          (warn "loop: ~3d~%" loop)
          (warn "union-link-list: ~A~%" (send-all union-link-list :name)))
-       (setq success (>= loop (/ stop 10)))
+
+       ;; convergence check
+       (setq success
+	     (send self :ik-convergence-check
+		   (>= loop (/ stop 10)) dif-pos dif-rot
+		   rotation-axis translation-axis thre rthre))
+       (if target-centroid-pos
+	   (setq success (and success (send self :cog-convergence-check cog-thre target-centroid-pos centroid-offset-func))))
+       (if (and additional-check success)
+           (setq success (and success (funcall additional-check))))
+
+       ;; calculation of move-coords velocities from vel-p and vel-r
        (dotimes (i (length move-target))
-         (let* ((move-target (elt move-target i))
-                (dif-pos (elt dif-pos i))
-                (dif-rot (elt dif-rot i))
-                (rotation-axis (elt rotation-axis i))
-                (translation-axis (elt translation-axis i))
-                (thre (elt thre i)) (rthre (elt rthre i))
-                (tmp-dim (elt tmp-dims i))
-                (vel-p (send* self :calc-vel-from-pos dif-pos translation-axis
+         (let* ((tmp-dim (elt tmp-dims i))
+                (vel-p (send* self :calc-vel-from-pos (elt dif-pos i) (elt translation-axis i)
                               (if p-limit (list :p-limit p-limit))))
-                (vel-r (send* self :calc-vel-from-rot dif-rot rotation-axis
+                (vel-r (send* self :calc-vel-from-rot (elt dif-rot i) (elt rotation-axis i)
                               (if r-limit (list :r-limit r-limit)))))
            (when (and debug-view (not (memq :no-message debug-view)))
              (format-array (scale 1000.0 vel-p) "vel-pos :")
              (format-array vel-r "vel-rot :")
              (warn "vel-pos-norm : ~7,3f/~7,3f~%vel-rot-norm : ~7,3f/~7,3f~%"
-                   (* 1000.0 (norm vel-p)) thre (norm vel-r) rthre))
-           (setq success (and success
-                              (if translation-axis (< (norm dif-pos) thre) t)
-                              (if rotation-axis (< (norm dif-rot) rthre) t)))
+                   (* 1000.0 (norm vel-p)) (elt thre i) (norm vel-r) (elt rthre i)))
            (dotimes (j (length vel-p)) (setf (elt tmp-dim j) (elt vel-p j)))
            (dotimes (j (length vel-r)) (setf (elt tmp-dim (+ j (length vel-p))) (elt vel-r j)))
            ))
-       (if target-centroid-pos
-	   (setq success (and success (send self :cog-convergence-check cog-thre target-centroid-pos centroid-offset-func))))
-       (if (and additional-check success)
-           (setq success (and success (funcall additional-check))))
        (dotimes (i (length tmp-dims))
          (dotimes (j (length (elt tmp-dims i)))
            (setf (elt tmp-dim (+ j vec-count)) (elt (elt tmp-dims i) j)))
@@ -1747,21 +1745,21 @@
          (when (eq success :ik-succeed)
 	   (setq success t) (return nil))
          ))
+     (let* ((target-coords
+	     (mapcar #'(lambda (x)
+			 (if (functionp x) (funcall x) x))
+		     target-coords)))
+       (setq dif-pos (mapcar #'(lambda (mt tc ta)
+				 (send mt :difference-position tc :translation-axis ta))
+			     move-target target-coords translation-axis)
+	     dif-rot (mapcar #'(lambda (mt tc ra)
+				 (send mt :difference-rotation tc :rotation-axis ra))
+			     move-target target-coords rotation-axis)
+	     success
+	     (send self :ik-convergence-check
+		   success dif-pos dif-rot
+		   rotation-axis translation-axis thre rthre)))
         ;; update difference
-     (dotimes (i (length move-target))
-       (let ((move-target (elt move-target i))
-             (target-coords (if (functionp (elt target-coords i))
-                                (funcall (elt target-coords i))
-                              (elt target-coords i)))
-             (rotation-axis (elt rotation-axis i))
-             (translation-axis (elt translation-axis i))
-             (thre (elt thre i)) (rthre (elt rthre i)))
-         (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
-               dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
-         (setq success (and success
-                            (if translation-axis (< (norm dif-pos) thre) t)
-                            (if rotation-axis (< (norm dif-rot) rthre) t)))
-         ))
      (mapcar #'(lambda (l a) (send l :analysis-level a)) union-link-list old-analysis-level)
      ;; check solved or not
      (if (or success (not revert-if-fail))
@@ -1770,18 +1768,8 @@
 	 (when warnp
 	   (warn ";; inverse-kinematics failed.~%")
            (dotimes (i (length move-target))
-             (let ((move-target (elt move-target i))
-                   (target-coords (if (functionp (elt target-coords i))
-				      (funcall (elt target-coords i))
-				    (elt target-coords i)))
-                   (rotation-axis (elt rotation-axis i))
-                   (translation-axis (elt translation-axis i))
-                   (thre (elt thre i)) (rthre (elt rthre i)))
-               (setq dif-pos (send move-target :difference-position target-coords :translation-axis translation-axis)
-                     dif-rot (send move-target :difference-rotation target-coords :rotation-axis rotation-axis))
-               (warn ";; dif-pos : ~a/(~a/~a)~%" dif-pos (norm dif-pos) thre)
-               (warn ";; dif-rot : ~a/(~a/~a)~%" dif-rot (norm dif-rot) rthre)
-               ))
+	     (warn ";; dif-pos : ~a/(~a/~a)~%" (elt dif-pos i) (norm (elt dif-pos i)) (elt thre i))
+	     (warn ";; dif-rot : ~a/(~a/~a)~%" (elt dif-rot i) (norm (elt dif-rot i)) (elt rthre i)))
            (warn ";;  coords : ~a~%" 
                  (send (let ((p self)) (while (send p :parent) (setq p (send p :parent))) p) :worldcoords))
 	   (warn ";;  angles : ~a~%" av0)
@@ -1793,6 +1781,14 @@
          (if c0 (send self :newcoords c0))
 	 nil))
      ))
+  (:ik-convergence-check
+   (success dif-pos dif-rot
+    rotation-axis translation-axis thre rthre)
+   (dotimes (i (length dif-pos))
+     (setq success (and success
+			(if (elt translation-axis i) (< (norm (elt dif-pos i)) (elt thre i)) t)
+			(if (elt rotation-axis i) (< (norm (elt dif-rot i)) (elt rthre i)) t))))
+   success)
   (:calc-vel-from-pos
    (dif-pos translation-axis
     &rest args
