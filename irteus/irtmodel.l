@@ -1251,6 +1251,7 @@
           (union-link-list (send self :calc-union-link-list link-list))
           (fik-len (send self :calc-target-joint-dimension union-link-list))
           (null-space) (debug-view)
+	  ;; if user wants to use cog-jacobian as null-space, please set cog-gain(> 0.0) and cog-target-pos
 	  (cog-gain 0.0) (cog-target-pos)
           (weight (fill (instantiate float-vector fik-len) 1.0))
           (tmp-nspace (instantiate float-vector fik-len)))
