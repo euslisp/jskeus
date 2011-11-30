@@ -1596,9 +1596,8 @@
        (setq success
 	     (send self :ik-convergence-check
 		   (>= loop (/ stop 10)) dif-pos dif-rot
-		   rotation-axis translation-axis thre rthre))
-       (if target-centroid-pos
-	   (setq success (and success (send self :cog-convergence-check cog-thre target-centroid-pos centroid-offset-func))))
+		   rotation-axis translation-axis thre rthre
+		   cog-thre target-centroid-pos centroid-offset-func))
        (if (and additional-check success)
            (setq success (and success (funcall additional-check))))
 
@@ -1668,6 +1667,7 @@
                           ((atom move-target) (deg2rad 1))
                           (t (make-list (length move-target) :initial-element (deg2rad 1)))))
                   (union-link-list)
+		  (cog-thre 1.0) (target-centroid-pos) (centroid-offset-func)
 		  &allow-other-keys)
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
@@ -1758,7 +1758,8 @@
 	     success
 	     (send self :ik-convergence-check
 		   success dif-pos dif-rot
-		   rotation-axis translation-axis thre rthre)))
+		   rotation-axis translation-axis thre rthre
+		   cog-thre target-centroid-pos centroid-offset-func)))
         ;; update difference
      (mapcar #'(lambda (l a) (send l :analysis-level a)) union-link-list old-analysis-level)
      ;; check solved or not
@@ -1783,11 +1784,14 @@
      ))
   (:ik-convergence-check
    (success dif-pos dif-rot
-    rotation-axis translation-axis thre rthre)
+    rotation-axis translation-axis thre rthre
+    cog-thre target-centroid-pos centroid-offset-func)
    (dotimes (i (length dif-pos))
      (setq success (and success
 			(if (elt translation-axis i) (< (norm (elt dif-pos i)) (elt thre i)) t)
 			(if (elt rotation-axis i) (< (norm (elt dif-rot i)) (elt rthre i)) t))))
+   (if target-centroid-pos
+       (setq success (and success (send self :cog-convergence-check cog-thre target-centroid-pos centroid-offset-func))))
    success)
   (:calc-vel-from-pos
    (dif-pos translation-axis
