@@ -433,14 +433,18 @@
 	     translation-axis))
      )
     )
+  (:difference-cog-position
+    (target-centroid-pos &optional (centroid-offset-func) (translation-axis :z))
+    (calc-dif-with-axis
+     (v- target-centroid-pos
+         (if (functionp centroid-offset-func)
+             (funcall centroid-offset-func)
+           (send self :centroid)))
+     translation-axis))
   (:cog-convergence-check
    (centroid-thre target-centroid-pos &optional centroid-offset-func)
    (> centroid-thre
-      (norm
-       (subseq (v- target-centroid-pos
-		   (if (functionp centroid-offset-func)
-		       (funcall centroid-offset-func)
-		     (send self :centroid))) 0 2))))
+      (norm (send self :difference-cog-position target-centroid-pos centroid-offset-func))))
   )
 
 ;; recursive computation for inverse-dynamics

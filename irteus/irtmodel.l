@@ -1771,6 +1771,9 @@
            (dotimes (i (length move-target))
 	     (warn ";; dif-pos : ~a/(~a/~a)~%" (elt dif-pos i) (norm (elt dif-pos i)) (elt thre i))
 	     (warn ";; dif-rot : ~a/(~a/~a)~%" (elt dif-rot i) (norm (elt dif-rot i)) (elt rthre i)))
+           (if target-centroid-pos
+               (let ((dif-cog (send self :difference-cog-position target-centroid-pos centroid-offset-func)))
+                 (warn ";; cog-dif : ~a/(~a/~a)~%" dif-cog (norm dif-cog) cog-thre)))
            (warn ";;  coords : ~a~%" 
                  (send (let ((p self)) (while (send p :parent) (setq p (send p :parent))) p) :worldcoords))
 	   (warn ";;  angles : ~a~%" av0)
