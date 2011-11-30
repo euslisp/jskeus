@@ -1591,6 +1591,7 @@
        (when (and debug-view (not (memq :no-message debug-view)))
          (warn "loop: ~3d~%" loop)
          (warn "union-link-list: ~A~%" (send-all union-link-list :name)))
+       (setq success (>= loop (/ stop 10)))
        (dotimes (i (length move-target))
          (let* ((move-target (elt move-target i))
                 (dif-pos (elt dif-pos i))
@@ -1609,7 +1610,6 @@
              (warn "vel-pos-norm : ~7,3f/~7,3f~%vel-rot-norm : ~7,3f/~7,3f~%"
                    (* 1000.0 (norm vel-p)) thre (norm vel-r) rthre))
            (setq success (and success
-                              (>= loop (/ stop 10))
                               (if translation-axis (< (norm dif-pos) thre) t)
                               (if rotation-axis (< (norm dif-rot) rthre) t)))
            (dotimes (j (length vel-p)) (setf (elt tmp-dim j) (elt vel-p j)))
