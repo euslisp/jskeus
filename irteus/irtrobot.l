@@ -313,6 +313,9 @@
     (coerce torque-vector cons))
    (if flush (send vwer :viewsurface :flush))
    );; draw-torque
+  ;; fullbody inverse kinematics for legged robot
+  ;;   necessary args : target-coords, move-target, and link-list must include legs' (or leg's) parameters
+  ;;                    ex. (send *robot* :fullbody-inverse-kinematics (list rarm-tc rleg-tc lleg-tc) :move-target (list rarm-mt rleg-mt lleg-mt) :link-list (list rarm-ll rleg-ll lleg-ll))
   (:fullbody-inverse-kinematics
     (target-coords
      &rest args
@@ -327,8 +330,9 @@
                  (dotimes (i 6) (setf (elt weight i) (elt root-link-virtual-joint-weight i)))
                  weight)))
           ;; default cog-jacobian parameters : target-centroid-pos, cog-gain, and centroid-thre
-          (target-centroid-pos (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos)))
-          (cog-gain 1.0) (centroid-thre 5.0) ;; [mm]
+          (target-centroid-pos (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos))) ;; <- target centroid position.
+          (cog-gain 1.0) ;; <- cog gain for null-space calculation. cog-gain should be over zero.
+          (centroid-thre 5.0) ;; cog convergence threshould [mm]
      &allow-other-keys)
     (with-append-root-joint ;; inverse-kinematics with base-link
      (link-list-with-robot-6dof self link-list
