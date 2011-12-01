@@ -49,14 +49,6 @@
                robot-ll (mapcar #'(lambda (l) (send *obj* :get l)) '(:rarm :larm))
                :joint-class 6dof-joint))
              (ll (car ret)) (ot (cadr ret))
-             (ul (apply #'append
-                        (mapcar
-                         #'(lambda (f)
-                             (send *robot* :calc-union-link-list
-                                   (mapcar #'(lambda (l)
-                                               (funcall f #'(lambda (x) (member x (send *robot* :links))) l))
-                                           ll)))
-                         (list #'remove-if-not #'remove-if))))
              (rotation-axis (cond
                              ((= (mod i 4) 1) '(:x t))
                              ((= (mod i 4) 3) '(t :x))
@@ -64,18 +56,27 @@
              (weight (fill (instantiate float-vector (send *robot* :calc-target-joint-dimension ll)) 1.0)))
         (dotimes (i 3)
           (setf (elt weight (+ (- (send *robot* :calc-target-joint-dimension ll) 6) i)) 0.001))
-        (send (car (last ul)) :assoc *obj*)
+        (send (send (car ot) :parent) :assoc *obj*)
         (send* *robot* :inverse-kinematics ot
-               :union-link-list ul :link-list ll :move-target mt
-               :weight weight
+               :link-list ll :move-target mt
                :rotation-axis rotation-axis
-               :jacobi #'(lambda ()
+               :weight weight
+               :union-link-list #'(lambda (tmp-ll)
+                                    (apply #'append
+                                           (mapcar
+                                            #'(lambda (f)
+                                                (send *robot* :calc-union-link-list
+                                                      (mapcar #'(lambda (l)
+                                                                  (funcall f #'(lambda (x) (member x (send *robot* :links))) l))
+                                                              tmp-ll)))
+                                            (list #'remove-if-not #'remove-if))))
+               :jacobi #'(lambda (tmp-ll tmp-mt tmp-ta tmp-ra)
                            (calc-jacobian-from-link-list-including-robot-and-obj-virtual-joint
-                            ll mt ot *robot* :rotation-axis rotation-axis))
+                            tmp-ll tmp-mt ot *robot* :rotation-axis tmp-ra))
                ;;:debug-view t
                :debug-view :no-message
                (append (if (= i 0) '(:stop 100)) args))
-        (send (car (last ul)) :dissoc *obj*)
+        (send (send (car ot) :parent) :dissoc *obj*)
         ))
      (incf i)
      (send *robot* :head :look-at (send *obj* :worldpos))
