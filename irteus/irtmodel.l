@@ -1581,7 +1581,7 @@
            (setq tmp-dim (cadr (memq :tmp-dim ik-args)))
          (setq tmp-dim (instantiate float-vector (send self :calc-target-axis-dimension rotation-axis translation-axis))))
        
-       (if (functionp jacobi) (setq jacobi (funcall jacobi)))
+       (if (functionp jacobi) (setq jacobi (funcall jacobi link-list move-target translation-axis rotation-axis)))
        (unless jacobi
          (setq jacobi (send* self :calc-jacobian-from-link-list link-list
                              :translation-axis translation-axis
@@ -1672,7 +1672,7 @@
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
    (let* ((loop 0)
-          (union-link-list (if union-link-list union-link-list (send self :calc-union-link-list link-list)))
+          (union-link-list (if (functionp union-link-list) (funcall union-link-list link-list) (send self :calc-union-link-list link-list)))
           (av0 (send-all (remove-duplicates
 			  (append (send-all union-link-list :joint) joint-list))
                          :joint-angle))
@@ -1975,9 +1975,10 @@
   (let* ((robot-ll (mapcar #'(lambda (l) ;; link-list for object link
                                (remove-if-not #'(lambda (x) (member x (send robot :links))) l))
                            link-list))
-         (obj-ll (mapcar #'(lambda (l) ;; link-list for robot link
-                             (remove-if #'(lambda (x) (member x (send robot :links))) l))
-                         link-list))
+         (obj-ll (remove nil ;; obj-move-target should corresponds to head of link-list
+                         (mapcar #'(lambda (l) ;; link-list for robot link
+                                     (remove-if #'(lambda (x) (member x (send robot :links))) l))
+                                 link-list)))
          (robot-ll-len (send robot :calc-target-joint-dimension robot-ll)))
     (send robot :calc-jacobian-from-link-list
           obj-ll :col-offset robot-ll-len :fik fik
