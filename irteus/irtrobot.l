@@ -313,6 +313,33 @@
     (coerce torque-vector cons))
    (if flush (send vwer :viewsurface :flush))
    );; draw-torque
+  (:fullbody-inverse-kinematics
+    (target-coords
+     &rest args
+     &key (move-target) (link-list)
+          ;; default robot root-link 6dof parameters : min, max, root-link-virtual-joint-weight, and weight
+          (min (float-vector -500 -500  -500 -20 -20 -10))
+          (max (float-vector  500  500   25  20  20  10))
+          (root-link-virtual-joint-weight #f(0.1 0.1 0.1 0.1 0.5 0.5))
+          (weight
+           #'(lambda (ul)
+               (let ((weight (fill (instantiate float-vector (send self :calc-target-joint-dimension ul)) 1.0)))
+                 (dotimes (i 6) (setf (elt weight i) (elt root-link-virtual-joint-weight i)))
+                 weight)))
+          ;; default cog-jacobian parameters : target-centroid-pos, cog-gain, and centroid-thre
+          (target-centroid-pos (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos)))
+          (cog-gain 1.0) (centroid-thre 5.0) ;; [mm]
+     &allow-other-keys)
+    (with-append-root-joint ;; inverse-kinematics with base-link
+     (link-list-with-robot-6dof self link-list
+                                :joint-class 6dof-joint
+                                :joint-args (list :min min :max max))
+     (send* self :inverse-kinematics target-coords
+            :move-target move-target :link-list link-list-with-robot-6dof
+            :cog-gain cog-gain :centroid-thre centroid-thre :target-centroid-pos target-centroid-pos
+            :weight weight
+            args)
+     ))
   )
 
 (in-package "GEOMETRY")
