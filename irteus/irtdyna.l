@@ -720,7 +720,7 @@
                    jvv)) ;; [rad/s]
            (jav (scale dt-1 (v- jvv pjvv)))) ;; [rad/s^2]
       (send* self calc-torque-method
-             :dt dt :jvv jvv :jav jav
+	     :jvv jvv :jav jav
              :debug-view debug-view
              calc-torque-args)
       (send self :put :prev-av av)
