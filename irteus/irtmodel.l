@@ -1642,7 +1642,7 @@
          (send self :draw-collision-debug-view)
          (when (car target-coords)
            (dotimes (i (length target-coords))
-             (send-message (elt move-target i) cascaded-link :draw-on :flush nil :size 100)
+	     (send-message (elt move-target i) coordinates :draw-on :flush nil :size 100)
              (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0))))
          (if (not (memq :no-flush debug-view)) (send *viewer* :viewsurface :flush))
          )
