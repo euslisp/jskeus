@@ -101,18 +101,21 @@
 	  (coerce (mapcar #'(lambda (l) (send l :joint :joint-angle))
 			  (send self limb)) float-vector)))
        (:inverse-kinematics
-	 (let ((link-list (if (memq :link-list args)
-			      (cadr (memq :link-list args))
-			    (send self :link-list
-				  (send self limb :end-coords :parent)
-				  (send self limb :root-link)))))
+	 (let* ((link-list (if (memq :link-list args)
+			       (cadr (memq :link-list args))
+			     (send self :link-list
+				   (send self limb :end-coords :parent)
+				   (send self limb :root-link))))
+		(collision-avoidance-link-pair
+		 (if (memq :collision-avoidance-link-pair args)
+		     (cadr (memq :collision-avoidance-link-pair args))
+		   (send self :collision-avoidance-link-pair-from-link-list link-list
+			 :collision-avoidance-links (send self limb :collision-avoidance-links)))))
 	   (send* self :inverse-kinematics (car args)
 		  :move-target (if (memq :move-target args)
 				   (cadr (memq :move-target args))
 				 (send self limb :end-coords))
-		  :collision-avoidance-link-pair
-		  (send self :collision-avoidance-link-pair-from-link-list link-list
-			:collision-avoidance-links (send self limb :collision-avoidance-links))
+		  :collision-avoidance-link-pair collision-avoidance-link-pair
 		  :link-list link-list
 		  (cdr args))))
        (:move-end
