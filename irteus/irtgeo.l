@@ -241,11 +241,15 @@
 
 ;;;
 (defmethod coordinates
-  (:rotate-vector (v &optional r) 
-		  (if r (transform rot v r) (transform rot v))))
-(defmethod cascaded-coords 
-  (:rotate-vector (v &optional r) 
-		  (send (send self :worldcoords) :rotate-vector v r)))
+  (:rotate-vector (v &optional r)
+                  (if r (transform rot v r) (transform rot v)))
+  (:inverse-rotate-vector (v &optional r)
+                          (if r (transform v rot r) (transform v rot))))
+(defmethod cascaded-coords
+  (:rotate-vector (v &optional r)
+                  (send (send self :worldcoords) :rotate-vector v r))
+  (:inverse-rotate-vector (v &optional r)
+                          (send (send self :worldcoords) :inverse-rotate-vector v r)))
 
 (defmethod coordinates
   (:inverse-transform-vector
