@@ -1590,7 +1590,10 @@
                              method-args)))
        (when (and debug-view (not (memq :no-message debug-view)))
          (warn "loop: ~3d~%" loop)
-         (warn "union-link-list: ~A~%" (send-all union-link-list :name)))
+         (warn "union-link-list: ~A~%" (send-all union-link-list :name))
+         (warn "move-target: ~A~%" move-target)
+         (warn "targe-coordst: ~A~%" target-coords)
+	 )
 
        ;; convergence check
        (setq success
