@@ -31,12 +31,12 @@
 
 (defmethod cascaded-coords
   (:make-pqpmodel
-   (&key (fat 0))
+   (&key (fat 0) ((:faces fs) (send self :faces)))
    (let ((m (pqpmakemodel))
 	 vs v1 v2 v3 (id 0))
      (setf (get self :pqpmodel) m)
      (pqpbeginmodel m)
-     (dolist (f (send self :faces))
+     (dolist (f fs)
        (dolist (poly (face-to-triangle-aux f))
 	 (setq vs (send poly :vertices)
 	       v1 (send self :inverse-transform-vector (first vs))
