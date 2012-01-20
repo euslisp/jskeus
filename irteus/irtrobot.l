@@ -327,11 +327,6 @@
           (min (float-vector -500 -500  -500 -20 -20 -10))
           (max (float-vector  500  500   25  20  20  10))
           (root-link-virtual-joint-weight #f(0.1 0.1 0.1 0.1 0.5 0.5))
-          (weight
-           #'(lambda (ul)
-               (let ((weight (fill (instantiate float-vector (send self :calc-target-joint-dimension ul)) 1.0)))
-                 (dotimes (i 6) (setf (elt weight i) (elt root-link-virtual-joint-weight i)))
-                 weight)))
           ;; default cog-jacobian parameters : target-centroid-pos, cog-gain, and centroid-thre
           (target-centroid-pos (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos))) ;; <- target centroid position.
           (cog-gain 1.0) ;; <- cog gain for null-space calculation. cog-gain should be over zero.
@@ -344,7 +339,13 @@
      (send* self :inverse-kinematics target-coords
             :move-target move-target :link-list link-list-with-robot-6dof
             :cog-gain cog-gain :centroid-thre centroid-thre :target-centroid-pos target-centroid-pos
-            :weight weight
+            :weight #'(lambda (union-link-list)
+			(let ((tmp-weight (fill (instantiate float-vector (send self :calc-target-joint-dimension union-link-list)) 1.0)))
+			  (dotimes (i 6) (setf (elt tmp-weight i) (elt root-link-virtual-joint-weight i)))
+			  (if (memq :weight args)
+			      (let ((tmp-weight2 (funcall (cadr (memq :weight args)) union-link-list)))
+				(dotimes (i (length tmp-weight2)) (setf (elt tmp-weight i) (* (elt tmp-weight i) (elt tmp-weight2 i))))))
+			  tmp-weight))
             args)
      ))
   )
