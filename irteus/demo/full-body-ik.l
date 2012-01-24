@@ -11,7 +11,7 @@
     (if (= (length (car (send *robot* :legs))) 6)
 	(send *robot* :legs :angle-vector #f(0 0 -10 20 0 -10)))
     (if (send *robot* :lleg)
-	(send *robot* :transform (send (send *robot* :lleg :end-coords) :transformation (make-coords)))
+        (send *robot* :newcoords (send (make-coords) :transform (send (send *robot* :lleg :end-coords) :transformation *robot*))) ;fix-leg
       (send *robot* :newcoords (make-coords)))
     (send *robot* :update-descendants)
     (let* ((move-target (send *robot* :larm :end-coords))
@@ -37,9 +37,9 @@
        (send *robot* :head :look-at
              (send *robot* :larm :end-coords :worldpos))
        (if (send *robot* :lleg)
-	   (send *robot* :transform (send (send *robot* :lleg :end-coords)
-					  :transformation (make-coords))) ;fix-leg
+           (send *robot* :newcoords (send (make-coords) :transform (send (send *robot* :lleg :end-coords) :transformation *robot*))) ;fix-leg
 	 (send *robot* :newcoords (make-coords)))
+       (if use-leg (send *irtviewer* :draw-objects :flush nil))
        (send *irtviewer* :viewer :viewsurface :color #f(1 1 1))
        (send *irtviewer* :viewer :viewsurface :line-width 2)
        (send *irtviewer* :viewer :viewsurface :3d-line
