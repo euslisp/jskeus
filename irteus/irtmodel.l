@@ -816,7 +816,7 @@
                      ((or
                        (and (< (+ l 1) len)
                             (not (eq (send j :child-link)
-                                     (send (elt link-list (+ l 1)) :parent-link))))
+                                     (find-parent (send (elt link-list (+ l 1)) :parent-link) link-list))))
                        (and (= len (+ l 1))
                             (not (eq (send j :child-link)
                                      (find-parent (send move-target :parent) link-list)))))
