@@ -105,8 +105,8 @@
 (defun calc-angle-speed-gain-scalar
   (j dav i periodic-time)
   (let ((dav-gain
-	 (/ (send j :max-joint-velocity)
-	    (/ (abs (elt dav i)) periodic-time))))
+	 (abs (/ (send j :max-joint-velocity)
+		 (/ (elt dav i) periodic-time)))))
     (if (< dav-gain 1.0) dav-gain 1.0)))
 
 ;; calc-angle-speed-gain-vector -> for wheel-joint, omniwheel-joint, sphere-joint and 6dof-joint
@@ -115,8 +115,8 @@
   (let ((dav-gain 1.0))
     (dotimes (ii (send j :joint-dof))
       (let ((tmp-gain
-	     (/ (elt (send j :max-joint-velocity) ii)
-		(/ (abs (elt dav (+ ii i))) periodic-time))))
+	     (abs (/ (elt (send j :max-joint-velocity) ii)
+		     (/ (elt dav (+ ii i)) periodic-time)))))
 	(if (< tmp-gain dav-gain) (setq dav-gain tmp-gain))))
     dav-gain))
 
