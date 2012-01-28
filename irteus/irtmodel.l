@@ -676,11 +676,16 @@
     (to &optional from)
     (let ((pl (send to :parent-link)))
       (cond
+       ;; if to is not included in (send self :links), just trace parent-link
+       ((and pl (not (find to (send self :links))))
+	(send self :find-link-route pl from))
+       ;; if (send self :links), append "to" link
        ((and pl (not (eq to from)))
         (append (send self :find-link-route pl from) (list to)))
+       ;; if link-route, just return "from" link
        ((and pl (eq to from))
         (list from))
-       ;; if parent-link is not prepared adequately, trace parent
+       ;; if parent-link is not prepared adequately, just trace parent
        ((and (not pl) (derivedp (send to :parent) bodyset-link))
         (send self :find-link-route (send to :parent) from)
         ))))
