@@ -43,6 +43,8 @@
 	 (send self :name name)
 	 (setq parent-link plink child-link clink
 	       min-angle min max-angle max)
+	 (if (< mjv 0.0) (warning-message 3 "[joint ~A] warning negative max-joint-velocity value ~A~%" name mjv))
+	 (if (< mjt 0.0) (warning-message 3 "[joint ~A] warning negative max-joint-torque value ~A~%" name mjt))
 	 (send self :max-joint-velocity mjv)
 	 (send self :max-joint-torque mjt)
 	 (setq default-coords (send child-link :copy-coords))
