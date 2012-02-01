@@ -190,13 +190,15 @@
     &key (tmp-va (float-vector 0 0 0))
          (tmp-vb (float-vector 0 0 0))
          (len (length additional-weights)))
-   (scale
-    (/ 1.0 new-weight)
-    (let ((ret (scale (send self :weight) self-centroid tmp-vb)))
-      (dotimes (i len)
-	(v+ ret (scale (elt additional-weights i) (elt additional-centroids i) tmp-va) ret))
-      ret)
-    tmp-vb))
+   (if (eps= new-weight 0.0)
+       self-centroid ;; if new-weight is 0, return self-centroid ;; in this case, this centroid value is not used latter calculation.
+     (scale
+      (/ 1.0 new-weight)
+      (let ((ret (scale (send self :weight) self-centroid tmp-vb)))
+	(dotimes (i len)
+	  (v+ ret (scale (elt additional-weights i) (elt additional-centroids i) tmp-va) ret))
+	ret)
+      tmp-vb)))
   (:append-inertia-no-update
    (additional-weights
     additional-centroids
