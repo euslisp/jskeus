@@ -685,10 +685,7 @@
        ;; if link-route, just return "from" link
        ((and pl (eq to from))
         (list from))
-       ;; if parent-link is not prepared adequately, just trace parent
-       ((and (not pl) (derivedp (send to :parent) bodyset-link))
-        (send self :find-link-route (send to :parent) from)
-        ))))
+       )))
   (:link-list
    (to &optional from)
    (let (ret1 ret2)
