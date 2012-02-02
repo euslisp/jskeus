@@ -35,7 +35,7 @@ PQPLIB=-L$(PQPLIBDIR) -lPQP-static
 MODULES.L=irt_modules.l
 EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 
-IRTEUS=irtmath irtutil pgsql
+IRTEUS=irtmath irtutil irtgraph pgsql
 IRTEUSG=irtgeo pqp irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada
 IRTEUSX=irtx
 IRTEUSIMG=irtimage eusjpeg png
@@ -164,6 +164,7 @@ clean:
 
 $(OBJDIR)/irtmath.$(OSFX): irtmath.l
 $(OBJDIR)/irtutil.$(OSFX): irtutil.l
+$(OBJDIR)/irtgraph.$(OSFX): irtgraph.l
 $(OBJDIR)/irtgeo.$(OSFX): irtgeo.l
 $(OBJDIR)/irtscene.$(OSFX): irtscene.l
 $(OBJDIR)/irtmodel.$(OSFX): irtmodel.l

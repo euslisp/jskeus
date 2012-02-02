@@ -30,6 +30,7 @@
 
 (comp:compile-file-if-src-newer "irtmath.l" *objdir*)
 (comp:compile-file-if-src-newer "irtutil.l" *objdir*)
+(comp:compile-file-if-src-newer "irtgraph.l" *objdir*)
 (comp:compile-file-if-src-newer (format nil "~A/lib/llib/pgsql.l" *eusdir*) *objdir*)
 
 
