@@ -400,7 +400,7 @@
 	  (send* (elt link-list l) :calc-inertia-matrix-column column :inertia-matrix inertia-matrix
                  ;; axis-for-angular is the axis for calculation of angular variables
                  ;; for example, we calculate angular momentum around the whole-body Center Of Mass as follows.
-		 :axis-for-angular (send self :centroid)
+		 :axis-for-angular (send self :centroid nil)
 		 :translation-axis translation-axis :rotation-axis rotation-axis args)))
     inertia-matrix)
   ;; return   ;; COG jacobian [m]
