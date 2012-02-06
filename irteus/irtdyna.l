@@ -412,8 +412,9 @@
           (inertia-matrix
 	   (make-matrix axis-dim (send self :calc-target-joint-dimension link-list)))
      &allow-other-keys)
-    (let ((all-M (* 0.001 (reduce #'+ (send-all (send self :links) :weight))))) ;; [kg]
+    (let ((all-M (* 0.001 (send self :weight)))) ;; [kg]
       (send* self :calc-inertia-matrix-from-link-list
+             :update-mass-properties nil
 	     :inertia-matrix inertia-matrix :link-list link-list args)
       ;; calc cog jacobian from inertia matrix
       (dotimes (i axis-dim)
