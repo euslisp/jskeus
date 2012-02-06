@@ -430,7 +430,7 @@
      &rest args
      &key (cog-gain 1.0)
           (translation-axis :z)
-          (target-centroid-pos (send (car (send self :links)) :get :c-til))
+          (target-centroid-pos)
 	  (centroid-offset-func)
      &allow-other-keys)
     (transform
@@ -444,7 +444,7 @@
 	     (v- target-centroid-pos
 		 (if (functionp centroid-offset-func)
 		     (funcall centroid-offset-func)
-		   (send (car (send self :links)) :get :c-til)))
+                   (send self :centroid)))
 	     translation-axis))
      )
     )
