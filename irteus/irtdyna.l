@@ -445,7 +445,7 @@
 	     (v- target-centroid-pos
 		 (if (functionp centroid-offset-func)
 		     (funcall centroid-offset-func)
-                   (send self :centroid)))
+                   (send self :centroid nil)))
 	     translation-axis))
      )
     )
