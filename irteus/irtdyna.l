@@ -317,8 +317,7 @@
   (:calc-inertia-matrix-column
    (column
     &rest args
-    &key (debug-view nil)
-         (rotation-axis nil)
+    &key (rotation-axis nil)
 	 (translation-axis t)
          ((:inertia-matrix im))
 	 (axis-for-angular (float-vector 0 0 0))
@@ -367,7 +366,6 @@
           (axis-dim (send self :calc-target-axis-dimension rotation-axis translation-axis))
 	  (inertia-matrix
 	   (make-matrix axis-dim (send self :calc-target-joint-dimension link-list)))
-	  (debug-view nil)
 	  (update-mass-properties t)
           ;; buffers for calculation
 	  (tmp-v0 (instantiate float-vector 0))
