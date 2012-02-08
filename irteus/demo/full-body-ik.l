@@ -28,12 +28,14 @@
                             :translation-axis t))
              (dif-rot (send move-target :difference-rotation target
                             :rotation-axis nil)))
-         (send *robot* :inverse-kinematics-loop dif-pos dif-rot
+         (send* *robot* :inverse-kinematics-loop dif-pos dif-rot
                :link-list link-list
                :target-coords target
                :move-target (send *robot* :larm :end-coords)
                :rotation-axis nil :translation-axis t
-               :debug-view :no-flush))
+               :manipulability-gain 0.05
+               :debug-view :no-flush
+               (if use-leg '(:manipulability-limit 0.5)))
        (send *robot* :head :look-at
              (send *robot* :larm :end-coords :worldpos))
        (if (send *robot* :lleg)
