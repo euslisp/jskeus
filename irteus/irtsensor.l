@@ -34,7 +34,7 @@
   (:read () data)
   (:draw-sensor (v) (warn ":draw-sensor should be defined in lower class~%"));; virtual method
   (:init
-   (shape &key name)
+   (shape &key name &allow-other-keys)
    (replace-object self shape)
    (send self :name name)
    shape))
@@ -87,7 +87,7 @@
           (yon 10000.0)
           &allow-other-keys)
    (let ()
-     (send-super :init b)
+     (send-super* :init b args)
      (setq pwidth pw pheight ph)
      (setq vwing
            (instance* perspective-viewing :init
