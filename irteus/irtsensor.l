@@ -227,13 +227,13 @@
   )
 
 ;; utility functions
-(defun make-camera-from-param (&key pwidth pheight fx fy cx cy (tx 0) (ty 0) parent-coords)
+(defun make-camera-from-param (&key pwidth pheight fx fy cx cy (tx 0) (ty 0) parent-coords name)
   (let* ((b (body+ (make-cube 40 30 30)
                    (send (make-cylinder 2 30) :rotate pi/2 :x)
                    (make-cylinder 13 25)))
 	 c (vd 1.0))
     (setq c (instance camera-model :init b :width pwidth :height pheight
-                      :viewdistance vd))
+                      :viewdistance vd :name name))
     (send (c . vwing) :screen (/ (* vd pwidth 0.5) fx) (/ (* vd pheight 0.5) fy))
     (send c :newprojection
           (make-matrix 4 4
