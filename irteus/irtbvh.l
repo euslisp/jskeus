@@ -230,7 +230,7 @@
    (&optional (strm *standard-output*))
    (let (a)
      (dolist (l links)
-       (setq a (map cons #'rad2deg (matrix-to-euler-angle (send child-link :rot) axis-order)))
+       (setq a (send l :joint :joint-angle-bvh))
        (dotimes (i (length a))
 	 (format strm "~0,6f " (elt a i))))
      (format strm "~%")))
