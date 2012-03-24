@@ -556,6 +556,8 @@
 ;;
 (defun matrix-to-euler-angle (m axis-order)
   (let (a0 a1 a2 (eps 1.0e-6))
+    (unless (and (matrixp m) (equal (array-dimensions m) '(3 3)))
+      (error "3x3 matrix is required~A" m))
     (case (elt axis-order 0)
       (:x
        (case (elt axis-order 2)
