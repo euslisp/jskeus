@@ -35,7 +35,7 @@
   :slots (type offset channels neutral))
 
 (defmethod bvh-link
-  (:init (name typ coords offst chs parent children rot)
+  (:init (name typ offst chs parent children)
          (let ((s 30) bs)
            (setq type typ offset offst channels chs)
 
@@ -44,22 +44,25 @@
 			  (make-cylinder (* 0.5 s) (* 0.60 s))))
 	   (dolist (b (cdr bs)) (send (car bs) :assoc b))
            (dolist (child children)
-             (setq child (send coords :rotate-vector child))
              (let* ((v (v- (normalize-vector child)))
                     (c (make-cylinder (/ s 3.0) (norm child)))
-                    (a (normalize-vector (v* v #f(0 0 1)))))
+                    (a (normalize-vector (v* v #f(0 0 1)))) m r)
                (if (eps= (norm a) 0.0) (setq a #f(1 0 0)))
-               (send c :rotate (acos (v. v #f(0 0 -1))) a)
+	       (setq m (send (send (make-coords) :rotate (acos (v. v #f(0 0 -1))) a) :rot))
+	       (dotimes (i 12)
+		 (push (transform m
+				  (float-vector (* (/ s 3) (sin (* -2pi (/ i 12.0))))
+						(* (/ s 3) (cos (* -2pi (/ i 12.0))))
+						0)) r))
+	       (setq c (make-prism r child))
                (send (car bs) :assoc c)
                (setq bs (nconc bs (list c)))))
-           (send-super :init (make-cascoords :rot rot)
-                       :bodies bs :name name)
+           (send-super :init (make-cascoords) :bodies bs :name name)
            (case type
              ('end  (send self :bodies :set-color :red))
              ('root (send self :bodies :set-color :darkgreen))
              (t     (send self :bodies :set-color :green)))
 
-           (setq offset (send coords :rotate-vector offset))
            (send self :locate
                  (if parent (v+ (send parent :worldpos) offset) offset) :world)
            (if parent (send parent :assoc self))
@@ -72,37 +75,46 @@
 
 (defclass bvh-sphere-joint
   :super sphere-joint
-  :slots (axis-order bvh-default-rotation))
+  :slots (axis-order bvh-offset-rotation))
 (defmethod bvh-sphere-joint
-  (:init (&rest args &key (order (list :z :x :y)) ((:bvh-default-rotation bvh-rotation) (unit-matrix 3)) ((:bvh-offset-rotation bvh-offset) (unit-matrix 3)) &allow-other-keys)
-         (setq axis-order order)
-         (setq bvh-default-rotation (m* (transpose bvh-offset) bvh-rotation))
+  (:init (&rest args &key (order (list :z :x :y)) ((:bvh-offset-rotation bvh-rotation) (unit-matrix 3)) &allow-other-keys)
+         (setq axis-order order
+	       bvh-offset-rotation bvh-rotation)
          (send-super* :init args))
-  (:joint-angle-bvh
-   (&optional v)
+  (:joint-angle-bvh (&optional v)
+   (send self :joint-angle-bvh-impl v (unit-matrix 3)))
+  (:joint-angle-bvh-offset (&optional v)
+   (send self :joint-angle-bvh-impl v bvh-offset-rotation))
+  (:joint-angle-bvh-impl
+   (v bvh-offset)
    (let (ja m)
      (when v
        (setq ja (map float-vector #'deg2rad v))
        (setq m (rotation-matrix (elt ja 2) (elt axis-order 2)))
        (rotate-matrix m (elt ja 1) (elt axis-order 1) t m)
        (rotate-matrix m (elt ja 0) (elt axis-order 0) t m)
-       (send self :joint-angle (map float-vector #'rad2deg (transform bvh-default-rotation (matrix-log m))))
+       (send self :joint-angle (map float-vector #'rad2deg (matrix-log (m* bvh-offset m))))
        )
-     (map cons #'rad2deg (matrix-to-euler-angle (matrix-exponent (transform (transpose bvh-default-rotation) (matrix-log (send child-link :rot)))) axis-order))))
+     (map cons #'rad2deg (matrix-to-euler-angle (m* (transpose bvh-offset) (send child-link :rot)) axis-order))))
   (:axis-order () axis-order)
+  (:bvh-offset-rotation () bvh-offset-rotation)
   )
 
 (defclass bvh-6dof-joint
   :super 6dof-joint
-  :slots (scale axis-order bvh-default-rotation))
+  :slots (scale axis-order bvh-offset-rotation))
 (defmethod bvh-6dof-joint
-  (:init (&rest args &key ((:scale scl)) (order (list :x :y :z :z :x :y)) ((:bvh-default-rotation bvh-rotation) (unit-matrix)) ((:bvh-offset-rotation bvh-offset) (unit-matrix 3)) &allow-other-keys)
-         (setq scale (if scl scl 1.0)
-               axis-order order
-	       bvh-default-rotation (m* (transpose bvh-offset) bvh-rotation))
+  (:init (&rest args &key (order (list :x :y :z :z :x :y)) ((:scale scl)) ((:bvh-offset-rotation bvh-rotation) (unit-matrix 3)) &allow-other-keys)
+         (setq axis-order order
+	       scale (if scl scl 1.0)
+               bvh-offset-rotation bvh-rotation)
          (send-super* :init args))
-  (:joint-angle-bvh
-   (&optional v)
+  (:joint-angle-bvh (&optional v)
+   (send self :joint-angle-bvh-impl v (unit-matrix 3)))
+  (:joint-angle-bvh-offset (&optional v)
+   (send self :joint-angle-bvh-impl v bvh-offset-rotation))
+  (:joint-angle-bvh-impl
+   (v bvh-offset)
    (let (m r p)
      (when v
        (setq r (map float-vector #'deg2rad (subseq v 3 6))
@@ -112,12 +124,14 @@
        (rotate-matrix m (elt r 0) (elt axis-order 3) t m)
        (send self :joint-angle
              (concatenate float-vector
-			  (transform bvh-default-rotation p)
-			  (map cons #'rad2deg (transform bvh-default-rotation (matrix-log m))))))
+			  (transform bvh-offset p)
+			  (map cons #'rad2deg (matrix-log (m* bvh-offset-rotation m))))))
      (concatenate cons
-		  (transform (transpose bvh-default-rotation) (scale 0.001 (send child-link :pos)))
-		  (map cons #'rad2deg (matrix-to-euler-angle (matrix-exponent (transform (transpose bvh-default-rotation) (matrix-log (send child-link :rot)))) (subseq axis-order 3 6))))))
-  (:axis-order () axis-order))
+		  (transform (transpose bvh-offset) (scale 0.001 (send child-link :pos)))
+		  (map cons #'rad2deg (matrix-to-euler-angle (m* (transpose bvh-offset) (send child-link :rot)) (subseq axis-order 3 6))))))
+  (:axis-order () axis-order)
+  (:bvh-offset-rotation () bvh-offset-rotation)
+  )
 
 (defclass bvh-robot-model
   :super robot-model
@@ -125,15 +139,16 @@
 
 (defmethod bvh-robot-model
   (:init
-   (&rest args &key tree (coords (make-coords)) ((:scale scl)))
+   (&rest args &key tree coords ((:scale scl)))
    (send-super* :init :coords (make-cascoords) args) ;; to avoid pass :coords keyword to upper-class
-   (send self :make-bvh-link tree :coords coords :scale scl)
+   (send self :make-bvh-link tree :scale scl)
+   (if coords (send self :transform coords))
    (setq links (reverse links)
          joint-list (reverse joint-list))
    (send self :init-ending)
    self)
   (:make-bvh-link
-   (tree &key parent (coords) ((:scale scl)))
+   (tree &key parent ((:scale scl)))
    (let (joint-type joint-name offset channels alink ajoint)
      (setq joint-type (caar tree)
            joint-name (cadr (pop tree))
@@ -141,12 +156,10 @@
            channels (cdr (pop tree)))
      (if (null scl) (setq scl 1.0))
      (setq alink (instance bvh-link :init joint-name joint-type
-                           coords
                            offset
 			   (car channels)
                            parent
                            (mapcar #'(lambda (tr) (cadr (assoc 'offset (cdr tr)))) tree)
-			   (send self :bvh-offset-rotate joint-name)
                            ))
      (push alink links)
      (unless (eql joint-type 'end)
@@ -161,15 +174,13 @@
            (t (warning-message 1 "unknown joint type ~A~%" channels)))
          (setq ajoint (instance joint-cls :init :name joint-name
                                 :child-link alink :parent-link parent
-                                :bvh-default-rotation (send coords :worldrot)
-                                :bvh-offset-rotation  (send self :bvh-offset-rotate joint-name)
+				:bvh-offset-rotation (send self :bvh-offset-rotate joint-name)
                                 :order (reduce #'(lambda (x y) (substitute (car y) (cdr y) x)) (list (cdr channels) (cons :x 'xrotation) (cons :y 'yrotation) (cons :z 'zrotation)))
                                 :scale scl))
          (push ajoint joint-list)))
      (dolist (tr tree)
-       (send self :make-bvh-link tr :parent alink :coords coords :scale scl))
+       (send self :make-bvh-link tr :parent alink :scale scl))
      parent))
-  (:bvh-offset-rotate (name) (unit-matrix 3))
   (:angle-vector
    (&optional vec
               (angle-vector (instantiate float-vector (calc-target-joint-dimension joint-list))))
@@ -179,11 +190,11 @@
            (case (send j :joint-dof)
              (1 (send j :joint-angle (elt vec i)))
              (3 (let ((v (subseq vec i (+ i (send j :joint-dof)))))
-		  (send j :joint-angle-bvh v)))
-             (t (send j :joint-angle-bvh (subseq vec i (+ i (send j :joint-dof)))))
+		  (send j :joint-angle-bvh-offset v)))
+             (t (send j :joint-angle-bvh-offset (subseq vec i (+ i (send j :joint-dof)))))
              ))
        (dotimes (k (send j :joint-dof))
-         (setf (elt angle-vector i) (elt (send j :joint-angle-bvh) k))
+         (setf (elt angle-vector i) (elt (send j :joint-angle-bvh-offset) k))
          (incf i)))
      angle-vector))
   ;;
@@ -238,6 +249,14 @@
    (robot)
    (warning-message 1 "subclass's responsibility :copy-state-to~%")
    )
+  (:fix-joint-angle
+   (i limb joint-name joint-order a)
+   a)
+  (:fix-joint-order (jo limb)
+   jo)
+  (:bvh-offset-rotate
+   (name)
+   (unit-matrix 3))
   ) ; bvh-robot-model
 
 ;;;
@@ -315,10 +334,10 @@
   :slots (frame model animation))
 (defmethod motion-capture-data
   (:init
-   (fname &key ((:scale scl)))
+   (fname &key (coords (make-coords)) ((:scale scl)))
    (let (bvh-data)
      (setq bvh-data (read-bvh fname :scale scl))
-     (setq model (make-bvh-robot-model (cadr (assoc 'hierarchy bvh-data)) :scale scl))
+     (setq model (make-bvh-robot-model (cadr (assoc 'hierarchy bvh-data)) :coords coords :scale scl))
      (setq animation (car (last (cadr (assoc 'motions bvh-data)))))
      (setq frame 0)
      self))
@@ -326,7 +345,9 @@
   (:animation (&rest args) (forward-message-to animation args))
   (:frame (&optional f)
    (if f (setq frame f))
-   (send model :angle-vector (elt animation frame))
+   (let ((av (elt animation frame)) (i 0))
+     (dolist (j (send model :joint-list))
+       (send j :joint-angle-bvh (subseq av i (incf i (send j :joint-dof))))))
    frame)
   (:frame-length () (length animation))
   (:animate
@@ -346,9 +367,9 @@
   ;;
   ) ; motion-capture-data
 
-(defun bvh2eus (fname &key (scale))
+(defun bvh2eus (fname &key (coords) (scale))
   (let (b)
-    (setq b (instance motion-capture-data :init fname :scale scale))
+    (setq b (instance motion-capture-data :init fname :coords coords :scale scale))
     (objects (list (send b :model)))
     (send b :animate)
     b))
