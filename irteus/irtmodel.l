@@ -420,8 +420,8 @@
      ))
   ;;
   (:joint-euler-angle
-   (&key (axis-order '(:z :y :x)))
-   (let ((m (send child-link :rot)))
+   (&key (axis-order '(:z :y :x)) ((:child-rot  m) (send child-link :rot)))
+   (let ()
      (map cons #'rad2deg
 	  (case (length axis-order)
 	    (1
