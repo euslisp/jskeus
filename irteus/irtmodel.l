@@ -1850,6 +1850,11 @@
      vel-r))
   )
 
+(defun all-descendants (s &optional (pred #'identity))
+  (append (mapcan #'(lambda (x)
+		      (if (funcall pred x) (list x))) (send s :descendants))
+	  (mapcan #'(lambda (x) (all-descendants x pred)) (send s :descendants))))
+
 (defun calc-dif-with-axis (dif axis &optional tmp-v0 tmp-v1 tmp-v2)
   (case axis
 	((:x :xx)
