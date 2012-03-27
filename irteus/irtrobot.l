@@ -182,6 +182,7 @@
 	   args))
        (:links (send self :limb limb nil))
        (:joint-list (send-all (send self :limb limb :links) :joint))
+       (:gripper (send* self :gripper limb args))
        (t
 	(cond
 	 ((or (null method) (send bodyset-link :method method))
@@ -197,6 +198,19 @@
 	    ))))
        ) ;; case method
      )) ;; defmethod
+  (:gripper
+   (limb &rest args)
+   (cond
+    ((memq :links args)
+     (all-descendants (send self limb :end-coords :parent) #'(lambda (x) (derivedp x bodyset-link))))
+    ((memq :joint-list args)
+     (send-all (cdr (send self :gripper limb :links)) :joint))
+    ((memq :angle-vector args)
+     (if (null (cdr args))
+	 (send-all (send self :gripper limb :joint-list) :joint-angle)
+       (map float-vector #'(lambda (x y) (send x :joint-angle y))
+	    (send self :gripper limb :joint-list) (cadr args))))))
+  ;;
   (:larm (&rest args) 
 	 (unless args (setq args (list nil))) (send* self :limb :larm args))
   (:rarm (&rest args)
