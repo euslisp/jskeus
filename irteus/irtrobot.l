@@ -202,9 +202,9 @@
    (limb &rest args)
    (cond
     ((memq :links args)
-     (all-descendants (send self limb :end-coords :parent) #'(lambda (x) (derivedp x bodyset-link))))
+     (sort (all-child-links (send self limb :end-coords :parent)) #'(lambda (a b) (string< (string (send a :name)) (string (send b :name))))))
     ((memq :joint-list args)
-     (send-all (cdr (send self :gripper limb :links)) :joint))
+     (send-all (send self :gripper limb :links) :joint))
     ((memq :angle-vector args)
      (if (null (cdr args))
 	 (send-all (send self :gripper limb :joint-list) :joint-angle)
