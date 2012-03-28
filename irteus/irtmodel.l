@@ -1957,10 +1957,11 @@
 	(setf (elt jamm 1) (funcall (if vp #'mm2m #'deg2rad) (elt (send j :max-angle) kk)))
 	(setf (elt jamm 2) (funcall (if vp #'mm2m #'deg2rad) (elt (send j :min-angle) kk)))))
      (t ;; 1-dof joint such as rotational-joint and linear-joint
-      (let ((vp (vectorp (j . axis))))
+      (let ((vp (case (send (class j) :name) ('rotational-joint nil) ('linear-joint t) (t (vectorp (j . axis))))))
 	(setf (elt jamm 0) (funcall (if vp #'mm2m #'deg2rad) (send j :joint-angle)))
 	(setf (elt jamm 1) (funcall (if vp #'mm2m #'deg2rad) (send j :max-angle)))
-	(setf (elt jamm 2) (funcall (if vp #'mm2m #'deg2rad) (send j :min-angle))))))))
+	(setf (elt jamm 2) (funcall (if vp #'mm2m #'deg2rad) (send j :min-angle)))))))
+  jamm)
 
 (defun joint-angle-limit-weight (j-l &optional (res (instantiate float-vector (calc-target-joint-dimension j-l))))
   (let ((k 0) (kk 0) (jamm (float-vector 0 0 0)))
