@@ -1665,7 +1665,7 @@
          )
        :ik-continues))
   (:inverse-kinematics
-   (target-coord &rest args 
+   (target-coords &rest args 
 		  &key (stop 50)
 		  (link-list)
 		  (move-target)
@@ -1686,7 +1686,7 @@
                   (union-link-list)
 		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func)
 		  &allow-other-keys)
-   ;; target-coord, move-target, rotation-axis, translation-axis, link-list
+   ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
    (let* ((loop 0)
           (union-link-list (if (functionp union-link-list) (funcall union-link-list link-list) (send self :calc-union-link-list link-list)))
@@ -1698,7 +1698,6 @@
 	  ;;
           (success t) 
 	  (old-analysis-level (send-all union-link-list :analysis-level))
-	  target-coords ;; target-coord it list/atom, target-coords is list, keep input arguments in target-coord and args
           ik-args)       
      (send-all union-link-list :analysis-level :coords)
      ;; argument check
@@ -1716,7 +1715,7 @@
 	 (push :no-flush debug-view)))
      (if (atom (car link-list)) (setq link-list (list link-list)))
      (if (atom move-target) (setq move-target (list move-target)))
-     (if (atom target-coord) (setq target-coords (list target-coord)) (setq target-coords target-coord))
+     (if (atom target-coords) (setq target-coords (list target-coords)))
      (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
      (if (atom translation-axis) (setq translation-axis (list translation-axis)))
      (if (atom thre) (setq thre (list thre)))
@@ -1795,7 +1794,7 @@
            (warn ";;  coords : ~a~%" 
                  (send (let ((p self)) (while (send p :parent) (setq p (send p :parent))) p) :worldcoords))
 	   (warn ";;  angles : ~a~%" av0)
-	   (warn ";;    args : ~a~%" (append (list target-coord) args))
+	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   )
 	 (mapc #'(lambda (j a) (send* j :joint-angle a joint-args))
 	       (remove-duplicates
