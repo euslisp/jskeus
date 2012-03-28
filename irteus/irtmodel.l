@@ -1798,7 +1798,7 @@
 	   (warn ";;  angles : ~a~%" av0)
 	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   (when dump-command
-	     (let (i (print-args (copy-object args)) command-init command-setup command-args command-id)
+	     (let (i (print-args (copy-list args)) command-init command-setup command-args command-id)
 	       (dotimes (j (count :link-list print-args))
 		 (if (setq i (position :link-list print-args :count (1+ j)))
 		     (cond ((atom (car (elt print-args (+ i 1))))
