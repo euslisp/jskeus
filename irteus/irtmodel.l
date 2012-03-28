@@ -1817,7 +1817,7 @@
 					(mapcar #'(lambda (x)
 						    `(let* ((p (send r ,(send (send x :parent) :name))) (c (make-cascoords :coords (send (send p :copy-worldcoords) :transform (make-cascoords :4x4 ,(send x :4x4))) :parent p))) c))
 						(elt args (+ i 1)))))))))
-	     (warn ";; command : ~a~%" `(let ((r (instance ,(send (class self) :name) :init))) (send r :newcoords (make-coords :4x4 ,(send self :4x4))) (mapc #'(lambda (j a) (send* j :joint-angle a ,joint-args)) ,(append '(list) (mapcar #'(lambda (x) `(send r ,(intern (string-upcase x) *keyword-package*))) (send-all (remove-duplicates (append (send-all union-link-list :joint) joint-list)) :name))) ,(append '(list) av0)) (objects (list r)) (send* r :inverse-kinematics ,(append '(list) (mapcar #'(lambda (x) `(make-coords :pos ,(send x :worldpos) :rot ,(send x :worldrot))) target-coords)) ,(append '(list) args))))
+	     (warn ";; command : ~a~%" `(let ((r (instance ,(send (class self) :name) :init))) (send r :newcoords (make-coords :4x4 ,(send self :4x4))) (mapc #'(lambda (j a) (send* j :joint-angle a ,joint-args)) ,(append '(list) (mapcar #'(lambda (x) `(send r ,(intern (string-upcase x) *keyword-package*))) (send-all (remove-duplicates (append (send-all union-link-list :joint) joint-list)) :name))) ,(append '(list) av0)) (objects (list r)) (send r :inverse-kinematics ,(append '(list) (mapcar #'(lambda (x) `(make-coords :pos ,(send x :worldpos) :rot ,(send x :worldrot))) target-coords)) . ,args)))
 	     )
 	   )
 	 (mapc #'(lambda (j a) (send* j :joint-angle a joint-args))
