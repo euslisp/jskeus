@@ -1698,7 +1698,7 @@
 	  ;;
           (success t) 
 	  (old-analysis-level (send-all union-link-list :analysis-level))
-	  target-coords ;; target-coord it list/atom, target-coords is list, keep input arguments in target-coord ans args
+	  target-coords ;; target-coord it list/atom, target-coords is list, keep input arguments in target-coord and args
           ik-args)       
      (send-all union-link-list :analysis-level :coords)
      ;; argument check
