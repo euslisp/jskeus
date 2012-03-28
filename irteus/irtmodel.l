@@ -1173,6 +1173,8 @@
 		    :calc-angle-speed-gain dav i periodic-time)))
 	 (if (< tmp-gain gain) (setq gain tmp-gain))))
      (setq dav (scale gain dav dav))
+     (when (and debug-view (not (memq :no-message debug-view)))
+       (format-array (map float-vector #'rad2deg dav) "dav^  :"))
 
      ;; update body
      (do ((i 0 (+ i (send j :joint-dof)))
