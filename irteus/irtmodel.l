@@ -1686,7 +1686,7 @@
                   (union-link-list)
 		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func)
 		  &allow-other-keys)
-   ;; target-coords, move-target, rotation-axis, translation-axis, link-list
+   ;; target-coord, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
    (let* ((loop 0)
           (union-link-list (if (functionp union-link-list) (funcall union-link-list link-list) (send self :calc-union-link-list link-list)))
@@ -1698,7 +1698,8 @@
 	  ;;
           (success t) 
 	  (old-analysis-level (send-all union-link-list :analysis-level))
-          ik-args target-coords)       
+	  target-coords ;; target-coord it list/atom, target-coords is list, keep input arguments in target-coord ans args
+          ik-args)       
      (send-all union-link-list :analysis-level :coords)
      ;; argument check
      (when (or (null link-list) (null move-target))
@@ -1794,7 +1795,7 @@
            (warn ";;  coords : ~a~%" 
                  (send (let ((p self)) (while (send p :parent) (setq p (send p :parent))) p) :worldcoords))
 	   (warn ";;  angles : ~a~%" av0)
-	   (warn ";;    args : ~a~%" (append (list target-coords) args))
+	   (warn ";;    args : ~a~%" (append (list target-coord) args))
 	   )
 	 (mapc #'(lambda (j a) (send* j :joint-angle a joint-args))
 	       (remove-duplicates
