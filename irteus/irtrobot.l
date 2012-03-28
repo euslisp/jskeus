@@ -183,6 +183,7 @@
        (:links (send self :limb limb nil))
        (:joint-list (send-all (send self :limb limb :links) :joint))
        (:gripper (send* self :gripper limb args))
+       (:joint-order (send self :joint-order limb))
        (t
 	(cond
 	 ((or (null method) (send bodyset-link :method method))
@@ -362,6 +363,28 @@
 			  tmp-weight))
             args)
      ))
+  (:joint-order
+   (limb &optional jname-list)
+   (let ((joint-list (mapcar #'(lambda (x) (cons x (find-if #'(lambda (y) (eq y (send r x))) (send self limb :joint-list)))) (mapcan #'(lambda (x) (if (substringp (format nil "~A-" (symbol-name limb)) (string x)) (list x)))(send self :methods))))
+         j (result) name)
+     (unless jname-list
+       (setq jname-list
+	     (case limb
+	       ((:larm :rarm) '("collar" "shoulder" "elbow" "wrist"))
+	       ((:lleg :rleg) '("crotch" "knee" "ankle"))
+	       ((:torso) '("chest" "weist"))
+	       ((:head) '("neck" "head")))))
+     (dolist (jname jname-list) ;; look for joint corresponds to jname
+       (while (substringp (string-upcase jname) (setq name (symbol-name (caar joint-list))))
+         (push
+          (read-from-string
+           (format nil ":~A" (subseq name (1- (length name)))))
+          j)
+         (pop joint-list))
+       (nreverse j)
+       (push j result)
+       (setq j nil))
+     (nreverse result)))
   )
 
 (in-package "GEOMETRY")
