@@ -1665,7 +1665,7 @@
          )
        :ik-continues))
   (:inverse-kinematics
-   (target-coords &rest args 
+   (target-coord &rest args 
 		  &key (stop 50)
 		  (link-list)
 		  (move-target)
@@ -1698,7 +1698,7 @@
 	  ;;
           (success t) 
 	  (old-analysis-level (send-all union-link-list :analysis-level))
-          ik-args)       
+          ik-args target-coords)       
      (send-all union-link-list :analysis-level :coords)
      ;; argument check
      (when (or (null link-list) (null move-target))
@@ -1715,7 +1715,7 @@
 	 (push :no-flush debug-view)))
      (if (atom (car link-list)) (setq link-list (list link-list)))
      (if (atom move-target) (setq move-target (list move-target)))
-     (if (atom target-coords) (setq target-coords (list target-coords)))
+     (if (atom target-coord) (setq target-coords (list target-coord)) (setq target-coords target-coord))
      (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
      (if (atom translation-axis) (setq translation-axis (list translation-axis)))
      (if (atom thre) (setq thre (list thre)))
