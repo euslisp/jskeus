@@ -367,9 +367,9 @@
   ;;
   ) ; motion-capture-data
 
-(defun bvh2eus (fname &key (coords) (scale))
+(defun bvh2eus (fname &rest args)
   (let (b)
-    (setq b (instance motion-capture-data :init fname :coords coords :scale scale))
+    (setq b (apply #'load-mcd fname args))
     (objects (list (send b :model)))
     (send b :animate)
     b))
@@ -545,9 +545,9 @@
    self) ;; init
   ) ;defmethod cmu-bvh-robot-model
 
-(defun load-mcd (fname &key (scale) (bvh-robot-model-class bvh-robot-model))
+(defun load-mcd (fname &key (scale) (coords) (bvh-robot-model-class bvh-robot-model))
   (let ((bvh-robot-model bvh-robot-model-class))
-    (instance motion-capture-data :init fname :scale scale)
+    (instance motion-capture-data :init fname :coords coords :scale scale)
     ))
 
 (in-package "GEOMETRY")
