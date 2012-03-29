@@ -916,12 +916,10 @@
          (format-array (map float-vector #'rad2deg tmp-len2) "Ny    :")
          (format-array (map float-vector #'rad2deg J#x) "dav   :")))
      J#x))
-  (:calc-joint-max-velocity
-   (union-link-list periodic-time)
+  (:calc-joint-angle-speed-gain
+   (union-link-list dav periodic-time)
    (let* ((fik-len (send self :calc-target-joint-dimension union-link-list))
-	  (av (instantiate float-vector fik-len))
-	  (dav (instantiate float-vector fik-len)) j)
-     (fill dav 1)
+	  (av (instantiate float-vector fik-len)) j)
      (do* ((i 0 (+ i (send j :joint-dof)))
 	   (l 0 (1+ l)))
 	 ((>= l (length union-link-list)))
@@ -1179,13 +1177,12 @@
      (setq dav (send* self :calc-joint-angle-speed union-vel args))
 
      ;; truncate to speed limit
-     (let ((speed-limit (send self :calc-joint-max-velocity union-link-list periodic-time))
-	   (tmp-gain) (max-gain 1.0))
-       (dotimes (i (length dav))
-	 (setq tmp-gain (/ (abs (elt dav i)) (elt speed-limit i)) )
-	 (if (> tmp-gain max-gain)
-	     (setq max-gain tmp-gain)))
-       (setq dav (scale (/ 1.0 max-gain) dav dav)))
+     (let ((tmp-gain (send self :calc-joint-angle-speed-gain union-link-list dav periodic-time))
+	   (min-gain 1.0))
+       (dotimes (i (length tmp-gain))
+	 (if (< (elt tmp-gain i) min-gain)
+	     (setq min-gain (elt tmp-gain i))))
+       (setq dav (scale min-gain dav dav)))
 
      (when (and debug-view (not (memq :no-message debug-view)))
        (format-array (map float-vector #'rad2deg dav) "dav^  :"))
@@ -1269,12 +1266,23 @@
     (cond
      ((functionp weight) (setq weight (funcall weight union-link-list)))
      ((listp weight) (setq weight (eval weight))))
+    ;; calc weight from joint limit
     (setq tmp-weight
           (send self :calc-weight-from-joint-limit
                 avoid-weight-gain fik-len link-list union-link-list
                 debug-view weight tmp-weight tmp-len))
     (dotimes (i fik-len)
       (setf (elt tmp-weight i) (* (elt weight i) (elt tmp-weight i))))
+#|
+    ;; calc weight from joint max velocity
+    (let* ((dav (fill (instantiate float-vector fik-len) 1))
+    	   (speed-limit (send self :calc-joint-angle-speed-gain union-link-list dav 0.5))
+	   (max-gain 1.0))
+      (dotimes (i (length speed-limit)) (setq max-gain (max (elt speed-limit i) max-gain)))
+      (setq speed-limit (scale (/ 1.0 max-gain) speed-limit speed-limit))
+      (setq tmp-weight (transform (diagonal speed-limit) tmp-weight tmp-weight)))
+|#
+    ;;
     (when (and debug-view (not (memq :no-message debug-view)))
       (format-array tmp-weight "weight:"))
     tmp-weight)
