@@ -916,6 +916,19 @@
          (format-array (map float-vector #'rad2deg tmp-len2) "Ny    :")
          (format-array (map float-vector #'rad2deg J#x) "dav   :")))
      J#x))
+  (:calc-joint-max-velocity
+   (union-link-list periodic-time)
+   (let* ((fik-len (send self :calc-target-joint-dimension union-link-list))
+	  (av (instantiate float-vector fik-len))
+	  (dav (instantiate float-vector fik-len)) j)
+     (fill dav 1)
+     (do* ((i 0 (+ i (send j :joint-dof)))
+	   (l 0 (1+ l)))
+	 ((>= l (length union-link-list)))
+       (setq j (send (elt union-link-list l) :joint))
+       (dotimes (k (send j :joint-dof))
+	 (setf (elt av (+ i k)) (send j :calc-angle-speed-gain dav i periodic-time))))
+      av))
   (:collision-avoidance-links
    (&optional l)
    (if l (setq collision-avoidance-links l)) collision-avoidance-links)
@@ -1158,21 +1171,22 @@
     (joint-args)
     (debug-view nil)
     &allow-other-keys)
-   (let (dav dtheta j (gain 1.0))
+   (let (dav dtheta j)
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
      (if (and debug-view (not (equal debug-view :no-clear)) *viewer*)
 	 (send *viewer* :viewsurface :clear))
 
      (setq dav (send* self :calc-joint-angle-speed union-vel args))
-     (do ((i 0 (+ i (send j :joint-dof)))
-	  (l 0 (1+ l)))
-	 ((>= l (length union-link-list)))
-       (setq j (send (elt union-link-list l) :joint))
-       (let ((tmp-gain
-	      (send (send (elt union-link-list l) :joint)
-		    :calc-angle-speed-gain dav i periodic-time)))
-	 (if (< tmp-gain gain) (setq gain tmp-gain))))
-     (setq dav (scale gain dav dav))
+
+     ;; truncate to speed limit
+     (let ((speed-limit (send self :calc-joint-max-velocity union-link-list periodic-time))
+	   (tmp-gain) (max-gain 1.0))
+       (dotimes (i (length dav))
+	 (setq tmp-gain (/ (abs (elt dav i)) (elt speed-limit i)) )
+	 (if (> tmp-gain max-gain)
+	     (setq max-gain tmp-gain)))
+       (setq dav (scale (/ 1.0 max-gain) dav dav)))
+
      (when (and debug-view (not (memq :no-message debug-view)))
        (format-array (map float-vector #'rad2deg dav) "dav^  :"))
 
@@ -1778,6 +1792,7 @@
          (setq success (send* self :inverse-kinematics-loop
                               dif-pos dif-rot
                               :target-coords target-coords
+                              :periodic-time 0.5
                               :stop stop :loop loop
                               :rotation-axis rotation-axis
                               :translation-axis translation-axis
