@@ -1894,7 +1894,7 @@
 						  (elt print-args (+ i 1)))))))))
 	       (setq command-init `(instance ,(send (class self) :name) :init)
 		     command-setup `(progn  (send r :newcoords (make-coords :4x4 ,(send self :4x4))) (mapc #'(lambda (j a) (send* j :joint-angle a ,joint-args)) (list . ,(mapcar #'(lambda (x) `(send r ,(intern (string-upcase x) *keyword-package*))) (send-all (remove-duplicates (append (send-all union-link-list :joint) joint-list)) :name))) ,(list 'quote av0)) (objects (list r)))
-		     command-args (nconc `(list . ,(mapcar #'(lambda (x) `(make-coords :pos ,(send x :worldpos) :rot ,(send x :worldrot))) target-coords)) (list :dump-command nil :debug-view t) print-args))
+		     command-args (nconc `(list . ,(mapcar #'(lambda (x) `(make-coords :pos ,(send (if (functionp x) (funcall x) x) :worldpos) :rot ,(send (if (functionp x) (funcall x) x) :worldrot))) target-coords)) (list :dump-command nil :debug-view t) print-args))
 	       (warn ";; command : ~a~%" `(let ((r ,command-init)) ,command-setup (send* r :inverse-kinematics ,command-args)))
 	       (warn ";; dump debug command to ~A/~A~%" command-directory command-filename)
 	       (warn ";; (progn (load \"~A\")(ik-setup)(ik-check))~%" command-directory command-filename)
