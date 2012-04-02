@@ -1760,12 +1760,12 @@
        (setq command-directory
 	     (format nil "/tmp/irtmodel-ik-~A" (unix::getpid))
 	     command-id
-	     (let ((lt (unix::localtime))) (substitute #\0 #\  (format nil "~04d-~02d-~02d-~02d-~02d-~02d" (+ 1900 (elt lt 5)) (elt lt 4) (elt lt 3) (elt lt 2) (elt lt 1) (elt lt 0))))
+	     (let ((lt (unix::localtime))) (substitute #\0 #\  (format nil "~A-~04d-~02d-~02d-~02d-~02d-~02d" (send (class self) :name) (+ 1900 (elt lt 5)) (elt lt 4) (elt lt 3) (elt lt 2) (elt lt 1) (elt lt 0))))
 	     command-filename
-	     (format nil "~A-~A" (send (class self) :name) command-id))
+	     (format nil "~A/~A.l" command-directory command-id))
        (unix::mkdir command-directory)
        (with-open-file
-	(f (format nil "~A/~A.l" command-directory command-filename) :direction :output)
+	(f (format nil "~A/~A.l" command-directory command-id) :direction :output)
 	(format f ";; ik ~A log at ~A on ~A~%;;~%" (if success "success" "fail") (string-trim '(10) (unix:asctime (unix:localtime))) lisp::lisp-implementation-version)
 	(format f ";; link-list ~A~%" link-list)
 	(format f ";; move-target ~A~%" move-target)
@@ -1852,7 +1852,7 @@
      (mapcar #'(lambda (l a) (send l :analysis-level a)) union-link-list old-analysis-level)
      ;; rename log file
      (when dump-command
-       (unix::rename (format nil "~A/~A.l" command-directory command-filename ) (format nil "~A/~A-~A.l" command-directory command-filename (if (or success (not revert-if-fail)) "success" "failure"))))
+       (unix::rename (format nil "~A/~A.l" command-directory command-id ) (setq command-filename (format nil "~A/~A-~A.l" command-directory command-id (if (or success (not revert-if-fail)) "success" "failure")))))
      ;; check solved or not
      (if (or success (not revert-if-fail))
          (send self :angle-vector)
@@ -1896,13 +1896,13 @@
 		     command-setup `(progn  (send r :newcoords (make-coords :4x4 ,(send self :4x4))) (mapc #'(lambda (j a) (send* j :joint-angle a ,joint-args)) (list . ,(mapcar #'(lambda (x) `(send r ,(intern (string-upcase x) *keyword-package*))) (send-all (remove-duplicates (append (send-all union-link-list :joint) joint-list)) :name))) ,(list 'quote av0)) (objects (list r)))
 		     command-args (nconc `(list . ,(mapcar #'(lambda (x) `(make-coords :pos ,(send (if (functionp x) (funcall x) x) :worldpos) :rot ,(send (if (functionp x) (funcall x) x) :worldrot))) target-coords)) (list :dump-command nil :debug-view t) print-args))
 	       (warn ";; command : ~a~%" `(let ((r ,command-init)) ,command-setup (send* r :inverse-kinematics ,command-args)))
-	       (warn ";; dump debug command to ~A/~A~%" command-directory command-filename)
-	       (warn ";; (progn (load \"~A\")(ik-setup)(ik-check))~%" command-directory command-filename)
+	       (warn ";; dump debug command to ~A~%" command-filename)
+	       (warn ";; (progn (load \"~A\")(ik-setup)(ik-check))~%" command-filename)
 	       ;; dump
 	       (with-open-file
-		(f (format nil "~A/~A-failure.l" command-directory command-filename) :direction :output  :if-exists :append)
+		(f command-filename :direction :output  :if-exists :append)
 		(format f "(defun ~A-setup () (let ((r ~A)) (setq *robot* r) ~A (objects (list *robot*))))~%" command-id command-init command-setup)
-		(format f "(defun ~A-check () (send* *robot* :inverse-kinematics ~A))~%" command-id command-args)
+		(format f "(defun ~A-check () (let ((r *robot*)) (send* r :inverse-kinematics ~A)))~%" command-id command-args)
 		(format f "(defun ik-setup () (~A-setup))~%" command-id)
 		(format f "(defun ik-check () (~A-check))~%" command-id)
 		)
