@@ -336,6 +336,23 @@ static pointer FVECTOR_REPLACE(ctx,n,argv)
 }
 //
 //
+pointer C_ISNAN (ctx,n,argv)
+     register context *ctx;
+     int n;
+     register pointer argv[];
+{
+  ckarg(1);
+
+  if ( isflt(argv[0]) ) {
+    numunion nu;
+    eusfloat_t f = fltval(argv[0]);
+    if(isnan(f)) return T;
+    return NIL;
+  } else {
+    return NIL;
+  }
+}
+
 pointer ___irtgeoc(ctx,n, argv, env)
      register context *ctx;int n;pointer *argv;pointer env;
 {
@@ -345,4 +362,6 @@ pointer ___irtgeoc(ctx,n, argv, env)
   defun(ctx,"VECTOR-ARRAY-VARIANCE",argv[0],VECTOR_ARRAY_VARIANCE);
   defun(ctx,"VECTOR-ARRAY-MAX-MIN",argv[0],VECTOR_ARRAY_MAX_MIN);
   defun(ctx,"FVECTOR-REPLACE", argv[0], FVECTOR_REPLACE);
+
+  defun(ctx,"C-ISNAN", argv[0], C_ISNAN);
 }
