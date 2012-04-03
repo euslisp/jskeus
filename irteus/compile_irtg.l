@@ -37,6 +37,7 @@
 (comp:compile-file-if-src-newer "irtrobot.l" *objdir*)
 (comp:compile-file-if-src-newer "irtbvh.l" *objdir*)
 (comp:compile-file-if-src-newer "irtcollada.l" *objdir*)
+(comp:compile-file-if-src-newer "irtpointcloud.l" *objdir*)
 
 (exit 0)
 

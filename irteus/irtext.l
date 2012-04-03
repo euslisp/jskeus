@@ -28,13 +28,13 @@
   (load-library
    (format nil "~A~A/lib/libirteus"
 	   *eusdir* (unix:getenv "ARCHDIR"))
-   '("irtmath" "irtutil" "irtc" "irtgraph" "pgsql")))
+   '("irtmath" "irtutil" "irtc" "irtgeoc" "irtgraph" "pgsql")))
 (defun load-irteusg ()
   (in-package "GEOMETRY")
   (load-library
    (format nil "~A~A/lib/libirteusg"
 	   *eusdir* (unix:getenv "ARCHDIR"))
-   '("irtgeo" "euspqp" "pqp" "irtscene" "irtmodel" "irtdyna" "irtrobot" "irtsensor" "irtbvh" "irtcollada"))
+   '("irtgeo" "euspqp" "pqp" "irtscene" "irtmodel" "irtdyna" "irtrobot" "irtsensor" "irtbvh" "irtcollada" "irtpointcloud"))
   (in-package "USER")
   (import '(collada::convert-irtmodel-to-collada)))
 (defun load-irteusx ()

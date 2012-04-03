@@ -48,6 +48,22 @@
   (defconstant GL_POLYGON_OFFSET_EXT		#x8037)
   (defconstant GL_POLYGON_OFFSET_FACTOR_EXT	#x8038)
   (defconstant GL_POLYGON_OFFSET_BIAS_EXT	#x8039)
+
+  ;; for using array in OpenGL
+  (defforeign glEnableClientState gl-lib "glEnableClientState" () :integer)
+  (defforeign glDisableClientState gl-lib "glDisableClientState" () :integer)
+  (defforeign glVertexPointer gl-lib "glVertexPointer" () :integer)
+  (defforeign glColorPointer gl-lib "glColorPointer" () :integer)
+  (defforeign glNormalPointer gl-lib "glNormalPointer" () :integer)
+  (defforeign glDrawElements gl-lib "glDrawElements" () :integer)
+  (defforeign glArrayElement gl-lib "glArrayElement" () :integer)
+  (defforeign glDrawArrays gl-lib "glDrawArrays" () :integer)
+  (defconstant GL_VERTEX_ARRAY        #x8074)
+  (defconstant GL_NORMAL_ARRAY        #x8075)
+  (defconstant GL_TEXTURE_COORD_ARRAY #x8078)
+  (defconstant GL_EDGE_FLAG_ARRAY     #x8079)
+  (defconstant GL_COLOR_ARRAY         #x8076)
+  (defconstant GL_INDEX_ARRAY         #x8077)
   )
 
 (unless (assoc :color-org (send glviewsurface :methods))

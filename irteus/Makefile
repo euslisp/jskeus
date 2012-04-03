@@ -36,7 +36,7 @@ MODULES.L=irt_modules.l
 EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 
 IRTEUS=irtmath irtutil irtgraph pgsql
-IRTEUSG=irtgeo pqp irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada
+IRTEUSG=irtgeo pqp irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud
 IRTEUSX=irtx
 IRTEUSIMG=irtimage eusjpeg png
 IRTEUSGL=irtgl irtglrgb irtviewer
@@ -84,7 +84,7 @@ IRTEUSGLDLLS=$(addprefix $(OBJDIR)/,$(IRTEUSGL_LSFX))
 IRTEUSGL_C=$(addsuffix .c,$(IRTEUSGL))
 IRTEUSGL_H=$(addsuffix .h,$(IRTEUSGL))
 
-IRTCOBJECTS=$(OBJDIR)/irtc.$(OSFX) 
+IRTCOBJECTS=$(OBJDIR)/irtc.$(OSFX) $(OBJDIR)/irtgeoc.$(OSFX)
 IRTGCOBJECTS=$(OBJDIR)/CPQP.$(OSFX) $(OBJDIR)/euspqp.$(OSFX)
 IRTIMGCOBJECTS=$(OBJDIR)/euspng.$(OSFX)
 NROBJECTS=$(OBJDIR)/nr.$(OSFX)
@@ -171,6 +171,7 @@ $(OBJDIR)/irtmodel.$(OSFX): irtmodel.l
 $(OBJDIR)/irtdyna.$(OSFX): irtdyna.l
 $(OBJDIR)/irtcollada.$(OSFX): irtcollada.l
 $(OBJDIR)/irtsensor.$(OSFX): irtsensor.l
+$(OBJDIR)/irtpointcloud.$(OSFX): irtpointcloud.l
 $(OBJDIR)/irtrobot.$(OSFX): irtrobot.l
 $(OBJDIR)/irtbvh.$(OSFX): irtbvh.l
 $(OBJDIR)/irtx.$(OSFX): irtx.l
@@ -183,8 +184,10 @@ $(OBJDIR)/png.$(OSFX): png.l
 $(OBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l
 $(OBJDIR)/eusjpeg.$(OSFX): $(EUSDIR)/lisp/image/jpeg/eusjpeg.l
 
-$(OBJDIR)/irtc.$(OSFX): irtc.c $(filter-out $(OBJDIR)/irtc.$(OSFX),$(IRTEUSOBJS) $(IRTCOBJECTS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(LIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS))
+$(OBJDIR)/irtc.$(OSFX): irtc.c $(filter-out $(OBJDIR)/irtc.$(OSFX),$(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(LIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS))
 	$(CC) $(CFLAGS) -c irtc.c $(OBJOPT)$(OBJDIR)/irtc.$(OSFX)
+$(OBJDIR)/irtgeoc.$(OSFX): irtgeoc.c $(filter-out $(OBJDIR)/irtgeoc.$(OSFX), $(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(LIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS))
+	$(CC) $(CFLAGS) -c irtgeoc.c $(OBJOPT)$(OBJDIR)/irtgeoc.$(OSFX)
 $(OBJDIR)/CPQP.$(OSFX): CPQP.C
 	$(CXX) $(CXXFLAGS) -c CPQP.C $(OBJOPT)$(OBJDIR)/CPQP.$(OSFX)
 $(OBJDIR)/euspqp.$(OSFX): euspqp.c
