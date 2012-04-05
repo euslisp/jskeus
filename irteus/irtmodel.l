@@ -1760,7 +1760,7 @@
        (setq command-directory
 	     (format nil "/tmp/irtmodel-ik-~A" (unix::getpid))
 	     command-id
-	     (let ((lt (unix::localtime))) (substitute #\0 #\  (format nil "~A-~04d-~02d-~02d-~02d-~02d-~02d" (send (class self) :name) (+ 1900 (elt lt 5)) (elt lt 4) (elt lt 3) (elt lt 2) (elt lt 1) (elt lt 0))))
+	     (let ((lt (unix::localtime))) (substitute #\0 #\  (format nil "~A-~04d-~02d-~02d-~02d-~02d-~02d" (send (class self) :name) (+ 1900 (elt lt 5)) (+ 1 (elt lt 4)) (elt lt 3) (elt lt 2) (elt lt 1) (elt lt 0))))
 	     command-filename
 	     (format nil "~A/~A.l" command-directory command-id))
        (unix::mkdir command-directory)
