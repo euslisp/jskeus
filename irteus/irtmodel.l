@@ -671,6 +671,8 @@
    (send self :update-descendants))
   (:links (&rest args) (user::forward-message-to-all links args))
   (:joint-list (&rest args) (user::forward-message-to-all joint-list args))
+  (:link (name) (find name links :test #'equal :key #'(lambda (x) (send x :name))))
+  (:joint (name) (find name joint-list :test #'equal :key #'(lambda (x) (send x :name))))
 
   (:bodies (&rest args) (user::forward-message-to-all bodies args))
   (:faces () (flatten (send-all bodies :faces)))
