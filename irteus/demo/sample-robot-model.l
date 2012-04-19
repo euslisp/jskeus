@@ -176,6 +176,7 @@
 			      jlr0 jlr1 jlr2 jlr3 jlr4 jlr5
 			      ))
        (setq collision-avoidance-links (list aroot-link (elt torso 1) (elt larm 3) (elt rarm 3)))
+       (send-all (send self :joint-list) :max-joint-torque 0.1) ;; [Nm]
 
        ;; set mass properties
        (dolist (l (append (list aroot-link) torso))
