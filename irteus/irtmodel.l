@@ -1963,6 +1963,34 @@
      (setq vel-r (calc-dif-with-axis dif-rot rotation-axis
 				     tmp-v0 tmp-v1 tmp-v2))
      vel-r))
+  ;; collision check methods
+  (:collision-check-pairs
+   (&key ((:links ls) links))
+   (let (pairs l neighbors)
+     (while (setq l (pop ls))
+       (setq neighbors (remove nil
+                               (append
+                                (send l :descendants)
+                                (send l :child-links)
+                                (list (send l :parent-link) (send l :parent)))))
+       (dolist (l2 ls)
+	 (if (not (memq l2 neighbors))
+	     (push (cons l l2) pairs))
+	 )
+       )
+     pairs))
+  (:self-collision-check
+   (&key (mode :all) (pairs (send self :collision-check-pairs)) (collision-func 'pqp-collision-check))
+   (let ((cpairs) (col-count 0))
+     (dolist (p pairs)
+       (let ((colp (/= (funcall collision-func (car p) (cdr p)) 0)))
+	 (when colp
+	   (incf col-count)
+	   (if (eq mode :first)
+	       (return-from :self-collision-check p)
+	     (push p cpairs)))
+	 ))
+     cpairs))
   )
 
 (defun all-child-links (s &optional (pred #'identity))
