@@ -1965,7 +1965,7 @@
      vel-r))
   ;; collision check methods
   (:collision-check-pairs
-   (&key ((:links ls) links))
+   (&key ((:links ls) (cons (car links) (all-child-links (car links)))))
    (let (pairs l neighbors)
      (while (setq l (pop ls))
        (setq neighbors (remove nil
