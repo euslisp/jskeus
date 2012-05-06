@@ -53,7 +53,7 @@
       (send *robot* :inverse-kinematics target-coords
             :link-list link-list :move-target move-target
             :stop 500 :thre '(10 10)
-            :rotation-axis '(nil nil) :debug-view nil)
+            :rotation-axis '(nil nil) :debug-view nil :dump-command nil)
       (send *robot* :head :look-at
             (apply #'midpoint 0.5 (send-all target-coords :worldpos)))
       (send b0 :orient (* 0.2 (sin (/ i 10.0))) :x :world)

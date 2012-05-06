@@ -58,7 +58,7 @@
                  :move-target move-target :link-list link-list
                  :rotation-axis rotation-axis :thre thre
                  :look-at-target t :centroid-thre 10.0
-                 :debug-view :no-flush)
+                 :debug-view :no-flush :dump-command nil)
            ;; draw
            (send *irtviewer* :draw-objects :flush nil)
            (mapcar #'(lambda (act ref)

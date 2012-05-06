@@ -75,6 +75,7 @@
                             tmp-ll tmp-mt ot *robot* :rotation-axis tmp-ra))
                ;;:debug-view t
                :debug-view :no-message
+	       :dump-command nil
                (append (if (= i 0) '(:stop 100)) args))
         (send (send (car ot) :parent) :dissoc *obj*)
         ))

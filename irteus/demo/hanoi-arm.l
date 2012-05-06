@@ -40,6 +40,7 @@
               :avoid-collision-joint-gain 2.0 ;; 1.0
               :avoid-collision-null-gain  1.0 ;; 1.0
               :debug-view :no-message
+	      :dump-command nil
               )
       (break))
     (send *irtviewer* :draw-objects)))
@@ -55,7 +56,7 @@
   (send *irtviewer* :draw-objects)
   (send *sarm* :solve-ik (make-cascoords :pos #f(500 0 100))
         :avoid-collision-null-gain  0.0 ;; 1.0
-        :rotation-axis t :debug-view nil)
+        :rotation-axis t :debug-view nil  :dump-command nil)
   (send *sarm* :open-hand)
   (send *irtviewer* :draw-objects)
 
