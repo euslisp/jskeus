@@ -243,7 +243,7 @@
      (dotimes (i points-num)
        (c-matrix-row parray i p)
        (if c (c-matrix-row carray i c))
-       (if n (n-matrix-row narray i n))
+       (if n (c-matrix-row narray i n))
 
        (if (and (or (null key) (funcall key p))
                 (or (null ckey) (or (null c) (funcall ckey c)))
