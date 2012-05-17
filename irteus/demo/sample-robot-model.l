@@ -14,92 +14,90 @@
          (crotch-width 75) (foot-depth 200) (foot-width 100) (foot-thickness 25) (foot-offset 50)
 	 (arm-radius 50) (upper-arm-length 275) (lower-arm-length 195) (shoulder-width 150) (hand-length 50))
    (send-super* :init args)
-   ;; define local functions to generate limb links
-   (labels ()
-     ;; generate links and assoc all links
-     (let ((aroot-link (send self :make-root-link)))
-       (setq torso (send self :make-torso-links) head (send self :make-head-links)
-	     rarm (send self :make-arm-links :rarm arm-radius upper-arm-length lower-arm-length shoulder-width hand-length)
-	     larm (send self :make-arm-links :larm arm-radius upper-arm-length lower-arm-length shoulder-width hand-length)
-	     rleg (send self :make-leg-links :rleg leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset)
-	     lleg (send self :make-leg-links :lleg leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset))
-       (send self :assoc aroot-link)
-       (send aroot-link :assoc (car torso))
-       (send (cadr torso) :assoc (car head))
-       (send (cadr torso) :assoc (car rarm))
-       (send (cadr torso) :assoc (car larm))
-       (send aroot-link :assoc (car rleg))
-       (send aroot-link :assoc (car lleg))
+   ;; generate links and assoc all links
+   (let ((aroot-link (send self :make-root-link)))
+     (setq torso (send self :make-torso-links) head (send self :make-head-links)
+           rarm (send self :make-arm-links :rarm arm-radius upper-arm-length lower-arm-length shoulder-width hand-length)
+           larm (send self :make-arm-links :larm arm-radius upper-arm-length lower-arm-length shoulder-width hand-length)
+           rleg (send self :make-leg-links :rleg leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset)
+           lleg (send self :make-leg-links :lleg leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset))
+     (send self :assoc aroot-link)
+     (send aroot-link :assoc (car torso))
+     (send (cadr torso) :assoc (car head))
+     (send (cadr torso) :assoc (car rarm))
+     (send (cadr torso) :assoc (car larm))
+     (send aroot-link :assoc (car rleg))
+     (send aroot-link :assoc (car lleg))
 
-       ;; generate all joints
-       (setq jc0 (instance rotational-joint :init :parent-link aroot-link :child-link (car torso) :name :torso-waist-y :axis :z :min -45 :max 45))
-       (setq jc1 (instance rotational-joint :init :parent-link (car torso) :child-link (cadr torso) :name :torso-waist-p :axis :y))
+     ;; generate all joints
+     (setq jc0 (instance rotational-joint :init :parent-link aroot-link :child-link (car torso) :name :torso-waist-y :axis :z :min -45 :max 45))
+     (setq jc1 (instance rotational-joint :init :parent-link (car torso) :child-link (cadr torso) :name :torso-waist-p :axis :y))
 
-       (setq jh0 (instance rotational-joint :init :parent-link (cadr torso) :child-link (car head) :name :head-neck-y :axis :z))
-       (setq jh1 (instance rotational-joint :init :parent-link (car head) :child-link (cadr head) :name :head-neck-p :axis :y))
+     (setq jh0 (instance rotational-joint :init :parent-link (cadr torso) :child-link (car head) :name :head-neck-y :axis :z))
+     (setq jh1 (instance rotational-joint :init :parent-link (car head) :child-link (cadr head) :name :head-neck-p :axis :y))
 
-       (setq jal0 (instance rotational-joint :init :parent-link (cadr torso) :child-link (elt larm 0) :name :larm-shoulder-p :axis :y))
-       (setq jal1 (instance rotational-joint :init :parent-link (elt larm 0) :child-link (elt larm 1) :name :larm-shoulder-r :axis :x :min -30 :max 180))
-       (setq jal2 (instance rotational-joint :init :parent-link (elt larm 1) :child-link (elt larm 2) :name :larm-shoulder-y :axis :z))
-       (setq jal3 (instance rotational-joint :init :parent-link (elt larm 2) :child-link (elt larm 3) :name :larm-elbow-p :axis :y :min -180 :max 0))
-       (setq jal4 (instance rotational-joint :init :parent-link (elt larm 3) :child-link (elt larm 4) :name :larm-wrist-y :axis :z))
-       (setq jal5 (instance rotational-joint :init :parent-link (elt larm 4) :child-link (elt larm 5) :name :larm-wrist-r :axis :x))
-       (setq jal6 (instance rotational-joint :init :parent-link (elt larm 5) :child-link (elt larm 6) :name :larm-wrist-p :axis :y))
+     (setq jal0 (instance rotational-joint :init :parent-link (cadr torso) :child-link (elt larm 0) :name :larm-shoulder-p :axis :y))
+     (setq jal1 (instance rotational-joint :init :parent-link (elt larm 0) :child-link (elt larm 1) :name :larm-shoulder-r :axis :x :min -30 :max 180))
+     (setq jal2 (instance rotational-joint :init :parent-link (elt larm 1) :child-link (elt larm 2) :name :larm-shoulder-y :axis :z))
+     (setq jal3 (instance rotational-joint :init :parent-link (elt larm 2) :child-link (elt larm 3) :name :larm-elbow-p :axis :y :min -180 :max 0))
+     (setq jal4 (instance rotational-joint :init :parent-link (elt larm 3) :child-link (elt larm 4) :name :larm-wrist-y :axis :z))
+     (setq jal5 (instance rotational-joint :init :parent-link (elt larm 4) :child-link (elt larm 5) :name :larm-wrist-r :axis :x))
+     (setq jal6 (instance rotational-joint :init :parent-link (elt larm 5) :child-link (elt larm 6) :name :larm-wrist-p :axis :y))
 
-       (setq jar0 (instance rotational-joint :init :parent-link (cadr torso)  :child-link (elt rarm 0) :name :rarm-shoulder-p :axis :y))
-       (setq jar1 (instance rotational-joint :init :parent-link (elt rarm 0) :child-link (elt rarm 1) :name :rarm-shoulder-r :axis :-x :min -30 :max 180))
-       (setq jar2 (instance rotational-joint :init :parent-link (elt rarm 1) :child-link (elt rarm 2) :name :rarm-shoulder-y :axis :-z))
-       (setq jar3 (instance rotational-joint :init :parent-link (elt rarm 2) :child-link (elt rarm 3) :name :rarm-elbow-p :axis :y :min -180 :max 0))
-       (setq jar4 (instance rotational-joint :init :parent-link (elt rarm 3) :child-link (elt rarm 4) :name :rarm-wrist-y :axis :-z))
-       (setq jar5 (instance rotational-joint :init :parent-link (elt rarm 4) :child-link (elt rarm 5) :name :rarm-wrist-r :axis :-x))
-       (setq jar6 (instance rotational-joint :init :parent-link (elt rarm 5) :child-link (elt rarm 6) :name :rarm-wrist-p :axis :y))
+     (setq jar0 (instance rotational-joint :init :parent-link (cadr torso)  :child-link (elt rarm 0) :name :rarm-shoulder-p :axis :y))
+     (setq jar1 (instance rotational-joint :init :parent-link (elt rarm 0) :child-link (elt rarm 1) :name :rarm-shoulder-r :axis :-x :min -30 :max 180))
+     (setq jar2 (instance rotational-joint :init :parent-link (elt rarm 1) :child-link (elt rarm 2) :name :rarm-shoulder-y :axis :-z))
+     (setq jar3 (instance rotational-joint :init :parent-link (elt rarm 2) :child-link (elt rarm 3) :name :rarm-elbow-p :axis :y :min -180 :max 0))
+     (setq jar4 (instance rotational-joint :init :parent-link (elt rarm 3) :child-link (elt rarm 4) :name :rarm-wrist-y :axis :-z))
+     (setq jar5 (instance rotational-joint :init :parent-link (elt rarm 4) :child-link (elt rarm 5) :name :rarm-wrist-r :axis :-x))
+     (setq jar6 (instance rotational-joint :init :parent-link (elt rarm 5) :child-link (elt rarm 6) :name :rarm-wrist-p :axis :y))
 
-       (setq jll0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt lleg 0) :name :lleg-crotch-y :axis :z))
-       (setq jll1 (instance rotational-joint :init :parent-link (elt lleg 0) :child-link (elt lleg 1) :name :lleg-crotch-r :axis :x))
-       (setq jll2 (instance rotational-joint :init :parent-link (elt lleg 1) :child-link (elt lleg 2) :name :lleg-crotch-p :axis :y))
-       (setq jll3 (instance rotational-joint :init :parent-link (elt lleg 2) :child-link (elt lleg 3) :name :lleg-knee-p :axis :y :min 0))
-       (setq jll4 (instance rotational-joint :init :parent-link (elt lleg 3) :child-link (elt lleg 4) :name :lleg-ankle-p :axis :y))
-       (setq jll5 (instance rotational-joint :init :parent-link (elt lleg 4) :child-link (elt lleg 5) :name :lleg-ankle-r :axis :x))
+     (setq jll0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt lleg 0) :name :lleg-crotch-y :axis :z))
+     (setq jll1 (instance rotational-joint :init :parent-link (elt lleg 0) :child-link (elt lleg 1) :name :lleg-crotch-r :axis :x))
+     (setq jll2 (instance rotational-joint :init :parent-link (elt lleg 1) :child-link (elt lleg 2) :name :lleg-crotch-p :axis :y))
+     (setq jll3 (instance rotational-joint :init :parent-link (elt lleg 2) :child-link (elt lleg 3) :name :lleg-knee-p :axis :y :min 0))
+     (setq jll4 (instance rotational-joint :init :parent-link (elt lleg 3) :child-link (elt lleg 4) :name :lleg-ankle-p :axis :y))
+     (setq jll5 (instance rotational-joint :init :parent-link (elt lleg 4) :child-link (elt lleg 5) :name :lleg-ankle-r :axis :x))
 
-       (setq jlr0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt rleg 0) :name :rleg-crotch-y :axis :-z))
-       (setq jlr1 (instance rotational-joint :init :parent-link (elt rleg 0) :child-link (elt rleg 1) :name :rleg-crotch-r :axis :-x))
-       (setq jlr2 (instance rotational-joint :init :parent-link (elt rleg 1) :child-link (elt rleg 2) :name :rleg-crotch-p :axis :y))
-       (setq jlr3 (instance rotational-joint :init :parent-link (elt rleg 2) :child-link (elt rleg 3) :name :rleg-knee-p :axis :y :min 0))
-       (setq jlr4 (instance rotational-joint :init :parent-link (elt rleg 3) :child-link (elt rleg 4) :name :rleg-ankle-p :axis :y))
-       (setq jlr5 (instance rotational-joint :init :parent-link (elt rleg 4) :child-link (elt rleg 5) :name :rleg-ankle-r :axis :-x))
+     (setq jlr0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt rleg 0) :name :rleg-crotch-y :axis :-z))
+     (setq jlr1 (instance rotational-joint :init :parent-link (elt rleg 0) :child-link (elt rleg 1) :name :rleg-crotch-r :axis :-x))
+     (setq jlr2 (instance rotational-joint :init :parent-link (elt rleg 1) :child-link (elt rleg 2) :name :rleg-crotch-p :axis :y))
+     (setq jlr3 (instance rotational-joint :init :parent-link (elt rleg 2) :child-link (elt rleg 3) :name :rleg-knee-p :axis :y :min 0))
+     (setq jlr4 (instance rotational-joint :init :parent-link (elt rleg 3) :child-link (elt rleg 4) :name :rleg-ankle-p :axis :y))
+     (setq jlr5 (instance rotational-joint :init :parent-link (elt rleg 4) :child-link (elt rleg 5) :name :rleg-ankle-r :axis :-x))
 
-       ;; define other parameters
-       (setq larm-root-link (car larm) rarm-root-link (car rarm)
-	     lleg-root-link (car lleg) rleg-root-link (car rleg)
-	     torso-root-link (car torso) head-root-link (car head))
-       (setq links (append (list aroot-link) torso head larm rarm lleg rleg))
-       (setq joint-list (list jc0 jc1 jh0 jh1
-			      jal0 jal1 jal2 jal3 jal4 jal5 jal6
-			      jar0 jar1 jar2 jar3 jar4 jar5 jar6
-			      jll0 jll1 jll2 jll3 jll4 jll5
-			      jlr0 jlr1 jlr2 jlr3 jlr4 jlr5
-			      ))
-       (setq collision-avoidance-links (list aroot-link (elt torso 1) (elt larm 3) (elt rarm 3)))
-       (send-all (send self :joint-list) :max-joint-torque 0.1) ;; [Nm]
+     ;; define other parameters
+     (setq larm-root-link (car larm) rarm-root-link (car rarm)
+           lleg-root-link (car lleg) rleg-root-link (car rleg)
+           torso-root-link (car torso) head-root-link (car head))
+     (setq links (append (list aroot-link) torso head larm rarm lleg rleg))
+     (setq joint-list (list jc0 jc1 jh0 jh1
+                            jal0 jal1 jal2 jal3 jal4 jal5 jal6
+                            jar0 jar1 jar2 jar3 jar4 jar5 jar6
+                            jll0 jll1 jll2 jll3 jll4 jll5
+                            jlr0 jlr1 jlr2 jlr3 jlr4 jlr5
+                            ))
+     (setq collision-avoidance-links (list aroot-link (elt torso 1) (elt larm 3) (elt rarm 3)))
+     (send-all (send self :joint-list) :max-joint-torque 0.1) ;; [Nm]
 
-       ;; set mass properties
-       (dolist (l (append (list aroot-link) torso))
-	 (send l :weight 100.0))
-       (dolist (l (append larm rarm lleg rleg head))
-	 (send l :weight 7.0))
-       (dolist (l (list aroot-link (elt torso 1) (elt head 1)))
-	 (let* ((valid-bodies (remove-if #'(lambda (x)
-					     (and (> (send x :volume) 0) (< (send x :volume) 0))) ;; nan check
-					 (send l :bodies))))
-	   (send l :centroid
-		 (if (= (length valid-bodies) 1)
-		     (send (car valid-bodies) :centroid)
-		   (scale (/ 1.0 (reduce #'+ (mapcar #'(lambda (x) (send x :volume)) valid-bodies)))
-			  (reduce #'v+ (mapcar #'(lambda (x) (scale (send x :volume) (send x :centroid))) valid-bodies)))))
-	   ))
+     ;; set mass properties
+     (dolist (l (append (list aroot-link) torso))
+       (send l :weight 100.0))
+     (dolist (l (append larm rarm lleg rleg head))
+       (send l :weight 7.0))
+     (dolist (l (list aroot-link (elt torso 1) (elt head 1)))
+       (let* ((valid-bodies (remove-if #'(lambda (x)
+                                           (and (> (send x :volume) 0) (< (send x :volume) 0))) ;; nan check
+                                       (send l :bodies))))
+         (send l :centroid
+               (if (= (length valid-bodies) 1)
+                   (send (car valid-bodies) :centroid)
+                 (scale (/ 1.0 (reduce #'+ (mapcar #'(lambda (x) (send x :volume)) valid-bodies)))
+                        (reduce #'v+ (mapcar #'(lambda (x) (scale (send x :volume) (send x :centroid))) valid-bodies)))))
+         ))
 
-       (send self :init-ending)
-       self)))
+     (send self :init-ending)
+     self))
   (:make-root-link
    ()
    (let ((bc0 (make-cube 100 200 100)))
