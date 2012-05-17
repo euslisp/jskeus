@@ -14,13 +14,15 @@
          (crotch-width 75) (foot-depth 200) (foot-width 100) (foot-thickness 25) (foot-offset 50)
 	 (arm-radius 50) (upper-arm-length 275) (lower-arm-length 195) (shoulder-width 150) (hand-length 50))
    (send-super* :init args)
-   ;; generate links and assoc all links
+   ;; 1. make links links and assoc all links
    (let ((aroot-link (send self :make-root-link)))
      (setq torso (send self :make-torso-links) head (send self :make-head-links)
            rarm (send self :make-arm-links :rarm arm-radius upper-arm-length lower-arm-length shoulder-width hand-length)
            larm (send self :make-arm-links :larm arm-radius upper-arm-length lower-arm-length shoulder-width hand-length)
            rleg (send self :make-leg-links :rleg leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset)
            lleg (send self :make-leg-links :lleg leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset))
+     ;; 2. assoc links
+     ;;    Root link should be associated with "self".
      (send self :assoc aroot-link)
      (send aroot-link :assoc (car torso))
      (send (cadr torso) :assoc (car head))
@@ -29,7 +31,8 @@
      (send aroot-link :assoc (car rleg))
      (send aroot-link :assoc (car lleg))
 
-     ;; generate all joints
+     ;; 3. make all joints
+     ;;    Before making joints, you should :assoc all links.
      (setq jc0 (instance rotational-joint :init :parent-link aroot-link :child-link (car torso) :name :torso-waist-y :axis :z :min -45 :max 45))
      (setq jc1 (instance rotational-joint :init :parent-link (car torso) :child-link (cadr torso) :name :torso-waist-p :axis :y))
 
@@ -66,10 +69,8 @@
      (setq jlr4 (instance rotational-joint :init :parent-link (elt rleg 3) :child-link (elt rleg 4) :name :rleg-ankle-p :axis :y))
      (setq jlr5 (instance rotational-joint :init :parent-link (elt rleg 4) :child-link (elt rleg 5) :name :rleg-ankle-r :axis :-x))
 
-     ;; define other parameters
-     (setq larm-root-link (car larm) rarm-root-link (car rarm)
-           lleg-root-link (car lleg) rleg-root-link (car rleg)
-           torso-root-link (car torso) head-root-link (car head))
+     ;; 4. define slots for robot class
+     ;;    links and joint-list for cascaded-link.
      (setq links (append (list aroot-link) torso head larm rarm lleg rleg))
      (setq joint-list (list jc0 jc1 jh0 jh1
                             jal0 jal1 jal2 jal3 jal4 jal5 jal6
@@ -77,10 +78,13 @@
                             jll0 jll1 jll2 jll3 jll4 jll5
                             jlr0 jlr1 jlr2 jlr3 jlr4 jlr5
                             ))
+     ;;    These are for robot-model.
+     (setq larm-root-link (car larm) rarm-root-link (car rarm)
+           lleg-root-link (car lleg) rleg-root-link (car rleg)
+           torso-root-link (car torso) head-root-link (car head))
      (setq collision-avoidance-links (list aroot-link (elt torso 1) (elt larm 3) (elt rarm 3)))
-     (send-all (send self :joint-list) :max-joint-torque 0.1) ;; [Nm]
 
-     ;; set mass properties
+     ;; set mass properties & max torques
      (dolist (l (append (list aroot-link) torso))
        (send l :weight 100.0))
      (dolist (l (append larm rarm lleg rleg head))
@@ -95,9 +99,12 @@
                  (scale (/ 1.0 (reduce #'+ (mapcar #'(lambda (x) (send x :volume)) valid-bodies)))
                         (reduce #'v+ (mapcar #'(lambda (x) (scale (send x :volume) (send x :centroid))) valid-bodies)))))
          ))
+     (send-all (send self :joint-list) :max-joint-torque 0.1) ;; [Nm]
 
+     ;; 5. call :init-ending after defining links and joint-list and return "self"
      (send self :init-ending)
      self))
+  ;; Methods to define robot links
   (:make-root-link
    ()
    (let ((bc0 (make-cube 100 200 100)))

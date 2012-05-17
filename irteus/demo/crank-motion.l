@@ -10,17 +10,24 @@
     (&rest args)
     (send-super* :init args)
     (setq handles nil)
+    ;; 1. make links links and assoc all links
     (let ((rl (send self :make-root-link))
           (cl (send self :make-crank-link)))
       (send cl :translate #f(0 0 500) :world)
+      ;; 2. assoc links
+      ;;    Root link should be associated with "self".
       (send self :assoc rl)
       (send rl :assoc cl)
+      ;; 3. define slots for robot class
+      ;;    links and joint-list for cascaded-link.
       (setq links (list rl cl))
       (setq joint-list (list (instance rotational-joint :init
                                        :parent-link rl :child-link cl
                                        :name :crank-joint :axis :z)))
+      ;; 4. call :init-ending after defining links and joint-list and return "self"
       (send self :init-ending)
       self))
+  ;; Methods to define robot links
   (:make-root-link
     ()
     (instance bodyset-link :init (make-cascoords)
