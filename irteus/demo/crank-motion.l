@@ -2,7 +2,7 @@
 
 (defclass sample-crank
   :super cascaded-link
-  :slots (handles)
+  :slots (handles crank-joint)
   )
 
 (defmethod sample-crank
@@ -18,13 +18,17 @@
       ;;    Root link should be associated with "self".
       (send self :assoc rl)
       (send rl :assoc cl)
-      ;; 3. define slots for robot class
+      ;; 3. make all joints
+      ;;    Before making joints, you should :assoc all links.
+      (setq crank-joint (instance rotational-joint :init
+                                  :parent-link rl :child-link cl
+                                  :name :crank-joint :axis :z
+                                  :min *-inf* :max *inf*))
+      ;; 4. define slots for robot class
       ;;    links and joint-list for cascaded-link.
       (setq links (list rl cl))
-      (setq joint-list (list (instance rotational-joint :init
-                                       :parent-link rl :child-link cl
-                                       :name :crank-joint :axis :z)))
-      ;; 4. call :init-ending after defining links and joint-list and return "self"
+      (setq joint-list (list crank-joint))
+      ;; 5. call :init-ending after defining links and joint-list and return "self"
       (send self :init-ending)
       self))
   ;; Methods to define robot links
@@ -52,6 +56,7 @@
         (push ahandle handles)
         br)))
   (:crank-handle () (car handles))
+  (:crank-joint (&rest args) (forward-message-to crank-joint args))
   )
 
 (defun crank-motion
@@ -92,7 +97,7 @@
            (rotation-axis (list nil t t))
            (fp (apply #'midpoint 0.5 (send-all fix-leg-coords :worldpos))))
       (do-until-key
-       (send crank :rotate (deg2rad 15) :z)
+       (send crank :crank-joint :joint-angle 15 :relative t)
        (let* ((target-coords (append (list (send crank :crank-handle)) fix-leg-coords)))
          (send *robot* :fullbody-inverse-kinematics target-coords
                :move-target move-target :link-list link-list
