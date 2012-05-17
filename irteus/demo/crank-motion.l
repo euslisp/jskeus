@@ -1,5 +1,52 @@
 (load "sample-robot-model.l")
 
+(defclass sample-crank
+  :super cascaded-link
+  :slots (handles)
+  )
+
+(defmethod sample-crank
+  (:init
+    (&rest args)
+    (send-super* :init args)
+    (setq handles nil)
+    (let ((rl (send self :make-root-link))
+          (cl (send self :make-crank-link)))
+      (send cl :translate #f(0 0 500) :world)
+      (send self :assoc rl)
+      (send rl :assoc cl)
+      (setq links (list rl cl))
+      (setq joint-list (list (instance rotational-joint :init
+                                       :parent-link rl :child-link cl
+                                       :name :crank-joint :axis :z)))
+      (send self :init-ending)
+      self))
+  (:make-root-link
+    ()
+    (instance bodyset-link :init (make-cascoords)
+              :bodies (list (make-cylinder 10 500))
+              :name :crank-root-link))
+  (:make-crank-link
+    ()
+    (let* ((b0 (make-cylinder 10 50))
+           (b1 (make-cylinder 10 70))
+           (b2 (make-cube 30 120 10)))
+      (send b2 :translate (float-vector 0 -50 55))
+      (send b1 :translate (float-vector 0 -100 60))
+      (send b0 :assoc b1)
+      (send b0 :assoc b2)
+      (let* ((br (instance bodyset-link :init (make-cascoords)
+                           :bodies (list b0 b1 b2) :name :crank-handle-link))
+             (ahandle
+              (make-cascoords :coords
+                               (send (send b1 :copy-worldcoords) :translate (float-vector 0 0 50))
+                               :name :crank-handle)))
+        (send br :assoc ahandle)
+        (push ahandle handles)
+        br)))
+  (:crank-handle () (car handles))
+  )
+
 (defun crank-motion
   ()
   "crank motion using full body ik"
@@ -18,22 +65,8 @@
     (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (make-coords))))
   (send *robot* :update-descendants)
 
-  (labels ((make-crank ()
-             (let* ((b0 (make-cylinder 10 50))
-		    (b1 (make-cylinder 10 70))
-		    (b2 (make-cube 30 120 10)))
-	       (send b2 :translate (float-vector 0 -50 55))
-	       (send b1 :translate (float-vector 0 -100 60))
-	       (send b0 :assoc b1) (send b0 :assoc b2)
-	       (let ((br (instance bodyset :init (make-cascoords)
-				   :bodies (list b0 b1 b2))))
-		 (send br :put :handle
-		       (make-cascoords :coords
-		            (send (send b1 :copy-worldcoords) :translate (float-vector 0 0 50))))
-		 (send br :assoc (send br :get :handle))
-		 br))))
-    (let ((crank (make-crank)))
-      (send crank :locate #f(350 100 500) :world)
+    (let ((crank (instance sample-crank :init)))
+      (send crank :locate #f(350 100 0) :world)
       (objects (list crank *robot*))
       (let* ((cog-target-pos
 	      (if (some #'null (send *robot* :legs))
@@ -53,7 +86,7 @@
              (fp (apply #'midpoint 0.5 (send-all fix-leg-coords :worldpos))))
         (do-until-key
          (send crank :rotate (deg2rad 15) :z)
-         (let* ((target-coords (append (list (send crank :get :handle)) fix-leg-coords)))
+         (let* ((target-coords (append (list (send crank :crank-handle)) fix-leg-coords)))
            (send *robot* :fullbody-inverse-kinematics target-coords
                  :move-target move-target :link-list link-list
                  :rotation-axis rotation-axis :thre thre
@@ -71,7 +104,7 @@
 	   (send *robot* :draw-torque *viewer*)
            (send *irtviewer* :flush)
            ))
-        ))))
+        )))
 
 (unless (boundp '*irtviewer*) (make-irtviewer))
 (warn "(crank-motion) for fullbody motion~%")
