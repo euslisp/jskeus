@@ -490,7 +490,7 @@
       ,@(mapcar #'(lambda (j)
                     (let ((joint-name (cdr (assoc :name j))))
                       `(newparam
-                        (@ (sid ,(format nil "libkinscenes.kinScene_libkinscenes.kinScene_inst_kinmodel.~A_axis0_value" joint-name)))
+                        (@ (sid ,(format nil "libkinscenes.kinScene_libkinscenes.kinScene_inst_kinmodel.~A.value" joint-name)))
                         ,(format nil "<SIDREF>kinsystem_motion/kinsystem_motion.kinsystem_inst.inst_~A_value</SIDREF>"
                                  joint-name))))
                 (eusmodel-joint-description desc))))))
