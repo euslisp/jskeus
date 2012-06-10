@@ -66,6 +66,17 @@
   (defconstant GL_INDEX_ARRAY         #x8077)
   )
 
+(defun set-stereo-gl-attribute ()
+  (reset-gl-attribute)
+  (let ((iv (make-array (1+ (length gl::*attributelist*)) :element-type :integer)))
+    (sys::vector-replace iv *attributelist*)
+    (setf (elt iv (1- (length *attributelist*))) glx_stereo)
+    (setq *attributelist* iv)))
+(defun reset-gl-attribute ()
+  (setq *attributelist*
+        (integer-vector glx_rgba glx_red_size 1 glx_green_size 1
+                        glx_blue_size 1 glx_doublebuffer glx_depth_size 1 0)))
+
 (unless (assoc :color-org (send glviewsurface :methods))
   (rplaca (assoc :color (send glviewsurface :methods)) :color-org))
 (defmethod glviewsurface
