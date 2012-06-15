@@ -300,6 +300,24 @@
                :debug-view debug-view
                :jvv jvv :jav jav)
    )
+  (:calc-force-from-joint-torque
+   (limb all-torque &key (move-target (send self limb :end-coords)) (use-torso))
+   (let* ((link-list
+	   (send self :link-list
+		 (send move-target :parent)
+		 (unless use-torso (car (send self limb :links)))))
+	  (jacobian
+	   (send self :calc-jacobian-from-link-list
+		 link-list
+		 :move-target move-target
+		 :rotation-axis (list t)
+		 :translation-axis (list t)))
+	  (torque (instantiate float-vector (length link-list))))
+     (dotimes (i (length link-list))
+       (setf (elt torque i)
+	     (elt all-torque (position (send (elt link-list i) :joint) (send self :joint-list)))))
+     (transform (send self :calc-inverse-jacobian (transpose jacobian))
+		torque)))
   (:draw-torque
    (vwer &key flush (width 2) (size 100) (color (float-vector 1 0.3 0)) (warning-color (float-vector 1 0 0)) (torque-threshold nil) (torque-vector (send self :torque-vector)))
    (mapcar
