@@ -2377,7 +2377,7 @@
                 ,new-move-target)
         ))))
 
-(defun eusmodel-validity-check (robot)
+(defun eusmodel-validity-check-one (robot)
   ;; root-link-validity-check
   (let ((root-link (car (send robot :links))))
     (assert (null (send root-link :parent-link))
@@ -2414,6 +2414,14 @@
 		   (member (send j :child-link) (send (send j :parent-link) :child-links)))
 	      (format nil "definition of child-link and parent-link should consistent in joints and links ~A ~A ~A" j (send j :child-link) (send j :parent-link)))
       )))
+
+(defun eusmodel-validity-check (robot)
+  (require :unittest "lib/llib/unittest.l")
+  (init-unit-test)
+  (setq lisp::*exit-on-fatal-error* nil)
+  (eusmodel-validity-check-one robot)
+  (run-all-tests)
+  )
 
 (in-package "GEOMETRY")
 
