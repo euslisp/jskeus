@@ -2377,6 +2377,44 @@
                 ,new-move-target)
         ))))
 
+(defun eusmodel-validity-check (robot)
+  ;; root-link-validity-check
+  (let ((root-link (car (send robot :links))))
+    (assert (null (send root-link :parent-link))
+	    (format nil "root link should have no parent-link!! ~A ~A~%" root-link (send root-link :parent-link)))
+    (assert (equal robot (send root-link :parent))
+            (format nil "root link ~A should be :assoced with robot ~A!!~%" root-link robot))
+    )
+
+  ;;link-joint-length-check-for-serial-link-manipulator
+  (let ((joint-list
+         (remove-duplicates
+          (append (mapcar #'cdr (remove-if-not #'(lambda (s) (derivedp (cdr s) joint)) (send robot :slots)))
+                  (send robot :joint-list))))
+	(links (remove-duplicates
+               (append (mapcar #'cdr (remove-if-not #'(lambda (s) (derivedp (cdr s) bodyset-link)) (send robot :slots)))
+                       (send robot :links)))))
+    (assert (= (+ (length joint-list) 1) (length links))
+	    (format nil ";; link(~A) = joint(=~A) + 1 <- for serial link manipulator!!~%" (length links) (length joint-list)))
+    ;; chain-validity-check
+    (dolist (j joint-list)
+      ;; joint should have child-link derived from bodyset-link class
+      (assert (and (send j :child-link) (derivedp (send j :child-link) bodyset-link))
+	      (format nil "joint should have child-link derived from bodyset-link class ~A ~A" j (send j :child-link)))
+      ;; joint should have parent-link derived from bodyset-link class
+      (assert (and (send j :parent-link) (derivedp (send j :parent-link) bodyset-link))
+	      (format nil "child-link should associated with parent-link ~A ~A"
+		      j (send j :parent-link)))
+      ;; definition of child-link and parent-link should consistent in joints and links
+      (assert (and (member (send j :child-link) (send (send j :parent-link) :descendants))
+		   (equal (send j :parent-link) (send (send j :child-link) :parent)))
+	      (format nil "definition of child-link and parent-link should consistent in joints and links ~A ~A ~A" j (send j :parent-link) (send j :child-link)))
+      ;; definition of child-link and parent-link should consistent in joints and links
+      (assert (and (equal (send (send j :child-link) :parent-link) (send j :parent-link))
+		   (member (send j :child-link) (send (send j :parent-link) :child-links)))
+	      (format nil "definition of child-link and parent-link should consistent in joints and links ~A ~A ~A" j (send j :child-link) (send j :parent-link)))
+      )))
+
 (in-package "GEOMETRY")
 
 (provide :irtmodel "$Id$")
