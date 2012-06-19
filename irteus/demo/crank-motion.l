@@ -55,6 +55,7 @@
         (send br :assoc ahandle)
         (push ahandle handles)
         br)))
+  (:handle () handles)
   (:crank-handle () (car handles))
   (:crank-joint (&rest args) (forward-message-to crank-joint args))
   )
