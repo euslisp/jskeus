@@ -53,44 +53,42 @@
   "dual arm ik"
   (send *irtviewer* :title "dual-arm-ik")
   (let ((i 0) link-list move-target target-coords b0)
-    (labels
-     ()
-     ;;
-     (unless (boundp '*robot*)
-       (setq *robot* (instance sample-robot :init)))
-     (send *robot* :reset-pose)
-     (if (= (length (car (send *robot* :arms))) 7)
-	 (send *robot* :arms :angle-vector #f(10 20 0 -20 10 0 0)))
-     (if (some #'null (send *robot* :legs))
-	 (send *robot* :newcoords (make-coords))
-       (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (make-coords))))
-     (send *robot* :update-descendants)
-     ;;
-     ;; make broom model
-     (setq b0 (instance sample-broom :init))
-     (send b0 :locate #f(250 0 0))
-     ;;
-     ;; setup move-target and link-list
-     (setq move-target (send *robot* :arms :end-coords)
-           link-list (mapcar #'(lambda (mt) (send *robot* :link-list mt)) (send-all move-target :parent)))
-     ;;
-     ;; look-at
-     (send *robot* :head :look-at (apply #'midpoint 0.5 (send-all (send b0 :handle) :worldpos)))
-     (objects (list *robot* b0))
-     ;;
-     ;; do sweep
-     (do-until-key
-      (send *robot* :inverse-kinematics (send b0 :handle)
-            :link-list link-list :move-target move-target
-            :stop 500 :thre '(10 10)
-            :rotation-axis '(nil nil) :debug-view nil :dump-command nil)
-      (send *robot* :head :look-at
-            (apply #'midpoint 0.5 (send-all (send b0 :handle) :worldpos)))
-      (send b0 :orient (* 0.2 (sin (/ i 10.0))) :x :world)
-      (send b0 :locate (float-vector 250 (* 250 (sin (/ (incf i) 10.0))) 0) :world)
-      (send *irtviewer* :draw-objects)
-      (incf i)
-      ))
+    ;;
+    (unless (boundp '*robot*)
+      (setq *robot* (instance sample-robot :init)))
+    (send *robot* :reset-pose)
+    (if (= (length (car (send *robot* :arms))) 7)
+	(send *robot* :arms :angle-vector #f(10 20 0 -20 10 0 0)))
+    (if (some #'null (send *robot* :legs))
+	(send *robot* :newcoords (make-coords))
+      (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (make-coords))))
+    (send *robot* :update-descendants)
+    ;;
+    ;; make broom model
+    (setq b0 (instance sample-broom :init))
+    (send b0 :locate #f(250 0 0))
+    ;;
+    ;; setup move-target and link-list
+    (setq move-target (send *robot* :arms :end-coords)
+	  link-list (mapcar #'(lambda (mt) (send *robot* :link-list mt)) (send-all move-target :parent)))
+    ;;
+    ;; look-at
+    (send *robot* :head :look-at (apply #'midpoint 0.5 (send-all (send b0 :handle) :worldpos)))
+    (objects (list *robot* b0))
+    ;;
+    ;; do sweep
+    (do-until-key
+     (send *robot* :inverse-kinematics (send b0 :handle)
+	   :link-list link-list :move-target move-target
+	   :stop 500 :thre '(10 10)
+	   :rotation-axis '(nil nil) :debug-view nil :dump-command nil)
+     (send *robot* :head :look-at
+	   (apply #'midpoint 0.5 (send-all (send b0 :handle) :worldpos)))
+     (send b0 :orient (* 0.2 (sin (/ i 10.0))) :x :world)
+     (send b0 :locate (float-vector 250 (* 250 (sin (/ (incf i) 10.0))) 0) :world)
+     (send *irtviewer* :draw-objects)
+     (incf i)
+     )
     ))
 (unless (boundp '*irtviewer*) (make-irtviewer))
 (warn "(dual-arm-ik) for tool usage~%")
