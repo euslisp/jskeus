@@ -2419,7 +2419,8 @@
   (require :unittest "lib/llib/unittest.l")
   (init-unit-test)
   (setq lisp::*exit-on-fatal-error* nil)
-  (eusmodel-validity-check-one robot)
+  (eval `(deftest eusmodel-validity-check-test
+	   (eusmodel-validity-check-one ,robot)))
   (run-all-tests)
   )
 
