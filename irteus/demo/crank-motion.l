@@ -7,13 +7,15 @@
 
 (defmethod sample-crank
   (:init
-    (&rest args)
+    (&rest args
+     &key (root-bar-height 550) (handle-base-radius 100) (handle-bar-height 40)
+     &allow-other-keys)
     (send-super* :init args)
     (setq handles nil)
     ;; 1. make links links and assoc all links
-    (let ((rl (send self :make-root-link))
-          (cl (send self :make-crank-link)))
-      (send cl :translate #f(0 0 500) :world)
+    (let ((rl (send self :make-root-link root-bar-height))
+          (cl (send self :make-crank-link handle-base-radius handle-bar-height)))
+      (send cl :translate (float-vector 0 0 root-bar-height) :world)
       ;; 2. assoc links
       ;;    Root link should be associated with "self".
       (send self :assoc rl)
@@ -33,24 +35,27 @@
       self))
   ;; Methods to define robot links
   (:make-root-link
-    ()
+    (root-bar-height)
     (instance bodyset-link :init (make-cascoords)
-              :bodies (list (make-cylinder 10 500))
+              :bodies (list (make-cylinder 10 root-bar-height))
               :name :crank-root-link))
   (:make-crank-link
-    ()
-    (let* ((b0 (make-cylinder 10 50))
-           (b1 (make-cylinder 10 70))
-           (b2 (make-cube 30 120 10)))
-      (send b2 :translate (float-vector 0 -50 55))
-      (send b1 :translate (float-vector 0 -100 60))
-      (send b0 :assoc b1)
-      (send b0 :assoc b2)
+    (handle-base-radius handle-bar-height)
+    (let* ((handle-base-thickness 10)
+           (handle-bar-radius 15)
+           (handle-base (make-cube (* handle-bar-radius 2) handle-base-radius handle-base-thickness))
+           (handle-bar (make-cylinder handle-bar-radius handle-bar-height)))
+      (send handle-bar :translate
+            (float-vector 0 (- handle-bar-radius handle-base-radius) (/ handle-base-thickness 2.0)))
+      (send handle-base :translate (float-vector 0 (/ handle-base-radius -2.0) 0))
+      (send handle-base :assoc handle-bar)
+      (send handle-base :translate (float-vector 0 0 (/ handle-base-thickness 2.0)))
       (let* ((br (instance bodyset-link :init (make-cascoords)
-                           :bodies (list b0 b1 b2) :name :crank-handle-link))
+                           :bodies (list handle-base handle-bar) :name :crank-handle-link))
              (ahandle
               (make-cascoords :coords
-                               (send (send b1 :copy-worldcoords) :translate (float-vector 0 0 50))
+                               (send (send handle-base :copy-worldcoords)
+                                     :translate (float-vector 0 (* -0.5 handle-base-radius) (/ handle-bar-height 2.0)))
                                :name :crank-handle)))
         (send br :assoc ahandle)
         (push ahandle handles)
