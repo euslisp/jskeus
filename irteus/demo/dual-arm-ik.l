@@ -7,11 +7,16 @@
 
 (defmethod sample-broom
   (:init
-    (&rest args)
+    (&rest args
+     &key (sweep-height 250) (sweep-width 125) (sweep-thickness 20)
+          (bar-length 700) (bar-width 20)
+     &allow-other-keys)
     (send-super* :init args)
     (setq handles nil)
     ;; 1. make links links and assoc all links
-    (let ((rl (send self :make-broom-link)))
+    (let ((rl (send self :make-broom-link
+                    sweep-height sweep-width sweep-thickness
+                    bar-length bar-width)))
       ;; 2. assoc links
       ;;    Root link should be associated with "self".
       (send self :assoc rl)
@@ -27,13 +32,17 @@
       self))
   ;; Methods to define robot links
   (:make-broom-link
-   ()
-   (let* ((sh 250) (sw 125) (length 700)
-	  (bar (make-cylinder 10 length))
+    (sh ;; sw = Sweep Height
+     sw ;; sw = Sweep Width
+     st ;; st = Sweep Thickness
+     bl ;; bl = Bar Length
+     bw) ;; bw = Bar Width
+   (let* ((bar (make-cylinder (/ bw 2.0) bl))
 	  (sweep (make-prism (list (float-vector sw (- sh) 0)
 				   (float-vector (- sw) (- sh) 0)
-				   (float-vector -20 0 0)
-				   (float-vector  20 0 0)) 20)))
+				   (float-vector (* -0.5 bw) 0 0)
+				   (float-vector (* 0.5 bw) 0 0))
+                             st)))
      (send bar :locate (float-vector 0 0 sh) :world)
      (send sweep :rotate pi/2 :x)
      (send sweep :locate (float-vector 0 10 sh) :world)
@@ -43,7 +52,7 @@
      (let ((br (instance bodyset-link :init (make-cascoords)
 			 :bodies (list bar sweep))))
        (dolist (rate (list 0.8 0.6))
-	 (push (make-cascoords :pos (float-vector 0 0 (+ (* rate length) sh))) handles))
+	 (push (make-cascoords :pos (float-vector 0 0 (+ (* rate bl) sh))) handles))
        (dolist (hc handles) (send br :assoc hc))
        br)))
   (:handle () handles)
