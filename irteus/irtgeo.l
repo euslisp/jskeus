@@ -31,7 +31,7 @@
                         height-of-cylinder radius-of-cylinder radius-of-sphere
 			matrix-to-euler-angle))
 
-(defvar *g-vec* (float-vector 0 0 9800)) ;; [mm/s^2]
+(defvar *g-vec* (float-vector 0 0 9806.65)) ;; [mm/s^2]
 
 (defun midcoords (p c1 c2)
   (let ()
