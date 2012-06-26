@@ -2,7 +2,7 @@
 
 (defclass sample-crank
   :super cascaded-link
-  :slots (handles crank-joint)
+  :slots (handle crank-joint)
   )
 
 (defmethod sample-crank
@@ -11,7 +11,7 @@
      &key (root-bar-height 550) (handle-base-radius 100) (handle-bar-height 40)
      &allow-other-keys)
     (send-super* :init args)
-    (setq handles nil)
+    (setq handle nil)
     ;; 1. make links links and assoc all links
     (let ((rl (send self :make-root-link root-bar-height))
           (cl (send self :make-crank-link handle-base-radius handle-bar-height)))
@@ -58,10 +58,10 @@
                                      :translate (float-vector 0 (* -0.5 handle-base-radius) (/ handle-bar-height 2.0)))
                                :name :crank-handle)))
         (send br :assoc ahandle)
-        (push ahandle handles)
+        (push ahandle handle)
         br)))
-  (:handle () handles)
-  (:crank-handle () (car handles))
+  (:handle () handle)
+  (:crank-handle () (car handle))
   (:crank-joint (&rest args) (forward-message-to crank-joint args))
   )
 

@@ -2,7 +2,7 @@
 
 (defclass sample-broom
   :super cascaded-link
-  :slots (handles)
+  :slots (handle)
   )
 
 (defmethod sample-broom
@@ -12,7 +12,7 @@
           (bar-length 700) (bar-width 20)
      &allow-other-keys)
     (send-super* :init args)
-    (setq handles nil)
+    (setq handle nil)
     ;; 1. make links links and assoc all links
     (let ((rl (send self :make-broom-link
                     sweep-height sweep-width sweep-thickness
@@ -52,10 +52,10 @@
      (let ((br (instance bodyset-link :init (make-cascoords)
 			 :bodies (list bar sweep))))
        (dolist (rate (list 0.8 0.6))
-	 (push (make-cascoords :pos (float-vector 0 0 (+ (* rate bl) sh))) handles))
-       (dolist (hc handles) (send br :assoc hc))
+	 (push (make-cascoords :pos (float-vector 0 0 (+ (* rate bl) sh))) handle))
+       (dolist (hc handle) (send br :assoc hc))
        br)))
-  (:handle () handles)
+  (:handle () handle)
   )
 
 (defun dual-arm-ik nil
