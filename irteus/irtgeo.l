@@ -27,7 +27,7 @@
 (in-package "GEOMETRY")
 
 (export '(body-to-faces body-to-triangles midcoords orient-coords-to-axis bodyset *g-vec*
-                        make-sphere x-of-cube y-of-cube z-of-cube
+                        make-sphere make-ring x-of-cube y-of-cube z-of-cube
                         height-of-cylinder radius-of-cylinder radius-of-sphere
 			matrix-to-euler-angle))
 
