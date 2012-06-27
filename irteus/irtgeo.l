@@ -515,6 +515,14 @@
     (send obj :csg `((:sphere ,r)))
     obj))
 
+(defun make-ring (ring-radius pipe-radius &rest args &key (segments 16))
+  (let ((v-list) (dtheta (/ 2pi segments)))
+    (dotimes (i segments)
+      (push (float-vector (+ (* pipe-radius (cos (* i dtheta))) ring-radius)
+                          0 (* pipe-radius (sin (* i dtheta))))
+            v-list))
+    (apply #'make-torus v-list :segments segments args)))
+
 ;;
 ;; accessor to primitive bodies
 ;;
