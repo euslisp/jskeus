@@ -422,6 +422,7 @@
 	  (setf (aref inertia-matrix i j) (/ (aref inertia-matrix i j) all-M))))
       inertia-matrix))
   ;; cog jacobian methods   : :cog-jacobian-balance-nspace, :difference-cog-position, and :cog-convergence-check
+  ;; return                 : angle velocity for COG tracking based on COG jacobian ;; (length dav) => (send self :calc-target-joint-dimension link-list))
   ;; arguments
   ;;   translation-axis     : use X and Y components of cog vector by default
   ;;   target-centroid-pos  : 3D vector of target centroid position
