@@ -251,16 +251,8 @@
          (debug-view nil)
 	 (jvv (instantiate float-vector (calc-target-joint-dimension joint-list))) ;; [rad/s] or [m/s]
 	 (jav (instantiate float-vector (calc-target-joint-dimension joint-list)))) ;; [rad/s^2] or [m/s^2]
-   (let ((weight-force (* (send self :weight) 1e-6 (elt *g-vec* 2)))) ;; weight[g] * 1e-6 * gvec[mm/s^2] = force[N]
-     ;; set default external force and moment at the end-effectors
-     (if (every #'null (send self :legs)) ;; for not legged robot
-	 (let ((fv (float-vector 0 0 weight-force))) ;; for non-legged robot
-	   (send (car (send self :links)) :ext-force fv)
-	   (let* ((c (send (car (send self :links)) :centroid))
-		  (moment-offset (v* (scale 1e-3 (send (car (send self :links)) :worldpos)) fv)))
-	     (send (car (send self :links)) :ext-moment moment-offset)
-	     ))
-       (progn ;; for legged robot
+     (unless (every #'null (send self :legs)) ;; for legged robot, set default external force and moment at the end-effectors
+       (let ((weight-force (* (send self :weight) 1e-6 (elt *g-vec* 2)))) ;; weight[g] * 1e-6 * gvec[mm/s^2] = force[N]
 	 (unless target-coords
 	   (dolist (limb '(:rleg :lleg))
 	     (push (send self limb :end-coords) target-coords)))
@@ -280,7 +272,7 @@
 	     ;; hypothesis : gravity force moment + rleg moment + lleg moment = 0, minimal internal moments <-> pseudo-inverse <-> lleg moment = rleg moment
 	     (dolist (limb '(:rleg :lleg))
 	       (push (scale 0.5 total-moment) moment-list))
-	     ))
+	     ))))
 	 (unless (= (length force-list) (length moment-list)
 		    (length target-coords))
 	   (warn ";; ERROR : list length differ : force-list ~A moment-list ~A target-coords ~A~%"
@@ -294,8 +286,6 @@
 			    (moment-offset (v* (scale 1e-3 (send tc :worldpos)) fv)))
 		       (send (send tc :parent) :ext-moment (v+ mv moment-offset))))
 		 force-list moment-list target-coords)
-	 )
-       ))
    (send-super :calc-torque
                :debug-view debug-view
                :jvv jvv :jav jav)
