@@ -1991,6 +1991,21 @@
 	     (push p cpairs)))
 	 ))
      cpairs))
+  ;; calc grasp matrix
+  ;;  -> grasp matrix is defined as
+  ;;   | E_3    0   E_3    0   ... |
+  ;;   | p1_hat E_3 p2_hat E_3 ... |
+  (:calc-grasp-matrix
+   (contact-points &optional (ret (make-matrix 6 (* 6 (length contact-points)))))
+   (let ((contact-matrices (mapcar #'(lambda (x) (outer-product-matrix (scale 1e-3 x))) contact-points)))
+     (dotimes (c (length contact-points))
+       (dotimes (i 3)
+	 (setf (aref ret i (+ (* c 6) i)) 1.0)
+	 (setf (aref ret (+ 3 i) (+ (* c 6) 3 i)) 1.0)
+	 (dotimes (j 3)
+	   (setf (aref ret (+ 3 i) (+ (* c 6) j)) (aref (elt contact-matrices c) i j))
+	   )))
+     ret))
   )
 
 (defun all-child-links (s &optional (pred #'identity))

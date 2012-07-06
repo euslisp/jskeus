@@ -256,23 +256,21 @@
        (unless target-coords
 	 (dolist (limb '(:rleg :lleg))
 	   (push (send self limb :end-coords) target-coords)))
-       (unless force-list ;; force [N]
-	 (let ((total-force/2 (* weight-force 0.5)))
-	   ;; hypothesis : lleg force = rleg force, lleg force + rleg force + gravity force = 0
-	   (dolist (limb '(:rleg :lleg))
-	     (push (float-vector 0.0 0.0 (case limb
-					   ((:rleg :lleg) total-force/2)
-					   (t 0.0))) force-list))
-	   ))
-       (unless moment-list ;; moment [Nm]
-	 (let ((total-moment (v* (scale 1e-3
-					(v- (send self :centroid nil)
-					    (apply #'midpoint 0.5 (send-all target-coords :worldpos))))
-				 (float-vector 0 0 weight-force))))
-	   ;; hypothesis : gravity force moment + rleg moment + lleg moment = 0, minimal internal moments <-> pseudo-inverse <-> lleg moment = rleg moment
-	   (dolist (limb '(:rleg :lleg))
-	     (push (scale 0.5 total-moment) moment-list))
-	   ))))
+       (unless (or force-list moment-list) ;; force [N], moment [Nm]
+	 ;; set default force & moment by solving mimimum internal forces
+	 (let ((ret-f
+		(transform
+		 (pseudo-inverse (send self :calc-grasp-matrix (send-all target-coords :worldpos)))
+		 (float-vector 0 0 weight-force
+			       (* 1e-3 (elt (send self :centroid nil) 1) weight-force)
+                               (* -1e-3 (elt (send self :centroid nil) 0) weight-force) 0))))
+	   (dotimes (i (length target-coords))
+	     (push (subseq ret-f (* i 6) (+ (* i 6) 3)) force-list)
+	     (push (subseq ret-f (+ (* i 6) 3) (+ (* i 6) 6)) moment-list)
+	     ))
+         (setq force-list (reverse force-list))
+         (setq moment-list (reverse moment-list))
+	 )))
    (unless (= (length force-list) (length moment-list)
 	      (length target-coords))
      (warn ";; ERROR : list length differ : force-list ~A moment-list ~A target-coords ~A~%"
