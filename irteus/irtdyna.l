@@ -697,7 +697,6 @@
      &key (pZMPz 0.0) ;; ZMP height [mm]
           (dt 0.005) ;; dt [s]
           (update t) (debug-view)
-          (calc-torque-method :calc-torque)
           (calc-torque-args))
     (unless update (return-from :calc-zmp (send self :get :zmp)))
 
@@ -742,7 +741,7 @@
                      (send self :get :prev-jvv)
                    jvv)) ;; [rad/s]
            (jav (scale dt-1 (v- jvv pjvv)))) ;; [rad/s^2]
-      (send* self calc-torque-method
+      (send* self :calc-torque
 	     :jvv jvv :jav jav
              :debug-view debug-view
              calc-torque-args)
