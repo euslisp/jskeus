@@ -351,13 +351,6 @@
 ;;  inertia matrix and COG jacobian is at the world coordinates
 ;;  link-list should be union-link-list (cannot use list of link-list)
 (defmethod cascaded-link
-  (:exec-func-for-all-links
-   (func)
-   (labels ((tmp-exec-func-for-all-links
-	     (l tmp-func)
-	     (funcall tmp-func l)
-	     (dolist (cl (send l :child-links)) (tmp-exec-func-for-all-links cl tmp-func))))
-     (tmp-exec-func-for-all-links (car (send self :links)) func)))
   ;; return   ;; inertia-matrix [m * kg]
   (:calc-inertia-matrix-from-link-list
     (&rest args
@@ -381,14 +374,15 @@
      &allow-other-keys)
     (when update-mass-properties 
       ;; parameter initialization
-      (send self :exec-func-for-all-links
-	    #'(lambda (l)
-		(send l :put :m-til 0)
-		(dotimes (i 3)
-		  (setf (elt (send l :get :c-til) i) 0.0))
-		(dotimes (j 3)
-		  (dotimes (i 3)
-		    (setf (aref (send l :get :I-til) i j) 0.0)))))
+      (all-child-links
+       (car (send self :links))
+       #'(lambda (l)
+           (send l :put :m-til 0)
+           (dotimes (i 3)
+             (setf (elt (send l :get :c-til) i) 0.0))
+           (dotimes (j 3)
+             (dotimes (i 3)
+               (setf (aref (send l :get :I-til) i j) 0.0)))))
       ;; calc all links' mass properties
       (send* (car (send self :links)) :propagate-mass-properties args))
     ;; calc inertia matrix
@@ -656,10 +650,11 @@
 	 (tmp-mc (make-matrix 3 3))
 	 (tmp-md (make-matrix 3 3)))
    (let ((torque-vector (instantiate float-vector (length joint-list))))
-     (send self :exec-func-for-all-links
-	   #'(lambda (l)
-	       (send l :put :spacial-velocity-jacobian (float-vector 0 0 0))
-	       (send l :put :angular-velocity-jacobian (float-vector 0 0 0))))
+     (all-child-links
+      (car (send self :links))
+      #'(lambda (l)
+          (send l :put :spacial-velocity-jacobian (float-vector 0 0 0))
+          (send l :put :angular-velocity-jacobian (float-vector 0 0 0))))
      ;; joint-angle update
      (dotimes (i (length joint-list))
        (let* ((jnt (elt joint-list i)))
@@ -675,10 +670,11 @@
 	   :tmp-va tmp-va :tmp-vb tmp-vb :tmp-vc tmp-vc
 	   :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc :tmp-md tmp-md)
      ;; reset ext force and ext moment
-     (send self :exec-func-for-all-links
-	   #'(lambda (l)
-	       (send l :ext-force (float-vector 0 0 0))
-	       (send l :ext-moment (float-vector 0 0 0))))
+     (all-child-links
+      (car (send self :links))
+      #'(lambda (l)
+          (send l :ext-force (float-vector 0 0 0))
+          (send l :ext-moment (float-vector 0 0 0))))
      (dotimes (i (length torque-vector))
        (setf (elt torque-vector i) (send (elt joint-list i) :joint-torque)))
      torque-vector))
@@ -696,8 +692,9 @@
     (unless update (return-from :calc-zmp (send self :get :zmp)))
 
     ;; under no external forces and moments
-    (send self :exec-func-for-all-links
-	  #'(lambda (l)
+    (all-child-links
+     (car (send self :links))
+     #'(lambda (l)
 	      (send l :ext-force (float-vector 0 0 0))
 	      (send l :ext-moment (float-vector 0 0 0))))
 
