@@ -250,7 +250,8 @@
    (&key (force-list) (moment-list) (target-coords)
          (debug-view nil)
 	 (jvv (instantiate float-vector (calc-target-joint-dimension joint-list))) ;; [rad/s] or [m/s]
-	 (jav (instantiate float-vector (calc-target-joint-dimension joint-list)))) ;; [rad/s^2] or [m/s^2]
+	 (jav (instantiate float-vector (calc-target-joint-dimension joint-list))) ;; [rad/s^2] or [m/s^2]
+         (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
    (unless (every #'null (send self :legs)) ;; for legged robot, set default external force and moment at the end-effectors
      (let ((weight-force (* (send self :weight) 1e-6 (elt *g-vec* 2)))) ;; weight[g] * 1e-6 * gvec[mm/s^2] = force[N]
        (unless target-coords
@@ -286,7 +287,7 @@
 	   force-list moment-list target-coords)
    (send self :calc-torque
               :debug-view debug-view
-              :jvv jvv :jav jav)
+              :jvv jvv :jav jav :calc-torque-buffer-args calc-torque-buffer-args)
    )
   (:calc-force-from-joint-torque
    (limb all-torque &key (move-target (send self limb :end-coords)) (use-torso))

@@ -647,18 +647,22 @@
 		 (t (elt (send j :max-joint-torque) k))))
          (incf i)))
      ret))
+  (:calc-torque-buffer-args
+    ()
+    ;; buffers for computation
+    (list :tmp-va (float-vector 0 0 0)
+          :tmp-vb (float-vector 0 0 0)
+          :tmp-vc (float-vector 0 0 0)
+          :tmp-ma (make-matrix 3 3)
+          :tmp-mb (make-matrix 3 3)
+          :tmp-mc (make-matrix 3 3)
+          :tmp-md (make-matrix 3 3))
+    )
   (:calc-torque
    (&key (debug-view nil)
 	 (jvv (instantiate float-vector (length joint-list))) ;; [rad/s] or [m/s]
 	 (jav (instantiate float-vector (length joint-list))) ;; [rad/s^2] or [m/s^2]
-	 ;; buffers for computation
-	 (tmp-va (float-vector 0 0 0))
-	 (tmp-vb (float-vector 0 0 0))
-	 (tmp-vc (float-vector 0 0 0))
-	 (tmp-ma (make-matrix 3 3))
-	 (tmp-mb (make-matrix 3 3))
-	 (tmp-mc (make-matrix 3 3))
-	 (tmp-md (make-matrix 3 3)))
+         (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
    (let ((torque-vector (instantiate float-vector (length joint-list))))
      (all-child-links
       (car (send self :links))
@@ -673,12 +677,10 @@
 	 ))
 
      ;; recursive calculation from root-link
-     (send (car (send self :links)) :forward-all-kinematics
-           :debug-view debug-view :tmp-va tmp-va)
-     (send (car (send self :links)) :inverse-dynamics
-           :debug-view debug-view
-	   :tmp-va tmp-va :tmp-vb tmp-vb :tmp-vc tmp-vc
-	   :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc :tmp-md tmp-md)
+     (send* (car (send self :links)) :forward-all-kinematics
+            :debug-view debug-view (subseq calc-torque-buffer-args 0 2))
+     (send* (car (send self :links)) :inverse-dynamics
+            :debug-view debug-view calc-torque-buffer-args)
      ;; reset ext force and ext moment
      (all-child-links
       (car (send self :links))
@@ -697,7 +699,7 @@
      &key (pZMPz 0.0) ;; ZMP height [mm]
           (dt 0.005) ;; dt [s]
           (update t) (debug-view)
-          (calc-torque-args))
+          (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
     (unless update (return-from :calc-zmp (send self :get :zmp)))
 
     ;; under no external forces and moments
@@ -741,10 +743,10 @@
                      (send self :get :prev-jvv)
                    jvv)) ;; [rad/s]
            (jav (scale dt-1 (v- jvv pjvv)))) ;; [rad/s^2]
-      (send* self :calc-torque
-	     :jvv jvv :jav jav
-             :debug-view debug-view
-             calc-torque-args)
+      (send self :calc-torque
+            :jvv jvv :jav jav
+            :debug-view debug-view
+            :calc-torque-buffer-args calc-torque-buffer-args)
       (send self :put :prev-av av)
       (send self :put :prev-jvv jvv))
 
