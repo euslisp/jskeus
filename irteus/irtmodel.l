@@ -1199,21 +1199,39 @@
 	 (t (setq dtheta (send j :speed-to-angle (subseq dav i (+ i (send j :joint-dof)))))))
        (send* (elt union-link-list l) :joint :joint-angle dtheta :relative t joint-args))
      t))
+  (:find-joint-angle-limit-weight-old-from-union-link-list
+    (union-link-list)
+    (assoc (send-all union-link-list :name) (get self :joint-angle-limit-weight-old)
+           :test #'(lambda (x y)
+                     (and (= (length x) (length y))
+                          (every #'identity (mapcar #'(lambda (xl yl)
+                                                        (cond
+                                                         ((and (symbolp xl) (symbolp yl)) (eq xl yl))
+                                                         ((and (stringp xl) (stringp yl)) (string= xl yl))
+                                                         (t )))
+                                                    x y))))))
+  (:reset-joint-angle-limit-weight-old
+    (union-link-list)
+    (let ((tmp-joint-angle-limit-weight-old
+           (send self :find-joint-angle-limit-weight-old-from-union-link-list union-link-list)))
+      (if tmp-joint-angle-limit-weight-old
+          (setf (cadr tmp-joint-angle-limit-weight-old) nil))))
   ;; calc weight according to joint limit
   ;;  this method should be called from :calc-inverse-kinematics-weight
   (:calc-weight-from-joint-limit
     (avoid-weight-gain fik-len link-list union-link-list
                        debug-view weight tmp-weight tmp-len)
     (let (joint-angle-limit-weight-old joint-angle-limit-weight)
-      (unless (get self :joint-angle-limit-weight-old)
-        (setf (get self :joint-angle-limit-weight-old) (make-hash-table)))
-      (setq joint-angle-limit-weight-old
-            (gethash union-link-list (get self :joint-angle-limit-weight-old)))
-      (unless joint-angle-limit-weight-old
-        (setq joint-angle-limit-weight-old (instantiate float-vector fik-len))
-        (fill joint-angle-limit-weight-old 1.0e+20)
-        (setf (gethash union-link-list (get self :joint-angle-limit-weight-old))
-              joint-angle-limit-weight-old))
+      (let ((tmp-joint-angle-limit-weight-old
+             (send self :find-joint-angle-limit-weight-old-from-union-link-list union-link-list)))
+        (unless tmp-joint-angle-limit-weight-old
+          (send self :put :joint-angle-limit-weight-old
+                (cons (list (send-all union-link-list :name) nil) (get self :joint-angle-limit-weight-old)))
+          (setq tmp-joint-angle-limit-weight-old (send self :find-joint-angle-limit-weight-old-from-union-link-list union-link-list)))
+        (unless (cadr tmp-joint-angle-limit-weight-old)
+          (setf (cadr tmp-joint-angle-limit-weight-old) (fill (instantiate float-vector fik-len) 1.0e+20)))
+        (setq joint-angle-limit-weight-old (cadr tmp-joint-angle-limit-weight-old)))
+
       ;;
       ;; wmat/weight: weighting joint angle weight 
       ;; 
@@ -1612,8 +1630,12 @@
          (method-args (nconc args ik-args))
          (p-limit (cadr (memq :p-limit args)))
          (r-limit (cadr (memq :r-limit args))))
-       (if (null union-link-list)
-           (setq union-link-list (send self :calc-union-link-list link-list)))
+       (when (null union-link-list)
+         (setq union-link-list (send self :calc-union-link-list link-list))
+         ;; tempolary reset weight for prevision joint-angle-limit-weight-old using hash-table
+         (if (/= (length union-link-list) (length link-list))
+             (send self :reset-joint-angle-limit-weight-old union-link-list)))
+
        ;; atom -> list
        (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
        (if (and debug-view (not (equal debug-view :no-clear)) *viewer*)
@@ -1806,6 +1828,7 @@
 				      :translation-axis translation-axis
 				      :rotation-axis rotation-axis
 				      :union-link-list union-link-list args) args))
+     (send self :reset-joint-angle-limit-weight-old union-link-list) ;; reset weight
      
      ;; inverse kinematics loop
      (while (< (incf loop) stop)
@@ -1858,6 +1881,8 @@
      ;; rename log file
      (when dump-command
        (unix::rename (format nil "~A/~A.l" command-directory command-id ) (setq command-filename (format nil "~A/~A-~A.l" command-directory command-id (if (or success (not revert-if-fail)) "success" "failure")))))
+     ;; reset weight
+     (send self :reset-joint-angle-limit-weight-old union-link-list)
      ;; check solved or not
      (if (or success (not revert-if-fail))
          (send self :angle-vector)
