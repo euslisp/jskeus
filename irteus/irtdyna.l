@@ -282,8 +282,7 @@
 	  (tmp-vb (instantiate float-vector 3))
 	  (tmp-ma (make-matrix 3 3))
 	  (tmp-mb (make-matrix 3 3))
-	  (tmp-mc (make-matrix 3 3))
-    &allow-other-keys)
+	  (tmp-mc (make-matrix 3 3)))
     ;; weight [g], centroid [mm], inertia [g mm^2]
     (if child-links
 	(progn
@@ -384,7 +383,8 @@
              (dotimes (i 3)
                (setf (aref (send l :get :I-til) i j) 0.0)))))
       ;; calc all links' mass properties
-      (send* (car (send self :links)) :propagate-mass-properties args))
+      (send (car (send self :links)) :propagate-mass-properties
+	    :tmp-va tmp-va :tmp-vb tmp-vb :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc))
     ;; calc inertia matrix
     (let ((j))
       (do ((column 0 (+ column (send j :joint-dof)))
