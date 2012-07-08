@@ -231,21 +231,20 @@
   (:inverse-kinematics
    (target-coords &rest args &key look-at-target &allow-other-keys)
    (if (atom target-coords) (setq target-coords (list target-coords)))
-   (let ((ret (send-super* :inverse-kinematics target-coords args)))
+   (prog1
+       (send-super* :inverse-kinematics target-coords args)
      (if look-at-target
-         (send self :head :look-at (send (car target-coords) :worldpos)))
-     ret))
+         (send self :head :look-at (send (car target-coords) :worldpos)))))
   (:inverse-kinematics-loop
    (dif-pos dif-rot &rest args
             &key target-coords debug-view look-at-target
             &allow-other-keys)
    (if (atom target-coords) (setq target-coords (list target-coords)))
-   (let ((ret
-          (send-super* :inverse-kinematics-loop dif-pos dif-rot
-                       :target-coords target-coords args)))
+   (prog1
+       (send-super* :inverse-kinematics-loop dif-pos dif-rot
+                    :target-coords target-coords args)
      (if (and debug-view look-at-target)
-         (send self :head :look-at (send (car target-coords) :worldpos)))
-     ret))
+         (send self :head :look-at (send (car target-coords) :worldpos)))))
   (:torque-vector
    (&key (force-list) (moment-list) (target-coords)
          (debug-view nil)
