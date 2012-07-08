@@ -350,6 +350,27 @@
 ;;  inertia matrix and COG jacobian is at the world coordinates
 ;;  link-list should be union-link-list (cannot use list of link-list)
 (defmethod cascaded-link
+  (:update-mass-properties
+   ;; buffers for calculation
+   (&key (tmp-va (instantiate float-vector 3))
+	 (tmp-vb (instantiate float-vector 3))
+	 (tmp-ma (make-matrix 3 3))
+	 (tmp-mb (make-matrix 3 3))
+	 (tmp-mc (make-matrix 3 3)))
+   ;; parameter initialization
+   (all-child-links
+    (car (send self :links))
+    #'(lambda (l)
+	(send l :put :m-til 0)
+	(dotimes (i 3)
+	  (setf (elt (send l :get :c-til) i) 0.0))
+	(dotimes (j 3)
+	  (dotimes (i 3)
+	    (setf (aref (send l :get :I-til) i j) 0.0)))))
+   ;; calc all links' mass properties
+   (send (car (send self :links)) :propagate-mass-properties
+	 :tmp-va tmp-va :tmp-vb tmp-vb :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc)
+   )
   ;; return   ;; inertia-matrix [m * kg]
   (:calc-inertia-matrix-from-link-list
     (&rest args
@@ -371,19 +392,8 @@
 	  (tmp-mb (make-matrix 3 3))
 	  (tmp-mc (make-matrix 3 3))
      &allow-other-keys)
-    (when update-mass-properties 
-      ;; parameter initialization
-      (all-child-links
-       (car (send self :links))
-       #'(lambda (l)
-           (send l :put :m-til 0)
-           (dotimes (i 3)
-             (setf (elt (send l :get :c-til) i) 0.0))
-           (dotimes (j 3)
-             (dotimes (i 3)
-               (setf (aref (send l :get :I-til) i j) 0.0)))))
-      ;; calc all links' mass properties
-      (send (car (send self :links)) :propagate-mass-properties
+    (when update-mass-properties
+      (send self :update-mass-properties
 	    :tmp-va tmp-va :tmp-vb tmp-vb :tmp-ma tmp-ma :tmp-mb tmp-mb :tmp-mc tmp-mc))
     ;; calc inertia matrix
     (let ((j))
