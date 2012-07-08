@@ -280,8 +280,7 @@
 	       (send (send tc :parent) :ext-force fv)
 	       ;; calc moment-offset caused by fv ;
 	       ;; current irtdyna.l's requires moment around the origin
-	       (let* ((c (send (send tc :parent) :centroid))
-		      (moment-offset (v* (scale 1e-3 (send tc :worldpos)) fv)))
+	       (let* ((moment-offset (v* (scale 1e-3 (send tc :worldpos)) fv)))
 		 (send (send tc :parent) :ext-moment (v+ mv moment-offset))))
 	   force-list moment-list target-coords)
    (send self :calc-torque
