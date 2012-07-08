@@ -770,11 +770,11 @@
   ;; method to calculate fullbody mass properties
   (:weight ;; total weight
    (&optional (update-mass-properties t))
-   (if update-mass-properties (send self :calc-inertia-matrix-from-link-list))
+   (if update-mass-properties (send self :update-mass-properties))
    (send (car (send self :links)) :get :m-til))
   (:centroid ;; total centroid
    (&optional (update-mass-properties t))
-   (if update-mass-properties (send self :calc-inertia-matrix-from-link-list))
+   (if update-mass-properties (send self :update-mass-properties))
    (send (car (send self :links)) :get :c-til))
   )
 
