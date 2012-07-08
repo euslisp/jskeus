@@ -284,9 +284,9 @@
 		      (moment-offset (v* (scale 1e-3 (send tc :worldpos)) fv)))
 		 (send (send tc :parent) :ext-moment (v+ mv moment-offset))))
 	   force-list moment-list target-coords)
-   (send-super :calc-torque
-               :debug-view debug-view
-               :jvv jvv :jav jav)
+   (send self :calc-torque
+              :debug-view debug-view
+              :jvv jvv :jav jav)
    )
   (:calc-force-from-joint-torque
    (limb all-torque &key (move-target (send self limb :end-coords)) (use-torso))
