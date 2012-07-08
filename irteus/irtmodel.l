@@ -1231,6 +1231,7 @@
               (scale avoid-weight-gain
                      (joint-angle-limit-weight (send-all union-link-list :joint) tmp-len) tmp-len))
         (when (and debug-view (not (memq :no-message debug-view)))
+          (format-array joint-angle-limit-weight-old "ocost :")
           (format-array joint-angle-limit-weight "cost  :"))
         (dotimes (i fik-len)
           (setf (elt tmp-weight i)
@@ -1268,6 +1269,8 @@
     (cond
      ((functionp weight) (setq weight (funcall weight union-link-list)))
      ((listp weight) (setq weight (eval weight))))
+    (when (and debug-view (not (memq :no-message debug-view)))
+      (format-array weight "usrwei:"))
     ;; calc weight from joint limit
     (setq tmp-weight
           (send self :calc-weight-from-joint-limit
