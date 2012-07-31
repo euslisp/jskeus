@@ -189,6 +189,72 @@
                  syms)
      ,@bodies))
 
+;; color utils
+(defun his2rgb (h &optional i s ret)
+  "(his2rgb h i s) ;; 0 <= h <= 360, 0.0 <= i <= 1.0, 0.0 <= s <= 1.0"
+  (hvs2rgb h i s ret))
+(defun hvs2rgb (h &optional i s ret)
+  "(hsv2rgb h i s) ;; 0 <= h <= 360, 0.0 <= i <= 1.0, 0.0 <= s <= 1.0"
+  (when (or (listp h) (vectorp h))
+    (setq ret i)
+    (setq s (elt h 2) i (elt h 1) h (elt h 0)))
+  (if (>= h 360) (setq h (mod (round h) 360)))
+  (if (< h    0) (setq h (- 360 (mod (round (- h)) 360))))
+  (setq s (* 255 s) i (* 255 i))
+  (let* ((hi (floor (/ h 60.0)))
+	 (f (- (/ h 60.0) hi))
+	 (p1 (* i (- 1.0 (/ s 255.0))))
+	 (p2 (* i (- 1.0 (* f (/ s 255.0)))))
+	 (p3 (* i (- 1.0 (* (- 1 f) (/ s 255.0)))))
+	 r g b)
+    (case hi
+     ((0 6) (setq r i  g p3 b p1))
+     (1 (setq r p2 g i  b p1))
+     (2 (setq r p1 g i  b p3))
+     (3 (setq r p1 g p2 b i))
+     (4 (setq r p3 g p1 b i))
+     (5 (setq r i  g p1 b p2))
+     (t (warn "hri2rgb error")))
+    (cond
+     (ret
+      (setf (elt ret 0) r)
+      (setf (elt ret 1) g)
+      (setf (elt ret 2) b)
+      ret)
+     (t (list r g b)))))
+
+(defun rgb2his (r &optional g b ret)
+  "(rgb2his r g b) ;; 0 <= r,g,b <= 255"
+  (rgb2hvs r g b ret))
+(defun rgb2hvs (r &optional g b ret)
+  "(rgb2hvs r g b) ;; 0 <= r,g,b <= 255"
+  (when (or (listp r) (vectorp r))
+    (setq ret g)
+    (setq g (elt r 1) b (elt r 2) r (elt r 0))
+    )
+  (let* ((max (max r g b))
+	 (min (min r g b))
+	 (d (float (- max min)))
+	 (rt (- max (/ (* r 60.0) d)))
+	 (gt (- max (/ (* g 60.0) d)))
+	 (bt (- max (/ (* b 60.0) d)))
+	 (i (/ max 255.0))
+	 (s (if (= d 0.0) 0 (/ (* 255.0 d) max)))
+	 (ht (if (= s 0) 0
+	      (cond
+	       ((= r max)(- bt gt))
+	       ((= g max) (- (+ 120 rt) bt))
+	       (t (- (+ 240 gt) rt)))))
+	 (h (if (< ht 0.0) (+ ht 360) ht)))
+    (setq s (/ s 255.0))
+    (cond
+     (ret
+      (setf (elt ret 0) h)
+      (setf (elt ret 1) i)
+      (setf (elt ret 2) s)
+      ret)
+     (t (list h i s)))))
+
 (provide :irtutil "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
