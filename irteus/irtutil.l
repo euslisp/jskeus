@@ -40,11 +40,22 @@
   `(apply #'send-message . ,msgs)
   )
 
-(defmacro do-until-key (&rest forms)
-  `(while (null (select-stream (list *standard-input*) 0.0000001))
+(defmacro do-until-key-with-check
+  (check &rest forms)
+  `(while (and (null (select-stream (list *standard-input*) 0.0000001))
+               (eval ,check))
      ,@forms
-     )
-  )
+     ))
+
+(defmacro do-until-key (&rest forms)
+  `(do-until-key-with-check t ,@forms))
+
+(defmacro do-until-key-with-timer
+  (time-limit &rest forms)
+  (let ((tm (gensym)))
+    `(let ((,tm (instance mtimer :init)))
+       (do-until-key-with-check (< (send ,tm :stop) ,time-limit) ,@forms)
+       )))
 
 (defclass mtimer
   :super object
