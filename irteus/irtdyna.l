@@ -453,8 +453,8 @@
 		      (send self :centroid nil))))
 	       (send self :put :ik-draw-on-params
 		     (append (send self :get :ik-draw-on-params)
-			     (list (list target-centroid-pos :color #f(1 0 0))
-				   (list current-centroid-pos :size 100))))
+			     (list (list target-centroid-pos :color #f(0 0 1))
+				   (list (float-vector (elt current-centroid-pos 0) (elt current-centroid-pos 1) (elt target-centroid-pos 2)) :size 100 :color #f(0 1 0)))))
 	       (v- target-centroid-pos current-centroid-pos))
 	     translation-axis))
      )
