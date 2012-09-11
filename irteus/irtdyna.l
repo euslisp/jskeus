@@ -447,10 +447,15 @@
 	    args)
      (scale (* 0.001 cog-gain) ;; [mm] -> [m]
 	    (calc-dif-with-axis
-	     (v- target-centroid-pos
-		 (if (functionp centroid-offset-func)
-		     (funcall centroid-offset-func)
-                   (send self :centroid nil)))
+	     (let ((current-centroid-pos
+		    (if (functionp centroid-offset-func)
+			(funcall centroid-offset-func)
+		      (send self :centroid nil))))
+	       (send self :put :ik-draw-on-params
+		     (append (send self :get :ik-draw-on-params)
+			     (list (list target-centroid-pos :color #f(1 0 0))
+				   (list current-centroid-pos :size 100))))
+	       (v- target-centroid-pos current-centroid-pos))
 	     translation-axis))
      )
     )
