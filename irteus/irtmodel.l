@@ -1173,8 +1173,6 @@
     &allow-other-keys)
    (let (dav dtheta j)
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
-     (if (and debug-view (not (equal debug-view :no-clear)) *viewer*)
-	 (send *viewer* :viewsurface :clear))
 
      (setq dav (send* self :calc-joint-angle-speed union-vel args))
 
