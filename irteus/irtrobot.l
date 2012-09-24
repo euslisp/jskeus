@@ -305,37 +305,6 @@
 	     (elt all-torque (position (send (elt link-list i) :joint) (send self :joint-list)))))
      (transform (send self :calc-inverse-jacobian (transpose jacobian))
 		torque)))
-  (:draw-torque
-   (vwer &key flush (width 2) (size 100) (color (float-vector 1 0.3 0)) (warning-color (float-vector 1 0 0)) (torque-threshold nil) (torque-vector (send self :torque-vector)))
-   (mapcar
-    #'(lambda (j r)
-	(let* ((rtorque (/ r (send j :max-joint-torque)))
-	       (paxis (send j :child-link :rotate-vector
-			    (case (j . axis)
-			      (:x #f(1 0 0)) (:y #f(0 1 0))
-			      (:z #f(0 0 1)) (:-x #f(-1 0 0))
-			      (:-y #f(0 -1 0)) (:-z #f(0 0 -1))
-			      (t (j . axis)))))
-	       (rot-th (acos (v. (float-vector 0 0 1) paxis)))
-	       (rot
-		(if (eps= rot-th 0.0)
-		    (unit-matrix 3)
-		  (rotation-matrix
-		   rot-th
-		   (v* (float-vector 0 0 (if (> rtorque 0.0) 1.0 -1.0)) paxis))))
-	       (default-width width) (default-color color))
-	  (when (and torque-threshold (> (abs rtorque) torque-threshold))
-	    (setq width (* 2 width) color warning-color))
-	  (send vwer :viewsurface :line-width width)
-	  (send vwer :viewsurface :color color)
-	  (send vwer :draw-circle
-		(make-coords :pos (send j :child-link :worldpos) :rot rot)
-		:radius (* size (abs rtorque)) :arrow t :arc (deg2rad 330))
-	  ))
-    (send self :joint-list)
-    (coerce torque-vector cons))
-   (if flush (send vwer :viewsurface :flush))
-   );; draw-torque
   ;; fullbody inverse kinematics for legged robot
   ;;   necessary args : target-coords, move-target, and link-list must include legs' (or leg's) parameters
   ;;                    ex. (send *robot* :fullbody-inverse-kinematics (list rarm-tc rleg-tc lleg-tc) :move-target (list rarm-mt rleg-mt lleg-mt) :link-list (list rarm-ll rleg-ll lleg-ll))
