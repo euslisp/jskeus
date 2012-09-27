@@ -774,7 +774,8 @@
     (send self :get :zmp))
 
   (:draw-torque
-   (vwer &key flush (width 2) (size 100) (color (float-vector 1 0.3 0)) (warning-color (float-vector 1 0 0)) (torque-threshold nil) (torque-vector (send self :torque-vector)))
+   (vwer &key flush (width 2) (size 100) (color (float-vector 1 0.3 0)) (warning-color (float-vector 1 0 0)) (torque-threshold nil)
+              (torque-vector (send self :torque-vector)) ((:joint-list jlist) (send self :joint-list)))
    (mapcar
     #'(lambda (j r)
 	(let* ((rtorque (/ r (send j :max-joint-torque)))
@@ -801,7 +802,7 @@
 		(make-coords :pos (send j :child-link :worldpos) :rot rot)
 		:radius (* size (abs rtorque)) :arrow t :arc (deg2rad 330))
 	  ))
-    (send self :joint-list)
+    jlist
     (coerce torque-vector cons))
    (if flush (send vwer :viewsurface :flush))
    );; draw-torque
