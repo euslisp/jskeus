@@ -792,6 +792,7 @@
 		   rot-th
 		   (v* (float-vector 0 0 (if (> rtorque 0.0) 1.0 -1.0)) paxis))))
 	       (default-width width) (default-color color))
+	  (unless ret (setq ret (unit-matrix 3)))
 	  (when (and torque-threshold (> (abs rtorque) torque-threshold))
 	    (setq width (* 2 width) color warning-color))
 	  (send vwer :viewsurface :line-width width)
