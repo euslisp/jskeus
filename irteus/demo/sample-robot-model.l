@@ -9,11 +9,12 @@
 (defmethod sample-robot
   (:init 
    (&rest args
-    ;; key word arguments for configure model size
-    &key (leg-radius 50) (upper-leg-length 250) (lower-leg-length 250) (ankle-length 50)
+    &key (name "sample-robot")
+         ;; key word arguments for configure model size
+         (leg-radius 50) (upper-leg-length 250) (lower-leg-length 250) (ankle-length 50)
          (crotch-width 75) (foot-depth 200) (foot-width 100) (foot-thickness 25) (foot-offset 50)
 	 (arm-radius 50) (upper-arm-length 275) (lower-arm-length 195) (shoulder-width 150) (hand-length 50))
-   (send-super* :init args)
+   (send-super* :init :name name args)
    ;; 1. make links links and assoc all links
    (let ((aroot-link (send self :make-root-link)))
      (setq torso (send self :make-torso-links) head (send self :make-head-links)
