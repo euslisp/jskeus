@@ -39,7 +39,7 @@ bashrc.eus:
 # bashrc.eus : environment variable for euslisp \n#\n\
 export EUSDIR=$(EUSDIR) \n\
 export ARCHDIR=$(ARCHDIR) \n\
-export PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$PATH \n\
+export PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$EUSDIR/\$$ARCHDIR/lib:\$$PATH \n\
 export LD_LIBRARY_PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
 "' > bashrc.eus
 	@bash -c 'echo -e "\e[1;32m;; generating bashrc.eus ...\n;;\e[m"'
