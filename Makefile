@@ -82,7 +82,7 @@ irteus-installed: irteus
 	cd irteus; make
 
 clean:
-	-rm bashrc.eus manual.pdf jmanual.pdf
+	-rm -f bashrc.eus manual.pdf jmanual.pdf
 	if [ -e irteus ]; then cd irteus; make clean ; fi
 	if [ -e eus/lisp ]; then cd eus/lisp; make clean ; fi
 
