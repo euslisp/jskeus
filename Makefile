@@ -16,10 +16,6 @@ ifeq ($(OS),Linux)
   export MAKEFILE=Makefile.Linux.thread
  endif
 endif
-ifeq ($(OS),Linux32)
- export ARCHDIR=Linux
- export MAKEFILE=Makefile.Linux.thread
-endif
 ifeq ($(OS),CYGWIN)
  export ARCHDIR=Cygwin
  export MAKEFILE=Makefile.Cygwin
