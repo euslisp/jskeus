@@ -61,9 +61,9 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
   png_read_info(png_ptr, info_ptr);
   int width = png_get_image_width(png_ptr, info_ptr);
   int height = png_get_image_height(png_ptr, info_ptr);
-  int bit_depth = png_get_image_bit_depth(png_ptr, info_ptr);
-  int channels = png_get_image_channels(png_ptr, info_ptr);
-  int color_type = png_get_image_color_type(png_ptr, info_ptr);
+  int bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+  int channels = png_get_channels(png_ptr, info_ptr);
+  int color_type = png_get_color_type(png_ptr, info_ptr);
   //fprintf(stderr, "bit_depth = %d, channels %d, color_type =%d (pal:%d,gray:%d,rgb:%d,rgba:%d)\n", bit_depth, channels, color_type, PNG_COLOR_TYPE_PALETTE,PNG_COLOR_TYPE_GRAY,PNG_COLOR_TYPE_RGB,PNG_COLOR_TYPE_RGB_ALPHA);
   switch (color_type) {
   case PNG_COLOR_TYPE_PALETTE:
@@ -94,8 +94,8 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
   }
   png_read_update_info(png_ptr, info_ptr);
   width = png_get_image_width(png_ptr, info_ptr); height = png_get_image_height(png_ptr, info_ptr);;
-  bit_depth = png_get_image_bit_depth(png_ptr, info_ptr); channels = png_get_image_bit_channels(png_ptr, info_ptr);
-  color_type = png_get_image_color_type(png_ptr, info_ptr);
+  bit_depth = png_get_bit_depth(png_ptr, info_ptr); channels = png_get_channels(png_ptr, info_ptr);
+  color_type = png_get_color_type(png_ptr, info_ptr);
 
   png_bytep * row_pointers = (png_bytep *)malloc(height*sizeof(png_bytep));
   int y, byte_per_scanline = png_get_rowbytes(png_ptr, info_ptr);
