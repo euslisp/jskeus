@@ -15,7 +15,10 @@ OBJECTS		= $(ARCHDIR)/PQP.o $(ARCHDIR)/BV.o \
 CLEAN		= $(ARCHDIR)/$(LPFX)PQP.$(LSFX) $(OBJECTS) *.$(LSFX) \
 		$(ARCHDIR)/*.o *~ $(ARCHDIR)/$(LPFX)PQP-static.a
 
-default: library
+default: directory library
+
+directory:
+	if [ ! -e $(ARCHDIR) ]; then mkdir -p $(ARCHDIR); fi
 
 install: $(EUSDIR)/$(ARCHDIR)/lib/$(LPFX)PQP.$(LSFX)
 
