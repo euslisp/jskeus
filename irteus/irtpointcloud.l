@@ -71,7 +71,7 @@
      ((and ht wd)
       (send self :size-change wd ht))
      (t
-      (send self :size-change (if mat (array-dimension mat 0)))))
+      (send self :size-change (if parray (array-dimension parray 0)))))
     (send-super* :init args)
     self)
   (:reset-box () (if (= (send self :size) 0)
@@ -94,7 +94,13 @@
     (ht
      (setq height ht
            width 1))
-    (t )))
+    (t
+     (if parray
+         (setq width (array-dimension parray 0)
+               height 1)
+       (setq width 0
+             height 0)))
+    ))
   (:view-coords (&optional vc) (if vc (setq view-coords vc)) view-coords)
   (:points (&optional pts wd ht) ;; copy from pts
    (when pts
