@@ -25,12 +25,11 @@
 
 ;;; pointcloud class
 
-
 (in-package "USER")
 
 (defclass pointcloud
   :super cascaded-coords
-  :slots (parray carray narray
+  :slots (parray carray narray curvature
           pcolor psize awidth asize
           box height width view-coords
           drawnormalmode transparent tcarray))
@@ -38,6 +37,7 @@
 (defmethod pointcloud
   (:init (&rest args
                 &key ((:points mat)) ((:colors cary)) ((:normals nary))
+                     ((:curvatures curv))
                      ((:height ht)) ((:width wd))
                      (point-color (float-vector 0 1 0))
                      (point-size 2.0)
@@ -60,6 +60,11 @@
       (send self :normals nary))
      (nary
       (setq narray nary)))
+    (cond
+     ((and nary (listp curv))
+      (send self :curvatures curv))
+     (nary
+      (setq curvature curv)))
 
     (setq psize point-size
           awidth arrow-width
@@ -153,6 +158,21 @@
          (sys::vector-replace (array-entity m) (array-entity nmls))
          (setq narray m)))))
    narray)
+  (:curvatures (&optional curv)
+   (when curv
+     (cond
+      ((listp curv)
+       (let ((vec (instantiate float-vector (length curv)))
+             (cntr 0))
+         (dolist (p curv)
+           (setf (elt curv cntr) p)
+           (incf cntr))
+         (setq curvature vec)))
+      ((vectorp curv)
+       (let ((vec (instantiate float-vector (length curv))))
+         (sys::vector-replace vec curv)
+         (setq curvature vec)))))
+   curvature)
   (:point-list ()
    (let (lst)
      (dotimes (i (send self :size))
@@ -175,6 +195,12 @@
            ;;(push (matrix-row narray i) lst)
            (push (c-matrix-row narray i) lst)
            )
+         (reverse lst))))
+  (:curvature-list ()
+   (if curvature
+       (let (lst)
+         (dotimes (i (length curvature))
+           (push (elt curvature i) lst))
          (reverse lst))))
   (:centroid ()
    (let ((ret (float-vector 0 0 0)))
@@ -199,6 +225,7 @@
           (p (float-vector 0 0 0))
           (c (if carray (float-vector 0 0 0)))
           (n (if narray (float-vector 0 0 0)))
+          cv
           (cntr 0))
      (when negative
        (let (tmp)
@@ -207,7 +234,8 @@
          ))
      (setq new-mat (make-matrix (length idx-lst) 3)
            new-col (if carray (make-matrix (length idx-lst) 3))
-           new-nom (if narray (make-matrix (length idx-lst) 3)))
+           new-nom (if narray (make-matrix (length idx-lst) 3))
+           new-cvt (if curvature (instantiate float-vector (length idx-lst))))
      (cond
       ((listp idx-lst)
        (dolist (i idx-lst)
@@ -227,6 +255,8 @@
          (when narray
            (c-matrix-row narray i n)
            (c-matrix-row new-nom cntr n t))
+         (when curvature
+           (setf (elt new-cvt i) (elt curvature i)))
          (incf cntr)))
       (t ;; vector
        (let (i)
@@ -248,19 +278,23 @@
            (when narray
              (c-matrix-row narray i n)
              (c-matrix-row new-nom cntr n t))
+           (when curvature
+             (setf (elt new-cvt i) (elt curvature i)))
            (incf cntr)))))
      (if create
          (let ((ret (instance pointcloud :init
                               :points new-mat
                               :colors new-col
-                              :normals new-nom)))
+                              :normals new-nom
+                              :curvatures new-cvt)))
            (setq (ret . view-coords) (send view-coords :copy-worldcoords))
            (send ret :transform (send self :worldcoords))
            ret)
        (progn
          (setq parray new-mat)
-         (if carray (setq carray new-col))
-         (if parray (setq narray new-nom))
+         (if new-col (setq carray new-col))
+         (if new-nom (setq narray new-nom))
+         (if new-cvt (setq curvature new-cvt))
          self)
        )))
   (:filtered-indices
