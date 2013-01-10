@@ -562,6 +562,188 @@
      ))
   )
 
+(defclass glvertices
+  :super propertied-object
+  :slots (parent-coords
+          mesh-list  ;; (list (list (:type ) (:material ) (:vertices ) (:normals ) (:indices )) (...) ...)
+          filename)
+  )
+
+(defmethod glvertices
+  (:init
+   (mlst &rest args &key (coords (make-cascoords)) ((:filename fn)) &allow-other-keys)
+   (setq parent-coords coords)
+   (setq mesh-list mlst)
+   (setq filename fn)
+   self)
+  (:set-parent-coords (cds) (setq parent-coords cds) parent-coords)
+  (:coords (&rest args) (forward-message-to parent-coords args))
+  (:worldcoords (&rest args) (send* parent-coords :worldcoords args))
+  (:filename (&optional nm) (if nm (setq filename nm)) filename)
+  (:clear-display-id ()) ;;; not implemented yet
+  ;; (:check-normal ())
+  (:vertices ()
+   (let (ret)
+     (dolist (minfo mesh-list)
+       (let ((v (cadr (assoc :vertices minfo))))
+         (when v
+           (dotimes (i (array-dimension v 0))
+             (push (user::c-matrix-row v i) ret)))))
+     ret))
+  (:draw
+   (vwr &rest args)
+   (let* (newlis
+          (mat (send (send parent-coords :worldcoords) :4x4))
+#+:jsk
+          (glcon (cdr (assq (sys:thread-self) ((send vwr :viewsurface) . glcon))))
+#-:jsk
+          (glcon ((send vwr :viewsurface) . glcon))
+          )
+#+:jsk
+     (sys::mutex-lock gl::*opengl-lock*)
+     (send vwr :viewsurface :makecurrent) ;; ???
+     (glPushAttrib GL_ALL_ATTRIB_BITS)
+     (glpushmatrix)
+     (glmultmatrixf (array-entity (transpose mat *temp-matrix*)))
+     (cond
+      ((setq newlis (cdr (assq glcon (get self :GL-DISPLAYLIST-ID))))
+       (glCallList newlis))
+      (t
+       (setq newlis (glgenlists 1))
+       (glnewlist newlis gl_compile)
+
+       (glMaterialfv GL_FRONT_AND_BACK GL_AMBIENT (float-vector 0.1 0.1 0.1 0.1))
+       (glMaterialfv GL_FRONT_AND_BACK GL_DIFFUSE (float-vector 1 1 1 1))
+       (glMaterialfv GL_FRONT_AND_BACK GL_SPECULAR (float-vector 0.2 0.2 0.2 0.1))
+       (glMaterialfv GL_FRONT_AND_BACK GL_EMISSION (float-vector 0.1 0.1 0.1 0.1))
+
+       (when (get self :transparent)
+         (glDepthMask GL_FALSE)
+         (glEnable GL_BLEND)
+         (glBlendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA))
+
+       (dolist (minfo mesh-list)
+         (let ((mesh-type (cadr (assoc :type minfo)))
+               (material-info (cadr (assoc :material minfo)))
+               (vertices (cadr (assoc :vertices minfo)))
+               (normals (cadr (assoc :normals minfo)))
+               (indices (cadr (assoc :indices minfo))))
+
+           (when material-info
+             (let ((col (cadr (assoc :color material-info)))
+                   (amb (cadr (assoc :ambient material-info)))
+                   (diff (cadr (assoc :diffuse material-info)))
+                   (spec (cadr (assoc :specular material-info)))
+                   (emmi (cadr (assoc :emmision material-info))))
+               (when col
+                 (glMaterialfv GL_FRONT_AND_BACK GL_DIFFUSE
+                               (if (get self :transparent)
+                                   (concatenate float-vector col (float-vector (get self :transparent)))
+                                 col)))
+               (when amb
+                 (if (get self :transparent)
+                     (setf (elt amb 3) (float-vector (get self :transparent))))
+                 (glMaterialfv GL_FRONT_AND_BACK GL_AMBIENT amb))
+               (when diff
+                 (if (get self :transparent)
+                     (setf (elt diff 3) (float-vector (get self :transparent))))
+                 (glMaterialfv GL_FRONT_AND_BACK GL_DIFFUSE diff))
+               (when spec
+                 (if (get self :transparent)
+                     (setf (elt spec 3) (float-vector (get self :transparent))))
+                 (glMaterialfv GL_FRONT_AND_BACK GL_SPECULAR spec))
+               (when emmi
+                 (if (get self :transparent)
+                     (setf (elt emmi 3) (float-vector (get self :transparent))))
+                 (glMaterialfv GL_FRONT_AND_BACK GL_EMISSION emmi))
+               ))
+
+           (glEnableClientState GL_VERTEX_ARRAY)
+           (when normals
+             (glEnableClientState GL_NORMAL_ARRAY)
+#+:x86_64
+             (glNormalPointer GL_DOUBLE 0 (array-entity normals))
+#-:x86_64
+             (glNormalPointer GL_FLOAT 0 (array-entity normals))
+             )
+
+#+:x86_64
+           (glVertexPointer 3 GL_DOUBLE 0 (array-entity vertices))
+#-:x86_64
+           (glVertexPointer 3 GL_FLOAT 0 (array-entity vertices))
+
+           (let (tp)
+             (case mesh-type
+               (:triangles (setq tp GL_TRIANGLES))
+               (:quads     (setq tp GL_QUADS))
+               (t (warn ";; mesh-type not found ~A~%") mesh-type))
+             (when tp
+               (cond
+                (indices
+                 (glDrawElements tp (length indices) GL_UNSIGNED_INT
+                                     (user::lvector2integer-bytestring indices)))
+                (t
+                 (glDrawArrays tp 0 (array-dimension vertices 0)))
+                )))
+
+           (when normals (glDisableClientState GL_NORMAL_ARRAY))
+           (glDisableClientState GL_VERTEX_ARRAY)
+           ))
+
+       (when (get self :transparent)
+         (glDepthMask GL_TRUE)
+         (glDisable GL_BLEND))
+
+       (glendlist)
+       (setf (get self :GL-DISPLAYLIST-ID)
+             (cons (cons glcon newlis)
+                   (get self :GL-DISPLAYLIST-ID)))
+       (setq newlis nil)
+       ))
+     (glpopmatrix)
+     (glpopattrib)
+#+:jsk
+     (sys::mutex-unlock *opengl-lock*)
+     (unless newlis (send self :draw vwr))
+     ))
+  (:convert-to-faceset ()) ;;; not implemented yet
+  (:collision-check-objects (&rest args)) ;; compatibility to jsk library
+  )
+
+#| ;; sample of glvertices
+(setq ver-lst (list
+(float-vector 0 0 0) (float-vector 1 0 0) (float-vector 1 1 0) (float-vector 0 1 0)
+(float-vector 1 0 0) (float-vector 1 0 -1) (float-vector 1 1 -1) (float-vector 1 1 0)
+(float-vector 0 0 -1) (float-vector 0 1 -1) (float-vector 1 1 -1) (float-vector 1 0 -1)
+(float-vector 0 0 -1) (float-vector 0 0 0) (float-vector 0 1 0) (float-vector 0 1 -1)
+(float-vector 0 1 0) (float-vector 1 1 0) (float-vector 1 1 -1) (float-vector 0 1 -1)
+(float-vector 0 0 0) (float-vector 0 0 -1) (float-vector 1 0 -1) (float-vector 1 0 0)
+))
+
+(setq nom-lst (list
+(float-vector 0 0 1) (float-vector 0 0 1) (float-vector 0 0 1) (float-vector 0 0 1)
+(float-vector 1 0 0) (float-vector 1 0 0) (float-vector 1 0 0) (float-vector 1 0 0)
+(float-vector 0 0 -1) (float-vector 0 0 -1) (float-vector 0 0 -1) (float-vector 0 0 -1)
+(float-vector -1 0 0) (float-vector -1 0 0) (float-vector -1 0 0) (float-vector -1 0 0)
+(float-vector 0 1 0) (float-vector 0 1 0) (float-vector 0 1 0) (float-vector 0 1 0)
+(float-vector 0 -1 0) (float-vector 0 -1 0) (float-vector 0 -1 0) (float-vector 0 -1 0)
+))
+
+(mapcar #'(lambda (v) (scale 1000.0 v v)) ver-lst)
+
+(setq a (instance glvertices :init))
+(setq p (instance pointcloud :init :points ver-lst :normals nom-lst))
+
+(setq l
+(list (list :material (list (list :color (float-vector 1 0 0))))
+      (list :vertices (send p :points))
+      (list :normals (send p :normals))
+      (list :type :quads)))
+
+(setq a (instance glvertices :init l))
+(objects (list a))
+|#
+
 (provide :irtgl "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
