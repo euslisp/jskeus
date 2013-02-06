@@ -563,25 +563,22 @@
   )
 
 (defclass glvertices
-  :super propertied-object
-  :slots (parent-coords
-          mesh-list  ;; (list (list (:type ) (:material ) (:vertices ) (:normals ) (:indices )) (...) ...)
+  :super cascaded-coords
+  :slots (mesh-list  ;; (list (list (:type ) (:material ) (:vertices ) (:normals ) (:indices )) (...) ...)
           filename)
   )
 
 (defmethod glvertices
   (:init
-   (mlst &rest args &key (coords (make-cascoords)) ((:filename fn)) &allow-other-keys)
-   (setq parent-coords coords)
+   (mlst &rest args &key ((:filename fn)) &allow-other-keys)
    (setq mesh-list mlst)
    (setq filename fn)
+   (send-super* :init args)
    self)
-  (:set-parent-coords (cds) (setq parent-coords cds) parent-coords)
-  (:coords (&rest args) (forward-message-to parent-coords args))
-  (:worldcoords (&rest args) (send* parent-coords :worldcoords args))
   (:filename (&optional nm) (if nm (setq filename nm)) filename)
   (:clear-display-id ()) ;;; not implemented yet
   ;; (:check-normal ())
+  ;; (:update ()) ;; call update when updating coordinates
   (:vertices ()
    (let (ret)
      (dolist (minfo mesh-list)
@@ -589,11 +586,13 @@
          (when v
            (dotimes (i (array-dimension v 0))
              (push (user::c-matrix-row v i) ret)))))
+     ;; transform ret???
      ret))
   (:draw
    (vwr &rest args)
    (let* (newlis
-          (mat (send (send parent-coords :worldcoords) :4x4))
+          (mat (send (send self :worldcoords) :4x4))
+          (stransparent (get self :transparent))
 #+:jsk
           (glcon (cdr (assq (sys:thread-self) ((send vwr :viewsurface) . glcon))))
 #-:jsk
@@ -617,7 +616,7 @@
        (glMaterialfv GL_FRONT_AND_BACK GL_SPECULAR (float-vector 0.2 0.2 0.2 0.1))
        (glMaterialfv GL_FRONT_AND_BACK GL_EMISSION (float-vector 0.1 0.1 0.1 0.1))
 
-       (when (get self :transparent)
+       (when stransparent
          (glDepthMask GL_FALSE)
          (glEnable GL_BLEND)
          (glBlendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA))
@@ -630,32 +629,36 @@
                (indices (cadr (assoc :indices minfo))))
 
            (when material-info
-             (let ((col (cadr (assoc :color material-info)))
-                   (amb (cadr (assoc :ambient material-info)))
-                   (diff (cadr (assoc :diffuse material-info)))
-                   (spec (cadr (assoc :specular material-info)))
-                   (emmi (cadr (assoc :emmision material-info))))
+             (let ((col   (cadr (assoc :color material-info)))
+                   (amb   (cadr (assoc :ambient material-info)))
+                   (diff  (cadr (assoc :diffuse material-info)))
+                   (spec  (cadr (assoc :specular material-info)))
+                   (emi   (cadr (assoc :emission material-info)))
+                   (shin  (cadr (assoc :shininess material-info)))
+                   (trans (cadr (assoc :transparency material-info))))
+               ;; override transparent ...
+               ;;(if (and stransparent trans) (setq stransparent trans))
                (when col
-                 (glMaterialfv GL_FRONT_AND_BACK GL_DIFFUSE
-                               (if (get self :transparent)
-                                   (concatenate float-vector col (float-vector (get self :transparent)))
+                 (glMaterialfv GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE
+                               (if stransparent
+                                   (concatenate float-vector col (float-vector stransparent))
                                  col)))
                (when amb
-                 (if (get self :transparent)
-                     (setf (elt amb 3) (float-vector (get self :transparent))))
+                 (if stransparent
+                     (setf (elt amb 3) (float-vector stransparent)))
                  (glMaterialfv GL_FRONT_AND_BACK GL_AMBIENT amb))
                (when diff
-                 (if (get self :transparent)
-                     (setf (elt diff 3) (float-vector (get self :transparent))))
+                 (if stransparent
+                     (setf (elt diff 3) (float-vector stransparent)))
                  (glMaterialfv GL_FRONT_AND_BACK GL_DIFFUSE diff))
                (when spec
-                 (if (get self :transparent)
-                     (setf (elt spec 3) (float-vector (get self :transparent))))
+                 (if stransparent
+                     (setf (elt spec 3) (float-vector stransparent)))
                  (glMaterialfv GL_FRONT_AND_BACK GL_SPECULAR spec))
-               (when emmi
-                 (if (get self :transparent)
-                     (setf (elt emmi 3) (float-vector (get self :transparent))))
-                 (glMaterialfv GL_FRONT_AND_BACK GL_EMISSION emmi))
+               (when emi
+                 (if stransparent
+                     (setf (elt emi 3) (float-vector stransparent)))
+                 (glMaterialfv GL_FRONT_AND_BACK GL_EMISSION emi))
                ))
 
            (glEnableClientState GL_VERTEX_ARRAY)
@@ -690,7 +693,7 @@
            (glDisableClientState GL_VERTEX_ARRAY)
            ))
 
-       (when (get self :transparent)
+       (when stransparent
          (glDepthMask GL_TRUE)
          (glDisable GL_BLEND))
 
@@ -708,6 +711,7 @@
      ))
   (:convert-to-faceset ()) ;;; not implemented yet
   (:collision-check-objects (&rest args)) ;; compatibility to jsk library
+  (:box () (make-bounding-box (list #f(0 0 0) #f(1000 1000 1000)) 0.0))
   )
 
 #| ;; sample of glvertices
@@ -731,16 +735,18 @@
 
 (mapcar #'(lambda (v) (scale 1000.0 v v)) ver-lst)
 
-(setq a (instance glvertices :init))
+;;(setq a (instance gl::glvertices :init))
 (setq p (instance pointcloud :init :points ver-lst :normals nom-lst))
 
+
 (setq l
-(list (list :material (list (list :color (float-vector 1 0 0))))
+(list (list :material '((:ambient #f(0.0 0.3 0.8)) (:diffuse #f(0.0 0.415686 0.921569)) (:specular #f(0.2 0.2 0.2)) (:emission #f(0.1 0.1 0.1)) (:shininess 0.22) (:transparency 0)))
+      (list :material '((:color #f(1 1 1))))
       (list :vertices (send p :points))
       (list :normals (send p :normals))
       (list :type :quads)))
 
-(setq a (instance glvertices :init l))
+(setq a (instance gl::glvertices :init (list l)))
 (objects (list a))
 |#
 
