@@ -565,7 +565,8 @@
 (defclass glvertices
   :super cascaded-coords
   :slots (mesh-list  ;; (list (list (:type ) (:material ) (:vertices ) (:normals ) (:indices )) (...) ...)
-          filename)
+          filename
+          bbox)
   )
 
 (defmethod glvertices
@@ -579,15 +580,21 @@
   (:clear-display-id ()) ;;; not implemented yet
   ;; (:check-normal ())
   ;; (:update ()) ;; call update when updating coordinates
-  (:vertices ()
+  (:actual-vertices ()
    (let (ret)
      (dolist (minfo mesh-list)
        (let ((v (cadr (assoc :vertices minfo))))
          (when v
            (dotimes (i (array-dimension v 0))
              (push (user::c-matrix-row v i) ret)))))
-     ;; transform ret???
      ret))
+  (:calc-bounding-box ()
+   (setq bbox (make-bounding-box (send self :actual-vertices) 0.0))
+   bbox)
+  (:vertices ()
+   (unless bbox
+     (send self :calc-bounding-box))
+   (send (send bbox :body) :vertices))
   (:draw
    (vwr &rest args)
    (let* (newlis
@@ -679,6 +686,7 @@
              (case mesh-type
                (:triangles (setq tp GL_TRIANGLES))
                (:quads     (setq tp GL_QUADS))
+               (:lines     (setq tp GL_LINES))
                (t (warn ";; mesh-type not found ~A~%") mesh-type))
              (when tp
                (cond
@@ -711,7 +719,10 @@
      ))
   (:convert-to-faceset ()) ;;; not implemented yet
   (:collision-check-objects (&rest args)) ;; compatibility to jsk library
-  (:box () (make-bounding-box (list #f(0 0 0) #f(1000 1000 1000)) 0.0))
+  (:box ()
+   (unless bbox
+     (send self :calc-bounding-box))
+   bbox)
   )
 
 #| ;; sample of glvertices
