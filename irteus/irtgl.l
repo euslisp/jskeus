@@ -595,6 +595,46 @@
    (unless bbox
      (send self :calc-bounding-box))
    (send (send bbox :body) :vertices))
+  (:reset-offset-from-parent ()
+   (let ((cds (send self :copy-coords)))
+     (send self :set-offset cds)
+     (send self :rest-coords))
+   self)
+  (:calc-normal
+   (&optional (force nil))
+   (let ((nmat (cadr (assoc :normals minfo))))
+     (when (and nmat (null force))
+       (return-from :calc-normal nil))
+     (unless nmat
+       )
+     ))
+  (:convert-to-faceset ()) ;;; not implemented yet
+  (:set-offset (cds) ;; not checked
+   (let* ((zero (float-vector 0 0 0))
+          (wpos (send cds :worldpos))
+          (wrot (send cds :worldrot)))
+     (dolist (minfo mesh-list)
+       (let ((vmat (cadr (assoc :vertices minfo)))
+             (nmat (cadr (assoc :normals minfo))))
+         (c-coords-transform-vector
+          wpos wrot vmat vmat)
+         (when nmat
+           (c-coords-transform-vector
+            zero wrot nmat nmat))))
+     self))
+  (:append-glvertices ;; not checked
+   (glv-lst)
+   (if (atom glv-lst) (setq glv-lst (list glv-lst)))
+   (let (ret (sw (send self :worldcoords)))
+     (dolist (glv glv-lst)
+       (let ((mlst (copy-object (glv . mesh-list)))
+             (cds (send sw :transformation (send glv :worldcoords))))
+         (let ((lglv (instance glvertices :init mlst)))
+           (send lglv :set-offset cds)
+           (setq ret (append ret mlst)))))
+     (setq mesh-list (append mesh-list ret))
+     (send self :calc-bounding-box)
+     self))
   (:draw
    (vwr &rest args)
    (let* (newlis
@@ -692,7 +732,7 @@
                (cond
                 (indices
                  (glDrawElements tp (length indices) GL_UNSIGNED_INT
-                                     (user::lvector2integer-bytestring indices)))
+                                 (user::lvector2integer-bytestring indices)))
                 (t
                  (glDrawArrays tp 0 (array-dimension vertices 0)))
                 )))
@@ -717,7 +757,6 @@
      (sys::mutex-unlock *opengl-lock*)
      (unless newlis (send self :draw vwr))
      ))
-  (:convert-to-faceset ()) ;;; not implemented yet
   (:collision-check-objects (&rest args)) ;; compatibility to jsk library
   (:box ()
    (unless bbox
