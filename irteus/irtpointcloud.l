@@ -40,7 +40,7 @@
                      ((:curvatures curv))
                      ((:height ht)) ((:width wd))
                      (point-color (float-vector 0 1 0))
-                     (point-size 2.0)
+                     (point-size 2.0) (fill)
                      (arrow-width 2.0) (arrow-size 0.0))
     ;; matrix was not be copied
     (cond
@@ -77,6 +77,15 @@
       (send self :size-change wd ht))
      (t
       (send self :size-change (if parray (array-dimension parray 0)))))
+
+    (when fill
+      (let ((w (send self :width))
+            (h (send self :height)))
+        (when (and w h)
+          (setq pcolor nil)
+          (setq parray (make-matrix (* w h) 3))
+          (setq carray (make-matrix (* w h) 3))
+          )))
     (send-super* :init args)
     self)
   (:reset-box () (if (= (send self :size) 0)
