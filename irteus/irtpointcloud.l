@@ -230,12 +230,11 @@
   (:filter-with-indices
    (idx-lst &key (create) (negative))
    (let* ((size (send self :size))
-          new-mat new-col new-nom
+          new-mat new-col new-nom new-cvt
           (p (float-vector 0 0 0))
           (c (if carray (float-vector 0 0 0)))
           (n (if narray (float-vector 0 0 0)))
-          cv
-          (cntr 0))
+          cv (cntr 0))
      (when negative
        (let (tmp)
          (dotimes (i size) (push (- size i 1) tmp))
