@@ -108,6 +108,10 @@
   (:fovy ()
    (let ((proj (send vwing :projection)))
      (* 2 (atan2 (/ pwidth 2.0) (aref proj 0 0)))))
+  (:cx () (let ((proj (send vwing :projection))) (aref proj 0 2)))
+  (:cy () (let ((proj (send vwing :projection))) (aref proj 1 2)))
+  (:fx () (let ((proj (send vwing :projection))) (aref proj 0 0)))
+  (:fy () (let ((proj (send vwing :projection))) (aref proj 1 1)))
   (:screen-point
    (pos)
    (let (v w)
@@ -198,8 +202,8 @@
      (setq viewpoint
            (v+ (send self :worldpos) ;; for right camera
                (send self :viewing :rotate-vector
-                     (scale 1000.0 (float-vector (/ (- (/  pwidth 2.0) cx) f)
-                                                 (/ (- (/ pheight 2.0) cy) f)
+                     (scale 1000.0 (float-vector (/ (- (- (/  pwidth 2.0) 1) cx) f)
+                                                 (/ (- (- (/ pheight 2.0) 1) cy) f)
                                                  0)))))
      ;; glview define view-directoin to oppsite direction
      (setq viewtarget
@@ -223,7 +227,61 @@
 	(send abody :draw-on :viewer vwr))
        (t (warn "Unknown body to draw ~A~%" abody)))
        )
-     (send vwr :viewsurface :flush)))
+     (send vwr :viewsurface :flush)
+     ))
+  (:get-image (vwr &key (points) (colors))
+   (let* ((sf (send vwr :viewsurface))
+          (width (send sf :width))
+          (height (send sf :height))
+          (cx (send self :cx))
+          (cy (send self :cy))
+          (num (* width height))
+          (fovy (send vwing :fovy))
+          (np (send vwing :hither))
+          (fp (send vwing :yon))
+          (focus (/ (/ height 2.0) (tan (/ fovy 2.0))))
+          (mptr 0)
+          (vptr 0)
+          (pos (float-vector 0 0 0))
+          (col (float-vector 0 0 0))
+          mat-ent img-ent col-ent fv
+          img)
+     (when points
+       (unless (and (= width pwidth) (= height pheight))
+         (warn ";; width: %d /= %d or height: %d /= %d~%" width pwidth height pheight)
+         (return-from :get-image))
+       (setq fv (make-array num :element-type :float))
+       (setq mat-ent (array-entity points))
+       (fill mat-ent 0.0)
+       (when colors
+         (setq col-ent (array-entity colors))
+         (fill col-ent 0.0)))
+     ;; get image
+     (setq img (send sf :getglimage :depthbuf fv))
+     (when points
+       (setq img-ent (send img :entity))
+       (dotimes (y height)
+         (dotimes (x width)
+           (if (< (elt fv vptr) 1.0)
+               (let ((zpos (/ (* fp np) (- (* (elt fv vptr) (- fp np)) fp))))
+                 (pprint (list x y))
+                 (setf (elt pos 0) (* (- cx x) (/ zpos focus)))
+                 (setf (elt pos 1) (* (- y cy) (/ zpos focus)))
+                 (setf (elt pos 2) (- zpos))
+                 (sys::vector-replace mat-ent pos mptr)
+                 (when colors
+                   (setf (elt col 0)
+                         (/ (sys::peek img-ent mptr :byte) 255.0))
+                   (setf (elt col 1)
+                         (/ (sys::peek img-ent (+ mptr 1) :byte) 255.0))
+                   (setf (elt col 2)
+                         (/ (sys::peek img-ent (+ mptr 2) :byte) 255.0))
+                   (sys::vector-replace col-ent col mptr))))
+           (incf mptr 3)
+           (incf vptr 1)
+           )))
+     img
+     ))
   )
 
 ;; utility functions
