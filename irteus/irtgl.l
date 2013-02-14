@@ -602,12 +602,16 @@
    self)
   (:calc-normal
    (&optional (force nil))
-   (let ((nmat (cadr (assoc :normals minfo))))
-     (when (and nmat (null force))
-       (return-from :calc-normal nil))
-     (unless nmat
-       )
-     ))
+   (dolist (minfo mesh-list)
+     (let ((nmat (cadr (assoc :normals minfo)))
+           (vmat (cadr (assoc :vertices minfo))))
+       (unless (and nmat (null force))
+         (unless nmat
+           (let ((len))
+             (setq nmat (make-matrix len 3))
+             ;; add nmat to minfo
+             ))
+         ))))
   (:convert-to-faceset ()) ;;; not implemented yet
   (:set-offset (cds) ;; not checked
    (let* ((zero (float-vector 0 0 0))
