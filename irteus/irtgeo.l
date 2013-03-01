@@ -512,7 +512,7 @@
   (let ((obj (make-gdome (make-icosahedron r))))
     (send obj :newcoords (apply #'make-coords args))
     (send obj :worldpos)
-    (send obj :csg `((:sphere ,r)))
+    (nconc (send obj :csg) `((:sphere ,r)))
     obj))
 
 (defun make-ring (ring-radius pipe-radius &rest args &key (segments 16))
