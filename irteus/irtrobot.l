@@ -361,6 +361,58 @@
      (nreverse result)))
   )
 
+;;; moved from rbrarin libraries
+(defmethod robot-model
+  (:fix-leg-to-coords
+   (fix-coords &optional (l/r :both) &key (mid 0.5) &allow-other-keys) ;; support-leg
+   (let (support-coords tmp-coords move-coords pos rot ra)
+     (cond
+      ((or (eq l/r :left) (eq l/r :lleg))
+       (setq support-coords
+             (send self :lleg :end-coords :copy-worldcoords)))
+      ((or (eq l/r :right) (eq l/r :rleg))
+       (setq support-coords
+             (send self :rleg :end-coords :copy-worldcoords)))
+      (t
+       (setq support-coords
+             (midcoords mid
+                        (send self :lleg :end-coords :copy-worldcoords)
+                        (send self :rleg :end-coords :copy-worldcoords)))))
+     (setq tmp-coords (send fix-coords :copy-worldcoords))
+     (setq move-coords (send support-coords :transformation self))
+     (send tmp-coords :transform move-coords :local)
+     (send self :newcoords tmp-coords)
+     (send self :worldcoords)
+     tmp-coords))
+  (:move-centroid-on-foot
+   (leg fix-limbs
+        &rest args
+        &key (thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) 1 5)) fix-limbs))
+        (rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) 1 5))) fix-limbs))
+        (mid 0.5)
+        (target-centroid-pos
+         (if (eq leg :both)
+             (apply
+              #'midpoint mid
+              (mapcar
+               #'(lambda (tmp-leg)
+                   (send self tmp-leg :end-coords :worldpos))
+               (remove-if-not #'(lambda (x) (memq x '(:rleg :lleg))) fix-limbs)))
+           (send self leg :end-coords :worldpos)))
+        &allow-other-keys)
+   (with-move-target-link-list
+    (mt ll self fix-limbs)
+    (let* ((root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5))) ;; use only translation x, y and rotation z
+      (send* self :fullbody-inverse-kinematics
+             (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) fix-limbs)
+             :move-target mt :link-list ll
+             :fix-limbs (remove-if-not #'(lambda (x) (memq x '(:rleg :lleg))) fix-limbs)
+             :root-link-virtual-joint-weight root-link-virtual-joint-weight
+             :thre thre :rthre rthre
+             :target-centroid-pos target-centroid-pos
+             args)
+      )))
+  )
 (in-package "GEOMETRY")
 
 (provide :irtrobot "$Id$")
