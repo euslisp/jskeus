@@ -363,8 +363,24 @@
 
 ;;; moved from rbrarin libraries
 (defmethod robot-model
+  ;; :foot-midcoords
+  ;;   purpose : to calculate midcoords of :rleg and :lleg
+  ;;   relevant euslib codes : defined in and copied from rbrain/basicape.l
+  ;;   objection : in the following codes, leged robot is assumed.
+  ;;               is this correct?
+  (:foot-midcoords
+   (&optional (mid 0.5))
+   (apply #'midcoords mid (send self :legs :end-coords))
+   )
+  ;; :fix-leg-to-coords
+  ;;   purpose : to fix robot's legs to a coords
+  ;;   relevant euslib codes : defined in and copied from rbrain/basicmodel.l
+  ;;   objection : in the following codes, leged robot is assumed.
+  ;;               is this correct?
   (:fix-leg-to-coords
    (fix-coords &optional (l/r :both) &key (mid 0.5) &allow-other-keys) ;; support-leg
+   (unless (not (some #'null (send self :legs :links)))
+     (return-from :fix-leg-to-coords nil))
    (let (support-coords tmp-coords move-coords pos rot ra)
      (cond
       ((or (eq l/r :left) (eq l/r :lleg))
