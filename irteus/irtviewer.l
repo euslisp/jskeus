@@ -271,6 +271,10 @@
    (setq drawmode mode)
    drawmode)
   (:flush () (if viewer (send viewer :viewsurface :glflush)))
+  (:change-background (col)
+   (let ((vs (send self :viewer :viewsurface)))
+     (setq (vs . x::bg-color) col)
+     (gl::glClearColorfv col)))
   )
    
 (defun draw-things (objs)
