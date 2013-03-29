@@ -600,8 +600,7 @@
      (send self :set-offset cds)
      (send self :rest-coords))
    self)
-  (:calc-normal
-   (&optional (force nil))
+  (:calc-normal (&optional (force nil))
    (dolist (minfo mesh-list)
      (let ((nmat (cadr (assoc :normals minfo)))
            (vmat (cadr (assoc :vertices minfo))))
@@ -612,7 +611,54 @@
              ;; add nmat to minfo
              ))
          ))))
-  (:convert-to-faceset ()) ;;; not implemented yet
+  (:convert-to-faces (&rest args) ;; check-normal <-> check-vertices-order, add face-color
+   (let (ret)
+     (dolist (mesh mesh-list)
+       (let ((vlst (cadr (assoc :vertices mesh)))
+             (nlst (cadr (assoc :normals mesh)))
+             (idces (cadr (assoc :indices mesh)))
+             (tp (cadr (assoc :type mesh)))
+             mesh-size lst)
+         (case tp
+           (:triangles (setq mesh-size 3))
+           (:quads     (setq mesh-size 4))
+           (t (warn ";; not supported mesh type -> ~A" tp)
+              (return-from :convert-to-faces)))
+         (cond
+          (idces
+           (do ((i 0 (+ i 1))
+                (v 0 (+ v mesh-size)))
+               ((>= v (length idces)))
+             (let (vs ns)
+               (dotimes (j mesh-size)
+                 (push (user::c-matrix-row vlst (elt idces (+ v j))) vs)
+                 (if nlst (push (user::c-matrix-row nlst (elt idces (+ v j))) ns)))
+               (push
+                (cond
+                 ;;((and ns check-vertices-order) )
+                 ;;(ns (instance face :init :vertices (nreverse vs) :normal ns))
+                 (t (instance face :init :vertices (nreverse vs))))
+                lst))))
+          (t
+           (do ((i 0 (+ i 1))
+                (v 0 (+ v mesh-size)))
+               ((>= v (array-dimension vlst 0)))
+             (let (vs ns)
+               (dotimes (j mesh-size)
+                 (push (user::c-matrix-row vlst (+ v j)) vs)
+                 (if nlst (push (user::c-matrix-row nlst (+ v j)) ns)))
+               (push
+                (if ns
+                    (instance face :init :vertices (nreverse vs) :normal ns)
+                  (instance face :init :vertices (nreverse vs)))
+                lst))))
+          ) ;; /cond
+         (push (nreverse lst) ret)))
+     (nreverse ret)))
+  (:faces () (flatten (send self :convert-to-faces)))
+  (:convert-to-faceset (&rest args)
+   (instance faceset :init :faces
+             (flatten (send* self :convert-to-faces args))))
   (:set-offset (cds) ;; not checked
    (let* ((zero (float-vector 0 0 0))
           (wpos (send cds :worldpos))
@@ -626,8 +672,8 @@
            (c-coords-transform-vector
             zero wrot nmat nmat))))
      self))
-  (:append-glvertices ;; not checked
-   (glv-lst)
+  (:devide-glvertices ()) ;; not implemented yet
+  (:append-glvertices (glv-lst) ;; not checked
    (if (atom glv-lst) (setq glv-lst (list glv-lst)))
    (let (ret (sw (send self :worldcoords)))
      (dolist (glv glv-lst)
@@ -639,8 +685,7 @@
      (setq mesh-list (append mesh-list ret))
      (send self :calc-bounding-box)
      self))
-  (:draw
-   (vwr &rest args)
+  (:draw (vwr &rest args)
    (let* (newlis
           (mat (send (send self :worldcoords) :4x4))
           (stransparent (get self :transparent))
