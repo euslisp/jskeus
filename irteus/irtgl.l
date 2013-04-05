@@ -773,32 +773,33 @@
                ;; override transparent ...
                ;;(if (and stransparent trans) (setq stransparent trans))
                (when col
-                 (glMaterialfv GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE
+                 (glColor3fv col)
+                 (glMaterialfv GL_BACK GL_AMBIENT_AND_DIFFUSE
                                (if stransparent
                                    (concatenate float-vector col (float-vector stransparent))
                                  col)))
                (when amb
                  (if stransparent
                      (setf (elt amb 3) (float-vector stransparent)))
-                 (glMaterialfv GL_FRONT_AND_BACK GL_AMBIENT amb))
+                 (glMaterialfv GL_FRONT GL_AMBIENT amb))
                (when diff
                  (if stransparent
                      (setf (elt diff 3) (float-vector stransparent)))
-                 (glMaterialfv GL_FRONT_AND_BACK GL_DIFFUSE diff))
+                 (glMaterialfv GL_FRONT GL_DIFFUSE diff))
                (when spec
                  (if stransparent
                      (setf (elt spec 3) (float-vector stransparent)))
-                 (glMaterialfv GL_FRONT_AND_BACK GL_SPECULAR spec))
+                 (glMaterialfv GL_FRONT GL_SPECULAR spec))
                (when emi
                  (if stransparent
                      (setf (elt emi 3) (float-vector stransparent)))
-                 (glMaterialfv GL_FRONT_AND_BACK GL_EMISSION emi))
+                 (glMaterialfv GL_FRONT GL_EMISSION emi))
                (cond
                 (shin
-                 (glMaterialf GL_FRONT_AND_BACK GL_SHININESS shin))
+                 (glMaterialf GL_FRONT GL_SHININESS shin))
                 (t
-                 (glMaterialf GL_FRONT_AND_BACK GL_SHININESS 0.0)
-                 (glMaterialfv GL_FRONT_AND_BACK GL_SPECULAR (float-vector 0 0 0 0))
+                 (glMaterialf GL_FRONT GL_SHININESS 0.0)
+                 (glMaterialfv GL_FRONT GL_SPECULAR (float-vector 0 0 0 0))
                  ))
                (when (and teximg texcoords)
                  (let ((im_width  (send teximg :width))
@@ -806,8 +807,16 @@
                        (im_buf    (send teximg :entity)))
                    (glPixelStorei GL_UNPACK_ALIGNMENT 1)
                    ;;
-                   (glTexImage2D GL_TEXTURE_2D 0 GL_RGB im_width im_height
-                                 0 GL_RGB GL_UNSIGNED_BYTE im_buf)
+                   (cond
+                    ((derivedp teximg image::grayscale-image)
+                     (glTexImage2D GL_TEXTURE_2D 0 GL_RGB im_width im_height
+                                   0 GL_LUMINANCE GL_UNSIGNED_BYTE im_buf))
+                    ((derivedp teximg image::color-image24)
+                     (glTexImage2D GL_TEXTURE_2D 0 GL_RGB im_width im_height
+                                   0 GL_RGB GL_UNSIGNED_BYTE im_buf))
+                    ((derivedp teximg image::color-image32)
+                     (glTexImage2D GL_TEXTURE_2D 0 GL_RGBA im_width im_height
+                                   0 GL_RGBA GL_UNSIGNED_BYTE im_buf)))
                    ;;(gluBuild2DMipmaps GL_TEXTURE_2D GL_RGB im_width im_height GL_RGB GL_UNSIGNED_BYTE imbuf) ;; case 2
                    ;;
                    (glTexParameteri GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_REPEAT)
@@ -817,14 +826,20 @@
                    (glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_NEAREST)
                    ;;(glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_LINEAR) ;; case 2
                    ;;(glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_LINEAR_MIPMAP_LINEAR) ;; case 2
-                   ;;
-                   (glTexEnvi GL_TEXTURE_ENV GL_TEXTURE_ENV_MODE GL_DECAL)
+
+                   ;;(glTexEnvi GL_TEXTURE_ENV GL_TEXTURE_ENV_MODE GL_DECAL) ;; flat color
+                   (glTexEnvi GL_TEXTURE_ENV GL_TEXTURE_ENV_MODE GL_MODULATE)
                    (glEnable GL_TEXTURE_2D)
                    ))
                ))
            (unless (and teximg texcoords) (setq texcoords nil))
-
+           ;;
            (glEnableClientState GL_VERTEX_ARRAY)
+#+:x86_64
+           (glVertexPointer 3 GL_DOUBLE 0 (array-entity vertices))
+#-:x86_64
+           (glVertexPointer 3 GL_FLOAT 0 (array-entity vertices))
+           ;;
            (when normals
              (glEnableClientState GL_NORMAL_ARRAY)
 #+:x86_64
@@ -832,6 +847,7 @@
 #-:x86_64
              (glNormalPointer GL_FLOAT 0 (array-entity normals))
              )
+           ;;
            (when texcoords
              (glEnableClientState GL_TEXTURE_COORD_ARRAY)
 #+:x86_64
@@ -839,10 +855,6 @@
 #-:x86_64
              (glTexCoordPointer 2 GL_FLOAT 0 texcoords)
              )
-#+:x86_64
-           (glVertexPointer 3 GL_DOUBLE 0 (array-entity vertices))
-#-:x86_64
-           (glVertexPointer 3 GL_FLOAT 0 (array-entity vertices))
 
            (let (tp)
              (case mesh-type
@@ -860,10 +872,10 @@
                  (glDrawArrays tp 0 (array-dimension vertices 0)))
                 )))
 
-           (when normals (glDisableClientState GL_NORMAL_ARRAY))
            (when texcoords
              (glDisable GL_TEXTURE_2D)
              (glDisableClientState GL_TEXTURE_COORD_ARRAY))
+           (when normals (glDisableClientState GL_NORMAL_ARRAY))
            (glDisableClientState GL_VERTEX_ARRAY)
            ))
 
