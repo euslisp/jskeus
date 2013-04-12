@@ -1,7 +1,7 @@
 all: eus-installed irteus-installed manuals bashrc.eus
 
 SVN_EUSURL=http://svn.code.sf.net/p/euslisp/code/trunk/EusLisp
-SVN_IRTEUSURL=https://jskeus.svn.sourceforge.net/svnroot/jskeus/trunk/irteus
+SVN_IRTEUSURL=http://svn.code.sf.net/p/jskeus/code/trunk/irteus
 
 EUSC_PATCH=eus.c_CUSTUM_EUSDIR.patch
 
