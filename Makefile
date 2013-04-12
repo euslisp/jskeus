@@ -1,6 +1,6 @@
 all: eus-installed irteus-installed manuals bashrc.eus
 
-SVN_EUSURL=https://euslisp.svn.sourceforge.net/svnroot/euslisp/trunk/EusLisp
+SVN_EUSURL=http://svn.code.sf.net/p/euslisp/code/trunk/EusLisp
 SVN_IRTEUSURL=https://jskeus.svn.sourceforge.net/svnroot/jskeus/trunk/irteus
 
 EUSC_PATCH=eus.c_CUSTUM_EUSDIR.patch
@@ -29,10 +29,10 @@ export EUSDIR=$(shell pwd)/eus
 
 manuals: manual.pdf jmanual.pdf
 manual.pdf:
-	wget http://euslisp.svn.sourceforge.net/svnroot/euslisp/trunk/EusLisp/doc/latex/manual.pdf -O manual.pdf
+	wget http://svn.code.sf.net/p/euslisp/code/trunk/EusLisp/doc/latex/manual.pdf -O manual.pdf
 
 jmanual.pdf:
-	wget http://euslisp.svn.sourceforge.net/svnroot/euslisp/trunk/EusLisp/doc/jlatex/jmanual.pdf -O jmanual.pdf
+	wget http://svn.code.sf.net/p/euslisp/code/trunk/EusLisp/doc/jlatex/jmanual.pdf -O jmanual.pdf
 
 bashrc.eus:
 	@bash -c 'echo -e "#\n\
