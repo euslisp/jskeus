@@ -66,6 +66,7 @@
   (:create
    (&rest args
 	  &key (title "IRT viewer")
+	  (view-name (gensym "title"))
 	  (hither 200.0) (yon 50000.0)
 	  (width 500) (height 500)
 	  &allow-other-keys)
@@ -82,7 +83,7 @@
 			 :x 0 :y 0
 			 :width width :height height 
 			 :title title
-			 :name (gensym "title")
+			 :name view-name
 			 args))
      (setf (get viewer :pickviewer) self)
      (setq user::*viewer* viewer)
