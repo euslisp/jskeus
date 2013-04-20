@@ -415,12 +415,14 @@
                    (send self tmp-leg :end-coords :worldpos))
                (remove-if-not #'(lambda (x) (memq x '(:rleg :lleg))) fix-limbs)))
            (send self leg :end-coords :worldpos)))
+        (fix-limbs-target-coords
+         (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) fix-limbs))
         &allow-other-keys)
    (with-move-target-link-list
     (mt ll self fix-limbs)
     (let* ((root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5))) ;; use only translation x, y and rotation z
       (send* self :fullbody-inverse-kinematics
-             (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) fix-limbs)
+             fix-limbs-target-coords
              :move-target mt :link-list ll
              :fix-limbs (remove-if-not #'(lambda (x) (memq x '(:rleg :lleg))) fix-limbs)
              :root-link-virtual-joint-weight root-link-virtual-joint-weight
