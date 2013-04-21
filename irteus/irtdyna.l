@@ -818,5 +818,538 @@
    (send (car (send self :links)) :get :c-til))
   )
 
+;;;
+;;; preview control and preview filter class
+;;; written by {nozawa,kanzaki,k-okada}@jsk.t.u-tokyo.ac.jp
+;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; riccati equation class
+;;;  solve steady solution of riccati equation
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass riccati-equation
+  :super propertied-object
+  :slots (A b c P Q R K
+            A-bKt R+btPb-1 ;; for buffer
+            ))
+(defmethod riccati-equation
+  (:init (AA bb cc QQ RR) 
+    (setq A AA b BB c CC Q QQ R RR)
+    (setq P (make-matrix (array-dimension c 1) (array-dimension c 1))))
+  (:solve ()
+    (let (diffP
+	  (At (transpose A))
+	  (bt (transpose b))
+	  (ct (transpose c))
+	  (zero-matrix (make-matrix (array-dimension c 1) (array-dimension c 1))))
+      (do ((loop 0 (1+ loop)))
+	  ((>= loop 2000))
+	(let* ((tmp-PA (m* P A)))
+          (setq R+btPb-1 (/ 1.0 (+ R (aref (m* bt (m* P b)) 0 0)))
+                K (scale-matrix R+btPb-1 (m* bt tmp-PA)))
+          (let ((prevP (m- (m+ (m* At tmp-pa)
+                               (m* ct (scale-matrix Q c)))
+                           (m* (m* (m* At P) b) K))))
+            (setq diffP (m- P prevP))
+            (when (matrix-eps= diffP zero-matrix (* *epsilon* 0.01))
+              (setq A-bKt (transpose (m- A (m* b K))))
+              (return-from :solve (list P K)))
+          (setq P prevP)
+          )))
+      (warn ";; ERROR in (reccati (:solve)) : Counld not convergence ~A~%" diffP)
+      ))
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; preview-control class to compute reference COG from reference ZMP
+;;;  (refer to "Biped Walking Pattern Generation by using Preview Control of Zero-Moment Point", ICRA 2003, p.1620-1626, Shuuji KAJITA, Fumio KANEHIRO, Kenji KANEKO, Kiyoshi FUJIWARA, Kensuke HARADA, Kazuhito YOKOI and Hirohisa HIRUKAWA
+;;;            "Humanoid Robot (in Japanese)", Ohmsha, 2005, Shuji Kajita, ISBN 4-274-20058-2)
+;;;  A, b, c -> system configuration matrices
+;;;  xk, uk  -> COG() and input for controller at "k"
+;;;             xk -> 3 x 2 matrix, uk -> 1 x 2 matrix (2 represents x and y)
+;;;  delay -> preview step calculated from predictive time (delay = N)
+;;;  p1-n -> reference ZMP queue (time is k, k+1, ... k+N)
+;;;  state equation of this system is
+;;;   xk+1 = A xk + b uk
+;;;   pk   = c xk
+;;;  unit system -> [mm], [s]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass preview-control
+  :super riccati-equation
+  :slots (xk uk delay f1-n p1-n dim cog-z zmp-z))
+(defmethod preview-control
+  (:init
+    (dt _zc ;; dt -> sampling time[s], _zc is height of COG[mm]
+     &key (q 1) (r 1e-6)
+          ((:delay d) 1.6)
+          (init-xk (float-vector 0 0 0))
+          ((:A _A) (make-matrix 3 3 (list (list 1 dt (* 0.5 dt dt))
+                                          (list 0 1 dt)
+                                          (list 0 0 1))))
+          ((:B _B) (make-matrix 3 1 (list (list (* (/ 1.0 6.0) dt dt dt))
+                                          (list (* 0.5 dt dt))
+                                          (list dt))))
+          ((:C _C) (make-matrix 1 3 (list (list 1.0 0.0 (- (/ _zc (elt *g-vec* 2))))))))
+    (setq delay (round (/ d dt)) dim 2 cog-z _zc)
+    (send-super :init _A _B _C q r)
+    (when (null xk)
+      (setq xk (make-matrix 3 dim))
+      (setf (matrix-row xk 0) (subseq init-xk 0 dim)))
+    (send self :solve)
+    (send self :calc-f)
+    self)
+  ;; getter methods
+  (:delay () delay)
+  (:refcog () (float-vector (elt (matrix-row xk 0) 0)
+                            (elt (matrix-row xk 0) 1)
+                            cog-z))
+  (:cart-zmp (&optional (_c c)) ;; table-cart zmp as an output variable
+    (let ((p (m* _c xk)))
+      (float-vector (aref p 0 0)
+                    (aref p 0 1)
+                    zmp-z)))
+  (:last-refzmp ()
+    (let ((p (matrix-row p1-n delay))) ;; tail of refzmp queue
+      (float-vector (elt p 0)
+                    (elt p 1)
+                    zmp-z)))
+  (:current-refzmp ()
+    (let ((p (matrix-row p1-n 0))) ;; head of refzmp queue
+      (float-vector (elt p 0)
+                    (elt p 1)
+                    zmp-z)))
+  ;;
+  (:calc-f () ;; calculate preview gain for k+1, ... k+N.
+    (setq f1-n (make-matrix 1 (1+ delay))) ;; (matrix-row f1-n 0) is dummy to being mutiplied by p1-n
+    (let* ((gsi (unit-matrix (array-dimension c 1)))
+	   (bt (transpose b))
+	   (ct (transpose c)))
+      (dotimes (i delay)
+	(let* ((qt (scale-matrix Q ct))
+	       (fa (scale-matrix R+btPb-1 (m* bt (m* gsi qt)))))
+          (setq gsi (m* A-bKt gsi))
+          (setf (aref f1-n 0 (1+ i)) (aref fa 0 0))
+          ))))
+  (:calc-u () (m- (m* f1-n p1-n) (m* K xk)))
+  (:calc-xk () ;; update xk+1
+    (setq xk (m+ (m* A xk) (m* b (send self :calc-u)))))
+  ;;
+  (:update-xk (p)
+    (setq zmp-z (elt p 2))
+    ;; update p1-n
+    (when (null p1-n)
+      (setq p1-n (make-matrix (1+ delay) dim))
+      (dotimes (i (1+ delay)) (setf (matrix-row p1-n i) (subseq p 0 dim))))
+    (dotimes (i delay) (setf (matrix-row p1-n i) (matrix-row p1-n (1+ i))))
+    (setf (matrix-row p1-n delay) (subseq p 0 dim))
+    ;;
+    (send self :calc-xk))
+  (:update-cog-z (zc)
+    (setf (aref c 0 2) (- (/ zc (elt *g-vec* 2))))
+    (send self :solve)
+    (send self :calc-f))
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; extended-preview-control class to compute reference COG from reference ZMP
+;;;  this class is error system of preview-control class
+;;;  (refer to "Digital Preview Control (in Japanese)", SangyoToshoKabusikiGaisha, Takeshi Tsuchiya and Tadashi Egami)
+;;;  orgA, orgb, orgc -> system configuration matrices for original table-cart model
+;;;  xk* -> [p^T, dxk^T]^T, (1+3) x 2 matrix
+;;;  state equation of this system is
+;;;   xk+1* = A xk* + b duk
+;;;   pk   = c xk*
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass extended-preview-control
+  :super preview-control
+  :slots (orgA orgB orgC xk*))
+
+(defmethod extended-preview-control
+  (:init
+    (dt zc &key (q 1.0) (r 1.0e-6) ((:delay d) 1.6) (init-xk (float-vector 0 0 0)))
+    (setq orgA (make-matrix 3 3 (list (list 1 dt (* 0.5 dt dt))
+                                    (list 0 1 dt)
+                                    (list 0 0 1)))
+          orgb (make-matrix 3 1 (list (list (* (/ 1.0 6.0) dt dt dt))
+                                    (list (* 0.5 dt dt))
+                                    (list dt)))
+          orgc (make-matrix 1 3 (list (list 1.0 0.0 (- (/ zc (elt *g-vec* 2)))))))
+    (send-super :init
+                dt zc
+                :A (concatenate-matrix-column
+                    (concatenate-matrix-row (make-matrix 1 1 (list (list 1.0))) (m* orgc orgA))
+                    (concatenate-matrix-row (make-matrix 3 1 (list (list 0) (list 0) (list 0))) orgA))
+                :b (concatenate-matrix-column (m* orgc orgb) orgb)
+                :c (make-matrix 1 4 (list (list 1.0 0.0 0.0 0.0)))
+                :q q :r r :delay d)
+    (when (null xk*)
+      (setq xk* (make-matrix 4 dim))
+      (setf (matrix-row xk* 0) (subseq init-xk 0 dim)))
+    self)
+  ;; getter methods
+  (:cart-zmp () (send-super :cart-zmp orgc))
+  ;;
+  (:calc-f ()
+    (setq f1-n (make-matrix 1 (1+ delay)))
+    (let* ((gsi (unit-matrix (array-dimension c 1)))
+	   (bt (transpose b))
+	   (ct (transpose c))
+	   (R+btPb-1bt (scale-matrix R+btPb-1 bt))
+	   (qt (scale-matrix Q ct)))
+      (dotimes (i delay)
+	(let* ((qt (if (= i (1- delay)) (m* P qt) qt))
+               (fa (scale-matrix R+btPb-1 (m* bt (m* gsi qt)))))
+          (setq gsi (m* A-bKt gsi))
+	  (setf (aref f1-n 0 (1+ i)) (aref fa 0 0))
+          ))))
+  (:calc-u () (m- (m* f1-n p1-n) (m* K xk*)))
+  (:calc-xk ()
+    (setq xk* (m+ (m* A xk*) (m* b (send self :calc-u))))
+    (dotimes (i 3)
+      (setf (matrix-row xk i)
+            (v+ (matrix-row xk i)
+                (matrix-row xk* (1+ i)))))
+    )
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; preview-dynamics-filter class to handle variables about preview control
+;;;  avs -> queue of variables for preview control (k, k+1, ..., k+N)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass preview-dynamics-filter
+  :super propertied-object
+  :slots (avs counter finishedp preview-controller))
+
+(defmethod preview-dynamics-filter
+  (:init (dt zc &optional (preview-class preview-control)
+                &rest args)
+    (setq counter 0
+          finishedp nil
+          preview-controller (instance* preview-class :init dt zc args)
+          avs (make-list (1+ (send preview-controller :delay))))
+    self)
+  ;;
+  (:finishedp () finishedp)
+  (:av () (car avs)) ;; get parameters at "k"
+  (:cart-zmp () (send preview-controller :cart-zmp))
+  (:refcog () (send preview-controller :refcog))
+  ;;
+  (:update (av p)
+    (let (r)
+      (dotimes (i (send preview-controller :delay)) (setf (elt avs i) (elt avs (1+ i))))
+      (setf (elt avs (send preview-controller :delay)) av)
+      (cond (p
+	     (send preview-controller :update-xk p)
+	     (if (< counter (send preview-controller :delay)) 	     
+		 (incf counter)
+	       (setq r t)))
+	    (t ;; (null p)
+	     (send preview-controller :update-xk
+                   (send preview-controller :last-refzmp))
+	     (if (> counter 0) (setq r (decf counter)))))
+      (if (<= counter 0) (setq finishedp t))
+      (if r (cons (send preview-controller :current-refzmp)
+		  (send preview-controller :refcog)) nil)
+      ))
+  )
+
+;;
+;; gait generator
+;;   currently biped robots are supported
+;; definition
+;;   step  -> one step
+;;   index -> one control loop in one step
+(defclass gait-generator
+  :super propertied-object
+  :slots (robot dt
+          ;; list for parameters (here, call "gait paramters")
+          footstep-node-list ;; list of footstep <- step-node class instance
+          support-leg-list ;; support leg list
+          support-leg-coords-list ;; support leg coords list
+          swing-leg-dst-coords-list ;; destination of swing leg
+          swing-leg-src-coords ;; source of swing leg = previous suppor leg coords
+          refzmp-cur-list ;; current reference zmp
+          refzmp-next ;; next reference zmp
+          refzmp-prev ;; previous reference zmp
+          step-height-list ;; step height list
+          ;; other parameters
+          one-step-len ;; division number for one step
+          index-count ;; counter for one step
+          default-step-height ;; default step height
+          default-double-support-ratio ;; default double support ratio ;; (- 1 default-double-support-ratio) is single support ratio
+          default-zmp-offsets ;; zmp offset list in the legs' end-coords ;; (list rleg-zmp-offset lleg-zmp-offset)
+          finalize-p ;; Are all footstep-node-list executed? finalize flag for make-gait-parameter. Is this necessary?
+          ;; preview controller parameters
+          preview-controller ;; preview controller for ZMP -> COG
+          )
+  )
+
+;; methods
+;; footstep generation process
+;;  footstep (input) -> support-leg-coords, swing-leg-coords -> refzmp -> cog -> angle-vector (output)
+;;  step-node class -> geometrical footstep parameters per one step
+;;  step-height, step-time -> real robot execution per one step sequence
+;;  robot, dt -> robot independent
+(defmethod gait-generator
+  (:init
+    (rb _dt)
+    (setq robot rb dt _dt)
+    ;; gen append methods
+    (dolist (list-name '(footstep-node-list support-leg-list
+                         support-leg-coords-list swing-leg-dst-coords-list
+                         swing-leg-src-coords refzmp-cur-list
+                         step-height-list))
+      (eval `(defmethod gait-generator
+               (,(read-from-string (format nil ":append-~A" list-name))
+                (_args)
+                (setq ,list-name (append ,list-name (list _args)))))))
+    self)
+  ;; initialize parameter and generate first gait parameter
+  (:initialize-gait-parameter
+    (fsl time cog ;; time is [s], cog is [mm]
+     &key ((:default-step-height dsh) 50) ;; height [mm]
+          ((:default-double-support-ratio ddsr) 0.2)
+          ((:default-zmp-offsets dzo) (list (float-vector 0 0 0) (float-vector 0 0 0))) ;; (list rleg lleg), [mm]
+          (delay 1.6) ;; delay [s]
+          (q 1.0) (r 1e-6))
+    (setq footstep-node-list fsl
+          one-step-len (round (/ time dt))
+          support-leg-coords-list nil
+          support-leg-list nil
+          swing-leg-dst-coords-list nil
+          refzmp-cur-list nil
+          step-height-list nil
+          default-step-height dsh
+          default-double-support-ratio ddsr
+          default-zmp-offsets dzo
+          index-count one-step-len
+          finalize-p nil)
+    (send self :append-support-leg-list (case (send (car footstep-node-list) :l/r)
+                                          (:rleg :lleg) (:lleg :rleg)))
+    (send self :append-support-leg-coords-list
+          (send robot (car support-leg-list) :end-coords :copy-worldcoords))
+    (send self :append-swing-leg-dst-coords-list
+          (send robot (send (car footstep-node-list) :l/r) :end-coords :copy-worldcoords))
+    (send self :append-refzmp-cur-list
+          (midpoint 0.5
+                    (v+ (send (car support-leg-coords-list) :worldpos)
+                        (send (car support-leg-coords-list) :rotate-vector
+                              (case (car support-leg-list) (:rleg (car default-zmp-offsets)) (:lleg (cadr default-zmp-offsets)))))
+                    (v+ (send (car swing-leg-dst-coords-list) :worldpos)
+                        (send (car swing-leg-dst-coords-list) :rotate-vector
+                              (case (car support-leg-list) (:lleg (car default-zmp-offsets)) (:rleg (cadr default-zmp-offsets)))))))
+    (send self :append-step-height-list 0.0)
+    (pop footstep-node-list)
+    ;; currently, not error system
+    (setq preview-controller (instance preview-dynamics-filter :init
+                                       dt (- (elt cog 2) (elt (car refzmp-cur-list) 2))
+                                       extended-preview-control
+                                       :delay delay
+                                       :q q :r r
+                                       :init-xk cog
+                                       )
+          swing-leg-src-coords (car swing-leg-dst-coords-list)
+          refzmp-next (v+ (send (car swing-leg-dst-coords-list) :worldpos)
+                          (send (car swing-leg-dst-coords-list) :rotate-vector
+                                (case (car support-leg-list) (:lleg (car default-zmp-offsets)) (:rleg (cadr default-zmp-offsets)))))
+          refzmp-prev (car refzmp-cur-list))
+    (send self :make-gait-parameter)
+    t)
+  ;; append final gait parameters
+  (:finalize-gait-parameter
+    ()
+    (let ((dst-swing-coords (car (last support-leg-coords-list))))
+      (send self :append-support-leg-list (case (car (last support-leg-list)) (:rleg :lleg) (:lleg :rleg)))
+      (send self :append-support-leg-coords-list (car (last swing-leg-dst-coords-list)))
+      (send self :append-swing-leg-dst-coords-list dst-swing-coords)
+      (send self :append-refzmp-cur-list
+            (midpoint 0.5
+                      (v+ (send (car (last support-leg-coords-list)) :worldpos)
+                          (send (car (last support-leg-coords-list)) :rotate-vector
+                                (case (car (last support-leg-list)) (:rleg (car default-zmp-offsets)) (:lleg (cadr default-zmp-offsets)))))
+                      (v+ (send (car (last swing-leg-dst-coords-list)) :worldpos)
+                          (send (car (last swing-leg-dst-coords-list)) :rotate-vector
+                                (case (car (last support-leg-list)) (:lleg (car default-zmp-offsets)) (:rleg (cadr default-zmp-offsets)))))))
+      (send self :append-step-height-list 0.0)
+      (setq refzmp-next (car (last refzmp-cur-list)))
+      t))
+  ;; generate gait parameters
+  (:make-gait-parameter
+    ()
+    (let ((fs (pop footstep-node-list)))
+      (send self :append-support-leg-list (case (send fs :l/r) (:rleg :lleg) (:lleg :rleg)))
+      (send self :append-support-leg-coords-list (car (last swing-leg-dst-coords-list)))
+      (send self :append-swing-leg-dst-coords-list (send fs :worldcoords))
+      (send self :append-refzmp-cur-list
+            (v+ (send (car (last support-leg-coords-list)) :worldpos)
+                (send (car (last support-leg-coords-list)) :rotate-vector
+                      (case (car (last support-leg-list)) (:rleg (car default-zmp-offsets)) (:lleg (cadr default-zmp-offsets))))))
+      (send self :append-step-height-list default-step-height)
+      t))
+  ;; calculate swing leg coords
+  (:calc-current-swing-leg-coords
+    (ratio src dst &key (type :shuffling) (step-height default-step-height))
+    (case type
+      (:shuffling
+        (midcoords ratio src dst))
+      (:cycloid
+        (send self :cycloid-midcoords ratio src dst step-height))
+      )
+    )
+  (:calc-ratio-from-double-support-ratio
+   ()
+   (let* (;; narrowed one-step-len according to double-support-ratio
+          (narrow-one-step-len (* (- 1.0 default-double-support-ratio) one-step-len))
+          ;; ratio = current count / narrow-one-len
+          (tmp-ratio (- 1.0 (/ (- (float index-count) (* 0.5 default-double-support-ratio one-step-len))
+                               narrow-one-step-len))))
+     ;; ratio <- [0.0 1.0]
+     (cond
+      ((< tmp-ratio 0.0) 0.0)
+      ((> tmp-ratio 1.0) 1.0)
+      (t tmp-ratio))))
+  (:calc-current-refzmp
+   (prev cur next)
+   (let* ((cnt (- one-step-len index-count))
+          (margin-count (* 0.5 default-double-support-ratio one-step-len)))
+     (cond
+      ((< cnt margin-count)
+       (midpoint (* (/ -0.5 margin-count) (- cnt margin-count))
+                 cur prev))
+      ((> cnt (- one-step-len margin-count))
+       (midpoint (* (/ 0.5 margin-count) (- cnt (- one-step-len margin-count)))
+                 cur next))
+      (t cur))
+     ))
+  (:calc-one-tick-gait-parameter
+   (type)
+   (list (car support-leg-list)
+         (car support-leg-coords-list)
+         (send self :calc-current-swing-leg-coords
+               (send self :calc-ratio-from-double-support-ratio)
+               swing-leg-src-coords (car swing-leg-dst-coords-list)
+               :type type :step-height (car step-height-list))
+         (send self :calc-current-refzmp
+               refzmp-prev (car refzmp-cur-list) refzmp-next)
+         )
+   )
+  ;; generate one tick parameter
+  ;;  in detail, calculate swing leg coords, cog and angle-vector
+  (:proc-one-tick
+    (&key (type :shuffling) (solve-angle-vector :solve-av-by-move-centroid-on-foot)
+          (solve-angle-vector-args) (debug nil))
+    (let* ((preview-data ;; data to push to preview-controller's que
+            (if support-leg-coords-list
+                (send self :calc-one-tick-gait-parameter type)))
+           (dd (send preview-controller :update ;; return value from preview-controller
+                     preview-data (if preview-data (elt preview-data 3))))
+           (gp (send preview-controller :av)) ;; gait parameter
+           (ret (if (and dd solve-angle-vector)
+                    (append (send self :solve-angle-vector
+                                  (elt gp 0) (elt gp 1) (elt gp 2) (cdr dd)
+                                  :solve-angle-vector solve-angle-vector
+                                  :solve-angle-vector-args solve-angle-vector-args)
+                            (if debug (append gp (list (cdr dd)
+                                                       (send preview-controller :cart-zmp))))))))
+      (when (>= 0 (decf index-count))
+        (send self :update-current-gait-parameter))
+      ret))
+  ;; update gait parameter
+  (:update-current-gait-parameter
+   ()
+   (setq refzmp-prev (car refzmp-cur-list))
+   (cond
+    (footstep-node-list
+     (send self :make-gait-parameter)
+     )
+    ((null finalize-p)
+     (send self :finalize-gait-parameter)
+     (setq finalize-p t)
+     ))
+   (setq index-count one-step-len)
+   (pop support-leg-list)
+   (setq swing-leg-src-coords (pop support-leg-coords-list))
+   (pop swing-leg-dst-coords-list)
+   (pop refzmp-cur-list)
+   (pop step-height-list)
+   (if (cadr refzmp-cur-list)
+       (setq refzmp-next (cadr refzmp-cur-list))
+     (setq refzmp-next (car refzmp-cur-list)))
+   )
+  (:solve-angle-vector
+    (support-leg support-leg-coords swing-leg-coords cog
+     &key (solve-angle-vector :solve-av-by-move-centroid-on-foot)
+          (solve-angle-vector-args))
+    (cond
+     ((functionp solve-angle-vector)
+      (apply solve-angle-vector
+             support-leg support-leg-coords
+             swing-leg-coords cog robot solve-angle-vector-args))
+     ((and (symbolp solve-angle-vector) (find-method self solve-angle-vector))
+      (send* self solve-angle-vector
+             support-leg support-leg-coords
+             swing-leg-coords cog robot solve-angle-vector-args))
+     (t (error ";; in :solve-angle-vector, invalid function or method~%!")))
+    (list (send robot :angle-vector) (send robot :copy-worldcoords)))
+
+  ;; solve-angle-vector methods
+  (:solve-av-by-move-centroid-on-foot
+   (support-leg support-leg-coords swing-leg-coords cog robot
+   &rest args &key (cog-gain 2) (stop 100) &allow-other-keys)
+   (let ((legs (list (case support-leg (:lleg :rleg) (:rleg :lleg)) support-leg)))
+     (send* robot :move-centroid-on-foot
+            :both legs :target-centroid-pos cog
+            :fix-limbs-target-coords (list swing-leg-coords support-leg-coords)
+            :cog-gain cog-gain :stop stop
+            :null-space
+            #'(lambda ()
+                (let ((xvr (send robot :rotate-vector #f(1 0 0)))
+                      (xvf (send (midcoords 0.5 swing-leg-coords support-leg-coords)
+                                 :rotate-vector #f(1 0 0)))
+                      (nv (instantiate float-vector (send robot :calc-target-joint-dimension (mapcar #'(lambda (l) (send robot :link-list (send (send robot l :end-coords) :parent))) legs)))))
+                  (dolist (xv (list xvr xvf)) (setf (elt xv 2) 0.0))
+                  (setf (elt nv 5) (* (if (and (eps= (norm xvf) 0.0) (eps= (norm xvr) 0.0))
+                                          0.0 (acos (v. (normalize-vector xvf) (normalize-vector xvr))))
+                                      (if (> (elt (v* xvf xvr) 2) 0.0) -1.0 1.0)))
+                  nv))
+            args)))
+  ;; calculate midpoint using cycloig orbit
+  ;;   ratio  -> midpoint ratio
+  ;;   start  -> start pos
+  ;;   goal   -> goal pos
+  ;;   height -> max height of step
+  (:cycloid-midpoint
+   (ratio start goal height &key (top-ratio 0.5))
+   (let* ((mc (v+ (float-vector 0 0 height)
+                  (midpoint top-ratio start goal)))
+          (mv (if (> ratio 0.5) (v- goal mc) (v- mc start)))
+          (u (v- goal start))
+          (w (scale (abs (elt mv 2)) (float-vector 0 0 1.0))))
+     (setf (elt mv 2) 0)
+     (setf (elt u 2) 0)
+     (let* ((u (scale (/ (* 2.0 (norm mv)) pi) (normalize-vector u)))
+            (v (normalize-vector (v* w u)))
+            (th (* 2pi ratio))
+            (cycloid-point
+             (float-vector (+ (if (> ratio 0.5) -pi/2 0.0) (* 0.5 (- th (sin th))))
+                           0.0
+                           (+ (if (> ratio 0.5) -1 0.0) (* 0.5 (- 1.0 (cos th))))))
+            (dv (transform cycloid-point
+                           (matrix u v w))))
+       (v+ dv (if (> ratio 0.5) mc start))
+       )))
+  ;; calculate midcoords using cycloig orbit
+  ;;   ratio  -> midpoint ratio
+  ;;   start  -> start pos
+  ;;   goal   -> goal pos
+  ;;   height -> max height of step
+  (:cycloid-midcoords
+   (ratio start goal height &key (top-ratio 0.5))
+   (let ((cp (send self :cycloid-midpoint ratio (send start :worldpos) (send goal :worldpos)
+                   height :top-ratio top-ratio)))
+     (make-coords :pos cp
+                  :rot (send (midcoords ratio start goal) :worldrot))))
+  )
+
 (in-package "GEOMETRY")
 (provide :irtdyna)
