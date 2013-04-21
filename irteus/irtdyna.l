@@ -1142,12 +1142,18 @@
           default-zmp-offsets dzo
           index-count one-step-len
           finalize-p nil)
-    (send self :append-support-leg-list (case (send (car footstep-node-list) :l/r)
-                                          (:rleg :lleg) (:lleg :rleg)))
+    (send self :append-support-leg-list
+          (case (if (find-method (car footstep-node-list) :l/r)
+                    (send (car footstep-node-list) :l/r)
+                  (send (car footstep-node-list) :get :l/r))
+            (:rleg :lleg) (:lleg :rleg)))
     (send self :append-support-leg-coords-list
           (send robot (car support-leg-list) :end-coords :copy-worldcoords))
     (send self :append-swing-leg-dst-coords-list
-          (send robot (send (car footstep-node-list) :l/r) :end-coords :copy-worldcoords))
+          (send robot (if (find-method (car footstep-node-list) :l/r)
+                          (send (car footstep-node-list) :l/r)
+                        (send (car footstep-node-list) :get :l/r))
+                :end-coords :copy-worldcoords))
     (send self :append-refzmp-cur-list
           (midpoint 0.5
                     (v+ (send (car support-leg-coords-list) :worldpos)
@@ -1195,7 +1201,11 @@
   (:make-gait-parameter
     ()
     (let ((fs (pop footstep-node-list)))
-      (send self :append-support-leg-list (case (send fs :l/r) (:rleg :lleg) (:lleg :rleg)))
+      (send self :append-support-leg-list
+            (case (if (find-method fs :l/r)
+                      (send fs :l/r)
+                    (send fs :get :l/r))
+              (:rleg :lleg) (:lleg :rleg)))
       (send self :append-support-leg-coords-list (car (last swing-leg-dst-coords-list)))
       (send self :append-swing-leg-dst-coords-list (send fs :worldcoords))
       (send self :append-refzmp-cur-list
