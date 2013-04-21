@@ -999,7 +999,7 @@
                   dt zc
                   :A newA :b newb
                   :c (make-matrix 1 4 (list (list 1.0 0.0 0.0 0.0)))
-                  :q q :r r :delay d))
+                  :q q :r r :delay d :init-xk init-xk))
     (when (null xk*)
       (setq xk* (make-matrix 4 dim))
       (setf (matrix-row xk* 0) (subseq init-xk 0 dim)))
