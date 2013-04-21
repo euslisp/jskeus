@@ -851,7 +851,8 @@
                                (m* ct (scale-matrix Q c)))
                            (m* (m* (m* At P) b) K))))
             (setq diffP (m- P prevP))
-            (when (matrix-eps= diffP zero-matrix (* *epsilon* 0.01))
+            (when ;;(matrix-eps= diffP zero-matrix (* *epsilon* 0.01))
+                (eps-v= (array-entity diffP) (array-entity zero-matrix) (* *epsilon* 0.01))
               (setq A-bKt (transpose (m- A (m* b K))))
               (return-from :solve (list P K)))
           (setq P prevP)
@@ -974,14 +975,31 @@
                                     (list (* 0.5 dt dt))
                                     (list dt)))
           orgc (make-matrix 1 3 (list (list 1.0 0.0 (- (/ zc (elt *g-vec* 2)))))))
-    (send-super :init
-                dt zc
-                :A (concatenate-matrix-column
-                    (concatenate-matrix-row (make-matrix 1 1 (list (list 1.0))) (m* orgc orgA))
-                    (concatenate-matrix-row (make-matrix 3 1 (list (list 0) (list 0) (list 0))) orgA))
-                :b (concatenate-matrix-column (m* orgc orgb) orgb)
-                :c (make-matrix 1 4 (list (list 1.0 0.0 0.0 0.0)))
-                :q q :r r :delay d)
+    (let* ((tmpAc (m* orgc orgA))
+           (newA (make-matrix
+                  (+ 1 (cadr (array-dimensions tmpAc)))
+                  (+ 3 (car (array-dimensions tmpAc)))))
+           (tmpcb (m* orgc orgb))
+           (newb (make-matrix
+                  (+ 1 (car (array-dimensions orgb))) 1)))
+      (setf (aref newA 0 0) 1.0)
+      (dotimes (i (cadr (array-dimensions tmpAc)))
+        (setf (aref newA 0 (+ 1 i)) (aref tmpAc 0 i)))
+      (dotimes (i (car (array-dimensions orgA)))
+        (dotimes (j (cadr (array-dimensions orgA)))
+          (setf (aref newA (+ 1 i) (+ 1 j)) (aref orgA i j))))
+      (setf (aref newb 0 0) (aref tmpcb 0 0))
+      (dotimes (i (car (array-dimensions orgb)))
+        (setf (aref newb (+ 1 i) 0) (aref orgb i 0)))
+      ;; (concatenate-matrix-column
+      ;;  (concatenate-matrix-row (make-matrix 1 1 (list (list 1.0))) (m* orgc orgA))
+      ;;  (concatenate-matrix-row (make-matrix 3 1 (list (list 0) (list 0) (list 0))) orgA))
+      ;; (concatenate-matrix-column (m* orgc orgb) orgb)
+      (send-super :init
+                  dt zc
+                  :A newA :b newb
+                  :c (make-matrix 1 4 (list (list 1.0 0.0 0.0 0.0)))
+                  :q q :r r :delay d))
     (when (null xk*)
       (setq xk* (make-matrix 4 dim))
       (setf (matrix-row xk* 0) (subseq init-xk 0 dim)))

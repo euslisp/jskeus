@@ -430,6 +430,80 @@
              :target-centroid-pos target-centroid-pos
              args)
       )))
+  (:calc-walk-pattern-from-footstep-list
+   (footstep-list
+    &key (default-step-height 50) (dt 0.1) (default-step-time 1.0)
+         (default-zmp-offsets (list (float-vector 0 0 0) (float-vector 0 0 0)))
+         (solve-angle-vector-args) (debug-view nil))
+   (let* ((res) (ret) (tm 0)
+          (gg (instance gait-generator :init self dt)))
+     ;; initial move centroid on foot
+     (send self :move-centroid-on-foot :both '(:rleg :lleg))
+     (send gg :initialize-gait-parameter
+           footstep-list default-step-time (send (car (send self :links)) :get :c-til)
+           :default-step-height default-step-height :default-double-support-ratio 0.2
+           :default-zmp-offsets default-zmp-offsets)
+
+     (while (null (setq ret (send gg :proc-one-tick :type :cycloid :debug t :solve-angle-vector-args solve-angle-vector-args))))
+     (dotimes (i 2) (send self :calc-zmp)) ;; for zmp initialization
+
+     ;; following are in control loop
+     (while (setq ret (send gg :proc-one-tick :type :cycloid :debug t :solve-angle-vector-args solve-angle-vector-args))
+       ;; only for debug view
+       (let ((czmp (send self :calc-zmp
+                         (send self :angle-vector)
+                         (send (car (send self :links)) :copy-worldcoords)
+                         :dt dt :pZMPz (elt (elt ret 5) 2))))
+         (if debug-view
+             (send self :draw-gg-debug-view
+                   (elt ret 4) ;; swc
+                   (elt ret 3) ;; spc
+                   (elt ret 5) ;; rz
+                   (elt ret 6) ;; cog
+                   (elt ret 7) ;; pz
+                   czmp dt))
+         (push
+          (list :angle-vector (send self :angle-vector)
+                :root-link (send self :copy-worldcoords)
+                :czmp czmp :refzmp (elt ret 5) :cog (elt ret 6)
+                :swing-leg-coords (elt ret 4)
+                :support-leg-coords (elt ret 3)
+                :time tm
+                :pz (elt ret 7)
+                )
+          res)
+         (setq tm (+ tm dt))
+         ))
+     (reverse res)
+     ))
+  (:draw-gg-debug-view
+   (swc spc rz cog pz czmp dt)
+   (send *viewer* :draw-objects :flush nil)
+   (labels ((with-modify-color
+             (col func)
+             (let ((pc (send *viewer* :viewsurface :color)))
+               (send *viewer* :viewsurface :color col)
+               (funcall func)
+               (send *viewer* :viewsurface :color pc))))
+     (send spc :draw-on :flush nil :size 300 :color #f(1 0 0))
+     (send swc :draw-on :flush nil :size 300 :color #f(0 1 0))
+     (send rz :draw-on :flush nil :size 300 :color #f(0 0 1))
+     (send czmp :draw-on :flush nil :size 200 :width 5)
+     (with-modify-color
+      #f(1 0 0)
+      #'(lambda () (send *viewer* :viewsurface :string 20 20 "red = support leg")))
+     (with-modify-color
+      #f(0 1 0)
+      #'(lambda () (send *viewer* :viewsurface :string 20 50 "green = swing leg")))
+     (with-modify-color
+      #f(0 0 1)
+      #'(lambda () (send *viewer* :viewsurface :string 20 80 "blue = refzmp")))
+     (with-modify-color
+      #f(1 1 1)
+      #'(lambda () (send *viewer* :viewsurface :string 20 110 "white = calc zmp"))))
+   (send *viewer* :viewsurface :flush)
+   (x::window-main-one)
+   )
   )
 (in-package "GEOMETRY")
 
