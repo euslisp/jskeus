@@ -25,6 +25,7 @@
 (in-package "USER")
 
 (require :irtmodel)
+(require :irtdyna)
 
 (defun make-default-robot-link (len radius axis name &optional extbody)
   (let (bs b0 b1 c a (r/2 (/ radius 2)))
@@ -504,6 +505,105 @@
    (send *viewer* :viewsurface :flush)
    (x::window-main-one)
    )
+  ;; generate footstep parameter
+  ;; currently only default, forward and outside
+  (:gen-footstep-parameter
+   ()
+   (warn ";; generating footstep-parameter...~%")
+   (let ((pav (send self :angle-vector))
+         (pc (send self :copy-worldcoords)))
+     (send self :reset-pose)
+     (send self :fix-leg-to-coords (make-coords) '(:rleg :lleg))
+     (let ((dol (abs (elt (apply #'v- (send self :legs :end-coords :worldpos)) 1))))
+       (labels ((ik-test
+                 (target-coords-func diff-func)
+                 (send self :reset-pose)
+                 (send self :fix-leg-to-coords (make-coords) '(:rleg :lleg))
+                 (let* ((tc (send self :rleg :end-coords :copy-worldcoords))
+                        (init-tc (send tc :copy-worldcoords)))
+                   (while (send self :inverse-kinematics
+                                (funcall target-coords-func tc)
+                                :link-list (send self :link-list (send self :rleg :end-coords :parent))
+                                :move-target (send self :rleg :end-coords) :warnp nil))
+                   (funcall diff-func tc init-tc))))
+         (let ((fol (ik-test #'(lambda (tc) (send tc :translate #f(10 0 0)))
+                             #'(lambda (tc init-tc) (abs (elt (v- (send tc :worldpos) (send init-tc :worldpos)) 0)))))
+               (ool (ik-test #'(lambda (tc) (send tc :translate #f(0 -10 0)))
+                             #'(lambda (tc init-tc) (abs (elt (v- (send tc :worldpos) (send init-tc :worldpos)) 1)))))
+               (frr (ik-test #'(lambda (tc) (send tc :rotate (deg2rad -2.5) :z))
+                             #'(lambda (tc init-tc) (abs (rad2deg (- (caar (send tc :rpy-angle)) (caar (send init-tc :rpy-angle)))))))))
+           (send self :newcoords pc)
+           (send self :angle-vector pav)
+           (warn ";; generating footstep-parameter... done.~%")
+           (send self :put :footstep-parameter
+                 (list :default-half-offset (float-vector 0 (* 0.5 dol) 0)
+                       :forward-offset-length (* fol 0.5)
+                       :outside-offset-length (* ool 0.5)
+                       :rotate-rad (* frr 0.5)))
+           )))
+     ))
+  (:footstep-parameter
+   ()
+   (unless (send self :get :footstep-parameter)
+     (send self :gen-footstep-parameter))
+   (send self :get :footstep-parameter)
+   )
+  ;; simple footstep gen
+  (:go-pos-params->footstep-list
+   (xx yy th ;; [mm] [mm] [deg]
+    &key ((:footstep-parameter prm) (send self :footstep-parameter))
+         ((:default-half-offset defp) (cadr (memq :default-half-offset prm)))
+         ((:forward-offset-length xx-max) (cadr (memq :forward-offset-length prm)))
+         ((:outside-offset-length yy-max) (cadr (memq :outside-offset-length prm)))
+         ((:rotate-rad th-max) (abs (rad2deg (cadr (memq :rotate-rad prm)))))
+         (gen-go-pos-step-node-func
+          #'(lambda
+              (mc leg leg-translate-pos)
+              (let ((cc (send (send mc :copy-worldcoords) :translate
+                              (cadr (assoc leg leg-translate-pos)))))
+                (send cc :put :l/r leg)
+                cc))))
+   (let* ((x-sign (if (> xx 0.0) 1.0 -1.0))
+          (y-sign (if (> yy 0.0) 1.0 -1.0))
+          (th-sign (if (> th 0.0) 1.0 -1.0))
+          (dx 0.0) (dy 0.0) (dth 0.0) (cnt 0)
+          (leg (if (> yy 0.0) :lleg :rleg))
+          (mc (apply #'midcoords 0.5 (send self :legs :end-coords :copy-worldcoords)))
+          ;;(mc (make-coords))
+          (leg-translate-pos
+           (mapcar #'(lambda (l)
+                       (list l (scale (case l (:rleg -1) (:lleg 1)) defp)))
+                   '(:rleg :lleg)))
+          (ret (list (funcall gen-go-pos-step-node-func mc (case leg (:lleg :rleg) (:rleg :lleg)) leg-translate-pos))))
+     (labels ((do-push-steps
+               (max-cnt func)
+               (setq cnt 0)
+               (dotimes (i max-cnt)
+                 (funcall func)
+                 (push (funcall gen-go-pos-step-node-func mc leg leg-translate-pos) ret)
+                 (setq leg (case leg (:lleg :rleg) (:rleg :lleg)))
+                 (incf cnt)
+                 ))
+              (calc-max-count
+               (val val-max)
+               (1+ (round (floor (- (/ (abs val) val-max) 1e-5))))))
+       (do-push-steps (max (calc-max-count xx xx-max)
+                           (calc-max-count yy yy-max)
+                           (calc-max-count th th-max))
+                      #'(lambda ()
+                          (let ((ddx (if (> xx-max (abs (- dx xx))) (- xx dx) (* xx-max x-sign)))
+                                (ddy (cond
+                                      ((oddp cnt) 0.0)
+                                      ((> yy-max (abs (- dy yy))) (- yy dy))
+                                      (t (* yy-max y-sign))))
+                                (ddth (cond
+                                       ((> th-max (abs (- dth th))) (- th dth))
+                                       (t (* th-max th-sign)))))
+                            (send mc :translate (float-vector ddx ddy 0.0))
+                            (send mc :rotate (deg2rad ddth) :z)
+                            (setq dx (+ dx ddx) dy (+ dy ddy) dth (+ dth ddth)))))
+       (push (funcall gen-go-pos-step-node-func mc leg leg-translate-pos) ret)
+       (reverse ret))))
   )
 (in-package "GEOMETRY")
 
