@@ -578,7 +578,7 @@
    (send-super* :init args)
    self)
   (:filename (&optional nm) (if nm (setq filename nm)) filename)
-  (:clear-display-id ()) ;;; not implemented yet
+  (:clear-display-id () (setf (get self :GL-DISPLAYLIST-ID) nil))
   ;; (:check-normal ())
   ;; (:update ()) ;; call update when updating coordinates
   (:actual-vertices ()
@@ -720,6 +720,10 @@
      (setq mesh-list (append mesh-list ret))
      (send self :calc-bounding-box)
      self))
+  (:draw-on
+   (&key ((:viewer vwer) *viewer*))
+   ;; not implemented yet
+   )
   (:draw (vwr &rest args)
    (let* (newlis
           (mat (send (send self :worldcoords) :4x4))
