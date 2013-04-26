@@ -7,6 +7,7 @@
 (load "hand-grasp-ik.l")
 (load "dual-manip-ik.l")
 (load "crank-motion.l")
+(load "walk-motion.l")
 (load "hanoi-arm.l")
 (load "particle.l")
 
