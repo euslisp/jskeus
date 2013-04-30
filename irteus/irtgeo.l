@@ -522,69 +522,7 @@
                           0 (* pipe-radius (sin (* i dtheta))))
             v-list))
     (apply #'make-torus v-list :segments segments args)))
-;; over write geo/primt.l
-(defun make-cube (xsize ysize zsize &rest args &key (name) (color) (origin-coords) &allow-other-keys)
-"MAKE-CUBE x y z &key color name coords"
-   (setq xsize (float xsize) ysize (float ysize) zsize (float zsize))
-   (let ((xsize/2 %(xsize / 2.0))
-         (ysize/2 %(ysize / 2.0))
-         (zsize/2 %(- zsize / 2.0))
-         v1 v2 v3 v4 b)
-      (setq v1 (float-vector xsize/2 ysize/2 zsize/2)
-            v2 (float-vector xsize/2 (- ysize/2)  zsize/2)
-            v3 (float-vector (- xsize/2) (- ysize/2) zsize/2)
-            v4 (float-vector (- xsize/2) ysize/2 zsize/2))
-      (cond
-       (origin-coords
-        (let ((vlst (mapcar #'(lambda (v) (send origin-coords :transform-vector v)) (list v1 v2 v3 v4)))
-              (zvec (send origin-coords :rotate-vector (float-vector 0 0 1))))
-          (scale zsize zvec zvec)
-          (setq b (apply #'make-prism vlst zvec
-                         :name name :color color
-                         :primitive (list ':cube xsize ysize zsize)
-                         args))))
-       (t
-        (setq b (apply #'make-prism (list v1 v2 v3 v4) zsize
-                       :name name :color color
-                       :primitive (list ':cube xsize ysize zsize)
-                       args))))
-      (dolist (f (send b :get-face nil :side))
-        (send f :id (append (send f :id) (list  (nth (nth 1 (send f :id))
-                                                     '(:-x :-y :x :y))))))
-      b))
-;; over write geo/primt.l
-(defun make-cylinder (radius height &rest args
-                             &key (segments 24) (circumscribed nil) (origin-coords)
-                             &allow-other-keys)
-"MAKE-CYLINDER radius height (:segments 12) (:circumscribed nil) (origin-coords) :color :name"
-   (setq radius (float radius) height (float height))
-   (let* ((theta (/ 2pi segments))
-          (radius (if circumscribed (/ radius (cos (/ theta 2.0))) radius))
-          (p (float-vector radius 0 0))
-          (base (list p))
-          cyl)
-     (dotimes (i (1- segments))
-       (push (rotate-vector (car base) theta :z) base))
-     (when origin-coords
-       (setq base
-             (mapcar #'(lambda (pp) (send origin-coords :transform-vector pp)) base))
-       (setq height
-             (send origin-coords :rotate-vector (float-vector 0 0 height))))
-     (setq cyl
-           (apply #'make-prism base height
-                  :primitive  (list ':cylinder radius height segments)
-                  args))
-     (cond
-      (origin-coords
-       (setf (get cyl :center-axis) (make-line (send origin-coords :worldpos)
-                                               (v+ (send origin-coords :worldpos) height))))
-      (t (setf (get cyl :center-axis) (make-line (float-vector 0 0 0)
-                                                 (float-vector 0 0 height)))))
-     cyl))
-(defun make-cube-from-bounding-box (bbox &rest args &key (origin))
-  (let ((cds (make-coords :pos (send bbox :center)))
-        (dsize (send bbox :diagonal)))
-    (apply #'make-cube (elt dsize 0) (elt dsize 1) (elt dsize 2) :origin-coords (when origin cds) args)))
+
 ;;
 ;; accessor to primitive bodies
 ;;
