@@ -231,21 +231,46 @@
   ;; override inverse-kinematics methods for look-at method
   (:inverse-kinematics
    (target-coords &rest args &key look-at-target &allow-other-keys)
+   "(target-coords &rest args &key look-at-target &allow-other-keys)
+    look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords"
    (if (atom target-coords) (setq target-coords (list target-coords)))
    (prog1
        (send-super* :inverse-kinematics target-coords args)
-     (if look-at-target
-         (send self :head :look-at (send (car target-coords) :worldpos)))))
+     (send self :look-at-target look-at-target :target-coords target-coords)
+     ))
   (:inverse-kinematics-loop
    (dif-pos dif-rot &rest args
             &key target-coords debug-view look-at-target
             &allow-other-keys)
+   "(dif-pos dif-rot &rest args
+            &key target-coords debug-view look-at-target
+            &allow-other-keys)
+    look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords"
    (if (atom target-coords) (setq target-coords (list target-coords)))
    (prog1
        (send-super* :inverse-kinematics-loop dif-pos dif-rot
                     :target-coords target-coords args)
-     (if (and debug-view look-at-target)
-         (send self :head :look-at (send (car target-coords) :worldpos)))))
+     (if debug-view (send self :look-at-target look-at-target :target-coords target-coords))
+     ))
+  ;; look-at-target supports -> t, nil, float-vector, coords, list of float-vector, list of coords
+  (:look-at-target
+   (look-at-target &key (target-coords))
+   (cond
+    ((float-vector-p look-at-target)
+     (send self :head :look-at look-at-target))
+    ((coordinates-p look-at-target)
+     (send self :head :look-at (send look-at-target :worldpos)))
+    ((and (consp look-at-target)
+          (every #'identity (mapcar #'float-vector-p look-at-target)))
+     (send self :head :look-at
+           (scale (/ 1.0 (length look-at-target)) (reduce #'v+ look-at-target :initial-value #f(0 0 0)))))
+    ((and (consp look-at-target)
+          (every #'identity (mapcar #'coordinates-p look-at-target)))
+     (send self :head :look-at
+           (scale (/ 1.0 (length look-at-target)) (reduce #'v+ (send-all look-at-target :worldpos) :initial-value #f(0 0 0)))))
+    ((null look-at-target))
+    (t (send self :head :look-at (send (car target-coords) :worldpos)))
+    ))
   (:torque-vector
    (&key (force-list) (moment-list) (target-coords)
          (debug-view nil)
