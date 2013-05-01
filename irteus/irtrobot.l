@@ -238,25 +238,57 @@
                   (t (list l/r))))))
   ;; override inverse-kinematics methods for look-at method
   (:inverse-kinematics
-   (target-coords &rest args &key look-at-target &allow-other-keys)
-   "(target-coords &rest args &key look-at-target &allow-other-keys)
-    look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords"
+   (target-coords
+    &rest args
+    &key look-at-target
+         (move-target)
+         (link-list
+          (if (atom move-target)
+              (send self :link-list (send move-target :parent))
+            (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target)))
+    &allow-other-keys)
+   "(target-coords
+    &rest args
+    &key look-at-target
+         (move-target)
+         (link-list
+          (if (atom move-target)
+              (send self :link-list (send move-target :parent))
+            (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target)))
+    &allow-other-keys)
+    look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords
+    link-list is set by default based on move-target -> root link link-list"
    (if (atom target-coords) (setq target-coords (list target-coords)))
    (prog1
-       (send-super* :inverse-kinematics target-coords args)
+       (send-super* :inverse-kinematics target-coords
+                    :move-target move-target :link-list link-list args)
      (send self :look-at-target look-at-target :target-coords target-coords)
      ))
   (:inverse-kinematics-loop
-   (dif-pos dif-rot &rest args
-            &key target-coords debug-view look-at-target
-            &allow-other-keys)
-   "(dif-pos dif-rot &rest args
-            &key target-coords debug-view look-at-target
-            &allow-other-keys)
-    look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords"
+   (dif-pos dif-rot
+    &rest args
+    &key target-coords debug-view look-at-target
+         (move-target)
+         (link-list
+          (if (atom move-target)
+              (send self :link-list (send move-target :parent))
+            (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target)))
+         &allow-other-keys)
+   "(dif-pos dif-rot
+    &rest args
+    &key target-coords debug-view look-at-target
+         (move-target)
+         (link-list
+          (if (atom move-target)
+              (send self :link-list (send move-target :parent))
+            (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target)))
+         &allow-other-keys)
+    look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords
+    link-list is set by default based on move-target -> root link link-list"
    (if (atom target-coords) (setq target-coords (list target-coords)))
    (prog1
        (send-super* :inverse-kinematics-loop dif-pos dif-rot
+                    :link-list link-list :move-target move-target
                     :target-coords target-coords args)
      (if debug-view (send self :look-at-target look-at-target :target-coords target-coords))
      ))
