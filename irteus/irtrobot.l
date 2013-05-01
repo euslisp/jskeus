@@ -227,7 +227,15 @@
 	 (unless args (setq args (list nil))) (send* self :limb :torso args))
   (:arms (&rest args) (list (send* self :larm args) (send* self :rarm args)))
   (:legs (&rest args) (list (send* self :lleg args) (send* self :rleg args)))
-  (:look-at-hand (l/r) (send self :head :look-at (send self l/r :end-coords :worldpos)))
+  (:look-at-hand
+   (l/r)
+   "(l/r) ;; l/r supports :rarm, :larm, :arms, and '(:rarm :larm) ;; "
+   (send self :look-at-target
+         (mapcar #'(lambda (x) (send self x :end-coords))
+                 (cond
+                  ((consp l/r) l/r)
+                  ((eq l/r :arms) '(:rarm :larm))
+                  (t (list l/r))))))
   ;; override inverse-kinematics methods for look-at method
   (:inverse-kinematics
    (target-coords &rest args &key look-at-target &allow-other-keys)
