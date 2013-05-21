@@ -132,50 +132,7 @@
 	      (pos (pop args)) (wrt (pop args)))
 	  (unless wrt (setq wrt :local))
 	  (send* self limb :move-end (send coords :translate pos wrt) args)))
-       (:look-at
-	(let* ((move-target
-                (if (memq :move-target args)
-                    (cadr (memq :move-target args))
-                  (send self limb :end-coords)))
-               (link-list (if (memq :link-list args)
-                              (cadr (memq :link-list args))
-                            (send self :link-list
-                                  (send move-target :parent)
-                                  (send self limb :root-link))))
-               (stop (if (memq :stop args) (cadr (memq :stop args)) 100))
-               (warnp (if (memq :warnp args) (cadr (memq :warnp args)) t))
-               dif-pos dif-rot p-dif-rot (count 0))
-	  (while (and (< (incf count) stop)
-		      (if p-dif-rot (> (norm (v- p-dif-rot dif-rot)) 1e-3) t))
-	    (let* ((target-coords
-                    (orient-coords-to-axis ;; orient target-coords to look-at direction
-                     (make-coords :pos (car args))
-                     (v- (car args) (send move-target :worldpos)))))
-              (setq p-dif-rot dif-rot
-                    dif-pos (send move-target :difference-position target-coords :translation-axis nil)
-                    dif-rot (send move-target :difference-rotation target-coords :rotation-axis :z))
-              (send self :inverse-kinematics-loop dif-pos dif-rot
-                    :move-target move-target
-                    :collision-avoidance-link-pair nil
-                    :rotation-axis :z
-                    :translation-axis nil
-                    :link-list link-list
-                    :loop count :stop stop ;;:thre nil
-                    :target-coords target-coords ;; for debug-view
-                    :debug-view (cadr (memq :debug-view args))))
-            )
-	  (if (and p-dif-rot (<= (norm (v- p-dif-rot dif-rot)) 1e-3))
-	      (send self :angle-vector)
-	    (when warnp
-	      (warn ";; :look-at failed.~%")
-	      (warn ";;     count : ~a~%" count)
-	      (when p-dif-rot
-		(warn ";; p-dif-rot : ~a/(~a)~%" p-dif-rot (norm p-dif-rot))
-		(warn ";;   dif-rot : ~a/(~a)~%" dif-rot (norm dif-rot))
-		(warn ";;      diff : ~a < ~A~%" (norm (v- p-dif-rot dif-rot)) 1e-3)
-		))
-	    nil)
-	  ))
+       (:look-at (send* self :inverse-kinematics-loop-for-look-at limb args))
        (:collision-avoidance-links
 	 (user::forward-message-to
 	   (cdr (assoc (intern (format nil "~A-COLLISION-AVOIDANCE-LINKS"
@@ -200,6 +157,51 @@
 	    ))))
        ) ;; case method
      )) ;; defmethod
+  (:inverse-kinematics-loop-for-look-at
+   (limb &rest args)
+   (let* ((move-target
+           (if (memq :move-target args)
+               (cadr (memq :move-target args))
+             (send self limb :end-coords)))
+          (link-list (if (memq :link-list args)
+                         (cadr (memq :link-list args))
+                       (send self :link-list
+                             (send move-target :parent)
+                             (send self limb :root-link))))
+          (stop (if (memq :stop args) (cadr (memq :stop args)) 100))
+          (warnp (if (memq :warnp args) (cadr (memq :warnp args)) t))
+          dif-pos dif-rot p-dif-rot (count 0))
+     (while (and (< (incf count) stop)
+                 (if p-dif-rot (> (norm (v- p-dif-rot dif-rot)) 1e-3) t))
+       (let* ((target-coords
+               (orient-coords-to-axis ;; orient target-coords to look-at direction
+                (make-coords :pos (car args))
+                (v- (car args) (send move-target :worldpos)))))
+         (setq p-dif-rot dif-rot
+               dif-pos (send move-target :difference-position target-coords :translation-axis nil)
+               dif-rot (send move-target :difference-rotation target-coords :rotation-axis :z))
+         (send self :inverse-kinematics-loop dif-pos dif-rot
+               :move-target move-target
+               :collision-avoidance-link-pair nil
+               :rotation-axis :z
+               :translation-axis nil
+               :link-list link-list
+               :loop count :stop stop ;;:thre nil
+               :target-coords target-coords ;; for debug-view
+               :debug-view (cadr (memq :debug-view args))))
+       )
+     (if (and p-dif-rot (<= (norm (v- p-dif-rot dif-rot)) 1e-3))
+         (send self :angle-vector)
+       (when warnp
+         (warn ";; :look-at failed.~%")
+         (warn ";;     count : ~a~%" count)
+         (when p-dif-rot
+           (warn ";; p-dif-rot : ~a/(~a)~%" p-dif-rot (norm p-dif-rot))
+           (warn ";;   dif-rot : ~a/(~a)~%" dif-rot (norm dif-rot))
+           (warn ";;      diff : ~a < ~A~%" (norm (v- p-dif-rot dif-rot)) 1e-3)
+           ))
+       nil)
+     ))
   (:gripper
    (limb &rest args)
    (cond
