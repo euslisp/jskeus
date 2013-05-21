@@ -132,7 +132,8 @@
 	      (pos (pop args)) (wrt (pop args)))
 	  (unless wrt (setq wrt :local))
 	  (send* self limb :move-end (send coords :translate pos wrt) args)))
-       (:look-at (send* self :inverse-kinematics-loop-for-look-at limb args))
+       (:look-at
+        (if (send self :head :links) (send* self :inverse-kinematics-loop-for-look-at limb args)))
        (:collision-avoidance-links
 	 (user::forward-message-to
 	   (cdr (assoc (intern (format nil "~A-COLLISION-AVOIDANCE-LINKS"
