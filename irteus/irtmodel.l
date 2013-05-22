@@ -156,7 +156,6 @@
    (let ()
      (when v
        (if relative (setq v (+ v joint-angle)))
-       (print (list max-angle v))
        (cond ((and (eq max-angle *inf*) (>= v 270.0))
 	      (setq v (mod v 360))
 	      (if (> v 270.0) (setq v (- v 360.0))))
