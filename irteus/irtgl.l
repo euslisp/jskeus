@@ -214,7 +214,7 @@
 ;; re-definition
 ;;  
 (defun draw-glbody (vwr abody)
-  (let* (glcon
+  (let* ((glcon ((send vwr :viewsurface) . glcon))
 	 (lis (cdr (assq glcon (get abody :GL-DISPLAYLIST-ID))))
 	 (hid (cdr (assq glcon (get abody :gl-hiddenline))))
 	 (col (get abody :face-color)))
