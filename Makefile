@@ -56,7 +56,7 @@ eus:
 
 rm-lib-dir:
 	# remove unsupported directories
-	@if [ -e eus/lib/clib -o -e eus/lib/demo -o -e eus/lib/bitmaps ]; then\
+	@if [ -e eus/lib/clib/.svn -o -e eus/lib/demo/.svn -o -e eus/lib/bitmaps/.svn ]; then\
 		svn up -q --set-depth files eus/lib/; \
 		svn up -q eus/lib/llib; \
 	fi
