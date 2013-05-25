@@ -891,8 +891,12 @@
              (when tp
                (cond
                 (indices
+#+:x86_64
                  (glDrawElements tp (length indices) GL_UNSIGNED_INT
-                                 (user::lvector2integer-bytestring indices)))
+                                 (user::lvector2integer-bytestring indices))
+#-:x86_64
+                 (glDrawElements tp (length indices) GL_UNSIGNED_INT indices)
+                 )
                 (t
                  (glDrawArrays tp 0 (array-dimension vertices 0)))
                 )))
