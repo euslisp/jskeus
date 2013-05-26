@@ -59,6 +59,8 @@ rm-lib-dir:
 	@if [ -e eus/lib/clib/.svn -o -e eus/lib/demo/.svn -o -e eus/lib/bitmaps/.svn ]; then\
 		svn up -q --set-depth files eus/lib/; \
 		svn up -q eus/lib/llib; \
+	else \
+		rm -fr eus/lib/clib eus/lib/demo eus/lib/bitmaps; \
 	fi
 
 eus-installed: eus rm-lib-dir
