@@ -140,7 +140,7 @@ $(BINS):
 	ln -sf eus$(ESFX) $(BINDIR)/irteus$(ESFX)
 	ln -sf eusgl$(ESFX) $(BINDIR)/irteusgl$(ESFX)
 $(EUSDIR)/irteus:
-	ln -sf `pwd` $(EUSDIR)/irteus
+	ln -sf ../irteus $(EUSDIR)/irteus
 
 install-irtext.l: $(EUSDIR)/lib/irtext.l
 $(EUSDIR)/lib/irtext.l: irtext.l
