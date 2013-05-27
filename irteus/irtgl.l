@@ -599,7 +599,7 @@
   (:reset-offset-from-parent ()
    (let ((cds (send self :copy-coords)))
      (send self :set-offset cds)
-     (send self :rest-coords))
+     (send self :reset-coords))
    self)
   (:expand-vertices ()
    (dolist (minfo mesh-list)
@@ -680,6 +680,7 @@
            (:quads     (setq mesh-size 4))
            (t (warn ";; not supported mesh type -> ~A" tp)
               (return-from :convert-to-faces)))
+         ;; convert from self coords
          (cond
           (idces
            (do ((i 0 (+ i 1))
@@ -713,8 +714,11 @@
      (nreverse ret)))
   (:faces () (flatten (send self :convert-to-faces)))
   (:convert-to-faceset (&rest args)
-   (instance faceset :init :faces
-             (flatten (send* self :convert-to-faces args))))
+   (let ((fs
+          (instance faceset :init :faces
+                    (flatten (send* self :convert-to-faces args)))))
+     (send fs :transform (send self :worldcoords))
+     fs))
   (:set-offset (cds) ;; not checked
    (let* ((zero (float-vector 0 0 0))
           (wpos (send cds :worldpos))
@@ -722,10 +726,10 @@
      (dolist (minfo mesh-list)
        (let ((vmat (cadr (assoc :vertices minfo)))
              (nmat (cadr (assoc :normals minfo))))
-         (c-coords-transform-vector
+         (user::c-coords-transform-vector
           wpos wrot vmat vmat)
          (when nmat
-           (c-coords-transform-vector
+           (user::c-coords-transform-vector
             zero wrot nmat nmat))))
      self))
   (:devide-glvertices ()) ;; not implemented yet
