@@ -7,6 +7,8 @@ EUSC_PATCH=eus.c_CUSTUM_EUSDIR.patch
 
 MACHINE=$(shell uname -m)
 OS=$(shell uname -s | sed 's/[^A-Za-z1-9].*//')
+$(info "-- MACHINE = ${MACHINE}")
+$(info "--      OS = ${OS}")
 ifeq ($(OS),Linux)
  ifeq ($(MACHINE),x86_64)
   export ARCHDIR=Linux64
