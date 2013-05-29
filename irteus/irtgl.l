@@ -88,19 +88,15 @@
    ((numberp dllst)
     (gldeletelists dllst 1))
    (t
-    (let ((glcon_drawable_pair
-           (mapcar #'(lambda (v)
-                       (cons (v . glcon)(v . x::drawable)))
-                   (send-all user::*viewers* :viewsurface))))
-      (dolist (alist dllst)
-        (cond
-         ((assq (car alist) glcon_drawable_pair)
-          (gl::glxMakeCurrent x::*display* (cdr (assq (car alist) glcon_drawable_pair)) (car alist))
-          (if (= 1 (glislist (cdr alist)))
-              (gldeletelists (cdr alist) 1)
-            (error "")))
-         (t  (error "")))
-        )))
+    (dolist (alist dllst)
+      (let ((v (find (car alist) user::*viewers* :key #'(lambda (x) ((send x :viewsurface) . glcon)))))
+        (if v
+            (progn
+              (send v :viewsurface :makecurrent)
+              (cond ((glIsList (cdr alist))
+                     (glDeleteLists (cdr alist) 1))
+                    (t (error "~A is not display list" alist))))
+          (error "could not find viewers for ~A" alist))))) ;; t
    ))
 
 (unless (assoc :color-org (send glviewsurface :methods))
