@@ -83,6 +83,26 @@
         (integer-vector glx_rgba glx_red_size 1 glx_green_size 1
                         glx_blue_size 1 glx_doublebuffer glx_depth_size 1 0)))
 
+(defun delete-displaylist-id (dllst)
+  (cond
+   ((numberp dllst)
+    (gldeletelists dllst 1))
+   (t
+    (let ((glcon_drawable_pair
+           (mapcar #'(lambda (v)
+                       (cons (v . glcon)(v . x::drawable)))
+                   (send-all user::*viewers* :viewsurface))))
+      (dolist (alist dllst)
+        (cond
+         ((assq (car alist) glcon_drawable_pair)
+          (gl::glxMakeCurrent x::*display* (cdr (assq (car alist) glcon_drawable_pair)) (car alist))
+          (if (= 1 (glislist (cdr alist)))
+              (gldeletelists (cdr alist) 1)
+            (error "")))
+         (t  (error "")))
+        )))
+   ))
+
 (unless (assoc :color-org (send glviewsurface :methods))
   (rplaca (assoc :color (send glviewsurface :methods)) :color-org))
 (defmethod glviewsurface
@@ -415,6 +435,7 @@
 	    (concatenate float-vector fc #f(0))))
       (setf (elt fc 3) param)
       (setf (get abody :face-color) fc)
+      (delete-displaylist-id (get abody :GL-DISPLAYLIST-ID))
       (setf (get abody :GL-DISPLAYLIST-ID) nil)
       fc)))
 
@@ -453,6 +474,7 @@
 (defmethod faceset
   (:set-color
    (color)
+   (delete-displaylist-id (get self :GL-DISPLAYLIST-ID))
    (setf (get self :GL-DISPLAYLIST-ID) nil)
    (setf (get self :face-color) (gl::find-color color)))
   (:draw-on
@@ -500,6 +522,7 @@
          (setf (get self :gl-textureimage)
                (append (get self :gl-textureimage) (list img))))
      (setf (get aface :gl-texturecoords) (make-hash-table :test #'equal))
+     (delete-displaylist-id (get self :GL-DISPLAYLIST-ID))
      (setf (get self :GL-DISPLAYLIST-ID) nil)
      ;;
      (dolist (e (send aface :edges))
@@ -578,7 +601,9 @@
    (send-super* :init args)
    self)
   (:filename (&optional nm) (if nm (setq filename nm)) filename)
-  (:clear-display-id () (setf (get self :GL-DISPLAYLIST-ID) nil))
+  (:clear-display-id ()
+   (delete-displaylist-id (get self :GL-DISPLAYLIST-ID))
+   (setf (get self :GL-DISPLAYLIST-ID) nil))
   ;; (:check-normal ())
   ;; (:update ()) ;; call update when updating coordinates
   (:actual-vertices ()
