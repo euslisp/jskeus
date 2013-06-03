@@ -487,6 +487,25 @@
         (fix-limbs-target-coords
          (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) fix-limbs))
         &allow-other-keys)
+   "(leg fix-limbs
+        &rest args
+        &key (thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) 1 5)) fix-limbs))
+        (rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) 1 5))) fix-limbs))
+        (mid 0.5)
+        (target-centroid-pos
+         (if (eq leg :both)
+             (apply
+              #'midpoint mid
+              (mapcar
+               #'(lambda (tmp-leg)
+                   (send self tmp-leg :end-coords :worldpos))
+               (remove-if-not #'(lambda (x) (memq x '(:rleg :lleg))) fix-limbs)))
+           (send self leg :end-coords :worldpos)))
+        (fix-limbs-target-coords
+         (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) fix-limbs))
+        &allow-other-keys)
+    leg -> legs for target of robot's centroid. :both, :rleg, and :lleg are supported.
+    fix-limbs -> limb names which are fixed in this IK."
    (with-move-target-link-list
     (mt ll self fix-limbs)
     (let* ((root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5))) ;; use only translation x, y and rotation z
