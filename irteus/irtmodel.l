@@ -1178,6 +1178,7 @@
     (periodic-time 0.05)         ;; sec
     (joint-args)
     (debug-view nil)
+    (move-joints-hook)
     &allow-other-keys)
    (let (dav dtheta j)
      (if (and debug-view (atom debug-view)) (setq debug-view (list debug-view)))
@@ -1204,6 +1205,7 @@
 	 (1 (setq dtheta (send j :speed-to-angle (elt dav i))))
 	 (t (setq dtheta (send j :speed-to-angle (subseq dav i (+ i (send j :joint-dof)))))))
        (send* (elt union-link-list l) :joint :joint-angle dtheta :relative t joint-args))
+     (if move-joints-hook (funcall move-joints-hook))
      t))
   (:find-joint-angle-limit-weight-old-from-union-link-list
     (union-link-list)
