@@ -597,9 +597,12 @@
    (send-super* :init args)
    self)
   (:filename (&optional nm) (if nm (setq filename nm)) filename)
-  (:clear-display-id ()
+  (:set-color (color)
    (delete-displaylist-id (get self :GL-DISPLAYLIST-ID))
-   (setf (get self :GL-DISPLAYLIST-ID) nil))
+   (setf (get self :GL-DISPLAYLIST-ID) nil)
+   (if color
+       (setf (get self :face-color) (gl::find-color color))
+     (setf (get self :face-color) nil)))
   ;; (:check-normal ())
   ;; (:update ()) ;; call update when updating coordinates
   (:actual-vertices ()
@@ -781,6 +784,7 @@
    (let* (newlis
           (mat (send (send self :worldcoords) :4x4))
           (stransparent (get self :transparent))
+          fcol
 #+:jsk
           (glcon (cdr (assq (sys:thread-self) ((send vwr :viewsurface) . glcon))))
 #-:jsk
@@ -796,13 +800,15 @@
       ((setq newlis (cdr (assq glcon (get self :GL-DISPLAYLIST-ID))))
        (glCallList newlis))
       (t
+       ;; search face color
+       (setq fcol (get self :face-color))
+       (when (and fcol (not (vectorp fcol)))
+         ;;(warn "draw-body: body ~A face-color ~A~%" abody col)
+         (setq fcol (find-color fcol))
+         (setf (get self :face-color) fcol))
+
        (setq newlis (glgenlists 1))
        (glnewlist newlis gl_compile)
-
-       (glMaterialfv GL_FRONT_AND_BACK GL_AMBIENT (float-vector 0.1 0.1 0.1 0.1))
-       (glMaterialfv GL_FRONT_AND_BACK GL_DIFFUSE (float-vector 1 1 1 1))
-       (glMaterialfv GL_FRONT_AND_BACK GL_SPECULAR (float-vector 0.2 0.2 0.2 0.1))
-       (glMaterialfv GL_FRONT_AND_BACK GL_EMISSION (float-vector 0.1 0.1 0.1 0.1))
 
        (when stransparent
          (glDepthMask GL_FALSE)
@@ -817,7 +823,17 @@
                (indices (cadr (assoc :indices minfo)))
                (texcoords (cadr (assoc :texcoords minfo)))
                teximg)
-           (when material-info
+           (cond
+            (fcol ;; use :face-color
+             (glColor3fv fcol)
+             (glMaterialfv GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE
+                           (if stransparent
+                               (concatenate float-vector fcol (float-vector stransparent))
+                             fcol))
+             ;;(glMaterialfv GL_FRONT_AND_BACK GL_SPECULAR (float-vector 0.2 0.2 0.2 0.1))
+             ;;(glMaterialfv GL_FRONT_AND_BACK GL_EMISSION (float-vector 0.1 0.1 0.1 0.1))
+             )
+            (material-info
              (let (;;(fnm   (cadr (assoc :filename material-info)))
                    (col   (cadr (assoc :color material-info)))
                    (amb   (cadr (assoc :ambient material-info)))
@@ -889,6 +905,12 @@
                    (glEnable GL_TEXTURE_2D)
                    ))
                ))
+            (t ;; default color
+             (glMaterialfv GL_FRONT_AND_BACK GL_AMBIENT (float-vector 0.1 0.1 0.1 0.1))
+             (glMaterialfv GL_FRONT_AND_BACK GL_DIFFUSE (float-vector 1 1 1 1))
+             (glMaterialfv GL_FRONT_AND_BACK GL_SPECULAR (float-vector 0.2 0.2 0.2 0.1))
+             (glMaterialfv GL_FRONT_AND_BACK GL_EMISSION (float-vector 0.1 0.1 0.1 0.1)))
+            ) ;; /cond
            (unless (and teximg texcoords) (setq texcoords nil))
            ;;
            (glEnableClientState GL_VERTEX_ARRAY)
