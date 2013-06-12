@@ -115,7 +115,7 @@
          (mapcar #'(lambda (act ref)
                      (send act :draw-on :flush nil :size 100)
                      (send ref :draw-on :flush nil :color #f(1 0 0)))
-                 (append (list (let ((ac (send (car (send *robot* :links)) :get :c-til)))
+                 (append (list (let ((ac (send *robot* :centroid)))
                                  (setf (elt ac 2) 0) ac))
                          (send-all move-target :worldpos))
                  (append (list cog-target-pos) target-coords))
