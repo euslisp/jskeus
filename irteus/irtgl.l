@@ -469,10 +469,17 @@
 
 (defmethod faceset
   (:set-color
-   (color)
+   (color &optional (transparent))
    (delete-displaylist-id (get self :GL-DISPLAYLIST-ID))
    (setf (get self :GL-DISPLAYLIST-ID) nil)
-   (setf (get self :face-color) (gl::find-color color)))
+   (cond
+    (transparent
+     (let ((col (gl::find-color color)))
+       (setq col (concatenate float-vector col (float-vector transparent)))
+       (setf (get self :face-color) col)))
+    (t
+     (setf (get self :face-color) (gl::find-color color)))
+    ))
   (:draw-on
    (&key ((:viewer vwer) *viewer*)
          flush (width 1) (color #f(1 1 1)))
@@ -597,9 +604,10 @@
    (send-super* :init args)
    self)
   (:filename (&optional nm) (if nm (setq filename nm)) filename)
-  (:set-color (color)
+  (:set-color (color &optional (transparent))
    (delete-displaylist-id (get self :GL-DISPLAYLIST-ID))
    (setf (get self :GL-DISPLAYLIST-ID) nil)
+   (setf (get self :transparent) transparent)
    (if color
        (setf (get self :face-color) (gl::find-color color))
      (setf (get self :face-color) nil)))
