@@ -400,6 +400,8 @@
    (send self :points (send pc :points))
    (send self :colors (send pc :colors))
    (send self :normals (send pc :normals))
+   (setq height (send pc :height))
+   (setq width (send pc :width))
    (send self :reset-coords)
    (send self :transform (send pc :worldcoords))
    (setq view-coords (send (pc . view-coords) :copy-worldcoords))
@@ -426,11 +428,11 @@
           mat mat)))
      ret))
   (:convert-to-world (&key (create))
-   (prog1
-       (send self :transform-points (send self :worldcoords) :create create)
-     (unless create
-       (send self :reset-coords)
-       (send self :worldcoords))))
+   (let ((ret
+          (send self :transform-points (send self :worldcoords) :create create)))
+     (send ret :reset-coords)
+     (send self :worldcoords)
+     ret))
   ;; (:add-normal ())
   (:drawnormalmode (&optional mode)
    (case mode
