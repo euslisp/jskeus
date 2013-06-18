@@ -304,6 +304,7 @@
          (if new-col (setq carray new-col))
          (if new-nom (setq narray new-nom))
          (if new-cvt (setq curvature new-cvt))
+         (send self :size-change)
          self)
        )))
   (:filtered-indices
