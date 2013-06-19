@@ -265,7 +265,7 @@
            (c-matrix-row narray i n)
            (c-matrix-row new-nom cntr n t))
          (when curvature
-           (setf (elt new-cvt i) (elt curvature i)))
+           (setf (elt new-cvt cntr) (elt curvature i)))
          (incf cntr)))
       (t ;; vector
        (let (i)
@@ -288,7 +288,7 @@
              (c-matrix-row narray i n)
              (c-matrix-row new-nom cntr n t))
            (when curvature
-             (setf (elt new-cvt i) (elt curvature i)))
+             (setf (elt new-cvt cntr) (elt curvature i)))
            (incf cntr)))))
      (if create
          (let ((ret (instance pointcloud :init
