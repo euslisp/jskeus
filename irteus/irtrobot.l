@@ -595,7 +595,7 @@
   ;; generate footstep parameter
   ;; currently only default, forward and outside
   (:gen-footstep-parameter
-   ()
+   (&key (ratio 1.0))
    (warn ";; generating footstep-parameter...~%")
    (let ((pav (send self :angle-vector))
          (pc (send self :copy-worldcoords)))
@@ -624,9 +624,9 @@
            (warn ";; generating footstep-parameter... done.~%")
            (send self :put :footstep-parameter
                  (list :default-half-offset (float-vector 0 (* 0.5 dol) 0)
-                       :forward-offset-length (* fol 0.5)
-                       :outside-offset-length (* ool 0.5)
-                       :rotate-rad (* frr 0.5)))
+                       :forward-offset-length (* fol 0.5 ratio)
+                       :outside-offset-length (* ool 0.5 ratio)
+                       :rotate-rad (* frr 0.5 ratio)))
            )))
      ))
   (:footstep-parameter
