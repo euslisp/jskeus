@@ -1323,7 +1323,7 @@
   ;; solve-angle-vector methods
   (:solve-av-by-move-centroid-on-foot
    (support-leg support-leg-coords swing-leg-coords cog robot
-   &rest args &key (cog-gain 2) (stop 100) &allow-other-keys)
+   &rest args &key (cog-gain 3.5) (stop 100) &allow-other-keys)
    (let ((legs (list (case support-leg (:lleg :rleg) (:rleg :lleg)) support-leg)))
      (send* robot :move-centroid-on-foot
             :both legs :target-centroid-pos cog
