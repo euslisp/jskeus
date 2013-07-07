@@ -1,6 +1,6 @@
 (load "sample-robot-model.l")
 
-(defun tmp-walk-motion
+(defun walk-motion
   (robot)
   "walking motion using preview-control, gait-generator, and fullbody ik"
   (let* ((is-small-robot
@@ -40,12 +40,12 @@
         :default-step-height default-step-height)
   ))
 
-(defun walk-motion ()
+(defun walk-motion-for-sample-robot ()
   (unless (boundp '*robot*)
     (setq *robot* (instance sample-robot :init)))
-  (tmp-walk-motion *robot*))
+  (walk-motion *robot*))
 
-(warn "(walk-motion) for walking motion~%")
+(warn "(walk-motion-for-sample-robot) for walking motion~%")
 
 (defun walk-motion-for-robots ()
   (unless (boundp '*robots*)
@@ -56,6 +56,6 @@
                   '(h7 h6 kaz3))))
   (dolist (rb *robots*)
     (format t ";; ~A walking~%" (send rb :name))
-    (tmp-walk-motion rb)
+    (walk-motion rb)
     ))
 (warn "(walk-motion-for-robots) for walking motion for several robot models~%")
