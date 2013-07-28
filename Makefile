@@ -14,8 +14,13 @@ ifeq ($(OS),Linux)
   export ARCHDIR=Linux64
   export MAKEFILE=Makefile.Linux64
  else
+ ifeq ($(MACHINE),armv6l)
+  export ARCHDIR=LinuxARM
+  export MAKEFILE=Makefile.LinuxARM
+ else
   export ARCHDIR=Linux
   export MAKEFILE=Makefile.Linux.thread
+ endif
  endif
 endif
 ifeq ($(OS),CYGWIN)
