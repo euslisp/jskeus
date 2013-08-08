@@ -32,7 +32,8 @@ LSFX=dll
 LPFX=lib
 ARCH=Cygwin
 ESFX=.exe
-SOFLAGS=-g -falign-functions=4 -Wl,--export-all-symbols -Wl,--unresolved-symbols=ignore-all
+#SOFLAGS=-g -falign-functions=4 -Wl,--export-all-symbols -Wl,--unresolved-symbols=ignore-all  -Wl,--stack,5000000
+SOFLAGS=-g -falign-functions=4 -Wl,--export-all-symbols
 IMPLIB=$(EUSDIR)/$(ARCH)/bin/eusgl.a $(EUSDIR)/$(ARCH)/lib/libnr.$(LSFX)
 IMPLIBGL=$(EUSDIR)/$(ARCH)/bin/eusgl.a -L/usr/X11R6/lib -lGLU -lGL -lXext
 IMPLIBIMG=-ljpeg -lpng
