@@ -588,29 +588,30 @@
 
 (defun eusmodel-description->collada-library-articulated-systems (desc name)
   `(library_articulated_systems
+    (@ (id "asystems"))
     (articulated_system
-     (@ (id "kinsystem")
+     (@ (id "robot1_kinematics")
         (name ,name))
      (kinematics
       (instance_kinematics_model
        (@ (url "#kmodel1")
           (sid "kmodel1_inst"))
        (newparam
-        (@ (sid "libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst"))
-        "<SIDREF>kinsystem/kmodel1_inst</SIDREF>")
+        (@ (sid "robot1_motion_kmodel1_inst"))
+        "<SIDREF>robot1_kinematics/kmodel1_inst</SIDREF>")
        ;; joint axis
        ,@(mapcar #'(lambda (j)
                      (let ((joint-name (cdr (assoc :name j))))
                        `(newparam
-                         (@ (sid ,(format nil "libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst.~A_axis0" joint-name)))
+                         (@ (sid ,(format nil "robot1_motion_kmodel1_inst.~A_axis0" joint-name)))
                          ,(format nil
-                                  "<SIDREF>kinsystem/kmodel1_inst/~A/axis0</SIDREF>~%" joint-name))))
+                                  "<SIDREF>robot1_kinematics/kmodel1_inst/~A/axis0</SIDREF>~%" joint-name))))
                  (eusmodel-joint-description desc))
        ;; joint axis value
        ,@(mapcar #'(lambda (j)
                      (let ((joint-name (cdr (assoc :name j))))
                        `(newparam
-                         (@ (sid ,(format nil "libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst.~A.value" joint-name)))
+                         (@ (sid ,(format nil "robot1_motion_kmodel1_inst.~A.value" joint-name)))
                          (float "0"))))
                  (eusmodel-joint-description desc)))
       (technique_common
@@ -623,21 +624,23 @@
           (eusmodel-joint-description desc)))))
     (articulated_system
      (@ (id "robot1_motion")
-        (name "robot1_motion"))
+        ;; (name "robot1_motion") ;; name not needed ??
+        )
      (motion
        (instance_articulated_system
-        (@ (url "#kinsystem")
-           (sid "kmodel1_inst"))
+        (@ (url "#robot1_kinematics")
+           ;; (sid "kmodel1_inst") ;; sid not needed ??
+           )
         ;; here we bind parameters...
         (newparam
          (@ (sid "robot1_motion.kmodel1_inst"))
-         "<SIDREF>kinsystem/libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst</SIDREF>")
+         "<SIDREF>robot1_kinematics/robot1_motion_kmodel1_inst</SIDREF>")
         ,@(mapcar
            #'(lambda (j)
                (let ((joint-name (cdr (assoc :name j))))
                  `(newparam
                    (@ (sid ,(format nil "robot1_motion.kmodel1_inst.inst_~A_axis0" joint-name)))
-                   ,(format nil "<SIDREF>kinsystem/libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst.~A_axis0</SIDREF>"
+                   ,(format nil "<SIDREF>robot1_kinematics/robot1_motion_kmodel1_inst.~A_axis0</SIDREF>"
                             joint-name)
                    )))
            (eusmodel-joint-description desc))
@@ -646,7 +649,7 @@
                (let ((joint-name (cdr (assoc :name j))))
                  `(newparam
                    (@ (sid ,(format nil "robot1_motion.kmodel1_inst.inst_~A_value" joint-name)))
-                   ,(format nil "<SIDREF>libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst.~A.value</SIDREF>"
+                   ,(format nil "<SIDREF>robot1_motion_kmodel1_inst.~A.value</SIDREF>"
                             joint-name))))
            (eusmodel-joint-description desc)))
        (technique_common
@@ -654,14 +657,14 @@
            #'(lambda (j)
                (let ((joint-name (cdr (assoc :name j))))
                  `(axis_info
-                   (@ (axis ,(format nil "kinsystem/~A_info" joint-name))))))
+                   (@ (axis ,(format nil "robot1_kinematics/~A_info" joint-name))))))
            (eusmodel-joint-description desc))))
      ;; for openrave profile
      ,@(mapcar
         #'(lambda (e)
             (eusmodel-endcoords-description->openrave-manipulator e desc))
-        (eusmodel-endcoords-description desc))
-     )))
+        (eusmodel-endcoords-description desc)))
+    ))
 
 (defun eusmodel-endcoords-description->openrave-manipulator (end-coords description)
   (let ((name (car end-coords))
