@@ -274,12 +274,14 @@
      (unit (@ (meter ,scale)
               (name "millimeter")))
      (up_axis "Z_UP"))
-    ,(eusmodel-description->collada-library-visual-scenes description)
+    ,(eusmodel-description->collada-library-visual-scenes name description)
     ,(eusmodel-description->collada-library-joints description)
     ,(links-description->collada-library-effects (eusmodel-link-description description))
     ,(links-description->collada-library-materials (eusmodel-link-description description))
     ,(eusmodel-description->collada-library-kinematics-models name description)
     ,(eusmodel-description->collada-library-kinematics-scenes name description)
+    ,(eusmodel-description->collada-library-physics-scenes name description)
+    ,(eusmodel-description->collada-library-physics-models name description)
     ,(eusmodel-description->collada-library-geometries description)
     ,(eusmodel-description->collada-library-articulated-systems description name)
     ;; default scene...
@@ -435,7 +437,7 @@
                                     (collada-geometry-id-base target-link) i))))))))
        (enum-integer-list (length meshes))))))
 
-(defun eusmodel-description->collada-library-visual-scenes (desc)
+(defun eusmodel-description->collada-library-visual-scenes (name desc)
   `(library_visual_scenes
     (@ (id "vscenes"))
     (visual_scene
@@ -444,7 +446,7 @@
      (node
       (@ (id "visual1")
          (sid "visual1")
-         (name "VisualRoot"))
+         (name ,name))
       (node
        (@ (id "root_node")
           (name "RootNode"))
@@ -508,10 +510,63 @@
   (let ((joints-desc (eusmodel-joint-description desc)))
     `(kinematics_model
       (@ (id "kmodel1")
-         (name ,(format nil "~A-kmodel1" name))) ;the name of robot...?
+         (name ,name)) ;the name of robot...?
       (technique_common
        ,@(joints-description->collada-instance-joints joints-desc)
        ,@(eusmodel-description->collada-links desc)))))
+
+;; physics
+(defun eusmodel-description->collada-library-physics-scenes (name desc)
+  `(library_physics_scenes
+    (@ (id "pscenes"))
+    (physics_scene
+     (@ (id "pscene")
+        (name "Eus2Collada Physics Scene"))
+     (instance_physics_model
+      (@ (url "#pmodel1")
+         (sid "pmodel1")
+         (parent "#visual1"))
+      ,(let* ((links (eusmodel-link-description desc))
+              (ids (enum-integer-list (length links))))
+         (mapcar #'(lambda (i l)
+                     `(instance_rigid_body
+                       (@ (body ,(format nil "rigid~a" i))
+                          (target ,(format nil "#~a" (collada-node-id l))))))
+                 ids links))))))
+
+(defun eusmodel-description->collada-library-physics-models (name desc)
+  `(library_physics_models
+    (@ (id "pmodels"))
+    (physics_model
+     (@ (id "pmodel1")
+        (name ,name))
+     ,@(mapcar
+        #'(lambda (i ld)
+            (let* ((link-name (cdr (assoc :name ld))) ;; link-name without _link
+                   (id (format nil "rigid~a" i)) ;; id
+                   (sid (format nil "rigid~a" i)) ;; sid
+                   (meshes (cdr (assoc :mesh ld))))
+              `(rigid_body
+                (@ (id ,(format nil "~a" id))
+                   (sid ,(format nil "~a" sid))
+                   (name ,(format nil "~a_link" link-name)))
+                (technique_common
+                 (mass "1")
+                 (mass_frame
+                  (translate "0 0 0")
+                  (rotate "0 0 1 0"))
+                 (inertia "1 1 1")
+                 ,@(mapcar
+                    #'(lambda (ii)
+                        `(shape
+                          (instance_geometry
+                           (@ (url ,(format nil "#~a.geometry.~a" link-name ii)
+                                   )))
+                          (translate "0 0 0")
+                          (rotate "0 0 1 0")))
+                    (enum-integer-list (length meshes)))))))
+        (enum-integer-list (length (eusmodel-link-description desc)))
+        (eusmodel-link-description desc)))))
 
 ;; returns the name of root link
 ;; TODO: this function does not work. we need to create a tree
@@ -765,6 +820,8 @@
 
 (defun eusmodel-description->collada-scene (description)
   `(scene
+    (instance_physics_scene
+     (@ (url "#pscene")))
     (instance_visual_scene
      (@ (url "#vscene")))
     (instance_kinematics_scene
