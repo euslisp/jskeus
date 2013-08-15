@@ -269,8 +269,7 @@
        ;; (xsi:schemaLocation "http://www.collada.org/2008/03/COLLADASchema http://www.khronos.org/files/collada_schema_1_5")
        )
     (asset
-     (contributor (authoring_tool 
-                    "Eus2Collada"))
+     (contributor (authoring_tool "Eus2Collada"))
      (unit (@ (meter ,scale)
               (name "millimeter")))
      (up_axis "Z_UP"))
@@ -416,10 +415,15 @@
          (link-descriptions (eusmodel-link-description desc))
          (j (find-joint-from-link-description target-link (eusmodel-joint-description desc)))
          (meshes (cdr (assoc :mesh target-link)))
-         (origin (cdr (assoc :origin target-link))))
+         (origin (cdr (assoc :origin target-link)))
+         (pos (position-if #'(lambda (l)
+                               (string= (cdr (assoc :name target-link))
+                                        (cdr (assoc :name l))))
+                           (eusmodel-link-description desc))))
   `(node
     (@ (id ,(collada-node-id target-link))
-       (name ,(collada-node-name target-link)))
+       (name ,(collada-node-name target-link))
+       (sid ,(format nil "node~D" pos)))
     ,@(eusmodel-description->collada-node-transformations target-link desc)
     ,@(mapcar
        #'(lambda (i)
@@ -447,12 +451,9 @@
       (@ (id "visual1")
          (sid "visual1")
          (name ,name))
-      (node
-       (@ (id "root_node")
-          (name "RootNode"))
-       ,@(mapcar #'(lambda (l)
-                     (eusmodel-description->collada-node l desc))
-                 (eusmodel-link-description desc)))))))
+      ,@(mapcar #'(lambda (l)
+                    (eusmodel-description->collada-node l desc))
+                (eusmodel-link-description desc))))))
 
 (defun mesh-description->instance-material (s)
   `(instance_material
@@ -827,7 +828,7 @@
     (instance_kinematics_scene
      (@ (url "#kscene"))
      (bind_kinematics_model
-      (@ (node "root_node"))
+      (@ (node "visual1/node0"))
       (param
        "kscene_kmodel1_inst"))
      ;; bind_joint_axis
