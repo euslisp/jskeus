@@ -437,11 +437,13 @@
 
 (defun eusmodel-description->collada-library-visual-scenes (desc)
   `(library_visual_scenes
-    (@ (id "libvisualscene"))
+    (@ (id "vscenes"))
     (visual_scene
-     (@ (id "libvisualscenes.scene"))
+     (@ (id "vscene")
+        (name "Eus2Collada Visual Scene"))
      (node
-      (@ (id "visual_root")
+      (@ (id "visual1")
+         (sid "visual1")
          (name "VisualRoot"))
       (node
        (@ (id "root_node")
@@ -469,20 +471,21 @@
 
 (defun eusmodel-description->collada-library-kinematics-scenes (name desc)
   `(library_kinematics_scenes
-    (@ (id "libkinscenes"))
+    (@ (id "kscenes"))
     (kinematics_scene
-     (@ (id "libkinscenes.kinScene"))
+     (@ (id "kscene")
+        (name "Eus2Collada Kinematics Scene"))
      (instance_articulated_system
       (@ (url "#kinsystem_motion")
          (sid "inst_kinsystem"))
       (newparam
-       (@ (sid "libkinscenes.kinScene_libkinscenes.kinScene_inst_kinmodel"))
+       (@ (sid "kscene_kscene_kmodel1_inst"))
        "<SIDREF>kinsystem_motion/kinsystem_motion.kinsystem_inst</SIDREF>")
       ;; joint axis
       ,@(mapcar #'(lambda (j)
                     (let ((joint-name (cdr (assoc :name j))))
                       `(newparam
-                        (@ (sid ,(format nil "libkinscenes.kinScene_libkinscenes.kinScene_inst_kinmodel.~A_axis0" joint-name)))
+                        (@ (sid ,(format nil "kscene_kscene_kmodel1_inst.~A_axis0" joint-name)))
                         ,(format nil "<SIDREF>kinsystem_motion/kinsystem_motion.kinsystem_inst.inst_~A_axis0</SIDREF>"
                                  joint-name))))
                 (eusmodel-joint-description desc))
@@ -490,21 +493,21 @@
       ,@(mapcar #'(lambda (j)
                     (let ((joint-name (cdr (assoc :name j))))
                       `(newparam
-                        (@ (sid ,(format nil "libkinscenes.kinScene_libkinscenes.kinScene_inst_kinmodel.~A.value" joint-name)))
+                        (@ (sid ,(format nil "kscene_kscene_kmodel1_inst.~A.value" joint-name)))
                         ,(format nil "<SIDREF>kinsystem_motion/kinsystem_motion.kinsystem_inst.inst_~A_value</SIDREF>"
                                  joint-name))))
                 (eusmodel-joint-description desc))))))
 
 (defun eusmodel-description->collada-library-kinematics-models (name desc)
   `(library_kinematics_models
-    (@ (id "libkinmodels"))
+    (@ (id "kmodels"))
     ,(eusmodel-description->collada-kinematics-model name desc)))
 
 (defun eusmodel-description->collada-kinematics-model (name desc)
   (let ((joints-desc (eusmodel-joint-description desc)))
     `(kinematics_model
-      (@ (id "kinmodel")
-         (name ,(format nil "~A-kinmodel" name))) ;the name of robot...?
+      (@ (id "kmodel1")
+         (name ,(format nil "~A-kmodel1" name))) ;the name of robot...?
       (technique_common
        ,@(joints-description->collada-instance-joints joints-desc)
        ,@(eusmodel-description->collada-links desc)))))
@@ -590,26 +593,24 @@
         (name ,name))
      (kinematics
       (instance_kinematics_model
-       ;;(@ (url "#kinmodel")
-       (@ (url "#kinmodel")
-          (sid "inst_kinmodel"))
+       (@ (url "#kmodel1")
+          (sid "kmodel1_inst"))
        (newparam
-        (@ (sid "libarticulated_systems.kinScene_libarticulated_systems.kinScene_inst_kinmodel"))
-        "<SIDREF>kinsystem/inst_kinmodel</SIDREF>")
-        
+        (@ (sid "libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst"))
+        "<SIDREF>kinsystem/kmodel1_inst</SIDREF>")
        ;; joint axis
        ,@(mapcar #'(lambda (j)
                      (let ((joint-name (cdr (assoc :name j))))
                        `(newparam
-                         (@ (sid ,(format nil "libarticulated_systems.kinScene_libarticulated_systems.kinScene_inst_kinmodel.~A_axis0" joint-name)))
+                         (@ (sid ,(format nil "libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst.~A_axis0" joint-name)))
                          ,(format nil
-                                  "<SIDREF>kinsystem/inst_kinmodel/~A/axis0</SIDREF>~%" joint-name))))
+                                  "<SIDREF>kinsystem/kmodel1_inst/~A/axis0</SIDREF>~%" joint-name))))
                  (eusmodel-joint-description desc))
        ;; joint axis value
        ,@(mapcar #'(lambda (j)
                      (let ((joint-name (cdr (assoc :name j))))
                        `(newparam
-                         (@ (sid ,(format nil "libarticulated_systems.kinScene_libarticulated_systems.kinScene_inst_kinmodel.~A.value" joint-name)))
+                         (@ (sid ,(format nil "libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst.~A.value" joint-name)))
                          (float "0"))))
                  (eusmodel-joint-description desc)))
       (technique_common
@@ -617,26 +618,26 @@
           #'(lambda (j)
               (let ((joint-name (cdr (assoc :name j))))
                 `(axis_info
-                  (@ (axis ,(format nil "kinmodel/~A/axis0" joint-name)) ;??
+                  (@ (axis ,(format nil "kmodel1/~A/axis0" joint-name)) ;??
                      (sid ,(format nil "~A_info" joint-name))))))
           (eusmodel-joint-description desc)))))
     (articulated_system
      (@ (id "kinsystem_motion")
-	(name "kinsystem_motion"))
+        (name "kinsystem_motion"))
      (motion
        (instance_articulated_system
-	(@ (url "#kinsystem")
-	   (sid "kinsystem_inst"))
+        (@ (url "#kinsystem")
+           (sid "kinsystem_inst"))
         ;; here we bind parameters...
         (newparam
          (@ (sid "kinsystem_motion.kinsystem_inst"))
-         "<SIDREF>kinsystem/libarticulated_systems.kinScene_libarticulated_systems.kinScene_inst_kinmodel</SIDREF>")
+         "<SIDREF>kinsystem/libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst</SIDREF>")
         ,@(mapcar
            #'(lambda (j)
                (let ((joint-name (cdr (assoc :name j))))
                  `(newparam
                    (@ (sid ,(format nil "kinsystem_motion.kinsystem_inst.inst_~A_axis0" joint-name)))
-                   ,(format nil "<SIDREF>kinsystem/libarticulated_systems.kinScene_libarticulated_systems.kinScene_inst_kinmodel.~A_axis0</SIDREF>"
+                   ,(format nil "<SIDREF>kinsystem/libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst.~A_axis0</SIDREF>"
                             joint-name)
                    )))
            (eusmodel-joint-description desc))
@@ -645,7 +646,7 @@
                (let ((joint-name (cdr (assoc :name j))))
                  `(newparam
                    (@ (sid ,(format nil "kinsystem_motion.kinsystem_inst.inst_~A_value" joint-name)))
-                   ,(format nil "<SIDREF>libarticulated_systems.kinScene_libarticulated_systems.kinScene_inst_kinmodel.~A.value</SIDREF>"
+                   ,(format nil "<SIDREF>libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst.~A.value</SIDREF>"
                             joint-name))))
            (eusmodel-joint-description desc)))
        (technique_common
@@ -672,9 +673,9 @@
       (technique
        (@ (profile "OpenRAVE"))
        (frame_origin
-        (@ (link ,(format nil "kinmodel/~A_link" origin-link-name))))
+        (@ (link ,(format nil "kmodel1/~A_link" origin-link-name))))
        (frame_tip
-        (@ (link ,(format nil "kinmodel/~A_link" tip-link-name))))))))
+        (@ (link ,(format nil "kmodel1/~A_link" tip-link-name))))))))
 
 (defun eusmodel-description->collada-links-tree (target links joints)
   ;; recursive function call!
@@ -691,7 +692,7 @@
                      (j (find-joint-from-link-description l joints)))
                  `((attachment_full
                     (@ (joint ,(format nil
-                                       "kinmodel/~A"
+                                       "kmodel1/~A"
                                        (cdr (assoc :name j)))))
                     (translate
                     ,(float-vector->collada-string
@@ -766,13 +767,13 @@
 (defun eusmodel-description->collada-scene (description)
   `(scene
     (instance_visual_scene
-     (@ (url "#libvisualscenes.scene")))
+     (@ (url "#vscene")))
     (instance_kinematics_scene
-     (@ (url "#libkinscenes.kinScene"))
+     (@ (url "#kscene"))
      (bind_kinematics_model
       (@ (node "root_node"))
       (param
-       "libkinscenes.kinScene_libkinscenes.kinScene_inst_kinmodel"))
+       "kscene_kscene_kmodel1_inst"))
      ;; bind_joint_axis
       ,@(mapcar
          #'(lambda (j)
@@ -785,12 +786,12 @@
                 (param
                    ,(format
                      nil
-                     "libkinscenes.kinScene_libkinscenes.kinScene_inst_kinmodel.~A_axis0"
+                     "kscene_kscene_kmodel1_inst.~A_axis0"
                      (cdr (assoc :name j)))))
                (value
                 (param
                  ,(format nil
-                          "libkinscenes.kinScene_libkinscenes.kinScene_inst_kinmodel.~A.value" (cdr (assoc :name j)))))))
+                          "kscene_kscene_kmodel1_inst.~A.value" (cdr (assoc :name j)))))))
          (eusmodel-joint-description description)))))
 
 (defun eusmodel-description->collada-library-geometries (description)
@@ -883,7 +884,6 @@
         (normal-count 0))
     (format ss "<p>")
     (dotimes (fi (length faces))
-      
       (let ((f (elt faces fi)))
         (let ((vertices-num (length (cdr (send f :vertices)))))
           (dotimes (vi vertices-num)
@@ -891,7 +891,6 @@
             (incf vertex-count)           ;increment vertex per vertex
             (format ss "~A " normal-count)) ;normal index
           (incf normal-count)           ;increment normal per faces
-          
           )
         (format ss "~%")
         ))
