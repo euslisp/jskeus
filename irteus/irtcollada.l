@@ -476,25 +476,25 @@
      (@ (id "kscene")
         (name "Eus2Collada Kinematics Scene"))
      (instance_articulated_system
-      (@ (url "#kinsystem_motion")
-         (sid "inst_kinsystem"))
+      (@ (url "#robot1_motion")
+         (sid "robot1_motion_inst"))
       (newparam
-       (@ (sid "kscene_kscene_kmodel1_inst"))
-       "<SIDREF>kinsystem_motion/kinsystem_motion.kinsystem_inst</SIDREF>")
+       (@ (sid "kscene_kmodel1_inst"))
+       "<SIDREF>robot1_motion/robot1_motion.kmodel1_inst</SIDREF>")
       ;; joint axis
       ,@(mapcar #'(lambda (j)
                     (let ((joint-name (cdr (assoc :name j))))
                       `(newparam
-                        (@ (sid ,(format nil "kscene_kscene_kmodel1_inst.~A_axis0" joint-name)))
-                        ,(format nil "<SIDREF>kinsystem_motion/kinsystem_motion.kinsystem_inst.inst_~A_axis0</SIDREF>"
+                        (@ (sid ,(format nil "kscene_kmodel1_inst.~A_axis0" joint-name)))
+                        ,(format nil "<SIDREF>robot1_motion/robot1_motion.kmodel1_inst.inst_~A_axis0</SIDREF>"
                                  joint-name))))
                 (eusmodel-joint-description desc))
       ;; joint axis value
       ,@(mapcar #'(lambda (j)
                     (let ((joint-name (cdr (assoc :name j))))
                       `(newparam
-                        (@ (sid ,(format nil "kscene_kscene_kmodel1_inst.~A.value" joint-name)))
-                        ,(format nil "<SIDREF>kinsystem_motion/kinsystem_motion.kinsystem_inst.inst_~A_value</SIDREF>"
+                        (@ (sid ,(format nil "kscene_kmodel1_inst.~A.value" joint-name)))
+                        ,(format nil "<SIDREF>robot1_motion/robot1_motion.kmodel1_inst.inst_~A_value</SIDREF>"
                                  joint-name))))
                 (eusmodel-joint-description desc))))))
 
@@ -622,21 +622,21 @@
                      (sid ,(format nil "~A_info" joint-name))))))
           (eusmodel-joint-description desc)))))
     (articulated_system
-     (@ (id "kinsystem_motion")
-        (name "kinsystem_motion"))
+     (@ (id "robot1_motion")
+        (name "robot1_motion"))
      (motion
        (instance_articulated_system
         (@ (url "#kinsystem")
-           (sid "kinsystem_inst"))
+           (sid "kmodel1_inst"))
         ;; here we bind parameters...
         (newparam
-         (@ (sid "kinsystem_motion.kinsystem_inst"))
+         (@ (sid "robot1_motion.kmodel1_inst"))
          "<SIDREF>kinsystem/libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst</SIDREF>")
         ,@(mapcar
            #'(lambda (j)
                (let ((joint-name (cdr (assoc :name j))))
                  `(newparam
-                   (@ (sid ,(format nil "kinsystem_motion.kinsystem_inst.inst_~A_axis0" joint-name)))
+                   (@ (sid ,(format nil "robot1_motion.kmodel1_inst.inst_~A_axis0" joint-name)))
                    ,(format nil "<SIDREF>kinsystem/libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst.~A_axis0</SIDREF>"
                             joint-name)
                    )))
@@ -645,7 +645,7 @@
            #'(lambda (j)
                (let ((joint-name (cdr (assoc :name j))))
                  `(newparam
-                   (@ (sid ,(format nil "kinsystem_motion.kinsystem_inst.inst_~A_value" joint-name)))
+                   (@ (sid ,(format nil "robot1_motion.kmodel1_inst.inst_~A_value" joint-name)))
                    ,(format nil "<SIDREF>libarticulated_systems.kinScene_libarticulated_systems.kinScene_kmodel1_inst.~A.value</SIDREF>"
                             joint-name))))
            (eusmodel-joint-description desc)))
@@ -773,7 +773,7 @@
      (bind_kinematics_model
       (@ (node "root_node"))
       (param
-       "kscene_kscene_kmodel1_inst"))
+       "kscene_kmodel1_inst"))
      ;; bind_joint_axis
       ,@(mapcar
          #'(lambda (j)
@@ -786,12 +786,12 @@
                 (param
                    ,(format
                      nil
-                     "kscene_kscene_kmodel1_inst.~A_axis0"
+                     "kscene_kmodel1_inst.~A_axis0"
                      (cdr (assoc :name j)))))
                (value
                 (param
                  ,(format nil
-                          "kscene_kscene_kmodel1_inst.~A.value" (cdr (assoc :name j)))))))
+                          "kscene_kmodel1_inst.~A.value" (cdr (assoc :name j)))))))
          (eusmodel-joint-description description)))))
 
 (defun eusmodel-description->collada-library-geometries (description)
