@@ -476,8 +476,9 @@
      (@ (id "kscene")
         (name "Eus2Collada Kinematics Scene"))
      (instance_articulated_system
-      (@ (url "#robot1_motion")
-         (sid "robot1_motion_inst"))
+      (@ (sid "robot1_motion_inst")
+         (url "#robot1_motion")
+         (name ,name))
       (newparam
        (@ (sid "kscene_kmodel1_inst"))
        "<SIDREF>robot1_motion/robot1_motion.kmodel1_inst</SIDREF>")
@@ -590,47 +591,10 @@
   `(library_articulated_systems
     (@ (id "asystems"))
     (articulated_system
-     (@ (id "robot1_kinematics")
-        (name ,name))
-     (kinematics
-      (instance_kinematics_model
-       (@ (url "#kmodel1")
-          (sid "kmodel1_inst"))
-       (newparam
-        (@ (sid "robot1_motion_kmodel1_inst"))
-        "<SIDREF>robot1_kinematics/kmodel1_inst</SIDREF>")
-       ;; joint axis
-       ,@(mapcar #'(lambda (j)
-                     (let ((joint-name (cdr (assoc :name j))))
-                       `(newparam
-                         (@ (sid ,(format nil "robot1_motion_kmodel1_inst.~A_axis0" joint-name)))
-                         ,(format nil
-                                  "<SIDREF>robot1_kinematics/kmodel1_inst/~A/axis0</SIDREF>~%" joint-name))))
-                 (eusmodel-joint-description desc))
-       ;; joint axis value
-       ,@(mapcar #'(lambda (j)
-                     (let ((joint-name (cdr (assoc :name j))))
-                       `(newparam
-                         (@ (sid ,(format nil "robot1_motion_kmodel1_inst.~A.value" joint-name)))
-                         (float "0"))))
-                 (eusmodel-joint-description desc)))
-      (technique_common
-       ,@(mapcar
-          #'(lambda (j)
-              (let ((joint-name (cdr (assoc :name j))))
-                `(axis_info
-                  (@ (axis ,(format nil "kmodel1/~A/axis0" joint-name)) ;??
-                     (sid ,(format nil "~A_info" joint-name))))))
-          (eusmodel-joint-description desc)))))
-    (articulated_system
-     (@ (id "robot1_motion")
-        ;; (name "robot1_motion") ;; name not needed ??
-        )
+     (@ (id "robot1_motion"))
      (motion
        (instance_articulated_system
-        (@ (url "#robot1_kinematics")
-           ;; (sid "kmodel1_inst") ;; sid not needed ??
-           )
+        (@ (url "#robot1_kinematics"))
         ;; here we bind parameters...
         (newparam
          (@ (sid "robot1_motion.kmodel1_inst"))
@@ -664,6 +628,38 @@
         #'(lambda (e)
             (eusmodel-endcoords-description->openrave-manipulator e desc))
         (eusmodel-endcoords-description desc)))
+    (articulated_system
+     (@ (id "robot1_kinematics"))
+     (kinematics
+      (instance_kinematics_model
+       (@ (url "#kmodel1")
+          (sid "kmodel1_inst"))
+       (newparam
+        (@ (sid "robot1_motion_kmodel1_inst"))
+        "<SIDREF>robot1_kinematics/kmodel1_inst</SIDREF>")
+       ;; joint axis
+       ,@(mapcar #'(lambda (j)
+                     (let ((joint-name (cdr (assoc :name j))))
+                       `(newparam
+                         (@ (sid ,(format nil "robot1_motion_kmodel1_inst.~A_axis0" joint-name)))
+                         ,(format nil
+                                  "<SIDREF>robot1_kinematics/kmodel1_inst/~A/axis0</SIDREF>~%" joint-name))))
+                 (eusmodel-joint-description desc))
+       ;; joint axis value
+       ,@(mapcar #'(lambda (j)
+                     (let ((joint-name (cdr (assoc :name j))))
+                       `(newparam
+                         (@ (sid ,(format nil "robot1_motion_kmodel1_inst.~A.value" joint-name)))
+                         (float "0"))))
+                 (eusmodel-joint-description desc)))
+      (technique_common
+       ,@(mapcar
+          #'(lambda (j)
+              (let ((joint-name (cdr (assoc :name j))))
+                `(axis_info
+                  (@ (axis ,(format nil "kmodel1/~A/axis0" joint-name)) ;??
+                     (sid ,(format nil "~A_info" joint-name))))))
+          (eusmodel-joint-description desc)))))
     ))
 
 (defun eusmodel-endcoords-description->openrave-manipulator (end-coords description)
