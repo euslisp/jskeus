@@ -185,7 +185,6 @@
     ;; calc principal axis
     (setq rot (search-minimum-rotation-matrix (car (user::sv-decompose it))))
     (setq inertia (m* (m* (transpose rot) it) rot))
-    (pprint (list rot inertia))
     (setq inertia (scale 1.0e-9 (float-vector (aref inertia 0 0) (aref inertia 1 1) (aref inertia 2 2))))
     ;; rotate inertia frame
     (send mframe :rotate rot)
