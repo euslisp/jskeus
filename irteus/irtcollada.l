@@ -128,10 +128,14 @@
 ;;  <joint-specs> := (<joint-spec> ...)
 ;;  <link-spec> := ((:name . <string>)
 ;;                  (:origin . <coordinates>)
-;;                  (:mesh . <mesh-spec>))
+;;                  (:mesh . <mesh-spec>)
+;;                  (:mass_frame . <coordinates>)
+;;                  (:mass . <float>)
+;;                  (:inertia . <float-vector>))
 ;;  <mesh-spec> := (<triangle faceset>)
 ;;   (all of the vertices has relative coordinates from the origin of the link)
 ;;  <joint-spec> := ((:name . <string>)
+;;                   (:id . <integer>)
 ;;                   (:type . <joint-type>)
 ;;                   (:limit . <limit-spec>)
 ;;                   (:axis . <float-vector>)
@@ -149,6 +153,7 @@
     ;; verification
     (verificate-unique-strings (mapcar #'string (send-all links :name)))
     (verificate-unique-strings (mapcar #'string (send-all joints :name)))
+    (dotimes (i (length joints)) (setf (get (elt joints i) :jointid) i)) ;; set :jointid to joint
     (list (eusmodel-link-specs links)
           (eusmodel-joint-specs joints)
           (eusmodel-endcoords-specs model))))
@@ -168,11 +173,31 @@
   (mapcar #'eusmodel-joint-spec joints))
 
 (defun eusmodel-link-spec (link)
-  (list (cons :name (string (send link :name)))
-        (cons :origin                   ;parent -> child transformation
-              (let ((parent (send link :parent)))
-                (send parent :transformation link)))
-        (cons :mesh (eusmodel-mesh-spec link))))
+  (let* ((ac (send link :centroid))
+         (it (send link :inertia-tensor))
+         (rt-cds (let ((lnk link)) (while (send lnk :parent) (setq lnk (send lnk :parent)))
+                      (send (car (send lnk :links)) :worldcoords)))
+         (mframe (send link :worldcoords))
+         rot inertia)
+    ;; centroid frame on rootlink coordinate
+    (send mframe :translate ac)
+    (setq mframe (send rt-cds :transformation mframe))
+    ;; calc principal axis
+    (setq rot (search-minimum-rotation-matrix (car (user::sv-decompose it))))
+    (setq inertia (m* (m* (transpose rot) it) rot))
+    (pprint (list rot inertia))
+    (setq inertia (scale 1.0e-9 (float-vector (aref inertia 0 0) (aref inertia 1 1) (aref inertia 2 2))))
+    ;; rotate inertia frame
+    (send mframe :rotate rot)
+    (list (cons :name (string (send link :name)))
+          (cons :origin                   ;parent -> child transformation
+                (let ((parent (send link :parent)))
+                  (send parent :transformation link)))
+          (cons :mesh (eusmodel-mesh-spec link))
+          (cons :mass_frame mframe)
+          (cons :mass (/ (send link :weight) 1000.0))
+          (cons :inertia inertia)
+          )))
 
 (defun eusmodel-mesh-spec (link)
   ;; right?
@@ -198,6 +223,7 @@
                       :rotational-joint)
                      ((derivedp _joint user::linear-joint)
                       :linear-joint)))
+        (cons :id (get _joint :jointid))
         (cons :limit (eusmodel-limit-spec _joint))
         (cons :axis (case (_joint . user::axis)
                       (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1))
@@ -552,11 +578,17 @@
                    (sid ,(format nil "~a" sid))
                    (name ,(format nil "~a_link" link-name)))
                 (technique_common
-                 (mass "1")
+                 (mass ,(format nil "~A" (cdr (assoc :mass ld))))
                  (mass_frame
-                  (translate "0 0 0")
-                  (rotate "0 0 1 0"))
-                 (inertia "1 1 1")
+                  (translate
+                   ,(float-vector->collada-string
+                     (send (cdr (assoc :mass_frame ld)) :worldpos)))
+                  (rotate
+                   ,(float-vector->collada-string
+                     (matrix->collada-rotate-vector
+                      (send (cdr (assoc :mass_frame ld)) :worldrot)))))
+                 (inertia
+                  ,(float-vector->collada-string (cdr (assoc :inertia ld))))
                  ,@(mapcar
                     #'(lambda (ii)
                         `(shape
@@ -786,7 +818,8 @@
         (name (cdr (assoc :name joint-description))))
     `(joint
       (@ (id ,id)
-         (name ,(format nil "~A" name)))
+         (name ,(format nil "~A" name))
+         (sid ,(format nil "jointsid~A" (cdr (assoc :id joint-description)))))
       ,(cond ((eq (cdr (assoc :type joint-description)) :linear-joint)
               (linear-joint-description->collada-joint joint-description))
              ((eq (cdr (assoc :type joint-description)) :rotational-joint)
@@ -990,6 +1023,52 @@
       (push i ids))
     (reverse ids)))
 
+(defun search-minimum-rotation-matrix (mat)
+  (let* ((a (matrix-column mat 0))
+         (b (matrix-column mat 1))
+         (c (matrix-column mat 2))
+         (src-lst (list a b c))
+         (xx (float-vector 1 0 0))
+         (yy (float-vector 0 1 0))
+         (zz (float-vector 0 0 1))
+         (dst-lst (list xx yy zz))
+         (max-dist -2)
+         ret)
+    ;; search minimum distance of each axis on new matrix
+    (dolist (src src-lst)
+      (dolist (dst dst-lst)
+        (let ((dist (abs (v. src dst))))
+          (when (> dist max-dist)
+            (setq max-dist dist)
+            (setq ret (cons src dst))))))
+    ;; choose order for making rotation matrix
+    (transpose
+    (cond
+     ((eq (cdr ret) xx)
+      (let ((r (apply #'matrix (if (> (v. (car ret) (cdr ret)) 0)
+                                   (car ret) (scale -1.0 (car ret)))
+                      (remove (car ret) src-lst))))
+        (if (< (user::matrix-determinant r) 0)
+            (apply #'matrix (if (> (v. (car ret) (cdr ret)) 0)
+                                (car ret) (scale -1.0 (car ret)))
+                   (reverse (remove (car ret) src-lst))) r)))
+     ((eq (cdr ret) yy)
+      (let* ((sc (remove (car ret) src-lst))
+             (r (matrix (car sc) (if (> (v. (car ret) (cdr ret)) 0)
+                                     (car ret) (scale -1.0 (car ret)))
+                        (cadr sc))))
+        (if (< (user::matrix-determinant r) 0)
+            (matrix (cadr sc) (if (> (v. (car ret) (cdr ret)) 0)
+                                (car ret) (scale -1.0 (car ret)))
+                    (car sc)) r)))
+     (t ;;(eq (cdr ret) zz)
+      (let* ((sc (remove (car ret) src-lst))
+             (r (matrix (car sc) (cadr sc) (if (> (v. (car ret) (cdr ret)) 0)
+                                               (car ret) (scale -1.0 (car ret))))))
+        (if (< (user::matrix-determinant r) 0)
+            (matrix (cadr sc) (car sc) (if (> (v. (car ret) (cdr ret)) 0)
+                                           (car ret) (scale -1.0 (car ret))))))))
+      )))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; convert function
 ;;  irtmodel -> collada model
