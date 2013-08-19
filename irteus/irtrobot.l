@@ -428,6 +428,21 @@
        (push j result)
        (setq j nil))
      (nreverse result)))
+  (:print-vector-for-robot-limb
+   (vec)
+   (let ((tmp-limbs
+          (remove-duplicates
+           (mapcar #'(lambda (l)
+                       (find-if #'(lambda (tmp-limb) (member l (send self tmp-limb :links))) '(:rarm :larm :rleg :lleg :torso :head)))
+                   (send-all (send self :joint-list) :child-link))))
+         (ordered-joint-list (send self :joint-list)))
+     (format t "    #f(~%      ")
+     (dolist (tmp-limb tmp-limbs)
+       (dolist (j (send self tmp-limb :joint-list))
+         (format t "~6,2f " (elt vec (position j ordered-joint-list))))
+       (format t "~%      "))
+     (format t ")~%")
+     vec))
   )
 
 ;;; moved from rbrarin libraries
