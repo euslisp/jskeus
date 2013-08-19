@@ -173,11 +173,11 @@
   (mapcar #'eusmodel-joint-spec joints))
 
 (defun eusmodel-link-spec (link)
-  (let* ((ac (send link :centroid))
+  (let* ((ac (link . user::acentroid))
          (it (send link :inertia-tensor))
          (rt-cds (let ((lnk link)) (while (send lnk :parent) (setq lnk (send lnk :parent)))
                       (send (car (send lnk :links)) :worldcoords)))
-         (mframe (send link :worldcoords))
+         (mframe (send link :copy-worldcoords))
          rot inertia)
     ;; centroid frame on rootlink coordinate
     (send mframe :translate ac)
