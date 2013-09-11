@@ -1283,6 +1283,7 @@
           (union-link-list (send self :calc-union-link-list link-list))
           (fik-len (send self :calc-target-joint-dimension union-link-list))
           (weight (fill (instantiate float-vector fik-len) 1)) ;; additional weight
+          (additional-weight-list) ;; (list (list joint1 var1) (list joint2 var2) ...) ;; var is value or function (lambda)
           (debug-view)
           (tmp-weight (instantiate float-vector fik-len))
           (tmp-len (instantiate float-vector fik-len)))
@@ -1291,6 +1292,15 @@
      ((listp weight) (setq weight (eval weight))))
     (when (and debug-view (not (memq :no-message debug-view)))
       (format-array weight "usrwei:"))
+    (dolist (ls additional-weight-list)
+      (let ((idx (reduce #'+ (send-all (send-all (subseq union-link-list 0 (position (send (car ls) :child-link) union-link-list :test #'equal)) :joint) :joint-dof)
+                         :initial-value 0)))
+        (setf (elt weight idx) (* (elt weight idx)
+                                  (if (functionp (cadr ls))
+                                      (funcall (cadr ls))
+                                    (cadr ls))))))
+    (when (and debug-view (not (memq :no-message debug-view)))
+      (format-array weight "addwei:"))
     ;; calc weight from joint limit
     (setq tmp-weight
           (send self :calc-weight-from-joint-limit
@@ -1337,6 +1347,7 @@
           (union-link-list (send self :calc-union-link-list link-list))
           (fik-len (send self :calc-target-joint-dimension union-link-list))
           (null-space) (debug-view)
+          (additional-nspace-list) ;; (list (list joint1 var1) (list joint2 var2) ...) ;; var is value or function (lambda)
 	  ;; if user wants to use cog-jacobian as null-space, please set cog-gain(> 0.0) and target-centroid-pos
 	  (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func)
           (weight (fill (instantiate float-vector fik-len) 1.0))
@@ -1356,6 +1367,13 @@
     (cond
      ((functionp null-space) (setq null-space (funcall null-space)))
      ((listp null-space) (setq null-space (eval null-space))))
+    (dolist (ls additional-nspace-list)
+      (let ((idx (reduce #'+ (send-all (send-all (subseq union-link-list 0 (position (send (car ls) :child-link) union-link-list :test #'equal)) :joint) :joint-dof)
+                         :initial-value 0)))
+        (setf (elt tmp-nspace idx) (+ (elt tmp-nspace idx)
+                                      (if (functionp (cadr ls))
+                                          (funcall (cadr ls))
+                                        (cadr ls))))))
     (if null-space
         (setq tmp-nspace
               (v+ null-space tmp-nspace tmp-nspace)))
@@ -1375,6 +1393,7 @@
               ((:collision-avoidance-link-pair pair-list)
                (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
 	      (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func)
+              (additional-weight-list) (additional-nspace-list)
               (tmp-len (instantiate float-vector fik-len))
               (tmp-len2 (instantiate float-vector fik-len))
 	      (tmp-weight (instantiate float-vector fik-len))
@@ -1405,7 +1424,8 @@
            (send self :calc-inverse-kinematics-weight-from-link-list
                  link-list :weight weight :fik-len fik-len
                  :avoid-weight-gain avoid-weight-gain :union-link-list union-link-list
-                 :debug-view debug-view :tmp-len tmp-len :tmp-weight tmp-weight))
+                 :debug-view debug-view :tmp-len tmp-len :tmp-weight tmp-weight
+                 :additional-weight-list additional-weight-list))
 
      ;; calc inverse jacobian and projection jacobian
      (setq jacobi# (send* self :calc-inverse-jacobian jacobi :weight weight args))
@@ -1470,7 +1490,8 @@
                  link-list :union-link-list union-link-list
                  :avoid-nspace-gain avoid-nspace-gain :debug-view debug-view
 		 :cog-gain cog-gain :target-centroid-pos target-centroid-pos :centroid-offset-func centroid-offset-func
-                 :weight weight :fik-len fik-len :null-space null-space :tmp-nspace tmp-nspace))
+                 :weight weight :fik-len fik-len :null-space null-space :tmp-nspace tmp-nspace
+                 :additional-nspace-list additional-nspace-list))
      (if (send self :get :collision-avoidance-null-vector)
 	 (v+ tmp-nspace (send self :get :collision-avoidance-null-vector) tmp-nspace))
      ;;
