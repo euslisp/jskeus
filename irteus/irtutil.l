@@ -266,6 +266,41 @@
       ret)
      (t (list h i s)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; macros for calculating execution time using mtimer
+;; bench  : args -> arbitrary S-exp.
+;;          return -> return value of args
+;;          ex. $ (bench (unix:sleep 1))
+;;                ;; time -> 1.0001[s]
+;;                t
+;;              $ (bench :print-string "hogehoge" (unix:usleep 500000))
+;;                ;; hogehoge -> 0.500067[s]
+;;                t
+;; bench2 : args -> arbitrary S-exp.
+;;          return -> execution time of args
+;;          ex. $ (bench2 (unix:sleep 1))
+;;                1.00024
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defmacro bench (&rest args)
+  (let ((tm (gensym))
+        (str (gensym)))
+    `(let ((,tm (instance mtimer :init))
+           (,str ,(if (memq :print-string args)
+                      (cadr (memq :print-string args))
+                    "time")))
+       (send ,tm :start)
+       (prog1
+           (progn ,@args)
+         (format t ";; ~A -> ~A[s]~%" ,str (send ,tm :stop))))))
+
+(defmacro bench2 (&rest args)
+  (let ((tm (gensym)))
+    `(let ((,tm (instance mtimer :init)))
+       (send ,tm :start)
+       (progn
+         ,@args
+         (send ,tm :stop)))))
+
 (provide :irtutil "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
