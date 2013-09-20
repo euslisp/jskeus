@@ -301,6 +301,32 @@
          ,@args
          (send ,tm :stop)))))
 
+;; redirect euslisp standard-output and error-output (null-output and with-all-output->file)
+;; null-ouput usage : (null-output (form1) (form2) .. )
+(defmacro null-output (&rest bodies)
+  `(with-all-output->file "/dev/null" ,@bodies))
+
+;; with-all-output->file : (with-all-output->file "filename" (form1) (form2) .. )
+(defmacro with-all-output->file (fname &rest bodies)
+  (let ((tmp-stdout (gensym))
+        (tmp-stderr (gensym))
+        (null-port (gensym))
+        (ret (gensym)))
+    `(progn
+       (let ((,tmp-stdout *standard-output*)
+             (,tmp-stderr *error-output*)
+             (,ret nil))
+         (unwind-protect
+             (with-open-file (,null-port ,fname :direction :output)
+               (setq *standard-output* ,null-port)
+               (setq *error-output* ,null-port)
+               (setq ,ret (progn ,@bodies))
+               )
+           (progn
+             (setq *standard-output* ,tmp-stdout)
+             (setq *error-output* ,tmp-stdout)
+             ,ret))))))
+
 (provide :irtutil "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
