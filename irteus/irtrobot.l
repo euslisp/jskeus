@@ -443,6 +443,41 @@
        (format t "~%      "))
      (format t ")~%")
      vec))
+  ;; Calculate zmp[mm] from sensor local forces and moments
+  ;;   If force_z is large, zmp can be defined and returns 3D zmp.
+  ;;   Otherwise, zmp cannot be defined and returns nil.
+  (:calc-zmp-from-forces-moments
+   (forces moments ;; [N] [Nm], sensor local force & moment
+    &key (wrt :world)
+         ;; :wrt is :local => calc local zmp for robot's root-link coords
+         ;; :wrt is :world => calc world zmp for robot
+         (limbs '(:rleg :lleg))
+         (force-sensors (mapcar #'(lambda (l) (send self :force-sensor l)) limbs))
+         (zmp-z (elt (apply #'midpoint 0.5 (mapcar #'(lambda (l) (send self l :end-coords :worldpos)) limbs)) 2)) ;; [mm]
+         (fz-thre 50)) ;; [N]
+   (let ((tmpzmpx 0) (tmpzmpy 0) (tmpfz 0)
+         (tmp-zmp-z (* 1e-3 zmp-z))) ;; [mm]->[m]
+     (mapcar #'(lambda (fs f m)
+                 (let ((fsp (scale 1e-3 (send fs :worldpos))) ;; [mm]->[m]
+                       (nf (send fs :rotate-vector f))
+                       (nm (send fs :rotate-vector m)))
+                   (setq tmpzmpx (+ tmpzmpx
+                                    (* (elt nf 2) (elt fsp 0))
+                                    (- (* (- (elt fsp 2) tmp-zmp-z) (elt nf 0)))
+                                    (- (elt nm 1)))
+                         tmpzmpy (+ tmpzmpy
+                                    (* (elt nf 2) (elt fsp 1))
+                                    (- (* (- (elt fsp 2) tmp-zmp-z) (elt nf 1)))
+                                    (elt nm 0))
+                         tmpfz (+ tmpfz (elt nf 2)))))
+             force-sensors forces moments)
+     (let ((tmpzmp (scale 1e3 (float-vector (/ tmpzmpx tmpfz) (/ tmpzmpy tmpfz) tmp-zmp-z)))) ;; [m]->[mm]
+       (cond
+        ((< tmpfz fz-thre) nil)
+        ((eq wrt :world) tmpzmp)
+        ((eq wrt :local) (send (car (send self :links)) :inverse-transform-vector tmpzmp))
+        (t )
+        ))))
   )
 
 ;;; moved from rbrarin libraries
