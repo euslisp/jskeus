@@ -219,6 +219,11 @@
 	    (transform-coords (send (send self :parentcoords)
 				    :inverse-transformation) cc cc)
 	    (send self :newcoords cc))))
+  (:move-coords
+   (target at) ;; fix "at" coords on "self" to "target"
+   (send self :transform (send at :transformation target) at)
+   (send self :worldcoords)
+   )
   )
 
 (defun transform-coords (c1 c2 &optional
