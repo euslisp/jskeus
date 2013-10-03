@@ -389,6 +389,8 @@
             meshes ids)))
 
 (defun mesh-description->collada-effect (mesh id)
+  (unless (get mesh :face-color)
+    (error ";; please set face-color for meshes ~A~%" mesh))
   `(effect
     (@ (id ,id))
     (|profile_COMMON|
