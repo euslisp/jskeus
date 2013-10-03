@@ -327,6 +327,13 @@
   (let ((name (send obj :name)))
     (unless name
       (error "You need to specify name"))
+    ;; support body or bodyset
+    (if (or (eq (send (class obj) :name) 'geo::body) (eq (send (class obj) :name) 'geo::bodyset))
+        (setq obj (let ((rb (instance user::cascaded-link :init :name (send obj :name))))
+                    (setq (rb . user::links) (list (instance user::bodyset-link :init (user::make-cascoords) :bodies (list obj))))
+                    (send rb :assoc (car (send rb :links)))
+                    (send rb :init-ending)
+                    rb)))
     (let ((descrpition (eusmodel-description obj)))
       (let ((sxml (eusmodel-description->collada
                    name descrpition :scale scale)))
