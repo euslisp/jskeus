@@ -207,7 +207,7 @@
                                  :faces
                                  (send (geo::body-to-triangles b nil)
                                        :faces))))
-                  (setf (get trimesh :face-color) (get b :face-color))
+                  (send trimesh :set-color (get b :face-color))
                   ;; move trimesh to origin...
                   (send trimesh
                         :move-to (send (send b :copy-worldcoords)
