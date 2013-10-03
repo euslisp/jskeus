@@ -36,7 +36,7 @@
 	   *eusdir* (unix:getenv "ARCHDIR"))
    '("irtgeo" "euspqp" "pqp" "irtscene" "irtmodel" "irtdyna" "irtrobot" "irtsensor" "irtbvh" "irtcollada" "irtpointcloud"))
   (in-package "USER")
-  (import '(collada::convert-irtmodel-to-collada)))
+  (import '(collada::convert-irtmodel-to-collada collada::eus2collada)))
 (defun load-irteusx ()
   (in-package "X")
   (load-library
