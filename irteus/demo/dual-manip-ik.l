@@ -23,7 +23,7 @@
                                 :translate (float-vector -75 0 0))))
     (send *obj* :assoc (send *obj* :get l)))
   (send *obj* :newcoords (make-coords :pos #f(300 0 700)))
-  (send *obj* :put :face-color :blue)
+  (send *obj* :set-color :blue)
   (send *robot* :head :look-at (send *obj* :worldpos))
   (objects (list *obj* *robot*))
   ;; ik codes
