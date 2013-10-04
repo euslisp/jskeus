@@ -866,25 +866,25 @@
                (when amb
                  (if stransparent
                      (setf (elt amb 3) (float-vector stransparent)))
-                 (glMaterialfv GL_FRONT GL_AMBIENT amb))
+                 (glMaterialfv GL_BACK GL_AMBIENT amb))
                (when diff
                  (if stransparent
                      (setf (elt diff 3) (float-vector stransparent)))
-                 (glMaterialfv GL_FRONT GL_DIFFUSE diff))
+                 (glMaterialfv GL_BACK GL_DIFFUSE diff))
                (when spec
                  (if stransparent
                      (setf (elt spec 3) (float-vector stransparent)))
-                 (glMaterialfv GL_FRONT GL_SPECULAR spec))
+                 (glMaterialfv GL_BACK GL_SPECULAR spec))
                (when emi
                  (if stransparent
                      (setf (elt emi 3) (float-vector stransparent)))
-                 (glMaterialfv GL_FRONT GL_EMISSION emi))
+                 (glMaterialfv GL_BACK GL_EMISSION emi))
                (cond
                 (shin
-                 (glMaterialf GL_FRONT GL_SHININESS shin))
+                 (glMaterialf GL_BACK GL_SHININESS shin))
                 (t
-                 (glMaterialf GL_FRONT GL_SHININESS 0.0)
-                 (glMaterialfv GL_FRONT GL_SPECULAR (float-vector 0 0 0 0))
+                 (glMaterialf GL_BACK GL_SHININESS 0.0)
+                 (glMaterialfv GL_BACK GL_SPECULAR (float-vector 0 0 0 0))
                  ))
                (when (and teximg texcoords)
                  (let ((im_width  (send teximg :width))
