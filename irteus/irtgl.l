@@ -804,6 +804,7 @@
      (glPushAttrib GL_ALL_ATTRIB_BITS)
      (glpushmatrix)
      (glmultmatrixf (array-entity (transpose mat *temp-matrix*)))
+     (gl::glLightModeli GL_LIGHT_MODEL_TWO_SIDE GL_TRUE) ;; draw back side
      (cond
       ((setq newlis (cdr (assq glcon (get self :GL-DISPLAYLIST-ID))))
        (glCallList newlis))
@@ -834,10 +835,13 @@
            (cond
             (fcol ;; use :face-color
              (glColor3fv fcol)
-             (glMaterialfv GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE
+             (glMaterialfv GL_BACK  GL_AMBIENT_AND_DIFFUSE
                            (if stransparent
                                (concatenate float-vector fcol (float-vector stransparent))
                              fcol))
+             (glMaterialfv GL_FRONT GL_AMBIENT_AND_DIFFUSE (if stransparent
+                                                               (float-vector 0.8 0.0 0.54 1)
+                                                             (float-vector 0.8 0.0 0.54)))
              ;;(glMaterialfv GL_FRONT_AND_BACK GL_SPECULAR (float-vector 0.2 0.2 0.2 0.1))
              ;;(glMaterialfv GL_FRONT_AND_BACK GL_EMISSION (float-vector 0.1 0.1 0.1 0.1))
              )
@@ -914,10 +918,17 @@
                    ))
                ))
             (t ;; default color
-             (glMaterialfv GL_FRONT_AND_BACK GL_AMBIENT (float-vector 0.1 0.1 0.1 0.1))
-             (glMaterialfv GL_FRONT_AND_BACK GL_DIFFUSE (float-vector 1 1 1 1))
-             (glMaterialfv GL_FRONT_AND_BACK GL_SPECULAR (float-vector 0.2 0.2 0.2 0.1))
-             (glMaterialfv GL_FRONT_AND_BACK GL_EMISSION (float-vector 0.1 0.1 0.1 0.1)))
+             ;; Font face was set CW at glview.l (glFrontFace GL_CW)
+             (glMaterialfv GL_BACK  GL_AMBIENT (float-vector 0.2 0.2 0.2 0.1))
+             (glMaterialfv GL_BACK  GL_DIFFUSE (float-vector 1 1 1 1))
+             (glMaterialfv GL_BACK  GL_SPECULAR (float-vector 0.2 0.2 0.2 0.1))
+             (glMaterialfv GL_BACK  GL_EMISSION (float-vector 0.1 0.1 0.1 0.1))
+             ;;
+             (glMaterialfv GL_FRONT GL_AMBIENT (float-vector 0.8 0.0 0.54 1))
+             (glMaterialfv GL_FRONT GL_DIFFUSE (float-vector 0.8 0.0 0.54 1))
+             (glMaterialfv GL_FRONT GL_SPECULAR (float-vector 0.2 0.2 0.2 1))
+             (glMaterialfv GL_FRONT GL_EMISSION (float-vector 0.1 0.1 0.1 1))
+             )
             ) ;; /cond
            (unless (and teximg texcoords) (setq texcoords nil))
            ;;
@@ -980,6 +991,7 @@
                    (get self :GL-DISPLAYLIST-ID)))
        (setq newlis nil)
        ))
+     (gl::glLightModeli GL_LIGHT_MODEL_TWO_SIDE GL_TRUE) ;; return to default
      (glpopmatrix)
      (glpopattrib)
 #+:jsk
