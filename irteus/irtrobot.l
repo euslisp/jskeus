@@ -314,6 +314,8 @@
     ((null look-at-target))
     (t (send self :head :look-at (send (car target-coords) :worldpos)))
     ))
+  ;; init-pose
+  (:init-pose () (send self :angle-vector (instantiate float-vector (send self :calc-target-joint-dimension (cdr (send self :links))))))
   (:torque-vector
    (&key (force-list) (moment-list) (target-coords)
          (debug-view nil)
