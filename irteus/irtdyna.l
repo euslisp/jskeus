@@ -652,6 +652,13 @@
 		 (t (elt (send j :max-joint-torque) k))))
          (incf i)))
      ret))
+  (:torque-ratio-vector
+    (&rest args &key (torque (send* self :torque-vector args)))
+    (let* ((mtq (send self :max-torque-vector))
+           (ret (instantiate float-vector (length mtq))))
+      (dotimes (i (length mtq))
+        (setf (elt ret i) (/ (elt torque i) (elt mtq i))))
+      ret))
   (:calc-torque-buffer-args
     ()
     ;; buffers for computation
