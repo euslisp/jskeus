@@ -391,6 +391,7 @@
           (target-centroid-pos (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos))) ;; <- target centroid position.
           (cog-gain 1.0) ;; <- cog gain for null-space calculation. cog-gain should be over zero.
           (centroid-thre 5.0) ;; cog convergence threshould [mm]
+          (additional-weight-list)
      &allow-other-keys)
     (with-append-root-joint ;; inverse-kinematics with base-link
      (link-list-with-robot-6dof self link-list
@@ -399,13 +400,10 @@
      (send* self :inverse-kinematics target-coords
             :move-target move-target :link-list link-list-with-robot-6dof
             :cog-gain cog-gain :centroid-thre centroid-thre :target-centroid-pos target-centroid-pos
-            :weight #'(lambda (union-link-list)
-			(let ((tmp-weight (fill (instantiate float-vector (send self :calc-target-joint-dimension union-link-list)) 1.0)))
-			  (dotimes (i 6) (setf (elt tmp-weight i) (elt root-link-virtual-joint-weight i)))
-			  (if (memq :weight args)
-			      (let ((tmp-weight2 (funcall (cadr (memq :weight args)) union-link-list)))
-				(dotimes (i (length tmp-weight2)) (setf (elt tmp-weight i) (* (elt tmp-weight i) (elt tmp-weight2 i))))))
-			  tmp-weight))
+            :additional-weight-list
+            (append
+             additional-weight-list
+             (list (list (car (send self :links)) root-link-virtual-joint-weight)))
             args)
      ))
   (:joint-order
