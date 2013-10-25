@@ -771,7 +771,18 @@
            (user::c-coords-transform-vector
             zero wrot nmat nmat))))
      self))
-  (:devide-glvertices ()) ;; not implemented yet
+  (:glvertices (&optional (name) (test #'string=))
+   (let (ret)
+     (cond
+      (name
+       (let ((m (find-if #'(lambda (m) (funcall test name (cadr (assoc :name m)))) mesh-list)))
+         (if m (setq ret (instance glvertices :init (list m))))))
+      (t
+       (dolist (minfo mesh-list)
+         (push (instance glvertices :init (list minfo)) ret))
+       (setq ret (nreverse ret))
+       ))
+     ret))
   (:append-glvertices (glv-lst) ;; not checked
    (if (atom glv-lst) (setq glv-lst (list glv-lst)))
    (let (ret (sw (send self :worldcoords)))
