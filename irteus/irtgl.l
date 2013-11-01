@@ -706,7 +706,7 @@
            (nconc minfo (list (list :normals nmat)))
            ))
        )))
-  (:convert-to-faces (&rest args) ;; check-normal <-> check-vertices-order, add face-color
+  (:convert-to-faces (&rest args &key (wrt :local) &allow-other-keys) ;; check-normal <-> check-vertices-order, add face-color
    (let (ret)
      (dolist (mesh mesh-list)
        (let ((vlst (cadr (assoc :vertices mesh)))
@@ -729,11 +729,15 @@
                (dotimes (j mesh-size)
                  (push (user::c-matrix-row vlst (elt idces (+ v j))) vs)
                  (if nlst (push (user::c-matrix-row nlst (elt idces (+ v j))) ns)))
+               (setq vs (case wrt
+                          (:world (mapcar #'(lambda (x) (send self :transform-vector x)) (nreverse vs)))
+                          (:local (nreverse vs))
+                          (t )))
                (push
                 (cond
                  ;;((and ns check-vertices-order) )
-                 ;;(ns (instance face :init :vertices (nreverse vs) :normal ns))
-                 (t (instance face :init :vertices (nreverse vs))))
+                 ;;(ns (instance face :init :vertices vs :normal ns))
+                 (t (instance face :init :vertices vs)))
                 lst))))
           (t
            (do ((i 0 (+ i 1))
@@ -743,10 +747,14 @@
                (dotimes (j mesh-size)
                  (push (user::c-matrix-row vlst (+ v j)) vs)
                  (if nlst (push (user::c-matrix-row nlst (+ v j)) ns)))
+               (setq vs (case wrt
+                          (:world (mapcar #'(lambda (x) (send self :transform-vector x)) (nreverse vs)))
+                          (:local (nreverse vs))
+                          (t )))
                (push
                 (if ns
-                    (instance face :init :vertices (nreverse vs) :normal ns)
-                  (instance face :init :vertices (nreverse vs)))
+                    (instance face :init :vertices vs :normal ns)
+                  (instance face :init :vertices vs))
                 lst))))
           ) ;; /cond
          (push (nreverse lst) ret)))
