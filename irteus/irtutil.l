@@ -327,6 +327,30 @@
              (setq *error-output* ,tmp-stdout)
              ,ret))))))
 
+;; usage:
+;; (read-char-case "y or n or r: "
+;;  (#\y (format t "yes~%") t)
+;;  (#\n (format t "no~%") t)
+;;  (#\r (format t "retry~%") t)
+;;  )
+(defmacro read-char-case (str &rest clauses)
+  (let ((ch (gensym))
+        (missed-return (gensym))
+        (flag (gensym)))
+    `(progn
+       (let ((,flag ',missed-return))
+         (while (eq ,flag ',missed-return)
+           (format t ,str)
+           (finish-output *standard-output*)
+           (setq ,flag
+                 (let ((,ch (read-char))) ;read-block
+                   (case ,ch
+                     ,@clauses
+                     (t                 ;if does not match to anything
+                      ',missed-return))))
+           )
+         ,flag))))
+
 (provide :irtutil "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
