@@ -536,6 +536,7 @@
            (send self leg :end-coords :worldpos)))
         (fix-limbs-target-coords
          (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) fix-limbs))
+        (root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5)) ;; use only translation x, y and rotation z
         &allow-other-keys)
    "(leg fix-limbs
         &rest args
@@ -558,7 +559,7 @@
     fix-limbs -> limb names which are fixed in this IK."
    (with-move-target-link-list
     (mt ll self fix-limbs)
-    (let* ((root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5))) ;; use only translation x, y and rotation z
+    (let* ()
       (send* self :fullbody-inverse-kinematics
              fix-limbs-target-coords
              :move-target mt :link-list ll
@@ -572,11 +573,12 @@
    (footstep-list
     &key (default-step-height 50) (dt 0.1) (default-step-time 1.0)
          (default-zmp-offsets (list :rleg (float-vector 0 0 0) :lleg (float-vector 0 0 0)))
-         (solve-angle-vector-args) (debug-view nil))
+         (solve-angle-vector-args) (debug-view nil)
+         (init-pose-function #'(lambda () (send self :move-centroid-on-foot :both '(:rleg :lleg)))))
    (let* ((res) (ret) (tm 0)
           (gg (instance gait-generator :init self dt)))
+     (funcall init-pose-function)
      ;; initial move centroid on foot
-     (send self :move-centroid-on-foot :both '(:rleg :lleg))
      (send gg :initialize-gait-parameter
            footstep-list default-step-time (send (car (send self :links)) :get :c-til)
            :default-step-height default-step-height :default-double-support-ratio 0.2
