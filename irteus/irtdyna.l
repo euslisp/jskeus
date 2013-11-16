@@ -1361,17 +1361,17 @@
             :both legs :target-centroid-pos cog
             :fix-limbs-target-coords (append swing-leg-coords support-leg-coords)
             :cog-gain cog-gain :stop stop
-            :null-space
-            #'(lambda ()
-                (let ((xvr (send robot :rotate-vector #f(1 0 0)))
-                      (xvf (send (midcoords 0.5 (car swing-leg-coords) (car support-leg-coords))
-                                 :rotate-vector #f(1 0 0)))
-                      (nv (instantiate float-vector (send robot :calc-target-joint-dimension (mapcar #'(lambda (l) (send robot :link-list (send (send robot l :end-coords) :parent))) legs)))))
-                  (dolist (xv (list xvr xvf)) (setf (elt xv 2) 0.0))
-                  (setf (elt nv 5) (* (if (and (eps= (norm xvf) 0.0) (eps= (norm xvr) 0.0))
-                                          0.0 (acos (v. (normalize-vector xvf) (normalize-vector xvr))))
-                                      (if (> (elt (v* xvf xvr) 2) 0.0) -1.0 1.0)))
-                  nv))
+            :additional-nspace-list
+            (list (list (car (send robot :links))
+                        #'(lambda ()
+                            (let ((xvr (send robot :rotate-vector #f(1 0 0)))
+                                  (xvf (send (midcoords 0.5 (car swing-leg-coords) (car support-leg-coords))
+                                             :rotate-vector #f(1 0 0))))
+                              (dolist (xv (list xvr xvf)) (setf (elt xv 2) 0.0))
+                              (float-vector 0 0 0 0 0
+                                            (* (if (and (eps= (norm xvf) 0.0) (eps= (norm xvr) 0.0))
+                                                      0.0 (acos (v. (normalize-vector xvf) (normalize-vector xvr))))
+                                               (if (> (elt (v* xvf xvr) 2) 0.0) -1.0 1.0)))))))
             args)))
   ;; calculate midpoint using cycloig orbit
   ;;   ratio  -> midpoint ratio
