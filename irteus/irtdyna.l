@@ -1134,10 +1134,10 @@
     (fsl time cog ;; time is [s], cog is [mm]
      &key ((:default-step-height dsh) 50) ;; height [mm]
           ((:default-double-support-ratio ddsr) 0.2)
-          ((:default-zmp-offsets dzo) (list (float-vector 0 0 0) (float-vector 0 0 0))) ;; (list rleg lleg), [mm]
+          ((:default-zmp-offsets dzo) (list :rleg (float-vector 0 0 0) :lleg (float-vector 0 0 0))) ;; [mm]
           (delay 1.6) ;; delay [s]
           (q 1.0) (r 1e-6))
-    (setq footstep-node-list fsl
+    (setq footstep-node-list (mapcar #'(lambda (l) (list l)) fsl)
           one-step-len (round (/ time dt))
           support-leg-coords-list nil
           support-leg-list nil
@@ -1149,26 +1149,26 @@
           default-zmp-offsets dzo
           index-count one-step-len
           finalize-p nil)
-    (send self :append-support-leg-list
-          (case (if (find-method (car footstep-node-list) :l/r)
-                    (send (car footstep-node-list) :l/r)
-                  (send (car footstep-node-list) :get :l/r))
-            (:rleg :lleg) (:lleg :rleg)))
-    (send self :append-support-leg-coords-list
-          (send robot (car support-leg-list) :end-coords :copy-worldcoords))
-    (send self :append-swing-leg-dst-coords-list
-          (send robot (if (find-method (car footstep-node-list) :l/r)
-                          (send (car footstep-node-list) :l/r)
-                        (send (car footstep-node-list) :get :l/r))
-                :end-coords :copy-worldcoords))
-    (send self :append-refzmp-cur-list
-          (midpoint 0.5
-                    (v+ (send (car support-leg-coords-list) :worldpos)
-                        (send (car support-leg-coords-list) :rotate-vector
-                              (case (car support-leg-list) (:rleg (car default-zmp-offsets)) (:lleg (cadr default-zmp-offsets)))))
-                    (v+ (send (car swing-leg-dst-coords-list) :worldpos)
-                        (send (car swing-leg-dst-coords-list) :rotate-vector
-                              (case (car support-leg-list) (:lleg (car default-zmp-offsets)) (:rleg (cadr default-zmp-offsets)))))))
+    (let ((current-swing-limbs (list (if (find-method (car (car footstep-node-list)) :l/r)
+                                         (send (car (car footstep-node-list)) :l/r)
+                                       (send (car (car footstep-node-list)) :get :l/r)))))
+      (send self :append-support-leg-list
+            (list (case (car current-swing-limbs) (:rleg :lleg) (:lleg :rleg))))
+      (let ((current-support-limbs (car support-leg-list)))
+        (send self :append-support-leg-coords-list
+              (mapcar #'(lambda (l) (send robot l :end-coords :copy-worldcoords)) current-support-limbs))
+        (send self :append-swing-leg-dst-coords-list
+              (mapcar #'(lambda (l) (send robot l :end-coords :copy-worldcoords)) current-swing-limbs))
+        (let ((current-support-leg-coords (car support-leg-coords-list))
+              (current-swing-leg-dst-coords (car swing-leg-dst-coords-list)))
+          (send self :append-refzmp-cur-list
+                (midpoint 0.5
+                          (v+ (send (car current-support-leg-coords) :worldpos)
+                              (send (car current-support-leg-coords) :rotate-vector
+                                    (cadr (memq (car current-swing-limbs) default-zmp-offsets))))
+                          (v+ (send (car current-swing-leg-dst-coords) :worldpos)
+                              (send (car current-swing-leg-dst-coords) :rotate-vector
+                                    (cadr (memq (car current-support-limbs) default-zmp-offsets))))))
     (send self :append-step-height-list 0.0)
     (pop footstep-node-list)
     ;; currently, not error system
@@ -1179,28 +1179,28 @@
                                        :q q :r r
                                        :init-xk cog
                                        )
-          swing-leg-src-coords (car swing-leg-dst-coords-list)
-          refzmp-next (v+ (send (car swing-leg-dst-coords-list) :worldpos)
-                          (send (car swing-leg-dst-coords-list) :rotate-vector
-                                (case (car support-leg-list) (:lleg (car default-zmp-offsets)) (:rleg (cadr default-zmp-offsets)))))
+          swing-leg-src-coords current-swing-leg-dst-coords
+          refzmp-next (v+ (send (car (car swing-leg-dst-coords-list)) :worldpos)
+                          (send (car (car swing-leg-dst-coords-list)) :rotate-vector
+                                (cadr (memq (car current-support-limbs) default-zmp-offsets))))
           refzmp-prev (car refzmp-cur-list))
     (send self :make-gait-parameter)
-    t)
+    t))))
   ;; append final gait parameters
   (:finalize-gait-parameter
     ()
     (let ((dst-swing-coords (car (last support-leg-coords-list))))
-      (send self :append-support-leg-list (case (car (last support-leg-list)) (:rleg :lleg) (:lleg :rleg)))
+      (send self :append-support-leg-list (list (case (car (car (last support-leg-list))) (:rleg :lleg) (:lleg :rleg))))
       (send self :append-support-leg-coords-list (car (last swing-leg-dst-coords-list)))
       (send self :append-swing-leg-dst-coords-list dst-swing-coords)
       (send self :append-refzmp-cur-list
             (midpoint 0.5
-                      (v+ (send (car (last support-leg-coords-list)) :worldpos)
-                          (send (car (last support-leg-coords-list)) :rotate-vector
-                                (case (car (last support-leg-list)) (:rleg (car default-zmp-offsets)) (:lleg (cadr default-zmp-offsets)))))
-                      (v+ (send (car (last swing-leg-dst-coords-list)) :worldpos)
-                          (send (car (last swing-leg-dst-coords-list)) :rotate-vector
-                                (case (car (last support-leg-list)) (:lleg (car default-zmp-offsets)) (:rleg (cadr default-zmp-offsets)))))))
+                      (v+ (send (car (car (last support-leg-coords-list))) :worldpos)
+                          (send (car (car (last support-leg-coords-list))) :rotate-vector
+                                (cadr (memq (car (car (last support-leg-list))) default-zmp-offsets))))
+                      (v+ (send (car (car (last swing-leg-dst-coords-list))) :worldpos)
+                          (send (car (car (last swing-leg-dst-coords-list))) :rotate-vector
+                                (cadr (memq (case (car (car (last support-leg-list))) (:rleg :lleg) (:lleg :rleg)) default-zmp-offsets))))))
       (send self :append-step-height-list 0.0)
       (setq refzmp-next (car (last refzmp-cur-list)))
       t))
@@ -1209,16 +1209,17 @@
     ()
     (let ((fs (pop footstep-node-list)))
       (send self :append-support-leg-list
-            (case (if (find-method fs :l/r)
-                      (send fs :l/r)
-                    (send fs :get :l/r))
-              (:rleg :lleg) (:lleg :rleg)))
+            (list
+             (case (if (find-method (car fs) :l/r)
+                       (send (car fs) :l/r)
+                     (send (car fs) :get :l/r))
+               (:rleg :lleg) (:lleg :rleg))))
       (send self :append-support-leg-coords-list (car (last swing-leg-dst-coords-list)))
-      (send self :append-swing-leg-dst-coords-list (send fs :worldcoords))
+      (send self :append-swing-leg-dst-coords-list (send-all fs :worldcoords))
       (send self :append-refzmp-cur-list
-            (v+ (send (car (last support-leg-coords-list)) :worldpos)
-                (send (car (last support-leg-coords-list)) :rotate-vector
-                      (case (car (last support-leg-list)) (:rleg (car default-zmp-offsets)) (:lleg (cadr default-zmp-offsets))))))
+            (v+ (send (car (car (last support-leg-coords-list))) :worldpos)
+                (send (car (car (last support-leg-coords-list))) :rotate-vector
+                      (cadr (memq (car (car (last support-leg-list))) default-zmp-offsets)))))
       (send self :append-step-height-list default-step-height)
       t))
   ;; calculate swing leg coords
@@ -1260,10 +1261,12 @@
    (type)
    (list (car support-leg-list)
          (car support-leg-coords-list)
-         (send self :calc-current-swing-leg-coords
-               (send self :calc-ratio-from-double-support-ratio)
-               swing-leg-src-coords (car swing-leg-dst-coords-list)
-               :type type :step-height (car step-height-list))
+         (mapcar #'(lambda (sw-sc sw-dc)
+                     (send self :calc-current-swing-leg-coords
+                           (send self :calc-ratio-from-double-support-ratio)
+                           sw-sc sw-dc
+                           :type type :step-height (car step-height-list)))
+                 swing-leg-src-coords (car swing-leg-dst-coords-list))
          (send self :calc-current-refzmp
                refzmp-prev (car refzmp-cur-list) refzmp-next)
          )
@@ -1331,15 +1334,15 @@
   (:solve-av-by-move-centroid-on-foot
    (support-leg support-leg-coords swing-leg-coords cog robot
    &rest args &key (cog-gain 3.5) (stop 100) &allow-other-keys)
-   (let ((legs (list (case support-leg (:lleg :rleg) (:rleg :lleg)) support-leg)))
+   (let ((legs (list (case (car support-leg) (:lleg :rleg) (:rleg :lleg)) (car support-leg))))
      (send* robot :move-centroid-on-foot
             :both legs :target-centroid-pos cog
-            :fix-limbs-target-coords (list swing-leg-coords support-leg-coords)
+            :fix-limbs-target-coords (append swing-leg-coords support-leg-coords)
             :cog-gain cog-gain :stop stop
             :null-space
             #'(lambda ()
                 (let ((xvr (send robot :rotate-vector #f(1 0 0)))
-                      (xvf (send (midcoords 0.5 swing-leg-coords support-leg-coords)
+                      (xvf (send (midcoords 0.5 (car swing-leg-coords) (car support-leg-coords))
                                  :rotate-vector #f(1 0 0)))
                       (nv (instantiate float-vector (send robot :calc-target-joint-dimension (mapcar #'(lambda (l) (send robot :link-list (send (send robot l :end-coords) :parent))) legs)))))
                   (dolist (xv (list xvr xvf)) (setf (elt xv 2) 0.0))

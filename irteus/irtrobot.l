@@ -571,7 +571,7 @@
   (:calc-walk-pattern-from-footstep-list
    (footstep-list
     &key (default-step-height 50) (dt 0.1) (default-step-time 1.0)
-         (default-zmp-offsets (list (float-vector 0 0 0) (float-vector 0 0 0)))
+         (default-zmp-offsets (list :rleg (float-vector 0 0 0) :lleg (float-vector 0 0 0)))
          (solve-angle-vector-args) (debug-view nil))
    (let* ((res) (ret) (tm 0)
           (gg (instance gait-generator :init self dt)))
@@ -623,8 +623,8 @@
                (send *viewer* :viewsurface :color col)
                (funcall func)
                (send *viewer* :viewsurface :color pc))))
-     (send spc :draw-on :flush nil :size 300 :color #f(1 0 0))
-     (send swc :draw-on :flush nil :size 300 :color #f(0 1 0))
+     (send-all spc :draw-on :flush nil :size 300 :color #f(1 0 0))
+     (send-all swc :draw-on :flush nil :size 300 :color #f(0 1 0))
      (send rz :draw-on :flush nil :size 300 :color #f(0 0 1))
      (send czmp :draw-on :flush nil :size 200 :width 5)
      (with-modify-color
