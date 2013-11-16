@@ -1140,21 +1140,27 @@
    (fs)
    (if (symbolp (car fs))
        (mapcar #'(lambda (f)
-               (case f (:rleg :lleg) (:lleg :rleg)))
+               (case f
+                 (:rleg :lleg)
+                 (:lleg :rleg)
+                 (:rarm :larm)
+                 (:larm :rarm)
+                 ))
                fs)
      (send self :get-counter-footstep-limbs (send self :get-footstep-limbs fs)))
    )
   (:get-limbs-zmp
    (limb-coords limb-names)
-   (reduce
-    #'v+
-    (apply
-     #'append
-     (mapcar #'(lambda (lc ln)
-                 (list (send lc :worldpos)
-                       (send lc :rotate-vector
-                             (cadr (memq ln default-zmp-offsets)))))
-             limb-coords limb-names)))
+   (scale (/ 1.0 (length limb-names))
+          (reduce
+           #'v+
+           (mapcar #'(lambda (lc ln)
+                       (v+ (send lc :worldpos)
+                           (send lc :rotate-vector
+                                 (cadr (memq ln default-zmp-offsets)))))
+                   limb-coords limb-names)
+           :initial-value (float-vector 0 0 0)
+           ))
    )
   ;; initialize parameter and generate first gait parameter
   (:initialize-gait-parameter
