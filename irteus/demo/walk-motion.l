@@ -44,8 +44,59 @@
   (unless (boundp '*robot*)
     (setq *robot* (instance sample-robot :init)))
   (walk-motion *robot*))
-
 (warn "(walk-motion-for-sample-robot) for walking motion~%")
+
+(defun quad-walk-motion-for-sample-robot ()
+  (unless (boundp '*robot*)
+    (setq *robot* (instance sample-robot :init)))
+  ;; initial quad pose
+  (send *robot* :reset-pose)
+  (send *robot* :newcoords (make-coords :pos #f(0 0 400) :rpy (list 0 (deg2rad -90) 0)))
+  (with-move-target-link-list
+   (mt ll *robot* '(:rleg :lleg :rarm :larm))
+   (send *robot* :inverse-kinematics
+         (list
+          (make-coords :pos #f(300 -120 0))
+          (make-coords :pos #f(300 120 0))
+          (make-coords :pos #f(-200 -120 0) :rpy (list 0 pi/2 0))
+          (make-coords :pos #f(-200 120 0) :rpy (list 0 pi/2 0)))
+         :stop 200 :move-target mt :link-list ll
+         ;;:debug-view :no-message
+         ))
+  ;; prepare footsteps
+  (let ((footstep-list
+         (list (list (send *robot* :rleg :end-coords :copy-worldcoords)
+                     (send *robot* :larm :end-coords :copy-worldcoords))
+               (list (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world)
+                     (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world))
+               (list (send (send *robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 100 0 0) :world)
+                     (send (send *robot* :larm :end-coords :copy-worldcoords) :translate (float-vector 100 0 0) :world))
+               (list (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 150 50 0) :world)
+                     (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 150 50 0) :world))
+               (list (send (send *robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world)
+                     (send (send *robot* :larm :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world))
+               (list (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world)
+                     (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world))
+               )))
+    (dolist (x footstep-list)
+      (send (car x) :put :l/r (if (evenp (position x footstep-list)) :rleg :lleg))
+      (send (cadr x) :put :l/r (if (evenp (position x footstep-list)) :larm :rarm)))
+    (objects (list *robot*))
+    ;; test move-centroid-on-foot
+    ;; (send *robot* :move-centroid-on-foot :both '(:rleg :lleg :rarm :larm)
+    ;;       ;;:debug-view :no-message
+    ;;       :stop 200 :root-link-virtual-joint-weight #f(0.1 0.1 0.1 0 0 0)
+    ;;       :target-centroid-pos (vector-mean (append (send *robot* :arms :end-coords :worldpos) (send *robot* :legs :end-coords :worldpos))))
+    ;; solve walk motion
+    (send *robot* :calc-walk-pattern-from-footstep-list
+          footstep-list :debug-view :no-message
+          :init-pose-function #'(lambda ())
+          :default-zmp-offsets
+          (list :rleg (float-vector 0 0 0) :lleg (float-vector 0 0 0)
+                :rarm (float-vector 0 0 0) :larm (float-vector 0 0 0))
+          :default-step-height 70)
+    ))
+(warn "(quad-walk-motion-for-sample-robot) for walking motion~%")
 
 (defun walk-motion-for-robots ()
   (unless (boundp '*robots*)
