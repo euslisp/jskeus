@@ -1356,16 +1356,18 @@
    &rest args &key (cog-gain 3.5) (stop 100) &allow-other-keys)
    (let ((legs
           (append (send self :get-counter-footstep-limbs support-leg)
-                  support-leg)))
+                  support-leg))
+         (fix-coords (append swing-leg-coords support-leg-coords)))
      (send* robot :move-centroid-on-foot
             :both legs :target-centroid-pos cog
-            :fix-limbs-target-coords (append swing-leg-coords support-leg-coords)
+            :fix-limbs-target-coords fix-coords
             :cog-gain cog-gain :stop stop
             :additional-nspace-list
             (list (list (car (send robot :links))
                         #'(lambda ()
-                            (let ((xvr (send robot :rotate-vector #f(1 0 0)))
-                                  (xvf (send (midcoords 0.5 (car swing-leg-coords) (car support-leg-coords))
+                            (let ((xvr (send robot :rotate-vector (case (length legs) (2 #f(1 0 0)) (4 #f(0 0 -1)))))
+                                  (xvf (send (apply #'midcoords 0.5
+                                                    (mapcar #'(lambda (x) (elt fix-coords (position x legs))) '(:rleg :lleg)))
                                              :rotate-vector #f(1 0 0))))
                               (dolist (xv (list xvr xvf)) (setf (elt xv 2) 0.0))
                               (float-vector 0 0 0 0 0

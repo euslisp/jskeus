@@ -82,15 +82,16 @@
       (send (car x) :put :l/r (if (evenp (position x footstep-list)) :rleg :lleg))
       (send (cadr x) :put :l/r (if (evenp (position x footstep-list)) :larm :rarm)))
     (objects (list *robot*))
-    ;; test move-centroid-on-foot
-    ;; (send *robot* :move-centroid-on-foot :both '(:rleg :lleg :rarm :larm)
-    ;;       ;;:debug-view :no-message
-    ;;       :stop 200 :root-link-virtual-joint-weight #f(0.1 0.1 0.1 0 0 0)
-    ;;       :target-centroid-pos (vector-mean (append (send *robot* :arms :end-coords :worldpos) (send *robot* :legs :end-coords :worldpos))))
     ;; solve walk motion
     (send *robot* :calc-walk-pattern-from-footstep-list
           footstep-list :debug-view :no-message
-          :init-pose-function #'(lambda ())
+          :init-pose-function
+          #'(lambda ()
+              (send *robot* :move-centroid-on-foot :both '(:rleg :lleg :rarm :larm)
+                    ;;:debug-view :no-message
+                    :stop 200 :root-link-virtual-joint-weight #f(0.1 0.1 0.1 0 0 0)
+                    :target-centroid-pos (vector-mean (append (send *robot* :arms :end-coords :worldpos) (send *robot* :legs :end-coords :worldpos)))))
+          :solve-angle-vector-args (list :root-link-virtual-joint-weight #f(0.1 0.1 0.1 0 0 0))
           :default-zmp-offsets
           (list :rleg (float-vector 0 0 0) :lleg (float-vector 0 0 0)
                 :rarm (float-vector 0 0 0) :larm (float-vector 0 0 0))
