@@ -604,7 +604,7 @@
                    czmp dt))
          (push
           (list :angle-vector (send self :angle-vector)
-                :root-coords (send self :copy-worldcoords)
+                :root-coords (send (car (send self :links)) :copy-worldcoords)
                 :czmp czmp :refzmp (elt ret 5) :cog (elt ret 6)
                 :swing-leg-coords (elt ret 4)
                 :support-leg-coords (elt ret 3)
