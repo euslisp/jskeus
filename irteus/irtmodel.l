@@ -2027,6 +2027,10 @@
 		(format f "(defun ~A-check () (let ((r *robot*)) (send* r :inverse-kinematics ~A)))~%" command-id command-args)
 		(format f "(defun ik-setup () (~A-setup))~%" command-id)
 		(format f "(defun ik-check () (~A-check))~%" command-id)
+                (format f "(setq ik-failed '(")
+                (format f "(:dif-pos . ~A) (:dif-rot . ~A~%)" dif-pos dif-rot)
+                (if target-centroid-pos (format f "(:dif-cog . ~A)" (send self :difference-cog-position target-centroid-pos centroid-offset-func)))
+                (format f "))~%")
 		)
 	       ) ;;let
 	     ) ;; dump
