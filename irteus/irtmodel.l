@@ -703,7 +703,7 @@
    (let ((i 0))
      (dolist (j joint-list)
        (when vec
-           ;; for joint w/ min-max-table
+           ;; for joint w/ min-max-table, see http://sourceforge.net/p/jskeus/tickets/43/
            (when (and (send j :joint-min-max-table) (send j :joint-min-max-target))
              ;; currently only 1dof joint is supported
              (when (and (= (send j :joint-dof) 1) (= (send (send j :joint-min-max-target) :joint-dof) 1))
@@ -723,9 +723,31 @@
                         (setq (j . joint-angle) tmp-joint-angle
                               (jj . joint-angle) tmp-target-joint-angle))
                        (t
-                        ))
-                 );; let*
-               )) ;; when
+                        ;;
+                        (do ((i 0 (incf i 0.1)))
+                            ((> i 1))
+                          (setq tmp-joint-min-angle (send j :joint-min-max-table-min-angle tmp-target-joint-angle)
+                                tmp-joint-max-angle (send j :joint-min-max-table-max-angle tmp-target-joint-angle))
+                          (setq tmp-target-joint-min-angle (send j :joint-min-max-table-min-angle tmp-joint-angle)
+                                tmp-target-joint-max-angle (send j :joint-min-max-table-max-angle tmp-joint-angle))
+
+                          (if (< tmp-joint-angle tmp-joint-min-angle)
+                              (incf tmp-joint-angle (* (- tmp-joint-min-angle tmp-joint-angle) i)))
+                          (if (> tmp-joint-angle tmp-joint-max-angle)
+                              (incf tmp-joint-angle (* (- tmp-joint-max-angle tmp-joint-angle) i)))
+                          (if (< tmp-target-joint-angle tmp-target-joint-min-angle)
+                              (incf tmp-target-joint-angle (* (- tmp-target-joint-min-angle tmp-target-joint-angle) i)))
+                          (if (> tmp-target-joint-angle tmp-target-joint-max-angle)
+                              (incf tmp-target-joint-angle (* (- tmp-target-joint-max-angle tmp-target-joint-angle) i)))
+                          )
+                        (setq (j . joint-angle) tmp-joint-angle
+                              (jj . joint-angle) tmp-target-joint-angle)
+                        (setf (elt vec i) tmp-joint-angle)
+                        (setf (elt vec ii) tmp-target-joint-angle)
+                        )
+                       );; cond
+               );; let*
+             )) ;; when
            (case (send j :joint-dof)
              (1 (send j :joint-angle (elt vec i)))
              (t (send j :joint-angle (subseq vec i (+ i (send j :joint-dof)))))
