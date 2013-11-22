@@ -720,7 +720,6 @@
                        tmp-target-joint-max-angle (send j :joint-min-max-table-max-angle tmp-joint-angle))
                  (cond ((<= tmp-joint-min-angle tmp-joint-angle tmp-joint-max-angle) ;; ok
                         ;; force change joint-angle to avoid problem
-                        (print (list tmp-joint-angle tmp-target-joint-angle))
                         (setq (j . joint-angle) tmp-joint-angle
                               (jj . joint-angle) tmp-target-joint-angle))
                        (t
