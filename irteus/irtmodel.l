@@ -76,14 +76,10 @@
   (:max-joint-torque (&optional mjt) (if mjt (setq max-joint-torque mjt) max-joint-torque))
   (:joint-min-max-table (&optional mm-table) (if mm-table (setq joint-min-max-table mm-table) joint-min-max-table))
   (:joint-min-max-target (&optional mm-target) (if mm-target (setq joint-min-max-target mm-target) joint-min-max-target))
-  (:joint-min-max-table-min-angle ()
-   (let* ((target-angle (send joint-min-max-target :joint-angle)) ;; integer
-          (min-max-angle (gethash (floor target-angle) joint-min-max-table)))
-     (car min-max-angle)))
-  (:joint-min-max-table-max-angle ()
-   (let* ((target-angle (send joint-min-max-target :joint-angle)) ;; integer
-          (min-max-angle (gethash (floor target-angle) joint-min-max-table)))
-     (cdr min-max-angle)))
+  (:joint-min-max-table-min-angle (&optional (target-angle (send joint-min-max-target :joint-angle)))
+     (car (gethash (floor target-angle) joint-min-max-table)))
+  (:joint-min-max-table-max-angle (&optional (target-angle (send joint-min-max-target :joint-angle)))
+     (cdr (gethash (floor target-angle) joint-min-max-table)))
   )
 
 (defun calc-jacobian-default-rotate-vector
@@ -706,7 +702,31 @@
               (angle-vector (instantiate float-vector (calc-target-joint-dimension joint-list))))
    (let ((i 0))
      (dolist (j joint-list)
-       (if vec
+       (when vec
+           ;; for joint w/ min-max-table
+           (when (and (send j :joint-min-max-table) (send j :joint-min-max-target))
+             ;; currently only 1dof joint is supported
+             (when (and (= (send j :joint-dof) 1) (= (send (send j :joint-min-max-target) :joint-dof) 1))
+               ;; find index of joint-min-max-target
+               (let* ((ii 0) (jj (elt joint-list ii))
+                     tmp-joint-angle tmp-joint-min-angle tmp-joint-max-angle
+                     tmp-target-joint-angle tmp-target-joint-min-angle tmp-target-joint-max-angle)
+                 (while (not (eq jj (send j :joint-min-max-target)))
+                   (incf ii) (setq jj (elt joint-list ii)))
+                 (setq tmp-joint-angle (elt vec i) tmp-target-joint-angle (elt vec ii))
+                 (setq tmp-joint-min-angle (send j :joint-min-max-table-min-angle tmp-target-joint-angle)
+                       tmp-joint-max-angle (send j :joint-min-max-table-max-angle tmp-target-joint-angle))
+                 (setq tmp-target-joint-min-angle (send j :joint-min-max-table-min-angle tmp-joint-angle)
+                       tmp-target-joint-max-angle (send j :joint-min-max-table-max-angle tmp-joint-angle))
+                 (cond ((<= tmp-joint-min-angle tmp-joint-angle tmp-joint-max-angle) ;; ok
+                        ;; force change joint-angle to avoid problem
+                        (print (list tmp-joint-angle tmp-target-joint-angle))
+                        (setq (j . joint-angle) tmp-joint-angle
+                              (jj . joint-angle) tmp-target-joint-angle))
+                       (t
+                        ))
+                 );; let*
+               )) ;; when
            (case (send j :joint-dof)
              (1 (send j :joint-angle (elt vec i)))
              (t (send j :joint-angle (subseq vec i (+ i (send j :joint-dof)))))
