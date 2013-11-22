@@ -31,7 +31,8 @@
   :super propertied-object
   :slots (parent-link child-link joint-angle min-angle max-angle default-coords
 		      joint-velocity joint-acceleration joint-torque
-		      max-joint-velocity max-joint-torque))
+		      max-joint-velocity max-joint-torque
+                      joint-min-max-table joint-min-max-target))
 
 (defmethod joint
   (:init (&key (name (intern (format nil "joint~A" (sys::address self)) "KEYWORD"))
@@ -39,6 +40,8 @@
 	       (min -90) (max 90)
 	       ((:max-joint-velocity mjv))
                ((:max-joint-torque mjt))
+	       ((:joint-min-max-table mm-table))
+               ((:joint-min-max-target mm-target))
 	       &allow-other-keys)
 	 (send self :name name)
 	 (setq parent-link plink child-link clink
@@ -53,6 +56,8 @@
 	     (error "[joint ~A] warning negative max-joint-torque value ~A~%" name mjt))
 	 (send self :max-joint-velocity mjv)
 	 (send self :max-joint-torque mjt)
+	 (send self :joint-min-max-table mm-table)
+	 (send self :joint-min-max-target mm-target)
 	 (setq default-coords (send child-link :copy-coords))
 	 self)
   (:min-angle (&optional v) (if v (setq min-angle v)) min-angle)
@@ -69,6 +74,8 @@
   (:joint-torque (&optional jt) (if jt (setq joint-torque jt) joint-torque))
   (:max-joint-velocity (&optional mjv) (if mjv (setq max-joint-velocity mjv) max-joint-velocity))
   (:max-joint-torque (&optional mjt) (if mjt (setq max-joint-torque mjt) max-joint-torque))
+  (:joint-min-max-table (&optional mm-table) (if mm-table (setq joint-min-max-table mm-table) joint-min-max-table))
+  (:joint-min-max-target (&optional mm-target) (if mm-target (setq joint-min-max-target mm-target) joint-min-max-target))
   )
 
 (defun calc-jacobian-default-rotate-vector
@@ -155,6 +162,12 @@
    "(self class &optional v &key relative &allow-other-keys) ;; v and return value are joint-angle scalar ;; scalar is rotational value[deg]"
    (let ()
      (when v
+       (when (and joint-min-max-table joint-min-max-target)
+         (let* ((target-angle (send joint-min-max-target :joint-angle)) ;; integer
+                (min-max-angle (gethash (floor target-angle) joint-min-max-table)))
+           (setq min-angle (car min-max-angle)
+                 max-angle (cdr min-max-angle))
+           ))
        (if relative (setq v (+ v joint-angle)))
        (cond ((> v max-angle)
 	      (unless relative (warning-message 3 ";; ~A :joint-angle(~A) violate max-angle(~A)~%" self v max-angle))
