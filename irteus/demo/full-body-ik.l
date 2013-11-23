@@ -50,6 +50,7 @@
        (send *irtviewer* :flush)
        )
       ))
+    )
 
 ;;
 (unless (boundp '*irtviewer*) (make-irtviewer))
