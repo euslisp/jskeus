@@ -76,10 +76,26 @@
   (:max-joint-torque (&optional mjt) (if mjt (setq max-joint-torque mjt) max-joint-torque))
   (:joint-min-max-table (&optional mm-table) (if mm-table (setq joint-min-max-table mm-table) joint-min-max-table))
   (:joint-min-max-target (&optional mm-target) (if mm-target (setq joint-min-max-target mm-target) joint-min-max-target))
-  (:joint-min-max-table-min-angle (&optional (target-angle (send joint-min-max-target :joint-angle)))
-     (car (gethash (floor target-angle) joint-min-max-table)))
-  (:joint-min-max-table-max-angle (&optional (target-angle (send joint-min-max-target :joint-angle)))
-     (cdr (gethash (floor target-angle) joint-min-max-table)))
+  (:joint-min-max-table-angle-interpolate
+   (target-angle car-or-cadr)
+   (let* ((int-target-angle (floor target-angle)) ;; integer value convered as a hash tablle key
+          (target-range (list int-target-angle (1+ int-target-angle))) ;; range of target-joint's angle, e.g., (car target-range) <= target-ang <= (cadr target-range)
+          (joint-range (mapcar #'(lambda (x) (funcall car-or-cadr (gethash x joint-min-max-table)))
+                               target-range)) ;; range of joint-angle based on target-range
+          (tmp-ratio (- target-angle (float int-target-angle))))
+     ;; overrange check
+     (unless (elt joint-range 0) (setf (elt joint-range 0) (elt joint-range 1)))
+     (unless (elt joint-range 1) (setf (elt joint-range 1) (elt joint-range 0)))
+     ;; calc min max
+     ;; interpolated joint-angle based on joint-range
+     ;; e.g., (car joint-range) <= min[max]-angle <= (cadr joint-range) or (cadr joint-range) <= min[max]-angle <= (car joint-range) 
+     (+ (* (car joint-range) (- 1 tmp-ratio)) (* (cadr joint-range) tmp-ratio))))
+  (:joint-min-max-table-min-angle
+   (&optional (target-angle (send joint-min-max-target :joint-angle)))
+   (send self :joint-min-max-table-angle-interpolate target-angle #'car))
+  (:joint-min-max-table-max-angle
+   (&optional (target-angle (send joint-min-max-target :joint-angle)))
+   (send self :joint-min-max-table-angle-interpolate target-angle #'cdr))
   )
 
 (defun calc-jacobian-default-rotate-vector
