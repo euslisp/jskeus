@@ -51,6 +51,7 @@
   (:simulate
    (objs)
    (let (r)
+     (unless objs (return-from :simulate nil))
      (if (atom objs) (setq objs (list objs)))
      (setq
       data
