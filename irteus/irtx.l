@@ -27,6 +27,9 @@
 (setq *skip-motion-event* (list :motionNotify :configureNotify :expose))
 
 (defun window-main-one (&optional fd)
+  (when (or (null *display*) (= *display* 0))
+    (warning-message 3 ";; (window-main-one ~A) was called, but no display is found.~%" fd)
+    (return-from window-main-one nil))
   (catch :window-main-loop
       (while (> (EventsQueued *display* 1) 0)
 	   (NextEvent *display* event)
