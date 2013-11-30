@@ -324,13 +324,7 @@
 
 (in-package "USER")
 
-(setq *irtviewer-objects* nil)
 (defun objects (&optional (objs t) vw)
-  (when (or (null x::*display*) (= x::*display* 0))
-    (if (not (eq objs t))
-	(setq *irtviewer-objects* objs))
-    (warning-message 1 ";; (objects ~A) was called, but no display is found.~%" (if (eq objs t) "" objs))
-    (return-from objects *irtviewer-objects*))
   (when
       (and objs (not (boundp '*irtviewer*)) (null vw))
     (warn ";; (make-irtviewer) executed~%")
@@ -346,10 +340,48 @@
 ;;
 (proclaim '(special *irtviewer*))
 (defun make-irtviewer (&rest args)
-  (when (or (null x::*display*) (= x::*display* 0))
+  (cond
+   ((or (null x::*display*) (= x::*display* 0))
     (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")
-    (return-from make-irtviewer nil))
-  (setq *irtviewer* (send-lexpr (instantiate x::irtviewer) :create args)))
+    (setq *irtviewer* (instance irtviewer-dummy))
+    (setq *viewer* (instance viewer-dummy))
+    (setf (get *viewer* :pickviewer) *irtviewer*))
+   (t
+    (setq *irtviewer* (send-lexpr (instantiate x::irtviewer) :create args))))
+   *irtviewer*)
+
+(defclass viewer-dummy
+  :super propertied-object
+  :slots ())
+(defmethod viewer-dummy
+  (:nomethod (&rest args) t)
+  )
+
+(defclass irtviewer-dummy
+  :super propertied-object
+  :slots (objects draw-things))
+(defmethod irtviewer-dummy
+  (:objects (&rest args)
+   (when
+       args
+     (cond
+      ((null (car args))
+       (setq objects nil))
+      ((consp (car args))
+       (setq objects (car args)))
+      ((atom (car args))
+       (setq objects (append args objects)))
+      ))
+   (send-all objects :worldcoords)
+   (setq draw-things (x::draw-things objects))
+   objects)
+  (:nomethod (&rest args) t)
+  ) ;;
+
+(defun make-irtviewer-dummy (&rest args)
+  (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")
+  (setq *irtviewer* (instance x::irtviewer-dummy)))
+
 
 (in-package "GL")
 
