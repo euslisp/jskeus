@@ -971,6 +971,7 @@
    (let ((J#x (transform jacobi# union-vel tmp-len)))
      (when (and debug-view (not (memq :no-message debug-view)))
        (format-array jacobi "J     :")
+       (warn "det(J):~7,3f~%" (matrix-determinant jacobi) )
        (format-array (transpose jacobi#) "J#t   :")
        (format-array union-vel "x     :")
        (format-array (map float-vector #'rad2deg J#x) "J#x   :"))
@@ -1377,7 +1378,7 @@
                 (setf (elt weight (+ ii idx)) (* (elt weight (+ ii idx))
                                                  (if (float-vector-p var) (elt var ii) var)))))
             ))))
-    (when (and debug-view (not (memq :no-message debug-view)))
+    (when (and debug-view (not (memq :no-message debug-view)) additional-weight-list)
       (format-array weight "addwei:"))
     ;; calc weight from joint limit
     (setq tmp-weight
@@ -1501,7 +1502,22 @@
 	   (if (vectorp a)
 	       (dotimes (i (length a)) (warn "~7,1f " (elt a i)))
 	     (warn "~7,1f " a))))
-	   (warn "~%"))
+	   (warn "~%")
+       (warn " min  :")
+       (dolist (j (send-all union-link-list :joint))
+	 (let ((a (send j :min-angle)))
+	   (if (vectorp a)
+	       (dotimes (i (length a)) (warn "~7,1f " (elt a i)))
+	     (warn "~7,1f " a))))
+	   (warn "~%")
+       (warn " max  :")
+       (dolist (j (send-all union-link-list :joint))
+	 (let ((a (send j :max-angle)))
+	   (if (vectorp a)
+	       (dotimes (i (length a)) (warn "~7,1f " (elt a i)))
+	     (warn "~7,1f " a))))
+	   (warn "~%")
+           )
      (setq weight ;; copied to tmp-weight
            (send self :calc-inverse-kinematics-weight-from-link-list
                  link-list :weight weight :fik-len fik-len
