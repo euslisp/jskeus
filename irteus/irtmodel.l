@@ -971,7 +971,7 @@
    (let ((J#x (transform jacobi# union-vel tmp-len)))
      (when (and debug-view (not (memq :no-message debug-view)))
        (format-array jacobi "J     :")
-       (warn "det(J):~7,3f~%" (matrix-determinant jacobi) )
+       (warn "d(JJt):~7,3f~%" (matrix-determinant (m* jacobi (transpose jacobi))) )
        (format-array (transpose jacobi#) "J#t   :")
        (format-array union-vel "x     :")
        (format-array (map float-vector #'rad2deg J#x) "J#x   :"))
