@@ -1881,6 +1881,8 @@
 		  (rthre (cond
                           ((atom move-target) (deg2rad 1))
                           (t (make-list (length move-target) :initial-element (deg2rad 1)))))
+                  (dif-pos-ratio 1.0)
+                  (dif-rot-ratio 1.0)
                   (union-link-list)
 		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func)
 		  (dump-command t)
@@ -1962,13 +1964,13 @@
                        target-coords))
               (dif-pos
                (mapcar #'(lambda (mv tc trans-axis)
-                           (send mv :difference-position tc
-                                 :translation-axis trans-axis))
+                           (scale dif-pos-ratio (send mv :difference-position tc
+                                                      :translation-axis trans-axis)))
                        move-target target-coords translation-axis))
               (dif-rot
                (mapcar #'(lambda (mv tc rot-axis)
-                           (send mv :difference-rotation tc
-                                 :rotation-axis rot-axis))
+                           (scale dif-rot-ratio (send mv :difference-rotation tc
+                                                      :rotation-axis rot-axis)))
                        move-target target-coords rotation-axis)))
          (setq success (send* self :inverse-kinematics-loop
                               dif-pos dif-rot
@@ -2014,8 +2016,8 @@
 	 (when warnp
 	   (warn ";; inverse-kinematics failed.~%")
            (dotimes (i (length move-target))
-	     (warn ";; dif-pos : ~a/(~a/~a)~%" (elt dif-pos i) (norm (elt dif-pos i)) (elt thre i))
-	     (warn ";; dif-rot : ~a/(~a/~a)~%" (elt dif-rot i) (norm (elt dif-rot i)) (elt rthre i)))
+	     (warn ";; dif-pos : ~a/(~a/~a) (~a)~%" (elt dif-pos i) (norm (elt dif-pos i)) (elt thre i) dif-pos-ratio)
+	     (warn ";; dif-rot : ~a/(~a/~a) (~a)~%" (elt dif-rot i) (norm (elt dif-rot i)) (elt rthre i) dif-rot-ratio))
            (if target-centroid-pos
                (let ((dif-cog (send self :difference-cog-position target-centroid-pos centroid-offset-func)))
                  (warn ";; cog-dif : ~a/(~a/~a)~%" dif-cog (norm dif-cog) centroid-thre)))
