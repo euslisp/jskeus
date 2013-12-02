@@ -212,7 +212,9 @@
      (send-all (send self :gripper limb :links) :joint))
     ((memq :angle-vector args)
      (if (null (cdr args))
-	 (send-all (send self :gripper limb :joint-list) :joint-angle)
+	 (concatenate
+          float-vector
+          (send-all (send self :gripper limb :joint-list) :joint-angle))
        (map float-vector #'(lambda (x y) (send x :joint-angle y))
 	    (send self :gripper limb :joint-list) (cadr args))))))
   ;;
