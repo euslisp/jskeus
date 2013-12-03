@@ -1738,6 +1738,8 @@
     (rthre (cond
             ((atom move-target) (deg2rad 1))
             (t (make-list (length move-target) :initial-element (deg2rad 1)))))
+    (dif-pos-ratio 1.0)
+    (dif-rot-ratio 1.0)
     union-link-list
     target-coords                 ;required for debug-view
     (jacobi)
@@ -1825,8 +1827,8 @@
              (format-array vel-r "vel-rot :")
              (warn "vel-pos-norm : ~7,3f/~7,3f~%vel-rot-norm : ~7,3f/~7,3f~%"
                    (* 1000.0 (norm vel-p)) (elt thre i) (norm vel-r) (elt rthre i)))
-           (dotimes (j (length vel-p)) (setf (elt tmp-dim j) (elt vel-p j)))
-           (dotimes (j (length vel-r)) (setf (elt tmp-dim (+ j (length vel-p))) (elt vel-r j)))
+           (dotimes (j (length vel-p)) (setf (elt tmp-dim j) (* dif-pos-ratio (elt vel-p j))))
+           (dotimes (j (length vel-r)) (setf (elt tmp-dim (+ j (length vel-p))) (* dif-rot-ratio (elt vel-r j))))
            ))
        (dotimes (i (length tmp-dims))
          (dotimes (j (length (elt tmp-dims i)))
