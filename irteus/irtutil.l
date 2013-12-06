@@ -42,9 +42,12 @@
 
 (defmacro do-until-key-with-check
   (check &rest forms)
-  `(while (and (null (select-stream (list *standard-input*) 0.0000001))
-               (eval ,check))
-     ,@forms
+  `(prog1
+       (while (and (null (select-stream (list *standard-input*) 0.0000001))
+                   (eval ,check))
+         ,@forms
+         )
+     (let ((strm (car (select-stream (list *standard-input*) 0.1)))) (if strm (read-line strm nil nil)))
      ))
 
 (defmacro do-until-key (&rest forms)
