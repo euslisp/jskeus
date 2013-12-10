@@ -1452,7 +1452,8 @@
               (let ((var (if (functionp (cadr ls)) (funcall (cadr ls)) (cadr ls))))
                 (setf (elt tmp-nspace (+ ii idx))
                       (+ (elt tmp-nspace (+ ii idx))
-                         (if (float-vector-p var) (elt var ii) var)))))
+                         (* (if (float-vector-p var) (elt var ii) var)
+                            (elt weight (+ ii idx)))))))
             ))))
     (cond
      ((functionp null-space) (setq null-space (funcall null-space)))
