@@ -1443,9 +1443,6 @@
 			:target-centroid-pos target-centroid-pos :cog-gain cog-gain)
 		  tmp-nspace tmp-nspace)))
     ;; add null-space from arguments
-    (cond
-     ((functionp null-space) (setq null-space (funcall null-space)))
-     ((listp null-space) (setq null-space (eval null-space))))
     (dolist (ls additional-nspace-list)
       (let ((ll-pos (position (car ls) union-link-list :test #'equal)))
         (when ll-pos
@@ -1457,6 +1454,9 @@
                       (+ (elt tmp-nspace (+ ii idx))
                          (if (float-vector-p var) (elt var ii) var)))))
             ))))
+    (cond
+     ((functionp null-space) (setq null-space (funcall null-space)))
+     ((listp null-space) (setq null-space (eval null-space))))
     (if null-space
         (setq tmp-nspace
               (v+ null-space tmp-nspace tmp-nspace)))
