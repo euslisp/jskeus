@@ -520,13 +520,23 @@
 			       (/ pi 4) (/ pi 4) (/ pi 4))) ;; [rad/s]
                 ((:max-joint-mjt mjt)
 		 (float-vector 100 100 100 100 100 100)) ;; [N] [N] [N] [Nm] [Nm] [Nm]
+                (absolute-p nil)
                 &allow-other-keys)
     (setq axis (list #f(1 0 0) #f(0 1 0) #f(0 0 1) :x :y :z))
     (send-super* :init :min min :max max
                  :max-joint-velocity mjv
                  :max-joint-torque mjt
                  args)
-    (setq joint-angle (float-vector 0 0 0 0 0 0)) ;; [mm] [deg]
+    (if absolute-p
+        (let* ((c (send parent-link :transformation child-link))
+               (b (make-coords :pos (send default-coords :worldpos)))
+               (p (send b :inverse-transform-vector (send c :worldpos)))
+               (r (matrix-log (m* (transpose (send b :worldrot)) (send c :worldrot)))))
+          (setq joint-angle
+                (float-vector (elt p 0) (elt p 1) (elt p 2) ;; [mm]
+                              (rad2deg (elt r 0)) (rad2deg (elt r 1)) (rad2deg (elt r 2)))) ;; [deg]
+          (setq default-coords b))
+      (setq joint-angle (float-vector 0 0 0 0 0 0))) ;; [mm] [deg]
     self)
   (:joint-angle
     (&optional v &key relative &allow-other-keys) ;; v [mm] [deg]

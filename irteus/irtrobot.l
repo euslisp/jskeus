@@ -394,11 +394,12 @@
           (cog-gain 1.0) ;; <- cog gain for null-space calculation. cog-gain should be over zero.
           (centroid-thre 5.0) ;; cog convergence threshould [mm]
           (additional-weight-list)
+          (joint-args nil)
      &allow-other-keys)
     (with-append-root-joint ;; inverse-kinematics with base-link
      (link-list-with-robot-6dof self link-list
                                 :joint-class 6dof-joint
-                                :joint-args (list :min min :max max))
+                                :joint-args (append (list :min min :max max) joint-args))
      (send* self :inverse-kinematics target-coords
             :move-target move-target :link-list link-list-with-robot-6dof
             :cog-gain cog-gain :centroid-thre centroid-thre :target-centroid-pos target-centroid-pos
