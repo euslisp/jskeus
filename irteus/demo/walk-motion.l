@@ -51,18 +51,32 @@
     (setq *robot* (instance sample-robot :init)))
   ;; initial quad pose
   (send *robot* :reset-pose)
-  (send *robot* :newcoords (make-coords :pos #f(0 0 400) :rpy (list 0 (deg2rad -90) 0)))
-  (with-move-target-link-list
-   (mt ll *robot* '(:rleg :lleg :rarm :larm))
-   (send *robot* :inverse-kinematics
-         (list
-          (make-coords :pos #f(300 -120 0))
-          (make-coords :pos #f(300 120 0))
-          (make-coords :pos #f(-200 -120 0) :rpy (list 0 pi/2 0))
-          (make-coords :pos #f(-200 120 0) :rpy (list 0 pi/2 0)))
-         :stop 200 :move-target mt :link-list ll
-         ;;:debug-view :no-message
-         ))
+  (send *robot* :fix-leg-to-coords (make-coords) '(:rleg :lleg))
+  (let ((tc (list
+             (make-coords :pos #f(300 -120 0))
+             (make-coords :pos #f(300 120 0))
+             (make-coords :pos #f(-200 -120 0) :rpy (list 0 pi/2 0))
+             (make-coords :pos #f(-200 120 0) :rpy (list 0 pi/2 0))))
+        (ik-args
+         (list :min (float-vector -1000 -1000 -1000 -90 -90 -90)
+               :max (float-vector  1000  1000  1000  90  90  90)
+               :joint-args '(:absolute-p t)
+               :additional-nspace-list
+               (list
+                (list (car (send *robot* :links))
+                      #'(lambda () (send *robot* :joint-angle-limit-nspace-for-6dof :limbs '(:rarm :larm :rleg :lleg))))
+                )
+               :root-link-virtual-joint-weight #F(0.1 0.1 0.1 0.5 0.5 0.5)
+               :cog-gain 5.0 :stop 200
+               :collision-avoidance-link-pair nil)))
+    (with-move-target-link-list
+     (mt ll *robot* '(:rleg :lleg :rarm :larm))
+     (send* *robot* :fullbody-inverse-kinematics
+            tc
+            :move-target mt :link-list ll
+            :target-centroid-pos (vector-mean (send-all tc :worldpos))
+            ;;:debug-view :no-message
+            ik-args))
   ;; prepare footsteps
   (let ((footstep-list
          (list (list (send *robot* :rleg :end-coords :copy-worldcoords)
@@ -87,16 +101,17 @@
           footstep-list :debug-view :no-message
           :init-pose-function
           #'(lambda ()
-              (send *robot* :move-centroid-on-foot :both '(:rleg :lleg :rarm :larm)
-                    ;;:debug-view :no-message
-                    :stop 200 :root-link-virtual-joint-weight #f(0.1 0.1 0.1 0 0 0)
-                    :target-centroid-pos (vector-mean (append (send *robot* :arms :end-coords :worldpos) (send *robot* :legs :end-coords :worldpos)))))
-          :solve-angle-vector-args (list :root-link-virtual-joint-weight #f(0.1 0.1 0.1 0 0 0))
+              (send* *robot* :move-centroid-on-foot :both '(:rleg :lleg :rarm :larm)
+                     ;;:debug-view :no-message
+                     :target-centroid-pos
+                     (vector-mean (append (send *robot* :arms :end-coords :worldpos) (send *robot* :legs :end-coords :worldpos)))
+                     ik-args))
+          :solve-angle-vector-args ik-args
           :default-zmp-offsets
           (list :rleg (float-vector 0 0 0) :lleg (float-vector 0 0 0)
                 :rarm (float-vector 0 0 0) :larm (float-vector 0 0 0))
           :default-step-height 70)
-    ))
+    )))
 (warn "(quad-walk-motion-for-sample-robot) for walking motion~%")
 
 (defun walk-motion-for-robots ()
