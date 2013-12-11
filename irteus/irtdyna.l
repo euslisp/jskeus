@@ -1342,17 +1342,18 @@
     (support-leg support-leg-coords swing-leg-coords cog
      &key (solve-angle-vector :solve-av-by-move-centroid-on-foot)
           (solve-angle-vector-args))
-    (cond
-     ((functionp solve-angle-vector)
-      (apply solve-angle-vector
-             support-leg support-leg-coords
-             swing-leg-coords cog robot solve-angle-vector-args))
-     ((and (symbolp solve-angle-vector) (find-method self solve-angle-vector))
-      (send* self solve-angle-vector
-             support-leg support-leg-coords
-             swing-leg-coords cog robot solve-angle-vector-args))
-     (t (error ";; in :solve-angle-vector, invalid function or method~%!")))
-    (list (send robot :angle-vector) (send robot :copy-worldcoords)))
+    (let ((ik-ret
+           (cond
+            ((functionp solve-angle-vector)
+             (apply solve-angle-vector
+                    support-leg support-leg-coords
+                    swing-leg-coords cog robot solve-angle-vector-args))
+            ((and (symbolp solve-angle-vector) (find-method self solve-angle-vector))
+             (send* self solve-angle-vector
+                    support-leg support-leg-coords
+                    swing-leg-coords cog robot solve-angle-vector-args))
+            (t (error ";; in :solve-angle-vector, invalid function or method~%!")))))
+      (list ik-ret (send robot :copy-worldcoords))))
 
   ;; solve-angle-vector methods
   (:solve-av-by-move-centroid-on-foot
