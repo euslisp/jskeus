@@ -1357,7 +1357,7 @@
   ;; solve-angle-vector methods
   (:solve-av-by-move-centroid-on-foot
    (support-leg support-leg-coords swing-leg-coords cog robot
-   &rest args &key (cog-gain 3.5) (stop 100) &allow-other-keys)
+   &rest args &key (cog-gain 3.5) (stop 100) (additional-nspace-list) &allow-other-keys)
    (let ((legs
           (append (send self :get-counter-footstep-limbs support-leg)
                   support-leg))
@@ -1367,17 +1367,20 @@
             :fix-limbs-target-coords fix-coords
             :cog-gain cog-gain :stop stop
             :additional-nspace-list
-            (list (list (car (send robot :links))
-                        #'(lambda ()
-                            (let ((xvr (send robot :rotate-vector (case (length legs) (2 #f(1 0 0)) (4 #f(0 0 -1)))))
-                                  (xvf (send (apply #'midcoords 0.5
-                                                    (mapcar #'(lambda (x) (elt fix-coords (position x legs))) '(:rleg :lleg)))
-                                             :rotate-vector #f(1 0 0))))
-                              (dolist (xv (list xvr xvf)) (setf (elt xv 2) 0.0))
-                              (float-vector 0 0 0 0 0
-                                            (* (if (and (eps= (norm xvf) 0.0) (eps= (norm xvr) 0.0))
-                                                      0.0 (acos (v. (normalize-vector xvf) (normalize-vector xvr))))
-                                               (if (> (elt (v* xvf xvr) 2) 0.0) -1.0 1.0)))))))
+            (append
+             additional-nspace-list
+             (list (list (car (send robot :links))
+                         #'(lambda ()
+                             (let* ((fcoords (apply #'midcoords 0.5
+                                                    (mapcar #'(lambda (x) (elt fix-coords (position x legs))) '(:rleg :lleg))))
+                                    (xvr (send robot :rotate-vector (case (length legs) (2 #f(1 0 0)) (4 #f(0 0 1)))))
+                                    (xvf (send fcoords :rotate-vector #f(1 0 0))))
+                               (if (> (elt (send fcoords :inverse-rotate-vector xvr) 0) 0) (setq xvr (scale -1 xvr)))
+                               (dolist (xv (list xvr xvf)) (setf (elt xv 2) 0.0))
+                               (let ((dth (if (and (eps= (norm xvf) 0.0) (eps= (norm xvr) 0.0))
+                                              0.0 (asin (elt (v* (normalize-vector xvf) (normalize-vector xvr)) 2)))))
+                                 (float-vector 0 0 0 0 0 dth)
+                                 ))))))
             args)))
   ;; calculate midpoint using cycloig orbit
   ;;   ratio  -> midpoint ratio
