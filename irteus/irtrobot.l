@@ -408,6 +408,33 @@
              (list (list (car (send self :links)) root-link-virtual-joint-weight)))
             args)
      ))
+  (:joint-angle-limit-nspace-for-6dof
+   (&key (avoid-nspace-gain 0.01))
+   (let* ((ll (mapcar #'(lambda (l) (send self l :links))
+                      '(:rleg :lleg)))
+          (J (send self :calc-jacobian-from-link-list
+                   (mapcar #'(lambda (l) (append (list (car (send self :links))) l)) ll)
+                   :move-target (mapcar #'(lambda (l) (send self l :end-coords))
+                                        '(:rleg :lleg))
+                   :translation-axis '(t t)
+                   :rotation-axis '(t t)))
+          (Jb (make-matrix (array-dimension J 0) 6))
+          (Jj (make-matrix (array-dimension J 0) (send self :calc-target-joint-dimension ll))))
+     (dotimes (i (array-dimension Jb 0))
+       (dotimes (ii (array-dimension Jb 1))
+         (setf (aref Jb i ii) (aref J i ii))))
+     (dotimes (i (array-dimension Jj 0))
+       (dotimes (ii (array-dimension Jj 1))
+         (setf (aref Jj i ii) (aref J i (+ 6 ii)))))
+     (let ((dthb
+            (transform (m* (send self :calc-inverse-jacobian Jb) Jj)
+                       (scale (* -1 avoid-nspace-gain)
+                              (joint-angle-limit-nspace
+                               (send-all (send self :calc-union-link-list ll) :joint))))))
+       (setf (elt dthb 0) 0)
+       (setf (elt dthb 1) 0)
+       dthb
+       )))
   (:joint-order
    (limb &optional jname-list)
    (let ((joint-list (mapcar #'(lambda (x) (cons x (find-if #'(lambda (y) (eq y (send self x))) (send self limb :joint-list)))) (mapcan #'(lambda (x) (if (substringp (format nil "~A-" (symbol-name limb)) (string x)) (list x)))(send self :methods))))
