@@ -706,7 +706,49 @@
      (dotimes (i (length torque-vector))
        (setf (elt torque-vector i) (send (elt joint-list i) :joint-torque)))
      torque-vector))
-
+  (:calc-root-coords-vel-acc-from-pos
+   (dt root-coords)
+   ;; set spacial-acceleration and angular-acceleration of root-link
+   (let* ((dt-1 (/ 1.0 dt))
+          (proot-coords
+           (if (send self :get :prev-root-coords)
+               (send self :get :prev-root-coords)
+             root-coords))
+          (rv (scale (* 1e-3 dt-1) (v- (send root-coords :worldpos) (send proot-coords :worldpos)))) ;; [m/s]
+          (rw (scale dt-1 (send proot-coords :rotate-vector (send proot-coords :difference-rotation root-coords)))) ;; [rad/s]
+          (prv (if (send self :get :prev-root-v)
+                   (send self :get :prev-root-v)
+                 rv)) ;; [m/s]
+          (prw (if (send self :get :prev-root-w)
+                   (send self :get :prev-root-w)
+                 rw)) ;; [rad/s]
+          (rva (scale dt-1 (v- rv prv))) ;; [m/s^2]
+          (rwa (scale dt-1 (v- rw prw)))) ;; [rad/s^2]
+     (send self :put :prev-root-coords root-coords)
+     (send self :put :prev-root-v rv)
+     (send self :put :prev-root-w rw)
+     (list :root-coords-spacial-acceleration ;; [m/s^2]
+           (v- rva (v+ (v* rwa (scale 1e-3 (send root-coords :worldpos))) ;; [rad/s^2] * [m]
+                       (v* rw rv))) ;; [rad/s] * [m/s]
+           :root-coords-angular-acceleration rwa) ;; [rad/s^2]
+     ))
+  (:calc-av-vel-acc-from-pos
+   (dt av)
+   ;; set joint velocities and joint accelerations
+   (let* ((dt-1 (/ 1.0 dt))
+          (pav (if (send self :get :prev-av)
+                   (send self :get :prev-av)
+                 av))
+          (jvv (scale dt-1 (map float-vector #'deg2rad (v- av pav)))) ;; [rad/s]
+          (pjvv (if (send self :get :prev-jvv)
+                    (send self :get :prev-jvv)
+                  jvv)) ;; [rad/s]
+          (jav (scale dt-1 (v- jvv pjvv)))) ;; [rad/s^2]
+     (send self :put :prev-av av)
+     (send self :put :prev-jvv jvv)
+     (list :joint-velocity-vector jvv
+           :joint-acceleration-vector jav)
+     ))
   ;; calculate Zero Moment Point based on Inverse Dynamics
   ;;   necessary arguments -> av and root-coords
   (:calc-zmp
@@ -726,45 +768,19 @@
 	      (send l :ext-moment (float-vector 0 0 0))))
 
     ;; set spacial-acceleration and angular-acceleration of root-link
-    (let* ((dt-1 (/ 1.0 dt))
-           (proot-coords
-            (if (send self :get :prev-root-coords)
-                (send self :get :prev-root-coords)
-              root-coords))
-           (rv (scale (* 1e-3 dt-1) (v- (send root-coords :worldpos) (send proot-coords :worldpos)))) ;; [m/s]
-           (rw (scale dt-1 (send proot-coords :rotate-vector (send proot-coords :difference-rotation root-coords)))) ;; [rad/s]
-           (prv (if (send self :get :prev-root-v)
-                    (send self :get :prev-root-v)
-                  rv)) ;; [m/s]
-           (prw (if (send self :get :prev-root-w)
-                    (send self :get :prev-root-w)
-                  rw)) ;; [rad/s]
-           (rva (scale dt-1 (v- rv prv))) ;; [m/s^2]
-           (rwa (scale dt-1 (v- rw prw)))) ;; [rad/s^2]
+    (let* ((ret (send self :calc-root-coords-vel-acc-from-pos dt root-coords)))
       (send (car (send self :links)) :spacial-acceleration ;; [m/s^2]
-            (v- rva (v+ (v* rwa (scale 1e-3 (send root-coords :worldpos))) ;; [rad/s^2] * [m]
-                        (v* rw rv)))) ;; [rad/s] * [m/s]
-      (send (car (send self :links)) :angular-acceleration rwa) ;; [rad/s^2]
-      (send self :put :prev-root-coords root-coords)
-      (send self :put :prev-root-v rv)
-      (send self :put :prev-root-w rw))
+            (cadr (memq :root-coords-spacial-acceleration ret)))
+      (send (car (send self :links)) :angular-acceleration
+            (cadr (memq :root-coords-angular-acceleration ret)))) ;; [rad/s^2]
 
     ;; set joint velocities and joint accelerations
-    (let* ((dt-1 (/ 1.0 dt))
-           (pav (if (send self :get :prev-av)
-                    (send self :get :prev-av)
-                  av))
-           (jvv (scale dt-1 (map float-vector #'deg2rad (v- av pav)))) ;; [rad/s]
-           (pjvv (if (send self :get :prev-jvv)
-                     (send self :get :prev-jvv)
-                   jvv)) ;; [rad/s]
-           (jav (scale dt-1 (v- jvv pjvv)))) ;; [rad/s^2]
+    (let* ((ret (send self :calc-av-vel-acc-from-pos dt av)))
       (send self :calc-torque
-            :jvv jvv :jav jav
+            :jvv (cadr (memq :joint-velocity-vector ret))
+            :jav (cadr (memq :joint-acceleration-vector ret))
             :debug-view debug-view
-            :calc-torque-buffer-args calc-torque-buffer-args)
-      (send self :put :prev-av av)
-      (send self :put :prev-jvv jvv))
+            :calc-torque-buffer-args calc-torque-buffer-args))
 
     ;; calculate ZMP from force and moment of root-link
     (let* ((f0 (send (car (send self :links)) :force)) ;; [N]
