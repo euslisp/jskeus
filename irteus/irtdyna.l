@@ -678,6 +678,8 @@
    (&key (debug-view nil)
 	 (jvv (instantiate float-vector (length joint-list))) ;; [rad/s] or [m/s]
 	 (jav (instantiate float-vector (length joint-list))) ;; [rad/s^2] or [m/s^2]
+         (root-spacial-acceleration (float-vector 0 0 0))
+         (root-angular-acceleration (float-vector 0 0 0))
          (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
    (let ((torque-vector (instantiate float-vector (length joint-list))))
      (all-child-links
@@ -691,6 +693,10 @@
 	 (send jnt :joint-velocity (elt jvv i))
 	 (send jnt :joint-acceleration (elt jav i))
 	 ))
+     (send (car (send self :links)) :spacial-acceleration ;; [m/s^2]
+           root-spacial-acceleration)
+     (send (car (send self :links)) :angular-acceleration
+           root-angular-acceleration) ;; [rad/s^2]
 
      ;; recursive calculation from root-link
      (send* (car (send self :links)) :forward-all-kinematics
@@ -727,10 +733,10 @@
      (send self :put :prev-root-coords root-coords)
      (send self :put :prev-root-v rv)
      (send self :put :prev-root-w rw)
-     (list :root-coords-spacial-acceleration ;; [m/s^2]
+     (list :root-spacial-acceleration ;; [m/s^2]
            (v- rva (v+ (v* rwa (scale 1e-3 (send root-coords :worldpos))) ;; [rad/s^2] * [m]
                        (v* rw rv))) ;; [rad/s] * [m/s]
-           :root-coords-angular-acceleration rwa) ;; [rad/s^2]
+           :root-angular-acceleration rwa) ;; [rad/s^2]
      ))
   (:calc-av-vel-acc-from-pos
    (dt av)
@@ -768,17 +774,14 @@
 	      (send l :ext-moment (float-vector 0 0 0))))
 
     ;; set spacial-acceleration and angular-acceleration of root-link
-    (let* ((ret (send self :calc-root-coords-vel-acc-from-pos dt root-coords)))
-      (send (car (send self :links)) :spacial-acceleration ;; [m/s^2]
-            (cadr (memq :root-coords-spacial-acceleration ret)))
-      (send (car (send self :links)) :angular-acceleration
-            (cadr (memq :root-coords-angular-acceleration ret)))) ;; [rad/s^2]
-
     ;; set joint velocities and joint accelerations
-    (let* ((ret (send self :calc-av-vel-acc-from-pos dt av)))
+    (let* ((ret-rc (send self :calc-root-coords-vel-acc-from-pos dt root-coords))
+           (ret-av (send self :calc-av-vel-acc-from-pos dt av)))
       (send self :calc-torque
-            :jvv (cadr (memq :joint-velocity-vector ret))
-            :jav (cadr (memq :joint-acceleration-vector ret))
+            :jvv (cadr (memq :joint-velocity-vector ret-av))
+            :jav (cadr (memq :joint-acceleration-vector ret-av))
+            :root-spacial-acceleration (cadr (memq :root-spacial-acceleration ret-rc))
+            :root-angular-acceleration (cadr (memq :root-angular-acceleration ret-rc))
             :debug-view debug-view
             :calc-torque-buffer-args calc-torque-buffer-args))
 
