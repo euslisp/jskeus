@@ -808,6 +808,7 @@
     (send self :calc-torque
           :dt dt :av av :root-coords root-coords
           :debug-view debug-view
+          :calc-statics-p nil
           :calc-torque-buffer-args calc-torque-buffer-args)
 
     ;; calculate ZMP from force and moment of root-link
