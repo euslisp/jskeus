@@ -2165,7 +2165,7 @@
   ;;   | E_3    0   E_3    0   ... |
   ;;   | p1_hat E_3 p2_hat E_3 ... |
   (:calc-grasp-matrix
-   (contact-points &optional (ret (make-matrix 6 (* 6 (length contact-points)))))
+   (contact-points &optional (ret (make-matrix 6 (* 6 (length contact-points))))) ;; contact-points [mm]
    (let ((contact-matrices (mapcar #'(lambda (x) (outer-product-matrix (scale 1e-3 x))) contact-points)))
      (dotimes (c (length contact-points))
        (dotimes (i 3)
