@@ -332,12 +332,7 @@
          (push (send self limb :end-coords) target-coords)))
      (unless (or force-list moment-list) ;; force [N], moment [Nm]
        ;; set default force & moment by solving mimimum internal forces
-       (let* ((weight-force (* (send self :weight) 1e-6 (elt *g-vec* 2))) ;; weight[g] * 1e-6 * gvec[mm/s^2] = force[N]
-              (ret-fm (send self :calc-contact-wrenches-from-total-wrench
-                            (send-all target-coords :worldpos)
-                            (float-vector 0 0 weight-force
-                                          (* 1e-3 (elt (send self :centroid nil) 1) weight-force)
-                                          (* -1e-3 (elt (send self :centroid nil) 0) weight-force) 0))))
+       (let* ((ret-fm (send self :calc-contact-wrenches-from-total-wrench (send-all target-coords :worldpos))))
          (setq force-list (car ret-fm) moment-list (cadr ret-fm))
          )))
    (unless (= (length force-list) (length moment-list)

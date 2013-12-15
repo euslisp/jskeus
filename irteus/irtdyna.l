@@ -833,7 +833,13 @@
   ;;  return = contact wrenches at each contact points
   ;;           contact force [N] and contact moment [Nm] at contact points
   (:calc-contact-wrenches-from-total-wrench
-   (target-pos-list total-wrench) ;; target-pos-list [mm]
+   (target-pos-list &optional (total-wrench)) ;; target-pos-list [mm]
+   (unless total-wrench ;; if total-wrench is not set, set default value
+     (setq total-wrench ;; default wrench = wrench derived from weight-force
+           (let* ((weight-force (* (send self :weight) 1e-6 (elt *g-vec* 2)))) ;; weight[g] * 1e-6 * gvec[mm/s^2] = force[N]
+             (float-vector 0 0 weight-force
+                           (* 1e-3 (elt (send self :centroid nil) 1) weight-force)
+                           (* -1e-3 (elt (send self :centroid nil) 0) weight-force) 0))))
    ;; set default force & moment by solving mimimum internal forces
    (let ((ret-f
           (transform
