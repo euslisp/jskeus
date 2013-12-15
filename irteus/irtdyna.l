@@ -788,6 +788,8 @@
       (send self :calc-torque
             :jvv (cadr (memq :joint-velocity-vector ret-av))
             :jav (cadr (memq :joint-acceleration-vector ret-av))
+            :root-spacial-velocity (cadr (memq :root-spacial-velocity ret-rc))
+            :root-angular-velocity (cadr (memq :root-angular-velocity ret-rc))
             :root-spacial-acceleration (cadr (memq :root-spacial-acceleration ret-rc))
             :root-angular-acceleration (cadr (memq :root-angular-acceleration ret-rc))
             :debug-view debug-view
