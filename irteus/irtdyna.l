@@ -682,7 +682,6 @@
          (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
    (let* ((ret-rc (send self :calc-root-coords-vel-acc-from-pos dt root-coords))
           (ret-av (send self :calc-av-vel-acc-from-pos dt av)))
-     (print (append ret-rc ret-av))
      (send self :calc-torque-from-vel-acc
            :jvv (cadr (memq :joint-velocity-vector ret-av))
            :jav (cadr (memq :joint-acceleration-vector ret-av))
