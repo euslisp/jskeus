@@ -815,18 +815,25 @@
      ))
   (:calc-torque-from-ext-wrenches
    (&key (force-list) (moment-list) (target-coords))
-   (let ((jacobi
-          (send self :calc-jacobian-from-link-list
-                (mapcar #'(lambda (tc) (send self :link-list (send tc :parent))) target-coords)
-                :move-target target-coords
-                :transform-coords (make-coords)
-                :rotation-axis (make-list (length target-coords) :initial-element t)
-                :translation-axis (make-list (length target-coords) :initial-element t)))
-         (wrenches
-          (mapcar #'(lambda (f m) (concatenate float-vector f m)) force-list moment-list)))
-     (transform (transpose jacobi)
-                (apply #'concatenate float-vector wrenches))
-     ))
+   (let* ((link-list (mapcar #'(lambda (tc) (send self :link-list (send tc :parent))) target-coords))
+          (jacobi
+           (send self :calc-jacobian-from-link-list
+                 link-list
+                 :move-target target-coords
+                 :transform-coords (mapcar #'(lambda (x) (make-coords)) target-coords)
+                 :rotation-axis (make-list (length target-coords) :initial-element t)
+                 :translation-axis (make-list (length target-coords) :initial-element t)))
+          (wrenches
+           (mapcar #'(lambda (f m) (concatenate float-vector f m)) force-list moment-list))
+          (tq (transform (transpose jacobi)
+                         (apply #'concatenate float-vector wrenches)))
+          (ret-tq (instantiate float-vector (length joint-list)))
+          (ul (send self :calc-union-link-list link-list)))
+     ;; tq = torque vector included in link-list
+     ;; ret-tq = all torque vector in joint-list
+     (dotimes (i (length ul))
+       (setf (elt ret-tq (position (send (elt ul i) :joint) joint-list)) (elt tq i)))
+     ret-tq))
   ;; calculate Zero Moment Point based on Inverse Dynamics
   ;;   necessary arguments -> av and root-coords
   (:calc-zmp
