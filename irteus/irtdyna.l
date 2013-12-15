@@ -546,9 +546,9 @@
          moment (float-vector 0 0 0) ;; [Nm] = [kg m^2/s^2]
          ext-force (float-vector 0 0 0) ;; [N] = [kg m/s^2]
          ext-moment (float-vector 0 0 0))) ;; [Nm] = [kg m^2/s^2]
-  (:angular-velocity () angular-velocity)
+  (:angular-velocity (&optional aa) (if aa (setq angular-velocity aa) angular-velocity))
   (:angular-acceleration (&optional aa) (if aa (setq angular-acceleration aa) angular-acceleration))
-  (:spacial-velocity () spacial-velocity)
+  (:spacial-velocity (&optional aa) (if aa (setq spacial-velocity aa) spacial-velocity))
   (:spacial-acceleration (&optional sa) (if sa (setq spacial-acceleration sa) spacial-acceleration))
   (:force () force)
   (:moment () moment)
@@ -678,6 +678,8 @@
    (&key (debug-view nil)
 	 (jvv (instantiate float-vector (length joint-list))) ;; [rad/s] or [m/s]
 	 (jav (instantiate float-vector (length joint-list))) ;; [rad/s^2] or [m/s^2]
+         (root-spacial-velocity (float-vector 0 0 0))
+         (root-angular-velocity (float-vector 0 0 0))
          (root-spacial-acceleration (float-vector 0 0 0))
          (root-angular-acceleration (float-vector 0 0 0))
          (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
@@ -697,6 +699,10 @@
            root-spacial-acceleration)
      (send (car (send self :links)) :angular-acceleration
            root-angular-acceleration) ;; [rad/s^2]
+     (send (car (send self :links)) :spacial-velocity ;; [m/s]
+           root-spacial-velocity)
+     (send (car (send self :links)) :angular-velocity ;; [rad/s]
+           root-angular-velocity)
 
      ;; recursive calculation from root-link
      (send* (car (send self :links)) :forward-all-kinematics
@@ -733,7 +739,9 @@
      (send self :put :prev-root-coords root-coords)
      (send self :put :prev-root-v rv)
      (send self :put :prev-root-w rw)
-     (list :root-spacial-acceleration ;; [m/s^2]
+     (list :root-spacial-velocity (v- rv (v* rw (scale 1e-3 (send root-coords :worldpos)))) ;; [m/s]
+           :root-angular-velocity rw ;; [rad/s]
+           :root-spacial-acceleration ;; [m/s^2]
            (v- rva (v+ (v* rwa (scale 1e-3 (send root-coords :worldpos))) ;; [rad/s^2] * [m]
                        (v* rw rv))) ;; [rad/s] * [m/s]
            :root-angular-acceleration rwa) ;; [rad/s^2]
