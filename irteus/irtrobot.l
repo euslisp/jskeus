@@ -321,8 +321,9 @@
   (:torque-vector
    (&key (force-list) (moment-list) (target-coords)
          (debug-view nil)
-	 (jvv (instantiate float-vector (calc-target-joint-dimension joint-list))) ;; [rad/s] or [m/s]
-	 (jav (instantiate float-vector (calc-target-joint-dimension joint-list))) ;; [rad/s^2] or [m/s^2]
+         (dt 0.005)
+         (av (send self :angle-vector))
+         (root-coords (send (car (send self :links)) :copy-worldcoords))
          (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
    (unless (every #'null (send self :legs)) ;; for legged robot, set default external force and moment at the end-effectors
      (let ((weight-force (* (send self :weight) 1e-6 (elt *g-vec* 2)))) ;; weight[g] * 1e-6 * gvec[mm/s^2] = force[N]
@@ -348,7 +349,7 @@
 	      (length target-coords))
      (warn ";; ERROR : list length differ : force-list ~A moment-list ~A target-coords ~A~%"
 	   (length force-list) (length moment-list) (length target-coords))
-     (return-from :torque-vector jvv))
+     (return-from :torque-vector (instantiate float-vector (length joint-list))))
    (mapcar #'(lambda (fv mv tc)
 	       (send (send tc :parent) :ext-force fv)
 	       ;; calc moment-offset caused by fv ;
@@ -358,7 +359,8 @@
 	   force-list moment-list target-coords)
    (send self :calc-torque
               :debug-view debug-view
-              :jvv jvv :jav jav :calc-torque-buffer-args calc-torque-buffer-args)
+              :av av :root-coords root-coords :dt dt
+              :calc-torque-buffer-args calc-torque-buffer-args)
    )
   (:calc-force-from-joint-torque
    (limb all-torque &key (move-target (send self limb :end-coords)) (use-torso))

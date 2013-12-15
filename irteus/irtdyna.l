@@ -676,6 +676,24 @@
     )
   (:calc-torque
    (&key (debug-view nil)
+         (dt 0.005)
+         (av (send self :angle-vector))
+         (root-coords (send (car (send self :links)) :copy-worldcoords))
+         (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
+   (let* ((ret-rc (send self :calc-root-coords-vel-acc-from-pos dt root-coords))
+          (ret-av (send self :calc-av-vel-acc-from-pos dt av)))
+     (print (append ret-rc ret-av))
+     (send self :calc-torque-from-vel-acc
+           :jvv (cadr (memq :joint-velocity-vector ret-av))
+           :jav (cadr (memq :joint-acceleration-vector ret-av))
+           :root-spacial-velocity (cadr (memq :root-spacial-velocity ret-rc))
+           :root-angular-velocity (cadr (memq :root-angular-velocity ret-rc))
+           :root-spacial-acceleration (cadr (memq :root-spacial-acceleration ret-rc))
+           :root-angular-acceleration (cadr (memq :root-angular-acceleration ret-rc))
+           :debug-view debug-view
+           :calc-torque-buffer-args calc-torque-buffer-args)))
+  (:calc-torque-from-vel-acc
+   (&key (debug-view nil)
 	 (jvv (instantiate float-vector (length joint-list))) ;; [rad/s] or [m/s]
 	 (jav (instantiate float-vector (length joint-list))) ;; [rad/s^2] or [m/s^2]
          (root-spacial-velocity (float-vector 0 0 0))
@@ -781,19 +799,10 @@
 	      (send l :ext-force (float-vector 0 0 0))
 	      (send l :ext-moment (float-vector 0 0 0))))
 
-    ;; set spacial-acceleration and angular-acceleration of root-link
-    ;; set joint velocities and joint accelerations
-    (let* ((ret-rc (send self :calc-root-coords-vel-acc-from-pos dt root-coords))
-           (ret-av (send self :calc-av-vel-acc-from-pos dt av)))
-      (send self :calc-torque
-            :jvv (cadr (memq :joint-velocity-vector ret-av))
-            :jav (cadr (memq :joint-acceleration-vector ret-av))
-            :root-spacial-velocity (cadr (memq :root-spacial-velocity ret-rc))
-            :root-angular-velocity (cadr (memq :root-angular-velocity ret-rc))
-            :root-spacial-acceleration (cadr (memq :root-spacial-acceleration ret-rc))
-            :root-angular-acceleration (cadr (memq :root-angular-acceleration ret-rc))
-            :debug-view debug-view
-            :calc-torque-buffer-args calc-torque-buffer-args))
+    (send self :calc-torque
+          :dt dt :av av :root-coords root-coords
+          :debug-view debug-view
+          :calc-torque-buffer-args calc-torque-buffer-args)
 
     ;; calculate ZMP from force and moment of root-link
     (let* ((f0 (send (car (send self :links)) :force)) ;; [N]
