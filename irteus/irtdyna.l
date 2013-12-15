@@ -683,6 +683,32 @@
          (dt 0.005) ;; [sec]
          (av (send self :angle-vector))
          (root-coords (send (car (send self :links)) :copy-worldcoords))
+         (force-list) (moment-list) (target-coords)
+         (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
+   ;; check length
+   (unless (= (length force-list) (length moment-list) (length target-coords))
+     (error ";; ERROR : list length differ in :calc-torque : force-list ~A moment-list ~A target-coords ~A~%"
+            (length force-list) (length moment-list) (length target-coords)))
+   ;; set ext wrench
+   (mapcar #'(lambda (fv mv tc)
+               (send (send tc :parent) :ext-force fv)
+               ;; calc moment-offset caused by fv ;
+               ;; current irtdyna.l's requires moment around the origin
+               (let* ((moment-offset (v* (scale 1e-3 (send tc :worldpos)) fv)))
+                 (send (send tc :parent) :ext-moment (v+ mv moment-offset))))
+           force-list moment-list target-coords)
+   (send self :calc-torque-without-ext-wrench
+              :debug-view debug-view
+              :calc-statics-p calc-statics-p
+              :av av :root-coords root-coords :dt dt
+              :calc-torque-buffer-args calc-torque-buffer-args)
+   )
+  (:calc-torque-without-ext-wrench
+   (&key (debug-view nil)
+         (calc-statics-p t)
+         (dt 0.005) ;; [sec]
+         (av (send self :angle-vector))
+         (root-coords (send (car (send self :links)) :copy-worldcoords))
          (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
    (send* self :calc-torque-from-vel-acc
           :debug-view debug-view

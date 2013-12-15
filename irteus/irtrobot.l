@@ -335,22 +335,11 @@
        (let* ((ret-fm (send self :calc-contact-wrenches-from-total-wrench (send-all target-coords :worldpos))))
          (setq force-list (car ret-fm) moment-list (cadr ret-fm))
          )))
-   (unless (= (length force-list) (length moment-list)
-	      (length target-coords))
-     (warn ";; ERROR : list length differ : force-list ~A moment-list ~A target-coords ~A~%"
-	   (length force-list) (length moment-list) (length target-coords))
-     (return-from :torque-vector (instantiate float-vector (length joint-list))))
-   (mapcar #'(lambda (fv mv tc)
-	       (send (send tc :parent) :ext-force fv)
-	       ;; calc moment-offset caused by fv ;
-	       ;; current irtdyna.l's requires moment around the origin
-	       (let* ((moment-offset (v* (scale 1e-3 (send tc :worldpos)) fv)))
-		 (send (send tc :parent) :ext-moment (v+ mv moment-offset))))
-	   force-list moment-list target-coords)
    (send self :calc-torque
               :debug-view debug-view
               :calc-statics-p calc-statics-p
               :av av :root-coords root-coords :dt dt
+              :force-list force-list :moment-list moment-list :target-coords target-coords
               :calc-torque-buffer-args calc-torque-buffer-args)
    )
   (:calc-force-from-joint-torque
