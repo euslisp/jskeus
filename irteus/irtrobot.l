@@ -333,19 +333,13 @@
      (unless (or force-list moment-list) ;; force [N], moment [Nm]
        ;; set default force & moment by solving mimimum internal forces
        (let* ((weight-force (* (send self :weight) 1e-6 (elt *g-vec* 2))) ;; weight[g] * 1e-6 * gvec[mm/s^2] = force[N]
-              (ret-f
-               (transform
-                (pseudo-inverse (send self :calc-grasp-matrix (send-all target-coords :worldpos)))
-                (float-vector 0 0 weight-force
-                              (* 1e-3 (elt (send self :centroid nil) 1) weight-force)
-                              (* -1e-3 (elt (send self :centroid nil) 0) weight-force) 0))))
-         (dotimes (i (length target-coords))
-           (push (subseq ret-f (* i 6) (+ (* i 6) 3)) force-list)
-           (push (subseq ret-f (+ (* i 6) 3) (+ (* i 6) 6)) moment-list)
-           ))
-       (setq force-list (reverse force-list))
-       (setq moment-list (reverse moment-list))
-       ))
+              (ret-fm (send self :calc-contact-wrenches-from-total-wrench
+                            (send-all target-coords :worldpos)
+                            (float-vector 0 0 weight-force
+                                          (* 1e-3 (elt (send self :centroid nil) 1) weight-force)
+                                          (* -1e-3 (elt (send self :centroid nil) 0) weight-force) 0))))
+         (setq force-list (car ret-fm) moment-list (cadr ret-fm))
+         )))
    (unless (= (length force-list) (length moment-list)
 	      (length target-coords))
      (warn ";; ERROR : list length differ : force-list ~A moment-list ~A target-coords ~A~%"

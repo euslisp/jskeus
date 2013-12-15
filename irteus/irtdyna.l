@@ -828,6 +828,24 @@
                              (* (* 1e-3 (elt (send self :get :zmp) 0)) f0y -1.0)
                              (* (* 1e-3 (elt (send self :get :zmp) 1)) f0x)))))
     (send self :get :zmp))
+  ;; calculate contact force from total wrench
+  ;;  total wrench = total force[N] + total moment[Nm] around the origin
+  ;;  return = contact wrenches at each contact points
+  ;;           contact force [N] and contact moment [Nm] at contact points
+  (:calc-contact-wrenches-from-total-wrench
+   (target-pos-list total-wrench) ;; target-pos-list [mm]
+   ;; set default force & moment by solving mimimum internal forces
+   (let ((ret-f
+          (transform
+           (pseudo-inverse (send self :calc-grasp-matrix target-pos-list))
+           total-wrench))
+         (force-list) (moment-list))
+     (dotimes (i (length target-pos-list))
+       (push (subseq ret-f (* i 6) (+ (* i 6) 3)) force-list)
+       (push (subseq ret-f (+ (* i 6) 3) (+ (* i 6) 6)) moment-list)
+       )
+     (list (reverse force-list) (reverse moment-list))
+     ))
 
   (:draw-torque
    (vwer &key flush (width 2) (size 100) (color (float-vector 1 0.3 0)) (warning-color (float-vector 1 0 0)) (torque-threshold nil)
