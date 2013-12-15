@@ -813,6 +813,20 @@
      (list :joint-velocity-vector jvv
            :joint-acceleration-vector jav)
      ))
+  (:calc-torque-from-ext-wrenches
+   (&key (force-list) (moment-list) (target-coords))
+   (let ((jacobi
+          (send self :calc-jacobian-from-link-list
+                (mapcar #'(lambda (tc) (send self :link-list (send tc :parent))) target-coords)
+                :move-target target-coords
+                :transform-coords (make-coords)
+                :rotation-axis (make-list (length target-coords) :initial-element t)
+                :translation-axis (make-list (length target-coords) :initial-element t)))
+         (wrenches
+          (mapcar #'(lambda (f m) (concatenate float-vector f m)) force-list moment-list)))
+     (transform (transpose jacobi)
+                (apply #'concatenate float-vector wrenches))
+     ))
   ;; calculate Zero Moment Point based on Inverse Dynamics
   ;;   necessary arguments -> av and root-coords
   (:calc-zmp
