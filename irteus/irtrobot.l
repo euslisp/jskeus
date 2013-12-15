@@ -321,6 +321,7 @@
   (:torque-vector
    (&key (force-list) (moment-list) (target-coords)
          (debug-view nil)
+         (calc-statics-p t)
          (dt 0.005)
          (av (send self :angle-vector))
          (root-coords (send (car (send self :links)) :copy-worldcoords))
@@ -359,6 +360,7 @@
 	   force-list moment-list target-coords)
    (send self :calc-torque
               :debug-view debug-view
+              :calc-statics-p calc-statics-p
               :av av :root-coords root-coords :dt dt
               :calc-torque-buffer-args calc-torque-buffer-args)
    )

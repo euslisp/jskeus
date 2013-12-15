@@ -119,8 +119,7 @@
                                  (setf (elt ac 2) 0) ac))
                          (send-all move-target :worldpos))
                  (append (list cog-target-pos) target-coords))
-         (send *robot* :draw-torque *viewer*
-               :torque-vector (send *robot* :torque-vector :dt 0.1))
+         (send *robot* :draw-torque *viewer*)
          (send *irtviewer* :flush)
          ))
       )))

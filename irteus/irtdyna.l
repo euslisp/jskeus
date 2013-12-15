@@ -676,21 +676,28 @@
     )
   (:calc-torque
    (&key (debug-view nil)
-         (dt 0.005)
+         ;; statics or dynamics
+         ;;   if t -> Calc statics. Do not update vel and acc for av and root-coords.
+         ;;   otherwise -> Calc dynamics. Update vel and acc from current av and root-coords.
+         (calc-statics-p t)
+         (dt 0.005) ;; [sec]
          (av (send self :angle-vector))
          (root-coords (send (car (send self :links)) :copy-worldcoords))
          (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
-   (let* ((ret-rc (send self :calc-root-coords-vel-acc-from-pos dt root-coords))
-          (ret-av (send self :calc-av-vel-acc-from-pos dt av)))
-     (send self :calc-torque-from-vel-acc
-           :jvv (cadr (memq :joint-velocity-vector ret-av))
-           :jav (cadr (memq :joint-acceleration-vector ret-av))
-           :root-spacial-velocity (cadr (memq :root-spacial-velocity ret-rc))
-           :root-angular-velocity (cadr (memq :root-angular-velocity ret-rc))
-           :root-spacial-acceleration (cadr (memq :root-spacial-acceleration ret-rc))
-           :root-angular-acceleration (cadr (memq :root-angular-acceleration ret-rc))
-           :debug-view debug-view
-           :calc-torque-buffer-args calc-torque-buffer-args)))
+   (send* self :calc-torque-from-vel-acc
+          :debug-view debug-view
+          :calc-torque-buffer-args calc-torque-buffer-args
+          (unless calc-statics-p
+            (let* ((ret-rc (send self :calc-root-coords-vel-acc-from-pos dt root-coords))
+                   (ret-av (send self :calc-av-vel-acc-from-pos dt av)))
+              (list
+               :jvv (cadr (memq :joint-velocity-vector ret-av))
+               :jav (cadr (memq :joint-acceleration-vector ret-av))
+               :root-spacial-velocity (cadr (memq :root-spacial-velocity ret-rc))
+               :root-angular-velocity (cadr (memq :root-angular-velocity ret-rc))
+               :root-spacial-acceleration (cadr (memq :root-spacial-acceleration ret-rc))
+               :root-angular-acceleration (cadr (memq :root-angular-acceleration ret-rc))
+               )))))
   (:calc-torque-from-vel-acc
    (&key (debug-view nil)
 	 (jvv (instantiate float-vector (length joint-list))) ;; [rad/s] or [m/s]
