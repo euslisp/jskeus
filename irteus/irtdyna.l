@@ -1226,6 +1226,7 @@
           finalize-p ;; Are all footstep-node-list executed? finalize flag for make-gait-parameter. Is this necessary?
           ;; preview controller parameters
           preview-controller ;; preview controller for ZMP -> COG
+          all-limbs
           )
   )
 
@@ -1344,11 +1345,22 @@
   ;; append final gait parameters
   (:finalize-gait-parameter
     ()
-    (let ((dst-swing-coords (car (last support-leg-coords-list))))
+    (let ((dst-swing-coords (car (last support-leg-coords-list)))
+          (prev-support-limbs (car (last support-leg-list))))
       (send self :append-support-leg-list
-            (send self :get-counter-footstep-limbs (car (last support-leg-list))))
-      (send self :append-support-leg-coords-list (car (last swing-leg-dst-coords-list)))
-      (send self :append-swing-leg-dst-coords-list dst-swing-coords)
+            (send self :get-counter-footstep-limbs
+                  (send self :get-swing-limbs (cadr (reverse support-leg-list)))))
+      (send self :append-support-leg-coords-list
+            (mapcar #'(lambda (x)
+                        (if (memq x prev-support-limbs)
+                            (elt (car (last support-leg-coords-list)) (position x prev-support-limbs))
+                          (elt (car (last swing-leg-dst-coords-list))
+                               (position x (send self :get-swing-limbs prev-support-limbs)))))
+                    (car (last support-leg-list))))
+      (send self :append-swing-leg-dst-coords-list
+            (mapcar #'(lambda (x)
+                        (elt dst-swing-coords (position x prev-support-limbs)))
+                    (send self :get-swing-limbs (car (last support-leg-list)))))
       (send self :append-refzmp-cur-list
             (scale (/ 1.0 (length (append (car (last support-leg-list)) (send self :get-counter-footstep-limbs (car (last support-leg-list))))))
                    (reduce
@@ -1366,10 +1378,17 @@
   ;; generate gait parameters
   (:make-gait-parameter
     ()
-    (let ((fs (pop footstep-node-list)))
+    (let ((fs (pop footstep-node-list))
+          (prev-support-limbs (car (last support-leg-list))))
       (send self :append-support-leg-list
             (send self :get-counter-footstep-limbs fs))
-      (send self :append-support-leg-coords-list (car (last swing-leg-dst-coords-list)))
+      (send self :append-support-leg-coords-list
+            (mapcar #'(lambda (x)
+                        (if (memq x prev-support-limbs)
+                            (elt (car (last support-leg-coords-list)) (position x prev-support-limbs))
+                          (elt (car (last swing-leg-dst-coords-list))
+                               (position x (send self :get-swing-limbs prev-support-limbs)))))
+                    (car (last support-leg-list))))
       (send self :append-swing-leg-dst-coords-list (send-all fs :worldcoords))
       (send self :append-refzmp-cur-list
             (send self :get-limbs-zmp (car (last support-leg-coords-list)) (car (last support-leg-list))))
@@ -1449,6 +1468,7 @@
   (:update-current-gait-parameter
    ()
    (setq refzmp-prev (car refzmp-cur-list))
+   (let ((prev-support-limbs2 (car support-leg-list)))
    (cond
     (footstep-node-list
      (send self :make-gait-parameter)
@@ -1459,7 +1479,13 @@
      ))
    (setq index-count one-step-len)
    (pop support-leg-list)
-   (setq swing-leg-src-coords (pop support-leg-coords-list))
+   (setq swing-leg-src-coords
+         (if support-leg-list
+             (mapcar #'(lambda (x)
+                         (elt (car support-leg-coords-list) (position x prev-support-limbs2)))
+                     (send self :get-swing-limbs (car support-leg-list)))))
+   (pop support-leg-coords-list)
+   )
    (pop swing-leg-dst-coords-list)
    (pop refzmp-cur-list)
    (pop step-height-list)
