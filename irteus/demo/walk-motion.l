@@ -47,7 +47,7 @@
 (warn "(walk-motion-for-sample-robot) for walking motion~%")
 
 (defun quad-walk-motion-for-sample-robot
-  (&key (go-backward-over t))
+  (gen-footstep-func &key (go-backward-over t))
   (unless (boundp '*robot*)
     (setq *robot* (instance sample-robot :init)))
   ;; initial quad pose
@@ -87,40 +87,72 @@
             :target-centroid-pos (vector-mean (send-all tc :worldpos))
             ik-args))
     ;; prepare footsteps
-    (let ((footstep-list
-           (list (list (send *robot* :rleg :end-coords :copy-worldcoords)
-                       (send *robot* :larm :end-coords :copy-worldcoords))
-                 (list (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world)
-                       (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world))
-                 (list (send (send *robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 100 0 0) :world)
-                       (send (send *robot* :larm :end-coords :copy-worldcoords) :translate (float-vector 100 0 0) :world))
-                 (list (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 150 50 0) :world)
-                       (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 150 50 0) :world))
-                 (list (send (send *robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world)
-                       (send (send *robot* :larm :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world))
-                 (list (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world)
-                       (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world))
-                 )))
-      (dolist (x footstep-list)
-        (send (car x) :put :l/r (if (evenp (position x footstep-list)) :rleg :lleg))
-        (send (cadr x) :put :l/r (if (evenp (position x footstep-list)) :larm :rarm)))
+    (let ((footstep-list (funcall gen-footstep-func)))
       (objects (list *robot*))
       ;; solve walk motion
       (send *robot* :calc-walk-pattern-from-footstep-list
             footstep-list :debug-view :no-message
+            :all-limbs '(:rleg :lleg :rarm :larm)
             :init-pose-function
             #'(lambda ()
                 (send* *robot* :move-centroid-on-foot :both '(:rleg :lleg :rarm :larm)
                        :target-centroid-pos
                        (vector-mean (append (send *robot* :arms :end-coords :worldpos) (send *robot* :legs :end-coords :worldpos)))
                        ik-args))
-            :solve-angle-vector-args ik-args
+            :solve-angle-vector-args
+            (append (list ;;:debug-view :no-message
+                          :centroid-thre 100
+                          :thre '(10 10 10 10)) ik-args)
             :default-zmp-offsets
             (list :rleg (float-vector 0 0 0) :lleg (float-vector 0 0 0)
                   :rarm (float-vector 0 0 0) :larm (float-vector 0 0 0))
             :default-step-height 70)
       )))
-(warn "(quad-walk-motion-for-sample-robot) for walking motion~%")
+
+(defun trot-walk-motion-for-sample-robot
+  (&key (go-backward-over t))
+  (quad-walk-motion-for-sample-robot
+   #'(lambda ()
+       (let ((fs
+              (list (list (send *robot* :rleg :end-coords :copy-worldcoords)
+                          (send *robot* :larm :end-coords :copy-worldcoords))
+                    (list (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world)
+                          (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world))
+                    (list (send (send *robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 100 0 0) :world)
+                          (send (send *robot* :larm :end-coords :copy-worldcoords) :translate (float-vector 100 0 0) :world))
+                    (list (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 150 50 0) :world)
+                          (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 150 50 0) :world))
+                    (list (send (send *robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world)
+                          (send (send *robot* :larm :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world))
+                    (list (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world)
+                          (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world))
+                    )))
+         (dolist (x fs)
+           (send (car x) :put :l/r (if (evenp (position x fs)) :rleg :lleg))
+           (send (cadr x) :put :l/r (if (evenp (position x fs)) :larm :rarm)))
+         fs))
+   :go-backward-over go-backward-over))
+(warn "(trot-walk-motion-for-sample-robot) for walking motion~%")
+
+(defun crawl-walk-motion-for-sample-robot
+  (&key (go-backward-over t))
+  (quad-walk-motion-for-sample-robot
+   #'(lambda ()
+       (let ((fs
+              (list (list (send *robot* :lleg :end-coords :copy-worldcoords))
+                    (list (send (send *robot* :larm :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world))
+                    (list (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world))
+                    (list (send (send *robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world))
+                    (list (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world))
+                    )))
+         (send (car (elt fs 0)) :put :l/r :lleg)
+         (send (car (elt fs 1)) :put :l/r :larm)
+         (send (car (elt fs 2)) :put :l/r :rarm)
+         (send (car (elt fs 3)) :put :l/r :rleg)
+         (send (car (elt fs 4)) :put :l/r :lleg)
+         fs))
+   :go-backward-over go-backward-over))
+(warn "(crawl-walk-motion-for-sample-robot) for walking motion~%")
 
 (defun walk-motion-for-robots ()
   (unless (boundp '*robots*)
