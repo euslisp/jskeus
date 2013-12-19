@@ -1259,14 +1259,10 @@
   (:get-counter-footstep-limbs
    (fs)
    (if (symbolp (car fs))
-       (mapcar #'(lambda (f)
-               (case f
-                 (:rleg :lleg)
-                 (:lleg :rleg)
-                 (:rarm :larm)
-                 (:larm :rarm)
-                 ))
-               fs)
+       (remove-if
+        #'(lambda (l)
+            (memq l (remove-if-not #'(lambda (x) (memq x fs)) '(:rleg :lleg :rarm :larm))))
+        '(:rleg :lleg :rarm :larm))
      (send self :get-counter-footstep-limbs (send self :get-footstep-limbs fs)))
    )
   (:get-limbs-zmp
