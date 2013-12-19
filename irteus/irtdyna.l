@@ -1261,22 +1261,29 @@
    (if (symbolp (car fs))
        (remove-if
         #'(lambda (l)
-            (memq l (remove-if-not #'(lambda (x) (memq x fs)) '(:rleg :lleg :rarm :larm))))
-        '(:rleg :lleg :rarm :larm))
+            (memq l (remove-if-not #'(lambda (x) (memq x fs)) all-limbs)))
+        all-limbs)
      (send self :get-counter-footstep-limbs (send self :get-footstep-limbs fs)))
    )
+  (:get-limbs-zmp-list
+   (limb-coords limb-names)
+   (mapcar #'(lambda (lc ln)
+               (v+ (send lc :worldpos)
+                   (send lc :rotate-vector
+                         (cadr (memq ln default-zmp-offsets)))))
+           limb-coords limb-names))
   (:get-limbs-zmp
    (limb-coords limb-names)
    (scale (/ 1.0 (length limb-names))
           (reduce
            #'v+
-           (mapcar #'(lambda (lc ln)
-                       (v+ (send lc :worldpos)
-                           (send lc :rotate-vector
-                                 (cadr (memq ln default-zmp-offsets)))))
-                   limb-coords limb-names)
+           (send self :get-limbs-zmp-list limb-coords limb-names)
            :initial-value (float-vector 0 0 0)
            ))
+   )
+  (:get-swing-limbs
+   (limbs)
+   (remove-if #'(lambda (x) (memq x limbs)) all-limbs)
    )
   ;; initialize parameter and generate first gait parameter
   (:initialize-gait-parameter
@@ -1285,6 +1292,7 @@
           ((:default-double-support-ratio ddsr) 0.2)
           ((:default-zmp-offsets dzo) (list :rleg (float-vector 0 0 0) :lleg (float-vector 0 0 0))) ;; [mm]
           (delay 1.6) ;; delay [s]
+          ((:all-limbs al) '(:rleg :lleg))
           (q 1.0) (r 1e-6))
     (setq footstep-node-list (mapcar #'(lambda (l) (if (consp l) l (list l))) fsl)
           one-step-len (round (/ time dt))
@@ -1297,7 +1305,8 @@
           default-double-support-ratio ddsr
           default-zmp-offsets dzo
           index-count one-step-len
-          finalize-p nil)
+          finalize-p nil
+          all-limbs al)
     (let ((current-swing-limbs
            (send self :get-footstep-limbs (car footstep-node-list))))
       (send self :append-support-leg-list
@@ -1310,9 +1319,13 @@
         (let ((current-support-leg-coords (car support-leg-coords-list))
               (current-swing-leg-dst-coords (car swing-leg-dst-coords-list)))
           (send self :append-refzmp-cur-list
-                (midpoint 0.5
-                          (send self :get-limbs-zmp current-support-leg-coords current-swing-limbs)
-                          (send self :get-limbs-zmp current-swing-leg-dst-coords current-support-limbs)))
+                (scale (/ 1.0 (length (append current-swing-limbs current-support-leg-coords)))
+                       (reduce
+                        #'v+
+                        (append
+                         (send self :get-limbs-zmp-list current-swing-leg-dst-coords current-swing-limbs)
+                         (send self :get-limbs-zmp-list current-support-leg-coords current-support-limbs))
+                        :initial-value (float-vector 0 0 0))))
     (send self :append-step-height-list 0.0)
     (pop footstep-node-list)
     ;; currently, not error system
@@ -1337,12 +1350,16 @@
       (send self :append-support-leg-coords-list (car (last swing-leg-dst-coords-list)))
       (send self :append-swing-leg-dst-coords-list dst-swing-coords)
       (send self :append-refzmp-cur-list
-            (midpoint 0.5
-                      (send self :get-limbs-zmp
-                            (car (last support-leg-coords-list)) (car (last support-leg-list)))
-                      (send self :get-limbs-zmp
-                            (car (last swing-leg-dst-coords-list))
-                            (send self :get-counter-footstep-limbs (car (last support-leg-list))))))
+            (scale (/ 1.0 (length (append (car (last support-leg-list)) (send self :get-counter-footstep-limbs (car (last support-leg-list))))))
+                   (reduce
+                    #'v+
+                    (append
+                     (send self :get-limbs-zmp-list
+                           (car (last support-leg-coords-list)) (car (last support-leg-list)))
+                     (send self :get-limbs-zmp-list
+                           (car (last swing-leg-dst-coords-list))
+                           (send self :get-counter-footstep-limbs (car (last support-leg-list)))))
+                    :initial-value (float-vector 0 0 0))))
       (send self :append-step-height-list 0.0)
       (setq refzmp-next (car (last refzmp-cur-list)))
       t))
