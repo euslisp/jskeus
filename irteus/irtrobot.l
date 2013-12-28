@@ -716,7 +716,9 @@
           (y-sign (if (> yy 0.0) 1.0 -1.0))
           (th-sign (if (> th 0.0) 1.0 -1.0))
           (dx 0.0) (dy 0.0) (dth 0.0) (cnt 0)
-          (leg (if (> yy 0.0) :lleg :rleg))
+          (leg (if (eps= (float yy) 0.0)
+                   (if (> th 0.0) :lleg :rleg)
+                 (if (> yy 0.0) :lleg :rleg)))
           (mc (apply #'midcoords 0.5 (send self :legs :end-coords :copy-worldcoords)))
           ;;(mc (make-coords))
           (leg-translate-pos
