@@ -265,7 +265,6 @@
          (dotimes (x width)
            (if (< (elt fv vptr) 1.0)
                (let ((zpos (/ (* fp np) (- (* (elt fv vptr) (- fp np)) fp))))
-                 (pprint (list x y))
                  (setf (elt pos 0) (* (- cx x) (/ zpos focus)))
                  (setf (elt pos 1) (* (- y cy) (/ zpos focus)))
                  (setf (elt pos 2) (- zpos))
