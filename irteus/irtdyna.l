@@ -1320,13 +1320,9 @@
         (let ((current-support-leg-coords (car support-leg-coords-list))
               (current-swing-leg-dst-coords (car swing-leg-dst-coords-list)))
           (send self :append-refzmp-cur-list
-                (scale (/ 1.0 (length (append current-swing-limbs current-support-leg-coords)))
-                       (reduce
-                        #'v+
-                        (append
-                         (send self :get-limbs-zmp-list current-swing-leg-dst-coords current-swing-limbs)
-                         (send self :get-limbs-zmp-list current-support-leg-coords current-support-limbs))
-                        :initial-value (float-vector 0 0 0))))
+                (send self :get-limbs-zmp
+                      (append current-swing-leg-dst-coords current-support-leg-coords)
+                      (append current-swing-limbs current-support-limbs)))
     (send self :append-step-height-list 0.0)
     (pop footstep-node-list)
     ;; currently, not error system
@@ -1362,16 +1358,9 @@
                         (elt dst-swing-coords (position x prev-support-limbs)))
                     (send self :get-swing-limbs (car (last support-leg-list)))))
       (send self :append-refzmp-cur-list
-            (scale (/ 1.0 (length (append (car (last support-leg-list)) (send self :get-counter-footstep-limbs (car (last support-leg-list))))))
-                   (reduce
-                    #'v+
-                    (append
-                     (send self :get-limbs-zmp-list
-                           (car (last support-leg-coords-list)) (car (last support-leg-list)))
-                     (send self :get-limbs-zmp-list
-                           (car (last swing-leg-dst-coords-list))
-                           (send self :get-counter-footstep-limbs (car (last support-leg-list)))))
-                    :initial-value (float-vector 0 0 0))))
+            (send self :get-limbs-zmp
+                  (append (car (last support-leg-coords-list)) (car (last swing-leg-dst-coords-list)))
+                  (append (car (last support-leg-list)) (send self :get-counter-footstep-limbs (car (last support-leg-list))))))
       (send self :append-step-height-list 0.0)
       (setq refzmp-next (car (last refzmp-cur-list)))
       t))
