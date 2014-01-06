@@ -582,8 +582,10 @@
   (:calc-walk-pattern-from-footstep-list
    (footstep-list
     &key (default-step-height 50) (dt 0.1) (default-step-time 1.0)
-         (default-zmp-offsets (list :rleg (float-vector 0 0 0) :lleg (float-vector 0 0 0)))
-         (solve-angle-vector-args) (debug-view nil) ((:all-limbs al) '(:rleg :lleg))
+         (solve-angle-vector-args) (debug-view nil)
+         ((:all-limbs al) '(:rleg :lleg))
+         ((:default-zmp-offsets dzo)
+          (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) ;; [mm]
          (init-pose-function #'(lambda () (send self :move-centroid-on-foot :both '(:rleg :lleg)))))
    (let* ((res) (ret) (tm 0)
           (gg (instance gait-generator :init self dt)))
@@ -592,7 +594,7 @@
      (send gg :initialize-gait-parameter
            footstep-list default-step-time (send (car (send self :links)) :get :c-til)
            :default-step-height default-step-height :default-double-support-ratio 0.2
-           :default-zmp-offsets default-zmp-offsets :all-limbs al)
+           :default-zmp-offsets dzo :all-limbs al)
 
      (while (null (setq ret (send gg :proc-one-tick :type :cycloid :debug t :solve-angle-vector-args solve-angle-vector-args))))
      (dotimes (i 2) (send self :calc-zmp)) ;; for zmp initialization

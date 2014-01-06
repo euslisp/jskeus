@@ -103,9 +103,6 @@
             (append (list ;;:debug-view :no-message
                           :centroid-thre 100
                           :thre '(10 10 10 10)) ik-args)
-            :default-zmp-offsets
-            (list :rleg (float-vector 0 0 0) :lleg (float-vector 0 0 0)
-                  :rarm (float-vector 0 0 0) :larm (float-vector 0 0 0))
             :default-step-height 70)
       )))
 

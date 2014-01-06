@@ -1291,9 +1291,10 @@
     (fsl time cog ;; time is [s], cog is [mm]
      &key ((:default-step-height dsh) 50) ;; height [mm]
           ((:default-double-support-ratio ddsr) 0.2)
-          ((:default-zmp-offsets dzo) (list :rleg (float-vector 0 0 0) :lleg (float-vector 0 0 0))) ;; [mm]
           (delay 1.6) ;; delay [s]
           ((:all-limbs al) '(:rleg :lleg))
+          ((:default-zmp-offsets dzo)
+           (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) ;; [mm]
           (q 1.0) (r 1e-6))
     (setq footstep-node-list (mapcar #'(lambda (l) (if (consp l) l (list l))) fsl)
           one-step-len (round (/ time dt))
