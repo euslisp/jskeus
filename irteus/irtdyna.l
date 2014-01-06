@@ -1338,7 +1338,7 @@
                                        :init-xk cog
                                        )
           swing-leg-src-coords current-swing-leg-dst-coords
-          refzmp-next (send self :get-limbs-zmp (car swing-leg-dst-coords-list) current-support-limbs)
+          refzmp-next (send self :get-limbs-zmp current-support-leg-coords current-support-limbs)
           refzmp-prev (car refzmp-cur-list))
     (send self :make-gait-parameter)
     t))))
