@@ -970,7 +970,7 @@
 	  (ct (transpose c))
 	  (zero-matrix (make-matrix (array-dimension c 1) (array-dimension c 1))))
       (do ((loop 0 (1+ loop)))
-	  ((>= loop 2000))
+	  ((>= loop 10000))
 	(let* ((tmp-PA (m* P A)))
           (setq R+btPb-1 (/ 1.0 (+ R (aref (m* bt (m* P b)) 0 0)))
                 K (scale-matrix R+btPb-1 (m* bt tmp-PA)))
