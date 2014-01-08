@@ -878,7 +878,7 @@
   (:calc-cop-from-force-moment ;; calc cop at ee-coords
    (force moment ;; [N] [Nm], global force & moment
     sensor-coords cop-coords
-    &key (fz-thre 1))
+    &key (fz-thre 1) (return-all-values))
    ;; cop-coords : reference coords for COP, pos,z=COP pos z, c^p_{c,z}=0, rot, z=normal vector
    ;; c^p_{c,x}=(c^f_{s,z} c^p_{s,x} - c^p_{s,z} c^f_{s,x} - c^n_{s,y})/c^f_{s,z}
    ;; c^p_{c,y}=(c^f_{s,z} c^p_{s,y} - c^p_{s,z} c^f_{s,y} + c^n_{s,x})/c^f_{s,z}
@@ -894,11 +894,16 @@
                       (- (* (elt cps 2) (elt cfs 1)))
                       (elt cms 0)))
           (tmpfz (elt cfs 2)))
-     (if (< tmpfz fz-thre)
-         nil
-       (send cop-coords :transform-vector
-             (scale 1e3 (float-vector (/ tmpcopx tmpfz) (/ tmpcopy tmpfz) 0))))
-     ))
+     (cond
+      ((< tmpfz fz-thre) nil)
+      (return-all-values
+       (list :cop
+             (send cop-coords :transform-vector
+                   (scale 1e3 (float-vector (/ tmpcopx tmpfz) (/ tmpcopy tmpfz) 0)))
+             :fz tmpfz))
+      (t (send cop-coords :transform-vector
+               (scale 1e3 (float-vector (/ tmpcopx tmpfz) (/ tmpcopy tmpfz) 0))))
+      )))
   ;; calculate contact force from total wrench
   ;;  total wrench = total force[N] + total moment[Nm] around the origin
   ;;  return = contact wrenches at each contact points
