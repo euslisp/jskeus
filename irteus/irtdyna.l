@@ -875,30 +875,30 @@
                              (* (* 1e-3 (elt (send self :get :zmp) 0)) f0y -1.0)
                              (* (* 1e-3 (elt (send self :get :zmp) 1)) f0x)))))
     (send self :get :zmp))
-    (:calc-cop-from-force-moment ;; calc cop at ee-coords
-     (force moment ;; [N] [Nm], global force & moment
-      sensor-coords cop-coords
-      &key (fz-thre 1))
-     ;; cop-coords : reference coords for COP, pos,z=COP pos z, c^p_{c,z}=0, rot, z=normal vector
-     ;; c^p_{c,x}=(c^f_{s,z} c^p_{s,x} - c^p_{s,z} c^f_{s,x} - c^n_{s,y})/c^f_{s,z}
-     ;; c^p_{c,y}=(c^f_{s,z} c^p_{s,y} - c^p_{s,z} c^f_{s,y} + c^n_{s,x})/c^f_{s,z}
-     ;; cop-coords relative values
-     (let* ((cfs (send cop-coords :inverse-rotate-vector force))
-            (cms (send cop-coords :inverse-rotate-vector moment))
-            (cps (scale 1e-3 (send cop-coords :inverse-transform-vector
-                                   (send sensor-coords :worldpos)))))
-       (setq tmpcopx (+ (* (elt cfs 2) (elt cps 0))
-                        (- (* (elt cps 2) (elt cfs 0)))
-                        (- (elt cms 1)))
-             tmpcopy (+ (* (elt cfs 2) (elt cps 1))
-                        (- (* (elt cps 2) (elt cfs 1)))
-                        (elt cms 0))
-             tmpfz (elt cfs 2))
-       (if (< tmpfz fz-thre)
-           nil
-         (send cop-coords :transform-vector
-               (scale 1e3 (float-vector (/ tmpcopx tmpfz) (/ tmpcopy tmpfz) 0))))
-       ))
+  (:calc-cop-from-force-moment ;; calc cop at ee-coords
+   (force moment ;; [N] [Nm], global force & moment
+    sensor-coords cop-coords
+    &key (fz-thre 1))
+   ;; cop-coords : reference coords for COP, pos,z=COP pos z, c^p_{c,z}=0, rot, z=normal vector
+   ;; c^p_{c,x}=(c^f_{s,z} c^p_{s,x} - c^p_{s,z} c^f_{s,x} - c^n_{s,y})/c^f_{s,z}
+   ;; c^p_{c,y}=(c^f_{s,z} c^p_{s,y} - c^p_{s,z} c^f_{s,y} + c^n_{s,x})/c^f_{s,z}
+   ;; cop-coords relative values
+   (let* ((cfs (send cop-coords :inverse-rotate-vector force))
+          (cms (send cop-coords :inverse-rotate-vector moment))
+          (cps (scale 1e-3 (send cop-coords :inverse-transform-vector
+                                 (send sensor-coords :worldpos))))
+          (tmpcopx (+ (* (elt cfs 2) (elt cps 0))
+                      (- (* (elt cps 2) (elt cfs 0)))
+                      (- (elt cms 1))))
+          (tmpcopy (+ (* (elt cfs 2) (elt cps 1))
+                      (- (* (elt cps 2) (elt cfs 1)))
+                      (elt cms 0)))
+          (tmpfz (elt cfs 2)))
+     (if (< tmpfz fz-thre)
+         nil
+       (send cop-coords :transform-vector
+             (scale 1e3 (float-vector (/ tmpcopx tmpfz) (/ tmpcopy tmpfz) 0))))
+     ))
   ;; calculate contact force from total wrench
   ;;  total wrench = total force[N] + total moment[Nm] around the origin
   ;;  return = contact wrenches at each contact points
