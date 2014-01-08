@@ -904,6 +904,28 @@
       (t (send cop-coords :transform-vector
                (scale 1e3 (float-vector (/ tmpcopx tmpfz) (/ tmpcopy tmpfz) 0))))
       )))
+  ;; get list of N x force and N x moment from 6 x N wrench vector
+  ;;   (list (list f1 ... fN) (list n1 ... nN)) <= [f1 n1 ... fN nN]
+  (:wrench-vector->wrench-list
+   (wrench-vector)
+   (let ((f-list) (m-list))
+     (dotimes (i (/ (length wrench-vector) 6))
+       (push (subseq wrench-vector (* 6 i) (+ 3 (* 6 i))) f-list)
+       (push (subseq wrench-vector (+ 3 (* 6 i)) (+ 6 (* 6 i))) m-list)
+       )
+     (list (reverse f-list) (reverse m-list))
+     ))
+  ;; get 6 x N wrench vector from list of N x force and N x moment
+  ;;   [f1 n1 ... fN nN] <= (list (list f1 ... fN) (list n1 ... nN))
+  (:wrench-list->wrench-vector
+   (wrench-list)
+   (apply
+    #'concatenate
+    float-vector
+    (mapcar #'(lambda (f m)
+                (concatenate float-vector f m))
+            (car wrench-list) (cadr wrench-list))
+    ))
   ;; calculate contact force from total wrench
   ;;  total wrench = total force[N] + total moment[Nm] around the origin
   ;;  return = contact wrenches at each contact points
