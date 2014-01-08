@@ -464,7 +464,6 @@
          (limbs '(:rleg :lleg))
          (force-sensors (mapcar #'(lambda (l) (send self :force-sensor l)) limbs))
          (cop-coords (mapcar #'(lambda (l) (send self l :end-coorde)) limbs))
-         (zmp-z (elt (apply #'midpoint 0.5 (mapcar #'(lambda (c) (send c :worldpos)) cop-coords)) 2)) ;; [mm]
          (fz-thre 50) ;; [N]
          (limb-cop-fz-list
           (mapcar #'(lambda (fs f m cc)
