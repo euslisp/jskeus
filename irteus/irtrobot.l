@@ -463,31 +463,25 @@
          ;; :wrt is :world => calc world zmp for robot
          (limbs '(:rleg :lleg))
          (force-sensors (mapcar #'(lambda (l) (send self :force-sensor l)) limbs))
-         (zmp-z (elt (apply #'midpoint 0.5 (mapcar #'(lambda (l) (send self l :end-coords :worldpos)) limbs)) 2)) ;; [mm]
-         (fz-thre 50)) ;; [N]
-   (let ((tmpzmpx 0) (tmpzmpy 0) (tmpfz 0)
-         (tmp-zmp-z (* 1e-3 zmp-z))) ;; [mm]->[m]
-     (mapcar #'(lambda (fs f m)
-                 (let ((fsp (scale 1e-3 (send fs :worldpos))) ;; [mm]->[m]
-                       (nf (send fs :rotate-vector f))
-                       (nm (send fs :rotate-vector m)))
-                   (setq tmpzmpx (+ tmpzmpx
-                                    (* (elt nf 2) (elt fsp 0))
-                                    (- (* (- (elt fsp 2) tmp-zmp-z) (elt nf 0)))
-                                    (- (elt nm 1)))
-                         tmpzmpy (+ tmpzmpy
-                                    (* (elt nf 2) (elt fsp 1))
-                                    (- (* (- (elt fsp 2) tmp-zmp-z) (elt nf 1)))
-                                    (elt nm 0))
-                         tmpfz (+ tmpfz (elt nf 2)))))
-             force-sensors forces moments)
-     (let ((tmpzmp (scale 1e3 (float-vector (/ tmpzmpx tmpfz) (/ tmpzmpy tmpfz) tmp-zmp-z)))) ;; [m]->[mm]
-       (cond
-        ((< tmpfz fz-thre) nil)
-        ((eq wrt :world) tmpzmp)
-        ((eq wrt :local) (send (car (send self :links)) :inverse-transform-vector tmpzmp))
-        (t )
-        ))))
+         (cop-coords (mapcar #'(lambda (l) (send self l :end-coorde)) limbs))
+         (zmp-z (elt (apply #'midpoint 0.5 (mapcar #'(lambda (c) (send c :worldpos)) cop-coords)) 2)) ;; [mm]
+         (fz-thre 50) ;; [N]
+         (limb-cop-fz-list
+          (mapcar #'(lambda (fs f m cc)
+                      (let ((fsp (scale 1e-3 (send fs :worldpos))) ;; [mm]->[m]
+                            (nf (send fs :rotate-vector f))
+                            (nm (send fs :rotate-vector m)))
+                        (send self :calc-cop-from-force-moment
+                              nf nm fs cc :fz-thre 0 :return-all-values t)))
+                  force-sensors forces moments cop-coords)))
+   (let* ((limb-fz (reduce #'+ (mapcar #'(lambda (x) (cadr (memq :fz x))) limb-cop-fz-list) :initial-value 0))
+          (tmpzmp (scale (/ 1.0 limb-fz) (reduce #'v+ (mapcar #'(lambda (x) (scale (cadr (memq :fz x)) (cadr (memq :cop x)))) limb-cop-fz-list)))))
+     (cond
+      ((< limb-fz fz-thre) nil)
+      ((eq wrt :world) tmpzmp)
+      ((eq wrt :local) (send (car (send self :links)) :inverse-transform-vector tmpzmp))
+      (t )
+      )))
   )
 
 ;;; moved from rbrarin libraries
