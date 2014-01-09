@@ -883,10 +883,10 @@
    ;; c^p_{c,x}=(c^f_{s,z} c^p_{s,x} - c^p_{s,z} c^f_{s,x} - c^n_{s,y})/c^f_{s,z}
    ;; c^p_{c,y}=(c^f_{s,z} c^p_{s,y} - c^p_{s,z} c^f_{s,y} + c^n_{s,x})/c^f_{s,z}
    ;; cop-coords relative values
-   (let* ((cfs (send cop-coords :inverse-rotate-vector force))
-          (cms (send cop-coords :inverse-rotate-vector moment))
+   (let* ((cfs (send cop-coords :inverse-rotate-vector force)) ;; [N]
+          (cms (send cop-coords :inverse-rotate-vector moment)) ;; [Nm]
           (cps (scale 1e-3 (send cop-coords :inverse-transform-vector
-                                 (send sensor-coords :worldpos))))
+                                 (send sensor-coords :worldpos)))) ;; [mm]->[m]
           (tmpcopx (+ (* (elt cfs 2) (elt cps 0))
                       (- (* (elt cps 2) (elt cfs 0)))
                       (- (elt cms 1))))
@@ -899,10 +899,10 @@
       (return-all-values
        (list :cop
              (send cop-coords :transform-vector
-                   (scale 1e3 (float-vector (/ tmpcopx tmpfz) (/ tmpcopy tmpfz) 0)))
+                   (scale 1e3 (float-vector (/ tmpcopx tmpfz) (/ tmpcopy tmpfz) 0))) ;; [m]->[mm]
              :fz tmpfz))
       (t (send cop-coords :transform-vector
-               (scale 1e3 (float-vector (/ tmpcopx tmpfz) (/ tmpcopy tmpfz) 0))))
+               (scale 1e3 (float-vector (/ tmpcopx tmpfz) (/ tmpcopy tmpfz) 0)))) ;; [m]->[mm]
       )))
   ;; get list of N x force and N x moment from 6 x N wrench vector
   ;;   (list (list f1 ... fN) (list n1 ... nN)) <= [f1 n1 ... fN nN]
