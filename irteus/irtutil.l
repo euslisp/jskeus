@@ -354,6 +354,16 @@
            )
          ,flag))))
 
+;; piped fork returning result as list
+(defun piped-fork-returns-list (cmd &optional args)
+  (let ((strm (apply #'piped-fork cmd args)))
+    (unwind-protect
+        (let ((ret) (buf))
+          (while (setq buf (read-line strm nil))
+            (push buf ret))
+          (reverse ret))
+      (close strm))))
+
 (provide :irtutil "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
