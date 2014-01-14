@@ -165,3 +165,48 @@
           *robots*)
   )
 (warn "(walk-motion-for-robots) for walking motion for several robot models~%")
+
+;; preview control example
+(defun test-preview-control
+  (&key (preview-class preview-control)
+        (q 1) (r 1e-6))
+  (let* ((dt 0.010) (max-tm 10.0)
+         (pc (instance preview-class :init dt 800 :q q :r r))
+         (tm-list (mapcar #'(lambda (x) (* x dt))
+                          (let ((i 0)) (mapcar #'(lambda (x) (incf i)) (make-list (round (/ max-tm dt)))))))
+         (ref-zmp-list
+          (mapcar #'(lambda (tm)
+                      (cond ((< tm 2) #f(0 0 0))
+                            ((< tm 4) #f(-20 20 0))
+                            ((< tm 6) #f(20 -20 0))
+                            (t #f(0 -20 0))))
+                  tm-list))
+         zmp-list cog-list ref-zmp-list2)
+    (mapcar
+     #'(lambda (ref-zmp tm)
+         (let ((xk (send pc :update-xk ref-zmp)))
+           (format t ";tm=~7,3f, u=~7,3f, p=~7,3f, xk=~30A~%"
+                   tm (elt (matrix-row (send pc :calc-u) 0) 0) (elt (send pc :cart-zmp) 0) (elt (send pc :refcog) 0))
+           (push (elt (send pc :cart-zmp) 0) zmp-list) ;; zmp ;; this zmp is "zmp as a table-cart model"
+           (push (elt (send pc :refcog) 0) cog-list)                   ;; cog
+           (push (elt (send pc :current-refzmp) 0) ref-zmp-list2) ;; ref zmp ;; ref-zmp-list2 should be equal to ref-zmp-list
+           ))
+     ref-zmp-list tm-list)
+    (with-open-file
+     (f "/tmp/test-preview-control-data.dat" :direction :output)
+     (mapcar #'(lambda (tm zmp cog refzmp)
+                 (format f "~A ~A ~A ~A~%" tm zmp cog refzmp))
+             tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
+     )
+    ;; gnuplot sample
+    ;; $ gnuplot
+    ;; gnuplot> set xlabel "Time [s]"
+    ;; gnuplot> set ylabel "ZMP X [mm]"
+    ;; gnuplot> plot '/tmp/test-preview-control-data.dat' using 1:2 title "cart zmp" with lines
+    ;; gnuplot> replot '/tmp/test-preview-control-data.dat' using 1:3 title "cog" with lines
+    ;; gnuplot> replot '/tmp/test-preview-control-data.dat' using 1:4 title "refzmp" with lines
+    (list :time-list
+          tm-list
+          :data-list
+          (list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2)))
+    ))
