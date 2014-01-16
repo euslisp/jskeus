@@ -1896,7 +1896,7 @@
                           (t (make-list (length move-target) :initial-element (deg2rad 1)))))
                   (union-link-list)
 		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func)
-		  (dump-command t)
+		  (dump-command t) (periodic-time 0.5) ;; [s]
 		  &allow-other-keys)
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
@@ -1986,7 +1986,7 @@
          (setq success (send* self :inverse-kinematics-loop
                               dif-pos dif-rot
                               :target-coords target-coords
-                              :periodic-time 0.5
+                              :periodic-time periodic-time
                               :stop stop :loop loop
                               :rotation-axis rotation-axis
                               :translation-axis translation-axis
