@@ -463,7 +463,7 @@
          ;; :wrt is :world => calc world zmp for robot
          (limbs '(:rleg :lleg))
          (force-sensors (mapcar #'(lambda (l) (send self :force-sensor l)) limbs))
-         (cop-coords (mapcar #'(lambda (l) (send self l :end-coorde)) limbs))
+         (cop-coords (mapcar #'(lambda (l) (send self l :end-coords)) limbs))
          (fz-thre 50) ;; [N]
          (limb-cop-fz-list
           (mapcar #'(lambda (fs f m cc)
