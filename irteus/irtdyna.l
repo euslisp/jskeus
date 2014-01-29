@@ -307,6 +307,9 @@
       (let ((cen (send self :centroid)))
 	(dotimes (i 3) (setf (elt (send self :get :c-til) i) (elt cen i)))
 	(send self :put :m-til (send self :weight))
+        (m* (m* (send self :worldrot) (send self :inertia-tensor) tmp-ma)
+            (transpose (send self :worldrot) tmp-mb)
+            (send self :get :I-til))
 	))
     (if debug-view
 	(warn ";; joint = ~A ;; m-til = ~A[g], c-til = ~A[mm]~%"
