@@ -666,10 +666,12 @@
                  (send self :fix-leg-to-coords (make-coords) '(:rleg :lleg))
                  (let* ((tc (send self :rleg :end-coords :copy-worldcoords))
                         (init-tc (send tc :copy-worldcoords)))
-                   (while (send self :inverse-kinematics
-                                (funcall target-coords-func tc)
-                                :link-list (send self :link-list (send self :rleg :end-coords :parent))
-                                :move-target (send self :rleg :end-coords) :warnp nil))
+                   (while (and
+                           (send self :inverse-kinematics
+                                 (funcall target-coords-func tc)
+                                 :link-list (send self :link-list (send self :rleg :end-coords :parent))
+                                 :move-target (send self :rleg :end-coords) :warnp nil)
+                           (send self :move-centroid-on-foot :lleg '(:rleg :lleg) :warnp nil)))
                    (funcall diff-func tc init-tc))))
          (let ((fol (ik-test #'(lambda (tc) (send tc :translate #f(10 0 0)))
                              #'(lambda (tc init-tc) (abs (elt (v- (send tc :worldpos) (send init-tc :worldpos)) 0)))))
