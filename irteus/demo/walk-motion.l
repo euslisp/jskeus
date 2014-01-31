@@ -35,7 +35,7 @@
   (if is-small-robot (send robot :gen-footstep-parameter :ratio 0.3))
   (send robot :calc-walk-pattern-from-footstep-list
         (send robot :go-pos-params->footstep-list
-              500 150 45) ;; x[mm] y[mm] th[rad]
+              500 150 45) ;; x[mm] y[mm] th[deg]
         :debug-view :no-message
         :default-step-height default-step-height)
   ))
@@ -154,10 +154,12 @@
 (defun walk-motion-for-robots ()
   (unless (boundp '*robots*)
     (setq *robots*
-          (mapcar #'(lambda (form)
-                      (load (format nil "models/~A-robot.l" form))
-                      (funcall form))
-                  '(h7 h6 kaz3))))
+          (append
+           (mapcar #'(lambda (form)
+                       (load (format nil "models/~A-robot.l" form))
+                       (funcall form))
+                   '(h7 h6 kaz3))
+           (list (progn (load (format nil "models/darwin.l")) (darwin))))))
   (mapcar #'(lambda
               (rb)
               (format t ";; ~A walking~%" (send rb :name))
