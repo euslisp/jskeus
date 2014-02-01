@@ -1187,18 +1187,16 @@
          (dav-col (instantiate float-vector fik-len)))
      (send self :put :collision-pair-list pair-list)
      (if (atom (car link-list)) (setq link-list (list link-list)))
-     (while (and (< n pair-len)
-                 (eps= min-distance (car (elt (send self :get :collision-distance) n)) 1.0))
+     (while (< n pair-len)
        (let* ((np (elt (send self :get :collision-distance) n))
               (pair (elt pair-list (car (last np)))))
          (incf n)
          (when (and debug-view (not (memq :no-message debug-view)))
            (let ((v (normalize-vector (v- (elt np 1) (elt np 2)))))
-             (warn "min-distance : ~7,3f(<~7,3f) #f(" min-distance avoid-collision-distance)
+             (warn "col-distance : ~7,3f(<~7,3f) #f(" (elt np 0) avoid-collision-distance)
              (dotimes (i 3) (warn "~7,3f " (elt v i)))
              (warn ") ~A~%" (send-all pair :name))))
-         (if (>= min-distance avoid-collision-distance)
-             (return-from :collision-avoidance dav-col))
+         (unless (>= (elt np 0) avoid-collision-distance)
 
          ;; extract a-link-list from link-list
          ;;   link-list = (list link-list0 link-list1 .. )
@@ -1214,7 +1212,8 @@
            (let* ((col-jacobi (send* self :calc-jacobian-from-link-list
                                      col-link-list :move-target drag-coords
                                      col-args))
-                  (ddav-col (transform (transpose col-jacobi) (elt np 3))))
+                  (ddav-col (transform (transpose col-jacobi) (elt np 3)))
+                  (distance-gain (- (/ avoid-collision-distance (elt np 0)) 1)))
              (send (car pair) :dissoc drag-coords)
              (dolist (al col-link-list)
                (labels ((calc-target-joint-dimension-from-subseq
@@ -1231,26 +1230,24 @@
                    (dotimes (i (calc-target-joint-dimension (list (send al :joint))))
                      (setf (elt dav-col (+ i dav-col-idx))
                            (+ (elt dav-col (+ i dav-col-idx))
-                              (elt ddav-col (+ ddav-col-idx i))))
+                              (* distance-gain (elt ddav-col (+ ddav-col-idx i)))))
                      )
                    )))
              ))
-         ))
+         )))
      (when (null I-J#J)
        (warn ";; ERROR : I-J#J is required in :collision-avoidance~%")
        (return-from :collision-avoidance dav-col))
 
-     (let ((distance-gain
-	    (- (/ avoid-collision-distance min-distance) 1)))
        (dotimes (i fik-len) (setf (elt dav-col i) (* (elt dav-col i) (elt weight i))))
        (send self :put :collision-avoidance-null-vector
-	     (scale (* distance-gain avoid-collision-null-gain) dav-col))
+	     (scale avoid-collision-null-gain dav-col))
        (send self :put :collision-avoidance-joint-vector
-	     (scale (* distance-gain avoid-collision-joint-gain) dav-col))
+	     (scale avoid-collision-joint-gain dav-col))
        (when (and debug-view (not (memq :no-message debug-view)))
          (format-array (map float-vector #'rad2deg (send self :get :collision-avoidance-joint-vector)) "coljnt:")
          (format-array (map float-vector #'rad2deg (send self :get :collision-avoidance-null-vector)) "colnul:")))
-     (send self :get :collision-avoidance-joint-vector)))
+     (send self :get :collision-avoidance-joint-vector))
   (:move-joints
    (union-vel &rest args
     &key
