@@ -648,7 +648,6 @@
       #f(1 1 1)
       #'(lambda () (send *viewer* :viewsurface :string 20 110 "white = calc zmp"))))
    (send *viewer* :viewsurface :flush)
-   (x::window-main-one)
    )
   ;; generate footstep parameter
   ;; currently only default, forward and outside
