@@ -1843,32 +1843,32 @@
        (if success
            :ik-succeed
          (progn
-       (when (and debug-view (not (memq :no-clear debug-view)) *viewer*)
-         (send *viewer* :viewsurface :clear))
-       (send self :put :collision-pair-list nil)
-       (send-message* self cascaded-link
-		      :move-joints-avoidance tmp-dim
-		      :union-link-list union-link-list
-		      :rotation-axis rotation-axis
-		      :translation-axis translation-axis
-		      :jacobi jacobi :debug-view debug-view
-		      ;; buffer for calculation
-		      method-args)
-       (when (and debug-view  *viewer*)
-         (send *viewer* :draw-objects :clear nil :flush nil)
-         ;;
-         ;; done
-         (send self :draw-collision-debug-view)
-         (when (car target-coords)
-           (dotimes (i (length target-coords))
-	     (send-message (elt move-target i) coordinates :draw-on :flush nil :size 100)
-             (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0))))
-	 (dolist (p (send self :get :ik-draw-on-params))
-	   (send* (car p) :draw-on :flush nil (cdr p)))
-	 (send self :put :ik-draw-on-params nil)
-         (if (not (memq :no-flush debug-view)) (send *viewer* :viewsurface :flush))
-         )
-       :ik-continues)
+           (when (and debug-view (not (memq :no-clear debug-view)) *viewer*)
+             (send *viewer* :viewsurface :clear))
+           (send self :put :collision-pair-list nil)
+           (send-message* self cascaded-link
+                          :move-joints-avoidance tmp-dim
+                          :union-link-list union-link-list
+                          :rotation-axis rotation-axis
+                          :translation-axis translation-axis
+                          :jacobi jacobi :debug-view debug-view
+                          ;; buffer for calculation
+                          method-args)
+           (when (and debug-view  *viewer*)
+             (send *viewer* :draw-objects :clear nil :flush nil)
+             ;;
+             ;; done
+             (send self :draw-collision-debug-view)
+             (when (car target-coords)
+               (dotimes (i (length target-coords))
+                 (send-message (elt move-target i) coordinates :draw-on :flush nil :size 100)
+                 (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0))))
+             (dolist (p (send self :get :ik-draw-on-params))
+               (send* (car p) :draw-on :flush nil (cdr p)))
+             (send self :put :ik-draw-on-params nil)
+             (if (not (memq :no-flush debug-view)) (send *viewer* :viewsurface :flush))
+             )
+           :ik-continues)
          )
        ))
   (:inverse-kinematics
