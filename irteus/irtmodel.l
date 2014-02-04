@@ -1841,7 +1841,8 @@
        
        ;; check loop end
        (if success
-           (return-from :inverse-kinematics-loop :ik-succeed))
+           :ik-succeed
+         (progn
        (when (and debug-view (not (memq :no-clear debug-view)) *viewer*)
          (send *viewer* :viewsurface :clear))
        (send self :put :collision-pair-list nil)
@@ -1867,7 +1868,9 @@
 	 (send self :put :ik-draw-on-params nil)
          (if (not (memq :no-flush debug-view)) (send *viewer* :viewsurface :flush))
          )
-       :ik-continues))
+       :ik-continues)
+         )
+       ))
   (:inverse-kinematics
    (target-coords &rest args 
 		  &key (stop 50)
