@@ -1176,7 +1176,7 @@
 	    avoid-collision-joint-gain
 	    avoid-collision-null-gain	    
             ((:collision-avoidance-link-pair pair-list))
-	    (union-link-list) (link-list) (I-J#J) (weight)
+	    (union-link-list) (link-list) (weight)
             ;; link-list -> both list and atom OK.
 	    (fik-len (send self :calc-target-joint-dimension union-link-list))
             debug-view
@@ -1235,9 +1235,6 @@
                    )))
              ))
          )))
-     (when (null I-J#J)
-       (warn ";; ERROR : I-J#J is required in :collision-avoidance~%")
-       (return-from :collision-avoidance dav-col))
 
        (dotimes (i fik-len) (setf (elt dav-col i) (* (elt dav-col i) (elt weight i))))
        (send self :put :collision-avoidance-null-vector
@@ -1572,7 +1569,6 @@
 		    (> avoid-collision-null-gain 0.0)))
        (setq angle-speed-collision-avoidance
 	     (send* self :collision-avoidance
-                         :I-J#J I-J#J
 			 :avoid-collision-distance avoid-collision-distance
 			 :avoid-collision-null-gain avoid-collision-null-gain
 			 :avoid-collision-joint-gain avoid-collision-joint-gain
