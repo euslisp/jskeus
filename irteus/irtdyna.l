@@ -846,7 +846,10 @@
           (pav (if (send self :get :prev-av)
                    (send self :get :prev-av)
                  av))
-          (jvv (scale dt-1 (map float-vector #'deg2rad (v- av pav)))) ;; [rad/s]
+          (jvv (let ((jr (instantiate float-vector (length av))))
+                 (dotimes (i (length joint-list))
+                   (setf (elt jr i) (* dt-1 (send (elt joint-list i) :angle-to-speed (- (elt av i) (elt pav i))))))
+                 jr))
           (pjvv (if (send self :get :prev-jvv)
                     (send self :get :prev-jvv)
                   jvv)) ;; [rad/s]
