@@ -786,24 +786,39 @@
            (if (send self :get :prev-root-coords)
                (send self :get :prev-root-coords)
              root-coords))
-          (rv (scale (* 1e-3 dt-1) (v- (send root-coords :worldpos) (send proot-coords :worldpos)))) ;; [m/s]
           (rw (scale dt-1 (send proot-coords :rotate-vector (send proot-coords :difference-rotation root-coords)))) ;; [rad/s]
+          (rp (scale 1e-3 (send root-coords :worldpos)))
+          (prp (scale 1e-3 (send proot-coords :worldpos)))
+          (rv (if (eps= (norm rw) 0.0)
+                  (scale dt-1 (v- rp prp)) ;; [m/s]
+                (v+
+                 (v* rw rp)
+                 (scale (norm rw)
+                        (transform
+                         (inverse-matrix
+                          (m+ (m* (m- (unit-matrix 3) (matrix-exponent (scale dt rw))) (outer-product-matrix (normalize-vector rw)))
+                              (scale-matrix (/ dt (norm rw))
+                                            (m*
+                                             (transpose (make-matrix 1 3 (list rw)))
+                                             (make-matrix 1 3 (list rw))))))
+                         (v- rp (transform (matrix-exponent (scale dt rw)) prp)))))))
           (prv (if (send self :get :prev-root-v)
                    (send self :get :prev-root-v)
                  rv)) ;; [m/s]
           (prw (if (send self :get :prev-root-w)
                    (send self :get :prev-root-w)
                  rw)) ;; [rad/s]
-          (rva (scale dt-1 (v- rv prv))) ;; [m/s^2]
-          (rwa (scale dt-1 (v- rw prw)))) ;; [rad/s^2]
-     (send self :put :prev-root-coords root-coords)
+          (rwa (scale dt-1 (v- rw prw))) ;; [rad/s^2]
+          ;; first order approximation
+          (sp-rva (v- (scale dt-1 (v- rv (transform (matrix-exponent (scale dt rw)) prv)))
+                      (v* rwa rp)))
+          ) ;; [m/s^2]
+     (send self :put :prev-root-coords (send root-coords :copy-worldcoords))
      (send self :put :prev-root-v rv)
      (send self :put :prev-root-w rw)
      (list :root-spacial-velocity (v- rv (v* rw (scale 1e-3 (send root-coords :worldpos)))) ;; [m/s]
            :root-angular-velocity rw ;; [rad/s]
-           :root-spacial-acceleration ;; [m/s^2]
-           (v- rva (v+ (v* rwa (scale 1e-3 (send root-coords :worldpos))) ;; [rad/s^2] * [m]
-                       (v* rw rv))) ;; [rad/s] * [m/s]
+           :root-spacial-acceleration sp-rva ;; [m/s^2]
            :root-angular-acceleration rwa) ;; [rad/s^2]
      ))
   (:calc-av-vel-acc-from-pos
