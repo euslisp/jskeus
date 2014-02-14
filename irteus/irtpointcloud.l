@@ -397,6 +397,18 @@
            ret)))
        )))
   ;;(:remove-outlier ())
+  (:generate-color-histogram-hs (&key (h-step 3) (s-step 3))
+    (let ((col (send self :colors))
+          (hist (make-array
+                 (list h-step s-step)
+                 :element-type float-vector)))
+      (dotimes (i (send self :size))
+        (let* ((his (rgb2his (matrix-row col i)))
+               (h-bin (get-bin (elt his 0) :step h-step :max-num 360.0))
+               (s-bin (get-bin (elt his 2) :step s-step)))
+          (incf (aref hist h-bin s-bin))))
+      (scale-matrix (/ 1.0 (send self :size)) hist)))
+  ;;
   (:copy-from (pc)
    (send self :points (send pc :points))
    (send self :colors (send pc :colors))
