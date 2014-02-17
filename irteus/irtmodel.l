@@ -413,7 +413,7 @@
 	    ;; if relative t
 	    ;; v is calculated from difference-rotation or jacobian
 	    (let ((vec (map float-vector #'deg2rad v)))
-	      (unless (eps= (rad2deg (norm vec)) 0.0)
+	      (unless (eps= (rad2deg (norm vec)) 0.0 1e-20)
 		(m* (rotation-matrix (norm vec) (normalize-vector vec)) drot drot))))
 	;; min max check
 	(let* ((dr (map float-vector #'rad2deg (matrix-log drot))))
@@ -553,7 +553,7 @@
 	(setq drot (matrix-exponent (map float-vector #'deg2rad (subseq joint-angle 3 6))))
 	(if relative
 	    (let ((vec (map float-vector #'deg2rad (subseq v 3 6))))
-	      (unless (eps= (rad2deg (norm vec)) 0.0)
+	      (unless (eps= (rad2deg (norm vec)) 0.0 1e-20)
 		(m* (rotation-matrix (norm vec) (normalize-vector vec)) drot drot))))
 	;; min max check
 	(let* ((dr (map float-vector #'rad2deg (matrix-log drot))))
