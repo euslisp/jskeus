@@ -474,8 +474,8 @@
                               nf nm fs cc :fz-thre 0 :return-all-values t)))
                   force-sensors forces moments cop-coords)))
    (let* ((limb-cop-fz-list2 (remove nil limb-cop-fz-list))
-          (limb-fz (reduce #'+ (mapcar #'(lambda (x) (cadr (memq :fz x))) limb-cop-fz-list) :initial-value 0))
-          (tmpzmp (scale (/ 1.0 limb-fz) (reduce #'v+ (mapcar #'(lambda (x) (scale (cadr (memq :fz x)) (cadr (memq :cop x)))) limb-cop-fz-list)))))
+          (limb-fz (reduce #'+ (mapcar #'(lambda (x) (cadr (memq :fz x))) limb-cop-fz-list2) :initial-value 0))
+          (tmpzmp (scale (/ 1.0 limb-fz) (reduce #'v+ (mapcar #'(lambda (x) (scale (cadr (memq :fz x)) (cadr (memq :cop x)))) limb-cop-fz-list2)))))
      (cond
       ((< limb-fz fz-thre) nil)
       ((eq wrt :world) tmpzmp)
