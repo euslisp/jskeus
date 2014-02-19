@@ -292,9 +292,9 @@
   (remprop 'normalize-vector 'compiler::builtin-function-entry)
   (setf (symbol-function 'normalize-vector-org) (symbol-function 'normalize-vector))
   (comp::def-builtin-entry 'NORMALIZE-VECTOR-ORG "VNORMALIZE"))
-(defun normalize-vector (v &optional r (eps *epsilon*))
+(defun normalize-vector (v &optional r (eps 1.0e-5))
   "normalize-vector #f(0 0 0)->#f(0 0 0)."
-  (if (< (norm v) *epsilon*)
+  (if (< (norm v) eps)
       (if r (fill r 0)
         (instantiate float-vector (length v)))
     (if r (normalize-vector-org v r)
