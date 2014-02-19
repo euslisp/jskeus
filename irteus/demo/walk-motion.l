@@ -212,19 +212,24 @@
             tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
     ))
 
+;; dynamics filter by using preview control
+;;   input motion : control ZMP at 0 based on COG model
+;;   output motion : control ZMP at 0 based on multi-body model
 (defun test-preview-control-dynamics-filter
   (robot &key reference-zmp-list (preview-class preview-control) (cog-method :move-base-pos) (dt 0.025))
   (let ((dt 0.025) (avs))
     (objects (list robot))
-    ;; generate av-list
+    ;; generate input motion control ZMP at 0, which corresponds to COG at 0 in this case
     (send robot :reset-pose)
     (send robot :fix-leg-to-coords (make-coords) '(:rleg :lleg))
     (dotimes (i 180)
       (send robot :arms :shoulder-p :joint-angle (+ -20 (* -45 (sin (* 6 (deg2rad i))))))
       (send robot :move-centroid-on-foot :both '(:lleg :rleg))
-      (push (list (send robot :angle-vector) (send (car (send robot :links)) :copy-worldcoords)) avs))
+      (push (list :angle-vector (send robot :angle-vector)
+                  :root-coords (send (car (send robot :links)) :copy-worldcoords)) avs))
     (setq avs (reverse avs))
-    (let ((data (send robot :preview-control-dynamics-filter dt avs)))
+    ;; filtering
+    (let ((data (subseq (send robot :preview-control-dynamics-filter dt avs) 4)))
       (with-open-file
        (f "/tmp/test-preview-control-data-2.dat" :direction :output)
        (mapcar #'(lambda (tm ozmp-x izmp-x ocog-x icog-x ozmp-y izmp-y ocog-y icog-y)

@@ -1046,7 +1046,8 @@
 
   ;; preview filter
   (:preview-control-dynamics-filter
-   (dt avs
+   (dt ;; [s]
+    avs ;; input motion : (list (list :angle-vector av :root-coords rc) ....)
     &key reference-zmp-list
          (preview-class preview-control)
          (cog-method :move-base-pos)
@@ -1054,8 +1055,8 @@
    ;; generate av-list
    (labels ((update-robot-state
              (av)
-             (send self :angle-vector (car av))
-             (send self :newcoords (cadr av))))
+             (send self :angle-vector (cadr (memq :angle-vector av)))
+             (send self :move-coords (cadr (memq :root-coords av)) (car (send self :links)))))
      (update-robot-state (car avs))
      (let ((df (instance preview-dynamics-filter
                          :init dt (elt (send self :centroid) 2) preview-class :delay delay))
@@ -1086,7 +1087,8 @@
              (setq r (send df :update (list av zmp (copy-object (send self :centroid)) rzmp) (if av dzmp nil)))
              (when r
                (push (list (send df :av) r) ret-list)
-               (let ((pav (send self :angle-vector)) (prc (send self :copy-worldcoords)))
+               (let ((pav (send self :angle-vector))
+                     (prc (send self :copy-worldcoords)))
                  (update-robot-state (car (send df :av)))
                  (case cog-method
                    (:move-centroid-on-foot
@@ -1098,12 +1100,11 @@
                       (send self :translate (float-vector (- (elt (send df :refcog) 0)) (- (elt (send df :refcog) 1)) 0) :world)
                       (mapcar #'(lambda (l ttc)
                                   (send self l :inverse-kinematics ttc :thre 0.1 :rthre (deg2rad 0.1)))
-                              '(:rleg :lleg) tc))
-                    ;; (send self :move-base-pos
-                    ;;      (float-vector (- (elt (send df :refcog) 0)) (- (elt (send df :refcog) 1)) 0) '(:rleg :lleg))
-                    )
+                              '(:rleg :lleg) tc)))
                    )
-                 (push (list (send self :angle-vector) (send self :copy-worldcoords)) ret-avs)
+                 (push (list :angle-vector (send self :angle-vector)
+                             :root-coords (send (car (send self :links)) :copy-worldcoords))
+                       ret-avs)
                  (send self :angle-vector pav)
                  (send self :newcoords prc)
                  )
