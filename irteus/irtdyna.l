@@ -1048,8 +1048,7 @@
   (:preview-control-dynamics-filter
    (dt ;; [s]
     avs ;; input motion : (list (list :angle-vector av :root-coords rc) ....)
-    &key reference-zmp-list
-         (preview-class preview-control)
+    &key (preview-class preview-control)
          (cog-method :move-base-pos)
          (delay 0.8)) ;; [s]
    ;; generate av-list
@@ -1063,7 +1062,7 @@
            (r))
        (dotimes (i 2) (send self :calc-zmp))
        (let ((ret-list) (last-av) (ret-avs) (last-zmp) (av)
-             (avs (copy-object avs)) (reference-zmp-list (copy-object reference-zmp-list)))
+             (avs (copy-object avs)))
          (while (not (send df :finishedp))
            (setq av (pop avs))
            (if av
@@ -1075,13 +1074,7 @@
                              (send self :angle-vector)
                              (send self :copy-worldcoords)
                              :dt dt))
-                  (rzmp (let ((tmp-zmp
-                               (cond
-                                (reference-zmp-list (pop reference-zmp-list))
-                                ((find-method :calc-target-centroid-pos self)
-                                 (send self :calc-target-centroid-pos :both '(:rleg :lleg)))
-                                (t (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos))))
-                               ))
+                  (rzmp (let ((tmp-zmp (cadr (memq :refzmp av))))
                           (if tmp-zmp (setq last-zmp tmp-zmp) last-zmp)))
                   (dzmp (v- zmp rzmp)))
              (setq r (send df :update (list av zmp (copy-object (send self :centroid)) rzmp) (if av dzmp nil)))

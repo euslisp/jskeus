@@ -216,8 +216,8 @@
 ;;   input motion : control ZMP at 0 based on COG model
 ;;   output motion : control ZMP at 0 based on multi-body model
 (defun test-preview-control-dynamics-filter
-  (robot &key reference-zmp-list (preview-class preview-control) (cog-method :move-base-pos) (dt 0.025))
-  (let ((dt 0.025) (avs))
+  (robot &key (preview-class preview-control) (cog-method :move-base-pos) (dt 0.025))
+  (let ((avs))
     (objects (list robot))
     ;; generate input motion control ZMP at 0, which corresponds to COG at 0 in this case
     (send robot :reset-pose)
@@ -226,7 +226,9 @@
       (send robot :arms :shoulder-p :joint-angle (+ -20 (* -45 (sin (* 6 (deg2rad i))))))
       (send robot :move-centroid-on-foot :both '(:lleg :rleg))
       (push (list :angle-vector (send robot :angle-vector)
-                  :root-coords (send (car (send robot :links)) :copy-worldcoords)) avs))
+                  :root-coords (send (car (send robot :links)) :copy-worldcoords)
+                  :refzmp (apply #'midpoint 0.5 (send robot :legs :end-coords :worldpos)))
+            avs))
     (setq avs (reverse avs))
     ;; filtering
     (let ((data (subseq (send robot :preview-control-dynamics-filter dt avs) 4)))
