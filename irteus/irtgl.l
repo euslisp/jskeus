@@ -729,22 +729,24 @@
   (:convert-to-faces (&rest args &key (wrt :local) &allow-other-keys) ;; check-normal <-> check-vertices-order, add face-color
    (let (ret)
      (dolist (mesh mesh-list)
-       (let ((vlst (cadr (assoc :vertices mesh)))
-             (nlst (cadr (assoc :normals mesh)))
-             (idces (cadr (assoc :indices mesh)))
-             (tp (cadr (assoc :type mesh)))
-             mesh-size lst)
+       (let* ((vlst (cadr (assoc :vertices mesh)))
+              (nlst (cadr (assoc :normals mesh)))
+              (idces (cadr (assoc :indices mesh)))
+              (idlen (length idces))
+              (tp (cadr (assoc :type mesh)))
+              mesh-size lst)
          (case tp
            (:triangles (setq mesh-size 3))
            (:quads     (setq mesh-size 4))
            (t (warn ";; not supported mesh type -> ~A" tp)
               (return-from :convert-to-faces)))
+         (setq idlen (* (/ idlen mesh-size) mesh-size))
          ;; convert from self coords
          (cond
           (idces
            (do ((i 0 (+ i 1))
                 (v 0 (+ v mesh-size)))
-               ((>= v (length idces)))
+               ((>= v idlen))
              (let (vs ns)
                (dotimes (j mesh-size)
                  (push (user::c-matrix-row vlst (elt idces (+ v j))) vs)
