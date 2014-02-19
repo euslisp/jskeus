@@ -1043,6 +1043,99 @@
    (&optional (update-mass-properties t))
    (if update-mass-properties (send self :update-mass-properties))
    (send (car (send self :links)) :get :c-til))
+
+  ;; preview filter
+  (:preview-control-dynamics-filter
+   (dt avs
+    &key reference-zmp-list
+         (preview-class preview-control)
+         (cog-method :move-base-pos)
+         (delay 0.8)) ;; [s]
+   ;; generate av-list
+   (labels ((update-robot-state
+             (av)
+             (send self :angle-vector (car av))
+             (send self :newcoords (cadr av))))
+     (update-robot-state (car avs))
+     (let ((df (instance preview-dynamics-filter
+                         :init dt (elt (send self :centroid) 2) preview-class :delay delay))
+           (r))
+       (dotimes (i 2) (send self :calc-zmp))
+       (let ((ret-list) (last-av) (ret-avs) (last-zmp) (av)
+             (avs (copy-object avs)) (reference-zmp-list (copy-object reference-zmp-list)))
+         (while (not (send df :finishedp))
+           (setq av (pop avs))
+           (if av
+               (progn
+                 (update-robot-state av)
+                 (setq last-av av))
+             (update-robot-state last-av))
+           (let* ((zmp (send self :calc-zmp
+                             (send self :angle-vector)
+                             (send self :copy-worldcoords)
+                             :dt dt))
+                  (rzmp (let ((tmp-zmp
+                               (cond
+                                (reference-zmp-list (pop reference-zmp-list))
+                                ((find-method :calc-target-centroid-pos self)
+                                 (send self :calc-target-centroid-pos :both '(:rleg :lleg)))
+                                (t (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos))))
+                               ))
+                          (if tmp-zmp (setq last-zmp tmp-zmp) last-zmp)))
+                  (dzmp (v- zmp rzmp)))
+             (setq r (send df :update (list av zmp (copy-object (send self :centroid)) rzmp) (if av dzmp nil)))
+             (when r
+               (push (list (send df :av) r) ret-list)
+               (let ((pav (send self :angle-vector)) (prc (send self :copy-worldcoords)))
+                 (update-robot-state (car (send df :av)))
+                 (case cog-method
+                   (:move-centroid-on-foot
+                    (send self :move-centroid-on-foot :both '(:lleg :rleg)
+                          :centroid-thre 0.1
+                          :target-centroid-pos (v- (send self :centroid) (send df :refcog))))
+                   (:move-base-pos
+                    (let ((tc (mapcar #'(lambda (l) (send self l :end-coords :copy-worldcoords)) '(:rleg :lleg))))
+                      (send self :translate (float-vector (- (elt (send df :refcog) 0)) (- (elt (send df :refcog) 1)) 0) :world)
+                      (mapcar #'(lambda (l ttc)
+                                  (send self l :inverse-kinematics ttc :thre 0.1 :rthre (deg2rad 0.1)))
+                              '(:rleg :lleg) tc))
+                    ;; (send self :move-base-pos
+                    ;;      (float-vector (- (elt (send df :refcog) 0)) (- (elt (send df :refcog) 1)) 0) '(:rleg :lleg))
+                    )
+                   )
+                 (push (list (send self :angle-vector) (send self :copy-worldcoords)) ret-avs)
+                 (send self :angle-vector pav)
+                 (send self :newcoords prc)
+                 )
+               )
+             ))
+         (setq ret-avs (reverse ret-avs) ret-list (reverse ret-list))
+         (update-robot-state (car ret-avs))
+         (dotimes (i 2) (send self :calc-zmp))
+         (objects (list self))
+         (let* ((tm (- dt))
+                (data
+                 (mapcar
+                  #'(lambda (av ret)
+                      (update-robot-state av)
+                      (let ((zmp (send self :calc-zmp
+                                       (send self :angle-vector)
+                                       (send self :copy-worldcoords)
+                                       :dt dt)))
+                        (send *viewer* :draw-objects :flush nil)
+                        (send (caddr (car ret)) :draw-on :flush nil :size 400)
+                        (send (send self :centroid) :draw-on :flush nil :size 300 :color #f(1 0 0))
+                        (send (cadr (car ret)) :draw-on :flush nil :size 400)
+                        (send zmp :draw-on :flush t :size 300 :color #f(1 0 0))
+                        (unix:usleep 10000)
+                        (setq tm (+ tm dt))
+                        (list :time tm :output-zmp zmp :input-zmp (cadr (car ret))
+                              :output-cog (send self :centroid nil)
+                              :input-cog (cadddr (car ret)))
+                        ))
+                  ret-avs ret-list)))
+           (mapcar #'(lambda (x y) (append x y)) ret-avs data)
+           )))))
   )
 
 ;;;

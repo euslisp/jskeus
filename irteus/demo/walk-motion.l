@@ -207,8 +207,53 @@
     ;; gnuplot> plot '/tmp/test-preview-control-data.dat' using 1:2 title "cart zmp" with lines
     ;; gnuplot> replot '/tmp/test-preview-control-data.dat' using 1:3 title "cog" with lines
     ;; gnuplot> replot '/tmp/test-preview-control-data.dat' using 1:4 title "refzmp" with lines
-    (list :time-list
-          tm-list
-          :data-list
-          (list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2)))
+    (mapcar #'(lambda (tm zmp cog refzmp)
+                (list :time tm :zmp zmp :cog cog :refzmp refzmp))
+            tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
     ))
+
+(defun test-preview-control-dynamics-filter
+  (robot &key reference-zmp-list (preview-class preview-control) (cog-method :move-base-pos) (dt 0.025))
+  (let ((dt 0.025) (avs))
+    (objects (list robot))
+    ;; generate av-list
+    (send robot :reset-pose)
+    (send robot :fix-leg-to-coords (make-coords) '(:rleg :lleg))
+    (dotimes (i 180)
+      (send robot :arms :shoulder-p :joint-angle (+ -20 (* -45 (sin (* 6 (deg2rad i))))))
+      (send robot :move-centroid-on-foot :both '(:lleg :rleg))
+      (push (list (send robot :angle-vector) (send (car (send robot :links)) :copy-worldcoords)) avs))
+    (setq avs (reverse avs))
+    (let ((data (send robot :preview-control-dynamics-filter dt avs)))
+      (with-open-file
+       (f "/tmp/test-preview-control-data-2.dat" :direction :output)
+       (mapcar #'(lambda (tm ozmp-x izmp-x ocog-x icog-x ozmp-y izmp-y ocog-y icog-y)
+                   (format f "~A ~A ~A ~A ~A ~A ~A ~A ~A~%" tm ozmp-x izmp-x ocog-x icog-x ozmp-y izmp-y ocog-y icog-y))
+               (mapcar #'(lambda (x) (cadr (memq :time x))) data)
+               (mapcar #'(lambda (x) (elt (cadr (memq :output-zmp x)) 0)) data)
+               (mapcar #'(lambda (x) (elt (cadr (memq :input-zmp x)) 0)) data)
+               (mapcar #'(lambda (x) (elt (cadr (memq :output-cog x)) 0)) data)
+               (mapcar #'(lambda (x) (elt (cadr (memq :input-cog x)) 0)) data)
+               (mapcar #'(lambda (x) (elt (cadr (memq :output-zmp x)) 1)) data)
+               (mapcar #'(lambda (x) (elt (cadr (memq :input-zmp x)) 1)) data)
+               (mapcar #'(lambda (x) (elt (cadr (memq :output-cog x)) 1)) data)
+               (mapcar #'(lambda (x) (elt (cadr (memq :input-cog x)) 1)) data)
+               ))
+      ;; gnuplot sample
+      ;; $ gnuplot
+      ;; gnuplot> set xlabel "Time [s]"
+      ;; gnuplot> set ylabel "ZMP X [mm]"
+      ;; gnuplot> plot '/tmp/test-preview-control-data-2.dat' using 1:2 title "output zmp" with lines
+      ;; gnuplot> replot '/tmp/test-preview-control-data-2.dat' using 1:3 title "input zmp" with lines
+      ;; gnuplot> replot '/tmp/test-preview-control-data-2.dat' using 1:4 title "output cog" with lines
+      ;; gnuplot> replot '/tmp/test-preview-control-data-2.dat' using 1:5 title "input cog" with lines
+      data
+      )))
+
+(defun test-preview-control-dynamics-filter-for-sample-robot
+  ()
+  (unless (boundp '*robot*)
+    (setq *robot* (instance sample-robot :init)))
+  (test-preview-control-dynamics-filter *robot*)
+  )
+
