@@ -457,26 +457,22 @@
     target-centroid-pos
     centroid-offset-func)
    (scale (* 0.001 cog-gain) ;; [mm] -> [m]
-          (calc-dif-with-axis
-           (let ((current-centroid-pos
-                  (if (functionp centroid-offset-func)
-                      (funcall centroid-offset-func)
-                    (send self :centroid nil))))
-             (send self :put :ik-draw-on-params
-                   (append (send self :get :ik-draw-on-params)
-                           (list (list target-centroid-pos :color #f(0 0 1))
-                                 (list (float-vector (elt current-centroid-pos 0) (elt current-centroid-pos 1) (elt target-centroid-pos 2)) :size 100 :color #f(0 1 0)))))
-             (v- target-centroid-pos current-centroid-pos))
-           translation-axis)
-          ))
+          (send self :difference-cog-position
+                target-centroid-pos centroid-offset-func translation-axis t)))
   (:difference-cog-position
-    (target-centroid-pos &optional (centroid-offset-func) (translation-axis :z))
-    (calc-dif-with-axis
-     (v- target-centroid-pos
-         (if (functionp centroid-offset-func)
-             (funcall centroid-offset-func)
-           (send self :centroid)))
-     translation-axis))
+    (target-centroid-pos &optional (centroid-offset-func) (translation-axis :z) (add-draw-on-param))
+    (let ((current-centroid-pos
+           (if (functionp centroid-offset-func)
+               (funcall centroid-offset-func)
+             (send self :centroid))))
+      (if add-draw-on-param
+          (send self :put :ik-draw-on-params
+                (append (send self :get :ik-draw-on-params)
+                        (list (list target-centroid-pos :color #f(0 0 1))
+                              (list (float-vector (elt current-centroid-pos 0) (elt current-centroid-pos 1) (elt target-centroid-pos 2)) :size 100 :color #f(0 1 0))))))
+      (calc-dif-with-axis
+       (v- target-centroid-pos current-centroid-pos)
+       translation-axis)))
   (:cog-convergence-check
    (centroid-thre target-centroid-pos &optional centroid-offset-func)
    (let ((cdiff
