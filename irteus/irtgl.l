@@ -680,7 +680,7 @@
      (setq mesh-list new-mesh)
      ))
   (:calc-normals (&optional (force nil) (expand t))
-   (if expand (send self :expand-vertices))
+   ;;(if expand (send self :expand-vertices))
    (dolist (minfo mesh-list)
      (let ((nmat (cadr (assoc :normals minfo)))
            (tp (cadr (assoc :type minfo)))
