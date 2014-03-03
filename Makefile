@@ -1,7 +1,6 @@
 all: eus-installed irteus-installed manuals bashrc.eus
 
-SVN_EUSURL=http://svn.code.sf.net/p/euslisp/code/trunk/EusLisp
-SVN_IRTEUSURL=http://svn.code.sf.net/p/jskeus/code/trunk/irteus
+GIT_EUSURL=http://github.com/euslisp/EusLisp
 
 EUSC_PATCH=eus.c_CUSTUM_EUSDIR.patch
 
@@ -56,27 +55,12 @@ export LD_LIBRARY_PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
 	@cat bashrc.eus
 
 eus:
-	# 'svn propget svn:externals .' to see the details
-	svn co -N $(SVN_EUSURL) eus
-	svn co -N $(SVN_EUSURL)/lib eus/lib
-	cd eus; svn up lisp lib/llib || svn up lisp lib/llib
+	git clone --depth 10 $(GIT_EUSURL) eus
 
-rm-lib-dir:
-	# remove unsupported directories
-	@if [ -e eus/lib/clib/.svn -o -e eus/lib/demo/.svn -o -e eus/lib/bitmaps/.svn ]; then\
-		svn up -q --set-depth files eus/lib/; \
-		svn up -q eus/lib/llib; \
-	else \
-		rm -fr eus/lib/clib eus/lib/demo eus/lib/bitmaps; \
-	fi
-
-eus-installed: eus rm-lib-dir
+eus-installed: eus
 	cd eus/lisp && ln -sf $(MAKEFILE) Makefile && make eus0 eus1 eus2 eusg eusx eusgl eus
 
-irteus:
-	if [ -e irteus/.svn ] && (svn up irteus || svn up irteus)
-
-irteus-installed: irteus
+irteus-installed:
 	cd irteus; make
 
 clean:
