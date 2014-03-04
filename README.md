@@ -11,6 +11,12 @@ for Ubuntu users
 ```
 $ sudo apt-get install subversion gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi msttcorefonts
 ```
+
+for Ubuntu 11.04 or later, install more fonts.
+```
+$ sudo apt-get install gsfonts-x11 texlive-fonts-extra xfonts-100dpi-transcoded xfonts-75dpi-transcoded
+```
+
 for Mac OSX users using MacPorts
 ```
 $ sudo port install jpeg libpng mesa xorg-libX11 wget
