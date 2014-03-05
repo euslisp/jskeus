@@ -42,7 +42,7 @@ RAPID=-LRAPID/$(ARCHDIR) -lRAPID-static
 RAPIDLIB=RAPID/$(ARCHDIR)/$(LPFX)RAPID-static.a
 FFTW=-L/usr/local/lib -lfftw -lrfftw
 
-SVNVERSION=\"$(shell svnversion)\"
+SVNVERSION=\"$(shell git rev-parse --short HEAD)\"
 
 MACHINE=armv6
 THREAD= -DTHREADED -DPTHREAD
