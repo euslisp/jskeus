@@ -458,9 +458,12 @@
     centroid-offset-func)
    (scale (* 0.001 cog-gain) ;; [mm] -> [m]
           (send self :difference-cog-position
-                target-centroid-pos centroid-offset-func translation-axis t)))
+                target-centroid-pos
+                :centroid-offset-func centroid-offset-func
+                :translation-axis translation-axis
+                :add-draw-on-param t)))
   (:difference-cog-position
-    (target-centroid-pos &optional (centroid-offset-func) (translation-axis :z) (add-draw-on-param))
+    (target-centroid-pos &key (centroid-offset-func) (translation-axis :z) (add-draw-on-param))
     (let ((current-centroid-pos
            (if (functionp centroid-offset-func)
                (funcall centroid-offset-func)
@@ -474,9 +477,10 @@
        (v- target-centroid-pos current-centroid-pos)
        translation-axis)))
   (:cog-convergence-check
-   (centroid-thre target-centroid-pos &optional centroid-offset-func)
+   (centroid-thre target-centroid-pos &key (centroid-offset-func) (translation-axis :z))
    (let ((cdiff
-            (send self :difference-cog-position target-centroid-pos centroid-offset-func)))
+            (send self :difference-cog-position target-centroid-pos
+                  :centroid-offset-func centroid-offset-func :translation-axis translation-axis)))
      (cond
       ((numberp centroid-thre) (> centroid-thre (norm cdiff)))
       ((functionp centroid-thre) (funcall cdiff))
