@@ -418,8 +418,9 @@
           (axis-dim (send self :calc-target-axis-dimension rotation-axis translation-axis))
           (inertia-matrix
 	   (make-matrix axis-dim (send self :calc-target-joint-dimension link-list)))
+          (update-mass-properties t)
      &allow-other-keys)
-    (let ((all-M (* 0.001 (send self :weight)))) ;; [kg]
+    (let ((all-M (* 0.001 (send self :weight update-mass-properties)))) ;; [kg]
       (send* self :calc-inertia-matrix-from-link-list
              :update-mass-properties nil
 	     :inertia-matrix inertia-matrix :link-list link-list args)
@@ -441,33 +442,39 @@
           (translation-axis :z)
           (target-centroid-pos)
 	  (centroid-offset-func)
+          (update-mass-properties t)
      &allow-other-keys)
     (transform
      (send* self :calc-inverse-jacobian
-	    (send* self :calc-cog-jacobian-from-link-list
+            (send* self :calc-cog-jacobian-from-link-list
+                   :update-mass-properties update-mass-properties
 		   :link-list link-list
 		   :translation-axis translation-axis args)
 	    args)
-     (send self :calc-vel-for-cog cog-gain translation-axis target-centroid-pos centroid-offset-func)
+     (send self :calc-vel-for-cog cog-gain translation-axis target-centroid-pos
+           :centroid-offset-func centroid-offset-func
+           :update-mass-properties nil)
      )
     )
   (:calc-vel-for-cog
    (cog-gain
     translation-axis
     target-centroid-pos
-    centroid-offset-func)
+    &key (centroid-offset-func)
+         (update-mass-properties t))
    (scale (* 0.001 cog-gain) ;; [mm] -> [m]
           (send self :difference-cog-position
                 target-centroid-pos
                 :centroid-offset-func centroid-offset-func
                 :translation-axis translation-axis
-                :add-draw-on-param t)))
+                :add-draw-on-param t
+                :update-mass-properties update-mass-properties)))
   (:difference-cog-position
-    (target-centroid-pos &key (centroid-offset-func) (translation-axis :z) (add-draw-on-param))
+    (target-centroid-pos &key (centroid-offset-func) (translation-axis :z) (add-draw-on-param) (update-mass-properties t))
     (let ((current-centroid-pos
            (if (functionp centroid-offset-func)
                (funcall centroid-offset-func)
-             (send self :centroid))))
+             (send self :centroid update-mass-properties))))
       (if add-draw-on-param
           (send self :put :ik-draw-on-params
                 (append (send self :get :ik-draw-on-params)
@@ -477,10 +484,10 @@
        (v- target-centroid-pos current-centroid-pos)
        translation-axis)))
   (:cog-convergence-check
-   (centroid-thre target-centroid-pos &key (centroid-offset-func) (translation-axis :z))
+   (centroid-thre target-centroid-pos &key (centroid-offset-func) (translation-axis :z) (update-mass-properties t))
    (let ((cdiff
             (send self :difference-cog-position target-centroid-pos
-                  :centroid-offset-func centroid-offset-func :translation-axis translation-axis)))
+                  :centroid-offset-func centroid-offset-func :translation-axis translation-axis :update-mass-properties update-mass-properties)))
      (cond
       ((numberp centroid-thre) (> centroid-thre (norm cdiff)))
       ((functionp centroid-thre) (funcall cdiff))
