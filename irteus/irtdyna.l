@@ -70,7 +70,7 @@
     (let ((tv (calc-dif-with-axis mj translation-axis tmp-v0 tmp-v1 tmp-v2)))
       (dotimes (i (length tv)) (setf (aref mat (+ row i) column) (elt tv i)))
       (let ((rv (calc-dif-with-axis hj rotation-axis tmp-v0 tmp-v1 tmp-v2)))
-	(dotimes (i (length rv)) (setf (aref mat (+ row i (length rv)) column) (elt rv i)))
+	(dotimes (i (length rv)) (setf (aref mat (+ row i (length tv)) column) (elt rv i)))
 	))))
 
 (defmethod rotational-joint
