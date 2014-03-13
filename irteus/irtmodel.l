@@ -1434,6 +1434,7 @@
 	  ;; if user wants to use cog-jacobian as null-space, please set cog-gain(> 0.0) and target-centroid-pos
 	  (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
           (weight (fill (instantiate float-vector fik-len) 1.0))
+          (update-mass-properties t)
           (tmp-nspace (instantiate float-vector fik-len)))
     ;; calc null-space from joint-limit
     (setq tmp-nspace
@@ -1444,6 +1445,7 @@
 	(setq tmp-nspace
 	      (v+ (send self :cog-jacobian-balance-nspace union-link-list
 			:weight weight :centroid-offset-func centroid-offset-func
+                        :update-mass-properties update-mass-properties
 			:target-centroid-pos target-centroid-pos :cog-gain cog-gain :translation-axis cog-translation-axis)
 		  tmp-nspace tmp-nspace)))
     ;; add null-space from arguments
@@ -1592,6 +1594,7 @@
                  link-list :union-link-list union-link-list
                  :avoid-nspace-gain avoid-nspace-gain :debug-view debug-view
 		 :cog-gain cog-gain :target-centroid-pos target-centroid-pos :centroid-offset-func centroid-offset-func
+                 :update-mass-properties nil
                  :cog-translation-axis cog-translation-axis
                  :weight weight :fik-len fik-len :null-space null-space :tmp-nspace tmp-nspace
                  :additional-nspace-list additional-nspace-list))
@@ -1752,6 +1755,7 @@
     (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
     debug-view ik-args
     &allow-other-keys)
+   (if target-centroid-pos (send self :update-mass-properties))
    ;; dif-pos, dif-rot, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
    (let (tmp-dim tmp-dims (vec-count 0) (success t)
@@ -1816,7 +1820,8 @@
 	     (send self :ik-convergence-check
 		   (>= loop (/ stop 10)) dif-pos dif-rot
 		   rotation-axis translation-axis thre rthre
-		   centroid-thre target-centroid-pos centroid-offset-func cog-translation-axis))
+		   centroid-thre target-centroid-pos centroid-offset-func cog-translation-axis
+                   :update-mass-properties nil))
        (if (and additional-check success)
            (setq success (and success (funcall additional-check))))
 
@@ -1995,6 +2000,7 @@
          (when (eq success :ik-succeed)
 	   (setq success t) (return nil))
          ))
+     (if target-centroid-pos (send self :update-mass-properties))
      (let* ((target-coords
 	     (mapcar #'(lambda (x)
 			 (if (functionp x) (funcall x) x))
@@ -2009,7 +2015,8 @@
 	     (send self :ik-convergence-check
 		   success dif-pos dif-rot
 		   rotation-axis translation-axis thre rthre
-		   centroid-thre target-centroid-pos centroid-offset-func cog-translation-axis)))
+		   centroid-thre target-centroid-pos centroid-offset-func cog-translation-axis
+                   :update-mass-properties nil)))
         ;; update difference
      (mapcar #'(lambda (l a) (send l :analysis-level a)) union-link-list old-analysis-level)
      ;; rename log file
@@ -2027,7 +2034,7 @@
 	     (warn ";; dif-pos : ~a/(~a/~a)~%" (elt dif-pos i) (norm (elt dif-pos i)) (elt thre i))
 	     (warn ";; dif-rot : ~a/(~a/~a)~%" (elt dif-rot i) (norm (elt dif-rot i)) (elt rthre i)))
            (if target-centroid-pos
-               (let ((dif-cog (send self :difference-cog-position target-centroid-pos :centroid-offset-func centroid-offset-func :translation-axis cog-translation-axis)))
+               (let ((dif-cog (send self :difference-cog-position target-centroid-pos :centroid-offset-func centroid-offset-func :translation-axis cog-translation-axis :update-mass-properties nil)))
                  (warn ";; cog-dif : ~a/(~a/~a)~%" dif-cog (norm dif-cog) centroid-thre)))
            (warn ";;  coords : ~a~%" 
                  (send (let ((p self)) (while (send p :parent) (setq p (send p :parent))) p) :worldcoords))
@@ -2071,7 +2078,7 @@
 		(format f "(defun ik-check () (~A-check))~%" command-id)
                 (format f "(setq ik-failed '(")
                 (format f "(:dif-pos . ~A) (:dif-rot . ~A~%)" dif-pos dif-rot)
-                (if target-centroid-pos (format f "(:dif-cog . ~A)" (send self :difference-cog-position target-centroid-pos :centroid-offset-func centroid-offset-func :translation-axis cog-translation-axis)))
+                (if target-centroid-pos (format f "(:dif-cog . ~A)" (send self :difference-cog-position target-centroid-pos :centroid-offset-func centroid-offset-func :translation-axis cog-translation-axis :update-mass-properties nil)))
                 (format f "))~%")
 		)
 	       ) ;;let
@@ -2086,7 +2093,8 @@
   (:ik-convergence-check
    (success dif-pos dif-rot
     rotation-axis translation-axis thre rthre
-    centroid-thre target-centroid-pos centroid-offset-func cog-translation-axis)
+    centroid-thre target-centroid-pos centroid-offset-func cog-translation-axis
+    &key (update-mass-properties t))
    (dotimes (i (length dif-pos))
      (setq success (and success
 			(if (elt translation-axis i) (< (norm (elt dif-pos i)) (elt thre i)) t)
@@ -2094,7 +2102,8 @@
    (if target-centroid-pos
        (setq success (and success (send self :cog-convergence-check centroid-thre target-centroid-pos
                                         :centroid-offset-func centroid-offset-func
-                                        :translation-axis cog-translation-axis))))
+                                        :translation-axis cog-translation-axis
+                                        :update-mass-properties update-mass-properties))))
    success)
   (:calc-vel-from-pos
    (dif-pos translation-axis
