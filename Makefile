@@ -4,7 +4,16 @@ GIT_EUSURL=http://github.com/euslisp/EusLisp
 
 EUSC_PATCH=eus.c_CUSTUM_EUSDIR.patch
 
-MACHINE=$(shell uname -m)
+ifneq ($(arch),)
+ ifeq ($(arch),amd64)
+   MACHINE=x86_64
+ endif
+ ifeq ($(arch),i386)
+   MACHINE=x86
+ endif
+else
+ MACHINE=$(shell uname -m)
+endif
 OS=$(shell uname -s | sed 's/[^A-Za-z1-9].*//')
 $(info "-- MACHINE = ${MACHINE}")
 $(info "--      OS = ${OS}")
