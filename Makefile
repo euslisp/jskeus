@@ -4,7 +4,19 @@ GIT_EUSURL=http://github.com/euslisp/EusLisp
 
 EUSC_PATCH=eus.c_CUSTUM_EUSDIR.patch
 
-MACHINE=$(shell uname -m)
+GCC_MACHINE=$(shell gcc -dumpmachine)
+$(info "-- GCC_MACHINE = ${GCC_MACHINE}")
+ifneq ($(GCC_MACHINE),)
+ ifeq ($(GCC_MACHINE),x86_64-linux-gnu)
+   MACHINE=x86_64
+ endif
+ ifeq ($(GCC_MACHINE),i686-linux-gnu)
+   MACHINE=x86
+ endif
+endif
+ifeq ($(MACHINE),)
+ MACHINE=$(shell uname -m)
+endif
 OS=$(shell uname -s | sed 's/[^A-Za-z1-9].*//')
 $(info "-- MACHINE = ${MACHINE}")
 $(info "--      OS = ${OS}")
