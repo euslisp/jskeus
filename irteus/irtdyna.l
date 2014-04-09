@@ -1642,7 +1642,15 @@
                          (append swing-leg-proj-coords (car support-leg-coords-list))
                          limbs) 2))
            )
-         )
+         (let* ((cnt (- one-step-len index-count))
+                (margin-count (* 0.5 default-double-support-ratio one-step-len)))
+           (if (or (< cnt margin-count)
+                   (> cnt (- one-step-len margin-count))
+                   (eps= (float (car step-height-list)) 0.0))
+               (mapcar #'(lambda (x) :support) all-limbs)
+             (mapcar #'(lambda (x) (if (memq x (car support-leg-list)) :support :swing)) all-limbs)
+             )
+           ))
    )
   ;; generate one tick parameter
   ;;  in detail, calculate swing leg coords, cog and angle-vector
@@ -1661,8 +1669,10 @@
                                    (elt gp 0) (elt gp 1) (elt gp 2) (cdr dd)
                                    :solve-angle-vector solve-angle-vector
                                    :solve-angle-vector-args solve-angle-vector-args)
-                             (if debug (append (butlast gp) (list (cdr dd)
-                                                                  (send preview-controller :cart-zmp))))))))
+                             (if debug (append (butlast gp 2) (list (cdr dd)
+                                                                  (send preview-controller :cart-zmp))
+                                               (last gp)
+                                               ))))))
         (when (>= 0 (decf index-count))
           (send self :update-current-gait-parameter))
         ret)))
@@ -1710,7 +1720,7 @@
                     support-leg support-leg-coords
                     swing-leg-coords cog robot solve-angle-vector-args))
             (t (error ";; in :solve-angle-vector, invalid function or method~%!")))))
-      (list ik-ret (send robot :copy-worldcoords))))
+      (list ik-ret (send (car (send robot :links)) :copy-worldcoords))))
 
   ;; solve-angle-vector methods
   (:solve-av-by-move-centroid-on-foot

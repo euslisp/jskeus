@@ -611,13 +611,15 @@
                    (elt ret 7) ;; pz
                    czmp dt))
          (push
-          (list :angle-vector (car ret);;(send self :angle-vector)
-                :root-coords (send (car (send self :links)) :copy-worldcoords)
+          (list :angle-vector (car ret)
+                :root-coords (cadr ret)
                 :czmp czmp :refzmp (elt ret 5) :cog (elt ret 6)
                 :swing-leg-coords (elt ret 4)
                 :support-leg-coords (elt ret 3)
                 :time tm
                 :pz (elt ret 7)
+                :contact-state (elt ret 8)
+                :end-coords-list (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) (gg . all-limbs))
                 )
           res)
          (setq tm (+ tm dt))
