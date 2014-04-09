@@ -1267,6 +1267,7 @@
     (setf (matrix-row p1-n delay) (subseq p 0 dim))
     ;;
     (send self :calc-xk))
+  (:cog-z () cog-z)
   (:update-cog-z (zc)
     (setf (aref c 0 2) (- (/ zc (elt *g-vec* 2))))
     (send self :solve)
@@ -1373,6 +1374,7 @@
   (:av () (car avs)) ;; get parameters at "k"
   (:cart-zmp () (send preview-controller :cart-zmp))
   (:refcog () (send preview-controller :refcog))
+  (:cog-z () (send preview-controller :cog-z))
   ;;
   (:update (av p)
     (let (r)
@@ -1626,6 +1628,20 @@
                  swing-leg-src-coords (car swing-leg-dst-coords-list))
          (send self :calc-current-refzmp
                refzmp-prev (car refzmp-cur-list) refzmp-next)
+         (let ((swing-leg-proj-coords
+                (mapcar #'(lambda (sw-sc sw-dc)
+                            (midcoords
+                             (send self :calc-ratio-from-double-support-ratio)
+                             sw-sc sw-dc))
+                        swing-leg-src-coords (car swing-leg-dst-coords-list)))
+               (limbs
+                (append (send self :get-counter-footstep-limbs (car support-leg-list))
+                        (car support-leg-list))))
+           (+ (send preview-controller :cog-z)
+              (elt (send self :get-limbs-zmp
+                         (append swing-leg-proj-coords (car support-leg-coords-list))
+                         limbs) 2))
+           )
          )
    )
   ;; generate one tick parameter
@@ -1638,17 +1654,18 @@
                 (send self :calc-one-tick-gait-parameter type)))
            (dd (send preview-controller :update ;; return value from preview-controller
                      preview-data (if preview-data (elt preview-data 3))))
-           (gp (send preview-controller :av)) ;; gait parameter
-           (ret (if (and dd solve-angle-vector)
-                    (append (send self :solve-angle-vector
-                                  (elt gp 0) (elt gp 1) (elt gp 2) (cdr dd)
-                                  :solve-angle-vector solve-angle-vector
-                                  :solve-angle-vector-args solve-angle-vector-args)
-                            (if debug (append gp (list (cdr dd)
-                                                       (send preview-controller :cart-zmp))))))))
-      (when (>= 0 (decf index-count))
-        (send self :update-current-gait-parameter))
-      ret))
+           (gp (send preview-controller :av))) ;; gait parameter
+      (if dd (setf (elt (cdr dd) 2) (elt gp 4))) ;; overwrite 
+      (let ((ret (if (and dd solve-angle-vector)
+                     (append (send self :solve-angle-vector
+                                   (elt gp 0) (elt gp 1) (elt gp 2) (cdr dd)
+                                   :solve-angle-vector solve-angle-vector
+                                   :solve-angle-vector-args solve-angle-vector-args)
+                             (if debug (append (butlast gp) (list (cdr dd)
+                                                                  (send preview-controller :cart-zmp))))))))
+        (when (>= 0 (decf index-count))
+          (send self :update-current-gait-parameter))
+        ret)))
   ;; update gait parameter
   (:update-current-gait-parameter
    ()
