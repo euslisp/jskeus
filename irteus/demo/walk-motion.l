@@ -85,6 +85,7 @@
             tc
             :move-target mt :link-list ll
             :target-centroid-pos (vector-mean (send-all tc :worldpos))
+            :stop 400
             ik-args))
     ;; prepare footsteps
     (let ((footstep-list (funcall gen-footstep-func)))
