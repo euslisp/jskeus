@@ -14,15 +14,34 @@
          (leg-radius 50) (upper-leg-length 250) (lower-leg-length 250) (ankle-length 50)
          (crotch-width 75) (foot-depth 200) (foot-width 100) (foot-thickness 25) (foot-offset 50)
 	 (arm-radius 50) (upper-arm-length 275) (lower-arm-length 195) (shoulder-width 150) (hand-length 50)
-         (waist-length 100) (torso-length 200))
+         (waist-length 100) (torso-length 200)
+         ;; mass distribution
+         ;;   refering to "WEIGHT, VOLUME, AND CENTER OF MASS OF SEGMENTS OF THE HUMAN BODY", C.E.Clauser et al., AMRL technical report TR-69-70(1969), http://www.dtic.mil/dtic/tr/fulltext/u2/710622.pdf
+         ;;   ratio is '((:head 7.3) (:trunk 50.7) (:upper-arm 2.6) (:forearm 1.6) (:hand 0.7) (:tight 10.3) (:calf 4.3) (:foot 1.5))
+         ;;   default total mass is 20.9[kg], which is calculated from total-height and avarage 6-years-old-Japanese Male weight http://www.mhlw.go.jp/toukei/youran/data25k/2-06.xls
+         (head-weight 1525.7)
+         (torso-weight (/ (* torso-length 10596.3) (+ torso-length waist-length)))
+         (waist-weight (/ (* waist-length 10596.3) (+ torso-length waist-length)))
+         (upper-arm-weight 543.4) (lower-arm-weight 334.4) (hand-weight 146.3)
+         (upper-leg-weight 2152.7) (lower-leg-weight 898.7) (foot-weight 313.5)
+         )
    (send-super* :init :name name args)
    ;; 1. make links links and assoc all links
-   (let ((aroot-link (send self :make-root-link waist-length)))
-     (setq torso (send self :make-torso-links torso-length) head (send self :make-head-links)
-           rarm (send self :make-arm-links :rarm arm-radius upper-arm-length lower-arm-length shoulder-width hand-length)
-           larm (send self :make-arm-links :larm arm-radius upper-arm-length lower-arm-length shoulder-width hand-length)
-           rleg (send self :make-leg-links :rleg leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset)
-           lleg (send self :make-leg-links :lleg leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset))
+   (let ((aroot-link (send self :make-root-link waist-length waist-weight)))
+     (setq torso (send self :make-torso-links torso-length torso-weight)
+           head (send self :make-head-links head-weight)
+           rarm (send self :make-arm-links :rarm
+                      arm-radius upper-arm-length lower-arm-length shoulder-width hand-length
+                      upper-arm-weight lower-arm-weight hand-weight)
+           larm (send self :make-arm-links :larm
+                      arm-radius upper-arm-length lower-arm-length shoulder-width hand-length
+                      upper-arm-weight lower-arm-weight hand-weight)
+           rleg (send self :make-leg-links :rleg
+                      leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset
+                      upper-leg-weight lower-leg-weight foot-weight)
+           lleg (send self :make-leg-links :lleg
+                      leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset
+                      upper-leg-weight lower-leg-weight foot-weight))
      ;; arrange limbs
      (send (car rarm) :translate (float-vector 0 (- shoulder-width) (- torso-length 25)) :world)
      (send (car larm) :translate (float-vector 0 shoulder-width (- torso-length 25)) :world)
@@ -93,11 +112,7 @@
            torso-root-link (car torso) head-root-link (car head))
      (setq collision-avoidance-links (list aroot-link (elt torso 1) (elt larm 3) (elt rarm 3)))
 
-     ;; set mass properties & max torques
-     (dolist (l (append (list aroot-link) torso))
-       (send l :weight 100.0))
-     (dolist (l (append larm rarm lleg rleg head))
-       (send l :weight 7.0))
+     ;; set max torques
      (dolist (l (list aroot-link (elt torso 1) (elt head 1)))
        (let* ((valid-bodies (remove-if #'(lambda (x)
                                            (and (> (send x :volume) 0) (< (send x :volume) 0))) ;; nan check
@@ -108,30 +123,30 @@
                  (scale (/ 1.0 (reduce #'+ (mapcar #'(lambda (x) (send x :volume)) valid-bodies)))
                         (reduce #'v+ (mapcar #'(lambda (x) (scale (send x :volume) (send x :centroid))) valid-bodies)))))
          ))
-     (send-all (send self :joint-list) :max-joint-torque 0.1) ;; [Nm]
+     (send-all (send self :joint-list) :max-joint-torque 7.5) ;; [Nm]
 
      ;; 5. call :init-ending after defining links and joint-list and return "self"
      (send self :init-ending)
      self))
   ;; Methods to define robot links
   (:make-root-link
-   (waist-length)
+   (waist-length waist-weight)
    (let ((bc0 (make-cube 100 200 waist-length)))
      (send bc0 :locate (float-vector 0 0 (+ (* -0.5 waist-length) -25)))
      (send bc0 :set-color :green)
-     (instance bodyset-link :init (make-cascoords) :bodies (list bc0) :name :waist)))
+     (instance bodyset-link :init (make-cascoords) :bodies (list bc0) :name :waist :weight waist-weight)))
   (:make-torso-links
-   (torso-length)
+   (torso-length torso-weight)
    (let ((bc1 (make-default-robot-link 0 50 :y :torso-link0))
 	 (bc2 (make-cube 100 200 torso-length)))
      (send bc1 :locate #f(0 0 -12.5))
      (send bc2 :locate (float-vector 0 0 (* 0.5 torso-length)))
      (send bc2 :set-color :green)
-     (setq bc2 (instance bodyset-link :init (make-cascoords :pos #f(0 0 -12.5)) :bodies (list bc2) :name :torso-link1))
+     (setq bc2 (instance bodyset-link :init (make-cascoords :pos #f(0 0 -12.5)) :bodies (list bc2) :name :torso-link1 :weight torso-weight))
      (send bc1 :assoc bc2)
      (list bc1 bc2)))
   (:make-head-links
-   ()
+   (head-weight)
    (let ((bh0 (make-default-robot-link 0 50 :y :head-link0))
 	 (bh2 (make-cube 120 100 150))
 	 (bh2e (make-cylinder 10 30))
@@ -142,13 +157,14 @@
      (send bh2e :locate #f(60 0 70) :world)
      (send bh2e :set-color :green)
      (send bh2 :assoc bh2e)
-     (setq bh1 (instance bodyset-link :init (make-cascoords) :bodies (list bh2 bh2e) :name :head-link1))
+     (setq bh1 (instance bodyset-link :init (make-cascoords) :bodies (list bh2 bh2e) :name :head-link1 :weight head-weight))
      (setq head-end-coords (make-cascoords :pos #f(60 0 100) :rpy (float-vector 0 pi/2 0)))
      (send bh1 :assoc head-end-coords)
      (send bh0 :assoc bh1)
      (list bh0 bh1)))
   (:make-arm-links
-   (l/r arm-radius upper-arm-length lower-arm-length shoulder-width hand-length)
+   (l/r arm-radius upper-arm-length lower-arm-length shoulder-width hand-length
+        upper-arm-weight lower-arm-weight hand-weight)
    (let ((ba1 (make-default-robot-link 0 arm-radius :y (read-from-string (format nil "~A-link0" l/r))))
 	 (ba2 (make-default-robot-link 0 arm-radius :x (read-from-string (format nil "~A-link1" l/r))))
 	 (ba3 (make-default-robot-link upper-arm-length arm-radius :z (read-from-string (format nil "~A-link2" l/r))))
@@ -156,6 +172,9 @@
 	 (ba5 (make-default-robot-link 0 arm-radius :z (read-from-string (format nil "~A-link4" l/r))))
 	 (ba6 (make-default-robot-link 0 arm-radius :x (read-from-string (format nil "~A-link5" l/r))))
 	 (ba7 (make-default-robot-link hand-length arm-radius :y (read-from-string (format nil "~A-link6" l/r)))))
+     (send ba3 :weight upper-arm-weight)
+     (send ba4 :weight lower-arm-weight)
+     (send ba7 :weight hand-weight)
      (case l/r
        (:rarm
 	(setq rarm-end-coords (make-cascoords))
@@ -177,7 +196,8 @@
      (send ba1 :assoc ba2)
      (list ba1 ba2 ba3 ba4 ba5 ba6 ba7)))
   (:make-leg-links
-   (l/r leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset)
+   (l/r leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset
+        upper-leg-weight lower-leg-weight foot-weight)
    (let* ((bl1 (make-default-robot-link 0 leg-radius :y (read-from-string (format nil "~A-link0" l/r))))
 	  (bl2 (make-default-robot-link 0 leg-radius :x (read-from-string (format nil "~A-link1" l/r))))
 	  (bl3 (make-default-robot-link (- upper-leg-length (/ leg-radius 2.0)) leg-radius :z (read-from-string (format nil "~A-link2" l/r))))
@@ -185,9 +205,12 @@
 	  (bl5 (make-default-robot-link 0 leg-radius :x (read-from-string (format nil "~A-link4" l/r))))
 	  (bl6b (make-cube foot-depth foot-width foot-thickness))
 	  (bl6))
+     (send bl3 :weight upper-leg-weight)
+     (send bl4 :weight lower-leg-weight)
      (send bl6b :locate (float-vector foot-offset 0 (- ankle-length)))
      (send bl6b :set-color :green)
      (setq bl6 (make-default-robot-link ankle-length leg-radius :y (read-from-string (format nil "~A-link5" l/r)) (list bl6b)))
+     (send bl6 :weight foot-weight)
      (case l/r
        (:rleg
 	(setq rleg-end-coords (make-cascoords))
