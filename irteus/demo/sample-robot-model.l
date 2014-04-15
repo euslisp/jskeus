@@ -13,15 +13,23 @@
          ;; key word arguments for configure model size
          (leg-radius 50) (upper-leg-length 250) (lower-leg-length 250) (ankle-length 50)
          (crotch-width 75) (foot-depth 200) (foot-width 100) (foot-thickness 25) (foot-offset 50)
-	 (arm-radius 50) (upper-arm-length 275) (lower-arm-length 195) (shoulder-width 150) (hand-length 50))
+	 (arm-radius 50) (upper-arm-length 275) (lower-arm-length 195) (shoulder-width 150) (hand-length 50)
+         (waist-length 100) (torso-length 200))
    (send-super* :init :name name args)
    ;; 1. make links links and assoc all links
-   (let ((aroot-link (send self :make-root-link)))
-     (setq torso (send self :make-torso-links) head (send self :make-head-links)
+   (let ((aroot-link (send self :make-root-link waist-length)))
+     (setq torso (send self :make-torso-links torso-length) head (send self :make-head-links)
            rarm (send self :make-arm-links :rarm arm-radius upper-arm-length lower-arm-length shoulder-width hand-length)
            larm (send self :make-arm-links :larm arm-radius upper-arm-length lower-arm-length shoulder-width hand-length)
            rleg (send self :make-leg-links :rleg leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset)
            lleg (send self :make-leg-links :lleg leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset))
+     ;; arrange limbs
+     (send (car rarm) :translate (float-vector 0 (- shoulder-width) (- torso-length 25)) :world)
+     (send (car larm) :translate (float-vector 0 shoulder-width (- torso-length 25)) :world)
+     (send (car rleg) :translate (float-vector 0 (- crotch-width) (+ (- waist-length) -50)) :world)
+     (send (car lleg) :translate (float-vector 0 crotch-width (+ (- waist-length) -50)) :world)
+     (send (car head) :locate (float-vector 0 0 (+ 25 torso-length)))
+
      ;; 2. assoc links
      ;;    Root link should be associated with "self".
      (send self :assoc aroot-link)
@@ -107,17 +115,17 @@
      self))
   ;; Methods to define robot links
   (:make-root-link
-   ()
-   (let ((bc0 (make-cube 100 200 100)))
-     (send bc0 :locate #f(0 0 -75))
+   (waist-length)
+   (let ((bc0 (make-cube 100 200 waist-length)))
+     (send bc0 :locate (float-vector 0 0 (+ (* -0.5 waist-length) -25)))
      (send bc0 :set-color :green)
      (instance bodyset-link :init (make-cascoords) :bodies (list bc0) :name :waist)))
   (:make-torso-links
-   ()
+   (torso-length)
    (let ((bc1 (make-default-robot-link 0 50 :y :torso-link0))
-	 (bc2 (make-cube 100 200 200)))
+	 (bc2 (make-cube 100 200 torso-length)))
      (send bc1 :locate #f(0 0 -12.5))
-     (send bc2 :locate #f(0 0 100))
+     (send bc2 :locate (float-vector 0 0 (* 0.5 torso-length)))
      (send bc2 :set-color :green)
      (setq bc2 (instance bodyset-link :init (make-cascoords :pos #f(0 0 -12.5)) :bodies (list bc2) :name :torso-link1))
      (send bc1 :assoc bc2)
@@ -138,7 +146,6 @@
      (setq head-end-coords (make-cascoords :pos #f(60 0 100) :rpy (float-vector 0 pi/2 0)))
      (send bh1 :assoc head-end-coords)
      (send bh0 :assoc bh1)
-     (send bh0 :locate #f(0 0 225))
      (list bh0 bh1)))
   (:make-arm-links
    (l/r arm-radius upper-arm-length lower-arm-length shoulder-width hand-length)
@@ -168,9 +175,6 @@
      (send ba3 :assoc ba4)
      (send ba2 :assoc ba3)
      (send ba1 :assoc ba2)
-     (case l/r
-       (:rarm (send ba1 :translate (float-vector 0 (- shoulder-width) 175) :world))
-       (:larm (send ba1 :translate (float-vector 0 shoulder-width 175) :world)))
      (list ba1 ba2 ba3 ba4 ba5 ba6 ba7)))
   (:make-leg-links
    (l/r leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset)
@@ -200,9 +204,6 @@
      (send bl3 :assoc bl4)
      (send bl2 :assoc bl3)
      (send bl1 :assoc bl2)
-     (case l/r
-       (:rleg (send bl1 :translate (float-vector 0 (- crotch-width) -150) :world))
-       (:lleg (send bl1 :translate (float-vector 0 crotch-width -150) :world)))
      (list bl1 bl2 bl3 bl4 bl5 bl6)))
   (:reset-pose ()
     (send self :angle-vector #f(0.0 0.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0)))
