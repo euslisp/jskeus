@@ -190,7 +190,7 @@
     &key (tmp-va (float-vector 0 0 0))
          (tmp-vb (float-vector 0 0 0))
          (len (length additional-weights)))
-   (if (eps= new-weight 0.0)
+   (if (eps= (float new-weight) 0.0)
        self-centroid ;; if new-weight is 0, return self-centroid ;; in this case, this centroid value is not used latter calculation.
      (scale
       (/ 1.0 new-weight)
