@@ -217,6 +217,30 @@
           (send-all (send self :gripper limb :joint-list) :joint-angle))
        (map float-vector #'(lambda (x y) (send x :joint-angle y))
 	    (send self :gripper limb :joint-list) (cadr args))))))
+  ;; sensor accessor definitions
+  (:camera (&rest args) (send* self :get-sensor-method :camera args))
+  (:force-sensor (&rest args) (send* self :get-sensor-method :force-sensor args))
+  (:imu-sensor (&rest args) (send* self :get-sensor-method :imu-sensor args))
+  (:get-sensor-method
+   (sensor-name &rest args)
+   (cond ((integerp (car args))
+          (forward-message-to (elt (send self (read-from-string (format nil "~As" sensor-name)) ) (car args)) (cdr args)))
+         ;; enable to access sensors by limb name
+         ((memq (car args) '(:larm :rarm :lleg :rleg :head :torso))
+          (find-if
+           #'(lambda (x) (member (send x :parent) (send self (car args) :links)))
+           (send self (read-from-string (format nil "~As" sensor-name)))))
+         ((and (keywordp (car args))
+               (derivedp (send self (car args)) cascaded-coords))
+          (send* self args))
+         ((keywordp (car args))
+          ;;(warn ";; no such sensor ~A~%" (car args))
+          nil)
+         ((stringp (car args))
+          (find-if #'(lambda (x) (string= (send x :name) (car args))) (send self (read-from-string (format nil "~As" sensor-name)))))
+         (t
+          (forward-message-to (car (send self (read-from-string (format nil "~As" sensor-name)))) args)
+          )))
   ;;
   (:larm (&rest args) 
 	 (unless args (setq args (list nil))) (send* self :limb :larm args))
