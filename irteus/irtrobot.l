@@ -224,13 +224,7 @@
   (:get-sensor-method
    (sensor-type sensor-name &rest args)
    (let ((sens (send self (read-from-string (format nil "~As" sensor-type)))))
-     (cond ((keywordp sensor-name)
-            (forward-message-to (find-if #'(lambda (x) (eq (send x :name) sensor-name)) sens) args))
-           ((stringp sensor-name)
-            (forward-message-to (find-if #'(lambda (x) (string= (send x :name) sensor-name)) sens) args))
-           (t
-            (warn ";; No such sensor ~A,~A" sensor-type sensor-name)
-            ))))
+     (find sensor-name sens :test #'equal :key #'(lambda (x) (send x :name)))))
   ;;
   (:larm (&rest args) 
 	 (unless args (setq args (list nil))) (send* self :limb :larm args))
