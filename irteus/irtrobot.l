@@ -601,11 +601,14 @@
        (let ((czmp (send self :calc-zmp
                          (send self :angle-vector)
                          (send (car (send self :links)) :copy-worldcoords)
-                         :dt dt :pZMPz (elt (elt ret 5) 2))))
+                         :dt dt :pZMPz (elt (elt ret 5) 2)))
+             (end-coords-list (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) (gg . all-limbs)))
+             (contact-state (elt ret 8))
+             )
          (if debug-view
              (send self :draw-gg-debug-view
-                   (elt ret 4) ;; swc
-                   (elt ret 3) ;; spc
+                   end-coords-list
+                   contact-state
                    (elt ret 5) ;; rz
                    (elt ret 6) ;; cog
                    (elt ret 7) ;; pz
@@ -614,12 +617,10 @@
           (list :angle-vector (car ret)
                 :root-coords (cadr ret)
                 :czmp czmp :refzmp (elt ret 5) :cog (elt ret 6)
-                :swing-leg-coords (elt ret 4)
-                :support-leg-coords (elt ret 3)
                 :time tm
                 :pz (elt ret 7)
-                :contact-state (elt ret 8)
-                :end-coords-list (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) (gg . all-limbs))
+                :contact-state contact-state
+                :end-coords-list end-coords-list
                 )
           res)
          (setq tm (+ tm dt))
@@ -627,7 +628,7 @@
      (reverse res)
      ))
   (:draw-gg-debug-view
-   (swc spc rz cog pz czmp dt)
+   (end-coords-list contact-state rz cog pz czmp dt)
    (send *viewer* :draw-objects :flush nil)
    (labels ((with-modify-color
              (col func)
@@ -635,8 +636,10 @@
                (send *viewer* :viewsurface :color col)
                (funcall func)
                (send *viewer* :viewsurface :color pc))))
-     (send-all spc :draw-on :flush nil :size 300 :color #f(1 0 0))
-     (send-all swc :draw-on :flush nil :size 300 :color #f(0 1 0))
+     (mapcar #'(lambda (ec cs)
+                 (send ec :draw-on :flush nil :size 300 :color
+                       (if (eq :swing cs) #f(0 1 0) #f(1 0 0))))
+             end-coords-list contact-state)
      (send rz :draw-on :flush nil :size 300 :color #f(0 0 1))
      (send czmp :draw-on :flush nil :size 200 :width 5)
      (with-modify-color
