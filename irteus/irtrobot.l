@@ -582,7 +582,9 @@
          ((:all-limbs al) '(:rleg :lleg))
          ((:default-zmp-offsets dzo)
           (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) ;; [mm]
-         (init-pose-function #'(lambda () (send self :move-centroid-on-foot :both '(:rleg :lleg)))))
+         (init-pose-function #'(lambda () (send self :move-centroid-on-foot :both '(:rleg :lleg))))
+         (start-with-double-support t)
+         (end-with-double-support t))
    (let* ((res) (ret) (tm 0)
           (gg (instance gait-generator :init self dt)))
      (funcall init-pose-function)
@@ -590,7 +592,8 @@
      (send gg :initialize-gait-parameter
            footstep-list default-step-time (send (car (send self :links)) :get :c-til)
            :default-step-height default-step-height :default-double-support-ratio 0.2
-           :default-zmp-offsets dzo :all-limbs al)
+           :default-zmp-offsets dzo :all-limbs al
+           :start-with-double-support start-with-double-support :end-with-double-support end-with-double-support)
 
      (while (null (setq ret (send gg :proc-one-tick :type :cycloid :debug t :solve-angle-vector-args solve-angle-vector-args))))
      (dotimes (i 2) (send self :calc-zmp)) ;; for zmp initialization
