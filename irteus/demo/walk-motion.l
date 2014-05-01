@@ -40,11 +40,49 @@
         :default-step-height default-step-height)
   ))
 
+(defun walk-motion-single-support
+  (robot)
+  "walking motion example which start or end with single support phase"
+  (let* ((is-small-robot
+          (< (abs (elt (send (send (car (send robot :links)) :transformation (apply #'midcoords 0.5 (send robot :legs :end-coords))) :worldpos) 2)) 400))
+         (default-step-height (if is-small-robot 10 50)))
+  ;; At the initial posture, the COG is above the right foot.
+  (send robot :reset-pose)
+  (send robot :fix-leg-to-coords (make-coords) '(:rleg :lleg))
+  (send robot :move-centroid-on-foot :rleg '(:rleg :lleg))
+  (objects (list robot))
+  (warn ";; test1 ;; specify footstep-list~%")
+  (let* ((test1-scale (if is-small-robot 0.25 1.0))
+        (footstep-list
+         (list (send robot :rleg :end-coords :copy-worldcoords)
+               (send (send robot :lleg :end-coords :copy-worldcoords) :translate (scale test1-scale #f(0 0 0)))
+               (send (send robot :rleg :end-coords :copy-worldcoords) :translate (scale test1-scale #f(0 0 100)))
+               )))
+    (objects (append (list robot) footstep-list))
+    (dolist (x footstep-list)
+      (send x :put :l/r (if (evenp (position x footstep-list)) :rleg :lleg)))
+    ;; Start : COG is above the right foot.
+    ;; End : COG is above the left foot.
+    (send robot :calc-walk-pattern-from-footstep-list
+          footstep-list :debug-view :no-message
+          :default-step-height default-step-height
+          :start-with-double-support nil
+          :end-with-double-support nil
+          :init-pose-function #'(lambda ()))
+    )
+  ))
+
 (defun walk-motion-for-sample-robot ()
   (unless (boundp '*robot*)
     (setq *robot* (instance sample-robot :init)))
   (walk-motion *robot*))
+
+(defun walk-motion-single-support-for-sample-robot ()
+  (unless (boundp '*robot*)
+    (setq *robot* (instance sample-robot :init)))
+  (walk-motion-single-support *robot*))
 (warn "(walk-motion-for-sample-robot) for walking motion~%")
+(warn "(walk-motion-single-support-for-sample-robot) for walking motion~%")
 
 (defun quad-walk-motion-for-sample-robot
   (gen-footstep-func &key (go-backward-over t))
