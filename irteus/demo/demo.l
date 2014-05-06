@@ -3,6 +3,7 @@
 ;;(load "irteus/irtdyna.l")
 
 (load "full-body-ik.l")
+(load "null-space-ik.l")
 (load "dual-arm-ik.l")
 (load "hand-grasp-ik.l")
 (load "dual-manip-ik.l")
