@@ -5,7 +5,8 @@
               jal0 jal1 jal2 jal3 jal4 jal5 jal6
               jar0 jar1 jar2 jar3 jar4 jar5 jar6
               jll0 jll1 jll2 jll3 jll4 jll5
-              jlr0 jlr1 jlr2 jlr3 jlr4 jlr5))
+              jlr0 jlr1 jlr2 jlr3 jlr4 jlr5
+              force-sensors imu-sensors cameras))
 (defmethod sample-robot
   (:init 
    (&rest args
@@ -124,7 +125,28 @@
                         (reduce #'v+ (mapcar #'(lambda (x) (scale (send x :volume) (send x :centroid))) valid-bodies)))))
          ))
      (send-all (send self :joint-list) :max-joint-torque 7.5) ;; [Nm]
-
+     ;; set sensors
+     (setq force-sensors
+           (mapcar #'(lambda (l)
+                       (send (send self l :end-coords :parent) :assoc
+                             (make-cascoords :coords (send self l :end-coords :copy-worldcoords)
+                                             :name (format nil "~A-fsensor" (string-downcase l)))))
+                   (list :rarm :larm :rleg :lleg)))
+     (setq imu-sensors
+           (list (let ((sen (make-cascoords
+                             :worldpos (send (car (send self :torso :waist-p :child-link :bodies)) :centroid)
+                             :name "torso-imusensor")))
+                   (send (send self :torso :waist-p :child-link) :assoc sen)
+                   sen)))
+     (setq cameras
+           (mapcar #'(lambda (pos name)
+                       (let ((sen (instance camera-model :init (make-cylinder 10 20) :name name)))
+                         (send sen :rotate pi/2 :y)
+                         (send sen :locate (v+ pos (send (car (send (send self :head :neck-p :child-link) :bodies)) :centroid)) :world)
+                         (send (send self :head :neck-p :child-link) :assoc sen)
+                         sen))
+                   (list (float-vector 0 30 0) (float-vector 0 -30 0))
+                   (list "left-camera" "right-camera")))
      ;; 5. call :init-ending after defining links and joint-list and return "self"
      (send self :init-ending)
      self))
@@ -232,8 +254,8 @@
     (send self :angle-vector #f(0.0 0.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0)))
   )
 
-;; user-defined joint
 (defmethod sample-robot
+  ;; user-defined joint
   (:torso-waist-y (&rest args) (forward-message-to jc0 args))
   (:torso-waist-p (&rest args) (forward-message-to jc1 args))
   (:head-neck-y (&rest args) (forward-message-to jh0 args))
@@ -264,4 +286,8 @@
   (:rleg-knee-p (&rest args) (forward-message-to jlr3 args))
   (:rleg-ankle-p (&rest args) (forward-message-to jlr4 args))
   (:rleg-ankle-r (&rest args) (forward-message-to jlr5 args))
+  ;; sensor accessors
+  (:force-sensors () force-sensors)
+  (:imu-sensors () imu-sensors)
+  (:cameras () cameras)
   )
