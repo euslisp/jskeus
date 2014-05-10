@@ -73,14 +73,8 @@
     (setq *robot* (instance sample-robot :init)))
   (send *robot* :reset-pose)
   (send *robot* :newcoords (make-coords))
-  (if (= (length (car (send *robot* :arms))) 6)
-      (send *robot* :arms :angle-vector #f(-20 20 0 -50 10 0 0)))
   (unless (some #'null (send *robot* :legs))
-    (mapcar #'(lambda (l)
-                (send *robot* l :inverse-kinematics
-                      (send (send *robot* l :end-coords :copy-worldcoords) :translate #f(0 0 30))))
-            '(:rleg :lleg))
-    (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (make-coords))))
+    (send *robot* :fix-leg-to-coords (make-coords)))
   (send *robot* :update-descendants)
 
   (let ((crank (instance sample-crank :init)))

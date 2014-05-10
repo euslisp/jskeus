@@ -7,7 +7,7 @@
           (< (abs (elt (send (send (car (send robot :links)) :transformation (apply #'midcoords 0.5 (send robot :legs :end-coords))) :worldpos) 2)) 400))
          (default-step-height (if is-small-robot 10 50)))
   (send robot :reset-pose)
-  (send robot :fix-leg-to-coords (make-coords) '(:rleg :lleg))
+  (send robot :fix-leg-to-coords (make-coords))
   (objects (list robot))
   (warn ";; test1 ;; specify footstep-list~%")
   (let* ((test1-scale (if is-small-robot 0.25 1.0))
@@ -48,7 +48,7 @@
          (default-step-height (if is-small-robot 10 50)))
   ;; At the initial posture, the COG is above the right foot.
   (send robot :reset-pose)
-  (send robot :fix-leg-to-coords (make-coords) '(:rleg :lleg))
+  (send robot :fix-leg-to-coords (make-coords))
   (send robot :move-centroid-on-foot :rleg '(:rleg :lleg))
   (objects (list robot))
   (warn ";; test1 ;; specify footstep-list~%")
@@ -90,7 +90,7 @@
     (setq *robot* (instance sample-robot :init)))
   ;; initial quad pose
   (send *robot* :reset-pose)
-  (send *robot* :fix-leg-to-coords (make-coords) '(:rleg :lleg))
+  (send *robot* :fix-leg-to-coords (make-coords))
   (send *robot* :rotate (if go-backward-over -pi/2 pi/2) :y)
   (let ((tc
          (if go-backward-over
@@ -260,7 +260,7 @@
     (objects (list robot))
     ;; generate input motion control ZMP at 0, which corresponds to COG at 0 in this case
     (send robot :reset-pose)
-    (send robot :fix-leg-to-coords (make-coords) '(:rleg :lleg))
+    (send robot :fix-leg-to-coords (make-coords))
     (dotimes (i 180)
       (send robot :arms :shoulder-p :joint-angle (+ -20 (* -45 (sin (* 6 (deg2rad i))))))
       (send robot :move-centroid-on-foot :both '(:lleg :rleg))
