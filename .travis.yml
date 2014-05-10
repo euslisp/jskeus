@@ -22,19 +22,7 @@ script: # All commands must exit with code 0 on success. Anything else is consid
   - cd jskeus
   - make
   - source bashrc.eus
-  - irteusgl irteus/test/irteus-demo.l
-  - irteusgl irteus/test/all-robots-objects.l
-  - irteusgl irteus/test/transparent.l
-  - irteusgl irteus/test/object.l
-  - irteusgl irteus/test/sort.l
-  - irteusgl irteus/test/bignum.l
-  - irteusgl irteus/test/vector.l
-  - irteusgl irteus/test/matrix.l
-  - irteusgl irteus/test/coords.l
-  - irteusgl irteus/test/read-img.l
-  - irteusgl irteus/test/graph.l
-  - irteusgl irteus/test/joint.l
-  - irteusgl irteus/test/test-irt-motion.l
+  - find irteus/test -iname "*.l" | grep -v unittest.l | xargs -n1 irteusgl
 after_failure:
   - echo "failure"
 
