@@ -32,23 +32,37 @@
 (deftest test-particle
   (particle))
 
+;; check whether all ik are solved for walking examples
 (deftest test-walk-motion-for-sample-robot
-  (walk-motion-for-sample-robot))
+  (assert
+   (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
+                             (walk-motion-for-sample-robot))))))
 
 (deftest test-trot-walk-motion-for-sample-robot-go-backward-over
-  (trot-walk-motion-for-sample-robot))
+  (assert
+   (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
+                             (trot-walk-motion-for-sample-robot))))))
 
 (deftest test-trot-walk-motion-for-sample-robot
-  (trot-walk-motion-for-sample-robot :go-backward-over nil))
+  (assert
+   (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
+                             (trot-walk-motion-for-sample-robot :go-backward-over nil))))))
 
 (deftest test-crawl-walk-motion-for-sample-robot-go-backward-over
-  (crawl-walk-motion-for-sample-robot))
+  (assert
+   (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
+                             (crawl-walk-motion-for-sample-robot))))))
 
 (deftest test-crawl-walk-motion-for-sample-robot
-  (crawl-walk-motion-for-sample-robot :go-backward-over nil))
+  (assert
+   (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
+                             (crawl-walk-motion-for-sample-robot :go-backward-over nil))))))
 
 (deftest test-walk-motion-for-robots
-  (walk-motion-for-robots))
+  (assert
+   (every #'identity
+          (mapcar #'(lambda (rs-list) (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x))) rs-list))))
+                  (walk-motion-for-robots)))))
 
 (run-all-tests)
 (exit)
