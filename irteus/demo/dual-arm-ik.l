@@ -66,11 +66,9 @@
     (unless (boundp '*robot*)
       (setq *robot* (instance sample-robot :init)))
     (send *robot* :reset-pose)
-    (if (= (length (car (send *robot* :arms))) 7)
-	(send *robot* :arms :angle-vector #f(10 20 0 -20 10 0 0)))
     (if (some #'null (send *robot* :legs))
 	(send *robot* :newcoords (make-coords))
-      (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (make-coords))))
+      (send *robot* :fix-leg-to-coords (make-coords)))
     (send *robot* :update-descendants)
     ;;
     ;; make broom model

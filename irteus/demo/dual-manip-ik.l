@@ -7,12 +7,11 @@
   (send *irtviewer* :title "dual-manip-ik")
   (unless (boundp '*robot*)
     (setq *robot* (instance sample-robot :init)))
-  (send *robot* :newcoords (make-coords))
   (send *robot* :reset-pose)
   ;; fix leg
   (if (some #'null (send *robot* :legs))
       (send *robot* :newcoords (make-coords))
-    (send *robot* :transform (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords)) :transformation (make-coords))))
+    (send *robot* :fix-leg-to-coords (make-coords)))
   (send *robot* :update-descendants)
   ;; generate object model
   (setq *obj* (make-cube 30 160 100))
