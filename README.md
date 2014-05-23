@@ -9,7 +9,7 @@ This repository containts software devleoped and used by [JSK](http://www.jsk.t.
 
 for Ubuntu users
 ```
-$ sudo apt-get install subversion gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi msttcorefonts
+$ sudo apt-get install git gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi msttcorefonts
 ```
 
 for Ubuntu 11.04 or later, install more fonts.
@@ -36,7 +36,7 @@ Also for Mac OSX lion (or older) users it's better to install the latest XQuartz
 
 for Raspberry Pi users using debian(Raspbian "wheezy")
 ```
-$ sudo apt-get install subversion gcc g++ libjpeg62-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi
+$ sudo apt-get install git gcc g++ libjpeg62-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi
 ## additional install for using OpenGL on raspberry pi
 $ sudo apt-get libgl1-mesa-dri xserver-xorg-video-vesa xutil
 ```
@@ -44,7 +44,7 @@ for Cygwin(now working with 32bit only)
 ```
 Packages listed below should be intalled using setup.exe.
 
-subversion, gcc-core, gcc-g++, make
+git, gcc-core, gcc-g++, make
 libjpeg-devel, libpng-devel
 libGL-devel, libGLU-devel, libglut-devel, libX11-devel, libXext-devel
 xorg-server

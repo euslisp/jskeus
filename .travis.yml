@@ -22,33 +22,7 @@ script: # All commands must exit with code 0 on success. Anything else is consid
   - cd jskeus
   - make
   - source bashrc.eus
-  - irteusgl irteus/demo/demo.l "(setq demo-func 'full-body-ik)" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func '(lambda () (full-body-ik :use-torso nil)))" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func '(lambda () (full-body-ik :use-leg t)))" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func 'dual-arm-ik)" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func 'dual-manip-ik)" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func 'crank-motion)" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func 'hand-grasp)" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func 'hanoi-arm)" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func 'particle)" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func 'walk-motion-for-sample-robot)" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func 'trot-walk-motion-for-sample-robot)" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func '(lambda () (trot-walk-motion-for-sample-robot :go-backward-over nil)))" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func 'crawl-walk-motion-for-sample-robot)" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func '(lambda () (crawl-walk-motion-for-sample-robot :go-backward-over nil)))" irteus/test/irteus-demo.l
-  - irteusgl irteus/demo/demo.l "(setq demo-func 'walk-motion-for-robots)" irteus/test/irteus-demo.l
-  - irteusgl irteus/test/all-robots-objects.l
-  - irteusgl irteus/test/transparent.l
-  - irteusgl irteus/test/object.l
-  - irteusgl irteus/test/sort.l
-  - irteusgl irteus/test/bignum.l
-  - irteusgl irteus/test/vector.l
-  - irteusgl irteus/test/matrix.l
-  - irteusgl irteus/test/coords.l
-  - irteusgl irteus/test/read-img.l
-  - irteusgl irteus/test/graph.l
-  - irteusgl irteus/test/joint.l
-  - irteusgl irteus/test/test-irt-motion.l
+  - find irteus/test -iname "*.l" | grep -v unittest.l | xargs -n1 irteusgl
 after_failure:
   - echo "failure"
 

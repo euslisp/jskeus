@@ -4,6 +4,7 @@
 (init-unit-test)
 
 (load "irteus/demo/sample-robot-model.l")
+(load "irteus/demo/sample-arm-model.l")
 (unless (boundp '*robot*)
   (setq *robot* (instance sample-robot :init))
   (unless (or (null x::*display*) (= x::*display* 0))
@@ -168,6 +169,170 @@
                    (send robot :joint-list)))
     ))
 
+;; sample mobile robot
+(defclass sample-mobile-robot
+  :super robot-model
+  :slots (wheel-l wheel-r end-coords))
+
+(defmethod sample-mobile-robot
+  (:init 
+   (&rest args)
+   (let (c body-base body-wheel-l body-wheel-r)
+     (send-super* :init args)
+     (setq body-base (make-cylinder 50 150))
+     (send body-base :locate #f(150 0 200))
+     (setq body-base (body+ (make-cylinder 200 200) body-base))
+     (send body-base :locate #f(0 0 100))
+     (send body-base :set-color :seagreen)
+     (setq body-base (instance bodyset-link :init (make-cascoords)
+			       :bodies (list body-base) :name :body))
+
+     (setq body-wheel-l (instance bodyset-link :init (make-cascoords)
+				  :bodies (list (make-cylinder 140 30))
+				  :name :wheel-l))
+     (send body-wheel-l :rotate -pi/2 :x)
+     (send body-wheel-l :locate #f(0 -140 -200))
+     (send-all (send body-wheel-l :bodies) :set-color :red)
+
+     (setq body-wheel-r (instance bodyset-link :init (make-cascoords)
+				  :bodies (list (make-cylinder 140 30))
+				  :name :wheel-r))
+     (send body-wheel-r :rotate -pi/2 :x)
+     (send body-wheel-r :locate #f(0 -140 200))
+     (send-all (send body-wheel-r :bodies) :set-color :red)
+
+     (send self :assoc body-base)
+
+     (send body-base :assoc (setq end-coords (make-cascoords :pos #f(10 0 0))))
+     (send body-base :assoc body-wheel-l)
+     (send body-base :assoc body-wheel-r)
+     
+     (setq wheel-l (instance rotational-joint :init :name :wheel-l
+			     :child-link body-wheel-l :parent-link body-base
+			     :axis :z
+			     :min *-inf* :max *inf*))
+     (setq wheel-r (instance rotational-joint :init :name :wheel-r
+			     :child-link body-wheel-r :parent-link body-base
+			     :axis :z
+			     :min *-inf* :max *inf*))
+     
+     (setq links (list body-base body-wheel-l body-wheel-r))
+     (setq joint-list (list wheel-l wheel-r))
+     (send self :init-ending)
+     self))
+  (:wheel-l (&rest args) (forward-message-to wheel-l args))
+  (:wheel-r (&rest args) (forward-message-to wheel-r args))
+  (:end-coords (&rest args) (forward-message-to end-coords args))
+  (:reset-pose ())
+  )
+
+;; check for wheel-joint and omniwheel-joint
+(defun test-joint-for-mobile-robot-common
+  (&rest args
+	 &key (robot-class) (wheel-class) (use-wholebody) (debug-view :no-message)
+	 &allow-other-keys)
+  (setq *ground* (make-cube 3000 3000 10))
+  (send *ground* :set-color :skyblue)
+  (setq *robot* (instance robot-class :init))
+  (send *robot* :reset-pose)
+  (if (eq robot-class sarmclass)
+      (send *robot* :angle-vector #f(0.0 0.0 90.0 0.0 90.0 90.0 0.0 0.0)))
+  (send *robot* :newcoords (make-coords))
+  (unless (or (null x::*display*) (= x::*display* 0))
+    (objects (list *robot* *ground*)))
+  (let ((robot-link-list
+         (if use-wholebody
+             (send *robot* :link-list (send *robot* :end-coords :parent)))))
+    (with-append-root-joint
+     (link-list-with-virtual-link *robot* robot-link-list :joint-class wheel-class)
+     (send* *robot* :inverse-kinematics
+            (make-cascoords :pos #f(1500 -1500 0) :rpy (float-vector pi 0 0))
+            :link-list (car link-list-with-virtual-link)
+            :move-target (send *robot* :end-coords)
+            :debug-view debug-view
+            args))
+    ))
+
+;; sample robot for sphere-joint and 6dof-joint check
+(defclass sample-multidof-joint-robot
+  :super cascaded-link
+  :slots (end-coords))
+
+(defmethod sample-multidof-joint-robot
+  (:init
+   (&rest args &key (joint-class sphere-joint) (child-init-coords (make-coords)) &allow-other-keys)
+   (send-super* :init args)
+   (let* ((b1 (make-gdome (make-icosahedron 30)))
+	  (b2 (body+ (make-cylinder 10 100)
+		     (send (make-cube 20 5 10) :locate #f(15 0 95))))
+	  (l1 (instance bodyset-link :init (make-cascoords) :bodies (list b1) :name :root))
+	  (l2 (instance bodyset-link :init (make-cascoords) :bodies (list b2) :name :bar)))
+     (send l2 :newcoords child-init-coords)
+     (let ((j (instance joint-class :init
+			:parent-link l1 :child-link l2
+                        :max-joint-velocity (float-vector *inf* *inf* *inf* *inf* *inf* *inf*))))
+       (setq links (list l1 l2))
+       (setq joint-list (list j))
+       (setq end-coords (make-cascoords :coords
+					(send (send l2 :copy-worldcoords) :translate #f(0 0 100))))
+       (send self :assoc l1)
+       (send l1 :assoc l2)
+       (send l2 :assoc end-coords)
+       (send self :init-ending)
+       self)))
+  (:end-coords (&rest args) (forward-message-to end-coords args))
+  (:joint (&rest args) (forward-message-to (car joint-list) args))
+  )
+
+;; check computation of orientation of 6dof-joint and sphere-joint
+;; check diff between end-coords after FK and IK
+(defun test-orientation-of-joint-class-common
+  (joint-class)
+  (setq *robot* (instance sample-multidof-joint-robot :init :joint-class joint-class
+		      :child-init-coords (make-coords :pos #f(100 200 300) :rpy (list (deg2rad 10) (deg2rad 20) (deg2rad 30)))))
+  (unless (or (null x::*display*) (= x::*display* 0))
+    (objects (list *robot* (send *robot* :end-coords))))
+  (let ((div 100.0) (max-dif-pos 0.0) (max-dif-rot 0.0) (range 90)
+	(ja (send *robot* :joint :joint-angle))
+	(ec (send *robot* :end-coords :copy-worldcoords))
+	(cc (send *robot* :joint :child-link :copy-worldcoords)))
+    (dotimes (i 600)
+      (let ((prev-ec ec) (prev-ja ja) (prev-cc cc)
+	    (dd (* range (sin (/ i div)))))
+	;; calc next joint-angle
+	(setq ja (let ((tmp-ja (instantiate float-vector (send *robot* :joint :joint-dof))))
+		   (dotimes (i (send *robot* :joint :joint-dof))
+		     (setf (elt tmp-ja i) dd))
+		   tmp-ja))
+
+       (send *robot* :joint :joint-angle ja)
+       (setq ec (send *robot* :end-coords :copy-worldcoords))
+       (setq cc (send *robot* :joint :child-link :copy-worldcoords))
+       (send *robot* :joint :joint-angle prev-ja)
+       (with-difference-position-and-rotation
+	(dp dr (send *robot* :end-coords) ec)
+	(send *robot* :inverse-kinematics-loop dp dr
+	      :link-list (send *robot* :link-list (send *robot* :end-coords :parent))
+	      :union-link-list (send *robot* :link-list (send *robot* :end-coords :parent))
+	      :move-target (send *robot* :end-coords)
+              :avoid-nspace-gain 0.0 :avoid-weight-gain 0.0
+	      ;; ease limitation of inverse-kinematics-loop
+	      :thre 0 :rthre 0 :p-limit 1000 :r-limit 1000
+              ))
+       (setq calc-ec (send *robot* :end-coords :copy-worldcoords))
+       (if (> (norm (send ec :difference-position calc-ec)) max-dif-pos)
+	   (setq max-dif-pos (norm (send ec :difference-position calc-ec))))
+       (if (> (norm (send ec :difference-rotation calc-ec)) max-dif-rot)
+	   (setq max-dif-rot (norm (send ec :difference-rotation calc-ec))))
+
+       (unless (or (null x::*display*) (= x::*display* 0))
+         (send *irtviewer* :draw-objects :flush nil)
+         (send ec :draw-on :flush nil :size 400)
+         (send calc-ec :draw-on :flush nil :color #f(1 0 0))
+         (send *irtviewer* :viewer :flush))
+       ))
+    (list max-dif-pos max-dif-rot)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; unit tests
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -176,6 +341,31 @@
   (assert (test-zmp-comomn *robot*))
   (assert (test-torque-from-its-own-weight-common *robot*))
   (assert (test-torque-from-ext-force-common *robot*)))
+
+(deftest test-joint-for-mobile-robot
+  (assert
+   (test-joint-for-mobile-robot-common
+    :robot-class sample-mobile-robot :wheel-class omniwheel-joint))
+  (assert
+   (test-joint-for-mobile-robot-common
+    :robot-class sarmclass :wheel-class omniwheel-joint
+    :translation-axis :z))
+  (assert
+   (test-joint-for-mobile-robot-common
+    :robot-class sarmclass :wheel-class omniwheel-joint
+    :use-wholebody t)))
+
+(deftest test-orientation-of-joint-class
+  (assert
+   (let ((ret (test-orientation-of-joint-class-common sphere-joint)))
+     (and
+      (> 0.01 (elt ret 0))
+      (> (deg2rad 1e-2) (elt ret 1)))))
+  (assert
+   (let ((ret (test-orientation-of-joint-class-common 6dof-joint)))
+     (and
+      (> 0.05 (elt ret 0))
+      (> (deg2rad 1e-2) (elt ret 1))))))
 
 (run-all-tests)
 (exit 0)
