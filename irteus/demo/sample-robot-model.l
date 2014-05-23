@@ -5,8 +5,7 @@
               jal0 jal1 jal2 jal3 jal4 jal5 jal6
               jar0 jar1 jar2 jar3 jar4 jar5 jar6
               jll0 jll1 jll2 jll3 jll4 jll5
-              jlr0 jlr1 jlr2 jlr3 jlr4 jlr5
-              force-sensors imu-sensors cameras))
+              jlr0 jlr1 jlr2 jlr3 jlr4 jlr5))
 (defmethod sample-robot
   (:init 
    (&rest args
@@ -286,8 +285,4 @@
   (:rleg-knee-p (&rest args) (forward-message-to jlr3 args))
   (:rleg-ankle-p (&rest args) (forward-message-to jlr4 args))
   (:rleg-ankle-r (&rest args) (forward-message-to jlr5 args))
-  ;; sensor accessors
-  (:force-sensors () force-sensors)
-  (:imu-sensors () imu-sensors)
-  (:cameras () cameras)
   )

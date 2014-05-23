@@ -76,7 +76,9 @@
 	  head-root-link torso-root-link
 	  larm-collision-avoidance-links
 	  rarm-collision-avoidance-links
-	  larm rarm lleg rleg torso head))
+	  larm rarm lleg rleg torso head
+          ;; sensor slots
+          force-sensors imu-sensors cameras))
 
 (defmethod robot-model
   (:limb
@@ -232,6 +234,10 @@
    (sensors-type limb)
    (remove-if-not #'(lambda (x) (member (send x :parent) (all-child-links (send self limb :root-link))))
                   (send self sensors-type)))
+  ;; sensor accessors
+  (:force-sensors () force-sensors)
+  (:imu-sensors () imu-sensors)
+  (:cameras () cameras)
   ;;
   (:larm (&rest args) 
 	 (unless args (setq args (list nil))) (send* self :limb :larm args))
