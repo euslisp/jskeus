@@ -124,7 +124,28 @@
                         (reduce #'v+ (mapcar #'(lambda (x) (scale (send x :volume) (send x :centroid))) valid-bodies)))))
          ))
      (send-all (send self :joint-list) :max-joint-torque 7.5) ;; [Nm]
-
+     ;; set sensors
+     (setq force-sensors
+           (mapcar #'(lambda (l)
+                       (send (send self l :end-coords :parent) :assoc
+                             (make-cascoords :coords (send self l :end-coords :copy-worldcoords)
+                                             :name (format nil "~A-fsensor" (string-downcase l)))))
+                   (list :rarm :larm :rleg :lleg)))
+     (setq imu-sensors
+           (list (let ((sen (make-cascoords
+                             :worldpos (send (car (send self :torso :waist-p :child-link :bodies)) :centroid)
+                             :name "torso-imusensor")))
+                   (send (send self :torso :waist-p :child-link) :assoc sen)
+                   sen)))
+     (setq cameras
+           (mapcar #'(lambda (pos name)
+                       (let ((sen (instance camera-model :init (make-cylinder 10 20) :name name)))
+                         (send sen :rotate pi/2 :y)
+                         (send sen :locate (v+ pos (send (car (send (send self :head :neck-p :child-link) :bodies)) :centroid)) :world)
+                         (send (send self :head :neck-p :child-link) :assoc sen)
+                         sen))
+                   (list (float-vector 0 30 0) (float-vector 0 -30 0))
+                   (list "left-camera" "right-camera")))
      ;; 5. call :init-ending after defining links and joint-list and return "self"
      (send self :init-ending)
      self))
@@ -232,8 +253,8 @@
     (send self :angle-vector #f(0.0 0.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0)))
   )
 
-;; user-defined joint
 (defmethod sample-robot
+  ;; user-defined joint
   (:torso-waist-y (&rest args) (forward-message-to jc0 args))
   (:torso-waist-p (&rest args) (forward-message-to jc1 args))
   (:head-neck-y (&rest args) (forward-message-to jh0 args))

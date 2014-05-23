@@ -76,7 +76,9 @@
 	  head-root-link torso-root-link
 	  larm-collision-avoidance-links
 	  rarm-collision-avoidance-links
-	  larm rarm lleg rleg torso head))
+	  larm rarm lleg rleg torso head
+          ;; sensor slots
+          force-sensors imu-sensors cameras))
 
 (defmethod robot-model
   (:limb
@@ -143,6 +145,9 @@
        (:joint-list (send-all (send self :limb limb :links) :joint))
        (:gripper (send* self :gripper limb args))
        (:joint-order (send self :joint-order limb))
+       (:cameras (send self :get-sensors-method-by-limb :cameras limb))
+       (:imu-sensors (send self :get-sensors-method-by-limb :imu-sensors limb))
+       (:force-sensors (send self :get-sensors-method-by-limb :force-sensors limb))
        (t
 	(cond
 	 ((or (null method) (send bodyset-link :method method))
@@ -217,6 +222,22 @@
           (send-all (send self :gripper limb :joint-list) :joint-angle))
        (map float-vector #'(lambda (x y) (send x :joint-angle y))
 	    (send self :gripper limb :joint-list) (cadr args))))))
+  ;; sensor accessor definitions
+  (:camera (sensor-name) (send self :get-sensor-method :camera sensor-name))
+  (:force-sensor (sensor-name) (send self :get-sensor-method :force-sensor sensor-name))
+  (:imu-sensor (sensor-name) (send self :get-sensor-method :imu-sensor sensor-name))
+  (:get-sensor-method
+   (sensor-type sensor-name)
+   (let ((sens (send self (read-from-string (format nil "~As" sensor-type)))))
+     (find sensor-name sens :test #'equal :key #'(lambda (x) (send x :name)))))
+  (:get-sensors-method-by-limb
+   (sensors-type limb)
+   (remove-if-not #'(lambda (x) (member (send x :parent) (all-child-links (send self limb :root-link))))
+                  (send self sensors-type)))
+  ;; sensor accessors
+  (:force-sensors () force-sensors)
+  (:imu-sensors () imu-sensors)
+  (:cameras () cameras)
   ;;
   (:larm (&rest args) 
 	 (unless args (setq args (list nil))) (send* self :limb :larm args))
