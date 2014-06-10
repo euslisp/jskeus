@@ -786,26 +786,6 @@
                             (setq dx (+ dx ddx) dy (+ dy ddy) dth (+ dth ddth)))))
        (push (funcall gen-go-pos-step-node-func mc leg leg-translate-pos) ret)
        (reverse ret))))
-  ;; make collision model from faces or gl-vertices
-  (:make-collision-model-for-links
-   (&key (fat 0) (collision-func 'pqp-collision-check) ((:links ls) (send self :links)))
-   (dolist (ll ls)
-     (unless (send ll :get (read-from-string (format nil ":~Amodel"
-                                                     (string-right-trim "-COLLISION-CHECK" (string collision-func)))))
-       (send ll
-             (read-from-string
-              (format nil ":make-~Amodel"
-                      (string-right-trim "-COLLISION-CHECK" (string collision-func))))
-             :fat fat
-             :faces (flatten (mapcar #'(lambda (x)
-                                         (cond
-                                          ((find-method x :def-gl-vertices)
-                                           (send (x . glvertices) :convert-to-faces :wrt :world))
-                                          (t
-                                           (send x :faces))))
-                                     (send ll :bodies)))))
-     )
-   )
   )
 (in-package "GEOMETRY")
 
