@@ -26,6 +26,7 @@
 
 (require :irtgeo)
 (require :irtutil)
+(require :pqp)
 
 (defclass joint
   :super propertied-object
@@ -77,25 +78,34 @@
   (:joint-min-max-table (&optional mm-table) (if mm-table (setq joint-min-max-table mm-table) joint-min-max-table))
   (:joint-min-max-target (&optional mm-target) (if mm-target (setq joint-min-max-target mm-target) joint-min-max-target))
   (:joint-min-max-table-angle-interpolate
-   (target-angle car-or-cadr)
-   (let* ((int-target-angle (floor target-angle)) ;; integer value convered as a hash tablle key
+   (target-angle min-or-max)
+   (let* ((int-target-angle (floor target-angle)) ;; integer value convered as a matrix table key
           (target-range (list int-target-angle (1+ int-target-angle))) ;; range of target-joint's angle, e.g., (car target-range) <= target-ang <= (cadr target-range)
-          (joint-range (mapcar #'(lambda (x) (funcall car-or-cadr (gethash x joint-min-max-table)))
+          (joint-range (mapcar #'(lambda (x)
+                                   (aref
+                                    joint-min-max-table
+                                    (case min-or-max
+                                          (:min-angle 1)
+                                          (:max-angle 2)
+                                          (t ))
+                                    (round
+                                     (-
+                                      (min (max (aref joint-min-max-table 0 0) x)
+                                           (aref joint-min-max-table 0 (- (array-dimension joint-min-max-table 1) 1)))
+                                      (aref joint-min-max-table 0 0)))
+                                    ))
                                target-range)) ;; range of joint-angle based on target-range
           (tmp-ratio (- target-angle (float int-target-angle))))
-     ;; overrange check
-     (unless (elt joint-range 0) (setf (elt joint-range 0) (elt joint-range 1)))
-     (unless (elt joint-range 1) (setf (elt joint-range 1) (elt joint-range 0)))
      ;; calc min max
      ;; interpolated joint-angle based on joint-range
      ;; e.g., (car joint-range) <= min[max]-angle <= (cadr joint-range) or (cadr joint-range) <= min[max]-angle <= (car joint-range) 
      (+ (* (car joint-range) (- 1 tmp-ratio)) (* (cadr joint-range) tmp-ratio))))
   (:joint-min-max-table-min-angle
    (&optional (target-angle (send joint-min-max-target :joint-angle)))
-   (send self :joint-min-max-table-angle-interpolate target-angle #'car))
+   (send self :joint-min-max-table-angle-interpolate target-angle :min-angle))
   (:joint-min-max-table-max-angle
    (&optional (target-angle (send joint-min-max-target :joint-angle)))
-   (send self :joint-min-max-table-angle-interpolate target-angle #'cdr))
+   (send self :joint-min-max-table-angle-interpolate target-angle :max-angle))
   )
 
 (defun calc-jacobian-default-rotate-vector
@@ -809,6 +819,112 @@
        (setq ret1 (nconc (nreverse ret2) ret1))
        )
      ret1))
+  ;; for min-max table
+  (:make-joint-min-max-table
+   (l0 l1 joint0 joint1
+    ;; l0, l1         : link pair to be checked
+    ;; joint0, joint1 : joint to be check min and max angle
+    &key (fat 0) (fat2 nil) (debug nil)
+         (margin 0.0) ;; margin [deg] is margin angle from collision-based min-angle and max-angle
+         (overwrite-collision-model nil))
+   ;; initialize for :make-joint-min-max-table
+   (if (null debug) (send-all (send self :links) :analysis-level :coords))
+   (let* ((pc (send self :copy-worldcoords))
+          (pav (send self :angle-vector))
+          (min-joint0 (truncate (- (send joint0 :min-angle) 1e-4)))
+          (max-joint0 (truncate (+ (send joint0 :max-angle) 1e-4)))
+          (min-joint1 (truncate (- (send joint1 :min-angle) 1e-4)))
+          (max-joint1 (truncate (+ (send joint1 :max-angle) 1e-4)))
+          (joint-range0 (1+ (round (- max-joint0 min-joint0))))
+          (joint-range1 (1+ (round (- max-joint1 min-joint1)))))
+     (when debug
+       (format t ";~10A ~20,10f ~20,10f~%" (send joint0 :name) (send joint0 :min-angle) (send joint0 :max-angle))
+       (format t ";~10A ~20,10f ~20,10f~%" (send joint1 :name) (send joint1 :min-angle) (send joint1 :max-angle))
+       (format t ";~10A ~20,10f ~20,10f~%" (send joint0 :name) min-joint0 max-joint0)
+       (format t ";~10A ~20,10f ~20,10f~%" (send joint1 :name) min-joint1 max-joint1))
+     (send self :newcoords (make-coords))
+     (send self :init-pose)
+     (when overwrite-collision-model
+       (setf (get l0 :pqpmodel) nil)    
+       (setf (get l1 :pqpmodel) nil)
+       (pqp-collision-check l0 l1 geo::PQP_FIRST_CONTACT :fat fat :fat2 fat2))
+
+     (send self :make-min-max-table-using-collision-check
+           l0 l1 joint0 joint1 joint-range0 joint-range1 min-joint0 min-joint1 fat fat2 debug margin)
+
+     ;; finalize for :make-joint-min-max-table
+     (send self :angle-vector pav)
+     (send self :newcoords pc)
+     (if (null debug) (send-all (send self :links) :analysis-level :body))
+     nil
+     ))
+  (:make-min-max-table-using-collision-check
+   (l0 l1 joint0 joint1 joint-range0 joint-range1 min-joint0 min-joint1 fat fat2 debug margin)
+   ;; put collision check results into collision matrix "col-mat".
+   (let ((col-mat (make-matrix joint-range1 joint-range0)))
+          ;; col-mat : joint-range1 x joint-range0 matrix
+          ;;   collision-free region => 0
+          ;;   collision region => 1
+     (let (flag c (skip-count 10))
+       (do ((j 0 (+ j 1))) ((>= j joint-range1))
+           (send joint1 :joint-angle (round (+ j min-joint1)))
+           (setq flag :low-limit)
+           (when (= (mod j 10) 0)
+             (format t ";~c~7d/~7d" #x0d (* j joint-range0) (* joint-range0 joint-range1)) 
+             (finish-output))
+           (do ((i 0 (+ i 1))) ((>= i joint-range0))
+               (catch :min-max-collision-check
+                 (send joint0 :joint-angle (round (+ i min-joint0)))
+                 (cond
+                  ((and (eq flag :free) (/= (mod i skip-count) 0) (<= i (- joint-range0 skip-count)))
+                   (setq c t))
+                  (t
+                   (setq c (= (pqp-collision-check l0 l1 geo::PQP_FIRST_CONTACT :fat fat :fat2 fat2) 0))
+                   (cond 
+                    ((and (eq flag :low-limit) c) 
+                     (setq flag :free))
+                    ((and (eq flag :free) (not c))
+                     (setq flag :high-limit) (setq i (max (- i skip-count) 0))
+                     (throw :min-max-collision-check nil))
+                    )))
+                 (setf (aref col-mat j i) (if c 1 0))
+                 (if debug (format t ";~10A ~7,3f / ~10A ~7,3f / ~A ~A~%"
+                                   (send joint1 :name) (+ j min-joint1)
+                                   (send joint0 :name) (+ i min-joint0) c flag))
+                 ))))
+     (format t "~%")
+     ;; generate min-max table from collision matrix
+     (labels
+         ((gen-min-max-table-from-collision-matrix
+           (self-joint-range target-joint-range
+                             self-min-joint target-min-joint
+                             aref-func)
+           (let ((table (make-matrix 3 self-joint-range))) ;; row = self-joint-angle, target-min, target-max
+             (dotimes (i self-joint-range)
+               (let ((min-v (1+ self-joint-range)) (max-v 0) (flag nil))
+                 (dotimes (j target-joint-range)
+                   (when (= (funcall aref-func col-mat i j) 1)
+                     (setq flag t)
+                     (if (< j min-v)(setq min-v j)) (if (> j max-v)(setq max-v j))))
+                 (if (null flag) (setq min-v (- target-min-joint) max-v (- target-min-joint)))
+                 (setf (aref table 0 i) (round (+ self-min-joint i)))
+                 (setf (aref table 1 i) (round (+ margin target-min-joint min-v)))
+                 (setf (aref table 2 i) (round (+ (- margin) target-min-joint max-v)))
+                 ))
+             table)))
+       (let ((table0 (gen-min-max-table-from-collision-matrix
+                      joint-range0 joint-range1
+                      min-joint0 min-joint1
+                      #'(lambda (m i j) (aref m j i)))))
+         (send joint1 :joint-min-max-target joint0)
+         (send joint1 :joint-min-max-table table0))
+       (let ((table1 (gen-min-max-table-from-collision-matrix
+                      joint-range1 joint-range0
+                      min-joint1 min-joint0
+                      #'(lambda (m i j) (aref m i j)))))
+         (send joint0 :joint-min-max-target joint1)
+         (send joint0 :joint-min-max-table table1))
+       )))
   )
 
 ;;;
