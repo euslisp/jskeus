@@ -94,36 +94,38 @@
 
 ;; min-max-table
 (deftest test-min-max-table
-  (let ((j1 (send *robot* :j1))
-        (j2 (send *robot* :j2))
-        (j1-min-max-table (make-hash-table))
-        (j2-min-max-table (make-hash-table))
-        min-max-table-view
-        x y)
+  (let* ((j1 (send *robot* :j1))
+         (j2 (send *robot* :j2))
+         (j1-min-max-table (make-hash-table))
+         (j2-min-max-table (make-hash-table))
+         (j1-org-min-angle (send j1 :min-angle)) (j2-org-min-angle (send j2 :min-angle))
+         (j1-org-max-angle (send j1 :max-angle)) (j2-org-max-angle (send j2 :max-angle))
+         min-max-table-view
+         x y)
 
     ;; set min-max-table
     ;; j1-hash
-    (do ((i -90 (+ i 1))) ((> i 90))
-      (setf (gethash (round i) j1-min-max-table) (cons (- (abs i) 90) (- 90 (abs i))))
-      (setf (gethash (round i) j2-min-max-table) (cons (- (abs i) 90) (- 90 (abs i))))
-      )
-    (setq (j1 . joint-min-max-table) j1-min-max-table)
-    (setq (j1 . joint-min-max-target) j2)
-    (setq (j2 . joint-min-max-table) j2-min-max-table)
-    (setq (j2 . joint-min-max-target) j1)
+    (mapcar #'(lambda (self-joint target-joint j-min-max-table)
+                (do ((i (round (send target-joint :min-angle)) (+ i 1))) ((> i (round (send target-joint :max-angle))))
+                  (setf (gethash (round i) j-min-max-table) (cons (- (abs i) (abs (send self-joint :min-angle))) (- (send self-joint :max-angle) (abs i)))))
+                (send self-joint :joint-min-max-table j-min-max-table)
+                (send self-joint :joint-min-max-target target-joint))
+            (list j1 j2)
+            (list j2 j1)
+            (list j1-min-max-table j2-min-max-table))
 
     ;; display min-max table if needed
     (unless (or (null x::*display*) (= x::*display* 0))
       (setq min-max-table-view
             (instance x::panel :create
-                      :width  (round (- (send j1 :max-angle) (send j1 :min-angle)))
-                      :height (round (- (send j2 :max-angle) (send j2 :min-angle)))
+                      :width  (round (- j1-org-max-angle j1-org-min-angle))
+                      :height (round (- j2-org-max-angle j2-org-min-angle))
                       :atitle "min-max-table-view"))
       ;;
-      (do ((x -90 (+ x 1)))
-          ((> x 90))
-        (do ((y -90 (+ y 1)))
-            ((> y 90))
+      (do ((x j1-org-min-angle (+ x 1)))
+          ((> x j1-org-max-angle))
+        (do ((y j2-org-min-angle (+ y 1)))
+            ((> y j2-org-max-angle))
           (let* ((j1-min-max (gethash (round y) j1-min-max-table)) ;; j1-min-max-table is functoin of j2
                  (j2-min-max (gethash (round x) j2-min-max-table))
                  (j1-min (car j1-min-max))
@@ -133,13 +135,13 @@
             (cond ((and (<= j1-min x j1-max)
                         (<= j2-min y j2-max)) ;; ok
                    (send min-max-table-view :color #xffffff)
-                   (send min-max-table-view :draw-line (float-vector (+ x 90) (+ y 90)) (float-vector (+ x 90) (+ y 90)))
+                   (send min-max-table-view :draw-line (float-vector (+ x j1-org-max-angle) (+ y j2-org-max-angle)) (float-vector (+ x j1-org-max-angle) (+ y j2-org-max-angle)))
                    ;;
                    )
                   ((and (or (< x j1-min) (< j1-max x))
                         (or (< y j2-min) (< j2-max y))) ;; vaiolated ok
                    (send min-max-table-view :color #x000000)
-                   (send min-max-table-view :draw-line (float-vector (+ x 90) (+ y 90)) (float-vector (+ x 90) (+ y 90)))
+                   (send min-max-table-view :draw-line (float-vector (+ x j1-org-max-angle) (+ y j2-org-max-angle)) (float-vector (+ x j1-org-max-angle) (+ y j2-org-max-angle)))
                    )
                   (t
                    ;; ??
@@ -148,31 +150,38 @@
       (send min-max-table-view :flush)
       );; display
     ;; do test
-    (dotimes (i (* 180 180))
-      (setq x (- (random 180) 90)
-            y (- (random 180) 90))
-      ;;
-      (send *robot* :angle-vector (float-vector x y))
-      ;;
-      ;; check if x-y with in the limit
-      (unless (eq (and (= x (send j1 :joint-angle)) (= y (send j2 :joint-angle))) ;; check if :anlge-vector did not modify value
-                   (<= (abs y) (- 90 (abs x)))) ;; ground truth
-        (format t "Is (~A ~A) safe posture? ~A ~A~%" x y (and (= x (send j1 :joint-angle)) (= y (send j2 :joint-angle))) (<= (abs y) (- 90 (abs x)))))
-      (when min-max-table-view
+    (let ((ret t))
+      (dotimes (i (round (* (- j1-org-max-angle j1-org-min-angle) (- j2-org-max-angle j2-org-min-angle))))
+        (setq x (round (+ (random (- j1-org-max-angle j1-org-min-angle)) j1-org-min-angle))
+              y (round (+ (random (- j2-org-max-angle j2-org-min-angle)) j2-org-min-angle)))
+        ;;
+        (send *robot* :angle-vector (float-vector x y))
+        ;;
+        ;; check if x-y with in the limit
+        (unless (eq (and (= x (send j1 :joint-angle)) (= y (send j2 :joint-angle))) ;; check if :anlge-vector did not modify value
+                    (<= (abs y) (- 90 (abs x)))) ;; ground truth
+          (if min-max-table-view
+              (format t ";; Is (~A ~A) safe posture? ~A ~A~%" x y (and (= x (send j1 :joint-angle)) (= y (send j2 :joint-angle))) (<= (abs y) (- 90 (abs x))))))
         ;; check in view
-        (cond ((and (= x (send j1 :joint-angle)) (= y (send j2 :joint-angle))) ;; with i nlimit
-               (send min-max-table-view :color #x0000ff)
-               )
+        (cond ((and (= x (send j1 :joint-angle)) (= y (send j2 :joint-angle)) min-max-table-view) ;; with i nlimit
+               (send min-max-table-view :color #x0000ff))
               (t ;; out of limit
-               (send min-max-table-view :color #xff0000)
-               (format t "out of limit ~A -> ~A~%"
-                       (float-vector (+ (round x) 90) (+ (round y) 90))
-                       (v+ (send *robot* :angle-vector (float-vector x y)) #f(90 90)))
-               (send min-max-table-view :draw-line (float-vector (+ (round x) 90) (+ (round y) 90))
-                     (v+ (send *robot* :angle-vector (float-vector x y)) #f(90 90)))))
-        (send min-max-table-view :draw-line (float-vector (+ (round x) 90) (+ (round y) 90)) (float-vector (+ (round x) 90) (+ (round y) 90)))
-        (send min-max-table-view :flush)
-        ))
+               (if min-max-table-view (format t ";; out of limit ~A -> ~A~%" (float-vector x y) (send *robot* :angle-vector)))
+               (setq ret
+                     (and ret
+                          (< (- (- (abs (send j2 :joint-angle)) (abs j1-org-max-angle)) *epsilon*) (send j1 :joint-angle) (+ (- (abs j1-org-max-angle) (abs (send j2 :joint-angle))) *epsilon*))
+                            (< (- (- (abs (send j1 :joint-angle)) (abs j2-org-max-angle)) *epsilon*) (send j2 :joint-angle) (+ (- (abs j2-org-max-angle) (abs (send j1 :joint-angle))) *epsilon*))))
+               (when min-max-table-view
+                 (send min-max-table-view :color #xff0000)
+                 (send min-max-table-view :draw-line
+                       (float-vector (- x j1-org-min-angle) (- y j2-org-min-angle))
+                       (v- (send *robot* :angle-vector) (float-vector j1-org-min-angle j2-org-min-angle))))))
+        (when min-max-table-view
+          (send min-max-table-view :draw-line (float-vector (- x j1-org-min-angle) (- y j2-org-min-angle)) (float-vector (- x j1-org-min-angle) (- y j2-org-min-angle)))
+          (send min-max-table-view :flush)
+          ))
+      (assert ret ";; check min-max violation")
+      )
     ;;
     ;; restore
     (setq (j1 . joint-min-max-table) nil)
