@@ -6,37 +6,25 @@
   ;; (setq *image-build-dir* (format nil "/tmp/tmp.~A" (string (gensym))))
   (setq *image-build-dir* (car (piped-fork-returns-list "mktemp -d"))))
 
-(load "models/irt-all-robots.l")
-(unless x::*root* (defun make-all-robots ())) ;; do not create viwer
-
-(setq robot-viewers (make-all-robots))
-(deftest make-all-robots
-  (let (fname (fname-list ""))
-    (dolist (viewer robot-viewers)
-      (send viewer :draw-objects)
-      (setq fname (format nil "~A/irt_robots_~A.png" *image-build-dir* (send viewer :name)))
-      (setq fname-list (format nil "~A ~A" fname-list fname))
-      (send viewer :viewer :viewsurface :write-to-image-file fname)
-      )
-    (unix::system (format nil "montage -geometry 100x100+1+1 ~A ~A/irt_all_robots.png"
-			  fname-list *image-build-dir*))
-    ))
-
-(load "models/irt-all-objects.l")
-(unless x::*root* (defun make-all-objects ())) ;; do not create viwer
-
-(setq object-viewers (make-all-objects))
-(deftest make-all-objects
-  (let (fname (fname-list ""))
-    (dolist (viewer object-viewers)
-      (send viewer :draw-objects)
-      (setq fname (format nil "~A/irt_objects_~A.png" *image-build-dir* (send viewer :name)))
-      (setq fname-list (format nil "~A ~A" fname-list fname))
-      (send viewer :viewer :viewsurface :write-to-image-file fname)
-      )
-    (unix::system (format nil "montage -geometry 100x100+1+1 ~A ~A/irt_all_objects.png"
-			  fname-list *image-build-dir*))
-    ))
+(mapcar
+ #'(lambda (model-type-name model-func-name)
+     (eval
+      `(deftest ,(read-from-string (format nil "test-~A" model-func-name))
+         (load (format nil "models/irt-all-~A.l" ,model-type-name))
+         (unless x::*root* (defun ,model-func-name ())) ;; do not create viwer
+         (setq model-viewers (,model-func-name))
+         (let (fname (fname-list ""))
+           (dolist (viewer model-viewers)
+             (send viewer :draw-objects)
+             (setq fname (format nil "~A/irt_~A_~A.png" *image-build-dir* ,model-type-name (send viewer :name)))
+             (setq fname-list (format nil "~A ~A" fname-list fname))
+             (send viewer :viewer :viewsurface :write-to-image-file fname)
+             )
+           (unix::system (format nil "montage -geometry 100x100+1+1 ~A ~A/irt_all_~A.png"
+                                 fname-list *image-build-dir* ,model-type-name))
+           ))))
+ '("robots" "objects" "scenes")
+ '(make-all-robots make-all-objects make-all-scenes))
 
 (run-all-tests)
 (exit)
