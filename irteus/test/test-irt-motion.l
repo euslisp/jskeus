@@ -333,6 +333,16 @@
        ))
     (list max-dif-pos max-dif-rot)))
 
+;; test :cog-convergence-check
+(defun test-cog-convergence-check-common
+  (robot)
+  (send robot :reset-pose)
+  (send robot :fix-leg-to-coords (make-coords))
+  (and (send robot :move-centroid-on-foot :both '(:rleg :lleg) :centroid-thre 10)
+       (send robot :move-centroid-on-foot :both '(:rleg :lleg) :centroid-thre #'(lambda (diff) (> 10 (norm diff))))
+       (send robot :move-centroid-on-foot :both '(:rleg :lleg) :centroid-thre #f(10 10)))
+  )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; unit tests
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -341,6 +351,9 @@
   (assert (test-zmp-comomn *robot*))
   (assert (test-torque-from-its-own-weight-common *robot*))
   (assert (test-torque-from-ext-force-common *robot*)))
+
+(deftest test-cog-convergence-check
+  (assert (test-cog-convergence-check-common *robot*)))
 
 (deftest test-joint-for-mobile-robot
   (assert

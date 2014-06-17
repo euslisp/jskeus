@@ -491,7 +491,7 @@
                   :centroid-offset-func centroid-offset-func :translation-axis translation-axis :update-mass-properties update-mass-properties)))
      (cond
       ((numberp centroid-thre) (> centroid-thre (norm cdiff)))
-      ((functionp centroid-thre) (funcall cdiff))
+      ((functionp centroid-thre) (funcall centroid-thre cdiff))
       ((vectorp centroid-thre) (v< (map float-vector #'abs cdiff) centroid-thre)))))
   )
 
