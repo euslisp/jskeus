@@ -2,6 +2,24 @@
 
 (init-unit-test)
 
+(in-package "GEO")
+(defun face-normal-vector (vertices)
+  (let* ((v1 (first vertices)) (v2) (vlist (rest vertices))
+         (v (float-vector 0 0 0))
+         (normal (float-vector 0 0 0)))
+    (while vlist
+      (setq v2 (pop vlist))
+      (v+ (v* v1 v2 v) normal normal)
+      (setq v1 v2))
+    (setq v2 (car vertices))
+    (v+ (v* v1 v2 v) normal normal)
+    (normalize-vector normal normal)) )
+
+(defmethod polygon
+  (:reset-normal ()
+                 (setq normal (face-normal-vector (rest vertices))
+                       distance (- (v. normal (car vertices))))))
+(in-package "USER")
 
 (deftest test-body+
   (let (bottom-frame
