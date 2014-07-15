@@ -5,10 +5,13 @@
 
 (load "irteus/demo/sample-robot-model.l")
 (load "irteus/demo/sample-arm-model.l")
-(unless (boundp '*robot*)
-  (setq *robot* (instance sample-robot :init))
+(load "irteus/demo/sample-multidof-arm-model.l")
+(unless (boundp '*sample-robot*)
+  (setq *sample-robot* (instance sample-robot :init))
   (unless (or (null x::*display*) (= x::*display* 0))
-    (objects (list *robot*))))
+    (objects (list *sample-robot*))))
+(unless (boundp '*sarm-robot*)
+  (setq *sarm-robot* (instance sample-multidof-arm-robot :init)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; common test codes
@@ -343,17 +346,32 @@
        (send robot :move-centroid-on-foot :both '(:rleg :lleg) :centroid-thre #f(10 10)))
   )
 
+;; test ik fail log
+(defun test-load-ik-fail-log-common
+  (robot)
+  (labels ((find-log-files
+            (log-directory)
+            (remove-if-not #'(lambda (x) (substringp (format nil "~A-" (send (class robot) :name)) x)) (directory log-directory))))
+    (let* ((log-directory (format nil "/tmp/irtmodel-ik-~A" (unix::getpid)))
+           (prev-log-files (find-log-files log-directory)))
+      (send robot :rarm :move-end-pos #f(10000 0 0) :world)
+      (let ((new-log-file ;; find latest log
+             (car (remove-if #'(lambda (x) (member x prev-log-files :test #'string=)) (find-log-files log-directory)))))
+        ;; ik log execution
+        (progn (load (format nil "~A/~A" log-directory new-log-file))(ik-setup)(ik-check))
+        t))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; unit tests
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftest test-irtdyna-samplerobot
-  (assert (test-zmp-comomn *robot*))
-  (assert (test-torque-from-its-own-weight-common *robot*))
-  (assert (test-torque-from-ext-force-common *robot*)))
+  (assert (test-zmp-comomn *sample-robot*))
+  (assert (test-torque-from-its-own-weight-common *sample-robot*))
+  (assert (test-torque-from-ext-force-common *sample-robot*)))
 
 (deftest test-cog-convergence-check
-  (assert (test-cog-convergence-check-common *robot*)))
+  (assert (test-cog-convergence-check-common *sample-robot*)))
 
 (deftest test-joint-for-mobile-robot
   (assert
@@ -379,6 +397,12 @@
      (and
       (> 0.05 (elt ret 0))
       (> (deg2rad 1e-2) (elt ret 1))))))
+
+(deftest test-load-ik-fail-log-for-sample-robot
+  (assert (test-load-ik-fail-log-common *sample-robot*)))
+
+(deftest test-load-ik-fail-log-for-sample-multidof-joint-robot
+  (assert (test-load-ik-fail-log-common *sarm-robot*)))
 
 (run-all-tests)
 (exit 0)
