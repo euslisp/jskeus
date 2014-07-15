@@ -5,10 +5,13 @@
 
 (load "irteus/demo/sample-robot-model.l")
 (load "irteus/demo/sample-arm-model.l")
+(load "irteus/demo/sample-multidof-arm-model.l")
 (unless (boundp '*robot*)
   (setq *robot* (instance sample-robot :init))
   (unless (or (null x::*display*) (= x::*display* 0))
     (objects (list *robot*))))
+(unless (boundp '*sarm-robot*)
+  (setq *sarm-robot* (instance sample-multidof-arm-robot :init)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; common test codes
@@ -395,8 +398,11 @@
       (> 0.05 (elt ret 0))
       (> (deg2rad 1e-2) (elt ret 1))))))
 
-(deftest test-load-ik-fail-log
+(deftest test-load-ik-fail-log-for-sample-robot
   (assert (test-load-ik-fail-log-common *robot*)))
+
+(deftest test-load-ik-fail-log-for-sample-multidof-joint-robot
+  (assert (test-load-ik-fail-log-common *sarm-robot*)))
 
 (run-all-tests)
 (exit 0)

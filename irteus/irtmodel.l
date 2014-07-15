@@ -2042,30 +2042,34 @@
 	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   (when dump-command
 	     (let (i (print-args (copy-list args)) command-init command-setup command-args)
+               (labels ((escape-string
+                         (name) ;; If string, escape it. Otherwise (=symbol), return original value.
+                         (if (stringp name) (format nil "\"~A\"" name) name)))
 	       (dotimes (j (count :link-list print-args))
 		 (if (setq i (position :link-list print-args :count (1+ j)))
 		     (cond ((atom (car (elt print-args (+ i 1))))
-			    (setf (elt print-args (+ i 1)) (append '(list) (mapcar #'(lambda (x) `(send r :link ,(send x :name))) (elt print-args (+ i 1))))))
+			    (setf (elt print-args (+ i 1)) (append '(list) (mapcar #'(lambda (x) `(send r :link ,(escape-string (send x :name)))) (elt print-args (+ i 1))))))
 			   (t
 			    (setf (elt print-args (+ i 1))
 				  (append '(list)
 					  (mapcar #'(lambda (y)
-						      (append '(list) (mapcar #'(lambda (x) `(send r :link ,(send x :name))) y)))
+						      (append '(list) (mapcar #'(lambda (x) `(send r :link ,(escape-string (send x :name)))) y)))
 						(elt print-args (+ i 1)))))))))
 	       (dotimes (j (count :move-target print-args))
 		 (if (setq i (position :move-target print-args :count (1+ j)))
 		     (cond ((atom (elt print-args (+ i 1)))
 			    (let ((x (elt print-args (+ i 1))))
-			      (setf (elt print-args (+ i 1)) `(let* ((p (send r :link ,(send (send x :parent) :name))) (c (make-cascoords :coords (send (send p :copy-worldcoords) :transform (make-cascoords :4x4 ,(send x :4x4))) :parent p))) c))))
+			      (setf (elt print-args (+ i 1)) `(let* ((p (send r :link ,(escape-string (send (send x :parent) :name)))) (c (make-cascoords :coords (send (send p :copy-worldcoords) :transform (make-cascoords :4x4 ,(send x :4x4))) :parent p))) c))))
 			   (t
 			    (setf (elt print-args (+ i 1))
 				  (append '(list)
 					  (mapcar #'(lambda (x)
-						      `(let* ((p (send r :link ,(send (send x :parent) :name))) (c (make-cascoords :coords (send (send p :copy-worldcoords) :transform (make-cascoords :4x4 ,(send x :4x4))) :parent p))) c))
+						      `(let* ((p (send r :link ,(escape-string (send (send x :parent) :name)))) (c (make-cascoords :coords (send (send p :copy-worldcoords) :transform (make-cascoords :4x4 ,(send x :4x4))) :parent p))) c))
 						  (elt print-args (+ i 1)))))))))
 	       (setq command-init `(instance ,(send (class self) :name) :init)
 		     command-setup `(progn  (send r :newcoords (make-coords :4x4 ,(send self :4x4))) (mapc #'(lambda (j a) (send* j :joint-angle a ,joint-args)) (list . ,(mapcar #'(lambda (x) `(send r ,(intern (string-upcase x) *keyword-package*))) (send-all (remove-duplicates (append (send-all union-link-list :joint) joint-list)) :name))) ,(list 'quote av0)) (objects (list r)))
 		     command-args (nconc `(list . ,(mapcar #'(lambda (x) `(make-coords :pos ,(send (if (functionp x) (funcall x) x) :worldpos) :rot ,(send (if (functionp x) (funcall x) x) :worldrot))) target-coords)) (list :dump-command nil :debug-view t) print-args))
+               ) ;; labels
 	       (warn ";; command : ~a~%" `(let ((r ,command-init)) ,command-setup (send* r :inverse-kinematics ,command-args)))
 	       (warn ";; dump debug command to ~A~%" command-filename)
 	       (warn ";; (progn (load \"~A\")(ik-setup)(ik-check))~%" command-filename)
