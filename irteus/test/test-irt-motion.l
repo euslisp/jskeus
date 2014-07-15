@@ -6,10 +6,10 @@
 (load "irteus/demo/sample-robot-model.l")
 (load "irteus/demo/sample-arm-model.l")
 (load "irteus/demo/sample-multidof-arm-model.l")
-(unless (boundp '*robot*)
-  (setq *robot* (instance sample-robot :init))
+(unless (boundp '*sample-robot*)
+  (setq *sample-robot* (instance sample-robot :init))
   (unless (or (null x::*display*) (= x::*display* 0))
-    (objects (list *robot*))))
+    (objects (list *sample-robot*))))
 (unless (boundp '*sarm-robot*)
   (setq *sarm-robot* (instance sample-multidof-arm-robot :init)))
 
@@ -366,12 +366,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftest test-irtdyna-samplerobot
-  (assert (test-zmp-comomn *robot*))
-  (assert (test-torque-from-its-own-weight-common *robot*))
-  (assert (test-torque-from-ext-force-common *robot*)))
+  (assert (test-zmp-comomn *sample-robot*))
+  (assert (test-torque-from-its-own-weight-common *sample-robot*))
+  (assert (test-torque-from-ext-force-common *sample-robot*)))
 
 (deftest test-cog-convergence-check
-  (assert (test-cog-convergence-check-common *robot*)))
+  (assert (test-cog-convergence-check-common *sample-robot*)))
 
 (deftest test-joint-for-mobile-robot
   (assert
@@ -399,7 +399,7 @@
       (> (deg2rad 1e-2) (elt ret 1))))))
 
 (deftest test-load-ik-fail-log-for-sample-robot
-  (assert (test-load-ik-fail-log-common *robot*)))
+  (assert (test-load-ik-fail-log-common *sample-robot*)))
 
 (deftest test-load-ik-fail-log-for-sample-multidof-joint-robot
   (assert (test-load-ik-fail-log-common *sarm-robot*)))
