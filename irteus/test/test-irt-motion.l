@@ -343,6 +343,21 @@
        (send robot :move-centroid-on-foot :both '(:rleg :lleg) :centroid-thre #f(10 10)))
   )
 
+;; test ik fail log
+(defun test-load-ik-fail-log-common
+  (robot)
+  (labels ((find-log-files
+            (log-directory)
+            (remove-if-not #'(lambda (x) (substringp (format nil "~A-" (send (class robot) :name)) x)) (directory log-directory))))
+    (let* ((log-directory (format nil "/tmp/irtmodel-ik-~A" (unix::getpid)))
+           (prev-log-files (find-log-files log-directory)))
+      (send robot :rarm :move-end-pos #f(10000 0 0) :world)
+      (let ((new-log-file ;; find latest log
+             (car (remove-if #'(lambda (x) (member x prev-log-files :test #'string=)) (find-log-files log-directory)))))
+        ;; ik log execution
+        (progn (load (format nil "~A/~A" log-directory new-log-file))(ik-setup)(ik-check))
+        t))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; unit tests
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -379,6 +394,9 @@
      (and
       (> 0.05 (elt ret 0))
       (> (deg2rad 1e-2) (elt ret 1))))))
+
+(deftest test-load-ik-fail-log
+  (assert (test-load-ik-fail-log-common *robot*)))
 
 (run-all-tests)
 (exit 0)
