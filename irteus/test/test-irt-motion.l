@@ -348,18 +348,48 @@
 
 ;; test ik fail log
 (defun test-load-ik-fail-log-common
-  (robot)
+  (robot ik-function)
   (labels ((find-log-files
             (log-directory)
             (remove-if-not #'(lambda (x) (substringp (format nil "~A-" (send (class robot) :name)) x)) (directory log-directory))))
     (let* ((log-directory (format nil "/tmp/irtmodel-ik-~A" (unix::getpid)))
            (prev-log-files (find-log-files log-directory)))
-      (send robot :rarm :move-end-pos #f(10000 0 0) :world)
+      (funcall ik-function robot)
       (let ((new-log-file ;; find latest log
              (car (remove-if #'(lambda (x) (member x prev-log-files :test #'string=)) (find-log-files log-directory)))))
         ;; ik log execution
-        (progn (load (format nil "~A/~A" log-directory new-log-file))(ik-setup)(ik-check))
+        (progn (load (format nil "~A/~A" log-directory new-log-file))(ik-setup)(null-output (ik-check)))
+        (unix:system (format nil "rm -f ~A/~A" log-directory new-log-file)) ;; clear log file
         t))))
+
+(defun test-load-ik-fail-log-rarm-ik-common
+  (robot)
+  (test-load-ik-fail-log-common
+   robot
+   #'(lambda (robot)
+       (send robot :newcoords (make-coords))
+       (send robot :rarm :move-end-pos #f(10000 0 0) :world :debug-view :no-message)))
+  )
+
+(defun test-load-ik-fail-log-assoc-ik-common
+  (robot)
+  (test-load-ik-fail-log-common
+   robot
+   #'(lambda (robot)
+       (send robot :newcoords (make-coords))
+       (send robot :reset-pose)
+       (let ((b (make-cylinder 10 250)))
+         (send b :move-coords (send robot :larm :end-coords) (send b :worldcoords))
+         (unless (or (null x::*display*) (= x::*display* 0))
+           (objects (list robot b)))
+         (let ((c (make-cascoords :pos (send b :transform-vector (float-vector 0 0 250)))))
+           (send b :assoc c)
+           (send (send robot :larm :end-coords :parent) :assoc b)
+           (send robot :larm :move-end-pos #f(10000 0 0) :world :rotation-axis nil :move-target c :debug-view :no-message)
+           (send (send robot :larm :end-coords :parent) :dissoc b)
+           (send b :dissoc c)
+           )))
+   ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; unit tests
@@ -398,11 +428,14 @@
       (> 0.05 (elt ret 0))
       (> (deg2rad 1e-2) (elt ret 1))))))
 
-(deftest test-load-ik-fail-log-for-sample-robot
-  (assert (test-load-ik-fail-log-common *sample-robot*)))
+(deftest test-load-ik-fail-log-rarm-ik-for-sample-robot
+  (assert (test-load-ik-fail-log-rarm-ik-common *sample-robot*)))
 
-(deftest test-load-ik-fail-log-for-sample-multidof-joint-robot
-  (assert (test-load-ik-fail-log-common *sarm-robot*)))
+(deftest test-load-ik-fail-log-rarm-ik-for-sample-multidof-joint-robot
+  (assert (test-load-ik-fail-log-rarm-ik-common *sarm-robot*)))
+
+(deftest test-load-ik-fail-log-assoc-ik-for-sample-robot
+  (assert (test-load-ik-fail-log-assoc-ik-common *sample-robot*)))
 
 (run-all-tests)
 (exit 0)
