@@ -371,6 +371,21 @@
        (send robot :rarm :move-end-pos #f(10000 0 0) :world :debug-view :no-message)))
   )
 
+(defun test-load-ik-fail-log-dual-arm-ik-common
+  (robot)
+  (test-load-ik-fail-log-common
+   robot
+   #'(lambda (robot)
+       (unless (or (null x::*display*) (= x::*display* 0))
+         (objects (list robot)))
+       (send robot :newcoords (make-coords))
+       (send robot :inverse-kinematics
+             (mapcar #'(lambda (x) (send (send robot x :end-coords :copy-worldcoords) :translate #f(10000 0 0) :world)) '(:rarm :larm))
+             :move-target (mapcar #'(lambda (x) (send robot x :end-coords)) '(:rarm :larm))
+             :link-list (mapcar #'(lambda (x) (send robot :link-list (send robot x :end-coords :parent))) '(:rarm :larm))
+             :debug-view :no-message)))
+  )
+
 (defun test-load-ik-fail-log-assoc-ik-common
   (robot)
   (test-load-ik-fail-log-common
@@ -436,6 +451,9 @@
 
 (deftest test-load-ik-fail-log-assoc-ik-for-sample-robot
   (assert (test-load-ik-fail-log-assoc-ik-common *sample-robot*)))
+
+(deftest test-load-ik-fail-log-dual-arm-ik-for-sample-robot
+  (assert (test-load-ik-fail-log-dual-arm-ik-common *sample-robot*)))
 
 (run-all-tests)
 (exit 0)

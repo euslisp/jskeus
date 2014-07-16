@@ -2041,10 +2041,23 @@
 	   (warn ";;  angles : ~a~%" av0)
 	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   (when dump-command
-	     (let (i (print-args (copy-list args)) command-init command-setup command-args)
-               (labels ((escape-string
+	     (let (i print-args command-init command-setup command-args)
+               (labels (;; escape functions to dump structure
+                        (escape-string ;; escape string like : "aa" => "\"aa\""
                          (name) ;; If string, escape it. Otherwise (=symbol), return original value.
                          (if (stringp name) (format nil "\"~A\"" name) name))
+                        (escape-list ;; escape list like : (a) => (list a)
+                         (lst idx)
+                         (when (consp (elt lst idx))
+                           (setf (elt lst idx) (append '(list) (elt lst idx))) ;; escape
+                           (dotimes (i (length (elt lst idx))) (escape-list (elt lst idx) i)))) ;; traverse list
+                        (escape-robot-link ;; escape link like : alink => (send r :link "alink-name")
+                         (lst idx)
+                         (when (and (derivedp (elt lst idx) bodyset-link) (send self :link (send (elt lst idx) :name))) ;; escape
+                           (setf (elt lst idx) `(send r :link ,(escape-string (send (elt lst idx) :name)))))
+                         (if (consp (elt lst idx))
+                             (dotimes (i (length (elt lst idx))) (escape-robot-link (elt lst idx) i)))) ;; traverse list
+                        ;; move target escaping
                         (transformation-list-until-links
                          (acoords)
                          (if (find (send acoords :parent) (send self :links))
@@ -2058,29 +2071,33 @@
                                                        (send (send p :copy-worldcoords) :transform (make-coords :4x4 ,(send (send (send (car move-target-transformation-list) :parent) :transformation
                                                                                                           (car (last move-target-transformation-list))) :4x4))))))
                               (send p :assoc mt)
-                              mt))))
-	       (dotimes (j (count :link-list print-args))
-		 (if (setq i (position :link-list print-args :count (1+ j)))
-		     (cond ((atom (car (elt print-args (+ i 1))))
-			    (setf (elt print-args (+ i 1)) (append '(list) (mapcar #'(lambda (x) `(send r :link ,(escape-string (send x :name)))) (elt print-args (+ i 1))))))
-			   (t
-			    (setf (elt print-args (+ i 1))
-				  (append '(list)
-					  (mapcar #'(lambda (y)
-						      (append '(list) (mapcar #'(lambda (x) `(send r :link ,(escape-string (send x :name)))) y)))
-						(elt print-args (+ i 1)))))))))
-	       (dotimes (j (count :move-target print-args))
+                              mt)))
+                        ;; make deep copy list instead of (copy-list lst)
+                        (deep-copy-list
+                         (lst)
+                         (mapcar #'(lambda (l)
+                                     (if (consp l) (deep-copy-list l) l))
+                                 lst)))
+               (setq print-args (deep-copy-list args)) ;; generate deep copy list for destructive operation
+               (dotimes (i (/ (length print-args) 2)) ;; escape list
+                 (unless (eq (elt print-args (* 2 i)) :move-target) ;; neglect :move-target because move-target is fixed later
+                   (escape-list print-args (+ 1 (* 2 i)))))
+               (dotimes (i (length print-args)) (escape-robot-link print-args i)) ;; escape robot link
+	       (dotimes (j (count :move-target print-args)) ;; escape move-target
 		 (if (setq i (position :move-target print-args :count (1+ j)))
 		     (cond ((atom (elt print-args (+ i 1)))
-			    (let ((x (elt print-args (+ i 1))))
-			      (setf (elt print-args (+ i 1)) (get-move-target-transform-list x))))
+                            (setf (elt print-args (+ i 1)) (get-move-target-transform-list (elt print-args (+ i 1)))))
 			   (t
 			    (setf (elt print-args (+ i 1))
 				  (append '(list)
 					  (mapcar #'(lambda (x) (get-move-target-transform-list x)) (elt print-args (+ i 1)))))))))
 	       (setq command-init `(instance ,(send (class self) :name) :init)
-		     command-setup `(progn  (send r :newcoords (make-coords :4x4 ,(send self :4x4))) (mapc #'(lambda (j a) (send* j :joint-angle a ,joint-args)) (list . ,(mapcar #'(lambda (x) `(send r ,(intern (string-upcase x) *keyword-package*))) (send-all (remove-duplicates (append (send-all union-link-list :joint) joint-list)) :name))) ,(list 'quote av0)) (objects (list r)))
-		     command-args (nconc `(list . ,(mapcar #'(lambda (x) `(make-coords :pos ,(send (if (functionp x) (funcall x) x) :worldpos) :rot ,(send (if (functionp x) (funcall x) x) :worldrot))) target-coords)) (list :dump-command nil :debug-view t) print-args))
+		     command-setup `(progn  (send r :newcoords (make-coords :4x4 ,(send self :4x4))) (mapc #'(lambda (j a) (send* j :joint-angle a ,joint-args)) (list . ,(mapcar #'(lambda (x) `(send r ,(intern (string-upcase x) *keyword-package*))) (send-all (remove-duplicates (append (send-all union-link-list :joint) joint-list)) :name))) ,(list 'quote av0)) (objects (list r))))
+               (setq command-args ;; append target-coords and print-args
+                     (append '(list)
+                             (list `(,@(mapcar #'(lambda (x) `(make-coords :pos ,(send (if (functionp x) (funcall x) x) :worldpos) :rot ,(send (if (functionp x) (funcall x) x) :worldrot))) target-coords)))
+                             (list :dump-command nil :debug-view t) print-args))
+               (setf (elt command-args 1) (append '(list) (elt command-args 1))) ;; escape target-coords list
                ) ;; labels
 	       (warn ";; command : ~a~%" `(let ((r ,command-init)) ,command-setup (send* r :inverse-kinematics ,command-args)))
 	       (warn ";; dump debug command to ~A~%" command-filename)
