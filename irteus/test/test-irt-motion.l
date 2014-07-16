@@ -359,6 +359,7 @@
              (car (remove-if #'(lambda (x) (member x prev-log-files :test #'string=)) (find-log-files log-directory)))))
         ;; ik log execution
         (progn (load (format nil "~A/~A" log-directory new-log-file))(ik-setup)(null-output (ik-check)))
+        (unix:system (format nil "rm -f ~A/~A" log-directory new-log-file)) ;; clear log file
         t))))
 
 (defun test-load-ik-fail-log-rarm-ik-common
