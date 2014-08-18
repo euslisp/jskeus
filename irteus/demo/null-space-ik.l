@@ -46,9 +46,14 @@
      (send *robot* :rarm :inverse-kinematics right-target-coords
 	   :collision-avoidance-link-pair (list (list (send *robot* :rarm :elbow-p :child-link) *box*))
 	   :avoid-collision-joint-gain 1.0 ;; 1.0
-	   :avoid-collision-null-gain  100 ;; 1.0
+	   :avoid-collision-null-gain  200 ;; 1.0
 	   :rotation-axis :z;; t
 	   :debug-view :no-message
+           ;; you can set optional ik convergence check by additional-check function
+           :additional-check #'(lambda ()
+                                 ;; calculate :inverse-kinematics-loop until collision distance becomes large enough. (> 80mm, in this case)
+                                 (let ((dist (car (pqp-collision-distance (send *robot* :rarm :elbow-p :child-link) *box*))))
+                                   (> dist 80)))
 	   )
      (send *box* :translate (float-vector 0 0 (* 7 (sin tm))))
      (incf tm 0.1)
