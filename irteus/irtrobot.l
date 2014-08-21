@@ -284,7 +284,6 @@
     &allow-other-keys)
     look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords
     link-list is set by default based on move-target -> root link link-list"
-   (if (atom target-coords) (setq target-coords (list target-coords)))
    (prog1
        (send-super* :inverse-kinematics target-coords
                     :move-target move-target :link-list link-list args)

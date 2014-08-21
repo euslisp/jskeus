@@ -1949,20 +1949,45 @@
 	 (push :no-clear debug-view))
        (when (memq :no-flush debug-view)
 	 (push :no-flush debug-view)))
-     (if (atom (car link-list)) (setq link-list (list link-list)))
-     (if (atom move-target) (setq move-target (list move-target)))
-     (if (atom target-coords) (setq target-coords (list target-coords)))
-     (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
-     (if (atom translation-axis) (setq translation-axis (list translation-axis)))
-     (if (atom thre) (setq thre (list thre)))
-     (if (atom rthre) (setq rthre (list rthre)))
      ;; argument check
-     (unless (= (length translation-axis) (length rotation-axis)
-                (length move-target) (length link-list) (length target-coords))
-       (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A target-coords ~A~%"
-             (length translation-axis) (length rotation-axis)
-             (length move-target) (length link-list) (length target-coords))
-       (return-from :inverse-kinematics t))
+     (let* ((tmp-al (list (car link-list) move-target
+                          rotation-axis translation-axis
+                          thre rthre
+                          target-coords))
+            (atom-num (count-if #'atom tmp-al)))
+       (cond ((= atom-num (length tmp-al))
+              (setq link-list (list link-list)
+                    move-target (list move-target)
+                    rotation-axis (list rotation-axis)
+                    translation-axis (list translation-axis)
+                    thre (list thre)
+                    rthre (list rthre)
+                    target-coords (list target-coords)))
+             ((> atom-num 0)
+              (error ";; ERROR: mixing atom and list : (car link-list) ~A move-target ~A rotation-axis ~A translation-axis ~A thre ~A rthre ~A target-coords ~A~%"
+                     (car link-list) move-target
+                     rotation-axis translation-axis
+                     thre rthre
+                     target-coords))))
+     (unless (= (length link-list) (length move-target)
+                (length rotation-axis) (length translation-axis)
+                (length thre) (length rthre)
+                (length target-coords))
+       (error ";; ERROR: list length differ : link-list ~A move-target ~A rotation-axis ~A translation-axis ~A thre ~A rthre ~A target-coords ~A~%"
+              (length link-list) (lenth move-target)
+              (length rotation-axis) (length translation-axis)
+              (length thre) (length rthre)
+              (length target-coords)))
+     (unless (zerop (count-if #'(lambda (x) (and (listp x) (not (null x))))
+                              (append move-target
+                                      rotation-axis translation-axis
+                                      thre rthre
+                                      target-coords)))
+       (error ";; ERROR: list element contain list : move-target ~A rotation-axis ~A translation-axis ~A thre ~A rthre ~A target-coords ~A~%"
+              move-target
+              rotation-axis translation-axis
+              thre rthre
+              target-coords))
      (setq ik-args (nconc (send* self :inverse-kinematics-args
 				      :translation-axis translation-axis
 				      :rotation-axis rotation-axis
