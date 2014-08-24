@@ -1751,7 +1751,14 @@
     union-link-list
     target-coords                 ;required for debug-view
     (jacobi)
-    (additional-check) ;; to add optional convergence conditions
+    ;; :additional-check
+    ;;   This argument is to add optional best-effort convergence conditions.
+    ;;   ":additional-check" should be function or lambda.
+    ;;   best-effort => In :inverse-kinematics-loop, "success" is overwritten by "(and success additional-check)"
+    ;;                  In :inverse-kinematics, "success" is not overwritten.
+    ;;                  So, :inverse-kinematics-loop wait until ":additional-check" becomes "t" as possible,
+    ;;                  but ":additional-check" is neglected in the final :inverse-kinematics return.
+    (additional-check)
     (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
     debug-view ik-args
     &allow-other-keys)
