@@ -40,14 +40,14 @@
    (setq joint-list
          (mapcar
           #'(lambda
-              (pl cl ax)
+              (pl cl ax jc)
               (send pl :assoc cl)
-              (instance joint-class :init
+              (instance jc :init
                         :parent-link pl
                         :child-link cl
                         :max-joint-torque 10
                         :axis ax))
-          (butlast links) (cdr links) axis-order))
+          (butlast links) (cdr links) axis-order joint-class-list))
    (mapcar #'(lambda (x) (send x :name (format nil "link~A" (position x links)))) links)
    (mapcar #'(lambda (x) (send x :name (format nil "joint~A" (position x joint-list)))) joint-list)
    (dolist (j (send self :joint-list))
