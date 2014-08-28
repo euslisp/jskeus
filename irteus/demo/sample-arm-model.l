@@ -294,7 +294,7 @@
   b))
 
 (defclass sarmclass 
-  :super cascaded-link
+  :super robot-model
   :slots (end-coords
 	  ;;jointx jointy jointz
 	  joint0 joint1 joint2 joint3 joint4 joint5

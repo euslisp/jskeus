@@ -1,5 +1,5 @@
 (defclass sample-hand
-  :super cascaded-link
+  :super robot-model
   :slots (thumb-end-coords middle-end-coords index-end-coords
                            j00 j01 j10 j11 j20 j21 j22))
 (defmethod sample-hand
