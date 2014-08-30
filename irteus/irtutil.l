@@ -176,7 +176,7 @@
     ))
 
 (defun format-array (arr &optional (header "") (in 7) (fl 3) (strm *error-output*) (use-line-break t))
-  "arr &optional (header \"\") (in 7) (fl 3) (strm *error-output*);; for format-print array"
+  "print formatted array"
   (let* ((val-format (case (send arr :element-type)
                            (:integer (format nil "~~~dd " in))
                            (:float (format nil "~~~d,~df " in fl))))
@@ -205,10 +205,10 @@
 
 ;; color utils
 (defun his2rgb (h &optional i s ret)
-  "(his2rgb h i s) ;; 0 <= h <= 360, 0.0 <= i <= 1.0, 0.0 <= s <= 1.0"
+  "convert his to rgb (0 <= h <= 360, 0.0 <= i <= 1.0, 0.0 <= s <= 1.0)"
   (hvs2rgb h i s ret))
 (defun hvs2rgb (h &optional i s ret)
-  "(hsv2rgb h i s) ;; 0 <= h <= 360, 0.0 <= i <= 1.0, 0.0 <= s <= 1.0"
+  "convert hvs to rgb (0 <= h <= 360, 0.0 <= i <= 1.0, 0.0 <= s <= 1.0)"
   (when (or (listp h) (vectorp h))
     (setq ret i)
     (setq s (elt h 2) i (elt h 1) h (elt h 0)))
@@ -238,10 +238,10 @@
      (t (list r g b)))))
 
 (defun rgb2his (r &optional g b ret)
-  "(rgb2his r g b) ;; 0 <= r,g,b <= 255"
+  "convert rgb to his (0 <= r,g,b <= 255)"
   (rgb2hvs r g b ret))
 (defun rgb2hvs (r &optional g b ret)
-  "(rgb2hvs r g b) ;; 0 <= r,g,b <= 255"
+  "convert rt to hvs (0 <= r,g,b <= 255)"
   (when (or (listp r) (vectorp r))
     (setq ret g)
     (setq g (elt r 1) b (elt r 2) r (elt r 0))
