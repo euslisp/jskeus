@@ -84,5 +84,21 @@
     (assert (eps-v= a b) "rotate-vector")
     ))
 
+(deftest reader
+  (let (a f i a2 f2 i2)
+    (setq a #a(1 2 3))
+    (setq f #f(1 2 3))
+    (setq i #i(1 2 3))
+    (setq a2 #2a((0 1)(2 3)))
+    (setq f2 #2f((0 1)(2 3)))
+    (setq i2 #2i((0 1)(2 3)))
+    (setq a (make-array (list 2)))
+    (setq i (make-array (list 2) :element-type :integer))
+    (setq f (make-array (list 2) :element-type :float))
+    (setq a2 (make-array (list 2 2)))
+    (setq i2 (make-array (list 2 2) :element-type :integer))
+    (setq f2 (make-array (list 2 2) :element-type :float))
+    ))
+
 (run-all-tests)
 (exit)
