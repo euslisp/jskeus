@@ -83,3 +83,6 @@ clean:
 wipe: clean
 	-rm -fr eus irteus
 
+
+doc:
+	cd doc; make
