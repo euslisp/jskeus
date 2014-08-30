@@ -9,13 +9,15 @@ notifications:
       - euslisp@jsk.t.u-tokyo.ac.jp
     on_success: always #[always|never|change] # default: change
     on_failure: always #[always|never|change] # default: always
+env:
+  - secure: "u0lUaQ+BR5IH2bJNmGPZ8Yp5/iroJiHNkADN6lvMMqS9FQc8kcEe74UgsTjMdteQXRsDTtJVmwB7UFB83bwwcKoVYwrGAdOfBkWM702hTgmEIqKTkBkaVyUjkzR/VrnVCHCLhQMysAuHQyPrEPjLlvmKiJJ/OYfRg2QCd74ef1I="
 before_install: # Use this to prepare the system to install prerequisites or dependencies
   # Define some config vars
   - export CI_SOURCE_PATH=$(pwd)
   - export REPOSITORY_NAME=${PWD##*/}
   - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
   - sudo apt-get update -qq
-  - sudo apt-get install -qq -y subversion gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi msttcorefonts
+  - sudo apt-get install -qq -y subversion gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi msttcorefonts texlive-latex-base ptex-bin latex2html nkf poppler-utils
 install: # Use this to install any prerequisites or dependencies necessary to run your build
   - cd ${HOME}
   - ln -s $CI_SOURCE_PATH jskeus
@@ -24,6 +26,26 @@ script: # All commands must exit with code 0 on success. Anything else is consid
   - make
   - source bashrc.eus
   - find irteus/test -iname "*.l" | grep -v unittest.l | xargs -n1 irteusgl
+after_success:
+  - export GIT_COMMITTER_NAME=$GIT_NAME
+  - export GIT_COMMITTER_EMAIL=$GIT_EMAIL
+  - export GIT_AUTHOR_NAME=$GIT_NAME
+  - export GIT_AUTHOR_EMAIL=$GIT_EMAIL
+  - (cd doc/; pdftotext jmanual.pdf; mv jmanual.txt jmanual.txt.old; make; pdftotext jmanual.pdf)
+  - (cd doc/; make html)
+  - cd doc
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then diff jmanual.txt jmanual.txt.old || (git add -f *.pdf *.dvi; git commit -m "add documents for $TRAVIS_COMMIT"); fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then git checkout master;      fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then git merge HEAD@{1};       fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then git push --quiet https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git master; fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then cd ~/;    fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then git clone --branch gh-pages https://github.com/$TRAVIS_REPO_SLUG doc;     fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then cd doc;   fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then git reset --hard bb420562a8d224491784081ed51536d0e9aaf072
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then cp -r ~/jskeus/doc/html/* ./;     fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then git add -f .;                     fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then git commit -m "Build documents from $TRAVIS_COMMIT" . ;   fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then git push -f --quiet https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git gh-pages; fi
 after_failure:
   - echo "failure"
 
