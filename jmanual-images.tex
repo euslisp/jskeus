@@ -1,0 +1,2788 @@
+\batchmode
+
+
+\documentclass{article}
+\RequirePackage{ifthen}
+
+
+\usepackage{makeidx,mytabbing,fancyheadings}
+
+
+\usepackage[dvipdfm]{graphicx,color,epsfig}
+\let\epsfile=\epsfig{\AtBeginDvi}{\special{pdf:tounicode 90ms-RKSJ-UCS2}}\fi
+
+%
+\providecommand{\eusversion}{9.00}%
+\providecommand{\irteusversion}{1.00} 
+
+
+\flushbottom
+\makeindex
+\pagestyle{myheadings}
+\oddsidemargin=0cm
+\evensidemargin=0cm
+
+
+\textwidth=16.5cm
+\textheight=24.6cm
+\topmargin=-0.8cm
+\oddsidemargin= 0.5cm
+\evensidemargin=0.5cm
+
+
+\parindent=10pt
+\parskip=1mm
+
+
+\setcounter{totalnumber}{3}
+%
+\renewcommand{\topfraction}{0.99}       % 85% of a page (from page
+                                        %
+\renewcommand{\bottomfraction}{0.99}    % 85% of a page (from page
+                                        %
+\renewcommand{\textfraction}{0.0}      % text shoud occupy 15% or
+                                        
+
+\usepackage{amsmath,amssymb}
+\usepackage{cases}%
+\providecommand{\labfig}[1]{\label{fig:#1}}%
+\providecommand{\labtab}[1]{\label{tab:#1}}%
+\providecommand{\labeq}[1]{\label{eq:#1}}%
+\providecommand{\labsec}[1]{\label{sec:#1}}%
+\providecommand{\labchap}[1]{\label{chap:#1}}%
+\providecommand{\labitem}[1]{\label{item:#1}}%
+\providecommand{\figlab}[1]{\label{fig:#1}}  % alias%
+\providecommand{\tablab}[1]{\label{tab:#1}}  % alias%
+\providecommand{\eqlab}[1]{\label{eq:#1}}  % alias%
+\providecommand{\eqlabel}[1]{\label{eq:#1}}  % alias%
+\providecommand{\equlab}[1]{\label{eq:#1}}  % alias%
+\providecommand{\reffig}[1]{{Fig.\ref{fig:#1}}~}%
+\providecommand{\reftab}[1]{{Table~\ref{tab:#1}}~}%
+\providecommand{\refeq}[1]{{Equation~\ref{eq:#1}}~}%
+\providecommand{\refchap}[1]{第\ref{chap:#1}章}%
+\providecommand{\refitem}[1]{\ref{item:#1}}%
+\providecommand{\refsec}[1]{第\ref{seq:#1}節}%
+\providecommand{\figref}[1]{{Fig.\ref{fig:#1}}~}  % alias%
+\providecommand{\tabref}[1]{{Table~\ref{tab:#1}}~}  % alias
+%
+\renewcommand{\eqref}[1]{{Equation~\ref{eq:#1}}~} % alias%
+\providecommand{\chapref}[1]{第\ref{chap:#1}章}  % alias%
+\providecommand{\secref}[1]{第\ref{seq:#1}節}  % alias%
+\providecommand{\bm}[1]{\mbox{\boldmath{$#1$}}} 
+\makeatletter%
+\providecommand{\footnoteref}[1]{\protected@xdef\@thefnmark{\ref{#1}}\@footnotemark} 
+\makeatother
+
+
+
+
+
+\pagecolor[gray]{.7}
+
+\usepackage[]{inputenc}
+
+
+
+\makeatletter
+
+\makeatletter
+\count@=\the\catcode`\_ \catcode`\_=8 
+\newenvironment{tex2html_wrap}{}{}%
+\catcode`\<=12\catcode`\_=\count@
+\newcommand{\providedcommand}[1]{\expandafter\providecommand\csname #1\endcsname}%
+\newcommand{\renewedcommand}[1]{\expandafter\providecommand\csname #1\endcsname{}%
+  \expandafter\renewcommand\csname #1\endcsname}%
+\newcommand{\newedenvironment}[1]{\newenvironment{#1}{}{}\renewenvironment{#1}}%
+\let\newedcommand\renewedcommand
+\let\renewedenvironment\newedenvironment
+\makeatother
+\let\mathon=$
+\let\mathoff=$
+\ifx\AtBeginDocument\undefined \newcommand{\AtBeginDocument}[1]{}\fi
+\newbox\sizebox
+\setlength{\hoffset}{0pt}\setlength{\voffset}{0pt}
+\addtolength{\textheight}{\footskip}\setlength{\footskip}{0pt}
+\addtolength{\textheight}{\topmargin}\setlength{\topmargin}{0pt}
+\addtolength{\textheight}{\headheight}\setlength{\headheight}{0pt}
+\addtolength{\textheight}{\headsep}\setlength{\headsep}{0pt}
+\setlength{\textwidth}{349pt}
+\newwrite\lthtmlwrite
+\makeatletter
+\let\realnormalsize=\normalsize
+\global\topskip=2sp
+\def\preveqno{}\let\real@float=\@float \let\realend@float=\end@float
+\def\@float{\let\@savefreelist\@freelist\real@float}
+\def\liih@math{\ifmmode$\else\bad@math\fi}
+\def\end@float{\realend@float\global\let\@freelist\@savefreelist}
+\let\real@dbflt=\@dbflt \let\end@dblfloat=\end@float
+\let\@largefloatcheck=\relax
+\let\if@boxedmulticols=\iftrue
+\def\@dbflt{\let\@savefreelist\@freelist\real@dbflt}
+\def\adjustnormalsize{\def\normalsize{\mathsurround=0pt \realnormalsize
+ \parindent=0pt\abovedisplayskip=0pt\belowdisplayskip=0pt}%
+ \def\phantompar{\csname par\endcsname}\normalsize}%
+\def\lthtmltypeout#1{{\let\protect\string \immediate\write\lthtmlwrite{#1}}}%
+\newcommand\lthtmlhboxmathA{\adjustnormalsize\setbox\sizebox=\hbox\bgroup\kern.05em }%
+\newcommand\lthtmlhboxmathB{\adjustnormalsize\setbox\sizebox=\hbox to\hsize\bgroup\hfill }%
+\newcommand\lthtmlvboxmathA{\adjustnormalsize\setbox\sizebox=\vbox\bgroup %
+ \let\ifinner=\iffalse \let\)\liih@math }%
+\newcommand\lthtmlboxmathZ{\@next\next\@currlist{}{\def\next{\voidb@x}}%
+ \expandafter\box\next\egroup}%
+\newcommand\lthtmlmathtype[1]{\gdef\lthtmlmathenv{#1}}%
+\newcommand\lthtmllogmath{\dimen0\ht\sizebox \advance\dimen0\dp\sizebox
+  \ifdim\dimen0>.95\vsize
+   \lthtmltypeout{%
+*** image for \lthtmlmathenv\space is too tall at \the\dimen0, reducing to .95 vsize ***}%
+   \ht\sizebox.95\vsize \dp\sizebox\z@ \fi
+  \lthtmltypeout{l2hSize %
+:\lthtmlmathenv:\the\ht\sizebox::\the\dp\sizebox::\the\wd\sizebox.\preveqno}}%
+\newcommand\lthtmlfigureA[1]{\let\@savefreelist\@freelist
+       \lthtmlmathtype{#1}\lthtmlvboxmathA}%
+\newcommand\lthtmlpictureA{\bgroup\catcode`\_=8 \lthtmlpictureB}%
+\newcommand\lthtmlpictureB[1]{\lthtmlmathtype{#1}\egroup
+       \let\@savefreelist\@freelist \lthtmlhboxmathB}%
+\newcommand\lthtmlpictureZ[1]{\hfill\lthtmlfigureZ}%
+\newcommand\lthtmlfigureZ{\lthtmlboxmathZ\lthtmllogmath\copy\sizebox
+       \global\let\@freelist\@savefreelist}%
+\newcommand\lthtmldisplayA{\bgroup\catcode`\_=8 \lthtmldisplayAi}%
+\newcommand\lthtmldisplayAi[1]{\lthtmlmathtype{#1}\egroup\lthtmlvboxmathA}%
+\newcommand\lthtmldisplayB[1]{\edef\preveqno{(\theequation)}%
+  \lthtmldisplayA{#1}\let\@eqnnum\relax}%
+\newcommand\lthtmldisplayZ{\lthtmlboxmathZ\lthtmllogmath\lthtmlsetmath}%
+\newcommand\lthtmlinlinemathA{\bgroup\catcode`\_=8 \lthtmlinlinemathB}
+\newcommand\lthtmlinlinemathB[1]{\lthtmlmathtype{#1}\egroup\lthtmlhboxmathA
+  \vrule height1.5ex width0pt }%
+\newcommand\lthtmlinlineA{\bgroup\catcode`\_=8 \lthtmlinlineB}%
+\newcommand\lthtmlinlineB[1]{\lthtmlmathtype{#1}\egroup\lthtmlhboxmathA}%
+\newcommand\lthtmlinlineZ{\egroup\expandafter\ifdim\dp\sizebox>0pt %
+  \expandafter\centerinlinemath\fi\lthtmllogmath\lthtmlsetinline}
+\newcommand\lthtmlinlinemathZ{\egroup\expandafter\ifdim\dp\sizebox>0pt %
+  \expandafter\centerinlinemath\fi\lthtmllogmath\lthtmlsetmath}
+\newcommand\lthtmlindisplaymathZ{\egroup %
+  \centerinlinemath\lthtmllogmath\lthtmlsetmath}
+\def\lthtmlsetinline{\hbox{\vrule width.1em \vtop{\vbox{%
+  \kern.1em\copy\sizebox}\ifdim\dp\sizebox>0pt\kern.1em\else\kern.3pt\fi
+  \ifdim\hsize>\wd\sizebox \hrule depth1pt\fi}}}
+\def\lthtmlsetmath{\hbox{\vrule width.1em\kern-.05em\vtop{\vbox{%
+  \kern.1em\kern0.8 pt\hbox{\hglue.17em\copy\sizebox\hglue0.8 pt}}\kern.3pt%
+  \ifdim\dp\sizebox>0pt\kern.1em\fi \kern0.8 pt%
+  \ifdim\hsize>\wd\sizebox \hrule depth1pt\fi}}}
+\def\centerinlinemath{%
+  \dimen1=\ifdim\ht\sizebox<\dp\sizebox \dp\sizebox\else\ht\sizebox\fi
+  \advance\dimen1by.5pt \vrule width0pt height\dimen1 depth\dimen1 
+ \dp\sizebox=\dimen1\ht\sizebox=\dimen1\relax}
+
+\def\lthtmlcheckvsize{\ifdim\ht\sizebox<\vsize 
+  \ifdim\wd\sizebox<\hsize\expandafter\hfill\fi \expandafter\vfill
+  \else\expandafter\vss\fi}%
+\providecommand{\selectlanguage}[1]{}%
+\makeatletter \tracingstats = 1 
+\providecommand{\Beta}{\textrm{B}}
+\providecommand{\Mu}{\textrm{M}}
+\providecommand{\Kappa}{\textrm{K}}
+\providecommand{\Rho}{\textrm{R}}
+\providecommand{\Epsilon}{\textrm{E}}
+\providecommand{\Chi}{\textrm{X}}
+\providecommand{\Iota}{\textrm{J}}
+\providecommand{\omicron}{\textrm{o}}
+\providecommand{\Zeta}{\textrm{Z}}
+\providecommand{\Eta}{\textrm{H}}
+\providecommand{\Nu}{\textrm{N}}
+\providecommand{\Omicron}{\textrm{O}}
+\providecommand{\Tau}{\textrm{T}}
+\providecommand{\Alpha}{\textrm{A}}
+
+
+\begin{document}
+\pagestyle{empty}\thispagestyle{empty}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength hsize=\the\hsize}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength vsize=\the\vsize}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength hoffset=\the\hoffset}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength voffset=\the\voffset}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength topmargin=\the\topmargin}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength topskip=\the\topskip}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength headheight=\the\headheight}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength headsep=\the\headsep}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength parskip=\the\parskip}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength oddsidemargin=\the\oddsidemargin}\lthtmltypeout{}%
+\makeatletter
+\if@twoside\lthtmltypeout{latex2htmlLength evensidemargin=\the\evensidemargin}%
+\else\lthtmltypeout{latex2htmlLength evensidemargin=\the\oddsidemargin}\fi%
+\lthtmltypeout{}%
+\makeatother
+\setcounter{page}{1}
+\onecolumn
+
+% !!! IMAGES START HERE !!!
+
+{\newpage\clearpage
+\lthtmlpictureA{tex2html_wrap532}%
+\epsfig{\AtBeginDvi}%
+\lthtmlpictureZ
+\lthtmlcheckvsize\clearpage}
+
+\setcounter{totalnumber}{3}
+
+%
+\providecommand{\ptext}[1]{\tt \begin{quote} \begin{tabbing} #1 \end{tabbing} \end{quote} \rm}%
+
+
+%
+\providecommand{\desclist}[1]{
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item #1
+\end{list}
+\vspace{3mm}}%
+
+
+%
+\providecommand{\functiondescription}[4]{
+
+{\bf #1} \em #2 \rm \hfill [#3] 
+
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item \hspace{0mm}#4
+\end{list}
+\vspace{3mm}
+}%
+
+
+%
+\providecommand{\bfx}[1]{{\bf #1}}%
+
+
+%
+\providecommand{\emx}[1]{{\em #1}}%
+
+
+%
+\providecommand{\longdescription}[3]{
+
+\begin{emtabbing}
+{\bf #1} 
+\it #2
+\rm
+\end{emtabbing}
+
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item #3
+\end{list}
+\vspace{3mm}
+}%
+
+
+%
+\providecommand{\funcdesc}[3]{
+
+{\bf #1} \em #2 \rm \hfill [関数] 
+
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item \hspace{0mm}#3
+\end{list}
+\vspace{3mm}
+}%
+
+
+%
+\providecommand{\macrodesc}[3]{
+
+{\bf #1} \em #2 \rm \hfill [マクロ] 
+
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item \hspace{0mm}#3
+\end{list}
+\vspace{3mm}
+}%
+
+
+%
+\providecommand{\specialdesc}[3]{
+
+{\bf #1} \em #2 \rm \hfill [特殊] 
+
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item \hspace{0mm}#3
+\end{list}
+\vspace{3mm}
+}%
+
+
+%
+\providecommand{\methoddesc}[3]{
+
+{\bf #1} \em #2 \rm \hfill [メソッド] 
+
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item \hspace{0mm}#3
+\end{list}
+\vspace{3mm}
+}%
+
+
+%
+\providecommand{\vardesc}[2]{
+
+{\bf #1} \em  \rm \hfill [変数] 
+
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item \hspace{0mm}#2
+\end{list}
+\vspace{3mm}
+}%
+
+
+%
+\providecommand{\fundesc}[2]{
+
+{\bf #1} \em #2 \rm \hfill [関数] 
+
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item \hspace{0mm}\hspace{0mm}
+\end{list}
+\vspace{3mm}
+}%
+
+
+%
+\providecommand{\macdesc}[2]{
+
+{\bf #1} \em #2 \rm \hfill [マクロ] 
+
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item \hspace{0mm}\hspace{0mm}
+\end{list}
+\vspace{3mm}
+}%
+
+
+%
+\providecommand{\spedesc}[2]{
+
+{\bf #1} \em #2 \rm \hfill [特殊] 
+
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item \hspace{0mm}\hspace{0mm}
+\end{list}
+\vspace{3mm}
+}%
+
+
+%
+\providecommand{\metdesc}[2]{
+
+{\bf #1} \em #2 \rm \hfill [メソッド] 
+
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item \hspace{0mm}\hspace{0mm}
+\end{list}
+\vspace{3mm}
+}%
+
+
+%
+\providecommand{\constdesc}[2]{
+
+{\bf #1} \em  \rm \hfill [定数] 
+
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item \hspace{0mm}#2
+\end{list}
+\vspace{3mm}
+}%
+
+
+%
+\providecommand{\classdesc}[4]{	%class, super slots description
+\vspace{2mm} 
+
+{\Large {\bf #1 }} \hfill [クラス]  %super
+\begin{tabbing}
+\hspace{30mm} :super \hspace{5mm} \= {\bf #2} \\
+\hspace{30mm} :slots \> #3 
+\end{tabbing}
+\vspace{4mm}
+
+\begin{list}{ }{\setlength{\rightmargin}{0mm}\topsep=0mm\partopsep=0mm}
+\item #4
+\end{list}
+\vspace{3mm}}%
+
+
+
+\newedenvironment{refdesc}{
+ \vspace{5mm} \parindent=0mm \topsep=0mm \parskip=0mm \leftmargin=10mm}{
+             \parindent=10mm \topsep=3mm \parskip=1mm \leftmargin=0mm }%
+
+\stepcounter{part}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\setcounter{enumi}{3}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure763}%
+\begin{figure}\epsfile{file=fig/eta3colavo.ps,width=150mm}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{section}
+{\newpage\clearpage
+\lthtmlfigureA{figure886}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/pointer.ps}
+\end{center}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67512}%
+$ -$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure898}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/object.ps}
+\end{center}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure917}%
+\begin{figure}\small
+\begin{verbatim}
+
+object
+     cons
+     propertied-object
+          symbol   -----  foreign-pod
+          package
+          stream
+               file-stream
+               broadcast-stream
+          io-stream ---- socket-stream
+          metaclass
+               vectorclass
+                    cstructclass
+          read-table
+          array
+          thread
+          barrier-synch
+          synch-memory-port
+          coordinates
+               cascaded-coords
+                    body
+                    sphere
+                    viewing
+                         projection
+                              viewing2d
+                              parallel-viewing
+                              perspective-viewing
+                    coordinates-axes
+               viewport
+          line --- edge --- winged-edge
+          plane
+               polygon
+                    face
+                    hole
+               semi-space
+          viewer
+          viewsurface  ----- tektro-viewsurface
+     compiled-code
+          foreign-code
+          closure
+          load-module
+     label-reference
+     vector
+          float-vector
+          integer-vector
+          string
+               socket-address
+               cstruct
+          bit-vector
+          foreign-string
+     socket-port
+     pathname
+     hash-table
+     surrounding-box
+     stereo-viewing\end{verbatim}
+
+\normalsize
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67562}%
+$ |$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing3962}%
+\begin{emtabbing}
+{\bf defclass} 
+\it classname \&key \= :super object \` [マクロ] \\
+\> :slots (\{var $|$\  (var [:type type] [:forward selectors])\}*) \\
+\> :metaclass metaclass \\
+\> :element-type t \\
+\> :size -1\\
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67671}%
+$ <$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{section}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67700}%
+$ \epsilon$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67702}%
+$ 2^{-21}= 4.768368 \times 10^{-7}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67705}%
+$ 2^{-21}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67711}%
+$ \pi$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67714}%
+$ 2\times \pi$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67717}%
+$ \pi/2$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67721}%
+$ -2\times \pi$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67724}%
+$ -\pi/2$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67738}%
+$ >$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67748}%
+$ >=$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67753}%
+$ <=$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67760}%
+$ integer-1$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67763}%
+$ integer+1$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67777}%
+$ \vert$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67804}%
+$ \sin(theta)$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67807}%
+$ \cos(theta)$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67810}%
+$ \tan(theta)$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67813}%
+$ \frac{e^{x}-e^{-x}}{2}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67816}%
+$ \frac{e^{x}+e^{-x}}{2}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67819}%
+$ \frac{e^{x}+e^{-x}}{e^{x}-e^{-x}}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67824}%
+$ (y/x)$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67832}%
+$ e^{x}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{section}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67842}%
+$ \backslash$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67844}%
+$ |...|$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline67909}%
+$ N=0,1,\cdots$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing11467}%
+\begin{emtabbing}
+{\bf make-array} 
+\it
+dims \&key \= (:element-type vector) \` [関数] \\
+\> (:initial-contents nil) \\
+\> (:initial-element nil) \\
+\> (:fill-pointer nil)  \\
+\> (:displaced-to nil) \\
+\> (:displaced-index-offset 0) \\
+\> (:adjustable nil)
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing15143}%
+\begin{emtabbing}
+{\bf open} 
+\it path \&key \= :direction :input \` [関数]\\
+\> :if-exists :new-version \\
+ \> :if-does-not-exist \\
+ \> :permission \#o644 \\
+ \> :buffer-size 512\\
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68144}%
+$ |g:pcube|$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68220}%
+$ \sim$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing18480}%
+\begin{emtabbing}
+{\bf compile-file} 
+\it srcfile \&key \= (:verbose nil) \hspace{43mm} \=
+\` [関数]\\
+\> (:optimize 2) (:c-optimize 1) (:safety 1) \> {\rm ;optimization level} \\
+\> (:pic t)  \> {\rm ;generate position independ-} \\
+\>\>{ \rm ent code to build library} \\
+\> (:cc t) \> {\rm ; run c compiler} \\
+\> (:entry (pathname-name file)) \\
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing18555}%
+\begin{emtabbing}
+{\bf load} 
+\it fname \&key \= :verbose \hspace{20mm} \= *load-verbose* \` [関数]\\
+ \> :package \>  *package* \\
+ \> :entry  \>  (pathname-name fname) \\
+ \> :symbol-input  \> "/usr/local/bin/eus" \\
+ \> :symbol-output \> "a.out" \\
+ \> :ld-option \> ""
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing18649}%
+\begin{emtabbing}
+{\bf system:binload} 
+\it opath qpath \&optional \=
+(entry (pathname-name opath)) \` [関数]\\
+\> (symfile "/usr/local/bin/eus")  \\
+\> (symout "a.out") \\
+\> (ldopt "")\\
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{part}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68422}%
+$ which=0$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68424}%
+$ which=1$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68426}%
+$ which=2$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+
+
+\setlength{\itemsep}{0cm}%
+
+\setlength{\itemsep}{0cm}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing24943}%
+\begin{emtabbing}
+{\bf connect-vxw} 
+\it\&key \= (:host "asvx0") \` [関数] \\
+\> (:port 2200)\\
+\> (:buffer-size 16384)\\
+\> (:priority 1280)\\
+\> (:option \#x1c)
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure25144}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/threadfig.ps,width=130mm}
+\end{center}
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure25156}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/parathreads.ps,width=120mm}
+\end{center}
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure25167}%
+\begin{figure}\begin{center}
+\begin{tabular}{c c}
+\epsfile{file=fig/threadobj.ps,width=7.5cm} &
+\epsfile{file=fig/threadpool.ps,width=7.5cm} \\
+\end{tabular}
+\end{center}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure25184}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/synchports.ps,width=130mm}
+
+\end{center}
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68662}%
+$ \Vert fltvec\Vert$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68665}%
+$ \Vert fltvec\Vert^2$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68669}%
+$ |fltvec-fltvec2|$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68672}%
+$ |fltvec-fltvec2|^2$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68679}%
+$ p:(1-p)$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68681}%
+$ (1-p)\cdot p1 + p\cdot p2$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68687}%
+$ rowsize \times columnsize$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68695}%
+$ \times$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing27759}%
+\begin{emtabbing}
+{\bf :init} 
+\it\&key \= :pos \hspace{8mm} \= \#f(0 0 0)
+ \` [メソッド] \\
+\> :rot \> \#2f((1 0 0) (0 1 0) (0 0 1)) \\
+ \> :rpy \> roll pitch yaw \\
+ \> :Euler \> az ay az2 \\
+ \> :axis \>  rotation-axis \\
+ \> :angle \> rotation-angle \\
+ \> :4X4   \> 4x4 matrix \\
+ \> :coords \> another coordinates \\
+ \> :properties \>  a list of (ind . value) pair \\
+ \> :name \> name property \\
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{section}
+{\newpage\clearpage
+\lthtmlfigureA{figure29705}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/beam.ps,height=10cm}
+\end{center}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68802}%
+$ \cdot$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68820}%
+$ \Vert$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline68932}%
+$ |normal|=1$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure30441}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/fig1.ps,height=19cm}
+\end{center}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69018}%
+$ z$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure35589}%
+\begin{figure}\epsfile{file=fig/fig-peg-in-hole1.ps,width=7.9cm}
+\epsfile{file=fig/fig-peg-in-hole2.ps,width=7.9cm}\\
+\epsfile{file=fig/fig-peg-in-hole3.ps,width=7.9cm}
+\epsfile{file=fig/fig-peg-in-hole4.ps,width=7.9cm}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{figure35597}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/fig-peg-naname-m1.ps,width=7.9cm}
+\epsfile{file=fig/fig-peg-naname-m2.ps,width=7.9cm}\\
+\epsfile{file=fig/fig-peg-naname-m3.ps,width=7.9cm}
+\epsfile{file=fig/fig-peg-naname-m4.ps,width=7.9cm}
+\end{center}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure35856}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/viewcoords.ps,height=10cm}
+\end{center}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing36510}%
+\begin{emtabbing}
+{\bf :init} 
+\it
+\&key  \= :target \hspace{12mm} \=  \#f(0 0 0) \` [メソッド]\\
+       \> :view-direction \> nil \\
+       \> :view-up \>  \#f(0.0 0.0 1.0)) \\
+       \> :view-right \>  nil \\
+       \> \&allow-other-keys
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing36648}%
+\begin{emtabbing}
+{\bf :init} 
+\it
+\&key \= :hither  \hspace{5mm} \= 100.0 \` [メソッド]\\
+      \> :yon    \> 1000.0 \\
+      \> :aspect \> 1.0  \\
+      \> :screen \> 100.0 \\
+      \> :screen-x  \> screen \\
+      \> :screen-y \> (* screen-x aspect) \\
+      \>  \&allow-other-keys
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69109}%
+$ x=-1, x=1, y=-1, y=1, z=0, z=1$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing37304}%
+\begin{emtabbing}
+{\bf view} 
+\it\&key \= (:size 500) (:width size) (:height size)
+\` [関数] \\
+\> (:x 100) (:y 100) \\
+\> (:title "eusx") \\
+\> (:border-width 3) \\
+\> (:background 0) \\
+\> (:viewpoint \#f(300 200 100)) (:target \#f(0 0 0)) \\
+\> (:viewdistance 5.0)  (:hither 100.0) (:yon 10000.0) \\
+\> (:screen 1.0) (:screen-x screen) (:screen-y screen) \\
+\> (:xcenter 500) (:ycenter 400) \\
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing37394}%
+\begin{emtabbing}
+{\bf render} 
+\it\&key \= :bodies :faces (:viewer *viewer*) \` [関数]\\
+\> (:lights *light-sources*)\\
+\> (colormap *render-colormap*) (y 1.0)
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure39169}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/xdraw.ps,height=6cm}
+\end{center}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69236}%
+$ (x, y)$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing40681}%
+\begin{emtabbing}
+{\bf :create} 
+\it\&key ( \= (:parent *root*) \` [メソッド] \\
+\> (:x 0) (:y 0) (:size 256) (:width size) (:height size) (:border-width 2) \\
+\> (:save-under nil) (:backing-store :always) (:backing-pixmap nil)\\
+\> (:border *fg-pixel*) (:background *bg-pixel*) \\
+\> (:map T) (:gravity :northwest) \\
+\> (:title "WINDOW") (:name title) \\
+\> (:font) \\
+\> :event-mask (:key :button :enterLeave :configure :motion)
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing41071}%
+\begin{emtabbing}
+{\bf :create} 
+\it\&key \= (:drawable defaultRootWindow) \` [メソッド]\\
+\> (:foreground *fg-pixel*) (:background *bg-pixel*) \\
+\> :function :plane-mask \\
+\> :line-width :line-style :cap-style :join-style \\
+\> :font :dash \\
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing41256}%
+\begin{emtabbing}
+{\bf :change-attributes} 
+\it\&key \= :function :plane-mask :foreground :background
+\`[メソッド]\\
+\>:line-width :line-style :cap-style :join-style :font :dash
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69328}%
+$ 2^{2+2+2}=2^6=64$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing41487}%
+\begin{emtabbing}
+{\bf :define-rainbow-LUT} 
+\it\= LUT-name count \` [メソッド]\\
+\> (hue-start 0) (hue-end 360)\\
+\> (brightness 0.5)\\
+\> (saturation 1.0) (private nil)
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69342}%
+$ -1$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing44581}%
+\begin{emtabbing}
+{\bf :create} 
+\it\&rest args \= \&key \= ((:item-height iheight) 30)
+((:item-width iwidth) 50)
+\` [メソッド]\\
+\>\> (:font font-lucidasans-bold-12)  ((:background color) *bisque1*) \\
+\> \&allow-other-keys)
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{figure43808}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/panellayout.ps,height=7cm}
+\end{center}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing44628}%
+\begin{emtabbing}
+{\bf :create-item} 
+\it klass label receiver method \= \&rest args
+\` [メソッド]\\
+\> \&key ((:font fontid)\\
+\> \&allow-other-keys)
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing44658}%
+\begin{emtabbing}
+{\bf :create-menubar} 
+\it\= \&rest args \`[メソッド]\\
+\> \&key (:font fontid)\\
+\> \&allow-other-keys
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing44781}%
+\begin{emtabbing}
+{\bf :create} 
+\it\&rest args \= \&key\= (:items) (:border-width 0)
+   (:font font-courb12)
+\` [メソッド]\\
+\>\> (:width 100) (:height-offset 15) (:color *bisque1*)
+                      (:active *bisque2*) \\
+           \>\&allow-other-keys) 
+  
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure43895}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/filepanel.ps,height=7.5cm}
+\end{center}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure43905}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/textviewpanel.ps,height=7cm}
+\end{center}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing44863}%
+\begin{emtabbing}
+{\bf :create} 
+\it name reciever method \= \&rest args
+\` [メソッド] \\
+\> \&key ((:width w) 100) ((:height h) 100) (:font font-courb12)\\
+\> \&allow-other-keys
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing44907}%
+\begin{emtabbing}
+{\bf :create} 
+\it label revciever method \= \&rest args
+\` [メソッド]\\
+\>\&key\= :width :height (:font (send parent :gc :font))\\
+\>\> (:background (send parent :gc :background)) \\
+\>\> (:border-width 0) \\
+\>\> (:state :top)\\
+\>\&allow-other-keys
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing44964}%
+\begin{emtabbing}
+{\bf :create} 
+\it\= label reciever method \` [メソッド]\\
+\>\&rest args\\
+\>\&key (:menu nil) (:items) (:state :flat)\\
+\>\&allow-other-keys
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing45020}%
+\begin{emtabbing}
+{\bf :create} 
+\it bitmap-file reciever method \= \&rest args
+\` [メソッド]\\
+                 \>\&key :width :height\\
+                 \>\&allow-other-keys)
+
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing45077}%
+\begin{emtabbing}
+{\bf :create} 
+\it label reciever method \= \&rest args
+\` [メソッド]\\
+           \>\&key \=(:choices '("0" "1")) (:initial-choice 0)\\
+\>\> (:font (send parent :gc :font))\\
+                \>\>(:button-size 13)\\
+                \>\>(:border-width 0)\\
+  
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing45165}%
+\begin{emtabbing}
+{\bf :create} 
+\it label reciever method \= \&rest args
+\` [メソッド]\\
+\>\&key (:min 0.0) (:max 1.0) (:parent)\\
+\>(:min-label "") (:max-label "") (:value-format "~4,2f")\\
+\>(:font font-courb12) (:span 100) (:border-width 0) (:initial-value min)  
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing45216}%
+\begin{emtabbing}
+{\bf :create} 
+\it name reciever method \= \&rest args
+\` [メソッド]\\
+           \>\&key \=(:stick-size 5) (:return nil)\\
+                \>\>(:min-x -1.0) (:max-x 1.0)\\
+                \>\>(:min-y -1.0) (:max-y 1.0)\\
+           \>\&allow-other-keys) 
+  
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{figure44063}%
+\begin{figure}\begin{center}
+\epsfile{file=fig/panelitem.ps,height=5cm}
+\end{center}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing45273}%
+\begin{emtabbing}
+{\bf :create} 
+\it label revciever method \= \&rest args \` [メソッド]\\
+\>\&key (:font font-courb12) (:columns 20) (:initial-value ) (:border-width 0)\\
+\>\&allow-other-keys
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing45350}%
+\begin{emtabbing}
+{\bf :create} 
+\it\=\&rest args \` [メソッド]\\
+\>\&key \=:width :height (:font font-courb14) :rows :columns\\
+\>(:show-cursor nil) (:notify-object nil) (:notify-method nil)\\
+\>\&allow-other-keys
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{part}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69485}%
+$ \Sigma_j$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69487}%
+$ a_j$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69491}%
+$ b_j$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69493}%
+$ q_j$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69497}%
+$\displaystyle {}^iT_j =
+ \left[
+ \begin{array}{cc}
+  e^{\hat{a}_jq_j} & b_j \\
+  0~0~0 & 1
+ \end{array}
+ \right]
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69499}%
+$ e^{\hat{a}_jq_j}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69501}%
+$ a$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69503}%
+$ wt[rad]$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69505}%
+$\displaystyle e^{\hat{\omega}t} = E + \hat{a} sin (wt) + \hat{a}^2 (1 - cos(wt))
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69507}%
+$ p_i, R_i$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69509}%
+$ \Sigma_i$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69511}%
+$\displaystyle T_i =
+ \left[
+ \begin{array}{cc}
+  R_i & p_i \\
+  0~0~0 & 1
+ \end{array}
+ \right]
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69513}%
+$\displaystyle T_j = T_i ~ {}^iT_j
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69521}%
+$ ^0_n$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69525}%
+$ H$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69530}%
+$ \theta$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69531}%
+$ =(\theta_1, \theta_2, ..., \theta_n)^T$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69536}%
+$ r$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69539}%
+$\displaystyle \mbox{\boldmath {$r$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69540}%
+$\displaystyle =$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69541}%
+$\displaystyle \mbox{\boldmath {$f$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69542}%
+$\displaystyle ($%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69543}%
+$\displaystyle \mbox{\boldmath {$\theta$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69544}%
+$\displaystyle )$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69550}%
+$\displaystyle ^{-1}($%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69554}%
+$ f^{-1}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69557}%
+$\displaystyle \dot{\mbox{\boldmath {$r$}}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69561}%
+$\displaystyle \frac{\partial \mbox{\boldmath {$f$}}}{\partial \mbox{\boldmath {$\theta$}}}
+(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69565}%
+$\displaystyle \mbox{\boldmath {$J$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69568}%
+$\displaystyle )\dot{\mbox{\boldmath {$\theta$}}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69573}%
+$ J$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69574}%
+$ ($%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69579}%
+$ )$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69581}%
+$ m \times n$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69583}%
+$ m$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69590}%
+$ n$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69600}%
+$ \dot{r}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69611}%
+$ )^{-1}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69614}%
+$\displaystyle \dot{\mbox{\boldmath {$\theta$}}} = \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})^{-1}\dot{\mbox{\boldmath {$r$}}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69620}%
+$ ^{\#}($%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69628}%
+$\displaystyle \mbox{\boldmath {$A$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmldisplayA{displaymath69629}%
+\begin{displaymath}^{\#} = \left\{
+\begin{array}{l l}
+& \mbox{\boldmath {$A$}}^{-1} \  ( m = n = rank \mbox{\boldmath {$A$}}) \\
+& \mbox{\boldmath {$A$}}^T \  (\mbox{\boldmath {$A$}}\mbox{\boldmath {$A$}}^T)^{-1} ( n > m = rank \mbox{\boldmath {$A$}}) \\
+& (\mbox{\boldmath {$A$}}^T\mbox{\boldmath {$A$}})^{-1}\mbox{\boldmath {$A$}}^T \  ( m > n = rank \mbox{\boldmath {$A$}})
+\end{array}
+\right.\end{displaymath}%
+\lthtmldisplayZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69631}%
+$ m>n$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69633}%
+$ n>=m$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69636}%
+$\displaystyle \min_{\dot{\mbox{\boldmath {$\theta$}}}} \left(\dot{\mbox{\boldmath {$r$}}} - \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}\right)^{T}
+\left(\dot{\mbox{\boldmath {$r$}}} - \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}\right)$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69639}%
+$\displaystyle \min_{\dot{\mbox{\boldmath {$\theta$}}}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69641}%
+$\displaystyle \dot{\mbox{\boldmath {$\theta$}}}^{T}\dot{\mbox{\boldmath {$\theta$}}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69643}%
+$\displaystyle s.t.$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69645}%
+$\displaystyle \dot{\mbox{\boldmath {$r$}}} = \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69648}%
+$\displaystyle \dot{\mbox{\boldmath {$\theta$}}} = \mbox{\boldmath {$J$}}^{\#}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$r$}}} +
+\left(\mbox{\boldmath {$E$}}_n - \mbox{\boldmath {$J$}}^{\#}(\mbox{\boldmath {$\theta$}})\mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\right)\mbox{\boldmath {$z$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69661}%
+$ \left|\dot{\mbox{\boldmath {$\theta$}}}\right|$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69680}%
+$ ^{*}($%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69689}%
+$\displaystyle ^{*}($%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69691}%
+$\displaystyle )
+=$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69693}%
+$\displaystyle ^T\left(\mbox{\boldmath {$J$}}\mbox{\boldmath {$J$}}^T + \epsilon \mbox{\boldmath {$E$}}_m\right)^{-1}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69696}%
+$\displaystyle \min_{\dot{\mbox{\boldmath {$\theta$}}}}
+\{
+\dot{\mbox{\boldmath {$\theta$}}}^T \dot{\mbox{\boldmath {$\theta$}}}
++
+\epsilon
+\left(\dot{\mbox{\boldmath {$r$}}} - \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}\right)^T
+\left(\dot{\mbox{\boldmath {$r$}}} - \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}\right)
+\}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69709}%
+$ \kappa($%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69719}%
+$\displaystyle \kappa($%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69721}%
+$\displaystyle ) = \sqrt{\mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}}) \mbox{\boldmath {$J$}}^{T}(\mbox{\boldmath {$\theta$}})}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69772}%
+$ j$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69778}%
+$ _j$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69781}%
+$\displaystyle _j= \begin{cases} \left[ \begin{array}{ccc} \mbox{\boldmath {$a$}}_j\\\mbox{\boldmath {$0$}} \end{array} \right] & \text{if linear joint} \\\left[ \begin{array}{ccc} \mbox{\boldmath {$a$}}_j \times (\mbox{\boldmath {$p$}}_{end} - \mbox{\boldmath {$p$}}_j)\\\mbox{\boldmath {$a$}}_j \end{array} \right] & \text{if rotational joint} \end{cases}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69792}%
+$ p$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69801}%
+$ _{end}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69809}%
+$\displaystyle \left|\mbox{\boldmath {$\dot{\theta}$}}\right|_{\mbox{\boldmath {$W$}}} =
+\sqrt{\mbox{\boldmath {$\dot{\theta}$}}^T\mbox{\boldmath {$W$}}\mbox{\boldmath {$\dot{\theta}$}}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69814}%
+$ W$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69820}%
+$ \in$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69824}%
+$ R$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69825}%
+$ ^{n \times n}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69836}%
+$ _{\mbox{\boldmath {$W$}}}, \mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69840}%
+$\displaystyle _{\mbox{\boldmath {$W$}}} = \mbox{\boldmath {$J$}}\mbox{\boldmath {$W$}}^{-\frac{1}{2}},
+\mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}} = \mbox{\boldmath {$W$}}^{\frac{1}{2}}\mbox{\boldmath {$\dot{\theta}$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69854}%
+$\displaystyle _{\mbox{\boldmath {$W$}}}\mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69856}%
+$\displaystyle \left|\dot{\mbox{\boldmath {$\theta$}}}\right|_{\mbox{\boldmath {$W$}}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69860}%
+$\displaystyle \sqrt{\mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}}^T\mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69863}%
+$\displaystyle \mbox{\boldmath {$\dot{\theta}$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69864}%
+$\displaystyle _{\mbox{\boldmath {$W$}}} = \mbox{\boldmath {$W$}}^{-1}\mbox{\boldmath {$J$}}^T
+\left(\mbox{\boldmath {$J$}}\mbox{\boldmath {$W$}}^{-1}\mbox{\boldmath {$J$}}^T\right)^{-1}\dot{\mbox{\boldmath {$r$}}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69868}%
+$ \theta_{i,\max},
+\theta_{i, \min}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69870}%
+$ H($%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69880}%
+$\displaystyle H($%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69882}%
+$\displaystyle ) = \sum_{i = 1}^n\frac{1}{4}
+\frac{(\theta_{i,\max} - \theta_{i,\min})^2}
+{(\theta_{i,\max} - \theta_i)(\theta_i - \theta_{i,\min})}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69884}%
+$ n \times n$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69892}%
+$\displaystyle \mbox{\boldmath {$W$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmldisplayA{displaymath69893}%
+\begin{displaymath} = \left[
+\begin{array}{ccccc}
+w_1 & 0 & 0 & \cdots & 0 \\
+0 & w_2 & 0 & \cdots & 0 \\
+\cdots & \cdots  & \cdots & \ddots & \cdots \\
+0 & 0 & 0 & \cdots & w_n \\
+\end{array}
+\right]\end{displaymath}%
+\lthtmldisplayZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69895}%
+$ w_i$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69898}%
+$\displaystyle w_i = 1 + \left|\frac{\partial \mbox{\boldmath {$H$}}(\mbox{\boldmath {$\theta$}})}{\partial \theta_i}\right|$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69901}%
+$\displaystyle \frac{\partial H(\mbox{\boldmath {$\theta$}})}{\partial \theta_i}
+= \frac{(\theta_{i,\max} - \theta_{i,\min})^2(2\theta_i -
+\theta_{i,\max} - \theta_{i,\min})}
+{4(\theta_{i,\max} - \theta_i)^2(\theta_i - \theta_{i,\min})^2}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmldisplayA{displaymath69906}%
+\begin{displaymath}w_i =
+\left\{
+\begin{array}{l l}
+1 + \left|\frac{\partial \mbox{\boldmath {$H$}}(\mbox{\boldmath {$\theta$}})}{\partial \theta_i}\right|
+& if \left|\frac{\partial \mbox{\boldmath {$H$}}(\mbox{\boldmath {$\theta$}})}{\partial
+\theta_i}\right| \geq 0 \\
+1 & if \left|\frac{\partial \mbox{\boldmath {$H$}}(\mbox{\boldmath {$\theta$}})}{\partial
+\theta_i}\right| < 0
+\end{array}
+\right.\end{displaymath}%
+\lthtmldisplayZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69929}%
+$ ca$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69931}%
+$ task$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69934}%
+$\displaystyle = f(d)$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69936}%
+$\displaystyle _{ca} + \left(1-f(d)\right)$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69938}%
+$\displaystyle _{task}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69940}%
+$ f(d)$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69942}%
+$ d$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69944}%
+$ d_a$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69946}%
+$ d_b$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmldisplayA{displaymath69949}%
+\begin{displaymath}f(d) =
+\left\{
+\begin{array}{l l}
+(d-d_a)/(d_b-d_a) & if d<d_a\\
+0 & otherwise
+\end{array}
+\right.\end{displaymath}%
+\lthtmldisplayZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69961}%
+$\displaystyle \mbox{\boldmath {$\delta x$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmldisplayA{displaymath69962}%
+\begin{displaymath} =
+\left\{
+\begin{array}{l l}
+0 & if \left|\mbox{\boldmath {$p$}}\right|>d_{a}\\
+(d_{a}/\left|\mbox{\boldmath {$p$}}\right|-1)\mbox{\boldmath {$p$}} & else
+\end{array}
+\right.\end{displaymath}%
+\lthtmldisplayZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay69964}%
+$\displaystyle \dot{\mbox{\boldmath {$\theta$}}}_{ca} = \mbox{\boldmath {$J$}}_{ca}^{T} k_{joint} \mbox{\boldmath {$\delta x$}} + (\mbox{\boldmath {$E$}}_n - \mbox{\boldmath {$J$}}_{task}^{*}\mbox{\boldmath {$J$}}_{task}) \mbox{\boldmath {$J$}}_{ca}^{T} k_{null} \mbox{\boldmath {$\delta x$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69966}%
+$ k_{joint}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69968}%
+$ k_{null}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69973}%
+$ d_a = 200[mm]$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69975}%
+$ d_b = 0.1 * d_a = 20[mm]$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69977}%
+$ k_{joint} = k_{null} = 1.0$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69979}%
+$ n_{ca}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69981}%
+$ _{n_{ca}}C_2$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69983}%
+$ _4C_2$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69993}%
+$ L$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69995}%
+$ N$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline69997}%
+$ [$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70001}%
+$ \xi$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70002}%
+$ _0^T,...,$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70007}%
+$ _{L-1}^T]^T$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70013}%
+$ \dot{\theta}_0$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70014}%
+$ ^T,...,$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70018}%
+$ \dot{\theta}_{L-1}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70019}%
+$ ^T]^T$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70021}%
+$ S = \{0,\hdots,N-1\}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70023}%
+$ i$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70025}%
+$ S_i$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70027}%
+$ S$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70029}%
+$ S = S_0 \cup \hdots \cup S_{L-1}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70033}%
+$ [\dot{\theta}_0, ..., \dot{\theta}_{N-1}]^T$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmldisplayA{displaymath70036}%
+\begin{displaymath}\left[
+\begin{array}{c}
+\mbox{\boldmath {$\xi$}}_0 \\
+\vdots\\
+\mbox{\boldmath {$\xi$}}_{L-1}
+\end{array}
+\right]
+=
+\left[
+\begin{array}{ccc}
+\mbox{\boldmath {$J$}}_{0,0}   &        \hdots & \mbox{\boldmath {$J$}}_{0, N-1}\\
+\vdots         &  \mbox{\boldmath {$J$}}_{i,j} & \vdots\\
+\mbox{\boldmath {$J$}}_{L-1,0} &        \hdots & \mbox{\boldmath {$J$}}_{L-1, N-1}
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+\dot{\theta}_0\\
+\vdots\\
+\dot{\theta}_{N-1}
+\end{array}
+\right]\end{displaymath}%
+\lthtmldisplayZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70042}%
+$ _{i,j}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{numcases48114}%
+\begin{numcases}
+{\mbox{\boldmath {$J$}}_{i,j}=} 
+\mbox{\boldmath {$J$}}_j
+& if $j$-th joint $\in$\  $i$-th link array\\
+\mbox{\boldmath {$0$}} & otherwise
+\end{numcases}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70055}%
+$ N+6$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70065}%
+$ x$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70067}%
+$ y$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70077}%
+$ 6\times6$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmldisplayA{displaymath70081}%
+\begin{displaymath}_{B,l} =
+\left[
+\begin{array}{cc}
+\mbox{\boldmath {$E$}}_3 &
+-\hat{\mbox{\boldmath {$p$}}}_{B\to l}\\
+\mbox{\boldmath {$0$}} & \mbox{\boldmath {$E$}}_3
+\end{array}
+\right]\end{displaymath}%
+\lthtmldisplayZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70087}%
+$ _{B\to l}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70089}%
+$ l$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70096}%
+$ [m_{new},$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70100}%
+$ c$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70101}%
+$ _{new},$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70105}%
+$ I$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70106}%
+$ _{new}]$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70108}%
+$\displaystyle [m_{new},$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70109}%
+$\displaystyle \mbox{\boldmath {$c$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70110}%
+$\displaystyle _{new},$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70111}%
+$\displaystyle \mbox{\boldmath {$I$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70112}%
+$\displaystyle _{new}] = AddMassProperty( [m_{1},$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70114}%
+$\displaystyle _{1},$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70116}%
+$\displaystyle _{1}] ,\hdots, [m_{K},$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70118}%
+$\displaystyle _{K},$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70120}%
+$\displaystyle _{K}] )$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70122}%
+$\displaystyle m_{new} = \sum_{j=1}^{K}m_{j}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70125}%
+$\displaystyle _{new} = \frac{1}{m_{new}}\sum_{j=1}^{K} m_j$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70127}%
+$\displaystyle _j$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70130}%
+$\displaystyle _{new} = \sum_{j=1}^{K} \left( \mbox{\boldmath {$I$}}_j + m_j \mbox{\boldmath {$D$}}(\mbox{\boldmath {$c$}}_{j} - \mbox{\boldmath {$c$}}_{new}) \right)$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70135}%
+$ D$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70141}%
+$ )=\hat{\mbox{\boldmath {$r$}}}^T\hat{\mbox{\boldmath {$r$}}}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70146}%
+$ \theta_j$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{numcases48208}%
+\begin{numcases}
+{\mbox{\boldmath {$P$}}_j =}
+\begin{array}{cl}
+\mbox{\boldmath {$a$}}_j \dot{\theta}_j \times (\tilde{\mbox{\boldmath {$c$}}}_{j} - \mbox{\boldmath {$p$}}_j) \tilde{m}_j
+& \text{if rotational joint}\\
+\mbox{\boldmath {$a$}}_j \dot{\theta}_j \tilde{m}_j &
+\text{if linear joint}
+\end{array}
+\end{numcases}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{numcases48225}%
+\begin{numcases}
+{\mbox{\boldmath {$L$}}_j =}
+\begin{array}{cl}
+\tilde{\mbox{\boldmath {$c$}}}_{j} \mbox{\boldmath {$P$}}_j + \tilde{\mbox{\boldmath {$I$}}}_j \mbox{\boldmath {$a$}}_j \dot{\theta}_j
+& \text{if rotational joint}\\
+\mbox{\boldmath {$0$}} & \text{if linear joint}
+\end{array}
+\end{numcases}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70148}%
+$ [\tilde{m}_j, \tilde{\mbox{\boldmath {$c$}}}_j, \tilde{\mbox{\boldmath {$I$}}}_j]$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70154}%
+$ \dot{\theta}_j$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{numcases48245}%
+\begin{numcases}
+{\mbox{\boldmath {$m$}}_j =}
+\begin{array}{cl}
+\mbox{\boldmath {$a$}}_j \times (\tilde{\mbox{\boldmath {$c$}}}_{j} - \mbox{\boldmath {$p$}}_j) \tilde{m}_j
+& \text{if rotational joint}\\
+\mbox{\boldmath {$a$}}_j \tilde{m}_j & \text{if linear joint}
+\end{array}
+\end{numcases}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{numcases48260}%
+\begin{numcases}
+{\mbox{\boldmath {$h$}}_j =}
+\begin{array}{cl}
+\tilde{\mbox{\boldmath {$c$}}}_{j} \times \mbox{\boldmath {$m$}}_j + \tilde{\mbox{\boldmath {$I$}}}_j \mbox{\boldmath {$a$}}_j
+& \text{if rotational joint}\\
+\mbox{\boldmath {$0$}} & \text{if linear joint}
+\end{array}
+\end{numcases}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70156}%
+$\displaystyle \mbox{\boldmath {$M$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70157}%
+$\displaystyle _{\dot{\mbox{\boldmath {$\theta$}}}} = [\mbox{\boldmath {$m$}}_1, \hdots, \mbox{\boldmath {$m$}}_{N}]$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70159}%
+$\displaystyle \mbox{\boldmath {$H$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70160}%
+$\displaystyle _{\dot{\mbox{\boldmath {$\theta$}}}} = [\mbox{\boldmath {$h$}}_1, \hdots, \mbox{\boldmath {$h$}}_{N}] - \hat{\mbox{\boldmath {$p$}}}_{G} \mbox{\boldmath {$M$}}_{\dot{\mbox{\boldmath {$\theta$}}}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmldisplayA{displaymath70177}%
+\begin{displaymath}\left[
+\begin{array}{c}
+\mbox{\boldmath {$M$}}_{B}\\
+\mbox{\boldmath {$H$}}_{B}
+\end{array}
+\right]
+=
+\left[
+\begin{array}{cc}
+M_{r} \mbox{\boldmath {$E$}}_3 & - M_{r} \hat{\mbox{\boldmath {$p$}}}_{B\to G}\\
+\mbox{\boldmath {$0$}} & \tilde{\mbox{\boldmath {$I$}}}
+\end{array}
+\right]\end{displaymath}%
+\lthtmldisplayZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmldisplayA{displaymath70180}%
+\begin{displaymath}\left[
+\begin{array}{c}
+\mbox{\boldmath {$P$}}\\
+\mbox{\boldmath {$L$}}
+\end{array}
+\right]
+=
+\left[
+\begin{array}{cc}
+\mbox{\boldmath {$M$}}_{B} & \mbox{\boldmath {$M$}}_{\dot{\mbox{\boldmath {$\theta$}}}}\\
+\mbox{\boldmath {$H$}}_{B} & \mbox{\boldmath {$H$}}_{\dot{\mbox{\boldmath {$\theta$}}}}
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+\mbox{\boldmath {$\xi$}}_{B}\\
+\dot{\mbox{\boldmath {$\theta$}}}
+\end{array}
+\right]\end{displaymath}%
+\lthtmldisplayZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70182}%
+$ M_{r}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70188}%
+$ _{G}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70190}%
+$ \tilde{\mbox{\boldmath {$I$}}}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70192}%
+$\displaystyle [M_{r},$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70193}%
+$\displaystyle \mbox{\boldmath {$p$}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70194}%
+$\displaystyle _{G}, \tilde{\mbox{\boldmath {$I$}}}] = AddMassProperty( [m_{1}, \mbox{\boldmath {$c$}}_{1}, \mbox{\boldmath {$I$}}_{1}] ,\hdots, [m_{N}, \mbox{\boldmath {$c$}}_{N}, \mbox{\boldmath {$I$}}_{N}] )$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70200}%
+$ M$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70201}%
+$ _{B}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline70207}%
+$ _{\dot{\mbox{\boldmath {$\theta$}}}}^{\prime}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay70210}%
+$\displaystyle _{G} =  \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath {$M$}}_{B} & \mbox{\boldmath {$M$}}_{\dot{\mbox{\boldmath {$\theta$}}}}^{\prime} \end{array} \right]$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+
+\end{document}

@@ -1,0 +1,259 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//JP">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>衝突回避のための関節角速度計算法</TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META NAME="description" CONTENT="衝突回避のための関節角速度計算法">
+<META NAME="keywords" CONTENT="jmanual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="jmanual.css">
+
+<LINK REL="next" HREF="jmanual-node157.html">
+<LINK REL="previous" HREF="jmanual-node155.html">
+<LINK REL="up" HREF="jmanual-node151.html">
+<LINK REL="next" HREF="jmanual-node157.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html2826"
+  HREF="jmanual-node157.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html2820"
+  HREF="jmanual-node151.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html2814"
+  HREF="jmanual-node155.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html2822"
+  HREF="jmanual-node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html2824"
+  HREF="jmanual-node186.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html2827"
+  HREF="jmanual-node157.html">衝突回避計算例</A>
+<B> Up:</B> <A NAME="tex2html2821"
+  HREF="jmanual-node151.html">ロボットの動作生成</A>
+<B> Previous:</B> <A NAME="tex2html2815"
+  HREF="jmanual-node155.html">衝突回避を含む逆運動学</A>
+ &nbsp; <B>  <A NAME="tex2html2823"
+  HREF="jmanual-node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2825"
+  HREF="jmanual-node186.html">Index</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION05012500000000000000">
+衝突回避のための関節角速度計算法</A>
+</H3>
+逆運動学計算における目標タスクと衝突回避の統合は
+リンク間最短距離を用いたblending係数により行われる.
+これにより,衝突回避の必要のないときは目標タスクを厳密に満し
+衝突回避の必要性があらわれたときに目標タスクを
+あきらめて衝突回避の行われる関節角速度計算を行うことが可能になる.
+最終的な関節角速度の関係式はEquation&nbsp;<A HREF="#eq:collision-avoidance-all"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;で得られる.
+以下では<SPAN CLASS="MATH"><B><IMG
+ WIDTH="20" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img185.png"
+ ALT="$ ca$"></B></SPAN>の添字は衝突回避計算のための成分を表し,
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="35" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img186.png"
+ ALT="$ task$"></B></SPAN>の部分は衝突回避計算以外のタスク目標を表すことにする.
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:collision-avoidance-all"></A><!-- MATH
+ \begin{equation}
+\mbox{\boldmath {$\dot{\theta}$}} = f(d)\mbox{\boldmath {$\dot{\theta}$}}_{ca}
++ \left(1-f(d)\right)\mbox{\boldmath {$\dot{\theta}$}}_{task}
+\end{equation}
+ -->
+<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
+ WIDTH="14" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img172.png"
+ ALT="$\displaystyle \mbox{\boldmath {$\dot{\theta}$}}$"><IMG
+ WIDTH="51" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img187.png"
+ ALT="$\displaystyle = f(d)$"><IMG
+ WIDTH="14" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img172.png"
+ ALT="$\displaystyle \mbox{\boldmath {$\dot{\theta}$}}$"><IMG
+ WIDTH="107" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img188.png"
+ ALT="$\displaystyle _{ca} + \left(1-f(d)\right)$"><IMG
+ WIDTH="14" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img172.png"
+ ALT="$\displaystyle \mbox{\boldmath {$\dot{\theta}$}}$"><IMG
+ WIDTH="30" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img189.png"
+ ALT="$\displaystyle _{task}$"></SPAN></TD>
+<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
+(<SPAN CLASS="arabic">24</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+blending係数<SPAN CLASS="MATH"><B><IMG
+ WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img190.png"
+ ALT="$ f(d)$"></B></SPAN>は,
+リンク間距離<SPAN CLASS="MATH"><B><IMG
+ WIDTH="13" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img191.png"
+ ALT="$ d$"></B></SPAN>と閾値<SPAN CLASS="MATH"><B><IMG
+ WIDTH="20" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img192.png"
+ ALT="$ d_a$"></B></SPAN>・<SPAN CLASS="MATH"><B><IMG
+ WIDTH="19" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img193.png"
+ ALT="$ d_b$"></B></SPAN>の関数として計算される
+(Equation&nbsp;<A HREF="#eq:collision-avoidance-blending-coefficient"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;).
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:collision-avoidance-blending-coefficient"></A><!-- MATH
+ \begin{eqnarray}
+f(d) =
+  \left\{
+   \begin{array}{l l}
+     (d-d_a)/(d_b-d_a) & if d<d_a\\
+     0 & otherwise
+    \end{array}
+  \right.
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="283" HEIGHT="54" BORDER="0"
+ SRC="jmanual-img194.png"
+ ALT="\begin{displaymath}f(d) =
+\left\{
+\begin{array}{l l}
+(d-d_a)/(d_b-d_a) &amp; if d&lt;d_a\\
+0 &amp; otherwise
+\end{array}\right.\end{displaymath}"></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">25</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="20" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img192.png"
+ ALT="$ d_a$"></B></SPAN>は衝突回避計算を行い始める値
+(yellow zone@xdefthefnmark<A HREF="jmanual-node155.html#WholebodyCollisionAvoidance:Sugiura:IROS07"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>footnotemark)であり,
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="19" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img193.png"
+ ALT="$ d_b$"></B></SPAN>は目標タスクを阻害しても衝突回避を行う閾値
+(orange zone@xdefthefnmark<A HREF="jmanual-node155.html#WholebodyCollisionAvoidance:Sugiura:IROS07"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>footnotemark)である.
+
+<P>
+衝突計算をする2リンク間の最短距離・最近傍点が計算できた場合の
+衝突を回避するための動作戦略は
+2リンク間に作用する仮想的な反力ポテンシャルから導出される.
+
+<P>
+2リンク間の最近傍点同士をつなぐベクトル<!-- MATH
+ $\mbox{\boldmath {$p$}}$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img160.png"
+ ALT="$ p$"></B></SPAN></B></SPAN>を用いた
+2リンク間反力から導出される速度計算を
+Equation&nbsp;<A HREF="#eq:collision-avoidance-distance-force"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;
+に記す.
+
+<P>
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:collision-avoidance-distance-force"></A><!-- MATH
+ \begin{eqnarray}
+\mbox{\boldmath {$\delta x$}} =
+  \left\{
+   \begin{array}{l l}
+     0 & if \left|\mbox{\boldmath {$p$}}\right|>d_{a}\\
+     (d_{a}/\left|\mbox{\boldmath {$p$}}\right|-1)\mbox{\boldmath {$p$}} & else
+    \end{array}
+  \right.
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img195.png"
+ ALT="$\displaystyle \mbox{\boldmath {$\delta x$}}$"><IMG
+ WIDTH="218" HEIGHT="54" BORDER="0"
+ SRC="jmanual-img196.png"
+ ALT="\begin{displaymath}=
+\left\{
+\begin{array}{l l}
+0 &amp; if \left\vert\mbox{\boldmath...
+...}\right\vert-1)\mbox{\boldmath {$p$}} &amp; else
+\end{array}\right.\end{displaymath}"></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">26</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+これを用いた関節角速度計算はEquation&nbsp;<A HREF="#eq:collision-avoidance-joint-speed"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;
+となる.
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:collision-avoidance-joint-speed"></A><!-- MATH
+ \begin{equation}
+\dot{\mbox{\boldmath {$\theta$}}}_{ca} = \mbox{\boldmath {$J$}}_{ca}^{T} k_{joint} \mbox{\boldmath {$\delta x$}}
++ (\mbox{\boldmath {$E$}}_n - \mbox{\boldmath {$J$}}_{task}^{*}\mbox{\boldmath {$J$}}_{task}) \mbox{\boldmath {$J$}}_{ca}^{T} k_{null} \mbox{\boldmath {$\delta x$}}
+\end{equation}
+ -->
+<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
+ WIDTH="357" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img197.png"
+ ALT="$\displaystyle \dot{\mbox{\boldmath {$\theta$}}}_{ca} = \mbox{\boldmath {$J$}}_{...
+..._{task}) \mbox{\boldmath {$J$}}_{ca}^{T} k_{null} \mbox{\boldmath {$\delta x$}}$"></SPAN></TD>
+<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
+(<SPAN CLASS="arabic">27</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="43" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img198.png"
+ ALT="$ k_{joint}$"></B></SPAN>・<SPAN CLASS="MATH"><B><IMG
+ WIDTH="37" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img199.png"
+ ALT="$ k_{null}$"></B></SPAN>はそれぞれ反力ポテンシャルを
+目標タスクのNullSpaceに分配するかそうでないかを制御する係数である.
+
+<P>
+<BR><HR>
+<ADDRESS>
+
+2014-08-30
+</ADDRESS>
+</BODY>
+</HTML>

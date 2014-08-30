@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//JP">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>非ブロック対角ヤコビアンによる全身協調動作生成</TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META NAME="description" CONTENT="非ブロック対角ヤコビアンによる全身協調動作生成">
+<META NAME="keywords" CONTENT="jmanual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="jmanual.css">
+
+<LINK REL="next" HREF="jmanual-node159.html">
+<LINK REL="previous" HREF="jmanual-node157.html">
+<LINK REL="up" HREF="jmanual-node151.html">
+<LINK REL="next" HREF="jmanual-node159.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html2854"
+  HREF="jmanual-node159.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html2848"
+  HREF="jmanual-node151.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html2842"
+  HREF="jmanual-node157.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html2850"
+  HREF="jmanual-node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html2852"
+  HREF="jmanual-node186.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html2855"
+  HREF="jmanual-node159.html">リンク間重複があるヤコビアン計算と関節角度計算</A>
+<B> Up:</B> <A NAME="tex2html2849"
+  HREF="jmanual-node151.html">ロボットの動作生成</A>
+<B> Previous:</B> <A NAME="tex2html2843"
+  HREF="jmanual-node157.html">衝突回避計算例</A>
+ &nbsp; <B>  <A NAME="tex2html2851"
+  HREF="jmanual-node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2853"
+  HREF="jmanual-node186.html">Index</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION05012700000000000000">
+非ブロック対角ヤコビアンによる全身協調動作生成</A>
+</H3>
+ヒューマノイドは枝分かれのある複雑な構造を持ち,
+複数のマニピュレータで協調して動作を行う必要がある
+(Fig.<A HREF="#fig:duplicate-link"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;)．
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig:duplicate-link"></A><A NAME="48063"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
+Duplicate Link Sequence</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+<IMG
+  WIDTH="528" HEIGHT="500" ALIGN="BOTTOM" BORDER="0"
+ SRC="./normal.jpg"
+ ALT="Image normal">
+    <IMG
+  WIDTH="528" HEIGHT="500" ALIGN="BOTTOM" BORDER="0"
+ SRC="./linklist.jpg"
+ ALT="Image linklist">
+    
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+複数マニピュレータの動作例として,
+
+<UL>
+<LI>リンク間に重複がない場合
+<BR>それぞれのマニピュレータについて
+Equation&nbsp;<A HREF="jmanual-node152.html#eq:inverse-kinematics"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;式を用いて関節角速度を求める.
+もしくは,複数の式を連立した方程式(ヤコビアンはブロック対角行列となる)
+を用いて関節角速度を求めても良い.
+</LI>
+<LI>リンク間に重複がある場合
+<BR>リンク間に重複がある場合は,
+リンク間の重複を考慮したヤコビアンを考える必要がある.
+例えば,双腕動作を行う場合,左腕のマニピュレータのリンク系列と
+右腕のマニピュレータのリンク系列とで,体幹部リンク系列が重複し,
+その部位は左右で協調して関節角速度を求める必要がある.
+</LI>
+</UL>
+次節ではリンク間に重複がある場合の
+非ブロック対角なヤコビアンの計算法
+および
+それを用いた関節角速度計算法を述べる
+(前者の重複がない場合も以下の計算方法により後者の一部として計算可能で
+ある).
+
+<P>
+<BR><HR>
+<ADDRESS>
+
+2014-08-30
+</ADDRESS>
+</BODY>
+</HTML>

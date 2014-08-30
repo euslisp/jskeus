@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//JP">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>ロボット動作と干渉計算</TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META NAME="description" CONTENT="ロボット動作と干渉計算">
+<META NAME="keywords" CONTENT="jmanual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="jmanual.css">
+
+<LINK REL="previous" HREF="jmanual-node175.html">
+<LINK REL="up" HREF="jmanual-node174.html">
+<LINK REL="next" HREF="jmanual-node177.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html3103"
+  HREF="jmanual-node177.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3097"
+  HREF="jmanual-node174.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3093"
+  HREF="jmanual-node175.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3099"
+  HREF="jmanual-node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html3101"
+  HREF="jmanual-node186.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html3104"
+  HREF="jmanual-node177.html">BVHデータ</A>
+<B> Up:</B> <A NAME="tex2html3098"
+  HREF="jmanual-node174.html">干渉計算</A>
+<B> Previous:</B> <A NAME="tex2html3094"
+  HREF="jmanual-node175.html">irteusからPQPの呼び出し</A>
+ &nbsp; <B>  <A NAME="tex2html3100"
+  HREF="jmanual-node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3102"
+  HREF="jmanual-node186.html">Index</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION05032000000000000000">
+ロボット動作と干渉計算</A>
+</H2>
+
+<P>
+ハンドで物体をつかむ，という動作の静的なシミュレーションを行う場合に
+手（指）のリンクと対象物体の干渉を調べ，これが起こるところで物体をつか
+む動作を停止させるということが出来る．
+
+<P>
+<PRE>
+(objects (list *sarm* *target*))
+
+(send *sarm* :solve-ik *target* :debug-view t)
+(while (&gt; a 0)
+  (if (pqp-collision-check-objects
+       (list (send *sarm* :joint-fr :child-link)
+             (send *sarm* :joint-fl :child-link))
+       (list *target*))
+      (return))
+  (decf a 0.1)
+  (send *irtviewer* :draw-objects)
+  (send *sarm* :move-fingers a))
+(send *sarm* :end-coords :assoc *target*)
+
+(dotimes (i 100)
+  (send *sarm* :joint0 :joint-angle 1 :relative t)
+  (send *irtviewer* :draw-objects))
+(send *sarm* :end-coords :dissoc *target*)
+(dotimes (i 100)
+  (send *sarm* :joint0 :joint-angle -1 :relative t)
+  (send *irtviewer* :draw-objects))
+</PRE>
+
+<P>
+同様の機能が，"irteus/demo/sample-arm-model.l"ファイルの:open-hand,
+:close-handというメソッドで提供されている．
+
+<P>
+
+ <BR>
+<BR> <A NAME="58957"></A>
+<B>pqp-collision-check-objects</B> <EM>geometry::obj1 geometry::obj2 &amp;key (geometry::fat 0.2)  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> return nil or t
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="58967"></A>
+<B>pqp-collision-check</B> <EM>geometry::model1 geometry::model2 &amp;optional (geometry::flag geometry::pqp_first_contact) &amp;key (geometry::fat 0) (geometry::fat2 nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="58978"></A>
+<B>pqp-collision-distance</B> <EM>geometry::model1 geometry::model2 &amp;key (geometry::fat 0) (geometry::fat2 nil) (geometry::qsize 2)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+             
+<P>
+<BR><HR>
+<ADDRESS>
+
+2014-08-30
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,359 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//JP">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>運動量・角運動量ヤコビアン</TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META NAME="description" CONTENT="運動量・角運動量ヤコビアン">
+<META NAME="keywords" CONTENT="jmanual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="jmanual.css">
+
+<LINK REL="next" HREF="jmanual-node164.html">
+<LINK REL="previous" HREF="jmanual-node162.html">
+<LINK REL="up" HREF="jmanual-node151.html">
+<LINK REL="next" HREF="jmanual-node164.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html2924"
+  HREF="jmanual-node164.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html2918"
+  HREF="jmanual-node151.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html2912"
+  HREF="jmanual-node162.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html2920"
+  HREF="jmanual-node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html2922"
+  HREF="jmanual-node186.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html2925"
+  HREF="jmanual-node164.html">重心ヤコビアン</A>
+<B> Up:</B> <A NAME="tex2html2919"
+  HREF="jmanual-node151.html">ロボットの動作生成</A>
+<B> Previous:</B> <A NAME="tex2html2913"
+  HREF="jmanual-node162.html">マスプロパティ計算</A>
+ &nbsp; <B>  <A NAME="tex2html2921"
+  HREF="jmanual-node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2923"
+  HREF="jmanual-node186.html">Index</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION050121200000000000000">
+運動量・角運動量ヤコビアン</A>
+</H3>
+シリアルリンクマニピュレータを対象とし，
+運動量・角運動量ヤコビアンを導出する．
+運動量・原点まわりの角運動量を各関節変数で表現し，
+その偏微分でヤコビアンの行を計算する．
+
+<P>
+第<SPAN CLASS="MATH"><B><IMG
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img157.png"
+ ALT="$ j$"></B></SPAN>関節の運動変数を<SPAN CLASS="MATH"><B><IMG
+ WIDTH="19" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img252.png"
+ ALT="$ \theta_j$"></B></SPAN>とする．
+まず，回転・並進の1自由度関節を考える．
+<BR>
+<IMG
+ WIDTH="452" HEIGHT="42" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img253.png"
+ ALT="\begin{numcases}
+{\mbox{\boldmath {$P$}}_j =}
+\begin{array}{cl}
+\mbox{\boldmath ...
+..._j \dot{\theta}_j \tilde{m}_j &amp;
+\text{if linear joint}
+\end{array}\end{numcases}">
+<BR>
+<BR>
+<IMG
+ WIDTH="435" HEIGHT="40" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img254.png"
+ ALT="\begin{numcases}
+{\mbox{\boldmath {$L$}}_j =}
+\begin{array}{cl}
+\tilde{\mbox{\bo...
+...nt}\\
+\mbox{\boldmath {$0$}} &amp; \text{if linear joint}
+\end{array}\end{numcases}">
+<BR>
+ここで，
+<!-- MATH
+ $[\tilde{m}_j, \tilde{\mbox{\boldmath {$c$}}}_j, \tilde{\mbox{\boldmath {$I$}}}_j]$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="79" HEIGHT="39" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img255.png"
+ ALT="$ [\tilde{m}_j, \tilde{\mbox{\boldmath {$c$}}}_j, \tilde{\mbox{\boldmath {$I$}}}_j]$"></B></SPAN>は
+AddMassProperty関数に第<SPAN CLASS="MATH"><B><IMG
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img157.png"
+ ALT="$ j$"></B></SPAN>関節の子リンクより
+末端側のリンクのマスプロパティを与えたものであり，
+実際には再帰計算により計算する<A NAME="tex2html41"
+  HREF="jmanual-footnode.html#foot48243"><SUP><SPAN CLASS="arabic">17</SPAN></SUP></A>．
+これらを<!-- MATH
+ $\dot{\theta}_j$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="19" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img256.png"
+ ALT="$ \dot{\theta}_j$"></B></SPAN>で割ることにより
+ヤコビアンの各列ベクトルを得る．
+<BR>
+<IMG
+ WIDTH="446" HEIGHT="39" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img257.png"
+ ALT="\begin{numcases}
+{\mbox{\boldmath {$m$}}_j =}
+\begin{array}{cl}
+\mbox{\boldmath ...
+...boldmath {$a$}}_j \tilde{m}_j &amp; \text{if linear joint}
+\end{array}\end{numcases}">
+<BR>
+<BR>
+<IMG
+ WIDTH="438" HEIGHT="40" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img258.png"
+ ALT="\begin{numcases}
+{\mbox{\boldmath {$h$}}_j =}
+\begin{array}{cl}
+\tilde{\mbox{\bo...
+...nt}\\
+\mbox{\boldmath {$0$}} &amp; \text{if linear joint}
+\end{array}\end{numcases}">
+<BR>
+これより慣性行列は次のように計算できる．
+<P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><!-- MATH
+ \begin{equation}
+\mbox{\boldmath {$M$}}_{\dot{\mbox{\boldmath {$\theta$}}}}
+=
+[\mbox{\boldmath {$m$}}_1, \hdots, \mbox{\boldmath {$m$}}_{N}]
+\end{equation}
+ -->
+<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
+ WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img259.png"
+ ALT="$\displaystyle \mbox{\boldmath {$M$}}$"><IMG
+ WIDTH="132" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img260.png"
+ ALT="$\displaystyle _{\dot{\mbox{\boldmath {$\theta$}}}} = [\mbox{\boldmath {$m$}}_1, \hdots, \mbox{\boldmath {$m$}}_{N}]$"></SPAN></TD>
+<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
+(<SPAN CLASS="arabic">34</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+<P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><!-- MATH
+ \begin{equation}
+\mbox{\boldmath {$H$}}_{\dot{\mbox{\boldmath {$\theta$}}}}
+=
+[\mbox{\boldmath {$h$}}_1, \hdots, \mbox{\boldmath {$h$}}_{N}]
+-
+\hat{\mbox{\boldmath {$p$}}}_{G} \mbox{\boldmath {$M$}}_{\dot{\mbox{\boldmath {$\theta$}}}}
+\end{equation}
+ -->
+<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
+ WIDTH="21" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img261.png"
+ ALT="$\displaystyle \mbox{\boldmath {$H$}}$"><IMG
+ WIDTH="191" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img262.png"
+ ALT="$\displaystyle _{\dot{\mbox{\boldmath {$\theta$}}}} = [\mbox{\boldmath {$h$}}_1,...
+...boldmath {$p$}}}_{G} \mbox{\boldmath {$M$}}_{\dot{\mbox{\boldmath {$\theta$}}}}$"></SPAN></TD>
+<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
+(<SPAN CLASS="arabic">35</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+ここでは，全関節数を<SPAN CLASS="MATH"><B><IMG
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img207.png"
+ ALT="$ N$"></B></SPAN>とした．
+また，ベースリンクは
+直動関節<SPAN CLASS="MATH"><B><IMG
+ WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img226.png"
+ ALT="$ x$"></B></SPAN>，<SPAN CLASS="MATH"><B><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img227.png"
+ ALT="$ y$"></B></SPAN>，<SPAN CLASS="MATH"><B><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img64.png"
+ ALT="$ z$"></B></SPAN>軸，
+回転関節<SPAN CLASS="MATH"><B><IMG
+ WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img226.png"
+ ALT="$ x$"></B></SPAN>，<SPAN CLASS="MATH"><B><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img227.png"
+ ALT="$ y$"></B></SPAN>，<SPAN CLASS="MATH"><B><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img64.png"
+ ALT="$ z$"></B></SPAN>軸を
+もつと考え整理し，次のようになる．
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<!-- MATH
+ \begin{eqnarray}
+\left[
+\begin{array}{c}
+\mbox{\boldmath {$M$}}_{B}\\
+\mbox{\boldmath {$H$}}_{B}
+\end{array}
+\right]
+=
+\left[
+\begin{array}{cc}
+M_{r} \mbox{\boldmath {$E$}}_3 & - M_{r} \hat{\mbox{\boldmath {$p$}}}_{B\to G}\\
+\mbox{\boldmath {$0$}} & \tilde{\mbox{\boldmath {$I$}}}
+\end{array}
+\right]
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="248" HEIGHT="56" BORDER="0"
+ SRC="jmanual-img263.png"
+ ALT="\begin{displaymath}\left[
+\begin{array}{c}
+\mbox{\boldmath {$M$}}_{B}\\
+\mbox{\...
+...math {$0$}} &amp; \tilde{\mbox{\boldmath {$I$}}}
+\end{array}\right]\end{displaymath}"></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">36</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+これを用いて重心まわりの角運動量・運動量は次のようになる．
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<!-- MATH
+ \begin{eqnarray}
+\left[
+\begin{array}{c}
+\mbox{\boldmath {$P$}}\\
+\mbox{\boldmath {$L$}}
+\end{array}
+\right]
+=
+\left[
+\begin{array}{cc}
+\mbox{\boldmath {$M$}}_{B} & \mbox{\boldmath {$M$}}_{\dot{\mbox{\boldmath {$\theta$}}}}\\
+\mbox{\boldmath {$H$}}_{B} & \mbox{\boldmath {$H$}}_{\dot{\mbox{\boldmath {$\theta$}}}}
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+\mbox{\boldmath {$\xi$}}_{B}\\
+\dot{\mbox{\boldmath {$\theta$}}}
+\end{array}
+\right]
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="227" HEIGHT="64" BORDER="0"
+ SRC="jmanual-img264.png"
+ ALT="\begin{displaymath}\left[
+\begin{array}{c}
+\mbox{\boldmath {$P$}}\\
+\mbox{\bold...
+...$}}_{B}\\
+\dot{\mbox{\boldmath {$\theta$}}}
+\end{array}\right]\end{displaymath}"></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">37</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+ここで
+ヒューマノイドの全質量<SPAN CLASS="MATH"><B><IMG
+ WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img265.png"
+ ALT="$ M_{r}$"></B></SPAN>，
+重心位置<!-- MATH
+ $\mbox{\boldmath {$p$}}_{G}$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img160.png"
+ ALT="$ p$"></B></SPAN><IMG
+ WIDTH="15" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img266.png"
+ ALT="$ _{G}$"></B></SPAN>，
+慣性テンソル<!-- MATH
+ $\tilde{\mbox{\boldmath {$I$}}}$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="14" HEIGHT="21" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img267.png"
+ ALT="$ \tilde{\mbox{\boldmath {$I$}}}$"></B></SPAN>は次のように
+全リンクのマスプロパティ演算より求める．
+<P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><!-- MATH
+ \begin{equation}
+[M_{r}, \mbox{\boldmath {$p$}}_{G}, \tilde{\mbox{\boldmath {$I$}}}]
+= AddMassProperty(
+[m_{1}, \mbox{\boldmath {$c$}}_{1}, \mbox{\boldmath {$I$}}_{1}]
+,\hdots,
+[m_{N}, \mbox{\boldmath {$c$}}_{N}, \mbox{\boldmath {$I$}}_{N}]
+)
+\end{equation}
+ -->
+<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
+ WIDTH="36" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img268.png"
+ ALT="$\displaystyle [M_{r},$">&nbsp; &nbsp;<IMG
+ WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img269.png"
+ ALT="$\displaystyle \mbox{\boldmath {$p$}}$"><IMG
+ WIDTH="406" HEIGHT="39" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img270.png"
+ ALT="$\displaystyle _{G}, \tilde{\mbox{\boldmath {$I$}}}] = AddMassProperty( [m_{1}, ...
+...{1}] ,\hdots, [m_{N}, \mbox{\boldmath {$c$}}_{N}, \mbox{\boldmath {$I$}}_{N}] )$"></SPAN></TD>
+<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
+(<SPAN CLASS="arabic">38</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+<BR><HR>
+<ADDRESS>
+
+2014-08-30
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//JP">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>衝突回避計算例</TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META NAME="description" CONTENT="衝突回避計算例">
+<META NAME="keywords" CONTENT="jmanual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="jmanual.css">
+
+<LINK REL="next" HREF="jmanual-node158.html">
+<LINK REL="previous" HREF="jmanual-node156.html">
+<LINK REL="up" HREF="jmanual-node151.html">
+<LINK REL="next" HREF="jmanual-node158.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html2840"
+  HREF="jmanual-node158.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html2834"
+  HREF="jmanual-node151.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html2828"
+  HREF="jmanual-node156.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html2836"
+  HREF="jmanual-node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html2838"
+  HREF="jmanual-node186.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html2841"
+  HREF="jmanual-node158.html">非ブロック対角ヤコビアンによる全身協調動作生成</A>
+<B> Up:</B> <A NAME="tex2html2835"
+  HREF="jmanual-node151.html">ロボットの動作生成</A>
+<B> Previous:</B> <A NAME="tex2html2829"
+  HREF="jmanual-node156.html">衝突回避のための関節角速度計算法</A>
+ &nbsp; <B>  <A NAME="tex2html2837"
+  HREF="jmanual-node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2839"
+  HREF="jmanual-node186.html">Index</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION05012600000000000000">
+衝突回避計算例</A>
+</H3>
+以下ではロボットモデル・環境モデルを用いた衝突回避例を示す.
+本研究では,
+ロボットのリンク同士,またはリンクと物体の衝突判定には,衝突判定ライブラリ
+PQP(A Proximity Query Package)
+<A NAME="tex2html34"
+  HREF="jmanual-footnode.html#foot48040"><SUP><SPAN CLASS="arabic">13</SPAN></SUP></A>を用いた.
+
+<P>
+Fig.<A HREF="#fig:collision-avoidance-example"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;では
+<!-- MATH
+ $d_a = 200[mm]$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="102" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img200.png"
+ ALT="$ d_a = 200[mm]$"></B></SPAN>,<!-- MATH
+ $d_b = 0.1 * d_a = 20[mm]$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="166" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img201.png"
+ ALT="$ d_b = 0.1 * d_a = 20[mm]$"></B></SPAN>,
+<!-- MATH
+ $k_{joint} = k_{null} = 1.0$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="138" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img202.png"
+ ALT="$ k_{joint} = k_{null} = 1.0$"></B></SPAN>と設定した.
+
+<P>
+この衝突判定計算では,衝突判定をリンクの設定を
+
+<OL>
+<LI>リンクのリスト<SPAN CLASS="MATH"><B><IMG
+ WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img203.png"
+ ALT="$ n_{ca}$"></B></SPAN>を登録
+</LI>
+<LI>登録されたリンクのリストから全リンクのペア<!-- MATH
+ $_{n_{ca}}C_2$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="44" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img204.png"
+ ALT="$ _{n_{ca}}C_2$"></B></SPAN>を計算
+</LI>
+<LI>隣接するリンクのペア,常に交わりを持つリンクのペアなどを除外
+</LI>
+</OL>
+のように行うという工夫を行っている.
+
+<P>
+Fig.<A HREF="#fig:collision-avoidance-example"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;例では衝突判定をするリンクを
+「前腕リンク」「上腕リンク」「体幹リンク」「ベースリンク」
+の4つとして登録した.
+この場合, <SPAN CLASS="MATH"><B><IMG
+ WIDTH="30" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img205.png"
+ ALT="$ _4C_2$"></B></SPAN>通りのリンクのペア数から
+隣接するリンクが除外され,全リンクペアは
+「前腕リンク-体幹リンク」
+「前腕リンク-ベースリンク」
+「上腕リンク-ベースリンク」
+の3通りとなる.
+
+<P>
+Fig.<A HREF="#fig:collision-avoidance-example"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;の3本の線(赤1本,緑2本)が
+衝突形状モデル間での最近傍点同士をつないだ
+最短距離ベクトルである.
+全リンクペアのうち赤い線が最も距離が近いペアであり,
+このリンクペアより衝突回避のための
+逆運動学計算を行っている.
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig:collision-avoidance-example"></A><A NAME="48053"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
+Example of Collision Avoidance</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+<IMG
+  WIDTH="427" HEIGHT="428" ALIGN="BOTTOM" BORDER="0"
+ SRC="./collision-avoidance-example.jpg"
+ ALT="Image collision-avoidance-example">
+    
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+<BR><HR>
+<ADDRESS>
+
+2014-08-30
+</ADDRESS>
+</BODY>
+</HTML>

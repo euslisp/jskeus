@@ -1,0 +1,319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//JP">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>三軸関節ロボットを使ったヤコビアン，逆運動学の例</TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META NAME="description" CONTENT="三軸関節ロボットを使ったヤコビアン，逆運動学の例">
+<META NAME="keywords" CONTENT="jmanual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="jmanual.css">
+
+<LINK REL="next" HREF="jmanual-node167.html">
+<LINK REL="previous" HREF="jmanual-node165.html">
+<LINK REL="up" HREF="jmanual-node165.html">
+<LINK REL="next" HREF="jmanual-node167.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html2967"
+  HREF="jmanual-node167.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html2961"
+  HREF="jmanual-node165.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html2955"
+  HREF="jmanual-node165.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html2963"
+  HREF="jmanual-node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html2965"
+  HREF="jmanual-node186.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html2968"
+  HREF="jmanual-node167.html">irteusのサンプルプログラムにおける例</A>
+<B> Up:</B> <A NAME="tex2html2962"
+  HREF="jmanual-node165.html">ロボットの動作生成プログラミング</A>
+<B> Previous:</B> <A NAME="tex2html2956"
+  HREF="jmanual-node165.html">ロボットの動作生成プログラミング</A>
+ &nbsp; <B>  <A NAME="tex2html2964"
+  HREF="jmanual-node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2966"
+  HREF="jmanual-node186.html">Index</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION05013100000000000000">
+三軸関節ロボットを使ったヤコビアン，逆運動学の例</A>
+</H3>
+
+<P>
+3軸関節をもつロボットを定義し，
+逆運動学やヤコビアンの計算例を紹介する．
+
+<P>
+ロボットの定義は以下の用になる．
+<PRE>
+(defclass 3dof-robot
+  :super cascaded-link
+  :slots (end-coords l1 l2 l3 l4 j1 j2 j3))
+(defmethod 3dof-robot
+  (:init ()
+   (let (b)
+     (send-super :init)
+
+     (setq b (make-cube 10 10 20))
+     (send b :locate #f(0 0 10))
+     (send b :set-color :red)
+     (setq l4 (instance bodyset-link :init (make-cascoords) :bodies (list b) :name 'l4))
+     (setq end-coords (make-cascoords :pos #f(0 0 20)))
+     (send l4 :assoc end-coords)
+     (send l4 :locate #f(0 0 100))
+     ;;
+     (setq b (make-cube 10 10 100))
+     (send b :locate #f(0 0 50))
+     (send b :set-color :green)
+     (setq l3 (instance bodyset-link :init (make-cascoords) :bodies (list b) :name 'l3))
+     (send l3 :assoc l4)
+     (send l3 :locate #f(0 0 100))
+     ;;
+     (setq b (make-cube 10 10 100))
+     (send b :locate #f(0 0 50))
+     (send b :set-color :blue)
+     (setq l2 (instance bodyset-link :init (make-cascoords) :bodies (list b) :name 'l2))
+     (send l2 :assoc l3)
+     (send l2 :locate #f(0 0 20))
+     ;;
+     (setq b (body+ (make-cube 10 10 20 :pos #f(0 0 10)) (make-cube 300 300 2)))
+     (send b :set-color :white)
+     (setq l1 (instance bodyset-link :init (make-cascoords) :bodies (list b) :name 'l2))
+     (send l1 :assoc l2)
+     ;;
+     (setq j1 (instance rotational-joint :init :name 'j1
+                 :parent-link l1 :child-link l2 :axis :y :min -100 :max 100)
+           j2 (instance rotational-joint :init  :name 'j2
+                 :parent-link l2 :child-link l3 :axis :y :min -100 :max 100)
+           j3 (instance rotational-joint :init  :name 'j3
+                 :parent-link l3 :child-link l4 :axis :y :min -100 :max 100))
+     ;;
+     (setq links (list l1 l2 l3 l4))
+     (setq joint-list (list j1 j2 j3))
+     ;;
+     (send self :init-ending)
+     self))
+  (:end-coords (&amp;rest args) (forward-message-to end-coords args))
+  )
+</PRE>
+
+<P>
+ここではロボットの手先の座標を<code>end-coords</code>というスロット変数に格
+納し，さらにこれにアクセスするためのメソッドを用意してある．
+
+<P>
+これまでと同様，
+<PRE>
+(setq r (instance 3dof-robot :init))
+(objects (list r))
+(send r :angle-vector #f(30 30 30))
+</PRE>
+としてロボットモデルの生成，表示，関節角度の指定が可能である．
+さらに，
+
+<P>
+<PRE>
+(send (send r :end-coords) :draw-on :flush t)
+</PRE>
+
+<P>
+とすると，ロボットの<code>end-coords</code>(端点座標系）の表示が可能であるが，
+マウスイベントが発生すると消えてしまう．恒久的に表示するためには
+
+<P>
+<PRE>
+(objects (list r (send r :end-coords)))
+</PRE>
+
+<P>
+とするとよい．
+
+<P>
+次に，ヤコビアン，逆運動学の例を示す．まず基本になるのが，
+<PRE>
+(send r :link-list (send r :end-coords :parent))
+</PRE>
+として得られるリンクのリストである．これはロボットのルート（胴体）から
+引数となるリンクまでのたどれるリンクを返す．
+
+<P>
+<code>:calc-jacobian-from-link-list</code>メソッドはリンクのリストを引数にと
+り，この各リンクに存在するジョイント（関節）に
+対応するヤコビアンを計算することができる．
+また，<code>:move-target</code>キーワード引数でエンドエフェクタの座標系を
+指定してる．その他のキーワード引数については後述する．
+
+<P>
+<PRE>
+(dotimes (i 100)
+  (setq j (send r :calc-jacobian-from-link-list
+                (send r :link-list (send r :end-coords :parent))
+                :move-target (send r :end-coords)
+                :rotation-axis t
+                :translation-axis t))
+  (setq j# (sr-inverse j))
+  (setq da (transform j# #f(1 0 0 0 0 0)))
+  ;;(setq da (transform j# #f(0 0 0 0 -1 0)))
+  (send r :angle-vector (v+ (send r :angle-vector) da))
+  (send *irtviewer* :draw-objects)
+  )
+</PRE>
+
+<P>
+ここではリンクの長さ（ジョイントの数）は3個なので6行3列のヤコビアン(<code>j</code>)が
+計算される．これの逆行列(<code>j#</code>)を作り，位置姿勢の6自由度の目標速度・角速度
+(<code>#f(1 0 0 0 0 0)</code>)を与えると，それに対応する関節速度(<code>da</code>)
+が計算でき，これを現在の関節角度に足している
+(<code>(v+ (send r :angle-vector) da)</code>)．
+
+<P>
+次に，ロボットの端点作業の位置は合わせるが姿勢は拘束せず任意のままでよい，とい
+う場合の例を示す．ここでは，<code>:calc-jacobian-from-link-list</code>のオプ
+ショナル引数として<code>:rotation-axis</code>, <code>:translation-axis</code>
+があり，それぞれ位置，姿勢での拘束条件を示す．
+<code>t</code>は三軸拘束，<code>nil</code>は拘束なし，その他に<code>:x</code>,
+<code>:y</code>, <code>:z</code>を指定することができる．
+
+<P>
+<PRE>
+(setq translation-axis t)
+(setq rotation-axis nil)
+(dotimes (i 2000)
+  (setq j (send r :calc-jacobian-from-link-list
+                (send r :link-list (send r :end-coords :parent))
+                :move-target (send r :end-coords)
+                :rotation-axis rotation-axis
+                :translation-axis translation-axis))
+  (setq j# (sr-inverse j))
+  (setq c (make-cascoords :pos (float-vector (* 100 (sin (/ i 500.0))) 0 200)))
+  (setq dif-pos (send (send r :end-coords) :difference-position c))
+  (setq da (transform j# dif-pos))
+  (send r :angle-vector (v+ (send r :angle-vector) da))
+  (send *irtviewer* :draw-objects :flush nil)
+  (send c :draw-on :flush t)
+  )
+</PRE>
+
+<P>
+ここでは位置の三軸のみを拘束した3行3列のヤコビアンを計算し，これの
+逆行列からロボットの関節に速度を与えている．さらに，ここでは
+<PRE>
+  (send *irtviewer* :draw-objects :flush nil)
+</PRE>
+として<code>*irtviewer*</code>に画面を描画しているが，実際に
+ディスプレイに表示するフラッシュ処理は行わず，その次の行の
+<PRE>
+  (send c :draw-on :flush t)
+</PRE>
+で目標座標は表示し，かつフラッシュ処理を行っている．
+
+<P>
+上記の計算をまとめた逆運動学メソッドが<code>:inverse-kinematics</code>である．
+第一引数に目標座標系を指定し，ヤコビアン計算のときと同様にキーワード
+引数で
+<code>:move-target</code>, <code>:translation-axis</code>, <code>:rotation-axis</code>
+を指定する．
+また，<code>:debug-view</code>キーワード引数に<code>t</code>を与えると計算中の様
+子をテキスト並びに視覚的に提示してくれる．
+<PRE>
+(setq c (make-cascoords :pos #f(100 0 0) :rpy (float-vector 0 pi 0)))
+(send r :inverse-kinematics  c
+      :link-list (send r :link-list (send r :end-coords :parent))
+      :move-target (send r :end-coords)
+      :translation-axis t
+      :rotation-axis t
+      :debug-view t)
+</PRE>
+
+<P>
+逆運運動学が失敗する場合のサンプルとして以下のプログラムを見てみよう．
+<PRE>
+(dotimes (i 400)
+  (setq c (make-cascoords
+             :pos (float-vector (+ 100 (* 80 (sin (/ i 100.0)))) 0 0)
+             :rpy (float-vector 0 pi 0)))
+  (send r :inverse-kinematics  c
+        :link-list (send r :link-list (send r :end-coords :parent))
+        :move-target (send r :end-coords) :translation-axis t  :rotation-axis t)
+  (x::window-main-one)
+  (send *irtviewer* :draw-objects :flush nil)
+  (send c :draw-on :flush t)
+  )
+</PRE>
+
+<P>
+このプログラムを実行すると以下のようなエラーが出てくる．
+<PRE>
+;; inverse-kinematics failed.
+;; dif-pos : #f(11.7826 0.0 0.008449)/(11.7826/1)
+;; dif-rot : #f(0.0 2.686130e-05 0.0)/(2.686130e-05/0.017453)
+;;  coords : #&lt;coordinates #X4bcccb0  0.0 0.0 0.0 / 0.0 0.0 0.0&gt;
+;;  angles : (14.9993 150 15.0006)
+;;    args : ((#&lt;cascaded-coords #X4b668a0  39.982 0.0 0.0 / 3.142 1.225e-16 3.14
+2&gt;) :link-list (#&lt;bodyset-link #X4cf8e60 l2  0.0 0.0 20.0 / 0.0 0.262 0.0&gt; #&lt;body
+set-link #X4cc8008 l3  25.866 0.0 116.597 / 3.142 0.262 3.142&gt; #&lt;bodyset-link #X4
+c7a0d0 l4  51.764 0.0 20.009 / 3.142 2.686e-05 3.142&gt;) :move-target;; #&lt;cascaded-
+coords #X4c93640  51.764 0.0 0.009 / 3.142 2.686e-05 3.142&gt; :translation-axis t :
+rotation-axis t)
+</PRE>
+
+<P>
+これは，関節の駆動範囲の制限から目標位置に手先が届かない状況である．
+このような場面では，例えば，手先の位置さえ目標位置に届けばよく姿勢を
+無視してよい場合<code>:rotation-axis nil</code>と指定することができる．
+
+<P>
+また，<code>:thre</code>や<code>:rthre</code>を使うことで逆運動学計算の終了条件で
+ある位置姿勢の誤差を指定することができる．正確な計算が求められていない
+状況ではこの値をデフォルトの<code>1</code>, <code>(deg2rad 1)</code>より大きい値を
+利用するのもよい．
+
+<P>
+また，逆運動学の計算に失敗した場合，デフォルトでは逆運動学計算を始める
+前の姿勢まで戻るが，<code>:revert-if-fail</code>というキーワード引数をnilと指定
+すると，指定されたの回数の計算を繰り替えしたあと，その姿勢のまま関数か
+ら抜けてくる．指定の回数もまた，<code>:stop</code>というキーワード引数で指
+定することができる．
+
+<P>
+<PRE>
+(setq c (make-cascoords :pos #f(300 0 0) :rpy (float-vector 0 pi 0)))
+(send r :inverse-kinematics  c
+      :link-list (send r :link-list (send r :end-coords :parent))
+      :move-target (send r :end-coords)
+      :translation-axis t
+      :rotation-axis nil
+      :revert-if-fail nil)
+</PRE>
+
+<P>
+<BR><HR>
+<ADDRESS>
+
+2014-08-30
+</ADDRESS>
+</BODY>
+</HTML>

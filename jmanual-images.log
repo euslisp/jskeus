@@ -1,0 +1,2051 @@
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2014.8.30)  30 AUG 2014 12:15
+entering extended mode
+ %&-line parsing enabled.
+**./jmanual-images.tex
+(./jmanual-images.tex
+LaTeX2e <2009/09/24>
+Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
+yphenation, loaded.
+
+(/usr/share/texmf-texlive/tex/latex/base/article.cls
+Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/share/texmf-texlive/tex/latex/base/size10.clo
+File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+) (/usr/share/texmf-texlive/tex/latex/base/ifthen.sty
+Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
+) (/usr/share/texmf-texlive/tex/latex/base/makeidx.sty
+Package: makeidx 2000/03/29 v1.0m Standard LaTeX package
+) (/tmp/tmp.PXGU3OLkvG/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
+hdr/fancyheadings.sty
+Package: fancyheadings 2008/02/04 1.99 Dummy package to call fancyhdr
+
+Package fancyheadings Warning: Please stop using fancyheadings!
+(fancyheadings)                Use fancyhdr instead.
+(fancyheadings)                We will call fancyhdr with the very same
+(fancyheadings)                options you passed to fancyheadings.
+(fancyheadings)                
+(fancyheadings)                fancyhdr is 99 percent compatible with
+(fancyheadings)                fancyheadings. The only incompatibility is
+(fancyheadings)                that \headrulewidth and \footrulewidth and
+(fancyheadings)                their \plain... versions are no longer length
+(fancyheadings)                parameters, but normal macros (to be changed
+(fancyheadings)                with \renewcommand rather than \setlength)..
+
+(/usr/share/texmf-texlive/tex/latex/fancyhdr/fancyhdr.sty
+\fancy@headwidth=\skip43
+\f@ncyO@elh=\skip44
+\f@ncyO@erh=\skip45
+\f@ncyO@olh=\skip46
+\f@ncyO@orh=\skip47
+\f@ncyO@elf=\skip48
+\f@ncyO@erf=\skip49
+\f@ncyO@olf=\skip50
+\f@ncyO@orf=\skip51
+)) (/usr/share/texmf-texlive/tex/latex/graphics/graphicx.sty
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+(/usr/share/texmf-texlive/tex/latex/graphics/keyval.sty
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks14
+) (/usr/share/texmf-texlive/tex/latex/graphics/graphics.sty
+Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+(/usr/share/texmf-texlive/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+) (/etc/texmf/tex/latex/config/graphics.cfg
+File: graphics.cfg 2009/08/28 v1.8 graphics configuration of TeX Live
+)
+Package graphics Info: Driver file: dvipdfm.def on input line 91.
+(/usr/share/texmf-texlive/tex/latex/dvipdfm/dvipdfm.def
+File: dvipdfm.def 1999/9/6 vx.x Driver-dependant file
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+) (/usr/share/texmf-texlive/tex/latex/graphics/color.sty
+Package: color 2005/11/14 v1.0j Standard LaTeX Color (DPC)
+(/etc/texmf/tex/latex/config/color.cfg
+File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
+)
+Package color Info: Driver file: dvipdfm.def on input line 130.
+(/usr/share/texmf-texlive/tex/latex/graphics/dvipsnam.def
+File: dvipsnam.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
+)) (/usr/share/texmf-texlive/tex/latex/graphics/epsfig.sty
+Package: epsfig 1999/02/16 v1.7a (e)psfig emulation (SPQR)
+\epsfxsize=\dimen105
+\epsfysize=\dimen106
+)
+! Argument of \AtBeginDvi has an extra }.
+<inserted text> 
+                \par 
+l.12 \let\epsfile=\epsfig{\AtBeginDvi}
+                                      {\special{pdf:tounicode 90ms-RKSJ-UCS2...
+I've run across a `}' that doesn't seem to match anything.
+For example, `\def\a#1{...}' and `\a}' would produce
+this error. If you simply proceed now, the `\par' that
+I've just inserted will cause me to report a runaway
+argument that might be the root of the problem. But if
+your `}' was spurious, just type `2' and it will go away.
+
+Runaway argument?
+! Paragraph ended before \AtBeginDvi was complete.
+<to be read again> 
+                   \par 
+l.12 \let\epsfile=\epsfig{\AtBeginDvi}
+                                      {\special{pdf:tounicode 90ms-RKSJ-UCS2...
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
+
+! Extra \fi.
+l.12 ...\special{pdf:tounicode 90ms-RKSJ-UCS2}}\fi
+                                                  
+I'm ignoring this; it doesn't match any \if.
+
+\@indexfile=\write3
+\openout3 = `jmanual-images.idx'.
+
+Writing index file jmanual-images.idx
+(/usr/share/texmf-texlive/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2000/07/18 v2.13 AMS math features
+\@mathmargin=\skip52
+For additional information on amsmath, use the `?' option.
+(/usr/share/texmf-texlive/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01
+(/usr/share/texmf-texlive/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0
+\@emptytoks=\toks15
+\ex@=\dimen107
+)) (/usr/share/texmf-texlive/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d
+\pmbraise@=\dimen108
+) (/usr/share/texmf-texlive/tex/latex/amsmath/amsopn.sty
+Package: amsopn 1999/12/14 v2.01 operator names
+)
+\inf@bad=\count87
+LaTeX Info: Redefining \frac on input line 211.
+\uproot@=\count88
+\leftroot@=\count89
+LaTeX Info: Redefining \overline on input line 307.
+\classnum@=\count90
+\DOTSCASE@=\count91
+LaTeX Info: Redefining \ldots on input line 379.
+LaTeX Info: Redefining \dots on input line 382.
+LaTeX Info: Redefining \cdots on input line 467.
+\Mathstrutbox@=\box26
+\strutbox@=\box27
+\big@size=\dimen109
+LaTeX Font Info:    Redeclaring font encoding OML on input line 567.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 568.
+\macc@depth=\count92
+\c@MaxMatrixCols=\count93
+\dotsspace@=\muskip10
+\c@parentequation=\count94
+\dspbrk@lvl=\count95
+\tag@help=\toks16
+\row@=\count96
+\column@=\count97
+\maxfields@=\count98
+\andhelp@=\toks17
+\eqnshift@=\dimen110
+\alignsep@=\dimen111
+\tagshift@=\dimen112
+\tagwidth@=\dimen113
+\totwidth@=\dimen114
+\lineht@=\dimen115
+\@envbody=\toks18
+\multlinegap=\skip53
+\multlinetaggap=\skip54
+\mathdisplay@stack=\toks19
+LaTeX Info: Redefining \[ on input line 2666.
+LaTeX Info: Redefining \] on input line 2667.
+) (/usr/share/texmf-texlive/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2009/06/22 v3.00
+(/usr/share/texmf-texlive/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2009/06/22 v3.00 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 96.
+)) (/usr/share/texmf-texlive/tex/latex/ltxmisc/cases.sty
+Package: cases 2002/05/02 ver 2.5 
+) (/usr/share/texmf-texlive/tex/latex/base/inputenc.sty
+Package: inputenc 2008/03/30 v1.1d Input encoding file
+\inpenc@prehook=\toks20
+\inpenc@posthook=\toks21
+)
+\sizebox=\box28
+\lthtmlwrite=\write4
+No file jmanual-images.aux.
+\openout1 = `jmanual-images.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 196.
+LaTeX Font Info:    ... okay on input line 196.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 196.
+LaTeX Font Info:    ... okay on input line 196.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 196.
+LaTeX Font Info:    ... okay on input line 196.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 196.
+LaTeX Font Info:    ... okay on input line 196.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 196.
+LaTeX Font Info:    ... okay on input line 196.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 196.
+LaTeX Font Info:    ... okay on input line 196.
+
+latex2htmlLength hsize=349.0pt
+
+latex2htmlLength vsize=744.17567pt
+
+latex2htmlLength hoffset=0.0pt
+
+latex2htmlLength voffset=0.0pt
+
+latex2htmlLength topmargin=0.0pt
+
+latex2htmlLength topskip=0.00003pt
+
+latex2htmlLength headheight=0.0pt
+
+latex2htmlLength headsep=0.0pt
+
+latex2htmlLength parskip=2.84526pt
+
+latex2htmlLength oddsidemargin=14.22636pt
+
+latex2htmlLength evensidemargin=14.22636pt
+
+! Missing \endcsname inserted.
+<to be read again> 
+                   \global 
+l.220 \epsfig{\AtBeginDvi}
+                          %
+The control sequence marked <to be read again> should
+not appear between \csname and \endcsname.
+
+! Extra \endcsname.
+<argument> \endcsname 
+                      
+l.220 \epsfig{\AtBeginDvi}
+                          %
+I'm ignoring this, since I wasn't doing a \csname.
+
+
+! Package keyval Error: \global \setbox \@begindvibox \vbox {\unvbox \@begindvi
+box  }undefined.
+
+See the keyval package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.220 \epsfig{\AtBeginDvi}
+                          %
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+! Undefined control sequence.
+\epsfig ...ize \ifx \Gfigname \relax \ErrorNoFile 
+                                                  \else \the \toks@ \fi \end...
+l.220 \epsfig{\AtBeginDvi}
+                          %
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+l2hSize :tex2html_wrap532:0.0pt::0.0pt::349.0pt.
+[1
+
+
+
+]
+File: fig/eta3colavo.ps Graphic file (type eps)
+<fig/eta3colavo.ps>
+Overfull \hbox (77.79134pt too wide) in paragraph at lines 428--429
+[][] 
+ []
+
+l2hSize :figure763:212.9832pt::0.0pt::349.0pt.
+[2
+
+
+]
+File: fig/pointer.ps Graphic file (type eps)
+<fig/pointer.ps>
+l2hSize :figure886:107.36374pt::0.0pt::349.0pt.
+[3
+
+
+]
+LaTeX Font Info:    Try loading font information for U+msa on input line 448.
+(/usr/share/texmf-texlive/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2009/06/22 v3.00 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 448.
+(/usr/share/texmf-texlive/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2009/06/22 v3.00 AMS symbols B
+)
+l2hSize :tex2html_wrap_inline67512:6.95831pt::6.95831pt::8.27783pt.
+[4
+
+
+]
+File: fig/object.ps Graphic file (type eps)
+<fig/object.ps>
+Overfull \hbox (49.48874pt too wide) in paragraph at lines 456--457
+ [] 
+ []
+
+l2hSize :figure898:130.44624pt::0.0pt::349.0pt.
+[5
+
+
+]
+l2hSize :figure917:606.0pt::0.0pt::349.0pt.
+[6
+
+
+]
+l2hSize :tex2html_wrap_inline67562:8.0pt::8.0pt::3.27782pt.
+[7
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ž in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ¯ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ­ in font cmr10!
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 558.
+
+(/usr/share/texmf-texlive/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 558.
+l2hSize :emtabbing3962:94.84526pt::0.0pt::350.05598pt.
+[8
+
+
+]
+l2hSize :tex2html_wrap_inline67671:6.95831pt::6.95831pt::8.27783pt.
+[9
+
+
+]
+l2hSize :tex2html_wrap_inline67700:6.45831pt::0.0pt::4.55907pt.
+[10
+
+
+]
+l2hSize :tex2html_wrap_inline67702:8.64003pt::8.64003pt::104.29175pt.
+[11
+
+
+]
+l2hSize :tex2html_wrap_inline67705:8.14003pt::0.0pt::20.22232pt.
+[12
+
+
+]
+l2hSize :tex2html_wrap_inline67711:6.45831pt::0.0pt::6.55908pt.
+[13
+
+
+]
+l2hSize :tex2html_wrap_inline67714:6.95831pt::6.95831pt::23.78123pt.
+[14
+
+
+]
+l2hSize :tex2html_wrap_inline67717:8.0pt::8.0pt::16.55911pt.
+[15
+
+
+]
+l2hSize :tex2html_wrap_inline67721:6.95831pt::6.95831pt::31.55904pt.
+[16
+
+
+]
+l2hSize :tex2html_wrap_inline67724:8.0pt::8.0pt::24.33691pt.
+[17
+
+
+]
+l2hSize :tex2html_wrap_inline67738:6.95831pt::6.95831pt::8.27783pt.
+[18
+
+
+]
+l2hSize :tex2html_wrap_inline67748:6.95831pt::6.95831pt::16.05563pt.
+[19
+
+
+]
+l2hSize :tex2html_wrap_inline67753:6.95831pt::6.95831pt::16.05563pt.
+[20
+
+
+]
+l2hSize :tex2html_wrap_inline67760:7.09525pt::7.09525pt::50.01114pt.
+[21
+
+
+]
+l2hSize :tex2html_wrap_inline67763:7.09525pt::7.09525pt::50.01114pt.
+[22
+
+
+]
+l2hSize :tex2html_wrap_inline67777:8.0pt::8.0pt::3.27782pt.
+[23
+
+
+]
+l2hSize :tex2html_wrap_inline67804:8.0pt::8.0pt::43.4816pt.
+[24
+
+
+]
+l2hSize :tex2html_wrap_inline67807:8.0pt::8.0pt::44.5927pt.
+[25
+
+
+]
+l2hSize :tex2html_wrap_inline67810:8.0pt::8.0pt::45.64828pt.
+[26
+
+
+]
+l2hSize :tex2html_wrap_inline67813:10.78847pt::10.78847pt::31.07172pt.
+[27
+
+
+]
+l2hSize :tex2html_wrap_inline67816:10.78847pt::10.78847pt::30.96062pt.
+[28
+
+
+]
+l2hSize :tex2html_wrap_inline67819:10.78847pt::10.78847pt::31.07172pt.
+[29
+
+
+]
+l2hSize :tex2html_wrap_inline67824:8.0pt::8.0pt::24.25471pt.
+[30
+
+
+]
+l2hSize :tex2html_wrap_inline67832:6.6428pt::0.0pt::10.19102pt.
+[31
+
+
+]
+l2hSize :tex2html_wrap_inline67842:8.0pt::8.0pt::5.50005pt.
+[32
+
+
+]
+l2hSize :tex2html_wrap_inline67844:8.0pt::8.0pt::14.38896pt.
+[33
+
+
+]
+l2hSize :tex2html_wrap_inline67909:7.33331pt::7.33331pt::55.18031pt.
+[34
+
+
+]
+Missing character: There is no é in font cmr10!
+Missing character: There is no – in font cmr10!
+Missing character: There is no ¢ in font cmr10!
+Missing character: There is no æ in font cmr10!
+Missing character: There is no • in font cmr10!
+Missing character: There is no ° in font cmr10!
+l2hSize :emtabbing11467:106.84526pt::0.0pt::349.0pt.
+[35
+
+
+]
+Missing character: There is no é in font cmr10!
+Missing character: There is no – in font cmr10!
+Missing character: There is no ¢ in font cmr10!
+Missing character: There is no æ in font cmr10!
+Missing character: There is no • in font cmr10!
+Missing character: There is no ° in font cmr10!
+l2hSize :emtabbing15143:94.84526pt::0.0pt::349.0pt.
+[36
+
+
+]
+l2hSize :tex2html_wrap_inline68144:8.0pt::8.0pt::43.54858pt.
+[37
+
+
+]
+l2hSize :tex2html_wrap_inline68220:6.45831pt::0.0pt::8.27783pt.
+[38
+
+
+]
+Missing character: There is no é in font cmr10!
+Missing character: There is no – in font cmr10!
+Missing character: There is no ¢ in font cmr10!
+Missing character: There is no æ in font cmr10!
+Missing character: There is no • in font cmr10!
+Missing character: There is no ° in font cmr10!
+l2hSize :emtabbing18480:106.84526pt::0.0pt::432.56528pt.
+[39
+
+
+]
+Missing character: There is no é in font cmr10!
+Missing character: There is no – in font cmr10!
+Missing character: There is no ¢ in font cmr10!
+Missing character: There is no æ in font cmr10!
+Missing character: There is no • in font cmr10!
+Missing character: There is no ° in font cmr10!
+l2hSize :emtabbing18555:94.84526pt::0.0pt::349.0pt.
+[40
+
+
+]
+Missing character: There is no é in font cmr10!
+Missing character: There is no – in font cmr10!
+Missing character: There is no ¢ in font cmr10!
+Missing character: There is no æ in font cmr10!
+Missing character: There is no • in font cmr10!
+Missing character: There is no ° in font cmr10!
+l2hSize :emtabbing18649:82.84526pt::0.0pt::349.0pt.
+[41
+
+
+]
+l2hSize :tex2html_wrap_inline68422:6.94444pt::0.0pt::45.55737pt.
+[42
+
+
+]
+l2hSize :tex2html_wrap_inline68424:6.94444pt::0.0pt::45.55737pt.
+[43
+
+
+]
+l2hSize :tex2html_wrap_inline68426:6.94444pt::0.0pt::45.55737pt.
+[44
+
+
+]
+Missing character: There is no é in font cmr10!
+Missing character: There is no – in font cmr10!
+Missing character: There is no ¢ in font cmr10!
+Missing character: There is no æ in font cmr10!
+Missing character: There is no • in font cmr10!
+Missing character: There is no ° in font cmr10!
+l2hSize :emtabbing24943:82.84526pt::0.0pt::349.0pt.
+[45
+
+
+]
+File: fig/threadfig.ps Graphic file (type eps)
+<fig/threadfig.ps>
+Overfull \hbox (20.88582pt too wide) in paragraph at lines 913--914
+ [] 
+ []
+
+l2hSize :figure25144:173.4837pt::0.0pt::349.0pt.
+[46
+
+
+]
+File: fig/parathreads.ps Graphic file (type eps)
+<fig/parathreads.ps>
+l2hSize :figure25156:304.6941pt::0.0pt::349.0pt.
+[47
+
+
+]
+File: fig/threadobj.ps Graphic file (type eps)
+<fig/threadobj.ps>
+File: fig/threadpool.ps Graphic file (type eps)
+<fig/threadpool.ps>
+Overfull \hbox (101.79132pt too wide) in paragraph at lines 934--938
+ [] 
+ []
+
+l2hSize :figure25167:134.15906pt::0.0pt::349.0pt.
+[48
+
+
+]
+File: fig/synchports.ps Graphic file (type eps)
+<fig/synchports.ps>
+Overfull \hbox (20.88582pt too wide) in paragraph at lines 949--950
+ [] 
+ []
+
+l2hSize :figure25184:202.1055pt::0.0pt::349.0pt.
+[49
+
+
+]
+l2hSize :tex2html_wrap_inline68662:8.0pt::8.0pt::37.45384pt.
+[50
+
+
+]
+l2hSize :tex2html_wrap_inline68665:8.64003pt::8.64003pt::41.93997pt.
+[51
+
+
+]
+l2hSize :tex2html_wrap_inline68669:8.0pt::8.0pt::77.18532pt.
+[52
+
+
+]
+l2hSize :tex2html_wrap_inline68672:8.64003pt::8.64003pt::81.67145pt.
+[53
+
+
+]
+l2hSize :tex2html_wrap_inline68679:8.0pt::8.0pt::43.89569pt.
+[54
+
+
+]
+l2hSize :tex2html_wrap_inline68681:8.0pt::8.0pt::82.2914pt.
+[55
+
+
+]
+l2hSize :tex2html_wrap_inline68687:7.44444pt::7.44444pt::98.40784pt.
+[56
+
+
+]
+l2hSize :tex2html_wrap_inline68695:6.95831pt::6.95831pt::8.27783pt.
+[57
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing27759:154.84526pt::0.0pt::349.0pt.
+[58
+
+
+]
+File: fig/beam.ps Graphic file (type eps)
+<fig/beam.ps>
+l2hSize :figure29705:294.52756pt::0.0pt::349.0pt.
+[59
+
+
+]
+l2hSize :tex2html_wrap_inline68802:6.45831pt::0.0pt::3.27782pt.
+[60
+
+
+]
+l2hSize :tex2html_wrap_inline68820:8.0pt::8.0pt::5.50005pt.
+[61
+
+
+]
+l2hSize :tex2html_wrap_inline68932:8.0pt::8.0pt::57.27438pt.
+[62
+
+
+]
+File: fig/fig1.ps Graphic file (type eps)
+<fig/fig1.ps>
+Overfull \hbox (34.645pt too wide) in paragraph at lines 1073--1074
+ [] 
+ []
+
+l2hSize :figure30441:551.60236pt::0.0pt::349.0pt.
+[63
+
+
+]
+l2hSize :tex2html_wrap_inline69018:6.45831pt::0.0pt::5.59033pt.
+[64
+
+
+]
+File: fig/fig-peg-in-hole1.ps Graphic file (type eps)
+<fig/fig-peg-in-hole1.ps>
+File: fig/fig-peg-in-hole2.ps Graphic file (type eps)
+<fig/fig-peg-in-hole2.ps>
+File: fig/fig-peg-in-hole3.ps Graphic file (type eps)
+<fig/fig-peg-in-hole3.ps>
+File: fig/fig-peg-in-hole4.ps Graphic file (type eps)
+<fig/fig-peg-in-hole4.ps>
+Underfull \hbox (badness 10000) in paragraph at lines 1091--1095
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1091--1095
+[]
+ []
+
+*** image for figure35589 is too tall at 902.11096pt, reducing to .95 vsize ***
+
+l2hSize :figure35589:706.96461pt::0.0pt::349.0pt.
+[65
+
+
+]
+File: fig/fig-peg-naname-m1.ps Graphic file (type eps)
+<fig/fig-peg-naname-m1.ps>
+File: fig/fig-peg-naname-m2.ps Graphic file (type eps)
+<fig/fig-peg-naname-m2.ps>
+File: fig/fig-peg-naname-m3.ps Graphic file (type eps)
+<fig/fig-peg-naname-m3.ps>
+File: fig/fig-peg-naname-m4.ps Graphic file (type eps)
+<fig/fig-peg-naname-m4.ps>
+*** image for figure35597 is too tall at 912.11096pt, reducing to .95 vsize ***
+
+l2hSize :figure35597:706.96461pt::0.0pt::349.0pt.
+[66
+
+
+]
+File: fig/viewcoords.ps Graphic file (type eps)
+<fig/viewcoords.ps>
+Overfull \hbox (69.89468pt too wide) in paragraph at lines 1119--1120
+ [] 
+ []
+
+l2hSize :figure35856:295.52756pt::0.0pt::349.0pt.
+[67
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing36510:82.84526pt::0.0pt::349.0pt.
+[68
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing36648:106.84526pt::0.0pt::349.0pt.
+[69
+
+
+]
+l2hSize :tex2html_wrap_inline69109:6.95831pt::6.95831pt::180.41145pt.
+[70
+
+
+]
+Missing character: There is no é in font cmr10!
+Missing character: There is no – in font cmr10!
+Missing character: There is no ¢ in font cmr10!
+Missing character: There is no æ in font cmr10!
+Missing character: There is no • in font cmr10!
+Missing character: There is no ° in font cmr10!
+l2hSize :emtabbing37304:142.84526pt::0.0pt::349.0pt.
+[71
+
+
+]
+Missing character: There is no é in font cmr10!
+Missing character: There is no – in font cmr10!
+Missing character: There is no ¢ in font cmr10!
+Missing character: There is no æ in font cmr10!
+Missing character: There is no • in font cmr10!
+Missing character: There is no ° in font cmr10!
+l2hSize :emtabbing37394:58.84526pt::0.0pt::349.0pt.
+[72
+
+
+]
+File: fig/xdraw.ps Graphic file (type eps)
+<fig/xdraw.ps>
+l2hSize :figure39169:180.71652pt::0.0pt::349.0pt.
+[73
+
+
+]
+l2hSize :tex2html_wrap_inline69236:8.0pt::8.0pt::23.69911pt.
+[74
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing40681:118.84526pt::0.0pt::370.77116pt.
+[75
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing41071:94.84526pt::0.0pt::349.0pt.
+[76
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing41256:46.84526pt::0.0pt::350.89491pt.
+[77
+
+
+]
+l2hSize :tex2html_wrap_inline69328:8.14003pt::0.0pt::76.38889pt.
+[78
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing41487:70.84526pt::0.0pt::349.0pt.
+[79
+
+
+]
+l2hSize :tex2html_wrap_inline69342:6.95831pt::6.95831pt::13.27785pt.
+[80
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+
+Overfull \hbox (4.54349pt too wide) detected at line 1298
+[] [] []
+ []
+
+l2hSize :emtabbing44581:58.84526pt::0.0pt::389.89873pt.
+[81
+
+
+]
+File: fig/panellayout.ps Graphic file (type eps)
+<fig/panellayout.ps>
+l2hSize :figure43808:209.16928pt::0.0pt::349.0pt.
+[82
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing44628:58.84526pt::0.0pt::349.0pt.
+[83
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing44658:58.84526pt::0.0pt::349.0pt.
+[84
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing44781:58.84526pt::0.0pt::415.07079pt.
+[85
+
+
+]
+File: fig/filepanel.ps Graphic file (type eps)
+<fig/filepanel.ps>
+l2hSize :figure43895:223.39566pt::0.0pt::349.0pt.
+[86
+
+
+]
+File: fig/textviewpanel.ps Graphic file (type eps)
+<fig/textviewpanel.ps>
+l2hSize :figure43905:209.16928pt::0.0pt::349.0pt.
+[87
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing44863:58.84526pt::0.0pt::402.54868pt.
+[88
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing44907:94.84526pt::0.0pt::353.48222pt.
+[89
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing44964:70.84526pt::0.0pt::349.0pt.
+[90
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing45020:58.84526pt::0.0pt::349.0pt.
+[91
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing45077:94.84526pt::0.0pt::349.0pt.
+[92
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing45165:70.84526pt::0.0pt::434.49286pt.
+[93
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing45216:82.84526pt::0.0pt::349.0pt.
+[94
+
+
+]
+File: fig/panelitem.ps Graphic file (type eps)
+<fig/panelitem.ps>
+l2hSize :figure44063:152.26378pt::0.0pt::349.0pt.
+[95
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing45273:58.84526pt::0.0pt::458.51488pt.
+[96
+
+
+]
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no ½ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ã in font cmr10!
+Missing character: There is no ƒ in font cmr10!
+Missing character: There is no ‰ in font cmr10!
+l2hSize :emtabbing45350:70.84526pt::0.0pt::349.0pt.
+[97
+
+
+]
+l2hSize :tex2html_wrap_inline69485:7.33331pt::7.33331pt::11.93582pt.
+[98
+
+
+]
+l2hSize :tex2html_wrap_inline69487:6.95831pt::6.95831pt::9.99948pt.
+[99
+
+
+]
+l2hSize :tex2html_wrap_inline69491:7.44444pt::7.44444pt::9.00525pt.
+[100
+
+
+]
+l2hSize :tex2html_wrap_inline69493:6.95831pt::6.95831pt::9.17772pt.
+[101
+
+
+]
+l2hSize :tex2html_wrap_indisplay69497:15.04503pt::15.04503pt::87.94737pt.
+[102
+
+
+]
+l2hSize :tex2html_wrap_inline69499:8.49002pt::0.0pt::21.13083pt.
+[103
+
+
+]
+l2hSize :tex2html_wrap_inline69501:6.45831pt::0.0pt::5.78592pt.
+[104
+
+
+]
+l2hSize :tex2html_wrap_inline69503:8.0pt::8.0pt::32.37509pt.
+[105
+
+
+]
+l2hSize :tex2html_wrap_indisplay69505:9.49002pt::9.49002pt::165.39134pt.
+[106
+
+
+]
+l2hSize :tex2html_wrap_inline69507:7.33331pt::7.33331pt::24.22716pt.
+[107
+
+
+]
+l2hSize :tex2html_wrap_inline69509:7.33331pt::7.33331pt::11.05154pt.
+[108
+
+
+]
+l2hSize :tex2html_wrap_indisplay69511:15.0001pt::15.0001pt::83.58913pt.
+[109
+
+
+]
+l2hSize :tex2html_wrap_indisplay69513:9.26085pt::9.26085pt::49.78352pt.
+[110
+
+
+]
+l2hSize :tex2html_wrap_inline69521:8.64003pt::8.64003pt::5.94336pt.
+[111
+
+
+]
+l2hSize :tex2html_wrap_inline69525:6.83331pt::0.0pt::9.625pt.
+[112
+
+
+]
+l2hSize :tex2html_wrap_inline69530:6.94444pt::0.0pt::5.47226pt.
+[113
+
+
+]
+l2hSize :tex2html_wrap_inline69531:8.91226pt::8.91226pt::75.29851pt.
+[114
+
+
+]
+l2hSize :tex2html_wrap_inline69536:6.45831pt::0.0pt::5.2894pt.
+[115
+
+
+]
+l2hSize :tex2html_wrap_indisplay69539:6.95831pt::6.95831pt::6.1065pt.
+[116
+
+
+]
+l2hSize :tex2html_wrap_indisplay69540:6.95831pt::6.95831pt::8.27783pt.
+[117
+
+
+]
+l2hSize :tex2html_wrap_indisplay69541:7.44444pt::7.44444pt::7.28476pt.
+[118
+
+
+]
+l2hSize :tex2html_wrap_indisplay69542:8.0pt::8.0pt::4.38893pt.
+[119
+
+
+]
+l2hSize :tex2html_wrap_indisplay69543:7.44444pt::7.44444pt::6.4375pt.
+[120
+
+
+]
+l2hSize :tex2html_wrap_indisplay69544:8.0pt::8.0pt::4.38893pt.
+[121
+
+
+]
+l2hSize :tex2html_wrap_indisplay69550:9.14003pt::9.14003pt::15.12508pt.
+[122
+
+
+]
+l2hSize :tex2html_wrap_inline69554:8.64003pt::8.64003pt::17.20844pt.
+[123
+
+
+]
+l2hSize :tex2html_wrap_indisplay69557:7.31749pt::7.31749pt::6.1065pt.
+[124
+
+
+]
+l2hSize :tex2html_wrap_indisplay69561:14.20952pt::14.20952pt::35.20207pt.
+[125
+
+
+]
+l2hSize :tex2html_wrap_indisplay69565:7.36111pt::7.36111pt::7.81946pt.
+[126
+
+
+]
+l2hSize :tex2html_wrap_indisplay69568:9.81749pt::9.81749pt::10.3264pt.
+[127
+
+
+]
+l2hSize :tex2html_wrap_inline69573:6.83331pt::0.0pt::7.00697pt.
+[128
+
+
+]
+l2hSize :tex2html_wrap_inline69574:8.0pt::8.0pt::4.38893pt.
+[129
+
+
+]
+l2hSize :tex2html_wrap_inline69579:8.0pt::8.0pt::4.38893pt.
+[130
+
+
+]
+l2hSize :tex2html_wrap_inline69581:6.95831pt::6.95831pt::27.50465pt.
+[131
+
+
+]
+l2hSize :tex2html_wrap_inline69583:6.45831pt::0.0pt::9.28017pt.
+[132
+
+
+]
+l2hSize :tex2html_wrap_inline69590:6.45831pt::0.0pt::6.50238pt.
+[133
+
+
+]
+l2hSize :tex2html_wrap_inline69600:6.67859pt::0.0pt::5.2894pt.
+[134
+
+
+]
+l2hSize :tex2html_wrap_inline69611:8.64003pt::8.64003pt::15.12508pt.
+[135
+
+
+]
+l2hSize :tex2html_wrap_indisplay69614:9.81749pt::9.81749pt::57.14804pt.
+[136
+
+
+]
+l2hSize :tex2html_wrap_inline69620:8.99002pt::8.99002pt::11.4584pt.
+[137
+
+
+]
+l2hSize :tex2html_wrap_indisplay69628:7.36111pt::7.36111pt::9.19443pt.
+[138
+
+
+]
+l2hSize :displaymath69629:45.04465pt::0.0pt::349.0pt.
+[139
+
+
+]
+l2hSize :tex2html_wrap_inline69631:6.95831pt::6.95831pt::28.61574pt.
+[140
+
+
+]
+l2hSize :tex2html_wrap_inline69633:6.95831pt::6.95831pt::36.39354pt.
+[141
+
+
+]
+l2hSize :tex2html_wrap_indisplay69636:14.31122pt::14.31122pt::140.29013pt.
+[142
+
+
+]
+l2hSize :tex2html_wrap_indisplay69639:11.80556pt::11.80556pt::17.16675pt.
+[143
+
+
+]
+l2hSize :tex2html_wrap_indisplay69641:12.12863pt::12.12863pt::18.67462pt.
+[144
+
+
+]
+l2hSize :tex2html_wrap_indisplay69643:6.95831pt::6.95831pt::14.35422pt.
+[145
+
+
+]
+l2hSize :tex2html_wrap_indisplay69645:9.81749pt::9.81749pt::46.4119pt.
+[146
+
+
+]
+l2hSize :tex2html_wrap_indisplay69648:12.00008pt::12.00008pt::160.73694pt.
+[147
+
+
+]
+l2hSize :tex2html_wrap_inline69661:12.00009pt::12.00009pt::13.10416pt.
+[148
+
+
+]
+l2hSize :tex2html_wrap_inline69680:8.0pt::8.0pt::8.98616pt.
+[149
+
+
+]
+l2hSize :tex2html_wrap_indisplay69689:8.0pt::8.0pt::8.98616pt.
+[150
+
+
+]
+l2hSize :tex2html_wrap_indisplay69691:8.0pt::8.0pt::14.94444pt.
+[151
+
+
+]
+l2hSize :tex2html_wrap_indisplay69693:14.03899pt::14.03899pt::84.6085pt.
+[152
+
+
+]
+l2hSize :tex2html_wrap_indisplay69696:14.31122pt::14.31122pt::184.74593pt.
+[153
+
+
+]
+l2hSize :tex2html_wrap_inline69709:8.0pt::8.0pt::10.15051pt.
+[154
+
+
+]
+l2hSize :tex2html_wrap_indisplay69719:8.0pt::8.0pt::10.15051pt.
+[155
+
+
+]
+l2hSize :tex2html_wrap_indisplay69721:14.17436pt::14.17436pt::76.09122pt.
+[156
+
+
+]
+l2hSize :tex2html_wrap_inline69772:7.09525pt::7.09525pt::5.19052pt.
+[157
+
+
+]
+l2hSize :tex2html_wrap_inline69778:6.95831pt::6.95831pt::4.7136pt.
+[158
+
+
+]
+l2hSize :tex2html_wrap_indisplay69781:33.0003pt::33.0003pt::207.50485pt.
+[159
+
+
+]
+l2hSize :tex2html_wrap_inline69792:6.95831pt::6.95831pt::5.53128pt.
+[160
+
+
+]
+l2hSize :tex2html_wrap_inline69801:6.95831pt::6.95831pt::13.90034pt.
+[161
+
+
+]
+l2hSize :tex2html_wrap_indisplay69809:16.71603pt::16.71603pt::80.1674pt.
+[162
+
+
+]
+l2hSize :tex2html_wrap_inline69814:6.83331pt::0.0pt::11.33337pt.
+[163
+
+
+]
+l2hSize :tex2html_wrap_inline69820:6.95831pt::6.95831pt::7.16672pt.
+[164
+
+
+]
+l2hSize :tex2html_wrap_inline69824:6.83331pt::0.0pt::8.17018pt.
+[165
+
+
+]
+l2hSize :tex2html_wrap_inline69825:7.96227pt::0.0pt::17.1367pt.
+[166
+
+
+]
+l2hSize :tex2html_wrap_inline69836:9.94444pt::9.94444pt::36.93733pt.
+[167
+
+
+]
+l2hSize :tex2html_wrap_indisplay69840:10.79845pt::10.79845pt::120.77176pt.
+[168
+
+
+]
+l2hSize :tex2html_wrap_indisplay69854:9.94444pt::9.94444pt::32.49292pt.
+[169
+
+
+]
+l2hSize :tex2html_wrap_indisplay69856:12.00009pt::12.00009pt::26.13187pt.
+[170
+
+
+]
+l2hSize :tex2html_wrap_indisplay69860:15.00769pt::15.00769pt::48.4304pt.
+[171
+
+
+]
+l2hSize :tex2html_wrap_indisplay69863:9.94444pt::9.94444pt::6.4375pt.
+[172
+
+
+]
+l2hSize :tex2html_wrap_indisplay69864:14.03899pt::14.03899pt::139.56659pt.
+[173
+
+
+]
+l2hSize :tex2html_wrap_inline69868:7.44444pt::7.44444pt::53.74898pt.
+[174
+
+
+]
+l2hSize :tex2html_wrap_inline69870:8.0pt::8.0pt::13.5139pt.
+[175
+
+
+]
+l2hSize :tex2html_wrap_indisplay69880:8.0pt::8.0pt::13.5139pt.
+[176
+
+
+]
+l2hSize :tex2html_wrap_indisplay69882:17.01393pt::17.01393pt::148.48512pt.
+[177
+
+
+]
+l2hSize :tex2html_wrap_inline69884:6.95831pt::6.95831pt::24.72687pt.
+[178
+
+
+]
+l2hSize :tex2html_wrap_indisplay69892:7.36111pt::7.36111pt::13.02774pt.
+[179
+
+
+]
+l2hSize :displaymath69893:61.65558pt::0.0pt::349.0pt.
+[180
+
+
+]
+l2hSize :tex2html_wrap_inline69895:6.95831pt::6.95831pt::10.98848pt.
+[181
+
+
+]
+l2hSize :tex2html_wrap_indisplay69898:15.00012pt::15.00012pt::80.83614pt.
+[182
+
+
+]
+l2hSize :tex2html_wrap_indisplay69901:15.4051pt::15.4051pt::214.67902pt.
+[183
+
+
+]
+l2hSize :displaymath69906:43.58902pt::0.0pt::349.0pt.
+[184
+
+
+]
+l2hSize :tex2html_wrap_inline69929:6.45831pt::0.0pt::10.11348pt.
+[185
+
+
+]
+l2hSize :tex2html_wrap_inline69931:6.94444pt::0.0pt::19.60538pt.
+[186
+
+
+]
+l2hSize :tex2html_wrap_indisplay69934:8.0pt::8.0pt::30.01047pt.
+[187
+
+
+]
+l2hSize :tex2html_wrap_indisplay69936:8.0pt::8.0pt::65.08844pt.
+[188
+
+
+]
+l2hSize :tex2html_wrap_indisplay69938:6.95831pt::6.95831pt::16.55301pt.
+[189
+
+
+]
+l2hSize :tex2html_wrap_inline69940:8.0pt::8.0pt::19.45496pt.
+[190
+
+
+]
+l2hSize :tex2html_wrap_inline69942:6.94444pt::0.0pt::5.7049pt.
+[191
+
+
+]
+l2hSize :tex2html_wrap_inline69944:7.44444pt::7.44444pt::10.54254pt.
+[192
+
+
+]
+l2hSize :tex2html_wrap_inline69946:7.44444pt::7.44444pt::9.72156pt.
+[193
+
+
+]
+l2hSize :displaymath69949:31.00023pt::0.0pt::349.0pt.
+[194
+
+
+]
+l2hSize :tex2html_wrap_indisplay69961:7.44444pt::7.44444pt::12.69443pt.
+[195
+
+
+]
+l2hSize :displaymath69962:31.00023pt::0.0pt::349.0pt.
+[196
+
+
+]
+l2hSize :tex2html_wrap_indisplay69964:9.81749pt::9.81749pt::221.76518pt.
+[197
+
+
+]
+l2hSize :tex2html_wrap_inline69966:7.44444pt::7.44444pt::24.66031pt.
+[198
+
+
+]
+l2hSize :tex2html_wrap_inline69968:7.44444pt::7.44444pt::21.01637pt.
+[199
+
+
+]
+l2hSize :tex2html_wrap_inline69973:8.0pt::8.0pt::61.99165pt.
+[200
+
+
+]
+l2hSize :tex2html_wrap_inline69975:8.0pt::8.0pt::101.76855pt.
+[201
+
+
+]
+l2hSize :tex2html_wrap_inline69977:7.44444pt::7.44444pt::84.62091pt.
+[202
+
+
+]
+l2hSize :tex2html_wrap_inline69979:6.95831pt::6.95831pt::14.91377pt.
+[203
+
+
+]
+l2hSize :tex2html_wrap_inline69981:7.33331pt::7.33331pt::25.19598pt.
+[204
+
+
+]
+l2hSize :tex2html_wrap_inline69983:7.33331pt::7.33331pt::16.6195pt.
+[205
+
+
+]
+l2hSize :tex2html_wrap_inline69993:6.83331pt::0.0pt::7.3056pt.
+[206
+
+
+]
+l2hSize :tex2html_wrap_inline69995:6.83331pt::0.0pt::9.625pt.
+[207
+
+
+]
+l2hSize :tex2html_wrap_inline69997:8.0pt::8.0pt::3.27782pt.
+[208
+
+
+]
+l2hSize :tex2html_wrap_inline70001:7.44444pt::7.44444pt::5.33511pt.
+[209
+
+
+]
+l2hSize :tex2html_wrap_inline70002:8.91226pt::8.91226pt::22.35524pt.
+[210
+
+
+]
+l2hSize :tex2html_wrap_inline70007:8.91226pt::8.91226pt::25.79976pt.
+[211
+
+
+]
+l2hSize :tex2html_wrap_inline70013:9.81749pt::9.81749pt::9.6806pt.
+[212
+
+
+]
+l2hSize :tex2html_wrap_inline70014:8.91226pt::8.91226pt::22.35524pt.
+[213
+
+
+]
+l2hSize :tex2html_wrap_inline70018:9.81749pt::9.81749pt::21.41676pt.
+[214
+
+
+]
+l2hSize :tex2html_wrap_inline70019:8.91226pt::8.91226pt::15.87712pt.
+[215
+
+
+]
+l2hSize :tex2html_wrap_inline70021:8.0pt::8.0pt::84.1108pt.
+[216
+
+
+]
+l2hSize :tex2html_wrap_inline70023:6.59525pt::0.0pt::3.94516pt.
+[217
+
+
+]
+l2hSize :tex2html_wrap_inline70025:7.33331pt::7.33331pt::9.96126pt.
+[218
+
+
+]
+l2hSize :tex2html_wrap_inline70027:6.83331pt::0.0pt::7.20834pt.
+[219
+
+
+]
+l2hSize :tex2html_wrap_inline70029:7.33331pt::7.33331pt::87.40253pt.
+[220
+
+
+]
+l2hSize :tex2html_wrap_inline70033:9.81749pt::9.81749pt::61.27333pt.
+[221
+
+
+]
+l2hSize :displaymath70036:51.49063pt::0.0pt::349.0pt.
+[222
+
+
+]
+l2hSize :tex2html_wrap_inline70042:6.95831pt::6.95831pt::9.91788pt.
+[223
+
+
+]
+l2hSize :numcases48114:26.0pt::0.0pt::349.0pt.
+[224
+
+
+]
+l2hSize :tex2html_wrap_inline70055:7.33331pt::7.33331pt::26.84715pt.
+[225
+
+
+]
+l2hSize :tex2html_wrap_inline70065:6.45831pt::0.0pt::6.2153pt.
+[226
+
+
+]
+l2hSize :tex2html_wrap_inline70067:6.95831pt::6.95831pt::5.76163pt.
+[227
+
+
+]
+l2hSize :tex2html_wrap_inline70077:6.95831pt::6.95831pt::22.7222pt.
+[228
+
+
+]
+l2hSize :displaymath70081:31.00023pt::0.0pt::349.0pt.
+[229
+
+
+]
+l2hSize :tex2html_wrap_inline70087:6.95831pt::6.95831pt::17.92473pt.
+[230
+
+
+]
+l2hSize :tex2html_wrap_inline70089:6.94444pt::0.0pt::3.6806pt.
+[231
+
+
+]
+l2hSize :tex2html_wrap_inline70096:8.0pt::8.0pt::30.04659pt.
+[232
+
+
+]
+l2hSize :tex2html_wrap_inline70100:6.45831pt::0.0pt::4.82759pt.
+[233
+
+
+]
+l2hSize :tex2html_wrap_inline70101:6.95831pt::6.95831pt::18.48866pt.
+[234
+
+
+]
+l2hSize :tex2html_wrap_inline70105:6.83331pt::0.0pt::5.68057pt.
+[235
+
+
+]
+l2hSize :tex2html_wrap_inline70106:8.0pt::8.0pt::18.48866pt.
+[236
+
+
+]
+l2hSize :tex2html_wrap_indisplay70108:8.0pt::8.0pt::30.04659pt.
+[237
+
+
+]
+l2hSize :tex2html_wrap_indisplay70109:6.95831pt::6.95831pt::5.63425pt.
+[238
+
+
+]
+l2hSize :tex2html_wrap_indisplay70110:6.95831pt::6.95831pt::18.48866pt.
+[239
+
+
+]
+l2hSize :tex2html_wrap_indisplay70111:7.36111pt::7.36111pt::6.38889pt.
+[240
+
+
+]
+l2hSize :tex2html_wrap_indisplay70112:8.0pt::8.0pt::138.69014pt.
+[241
+
+
+]
+l2hSize :tex2html_wrap_indisplay70114:6.95831pt::6.95831pt::7.76395pt.
+[242
+
+
+]
+l2hSize :tex2html_wrap_indisplay70116:8.0pt::8.0pt::52.03148pt.
+[243
+
+
+]
+l2hSize :tex2html_wrap_indisplay70118:6.95831pt::6.95831pt::10.98758pt.
+[244
+
+
+]
+l2hSize :tex2html_wrap_indisplay70120:8.0pt::8.0pt::14.87648pt.
+[245
+
+
+]
+l2hSize :tex2html_wrap_indisplay70122:18.78339pt::18.78339pt::66.92903pt.
+[246
+
+
+]
+l2hSize :tex2html_wrap_indisplay70125:18.78339pt::18.78339pt::86.2065pt.
+[247
+
+
+]
+l2hSize :tex2html_wrap_indisplay70127:6.95831pt::6.95831pt::4.7136pt.
+[248
+
+
+]
+l2hSize :tex2html_wrap_indisplay70130:18.78339pt::18.78339pt::147.64467pt.
+[249
+
+
+]
+l2hSize :tex2html_wrap_inline70135:6.83331pt::0.0pt::9.05698pt.
+[250
+
+
+]
+l2hSize :tex2html_wrap_inline70141:9.89449pt::9.89449pt::35.23476pt.
+[251
+
+
+]
+l2hSize :tex2html_wrap_inline70146:7.44444pt::7.44444pt::9.40804pt.
+[252
+
+
+]
+l2hSize :numcases48208:27.04054pt::0.0pt::349.0pt.
+[253
+
+
+]
+l2hSize :numcases48225:25.91753pt::0.0pt::349.0pt.
+[254
+
+
+]
+l2hSize :tex2html_wrap_inline70148:9.73416pt::9.73416pt::47.38832pt.
+[255
+
+
+]
+l2hSize :tex2html_wrap_inline70154:9.81749pt::9.81749pt::9.40804pt.
+[256
+
+
+]
+l2hSize :numcases48245:25.20549pt::0.0pt::349.0pt.
+[257
+
+
+]
+l2hSize :numcases48260:25.8342pt::0.0pt::349.0pt.
+[258
+
+
+]
+l2hSize :tex2html_wrap_indisplay70156:7.36111pt::7.36111pt::13.06247pt.
+[259
+
+
+]
+l2hSize :tex2html_wrap_indisplay70157:8.0pt::8.0pt::80.76729pt.
+[260
+
+
+]
+l2hSize :tex2html_wrap_indisplay70159:7.36111pt::7.36111pt::11.14581pt.
+[261
+
+
+]
+l2hSize :tex2html_wrap_indisplay70160:8.0pt::8.0pt::117.42825pt.
+[262
+
+
+]
+l2hSize :displaymath70177:31.8342pt::0.0pt::349.0pt.
+[263
+
+
+]
+l2hSize :displaymath70180:37.00029pt::0.0pt::349.0pt.
+[264
+
+
+]
+l2hSize :tex2html_wrap_inline70182:7.33331pt::7.33331pt::14.62968pt.
+[265
+
+
+]
+l2hSize :tex2html_wrap_inline70188:6.95831pt::6.95831pt::7.22601pt.
+[266
+
+
+]
+l2hSize :tex2html_wrap_inline70190:9.23416pt::0.0pt::6.38889pt.
+[267
+
+
+]
+l2hSize :tex2html_wrap_indisplay70192:8.0pt::8.0pt::20.18526pt.
+[268
+
+
+]
+l2hSize :tex2html_wrap_indisplay70193:6.95831pt::6.95831pt::6.50926pt.
+[269
+
+
+]
+l2hSize :tex2html_wrap_indisplay70194:9.73416pt::9.73416pt::252.53546pt.
+[270
+
+
+]
+l2hSize :tex2html_wrap_inline70200:6.83331pt::0.0pt::11.29169pt.
+[271
+
+
+]
+l2hSize :tex2html_wrap_inline70201:6.95831pt::6.95831pt::7.38303pt.
+[272
+
+
+]
+l2hSize :tex2html_wrap_inline70207:8.01782pt::8.01782pt::6.9375pt.
+[273
+
+
+]
+l2hSize :tex2html_wrap_indisplay70210:13.70952pt::13.70952pt::106.64531pt.
+[274
+
+
+] (./jmanual-images.aux) ) 
+Here is how much of TeX's memory you used:
+ 2031 strings out of 495062
+ 24479 string characters out of 1182644
+ 84750 words of memory out of 3000000
+ 5164 multiletter control sequences out of 15000+50000
+ 8908 words of font info for 34 fonts, out of 3000000 for 9000
+ 28 hyphenation exceptions out of 8191
+ 28i,17n,45p,398b,413s stack positions out of 5000i,500n,10000p,200000b,50000s
+
+Output written on jmanual-images.dvi (274 pages, 79708 bytes).

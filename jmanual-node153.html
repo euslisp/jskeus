@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//JP">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>基礎ヤコビ行列</TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META NAME="description" CONTENT="基礎ヤコビ行列">
+<META NAME="keywords" CONTENT="jmanual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="jmanual.css">
+
+<LINK REL="next" HREF="jmanual-node154.html">
+<LINK REL="previous" HREF="jmanual-node152.html">
+<LINK REL="up" HREF="jmanual-node151.html">
+<LINK REL="next" HREF="jmanual-node154.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html2784"
+  HREF="jmanual-node154.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html2778"
+  HREF="jmanual-node151.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html2772"
+  HREF="jmanual-node152.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html2780"
+  HREF="jmanual-node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html2782"
+  HREF="jmanual-node186.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html2785"
+  HREF="jmanual-node154.html">関節角度限界回避を含む逆運動学</A>
+<B> Up:</B> <A NAME="tex2html2779"
+  HREF="jmanual-node151.html">ロボットの動作生成</A>
+<B> Previous:</B> <A NAME="tex2html2773"
+  HREF="jmanual-node152.html">逆運動学</A>
+ &nbsp; <B>  <A NAME="tex2html2781"
+  HREF="jmanual-node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2783"
+  HREF="jmanual-node186.html">Index</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION05012200000000000000">
+基礎ヤコビ行列</A>
+</H3>
+一次元対偶を関節に持つマニピュレータのヤコビアンは
+基礎ヤコビ行列<A NAME="tex2html28"
+  HREF="jmanual-footnode.html#foot47832"><SUP><SPAN CLASS="arabic">7</SPAN></SUP></A>により
+計算することが可能である.
+基礎ヤコビ行列の第<SPAN CLASS="MATH"><B><IMG
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img157.png"
+ ALT="$ j$"></B></SPAN>関節に対応するヤコビアンの列ベクトル<!-- MATH
+ $\mbox{\boldmath {$J$}}_j$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img128.png"
+ ALT="$ J$"></B></SPAN><IMG
+ WIDTH="11" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img158.png"
+ ALT="$ _j$"></B></SPAN>は
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:basic-jacobian-column-vector"></A><!-- MATH
+ \begin{equation}
+\mbox{\boldmath {$J$}}_j=
+\begin{cases}
+\left[
+\begin{array}{ccc}
+\mbox{\boldmath {$a$}}_j\\
+\mbox{\boldmath {$0$}}
+\end{array}
+\right]
+& \text{if linear joint} \\
+\left[
+\begin{array}{ccc}
+\mbox{\boldmath {$a$}}_j \times (\mbox{\boldmath {$p$}}_{end} - \mbox{\boldmath {$p$}}_j)\\
+\mbox{\boldmath {$a$}}_j
+\end{array}
+\right]
+& \text{if rotational joint}
+\end{cases}
+\end{equation}
+ -->
+<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img126.png"
+ ALT="$\displaystyle \mbox{\boldmath {$J$}}$"><IMG
+ WIDTH="334" HEIGHT="113" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img159.png"
+ ALT="$\displaystyle _j= \begin{cases}\left[ \begin{array}{ccc} \mbox{\boldmath {$a$}}...
+...\boldmath {$a$}}_j \end{array} \right] &amp; \text{if rotational joint} \end{cases}$"></SPAN></TD>
+<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
+(<SPAN CLASS="arabic">13</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+と表される.
+<!-- MATH
+ $\mbox{\boldmath {$a$}}_j$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img104.png"
+ ALT="$ a$"></B></SPAN><IMG
+ WIDTH="11" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img158.png"
+ ALT="$ _j$"></B></SPAN>・<!-- MATH
+ $\mbox{\boldmath {$p$}}_j$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img160.png"
+ ALT="$ p$"></B></SPAN><IMG
+ WIDTH="11" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img158.png"
+ ALT="$ _j$"></B></SPAN>はそれぞれ第<SPAN CLASS="MATH"><B><IMG
+ WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img157.png"
+ ALT="$ j$"></B></SPAN>関節の関節軸単位ベクトル・位置ベクトルであり,
+<!-- MATH
+ $\mbox{\boldmath {$p$}}_{end}$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img160.png"
+ ALT="$ p$"></B></SPAN><IMG
+ WIDTH="26" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img161.png"
+ ALT="$ _{end}$"></B></SPAN>はヤコビアンで運動を制御するエンドエフェクタの位置ベクトルである.
+上記では1自由度対偶の
+回転関節・直動関節について導出したが，
+その他の関節でもこれらの列ベクトルを
+連結した行列としてヤコビアンを定義可能である．
+非全方位台車の運動を表す2自由度関節は
+前後退の直動関節と
+旋回のための回転関節から構成できる．
+全方位台車の運動を表す3自由度関節は
+並進2自由度の直動関節と
+旋回のための回転関節から構成できる．
+球関節は姿勢を姿勢行列で，
+姿勢変化を等価角軸変換によるものとすると，
+3つの回転関節をつなぎ合わせたものとみなせる．
+
+<P>
+<BR><HR>
+<ADDRESS>
+
+2014-08-30
+</ADDRESS>
+</BODY>
+</HTML>

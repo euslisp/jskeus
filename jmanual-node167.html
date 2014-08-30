@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//JP">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>irteusのサンプルプログラムにおける例</TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META NAME="description" CONTENT="irteusのサンプルプログラムにおける例">
+<META NAME="keywords" CONTENT="jmanual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="jmanual.css">
+
+<LINK REL="next" HREF="jmanual-node168.html">
+<LINK REL="previous" HREF="jmanual-node166.html">
+<LINK REL="up" HREF="jmanual-node165.html">
+<LINK REL="next" HREF="jmanual-node168.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html2981"
+  HREF="jmanual-node168.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html2975"
+  HREF="jmanual-node165.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html2969"
+  HREF="jmanual-node166.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html2977"
+  HREF="jmanual-node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html2979"
+  HREF="jmanual-node186.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html2982"
+  HREF="jmanual-node168.html">実際のロボットモデル</A>
+<B> Up:</B> <A NAME="tex2html2976"
+  HREF="jmanual-node165.html">ロボットの動作生成プログラミング</A>
+<B> Previous:</B> <A NAME="tex2html2970"
+  HREF="jmanual-node166.html">三軸関節ロボットを使ったヤコビアン，逆運動学の例</A>
+ &nbsp; <B>  <A NAME="tex2html2978"
+  HREF="jmanual-node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2980"
+  HREF="jmanual-node186.html">Index</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION05013200000000000000">
+irteusのサンプルプログラムにおける例</A>
+</H3>
+
+<P>
+cascaded-coordsクラスでは
+
+<UL>
+<LI>(:link-list (to &amp;optional form))
+</LI>
+<LI>(:calc-jacobian-from-link-list (link-list &amp;key move-target
+  (rotation-axis nil)))
+</LI>
+</UL>
+というメソッドが用意されている．
+
+<P>
+前者はリンクを引数として，ルートリンクからこのリンクまでの経路を計算し，
+リンクのリストとして返す．後者はこのリンクのリストを引数とし，
+move-target座標系をに対するヤコビアンを計算する．
+
+<P>
+concatenate result-type a bは a bを
+連結しresult-type型に変換し返し，scale a b はベクトルbの全ての要素をス
+カラーa倍し，matrix-logは行列対数関数を計算する．
+
+<P>
+<PRE>
+(if (not (boundp '*irtviewer*)) (make-irtviewer))
+
+(load "irteus/demo/sample-arm-model.l")
+(setq *sarm* (instance sarmclass :init))
+(send *sarm* :reset-pose)
+(setq *target* (make-coords :pos #f(350 200 400)))
+(objects (list *sarm* *target*))
+
+(do-until-key
+  ;; step 3
+  (setq c (send *sarm* :end-coords))
+  (send c :draw-on :flush t)
+  ;; step 4
+  ;; step 4
+  (setq dp (scale 0.001 (v- (send *target* :worldpos) (send c :worldpos))) ;; mm-&gt;m
+        dw (matrix-log (m* (transpose (send c :worldrot)) (send *target* :worldrot))))
+  (format t "dp = ~7,3f ~7,3f ~7,3f, dw = ~7,3f ~7,3f ~7,3f~%"
+          (elt dp 0) (elt dp 1) (elt dp 2)
+          (elt dw 0) (elt dw 1) (elt dw 2))
+  ;; step 5
+  (when (&lt; (+ (norm dp) (norm dw)) 0.01) (return))
+  ;; step 6
+  (setq ll (send *sarm* :link-list (send *sarm* :end-coords :parent)))
+  (setq j (send *sarm* :calc-jacobian-from-link-list
+                ll :move-target (send *sarm* :end-coords)
+                :trnaslation-axis t :rotation-axis t))
+  (setq q (scale 1.0 (transform (pseudo-inverse j) (concatenate float-vector dp dw))))
+  ;; step 7
+  (dotimes (i (length ll))
+    (send (send (elt ll i) :joint) :joint-angle (elt q i) :relative t))
+  ;; draw
+  (send *irtviewer* :draw-objects)
+  (x::window-main-one))
+</PRE>
+
+<P>
+実際のプログラミングでは:inverse-kinematicsというメソッドが用意されて
+おり，ここでは特異点や関節リミットの回避，あるいは自己衝突回避等の機能
+が追加されている．
+
+<P>
+また，"irteus/demo/sample-arm-model.l"ファイルにはさらに，これを簡単に
+使う:solve-ikというメソッドが定義されている．その使い方は，
+
+<P>
+<PRE>
+$ (send *sarm* :solve-ik *target* :debug-view t)
+</PRE>
+
+<P>
+となる．
+
+<P>
+<BR><HR>
+<ADDRESS>
+
+2014-08-30
+</ADDRESS>
+</BODY>
+</HTML>
