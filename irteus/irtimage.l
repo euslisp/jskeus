@@ -27,6 +27,7 @@
 (export '(read-image-file write-image-file))
 
 (defun read-image-file (fname)
+  "read image of given fname. It returns instance of {\\bf grayscale-image} or {\\bf color-image24}."
   (cond
    ((probe-file fname)
     (cond ((or (string= (pathname-type fname) "jpg")
@@ -42,6 +43,7 @@
       (return-from read-image-file nil))))
 
 (defun write-image-file (fname img)
+  "write img to given fname"
   (cond
    ((or (string= (pathname-type fname) "jpg")
         (string= (pathname-type fname) "jpeg"))

@@ -340,6 +340,7 @@
 ;;
 (proclaim '(special *irtviewer*))
 (defun make-irtviewer (&rest args)
+  "Create irtviewer"
   (cond
    ((or (null x::*display*) (= x::*display* 0))
     (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")

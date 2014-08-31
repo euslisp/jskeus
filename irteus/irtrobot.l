@@ -223,9 +223,9 @@
        (map float-vector #'(lambda (x y) (send x :joint-angle y))
 	    (send self :gripper limb :joint-list) (cadr args))))))
   ;; sensor accessor definitions
-  (:camera (sensor-name) (send self :get-sensor-method :camera sensor-name))
-  (:force-sensor (sensor-name) (send self :get-sensor-method :force-sensor sensor-name))
-  (:imu-sensor (sensor-name) (send self :get-sensor-method :imu-sensor sensor-name))
+  (:camera (sensor-name) "Returns camera with given name" (send self :get-sensor-method :camera sensor-name))
+  (:force-sensor (sensor-name) "Returns force sensor with given name" (send self :get-sensor-method :force-sensor sensor-name))
+  (:imu-sensor (sensor-name) "Returns imu sensor of given name" (send self :get-sensor-method :imu-sensor sensor-name))
   (:get-sensor-method
    (sensor-type sensor-name)
    (let ((sens (send self (read-from-string (format nil "~As" sensor-type)))))
@@ -235,9 +235,9 @@
    (remove-if-not #'(lambda (x) (member (send x :parent) (all-child-links (send self limb :root-link))))
                   (send self sensors-type)))
   ;; sensor accessors
-  (:force-sensors () force-sensors)
-  (:imu-sensors () imu-sensors)
-  (:cameras () cameras)
+  (:force-sensors () "Returns force sensors." force-sensors)
+  (:imu-sensors () "Returns imu sensors." imu-sensors)
+  (:cameras () "Returns camera sensors." cameras)
   ;;
   (:larm (&rest args) 
 	 (unless args (setq args (list nil))) (send* self :limb :larm args))
@@ -305,6 +305,7 @@
   ;; look-at-target supports -> t, nil, float-vector, coords, list of float-vector, list of coords
   (:look-at-target
    (look-at-target &key (target-coords))
+   "move robot head to look at targets, look-at-target support t/nil float-vector coordinates, center of list of float-vector or list of coordinates"
    (cond
     ((float-vector-p look-at-target)
      (send self :head :look-at look-at-target))
@@ -322,7 +323,7 @@
     (t (send self :head :look-at (send (car target-coords) :worldpos)))
     ))
   ;; init-pose
-  (:init-pose () (send self :angle-vector (instantiate float-vector (send self :calc-target-joint-dimension (cdr (send self :links))))))
+  (:init-pose () "Set robot to initial posture." (send self :angle-vector (instantiate float-vector (send self :calc-target-joint-dimension (cdr (send self :links))))))
   (:torque-vector
    (&key (force-list) (moment-list) (target-coords)
          (debug-view nil)
@@ -331,6 +332,7 @@
          (av (send self :angle-vector))
          (root-coords (send (car (send self :links)) :copy-worldcoords))
          (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
+   "Returns torque vector"
    (unless (every #'null (send self :legs)) ;; for legged robot, set default external force and moment at the end-effectors
      (unless target-coords
        (dolist (limb '(:rleg :lleg))
@@ -365,9 +367,6 @@
 	     (elt all-torque (position (send (elt link-list i) :joint) (send self :joint-list)))))
      (transform (send self :calc-inverse-jacobian (transpose jacobian))
 		torque)))
-  ;; fullbody inverse kinematics for legged robot
-  ;;   necessary args : target-coords, move-target, and link-list must include legs' (or leg's) parameters
-  ;;                    ex. (send *robot* :fullbody-inverse-kinematics (list rarm-tc rleg-tc lleg-tc) :move-target (list rarm-mt rleg-mt lleg-mt) :link-list (list rarm-ll rleg-ll lleg-ll))
   (:fullbody-inverse-kinematics
     (target-coords
      &rest args
@@ -383,6 +382,9 @@
           (additional-weight-list)
           (joint-args nil)
      &allow-other-keys)
+    "fullbody inverse kinematics for legged robot.
+     necessary args : target-coords, move-target, and link-list must include legs' (or leg's) parameters
+                      ex. (send *robot* :fullbody-inverse-kinematics (list rarm-tc rleg-tc lleg-tc) :move-target (list rarm-mt rleg-mt lleg-mt) :link-list (list rarm-ll rleg-ll lleg-ll))"
     (with-append-root-joint ;; inverse-kinematics with base-link
      (link-list-with-robot-6dof self link-list
                                 :joint-class 6dof-joint
@@ -458,9 +460,6 @@
        (format t "~%      "))
      (format t ")~%")
      vec))
-  ;; Calculate zmp[mm] from sensor local forces and moments
-  ;;   If force_z is large, zmp can be defined and returns 3D zmp.
-  ;;   Otherwise, zmp cannot be defined and returns nil.
   (:calc-zmp-from-forces-moments
    (forces moments ;; [N] [Nm], sensor local force & moment
     &key (wrt :world)
@@ -478,6 +477,9 @@
                         (send self :calc-cop-from-force-moment
                               nf nm fs cc :fz-thre fz-thre :return-all-values t)))
                   force-sensors forces moments cop-coords)))
+   "Calculate zmp[mm] from sensor local forces and moments
+       If force_z is large, zmp can be defined and returns 3D zmp.
+       Otherwise, zmp cannot be defined and returns nil."
    (let* ((limb-cop-fz-list2 (remove nil limb-cop-fz-list))
           (limb-fz (reduce #'+ (mapcar #'(lambda (x) (cadr (memq :fz x))) limb-cop-fz-list2) :initial-value 0)))
      (if (< limb-fz fz-thre)
@@ -493,22 +495,18 @@
 
 ;;; moved from rbrarin libraries
 (defmethod robot-model
-  ;; :foot-midcoords
-  ;;   purpose : to calculate midcoords of :rleg and :lleg
-  ;;   relevant euslib codes : defined in and copied from rbrain/basicape.l
-  ;;   objection : in the following codes, leged robot is assumed.
-  ;;               is this correct?
   (:foot-midcoords
    (&optional (mid 0.5))
+   "Calculate midcoords of :rleg and :lleg.
+     relevant euslib codes : defined in and copied from rbrain/basicape.l
+     objection : in the following codes, leged robot is assumed."
    (apply #'midcoords mid (send self :legs :end-coords))
    )
-  ;; :fix-leg-to-coords
-  ;;   purpose : to fix robot's legs to a coords
-  ;;   relevant euslib codes : defined in and copied from rbrain/basicmodel.l
-  ;;   objection : in the following codes, leged robot is assumed.
-  ;;               is this correct?
   (:fix-leg-to-coords
    (fix-coords &optional (l/r :both) &key (mid 0.5) &allow-other-keys) ;; support-leg
+   "Fix robot's legs to a coords
+     relevant euslib codes : defined in and copied from rbrain/basicmodel.l
+     objection : in the following codes, leged robot is assumed."
    (unless (not (some #'null (send self :legs :links)))
      (return-from :fix-leg-to-coords nil))
    (let (support-coords tmp-coords move-coords pos rot ra)
