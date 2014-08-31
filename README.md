@@ -138,12 +138,11 @@ Use [issue tracker](https://github.com/euslisp/jskeus/issues) for get support
 
 Use [pull requests](https://github.com/euslisp/jskeus/pulls) to report bugs or patches.
 
-### Online Documents
+### Online Documents (Currently only Japanese is avilable)
 
+See online [manual](http://euslisp.github.io/jskeus/)
 
-See online [manual](http://jskeus.sourceforge.net/html/manual.html). (Japanese translation [manual](http://jskeus.sourceforge.net/html/jmanual.html manual))
-
-PDF files are also available from [here](https://svn.code.sf.net/p/euslisp/code/trunk/EusLisp/doc/latex/manual.pdf) (Japanese translation from [here](https://svn.code.sf.net/p/euslisp/code/trunk/EusLisp/doc/jlatex/jmanual.pdf))
+PDF files are also available from [here](https://github.com/euslisp/jskeus/raw/master/doc/jmanual.pdf)
 
 ### Acknowledgment
 
