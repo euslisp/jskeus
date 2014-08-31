@@ -255,7 +255,7 @@
   (:legs (&rest args) (list (send* self :lleg args) (send* self :rleg args)))
   (:look-at-hand
    (l/r)
-   "(l/r) ;; l/r supports :rarm, :larm, :arms, and '(:rarm :larm) ;; "
+   "look at hand position, l/r supports :rarm, :larm, :arms, and '(:rarm :larm)"
    (send self :look-at-target
          (mapcar #'(lambda (x) (send self x :end-coords))
                  (cond
@@ -273,15 +273,7 @@
               (send self :link-list (send move-target :parent))
             (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target)))
     &allow-other-keys)
-   "(target-coords
-    &rest args
-    &key look-at-target
-         (move-target)
-         (link-list
-          (if (atom move-target)
-              (send self :link-list (send move-target :parent))
-            (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target)))
-    &allow-other-keys)
+   "solve inverse kinematics, move move-target to target-coords
     look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords
     link-list is set by default based on move-target -> root link link-list"
    (if (atom target-coords) (setq target-coords (list target-coords)))
@@ -300,15 +292,7 @@
               (send self :link-list (send move-target :parent))
             (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target)))
          &allow-other-keys)
-   "(dif-pos dif-rot
-    &rest args
-    &key target-coords debug-view look-at-target
-         (move-target)
-         (link-list
-          (if (atom move-target)
-              (send self :link-list (send move-target :parent))
-            (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target)))
-         &allow-other-keys)
+   "move move-target using dif-pos and dif-rot,
     look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords
     link-list is set by default based on move-target -> root link link-list"
    (if (atom target-coords) (setq target-coords (list target-coords)))
@@ -565,23 +549,7 @@
          (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) fix-limbs))
         (root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5)) ;; use only translation x, y and rotation z
         &allow-other-keys)
-   "(leg fix-limbs
-        &rest args
-        &key (thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) 1 5)) fix-limbs))
-        (rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) 1 5))) fix-limbs))
-        (mid 0.5)
-        (target-centroid-pos
-         (if (eq leg :both)
-             (apply
-              #'midpoint mid
-              (mapcar
-               #'(lambda (tmp-leg)
-                   (send self tmp-leg :end-coords :worldpos))
-               (remove-if-not #'(lambda (x) (memq x '(:rleg :lleg))) fix-limbs)))
-           (send self leg :end-coords :worldpos)))
-        (fix-limbs-target-coords
-         (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) fix-limbs))
-        &allow-other-keys)
+   "move robot base position in order to change centroid-on-foot location,
     leg -> legs for target of robot's centroid. :both, :rleg, and :lleg are supported.
     fix-limbs -> limb names which are fixed in this IK."
    (with-move-target-link-list

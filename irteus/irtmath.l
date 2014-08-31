@@ -50,7 +50,7 @@
     m))
 
 (defun minor-matrix (m ic jc)
-  " return a matrix removing ic row and jc col elements from m"
+  "return a matrix removing ic row and jc col elements from m"
   (let*
       ((row (1- (array-dimension m 0)))
        (col (1- (array-dimension m 1)))
@@ -293,7 +293,7 @@
   (setf (symbol-function 'normalize-vector-org) (symbol-function 'normalize-vector))
   (comp::def-builtin-entry 'NORMALIZE-VECTOR-ORG "VNORMALIZE"))
 (defun normalize-vector (v &optional r (eps 1.0e-20))
-  "normalize-vector #f(0 0 0)->#f(0 0 0)."
+  "calculate normalize-vector #f(0 0 0)->#f(0 0 0)."
   (if (< (norm v) eps)
       (if r (fill r 0)
         (instantiate float-vector (length v)))

@@ -179,7 +179,7 @@
 	 self)
   (:joint-angle
    (&optional v &key relative &allow-other-keys)
-   "(self class &optional v &key relative &allow-other-keys) ;; v and return value are joint-angle scalar ;; scalar is rotational value[deg]"
+   "return joint-angle if v is not set, if v is given, set joint angle. v is rotational value in [deg]."
    (let ()
      (when v
        (when (and joint-min-max-table joint-min-max-target)
@@ -233,7 +233,7 @@
 	 self)
   (:joint-angle
    (&optional v &key relative &allow-other-keys)
-   "(self class &optional v &key relative &allow-other-keys) ;; v and return value are joint-angle scalar ;; scalar is linear value[mm]"
+   "return joint-angle if v is not set, if v is given, set joint angle. v is linear value in [mm]."
    (let ()
      (when v
        (if relative (setq v (+ v joint-angle)))
@@ -279,7 +279,7 @@
 	 self)
   (:joint-angle
    (&optional v &key relative &allow-other-keys)
-   "(self class &optional v &key relative &allow-other-keys) ;; v and return value are joint-angle vector ;; vector is (float-vector translation-x[mm] rotation-z[deg])"
+   "return joint-angle if v is not set, if v is given, set joint angle. v is  joint-angle vector, which is  (float-vector translation-x[mm] rotation-z[deg])"
    (let (relvel relang)
      (unless relative
        (if v (warn "wheel-joint does not support non-relative mode??~%"))
@@ -339,7 +339,7 @@
        self)
   (:joint-angle
    (&optional v &key relative &allow-other-keys)
-   "(self class &optional v &key relative &allow-other-keys) ;; v and return value are joint-angle vector ;; vector is (float-vector translation-x[mm] translation-y[mm] rotation-z[deg])"
+   "return joint-angle if v is not set, if v is given, set joint angle. v is joint-angle vector, which is (float-vector translation-x[mm] translation-y[mm] rotation-z[deg])"
    (when v
      (if relative (setq v (v+ v joint-angle)))
      (setq joint-angle (vmin (vmax v min-angle) max-angle))
@@ -402,7 +402,7 @@
     self)
   (:joint-angle
     (&optional v &key relative &allow-other-keys)
-    "(self class &optional v &key relative &allow-other-keys) ;; v and return value are joint-angle vector by axis-angle representation ;; vector is (scale rotation-angle-from-default-coords[deg] axis-unit-vector)"
+    "return joint-angle if v is not set, if v is given, set joint angle. v is joint-angle vector by axis-angle representation, i.e (scale rotation-angle-from-default-coords[deg] axis-unit-vector)"
     ;; v is anguler velocity [deg]
     (when v
       ;; if relative nil
@@ -425,7 +425,7 @@
     joint-angle)
   (:joint-angle-rpy ;; v and return-value -> [deg] and (float-vector yaw roll pitch)
     (&optional v &key relative)
-    "(self class &optional v &key relative) ;; v and return value are joint-angle vector by RPY representation ;; vector is (float-vector yaw[deg] roll[deg] pitch[deg])"
+    "return joint-angle if v is not set, if v is given, set joint-angle vector by RPY representation, i.e. (float-vector yaw[deg] roll[deg] pitch[deg])"
     (when v
       (let ((ja (if relative
 		    (v+ (map float-vector #'deg2rad v)
@@ -540,7 +540,7 @@
     self)
   (:joint-angle
     (&optional v &key relative &allow-other-keys) ;; v [mm] [deg]
-    "(self class &optional v &key relative &allow-other-keys) ;; v and return value are joint-angle vector ;; vector is 6D vector of 3D translation[mm] and 3D rotation[deg] ;; for rotation, please see (find-if #'(lambda (x) (eq (send (car x) :name) 'sphere-joint)) (documentation :joint-angle))"
+    "return joint-angle if v is not set, if v is given, set joint angle vector, which is 6D vector of 3D translation[mm] and 3D rotation[deg], i.e. (find-if #'(lambda (x) (eq (send (car x) :name) 'sphere-joint)) (documentation :joint-angle))"
     (when v
       (let (dp drot)
 	;; translation
@@ -568,7 +568,7 @@
     joint-angle)
   (:joint-angle-rpy ;; v and return-value -> [deg] and (float-vector yaw roll pitch)
     (&optional v &key relative)
-    "(self class &optional v &key relative) ;; v and return value are joint-angle vector ;; vector is 6D vector of 3D translation[mm] and 3D rotation[deg] ;; for rotation, please see (find-if #'(lambda (x) (eq (send (car x) :name) 'sphere-joint)) (documentation :joint-angle-rpy))"
+    "return joint-angle if v is not set, if v is given, set joint angle. v is joint-angle vector, which is 6D vector of 3D translation[mm] and 3D rotation[deg], for rotation, please see (find-if #'(lambda (x) (eq (send (car x) :name) 'sphere-joint)) (documentation :joint-angle-rpy))"
     (when v
       (let ((ja (if relative
 		    (v+ (map float-vector #'deg2rad (subseq v 3 6))
