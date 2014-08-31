@@ -64,7 +64,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   
  <BR>
 <BR> <BR> 
-<A NAME="56180"></A>
+<A NAME="56022"></A>
 <BIG CLASS="XLARGE"><B>sensor-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>body</B> 
 <BR>  :slots 		 data profile 
@@ -80,7 +80,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56197"></A>
+<A NAME="56039"></A>
 <B>:profile</B> <EM>&amp;optional p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -95,7 +95,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56207"></A>
+<A NAME="56049"></A>
 <B>:signal</B> <EM>rawinfo  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -110,7 +110,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56217"></A>
+<A NAME="56059"></A>
 <B>:simulate</B> <EM>model  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -125,7 +125,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56227"></A>
+<A NAME="56069"></A>
 <B>:read</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -140,7 +140,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56237"></A>
+<A NAME="56079"></A>
 <B>:draw-sensor</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -155,7 +155,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56247"></A>
+<A NAME="56089"></A>
 <B>:init</B> <EM>shape &amp;key name &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -173,7 +173,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="56258"></A>
+<A NAME="56100"></A>
 <BIG CLASS="XLARGE"><B>bumper-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>sensor-model</B> 
 <BR>  :slots 		 bumper-threshold 
@@ -188,38 +188,31 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </DL>
 <BR>
 <BR>
+
+<A NAME="56117"></A>
+<B>:init</B> <EM>b &amp;rest args &amp;key ((:bumper-threshold bt) 20) name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Create bumper model, b is the shape of an object and bt is the threshold in distance[mm].
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56127"></A>
+<B>:simulate</B> <EM>objs  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Simulate bumper, with given objects, return 1 if the sensor detects an object and 0 if not.
+</DD>
+</DL>
+<BR>
+<BR>
+
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56275"></A>
-<B>:init</B> <EM>b &amp;rest args &amp;key ((:bumper-threshold bt) 20) name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56285"></A>
-<B>:simulate</B> <EM>objs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56295"></A>
+<A NAME="56137"></A>
 <B>:draw</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -234,7 +227,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56305"></A>
+<A NAME="56147"></A>
 <B>:draw-sensor</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -252,7 +245,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="56316"></A>
+<A NAME="56158"></A>
 <BIG CLASS="XLARGE"><B>camera-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>sensor-model</B> 
 <BR>  :slots 		 (vwing :forward (:projection :newprojection :view :viewpoint :view-direction :viewdistance :yon :hither)) pwidth pheight 
@@ -267,53 +260,130 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </DL>
 <BR>
 <BR>
+
+<A NAME="56175"></A>
+<B>:init</B> <EM>b &amp;rest args &amp;key ((:width pw) 320) ((:height ph) 240) (view-up #f(0.0 1.0 0.0)) (viewdistance 5.0) (hither 100.0) (yon 10000.0) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Create camera model. b is the shape of an object
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56185"></A>
+<B>:width</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns width of the camera in pixel.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56195"></A>
+<B>:height</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns height of the camera in pixel.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56205"></A>
+<B>:fovy</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns field of view in degree
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56215"></A>
+<B>:cx</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns center x.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56225"></A>
+<B>:cy</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns center y.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56235"></A>
+<B>:fx</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns focal length of x.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56245"></A>
+<B>:fy</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns focal length of y.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56255"></A>
+<B>:screen-point</B> <EM>pos  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns point in screen corresponds to the given pos.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56265"></A>
+<B>:3d-point</B> <EM>x y d  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns 3d position
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56275"></A>
+<B>:ray</B> <EM>x y  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns ray vector of given x and y.
+</DD>
+</DL>
+<BR>
+<BR>
+
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56333"></A>
-<B>:init</B> <EM>b &amp;rest args &amp;key ((:width pw) 320) ((:height ph) 240) (view-up #f(0.0 1.0 0.0)) (viewdistance 5.0) (hither 100.0) (yon 10000.0) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56343"></A>
-<B>:width</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56353"></A>
-<B>:height</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56363"></A>
+<A NAME="56285"></A>
 <B>:viewing</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -328,8 +398,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56373"></A>
-<B>:fovy</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="56295"></A>
+<B>:draw-on</B> <EM>&amp;rest args &amp;key ((:viewer vwer) viewer) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -343,127 +413,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56383"></A>
-<B>:cx</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56393"></A>
-<B>:cy</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56403"></A>
-<B>:fx</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56413"></A>
-<B>:fy</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56423"></A>
-<B>:screen-point</B> <EM>pos  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56433"></A>
-<B>:3d-point</B> <EM>x y d  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56443"></A>
-<B>:ray</B> <EM>x y  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56453"></A>
-<B>:draw-on</B> <EM>&amp;rest args &amp;key ((:viewer vwer) &sstarf#star;viewer&sstarf#star;) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56463"></A>
+<A NAME="56305"></A>
 <B>:draw-sensor</B> <EM>vwer &amp;key flush (width 1) (color (float-vector 1 1 1))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -478,7 +428,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56473"></A>
+<A NAME="56315"></A>
 <B>:draw-objects</B> <EM>vwr objs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -493,7 +443,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56483"></A>
+<A NAME="56325"></A>
 <B>:get-image</B> <EM>vwr &amp;key (points) (colors)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -510,22 +460,18 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </SMALL>
 
 <P>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56493"></A>
-<B>make-camera-from-param</B> <EM>&amp;key pwidth pheight fx fy cx cy (tx 0) (ty 0) parent-coords name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
-</SMALL>
+<A NAME="56335"></A>
+<B>make-camera-from-param</B> <EM>&amp;key pwidth pheight fx fy cx cy (tx 0) (ty 0) parent-coords name  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
-<DD>  
+<DD> Create camera object from given parameters.
 </DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
+</DL>
 <BR>
 <BR>
 
-<BR>
-</SMALL>
               
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->

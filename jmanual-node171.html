@@ -64,7 +64,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   
  <BR>
 <BR> <BR> 
-<A NAME="56796"></A>
+<A NAME="56629"></A>
 <BIG CLASS="XLARGE"><B>scene-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>cascaded-coords</B> 
 <BR>  :slots 		 name objs 
@@ -79,98 +79,75 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </DL>
 <BR>
 <BR>
+
+<A NAME="56646"></A>
+<B>:init</B> <EM>&amp;rest args &amp;key ((:name n) scene) ((:objects o))  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Create scene model
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56656"></A>
+<B>:objects</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns objects in the scene.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56666"></A>
+<B>:find-object</B> <EM>name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns objects with given name.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56676"></A>
+<B>:spots</B> <EM>&amp;optional name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns spots in the scene. If name is given returns spot of given name.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56686"></A>
+<B>:object</B> <EM>name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns object of given name.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56696"></A>
+<B>:spot</B> <EM>name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns scene of given name.
+</DD>
+</DL>
+<BR>
+<BR>
+
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56813"></A>
-<B>:init</B> <EM>&amp;rest args &amp;key ((:name n) scene) ((:objects o))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56823"></A>
-<B>:objects</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56833"></A>
-<B>:find-object</B> <EM>name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56843"></A>
-<B>:spots</B> <EM>&amp;optional name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56853"></A>
-<B>:object</B> <EM>name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56863"></A>
-<B>:spot</B> <EM>name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="56873"></A>
+<A NAME="56706"></A>
 <B>:bodies</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -187,7 +164,36 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </SMALL>
 
 <P>
-              <BR><HR>
+              
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html3035"
+  HREF="jmanual-node172.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3029"
+  HREF="jmanual-node144.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3023"
+  HREF="jmanual-node170.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3031"
+  HREF="jmanual-node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html3033"
+  HREF="jmanual-node186.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html3036"
+  HREF="jmanual-node172.html">動力学計算・歩行動作生成</A>
+<B> Up:</B> <A NAME="tex2html3030"
+  HREF="jmanual-node144.html">ロボットモデリング</A>
+<B> Previous:</B> <A NAME="tex2html3024"
+  HREF="jmanual-node170.html">センサモデル</A>
+ &nbsp; <B>  <A NAME="tex2html3032"
+  HREF="jmanual-node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3034"
+  HREF="jmanual-node186.html">Index</A></B> </DIV>
+<!--End of Navigation Panel-->
 <ADDRESS>
 
 2014-08-31

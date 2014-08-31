@@ -63,7 +63,18 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </H2>
  
  <BR>
-<BR> <A NAME="66978"></A>
+<BR> <A NAME="66733"></A>
+<B>inverse-matrix</B> <EM>mat  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns inverse matrix of mat
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66743"></A>
 <B>diagonal</B> <EM>v  </EM>[関数]
 
 <DL COMPACT>
@@ -74,7 +85,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="66988"></A>
+<A NAME="66753"></A>
 <B>minor-matrix</B> <EM>m ic jc  </EM>[関数]
 
 <DL COMPACT>
@@ -85,7 +96,124 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="66998"></A>
+<A NAME="66763"></A>
+<B>atan2</B> <EM>y x  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns atan2 of y and x (atan (/ y x))
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66773"></A>
+<B>outer-product-matrix</B> <EM>v &amp;optional (ret (unit-matrix 3))  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns outer product matrix of given v 
+<BR>   <TT>   matrix(a) v = a v 
+<BR>
+0 -w2 w1
+<BR>
+w2 0 -w0
+<BR>   -w1 w0  0
+<BR>   </TT>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66784"></A>
+<B>matrix2quaternion</B> <EM>m  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns quaternion of given matrix
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66794"></A>
+<B>quaternion2matrix</B> <EM>q  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns matrix of given quaternion
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66804"></A>
+<B>matrix-log</B> <EM>m  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns matrix log of given m, it returns [-pi, pi]
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66814"></A>
+<B>matrix-exponent</B> <EM>omega &amp;optional (p 1.0)  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns exponent of given omega
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66824"></A>
+<B>midrot</B> <EM>p r1 r2  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns mid (or p) rotation matrix of given two matrix r1 and r1
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66834"></A>
+<B>pseudo-inverse</B> <EM>mat &amp;optional weight-vector ret wmat mat-tmp  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns pseudo inverse of given mat
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66844"></A>
+<B>sr-inverse</B> <EM>mat &amp;optional (k 1.0) weight-vector ret wmat tmat umat umat2 mat-tmp mat-tmp-rc mat-tmp-rr mat-tmp-rr2  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns sr-inverse of given mat
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66854"></A>
+<B>manipulability</B> <EM>jacobi &amp;optional tmp-mrr tmp-mcr  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> return manipulability of given matrix
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66864"></A>
 <B>normalize-vector</B> <EM>v &amp;optional r (eps 1.000000e-20)  </EM>[関数]
 
 <DL COMPACT>
@@ -97,151 +225,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67008"></A>
-<B>inverse-matrix</B> <EM>mat  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67019"></A>
-<B>atan2</B> <EM>y x  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67030"></A>
-<B>outer-product-matrix</B> <EM>v &amp;optional (ret (unit-matrix 3))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67041"></A>
-<B>matrix2quaternion</B> <EM>m  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67052"></A>
-<B>quaternion2matrix</B> <EM>q  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67063"></A>
-<B>matrix-log</B> <EM>m  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67074"></A>
-<B>matrix-exponent</B> <EM>omega &amp;optional (p 1.0)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67085"></A>
-<B>midrot</B> <EM>p r1 r2  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67096"></A>
-<B>pseudo-inverse</B> <EM>mat &amp;optional weight-vector ret wmat mat-tmp  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67107"></A>
+<A NAME="66874"></A>
 <B>pseudo-inverse-org</B> <EM>m &amp;optional ret winv mat-tmp-cr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -257,40 +241,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67118"></A>
-<B>sr-inverse</B> <EM>mat &amp;optional (k 1.0) weight-vector ret wmat tmat umat umat2 mat-tmp mat-tmp-rc mat-tmp-rr mat-tmp-rr2  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67129"></A>
+<A NAME="66885"></A>
 <B>sr-inverse-org</B> <EM>mat &amp;optional (k 1) me mat-tmp-cr mat-tmp-rr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67140"></A>
-<B>manipulability</B> <EM>jacobi &amp;optional tmp-mrr tmp-mcr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
 

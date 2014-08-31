@@ -64,7 +64,7 @@ BVHデータ</A>
  
  <BR>
 <BR> <BR> 
-<A NAME="59237"></A>
+<A NAME="59056"></A>
 <BIG CLASS="XLARGE"><B>bvh-link </B></BIG> [クラス]  <PRE><TT>
   :super   <B>bodyset-link</B> 
 <BR>  :slots 		 type offset channels neutral 
@@ -79,23 +79,20 @@ BVHデータ</A>
 </DL>
 <BR>
 <BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59254"></A>
-<B>:init</B> <EM>name typ offst chs parent children  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
-</SMALL>
+<A NAME="59073"></A>
+<B>:init</B> <EM>name typ offst chs parent children  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD> create link for bvh model
 </DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
+</DL>
 <BR>
 <BR>
 
-<BR>
-
-<A NAME="59264"></A>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="59083"></A>
 <B>:type</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -110,7 +107,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59274"></A>
+<A NAME="59093"></A>
 <B>:offset</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -125,7 +122,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59284"></A>
+<A NAME="59103"></A>
 <B>:channels</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -143,7 +140,7 @@ BVHデータ</A>
 
 <P>
 	<BR> 
-<A NAME="59295"></A>
+<A NAME="59114"></A>
 <BIG CLASS="XLARGE"><B>bvh-sphere-joint </B></BIG> [クラス]  <PRE><TT>
   :super   <B>sphere-joint</B> 
 <BR>  :slots 		 axis-order bvh-offset-rotation 
@@ -158,23 +155,20 @@ BVHデータ</A>
 </DL>
 <BR>
 <BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59312"></A>
-<B>:init</B> <EM>&amp;rest args &amp;key (order (list :z :x :y)) ((:bvh-offset-rotation bvh-rotation) (unit-matrix 3)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
-</SMALL>
+<A NAME="59131"></A>
+<B>:init</B> <EM>&amp;rest args &amp;key (order (list :z :x :y)) ((:bvh-offset-rotation bvh-rotation) (unit-matrix 3)) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD> create joint for bvh model
 </DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
+</DL>
 <BR>
 <BR>
 
-<BR>
-
-<A NAME="59322"></A>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="59141"></A>
 <B>:joint-angle-bvh</B> <EM>&amp;optional v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -189,7 +183,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59332"></A>
+<A NAME="59151"></A>
 <B>:joint-angle-bvh-offset</B> <EM>&amp;optional v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -204,7 +198,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59342"></A>
+<A NAME="59161"></A>
 <B>:joint-angle-bvh-impl</B> <EM>v bvh-offset  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -219,7 +213,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59352"></A>
+<A NAME="59171"></A>
 <B>:axis-order</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -234,7 +228,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59362"></A>
+<A NAME="59181"></A>
 <B>:bvh-offset-rotation</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -252,7 +246,7 @@ BVHデータ</A>
 
 <P>
 	<BR> 
-<A NAME="59373"></A>
+<A NAME="59192"></A>
 <BIG CLASS="XLARGE"><B>bvh-6dof-joint </B></BIG> [クラス]  <PRE><TT>
   :super   <B>6dof-joint</B> 
 <BR>  :slots 		 scale axis-order bvh-offset-rotation 
@@ -268,7 +262,7 @@ BVHデータ</A>
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59390"></A>
+<A NAME="59209"></A>
 <B>:init</B> <EM>&amp;rest args &amp;key (order (list :x :y :z :z :x :y)) ((:scale scl)) ((:bvh-offset-rotation bvh-rotation) (unit-matrix 3)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -283,7 +277,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59400"></A>
+<A NAME="59219"></A>
 <B>:joint-angle-bvh</B> <EM>&amp;optional v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -298,7 +292,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59410"></A>
+<A NAME="59229"></A>
 <B>:joint-angle-bvh-offset</B> <EM>&amp;optional v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -313,7 +307,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59420"></A>
+<A NAME="59239"></A>
 <B>:joint-angle-bvh-impl</B> <EM>v bvh-offset  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -328,7 +322,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59430"></A>
+<A NAME="59249"></A>
 <B>:axis-order</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -343,7 +337,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59440"></A>
+<A NAME="59259"></A>
 <B>:bvh-offset-rotation</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -361,7 +355,7 @@ BVHデータ</A>
 
 <P>
 	<BR> 
-<A NAME="59451"></A>
+<A NAME="59270"></A>
 <BIG CLASS="XLARGE"><B>bvh-robot-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>robot-model</B> 
 <BR>  :slots 		 nil 
@@ -376,23 +370,20 @@ BVHデータ</A>
 </DL>
 <BR>
 <BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59468"></A>
-<B>:init</B> <EM>&amp;rest args &amp;key tree coords ((:scale scl))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
-</SMALL>
+<A NAME="59287"></A>
+<B>:init</B> <EM>&amp;rest args &amp;key tree coords ((:scale scl))  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD> create robot model for bvh model
 </DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
+</DL>
 <BR>
 <BR>
 
-<BR>
-
-<A NAME="59478"></A>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="59297"></A>
 <B>:make-bvh-link</B> <EM>tree &amp;key parent ((:scale scl))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -407,7 +398,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59488"></A>
+<A NAME="59307"></A>
 <B>:angle-vector</B> <EM>&amp;optional vec (angle-vector (instantiate float-vector (calc-target-joint-dimension joint-list)))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -422,8 +413,8 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59498"></A>
-<B>:dump-joints</B> <EM>links &amp;key (depth 0) (strm &sstarf#star;standard-output&sstarf#star;)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="59317"></A>
+<B>:dump-joints</B> <EM>links &amp;key (depth 0) (strm standard-output)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -437,8 +428,8 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59508"></A>
-<B>:dump-hierarchy</B> <EM>&amp;optional (strm &sstarf#star;standard-output&sstarf#star;)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="59327"></A>
+<B>:dump-hierarchy</B> <EM>&amp;optional (strm standard-output)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -452,8 +443,8 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59518"></A>
-<B>:dump-motion</B> <EM>&amp;optional (strm &sstarf#star;standard-output&sstarf#star;)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="59337"></A>
+<B>:dump-motion</B> <EM>&amp;optional (strm standard-output)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -467,7 +458,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59528"></A>
+<A NAME="59347"></A>
 <B>:copy-state-to</B> <EM>robot  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -482,7 +473,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59538"></A>
+<A NAME="59357"></A>
 <B>:fix-joint-angle</B> <EM>i limb joint-name joint-order a  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -497,7 +488,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59548"></A>
+<A NAME="59367"></A>
 <B>:fix-joint-order</B> <EM>jo limb  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -512,7 +503,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59558"></A>
+<A NAME="59377"></A>
 <B>:bvh-offset-rotate</B> <EM>name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -527,7 +518,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59568"></A>
+<A NAME="59387"></A>
 <B>:init-end-coords</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -542,7 +533,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59578"></A>
+<A NAME="59397"></A>
 <B>:init-root-link</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -560,7 +551,7 @@ BVHデータ</A>
 
 <P>
 	<BR> 
-<A NAME="59589"></A>
+<A NAME="59408"></A>
 <BIG CLASS="XLARGE"><B>motion-capture-data </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
 <BR>  :slots 		 frame model animation 
@@ -576,7 +567,7 @@ BVHデータ</A>
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59606"></A>
+<A NAME="59425"></A>
 <B>:init</B> <EM>fname &amp;key (coords (make-coords)) ((:scale scl))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -591,7 +582,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59616"></A>
+<A NAME="59435"></A>
 <B>:model</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -606,7 +597,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59626"></A>
+<A NAME="59445"></A>
 <B>:animation</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -621,7 +612,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59636"></A>
+<A NAME="59455"></A>
 <B>:frame</B> <EM>&amp;optional f  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -636,7 +627,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59646"></A>
+<A NAME="59465"></A>
 <B>:frame-length</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -651,7 +642,7 @@ BVHデータ</A>
 
 <BR>
 
-<A NAME="59656"></A>
+<A NAME="59475"></A>
 <B>:animate</B> <EM>&amp;rest args &amp;key (start 0) (step 1) (end (send self :frame-length)) (interval 20) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -669,7 +660,7 @@ BVHデータ</A>
 
 <P>
 	<BR> 
-<A NAME="59667"></A>
+<A NAME="59486"></A>
 <BIG CLASS="XLARGE"><B>rikiya-bvh-robot-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>bvh-robot-model</B> 
 <BR>  :slots 		 nil 
@@ -685,7 +676,7 @@ BVHデータ</A>
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59684"></A>
+<A NAME="59503"></A>
 <B>:init</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -703,7 +694,7 @@ BVHデータ</A>
 
 <P>
 	<BR> 
-<A NAME="59695"></A>
+<A NAME="59514"></A>
 <BIG CLASS="XLARGE"><B>tum-bvh-robot-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>bvh-robot-model</B> 
 <BR>  :slots 		 nil 
@@ -719,7 +710,7 @@ BVHデータ</A>
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59712"></A>
+<A NAME="59531"></A>
 <B>:init</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -737,7 +728,7 @@ BVHデータ</A>
 
 <P>
 	<BR> 
-<A NAME="59723"></A>
+<A NAME="59542"></A>
 <BIG CLASS="XLARGE"><B>cmu-bvh-robot-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>bvh-robot-model</B> 
 <BR>  :slots 		 nil 
@@ -753,7 +744,7 @@ BVHデータ</A>
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59740"></A>
+<A NAME="59559"></A>
 <B>:init</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -770,8 +761,42 @@ BVHデータ</A>
 </SMALL>
 
 <P>
+
+<A NAME="59569"></A>
+<B>read-bvh</B> <EM>fname &amp;key scale  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> read bvh file
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="59579"></A>
+<B>bvh2eus</B> <EM>fname &amp;rest args  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> read bvh file and anmiate robot model in the viewer
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="59589"></A>
+<B>load-mcd</B> <EM>fname &amp;key (scale) (coords) (bvh-robot-model-class bvh-robot-model)  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> load motion capture data
+</DD>
+</DL>
+<BR>
+<BR>
+
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59750"></A>
+<A NAME="59599"></A>
 <B>parse-bvh-sexp</B> <EM>src &amp;key ((:scale scl))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -787,56 +812,8 @@ BVHデータ</A>
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59761"></A>
-<B>read-bvh</B> <EM>fname &amp;key scale  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59772"></A>
+<A NAME="59610"></A>
 <B>make-bvh-robot-model</B> <EM>bvh-data &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59783"></A>
-<B>bvh2eus</B> <EM>fname &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59794"></A>
-<B>load-mcd</B> <EM>fname &amp;key (scale) (coords) (bvh-robot-model-class bvh-robot-model)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
 
