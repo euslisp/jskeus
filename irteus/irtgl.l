@@ -104,12 +104,14 @@
 (defmethod glviewsurface
   (:color 
    (&optional color-vector)
+   "Returns color, if color-vector is given it set color"
    (if color-vector (send self :color-org color-vector)
      (let ((v (float-vector 0 0 0 0)))
        (glgetfloatv GL_CURRENT_COLOR v)
        (subseq v 0 3))))
   (:line-width 
    (&optional x)
+   "Returns line width, if x is given, it set line width"
    (if x (glLineWidth (float x))
      (let ((tmp (float-vector 0)))
        (glGetFloatv GL_LINE_WIDTH tmp)
@@ -117,12 +119,14 @@
      ))
   (:point-size 
    (&optional x)
+   "Returns point size, if x is given, it set point size"
    (if x (glPointSize (float x))
      (let ((tmp (float-vector 0)))
        (glGetFloatv GL_POINT_SIZE tmp)
        (elt tmp 0))
      ))
   (:3d-point (pos &key (depth-test t) (lighting t)) ;; redefined
+             "Draw 3D point"
 	     (if depth-test (glDisable GL_DEPTH_TEST))
 	     (if lighting (glDisable GL_LIGHTING))
 	     (glBegin GL_POINTS)
@@ -131,6 +135,7 @@
 	     (if depth-test (glEnable GL_DEPTH_TEST))
 	     (if lighting (glEnable GL_LIGHTING)))
   (:3d-line (start end &key (depth-test t) (lighting t)) ;; redefined
+            "Draw 3D line from start to end"
 	    (if depth-test (glDisable GL_DEPTH_TEST))
 	    (if lighting (glDisable GL_LIGHTING))
 	    (glBegin GL_LINE_STRIP)
@@ -140,6 +145,7 @@
 	    (if depth-test (glEnable GL_DEPTH_TEST))
 	    (if lighting (glEnable GL_LIGHTING)))
   (:3d-lines (points &key (depth-test t) (lighting t))
+             "Draw 3D lines that connecting points"
 	     (if depth-test (glDisable GL_DEPTH_TEST))
 	     (if lighting (glDisable GL_LIGHTING))
 	     (glBegin GL_LINE_STRIP)
@@ -152,6 +158,7 @@
   (:redraw (&rest args) (send self :flush))
   (:flush 
    ()
+   "send glflush"
    (send self :makecurrent)
    (send self :glflush)
    (send-super :flush)
@@ -162,6 +169,7 @@
    (file &key (x 0) (y 0)
 	 (width x::width)
 	 (height x::height))
+   "Write current view to file name"
    (let* ((glimg (send self :getglimage
 		       :x x :y y :width (1- width) :height height)))
      (image::write-image-file file glimg)
@@ -172,6 +180,7 @@
 	 (height x::height)
 	 ((:imagebuf imgbuf) (make-string (* width height 3)))
          (depthbuf))
+   "Get current view to a image object. It returns color-image24 object."
    (let ()
      (send self :makecurrent)
      (glReadBuffer GL_BACK)
@@ -427,6 +436,7 @@
     ))
 
 (defun find-color (color)
+  "returns color vector of given color name, the name is defiend in https://github.com/euslisp/jskeus/blob/master/irteus/irtglrgb.l"
   (let (v c)
     (setq v
       (cond
@@ -441,6 +451,7 @@
     v))
 
 (defun transparent (abody param)
+  "Set abody to transparent with param"
   (let (fc dif)
     (when (setq fc (get abody :face-color))
       (unless (vectorp fc)

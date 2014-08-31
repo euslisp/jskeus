@@ -31,6 +31,7 @@
 (defmethod scene-model
   (:init
    (&rest args &key ((:name n) "scene") ((:objects o)))
+   "Create scene model"
    (send-super* :init args)
    (setq name :name)
    (setq objs o)
@@ -41,9 +42,10 @@
        (setf (get obj :color) #f(0.294118 0.572549 0.858823))
        (setf (get obj :size) 300)))
    self)
-  (:objects () objs)
+  (:objects () "Returns objects in the scene." objs)
   (:find-object
    (name)
+   "Returns objects with given name."
    (append
     (mapcan
      #'(lambda(x)(if (derivedp x scene-model) (send x :find-object name) nil))
@@ -53,6 +55,7 @@
 	    objs)))
   (:spots
    (&optional name)
+   "Returns spots in the scene. If name is given returns spot of given name."
    (append
     (mapcan
      #'(lambda(x)(if (derivedp x scene-model) (send x :spots name) nil))
@@ -65,6 +68,7 @@
   ;;
   (:object
    (name)
+   "Returns object of given name."
    (let ((r (send self :find-object name)))
      (case (length r)
        (0 (warning-message 1 "could not found object(~A)" name) nil)
@@ -72,6 +76,7 @@
        (t (warning-message 1 "found multiple object ~A for given name(~A)" r name) (car r)))))
   (:spot
    (name)
+   "Returns scene of given name."
    (let ((r (send self :spots name)))
      (case (length r)
        (0 (warning-message 1 "could not found spot(~A)" name) nil)

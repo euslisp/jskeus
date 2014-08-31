@@ -45,11 +45,13 @@
 (defmethod bumper-model
   (:init
    (b &rest args &key ((:bumper-threshold bt) 20) name)
+   "Create bumper model, b is the shape of an object and bt is the threshold in distance[mm]."
    (setq data 0)
    (setq bumper-threshold bt)
    (send-super* :init b :name name args))
   (:simulate
    (objs)
+   "Simulate bumper, with given objects, return 1 if the sensor detects an object and 0 if not."
    (let (r)
      (unless objs (return-from :simulate nil))
      (if (atom objs) (setq objs (list objs)))
@@ -87,6 +89,7 @@
           (hither 100.0)
           (yon 10000.0)
           &allow-other-keys)
+   "Create camera model. b is the shape of an object"
    (let ()
      (send-super* :init b args)
      (setq pwidth pw pheight ph)
@@ -103,18 +106,19 @@
                       ))
      (send self :assoc vwing)
      self))
-  (:width () pwidth)
-  (:height () pheight)
+  (:width () "Returns width of the camera in pixel." pwidth)
+  (:height () "Returns height of the camera in pixel." pheight)
   (:viewing (&rest args) (forward-message-to vwing args))
-  (:fovy ()
+  (:fovy () "Returns field of view in degree"
    (let ((proj (send vwing :projection)))
      (* 2 (atan2 (/ pwidth 2.0) (aref proj 0 0)))))
-  (:cx () (let ((proj (send vwing :projection))) (aref proj 0 2)))
-  (:cy () (let ((proj (send vwing :projection))) (aref proj 1 2)))
-  (:fx () (let ((proj (send vwing :projection))) (aref proj 0 0)))
-  (:fy () (let ((proj (send vwing :projection))) (aref proj 1 1)))
+  (:cx () "Returns center x." (let ((proj (send vwing :projection))) (aref proj 0 2)))
+  (:cy () "Returns center y." (let ((proj (send vwing :projection))) (aref proj 1 2)))
+  (:fx () "Returns focal length of x." (let ((proj (send vwing :projection))) (aref proj 0 0)))
+  (:fy () "Returns focal length of y." (let ((proj (send vwing :projection))) (aref proj 1 1)))
   (:screen-point
    (pos)
+   "Returns point in screen corresponds to the given pos."
    (let (v w)
      (setq v (send vwing :project3 (send vwing :inverse-transform-vector pos)))
      (setq w (aref v 2))
@@ -123,6 +127,7 @@
      (return-from :screen-point (subseq v 0 2))))
   (:3d-point
    (x y d)
+   "Returns 3d position"
    (let* ((proj (send vwing :projection))
           (cx (aref proj 0 2)) (cy (aref proj 1 2))
           (f  (aref proj 0 0))
@@ -139,6 +144,7 @@
      (scale (/ 1.0 w) (subseq r 0 3))))
   (:ray
    (x y)
+   "Returns ray vector of given x and y."
    (let* (xx yy u v
              (proj (send vwing :projection))
              (cx (aref proj 0 2)) (cy (aref proj 1 2))
@@ -286,6 +292,7 @@
 
 ;; utility functions
 (defun make-camera-from-param (&key pwidth pheight fx fy cx cy (tx 0) (ty 0) parent-coords name)
+  "Create camera object from given parameters."
   (let* ((b (body+ (make-cube 40 30 30)
                    (send (make-cylinder 2 30) :rotate pi/2 :x)
                    (make-cylinder 13 25)))

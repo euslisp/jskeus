@@ -34,6 +34,7 @@
 (defvar *g-vec* (float-vector 0 0 9806.65)) ;; [mm/s^2]
 
 (defun midcoords (p c1 c2)
+  "Returns mid (or p) coordinates of given two cooridnates c1 and c2"
   (let ()
     (make-coords :pos (midpoint p (send c1 :worldpos) (send c2 :worldpos))
 		 :rot (user::midrot p (send c1 :worldrot) (send c2 :worldrot)))
@@ -49,6 +50,7 @@
 	 )
   (:difference-position 
    (coords &key (translation-axis t))
+   "return diffece in positoin of given coords, translation-axis can take (:x, :y, :z, :xy, :yz, :zx)."
    (let ((dif-pos
 	  (send self :inverse-transform-vector (send coords :worldpos))))
      (case
@@ -62,6 +64,7 @@
      dif-pos))
   (:difference-rotation
    (coords &key (rotation-axis t))
+   "return diffece in rotation of given coords, rotation-axis can take (:x, :y, :z, :xx, :yy, :zz, :xm, :ym, :zm)"
    (labels
     ((need-mirror-for-nearest-axis
       (coords0 coords1 axis)
@@ -273,6 +276,8 @@
 ;;   orient "axis" in "target-coords" to the direction specified by "v" destructively.
 ;;   "v" must be non-zero vector.
 (defun orient-coords-to-axis (target-coords v &optional (axis :z))
+  "orient 'axis' in 'target-coords' to the direction specified by 'v' destructively.
+   'v' must be non-zero vector."
   (let* ((nv (normalize-vector v))
          (ax (send target-coords :rotate-vector ;; axis in the worldcoords
                    (case axis
@@ -316,6 +321,7 @@
     &key (name (intern (format nil "bodyset~A" (sys::address self)) "KEYWORD"))
     ((:bodies bs))
     &allow-other-keys)
+   "Create bodyset object"
    (let ()
      (send-super* :init :name name args)
      (send coords :copy-worldcoords self)
@@ -340,12 +346,14 @@
 ;; body->triangle
 ;;
 (defun face-to-triangle-aux (f)
+  "triangulate the face."
   (cond
    ((null f) nil)
    ((= (length (send f :edges)) 3) (list f))
    (t (face-to-triangle f))))
 
 (defun face-to-triangle (f)
+  "convert face to set of triangles."
   (if (and (derivedp f face) (send f :holes))
       (when (send f :holes) (setq f (geo::face-to-triangle-make-simple f))))
   (let* ((start 0) 
@@ -361,6 +369,7 @@
 ;; return polygon if triangable ,unless return nil.
 ;; this function = sharpp + trianglable + insidep
 (defun face-to-tessel-triangle (f num)
+  "return polygon if triangable, return nil if it is not."
   (let* ((vers (send f :vertices))
 	 (len (length (cdr vers)))
 	 (v0 (nth (mod (1- (+ num len)) len) vers))
@@ -459,6 +468,7 @@
 ;; body-to-triangles
 ;;
 (defun body-to-faces (abody)
+  "return triangled faces of given body"
   (body-to-triangles abody nil))
 (defun body-to-triangles (abody &optional (limit 50))
   (let (fs)
@@ -514,6 +524,7 @@
 ;; make-* functions
 ;;
 (defun make-sphere (r &rest args)
+  "make sphere of given r"
   (let ((obj (make-gdome (make-icosahedron r))))
     (send obj :newcoords (apply #'make-coords args))
     (send obj :worldpos)
@@ -521,6 +532,7 @@
     obj))
 
 (defun make-ring (ring-radius pipe-radius &rest args &key (segments 16))
+  "make ring of given ring and pipe radius"
   (let ((v-list) (dtheta (/ 2pi segments)))
     (dotimes (i segments)
       (push (float-vector (+ (* pipe-radius (cos (* i dtheta))) ring-radius)
@@ -532,30 +544,37 @@
 ;; accessor to primitive bodies
 ;;
 (defun x-of-cube (cub)
+  "return x of cube."
   (let ((csg (send cub :csg)))
     (car (cdr (assoc :cube csg)))))
 
 (defun y-of-cube (cub)
+  "return y of cube."
   (let ((csg (send cub :csg)))
     (cadr (cdr (assoc :cube csg)))))
 
 (defun z-of-cube (cub)
+  "return z of cube."
   (let ((csg (send cub :csg)))
     (caddr (cdr (assoc :cube csg)))))
 
 (defun height-of-cylinder (cyl)
+  "return height of cylinder."
   (let ((csg (send cyl :csg)))
     (caddr (assoc :cylinder csg))))
 
 (defun radius-of-cylinder (cyl)
+  "return radius of cylinder."
   (let ((csg (send cyl :csg)))
     (cadr (assoc :cylinder csg))))
 
 (defun radius-of-sphere (sp)
+  "return radius of shape."
   (let ((csg (send sp :csg)))
     (cadr (assoc :sphere csg))))
 
 (defun make-faceset-from-vertices (vs)
+  "create faceset from vertices."
   (let ((fs))
     (while vs
       (print (list (elt vs 0) (elt vs 1) (elt vs 2)))
@@ -568,6 +587,7 @@
 ;; matrix-to-euler-angle
 ;;
 (defun matrix-to-euler-angle (m axis-order)
+  "return euler angle from matrix."
   (let (a0 a1 a2 (eps 1.0e-6))
     (unless (and (matrixp m) (equal (array-dimensions m) '(3 3)))
       (error "3x3 matrix is required~A" m))

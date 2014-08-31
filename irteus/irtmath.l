@@ -23,6 +23,7 @@
 ;;;
 
 (defun inverse-matrix (mat) ;; redefined
+  "returns inverse matrix of mat"
   (let* ((dim (array-dimension mat 0))
 	 (work (unit-matrix dim))
 	 (perm (lu-decompose2 mat work))
@@ -66,6 +67,7 @@
   )
 
 (defun atan2 (y x)
+  "returns atan2 of y and x (atan (/ y x))"
   (let* ((eps 1.0e-10) (-eps (- eps)))
     (if (> x eps)
 	(return-from atan2 (atan (/ y x))))
@@ -79,11 +81,13 @@
     ))
 
 (defun outer-product-matrix (v &optional (ret (unit-matrix 3)))
-  ;; 外積の行列を作る
-  ;; matrix(a) v = a * v 
-  ;;  0 -w2 w1
-  ;;  w2 0 -w0
-  ;; -w1 w0  0
+  "returns outer product matrix of given v \\\\
+   {\\tt
+   matrix(a) v = a * v \\\\
+    0 -w2 w1\\\\
+    w2 0 -w0\\\\
+   -w1 w0  0\\\\
+   }"
   (let ()
     (setf (aref ret 0 0) 0)
     (setf (aref ret 0 1) (- (aref v 2)))
@@ -100,6 +104,7 @@
 
 
 (defun matrix2quaternion (m)
+  "returns quaternion of given matrix"
   (let (q0 q1 q2 q3  mq^2
 	   (q0^2 (/ (+ 1 (aref m 0 0) (aref m 1 1) (aref m 2 2)) 4))
 	   (q1^2 (/ (+ 1 (aref m 0 0) (- (aref m 1 1)) (- (aref m 2 2))) 4))
@@ -131,6 +136,7 @@
     (float-vector q0 q1 q2 q3)))
 
 (defun quaternion2matrix (q)
+  "returns matrix of given quaternion"
   (let ((q0 (elt q 0)) (q1 (elt q 1)) (q2 (elt q 2)) (q3 (elt q 3)))
     (make-matrix 
      3 3
@@ -148,6 +154,7 @@
     ))
 
 (defun matrix-log (m) ;; matrix-log retuns [-pi, pi]
+ "returns matrix log of given m, it returns [-pi, pi]"
  (let* ((qq (matrix2quaternion m))
         (q0 (elt qq 0))
         (q (subseq qq 1 4))
@@ -159,6 +166,7 @@
   (scale th (normalize-vector q))))
 
 (defun matrix-exponent (omega &optional (p 1.0))
+  "returns exponent of given omega"
   (let (w amat)
     (setq w (norm omega))
     (setq amat (outer-product-matrix (normalize-vector omega)))
@@ -168,6 +176,7 @@
     ))
 
 (defun midrot (p r1 r2)
+  "returns mid (or p) rotation matrix of given two matrix r1 and r1"
   (let (r omega)
     (setq r (m* (transpose r1) r2))
     (setq omega (matrix-log r))
@@ -179,6 +188,7 @@
 ;;
 
 (defun pseudo-inverse (mat &optional weight-vector ret wmat mat-tmp)
+  "returns pseudo inverse of given mat"
   (let* ((r (array-dimension mat 0)) (c (array-dimension mat 1))
 	 a p tmp-mat)
     (if (null ret) (setq ret (make-matrix c r)))
@@ -226,6 +236,7 @@
 (defun sr-inverse (mat &optional (k 1.0) weight-vector ret
 		       wmat tmat umat umat2 mat-tmp
 		       mat-tmp-rc mat-tmp-rr mat-tmp-rr2)
+  "returns sr-inverse of given mat"
   (let* ((r (array-dimension mat 0)) (c (array-dimension mat 1)))
     ;; mat (r c)
     (if (null tmat) (setq tmat (make-matrix c r)))
@@ -279,6 +290,7 @@
     ))
 
 (defun manipulability (jacobi &optional tmp-mrr tmp-mcr)
+  "return manipulability of given matrix"
   (let* ((r (array-dimension jacobi 0))
 	 (c (array-dimension jacobi 1)))
     (if (null tmp-mrr) (setq tmp-mrr (make-matrix r r)))

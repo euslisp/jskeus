@@ -64,9 +64,9 @@
   :super object
   :slots (buf))
 (defmethod mtimer
-  (:init () (send self :start) self)
-  (:start () (setq buf (unix:gettimeofday)))
-  (:stop ()
+  (:init () "Initialize timer object." (send self :start) self)
+  (:start () "Start timer." (setq buf (unix:gettimeofday)))
+  (:stop () "Stop timer and returns elapsed time in seconds."
 	 (let ((tmp nil))
 	    (setq tmp (unix:gettimeofday))
 	    (setq tmp (map cons #'- tmp buf))
@@ -74,6 +74,7 @@
   )
 
 (defun permutation (lst n)
+  "Returns permutation of given list"
   (if (< n 1)
       '(())
     (mapcan #'(lambda (x)
@@ -82,6 +83,7 @@
             lst)))
 
 (defun combination (lst n)
+  "Returns combination of given list"
   (if (< n 1)
       '(())
     (mapcan #'(lambda (x)
@@ -97,7 +99,7 @@
              seq1))
 
 (defun find-extreams (datum &key (key #'identity) (identity #'=) (bigger #'>))
-  "returns the elementS of datum which maximizes key function"
+  "Returns the elements of datum which maximizes key function"
   (let* ((max-value (funcall key (car datum)))
          (max-element (car datum))
          (results (list max-element)))
@@ -123,6 +125,7 @@
 
 ;; thread
 (defun eus-server (&optional (port 6666) &key (host (unix:gethostname)))
+  "Create euslisp interpreter server, data sent to socket is evaluated as lisp expression"
   (let ((sp (make-socket-port
 	     (make-socket-address
 	      :host host
@@ -158,6 +161,7 @@
                                      &key
                                      (max-port (+ port 20))
                                      (return-with-port nil))
+  "Connect euslisp interpreter server until success"
   (let (s (p port))
     (while (and (not (streamp (setq s (connect-server host port))))
 		(< port max-port))

@@ -42,6 +42,7 @@
                      (point-color (float-vector 0 1 0))
                      (point-size 2.0) (fill)
                      (arrow-width 2.0) (arrow-size 0.0))
+    "Create point cloud object"
     ;; matrix was not be copied
     (cond
      ((and mat (listp mat))

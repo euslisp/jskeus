@@ -36,6 +36,7 @@
 
 (defmethod bvh-link
   (:init (name typ offst chs parent children)
+         "create link for bvh model"
          (let ((s 30) bs)
            (setq type typ offset offst channels chs)
 
@@ -78,6 +79,7 @@
   :slots (axis-order bvh-offset-rotation))
 (defmethod bvh-sphere-joint
   (:init (&rest args &key (order (list :z :x :y)) ((:bvh-offset-rotation bvh-rotation) (unit-matrix 3)) &allow-other-keys)
+         "create joint for bvh model"
          (setq axis-order order
 	       bvh-offset-rotation bvh-rotation)
          (send-super* :init args))
@@ -140,6 +142,7 @@
 (defmethod bvh-robot-model
   (:init
    (&rest args &key tree coords ((:scale scl)))
+   "create robot model for bvh model"
    (send-super* :init :coords (make-cascoords) args) ;; to avoid pass :coords keyword to upper-class
    (send self :make-bvh-link tree :scale scl)
    (if coords (send self :transform coords))
@@ -286,6 +289,7 @@
       (reverse result))))
 
 (defun read-bvh (fname &key scale)
+  "read bvh file"
   (let ((*readtable* (copy-readtable))
         (eof (gensym)) hierarchy motions frames frame-time)
     (set-syntax-from-char #\# #\;) ;; commnet
@@ -368,6 +372,7 @@
   ) ; motion-capture-data
 
 (defun bvh2eus (fname &rest args)
+  "read bvh file and anmiate robot model in the viewer"
   (let (b)
     (setq b (apply #'load-mcd fname args))
     (objects (list (send b :model)))
@@ -546,6 +551,7 @@
   ) ;defmethod cmu-bvh-robot-model
 
 (defun load-mcd (fname &key (scale) (coords) (bvh-robot-model-class bvh-robot-model))
+  "load motion capture data"
   (let ((bvh-robot-model bvh-robot-model-class))
     (instance motion-capture-data :init fname :coords coords :scale scale)
     ))

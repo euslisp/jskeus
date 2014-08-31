@@ -43,6 +43,8 @@
 	       ((:joint-min-max-table mm-table))
                ((:joint-min-max-target mm-target))
 	       &allow-other-keys)
+         "abstract class of joint, users need to use rotational-joint, linear-joint, sphere-joint, 6dof-joint, wheel-joint or omniwheel-joint.
+          use :parent-link/:child-link for specifying links that this joint connect to and :min/:min for range of joint angle in degree."
 	 (send self :name name)
 	 (setq parent-link plink child-link clink
 	       min-angle min max-angle max)
@@ -60,10 +62,18 @@
 	 (send self :joint-min-max-target mm-target)
 	 (setq default-coords (send child-link :copy-coords))
 	 self)
-  (:min-angle (&optional v) (if v (setq min-angle v)) min-angle)
-  (:max-angle (&optional v) (if v (setq max-angle v)) max-angle)
-  (:parent-link (&rest args) (user::forward-message-to parent-link args))
-  (:child-link (&rest args) (user::forward-message-to child-link args))
+  (:min-angle (&optional v)
+   "If v is set, it updates min-angle of this instance. :min-angle returns minimal angle of this joint in degree."
+   (if v (setq min-angle v)) min-angle)
+  (:max-angle (&optional v)
+   "If v is set, it updates max-angle of this instance. :max-angle returns maximum angle of this joint in degree."
+   (if v (setq max-angle v)) max-angle)
+  (:parent-link (&rest args)
+   "Returns parent link of this joint. if any arguments is set, it is passed to the parent-link."
+   (user::forward-message-to parent-link args))
+  (:child-link (&rest args)
+   "Returns child link of this joint. if any arguments is set, it is passed to the child-link."
+   (user::forward-message-to child-link args))
   (:calc-dav-gain (dav i periodic-time) (warn "subclass's respoinsibility (send ~s :calc-dav-gain)~%" self))
   (:joint-dof () (warn "subclass's respoinsibility (send ~s :joint-dof)~%" self))
   (:speed-to-angle (&rest args) (warn "subclass's respoinsibility (send ~s :speed-to-angle)~%" self))
@@ -164,6 +174,7 @@
                ((:max-joint-velocity mjv) 5) ;; [rad/s]
                ((:max-joint-torque mjt) 100) ;; [Nm]
           &allow-other-keys)
+         "create instance of rotational-joint. :axis is either (:x, :y, :z) or vector. :min-angle and :max-angle takes in radius, but velocity and torque are given in SI units."
 	 (setq axis ax)
 	 (setq joint-angle 0.0)
 	 (send-super* :init
@@ -179,7 +190,7 @@
 	 self)
   (:joint-angle
    (&optional v &key relative &allow-other-keys)
-   "return joint-angle if v is not set, if v is given, set joint angle. v is rotational value in [deg]."
+   "Return joint-angle if v is not set, if v is given, set joint angle. v is rotational value in degree."
    (let ()
      (when v
        (when (and joint-min-max-table joint-min-max-target)
@@ -196,7 +207,7 @@
        (send child-link :replace-coords default-coords)
        (send child-link :rotate (deg2rad joint-angle) axis))
      joint-angle))
-  (:joint-dof () 1)
+  (:joint-dof () "Returns DOF of rotational joint, 1." 1)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-scalar self dav i periodic-time))
   (:speed-to-angle (v) (rad2deg v))
   (:angle-to-speed (v) (deg2rad v))
@@ -213,6 +224,7 @@
           ((:max-joint-velocity mjv) (/ pi 4)) ;; [m/s]
           ((:max-joint-torque mjt) 100) ;; [N]
           &allow-other-keys)
+         "Create instance of linear-joint. :axis is either (:x, :y, :z) or vector. :min-angle and :max-angle takes in [mm], but velocity and torque are given in SI units."
 	 (setq axis 
 	   (if (float-vector-p ax) 
 	       ax
@@ -247,7 +259,7 @@
        (send child-link :replace-coords default-coords)
        (send child-link :translate (scale joint-angle axis)))
      joint-angle))
-  (:joint-dof () 1)
+  (:joint-dof () "Returns DOF of linear joint, 1." 1)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-scalar self dav i periodic-time))
   (:speed-to-angle (v) (* 1000 v))
   (:angle-to-speed (v) (* 0.001 v))
@@ -269,6 +281,7 @@
                 ((:max-joint-torque mjt)
 		 (float-vector 100 100)) ;; [N] [Nm]
                 &allow-other-keys)
+         "Create instance of wheel-joint."
 	 (setq joint-angle (float-vector 0 0))
          (setq axis (list #f(1 0 0) :z))
 	 (send-super* :init :min min :max max
@@ -290,7 +303,7 @@
        (send child-link :rotate (deg2rad relang) :z)
        )
      joint-angle))
-  (:joint-dof () 2)
+  (:joint-dof () "Returns DOF of linear joint, 2." 2)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
   (:speed-to-angle (dv)
                    (float-vector (* 1000 (elt dv 0))
@@ -329,6 +342,7 @@
                 ((:max-joint-torque mjt)
 		 (float-vector 100 100 100)) ;; [N] [N] [Nm]
                 &allow-other-keys)
+         "create instance of omniwheel-joint."
        (setq joint-angle (float-vector 0 0 0))
        (setq axis (list #f(1 0 0) #f(0 1 0) :z))
        (send-super* :init :min min :max max
@@ -347,7 +361,7 @@
      (send child-link :translate (float-vector (elt joint-angle 0) (elt joint-angle 1) 0))
      (send child-link :rotate (deg2rad (elt joint-angle 2)) :z))
    joint-angle)
-  (:joint-dof () 3)
+  (:joint-dof () "Returns DOF of linear joint, 3." 3)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
   (:speed-to-angle (dv)
                    (float-vector (* 1000 (elt dv 0))
@@ -392,6 +406,7 @@
                 ((:max-joint-torque mjt)
                  (float-vector 100 100 100)) ;; [Nm] [Nm] [Nm]
 		&allow-other-keys)
+         "Create instance of sphere-joint. min/max are defiend as a region of angular velocity in degree."
     (setq axis (list :x :y :z))
     (send-super* :init :min min :max max
                  :max-joint-velocity mjv
@@ -425,7 +440,7 @@
     joint-angle)
   (:joint-angle-rpy ;; v and return-value -> [deg] and (float-vector yaw roll pitch)
     (&optional v &key relative)
-    "return joint-angle if v is not set, if v is given, set joint-angle vector by RPY representation, i.e. (float-vector yaw[deg] roll[deg] pitch[deg])"
+    "Return joint-angle if v is not set, if v is given, set joint-angle vector by RPY representation, i.e. (float-vector yaw[deg] roll[deg] pitch[deg])"
     (when v
       (let ((ja (if relative
 		    (v+ (map float-vector #'deg2rad v)
@@ -434,7 +449,7 @@
 		  (map float-vector #'deg2rad v))))
 	(send self :joint-angle (map cons #'rad2deg (matrix-log (rpy-matrix (elt ja 0) (elt ja 1) (elt ja 2)))))))
     (map float-vector #'rad2deg (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad joint-angle))))))
-  (:joint-dof () 3)
+  (:joint-dof () "Returns DOF of linear joint, 3." 3)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
   (:speed-to-angle (dv)
                    (float-vector (rad2deg (elt dv 0))
@@ -465,6 +480,7 @@
   ;;
   (:joint-euler-angle
    (&key (axis-order '(:z :y :x)) ((:child-rot  m) (send child-link :rot)))
+   "Return joint-angle if v is not set, if v is given, set joint-angle vector by euler representation."
    (let ()
      (map cons #'rad2deg
 	  (case (length axis-order)
@@ -522,6 +538,7 @@
 		 (float-vector 100 100 100 100 100 100)) ;; [N] [N] [N] [Nm] [Nm] [Nm]
                 (absolute-p nil)
                 &allow-other-keys)
+         "Create instance of 6dof-joint."
     (setq axis (list #f(1 0 0) #f(0 1 0) #f(0 0 1) :x :y :z))
     (send-super* :init :min min :max max
                  :max-joint-velocity mjv
@@ -540,7 +557,7 @@
     self)
   (:joint-angle
     (&optional v &key relative &allow-other-keys) ;; v [mm] [deg]
-    "return joint-angle if v is not set, if v is given, set joint angle vector, which is 6D vector of 3D translation[mm] and 3D rotation[deg], i.e. (find-if #'(lambda (x) (eq (send (car x) :name) 'sphere-joint)) (documentation :joint-angle))"
+    "Return joint-angle if v is not set, if v is given, set joint angle vector, which is 6D vector of 3D translation[mm] and 3D rotation[deg], i.e. (find-if #'(lambda (x) (eq (send (car x) :name) 'sphere-joint)) (documentation :joint-angle))"
     (when v
       (let (dp drot)
 	;; translation
@@ -568,7 +585,7 @@
     joint-angle)
   (:joint-angle-rpy ;; v and return-value -> [deg] and (float-vector yaw roll pitch)
     (&optional v &key relative)
-    "return joint-angle if v is not set, if v is given, set joint angle. v is joint-angle vector, which is 6D vector of 3D translation[mm] and 3D rotation[deg], for rotation, please see (find-if #'(lambda (x) (eq (send (car x) :name) 'sphere-joint)) (documentation :joint-angle-rpy))"
+    "Return joint-angle if v is not set, if v is given, set joint angle. v is joint-angle vector, which is 6D vector of 3D translation[mm] and 3D rotation[deg], for rotation, please see (find-if #'(lambda (x) (eq (send (car x) :name) 'sphere-joint)) (documentation :joint-angle-rpy))"
     (when v
       (let ((ja (if relative
 		    (v+ (map float-vector #'deg2rad (subseq v 3 6))
@@ -581,7 +598,7 @@
     (concatenate float-vector
 		 (subseq joint-angle 0 3)
 		 (map float-vector #'rad2deg (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad (subseq joint-angle 3 6))))))))
-  (:joint-dof () 6)
+  (:joint-dof () "Returns DOF of linear joint, 6." 6)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
   (:speed-to-angle (dv)
                    (float-vector (* 1000 (elt dv 0))
@@ -651,12 +668,14 @@
     ((:centroid c) #f(0 0 0))
     ((:inertia-tensor i) (unit-matrix 3))
     &allow-other-keys)
+   "Create instance of bodyset-link."
    (setq analysis-level level)
    (setq weight w inertia-tensor i acentroid c)
    (send self :reset-dynamics)
    (send-super* :init coords args))
   (:worldcoords
    (&optional (level analysis-level))
+   "Returns a coordinates object which represents this coord in the world by concatenating all the cascoords from the root to this coords."
    (case
     level
     (:coords (send-message self cascaded-coords :worldcoords))
@@ -664,29 +683,33 @@
    )
   (:analysis-level
    (&optional v)
+   "Change analysis level :coords only changes kinematics level and :body changes geometry too."
    (if v (setq analysis-level v)) analysis-level)
   (:weight
    (&optional w)
+   "Returns a weight of the link. If w is given, set weight."
    (if w (setq weight w)) weight)
   (:centroid
    (&optional c)
+   "Returns a centroid of the link. If c is given, set new centroid."
    (if c (setq acentroid c))
    (send (send self :worldcoords) :transform-vector acentroid))
   (:inertia-tensor
    (&optional i)
+   "Returns a inertia tensor of the link. If c is given, set new intertia tensor."
    (if i (setq inertia-tensor i)) inertia-tensor)
-  (:joint (&rest args) (user::forward-message-to joint args))
-  (:add-joint (j) (setq joint j))
-  (:del-joint () (setq joint nil))
+  (:joint (&rest args) "Returns a joint associated with this link. If args is given, args are forward to the joint." (user::forward-message-to joint args))
+  (:add-joint (j) "Set j as joint of this link" (setq joint j))
+  (:del-joint () "Remove current joint of this link" (setq joint nil))
 
-  (:parent-link () parent-link)
-  (:child-links () child-links)
+  (:parent-link () "Returns parent link" parent-link)
+  (:child-links () "Returns child links" child-links)
 
-  (:add-child-links (l) (unless (or (member l child-links) (not l))(push l child-links)))
-  (:add-parent-link (l) (setq parent-link l))
+  (:add-child-links (l) "Add l to child links" (unless (or (member l child-links) (not l))(push l child-links)))
+  (:add-parent-link (l) "Set l as parent link" (setq parent-link l))
 
-  (:del-child-link  (l) (setq child-links (delete l child-links)))
-  (:del-parent-link ()  (setq parent-link nil))
+  (:del-child-link  (l) "Delete l from child links" (setq child-links (delete l child-links)))
+  (:del-parent-link ()  "Delete parent link" (setq parent-link nil))
 
   (:default-coords (&optional c) (if c (setq default-coords c)) default-coords)
   )
@@ -700,10 +723,12 @@
   (:init (&rest args
 		&key name
 		&allow-other-keys)
+         "Create cascaded-link."
 	 (send-super-lexpr :init args)
 	 self)
   (:init-ending
    ()
+   "This method is to called finalize the instantiation of the cascaded-link. This update bodies and child-link and parent link from joint-list"
    (setq bodies (flatten (send-all links :bodies)))
    (dolist (j joint-list)
      (send (send j :child-link) :add-joint j)
@@ -711,13 +736,13 @@
      (send (send j :parent-link) :add-child-links (send j :child-link))
      )
    (send self :update-descendants))
-  (:links (&rest args) (user::forward-message-to-all links args))
-  (:joint-list (&rest args) (user::forward-message-to-all joint-list args))
-  (:link (name) (find name links :test #'equal :key #'(lambda (x) (send x :name))))
-  (:joint (name) (find name joint-list :test #'equal :key #'(lambda (x) (send x :name))))
+  (:links (&rest args) "Returns links, or args is passed to links" (user::forward-message-to-all links args))
+  (:joint-list (&rest args) "Returns joint list, or args is passed to joints" (user::forward-message-to-all joint-list args))
+  (:link (name) "Return a link with given name." (find name links :test #'equal :key #'(lambda (x) (send x :name))))
+  (:joint (name) "Return a joint with given name." (find name joint-list :test #'equal :key #'(lambda (x) (send x :name))))
 
-  (:bodies (&rest args) (user::forward-message-to-all bodies args))
-  (:faces () (flatten (send-all bodies :faces)))
+  (:bodies (&rest args) "Return bodies of this object. If args is given it passed to all bodies" (user::forward-message-to-all bodies args))
+  (:faces () "Return faces of this object." (flatten (send-all bodies :faces)))
 
   (:update-descendants
    (&rest args)
@@ -726,6 +751,7 @@
   (:angle-vector
    (&optional vec
               (angle-vector (instantiate float-vector (calc-target-joint-dimension joint-list))))
+   "Returns angle-vector of this object, if vec is given, it updates angles of all joint. If given angle-vector violate min/max range, the value is modified."
    (let ((i 0))
      (dolist (j joint-list)
        (when vec
@@ -802,6 +828,7 @@
        )))
   (:link-list
    (to &optional from)
+   "Find link list from to link to from link."
    (let (ret1 ret2)
      (setq ret1 (send self :find-link-route to from))
      (when (and from (not (eq from (car ret1))))
@@ -1907,6 +1934,7 @@
 		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
 		  (dump-command t) (periodic-time 0.5) ;; [s]
 		  &allow-other-keys)
+   "Move move-target to target-coords."
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
    (let* ((loop 0)
@@ -2648,6 +2676,7 @@
       )))
 
 (defun eusmodel-validity-check (robot)
+  "Check if the robot model is validate"
   (require :unittest "lib/llib/unittest.l")
   (init-unit-test)
   (setq lisp::*exit-on-fatal-error* nil)
