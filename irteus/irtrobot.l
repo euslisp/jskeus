@@ -497,16 +497,14 @@
 (defmethod robot-model
   (:foot-midcoords
    (&optional (mid 0.5))
-   "Calculate midcoords of :rleg and :lleg.
-     relevant euslib codes : defined in and copied from rbrain/basicape.l
-     objection : in the following codes, leged robot is assumed."
+   "Calculate midcoords of :rleg and :lleg end-coords.
+    In the following codes, leged robot is assumed."
    (apply #'midcoords mid (send self :legs :end-coords))
    )
   (:fix-leg-to-coords
    (fix-coords &optional (l/r :both) &key (mid 0.5) &allow-other-keys) ;; support-leg
    "Fix robot's legs to a coords
-     relevant euslib codes : defined in and copied from rbrain/basicmodel.l
-     objection : in the following codes, leged robot is assumed."
+    In the following codes, leged robot is assumed."
    (unless (not (some #'null (send self :legs :links)))
      (return-from :fix-leg-to-coords nil))
    (let (support-coords tmp-coords move-coords pos rot ra)
@@ -547,9 +545,9 @@
          (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) fix-limbs))
         (root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5)) ;; use only translation x, y and rotation z
         &allow-other-keys)
-   "move robot base position in order to change centroid-on-foot location,
-    leg -> legs for target of robot's centroid. :both, :rleg, and :lleg are supported.
-    fix-limbs -> limb names which are fixed in this IK."
+   "Move robot COG to change centroid-on-foot location,
+    leg : legs for target of robot's centroid, which should be :both, :rleg, and :lleg.
+    fix-limbs : limb names which are fixed in this IK."
    (with-move-target-link-list
     (mt ll self fix-limbs)
     (let* ()
@@ -572,6 +570,7 @@
          (init-pose-function #'(lambda () (send self :move-centroid-on-foot :both '(:rleg :lleg))))
          (start-with-double-support t)
          (end-with-double-support t))
+   "Calculate walking pattern from foot step list and return pattern list as a list of angle-vector, root-coords, time, and so on."
    (let* ((res) (ret) (tm 0)
           (gg (instance gait-generator :init self dt)))
      (funcall init-pose-function)
@@ -650,6 +649,7 @@
   ;; currently only default, forward and outside
   (:gen-footstep-parameter
    (&key (ratio 1.0))
+   "Generate footstep parameter"
    (warn ";; generating footstep-parameter...~%")
    (let ((pav (send self :angle-vector))
          (pc (send self :copy-worldcoords)))
@@ -709,6 +709,7 @@
                               (cadr (assoc leg leg-translate-pos)))))
                 (send cc :put :l/r leg)
                 cc))))
+   "Calculate foot step list from goal x position [mm], goal y position [mm], and goal yaw orientation [deg]."
    (let* ((x-sign (if (> xx 0.0) 1.0 -1.0))
           (y-sign (if (> yy 0.0) 1.0 -1.0))
           (th-sign (if (> th 0.0) 1.0 -1.0))
