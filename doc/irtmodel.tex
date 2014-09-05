@@ -1728,17 +1728,6 @@ concatenate result-type a bは a bを
 おり，ここでは特異点や関節リミットの回避，あるいは自己衝突回避等の機能
 が追加されている．
 
-また，"irteus/demo/sample-arm-model.l"ファイルにはさらに，これを簡単に
-使う:solve-ikというメソッドが定義されている．その使い方は，
-
-{\baselineskip=10pt
-\begin{verbatim}
-$ (send *sarm* :solve-ik *target* :debug-view t)
-\end{verbatim}
-}
-
-となる．
-
 \subsubsection{実際のロボットモデル}
 
 実際のロボットや環境を利用した実践的なサンプルプログラムを見てみよう．
