@@ -457,11 +457,6 @@
            (send (send self :end-coords :parent) :assoc obj)))
      (send self :move-fingers 0)))
 
-  (:solve-ik
-   (target-coords &rest args)
-   (send* self :inverse-kinematics target-coords
-          :link-list (send self :link-list (send self :end-coords :parent))
-          :move-target (send self :end-coords) args))
   )
 
 ;;;
