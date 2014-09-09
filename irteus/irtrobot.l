@@ -707,7 +707,7 @@
               (mc leg leg-translate-pos)
               (let ((cc (send (send mc :copy-worldcoords) :translate
                               (cadr (assoc leg leg-translate-pos)))))
-                (send cc :put :l/r leg)
+                (send cc :name leg)
                 cc))))
    "Calculate foot step list from goal x position [mm], goal y position [mm], and goal yaw orientation [deg]."
    (let* ((x-sign (if (> xx 0.0) 1.0 -1.0))
