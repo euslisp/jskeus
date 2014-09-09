@@ -1453,7 +1453,7 @@
    (mapcar #'(lambda (tmpfs)
                (if (find-method tmpfs :l/r)
                    (send tmpfs :l/r)
-                 (send tmpfs :get :l/r)))
+                 (send tmpfs :name)))
            fs))
   (:get-counter-footstep-limbs
    (fs)
