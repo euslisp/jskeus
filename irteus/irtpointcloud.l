@@ -98,6 +98,7 @@
   (:width () width)
   (:height () height)
   (:size-change
+   "change width and height, this method does not change points data"
    (&optional wd ht)
    (cond
     ((and wd ht)
@@ -118,6 +119,7 @@
     ))
   (:view-coords (&optional vc) (if vc (setq view-coords vc)) view-coords)
   (:points (&optional pts wd ht) ;; copy from pts
+   "replace points, pts should be list of points or n$\times$ matrix"
    (when pts
      (send self :size-change wd ht)
      (cond
@@ -135,6 +137,7 @@
          (setq parray m)))))
    parray)
   (:colors (&optional cls) ;; copy from cls
+   "replace colors, cls should be list of points or n$\times$ matrix"
    (when cls
      (cond
       ((listp cls)
@@ -153,6 +156,7 @@
          (setq carray m)))))
    carray)
   (:normals (&optional nmls) ;; copy from nmls
+   "replace normals by, nmls should be list of points or n$\times$3 matrix"
    (when nmls
      (cond
       ((listp nmls)
@@ -184,6 +188,7 @@
          (setq curvature vec)))))
    curvature)
   (:point-list (&optional (remove-nan))
+   "return list of points"
    (let (lst p)
      (dotimes (i (send self :size))
        ;;(push (matrix-row parray i) lst)
@@ -192,6 +197,7 @@
          (push p lst)))
      (reverse lst)))
   (:color-list ()
+   "return list of colors"
    (if carray
        (let (lst)
          (dotimes (i (array-dimension carray 0))
@@ -200,6 +206,7 @@
            )
          (reverse lst))))
   (:normal-list ()
+   "return list of normals"
    (if narray
        (let (lst)
          (dotimes (i (array-dimension narray 0))
@@ -214,6 +221,7 @@
            (push (elt curvature i) lst))
          (reverse lst))))
   (:centroid ()
+   "retrun centroid of this point cloud"
    (let ((ret (float-vector 0 0 0)))
      (vector-array-mean parray ret)
      ret))
@@ -227,10 +235,15 @@
   (:append-list () (warn ";; this method has not been implemented !!!"))
   (:nfilter (&rest args) (send* self :filter args)) ;; compatibility to 3dpointcloud
   (:filter (&rest args &key create &allow-other-keys)
+   "this method can take the same keywords with :filter-with-indices method.
+    if :create is true, return filtered point cloud and original point cloud does not change.\\\\"
    (let ((indices (send* self :filtered-indices args)))
      (send self :filter-with-indices indices :create create)))
   (:filter-with-indices
    (idx-lst &key (create) (negative))
+   "filter point cloud with list of index (points which are indicated by indices will remain).\\\\
+    if :create is true, return filtered point cloud and original point cloud does not change.\\\\
+    if :negative is true, points which are indicated by indices will be removed."
    (let* ((size (send self :size))
           new-mat new-col new-nom new-cvt
           (p (float-vector 0 0 0))
@@ -310,6 +323,10 @@
        )))
   (:filtered-indices
    (&key key ckey nkey pckey pnkey pcnkey negative &allow-other-keys)
+   "create list of index where filter function retrun true.\\\\
+    key, ckey, nkey are filter function for points, colors, normals. They are expected to take one argument and return t or nil.\\\\
+    pckey, pnkey are filter function for points and colors, points and normals. They are expected to take two arguments and return t or nil.\\\\
+    pcnkey is filter function for points, colors and normals. It is expected to take three arguments and return t or nil."
    (let* (ret-lst
           (points-num (send self :size))
           (p (instantiate float-vector 3))
@@ -382,6 +399,7 @@
      ))
   (:step
    (step &key (fixsize) (create))
+   "downsample points with step"
    (let* ((offx (floor (/ (mod (1- width) step) 2.0)))
           (offy (floor (/ (mod (1- height) step) 2.0)))
           (nw (/ (1+ (- width offx)) step))
@@ -448,6 +466,7 @@
       ))
   ;;
   (:copy-from (pc)
+   "update object by pc"
    (send self :points (send pc :points))
    (send self :colors (send pc :colors))
    (send self :normals (send pc :normals))
@@ -459,6 +478,8 @@
    (send self :worldcoords)
    self)
   (:transform-points
+   "transform points and normals with coords.\\\\
+    if :create is true, return transformed point cloud and original point cloud does not change."
    (coords &key (create))
    (let ((ret (if create (instance pointcloud :init) self)))
      (if create (send ret :copy-from self))
