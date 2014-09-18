@@ -3,9 +3,24 @@
 
 This repository containts software devleoped and used by [JSK](http://www.jsk.t.u-tokyo.ac.jp )at The University of Tokyo.
 
-### Getting started
+## 1. Getting started
 
-#### Installing dependent libraries
+### 1.1 Install binary (Ubuntu)
+
+#### 1.1.1 Setup ROS repository
+```
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
+wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+echo "source /opt/ros/hydro/setup.bash" >> ~/.bashrc
+sudo apt-get update
+```
+#### 1.1.2 Install Euslisp
+```
+sudo apt-get install ros-hydro-euslisp
+```
+
+### 1.2 Install from source code
+#### 1.2.1 Installing dependent libraries
 
 for Ubuntu users
 ```
@@ -54,7 +69,7 @@ bitmap fonts (all bitmap font packages -75dpi, -100dpi, -misc )
 ```
 
 
-#### Downloading and building EusLisp
+#### 1.2.2 Downloading and building EusLisp
 ```
 $ git clone http://github.com/euslisp/jskeus jskeus
 $ cd jskeus
@@ -63,10 +78,14 @@ you will see instructions to add EUSDIR, ARCHDIR, PATH, LD_LIBRARY_PATH environm
 $ echo "source ~/bashrc.eus" >> ~/.bashrc
 ```
 
-#### Demo program
+## 2 Playing with Demo programs
+
+### 2.1 Motion generation
 ```
 $ irteusgl irteus/demo/demo.l
 ```
+and type any command, such as '(crank-motion)' or '(dual-arm-ik)'
+
 
 ![full-body-ik](images/Full-body-ik.png)
 ![dual-arm-ik](images/Dual-arm-ik.png)
@@ -76,7 +95,7 @@ $ irteusgl irteus/demo/demo.l
 ![hanoi-arm](images/Hanoi-arm.png)
 ![particle](images/Particle.png)
 
-#### Robots and objects models
+### 2.2 Robots and objects models
 ```
 $ irteusgl models/irt-all-robots.l "(make-all-robots)"
 ```
@@ -87,39 +106,52 @@ $ irteusgl models/irt-all-objects.l "(make-all-objects)"
 ```
 ![all objects](images/irt-all-objects.png)
 
-### Getting started for ROS and PR2 users
+## 3 Getting started for ROS and PR2 users
 
-* Install ROS and jsk-ros-pkg repository (See http://www.ros.org/wiki/ROS/Installation/rosinstall for more detail)
+### 3.1 Install binaries
+
+#### 3.1.1 Setup ROS repository
+
+You can skip this procdeure if you already setup ROS system
 ```
-$ sudo apt-get install python-setuptools
-$ sudo easy_install -U rosinstall
-$ rosinstall ~/ros/cturtle http://www.ros.org/rosinstalls/cturtle_pr2.rosinstall
-$ rosinstall ~/ros/cturtle http://jsk-ros-pkg.svn.sourceforge.net/viewvc/jsk-ros-pkg/trunk/jsk.rosinstall
-$ echo "source ~/ros/cturtle/setup.sh" >> ~/.bashrc
-$ . ~/.bashrc
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
+wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+echo "source /opt/ros/hydro/setup.bash" >> ~/.bashrc
+sudo apt-get update
+```
+#### 3.1.2 Install pr2/euslisp programs
+
+```
+sudo apt-get install ros-hydro-pr2eus
 ```
 
-* for ROS users
+### 3.2 Install from source
 
-euslisp compile
+#### 3.2.1  Install ROS and jsk-ros-pkg repository (See http://wiki.ros.org/indigo/Installation/Source for more detail)
 ```
-$ rosdep install euslisp
-$ rosmake euslisp
+$ sudo apt-get install python-rosdep python-rosinstall-generator python-wstool python-rosinstall build-essential
+$ mkdir -p ~/ros_catkin_ws/src
+$ cd ~/ros_catkin_ws/src
+$ wstool init src https://raw.githubusercontent.com/jsk-ros-pkg/jsk_pr2eus/master/.rosinstall
+$ cd ..
+$ rosdep install --from-paths src --ignore-src --rosdistro hydro -y
+$ catkin_make
+$ source devel/setup.bash
 ```
-demo program
+
+### 3.3 Running demo programs
+
+#### 3.3.1 Visualizinot pr2 robot
 ```
-$ rosdep install euscollada
-$ roscd euscollada
-$ rosmake
-$ ./pr2.sh
+$ rosrun euscollada pr2.sh
 ```
 
 ![./pr2.sh](images/Pr2eus.png)
 
-* for real PR2 users
+#### 3.3.2 For real PR2 users
+
 ```
 $ roscd pr2eus
-$ rosmake
 ;; read joint state and display in euslisp viewer, print jacobian
 $ roslaunch ./pr2-read-state.launch
 ;; sample program to show how to make pr2 posture from euslisp
@@ -131,19 +163,19 @@ $ roslaunch ./pr2-send-joints.launch
 
 see roseus package in http://github.com/jsk-ros-pkg repository for ROS client library for euslisp
 
-### Support and Trouble Shooting
+### 3.4 Support and Trouble Shooting
 
 
 Use [issue tracker](https://github.com/euslisp/jskeus/issues) for get support
 
 Use [pull requests](https://github.com/euslisp/jskeus/pulls) to report bugs or patches.
 
-### Online Documents (Currently only Japanese is avilable)
+### 3.5 Online Documents (Currently only Japanese is avilable)
 
 See online [manual](http://euslisp.github.io/jskeus/)
 
 PDF files are also available from [here](https://github.com/euslisp/jskeus/raw/master/doc/jmanual.pdf)
 
-### Acknowledgment
+### 3.6 Acknowledgment
 
 The software in this repository is based on [EusLisp language](http://euslisp.sourceforge.net).
