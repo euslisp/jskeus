@@ -5,7 +5,7 @@ This repository containts software devleoped and used by [JSK](http://www.jsk.t.
 
 ## 1. Getting started
 
-### 1.1 Install binary (Ubuntu)
+### 1.1 Install binary (Ubuntu 12.04)
 
 #### 1.1.1 Setup ROS repository
 ```
@@ -108,7 +108,7 @@ $ irteusgl models/irt-all-objects.l "(make-all-objects)"
 
 ## 3 Getting started for ROS and PR2 users
 
-### 3.1 Install binaries
+### 3.1 Install binaries (Ubuntu 12.04)
 
 #### 3.1.1 Setup ROS repository
 
@@ -127,7 +127,10 @@ sudo apt-get install ros-hydro-pr2eus
 
 ### 3.2 Install from source
 
-#### 3.2.1  Install ROS and jsk-ros-pkg repository (See http://wiki.ros.org/indigo/Installation/Source for more detail)
+#### 3.2.1  Install ROS and jsk-ros-pkg repository
+
+See http://wiki.ros.org/indigo/Installation/Source for more detail
+
 ```
 $ sudo apt-get install python-rosdep python-rosinstall-generator python-wstool python-rosinstall build-essential
 $ mkdir -p ~/ros_catkin_ws/src
