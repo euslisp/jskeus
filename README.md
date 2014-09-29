@@ -154,12 +154,22 @@ $ rosrun euscollada pr2.sh
 
 #### 3.3.2 For real PR2 users
 
+After you set `ROS_MASTER_URI` and `ROS_IP` to your PR2 robot (or simulated PR2), try following command
+
 ```
 $ roscd pr2eus
 ;; read joint state and display in euslisp viewer, print jacobian
 $ roslaunch ./pr2-read-state.launch
-;; sample program to show how to make pr2 posture from euslisp
+;; sample program to show how to make pr2 posture from euslisp, THIS WILL MOVE REAL ROBOT, CAUTION!!!
 $ roslaunch ./pr2-send-joints.launch
+```
+
+You can use our script to set  `ROS_MASTER_URI` and `ROS_IP`
+```
+$ source `rospack find jsk_tools`/src/bashrc.ros
+$ rossetrobot pr1012.jsk.com # change to your environment
+$ rossetip
+
 ```
 
 ![./pr2-read-state.launch](images/Pr2-read-state.png)
