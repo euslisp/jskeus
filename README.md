@@ -129,15 +129,16 @@ sudo apt-get install ros-hydro-pr2eus
 
 #### 3.2.1  Install ROS and jsk-ros-pkg repository
 
-See http://wiki.ros.org/indigo/Installation/Source for more detail
+See http://wiki.ros.org/hydro/Installation/Source for more detail
 
 ```
 $ sudo apt-get install python-rosdep python-rosinstall-generator python-wstool python-rosinstall build-essential
 $ mkdir -p ~/ros_catkin_ws/src
 $ cd ~/ros_catkin_ws/src
 $ wstool init src https://raw.githubusercontent.com/jsk-ros-pkg/jsk_pr2eus/master/.rosinstall
+$ wget https://raw.githubusercontent.com/jsk-ros-pkg/jsk_travis/master/rosdep-install.sh
+$ sh ./rosdep-install.sh
 $ cd ..
-$ rosdep install --from-paths src --ignore-src --rosdistro hydro -y
 $ catkin_make
 $ source devel/setup.bash
 ```
