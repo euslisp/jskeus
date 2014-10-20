@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>ユーティリティ関数</TITLE>
+<TITLE>GL/X表示</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="ユーティリティ関数">
+<META NAME="description" CONTENT="GL/X表示">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -21,53 +21,53 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="jmanual-node184.html">
 <LINK REL="previous" HREF="jmanual-node182.html">
-<LINK REL="up" HREF="jmanual-node181.html">
+<LINK REL="up" HREF="jmanual-node182.html">
 <LINK REL="next" HREF="jmanual-node184.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html3203"
+<A NAME="tex2html3204"
   HREF="jmanual-node184.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3197"
-  HREF="jmanual-node181.html">
+<A NAME="tex2html3198"
+  HREF="jmanual-node182.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3191"
+<A NAME="tex2html3192"
   HREF="jmanual-node182.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3199"
+<A NAME="tex2html3200"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3201"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html3202"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3204"
-  HREF="jmanual-node184.html">数学関数</A>
-<B> Up:</B> <A NAME="tex2html3198"
-  HREF="jmanual-node181.html">irteus拡張</A>
-<B> Previous:</B> <A NAME="tex2html3192"
-  HREF="jmanual-node182.html">GL/X表示</A>
- &nbsp; <B>  <A NAME="tex2html3200"
+<B> Next:</B> <A NAME="tex2html3205"
+  HREF="jmanual-node184.html">ユーティリティ関数</A>
+<B> Up:</B> <A NAME="tex2html3199"
+  HREF="jmanual-node182.html">irteus拡張</A>
+<B> Previous:</B> <A NAME="tex2html3193"
+  HREF="jmanual-node182.html">irteus拡張</A>
+ &nbsp; <B>  <A NAME="tex2html3201"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3202"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3203"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION05082000000000000000">
-ユーティリティ関数</A>
+<H2><A NAME="SECTION05081000000000000000">
+GL/X表示</A>
 </H2>
- 
+  
  <BR>
 <BR> <BR> 
-<A NAME="66288"></A>
-<BIG CLASS="XLARGE"><B>mtimer </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>object</B> 
-<BR>  :slots 		 buf 
+<A NAME="65434"></A>
+<BIG CLASS="XLARGE"><B>gl::glvertices </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>cascaded-coords</B> 
+<BR>  :slots 		 gl::mesh-list gl::filename gl::bbox 
 </TT></PRE>
 <BR>
 <BR>
@@ -79,157 +79,320 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </DL>
 <BR>
 <BR>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="65451"></A>
+<B>:init</B> <EM>gl::mlst &amp;rest args &amp;key ((:filename gl::fn)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
-<A NAME="66305"></A>
-<B>:init</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Initialize timer object.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="66315"></A>
-<B>:start</B> [メソッド]
+</SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> Start timer.
+<DD> 
 </DD>
-</DL>
+</DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="66325"></A>
-<B>:stop</B> [メソッド]
+<BR>
+
+<A NAME="65461"></A>
+<B>:filename</B> <EM>&amp;optional gl::nm  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> Stop timer and returns elapsed time in seconds.
+<DD> 
 </DD>
-</DL>
+</DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
+<BR>
 
+<A NAME="65471"></A>
+<B>:set-color</B> <EM>gl::color &amp;optional (gl::transparent)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65481"></A>
+<B>:actual-vertices</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65491"></A>
+<B>:calc-bounding-box</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65501"></A>
+<B>:vertices</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65511"></A>
+<B>:reset-offset-from-parent</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65521"></A>
+<B>:expand-vertices</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65531"></A>
+<B>:calc-normals</B> <EM>&amp;optional (gl::force nil) (gl::expand t)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65541"></A>
+<B>:convert-to-faces</B> <EM>&amp;rest args &amp;key (gl::wrt :local) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65551"></A>
+<B>:faces</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65561"></A>
+<B>:convert-to-faceset</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65571"></A>
+<B>:set-offset</B> <EM>gl::cds  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65581"></A>
+<B>:glvertices</B> <EM>&amp;optional (name) (gl::test #'string=)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65591"></A>
+<B>:append-glvertices</B> <EM>gl::glv-lst  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65601"></A>
+<B>:draw-on</B> <EM>&amp;key ((:viewer gl::vwer) viewer)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65611"></A>
+<B>:draw</B> <EM>gl::vwr &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65621"></A>
+<B>:collision-check-objects</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="65631"></A>
+<B>:box</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
 
 <P>
 
-<A NAME="66335"></A>
-<B>permutation</B> <EM>lst n  </EM>[関数]
+<A NAME="65641"></A>
+<B>gl::find-color</B> <EM>gl::color  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
-<DD> Returns permutation of given list
+<DD> returns color vector of given color name, the name is defiend in https://github.com/euslisp/jskeus/blob/master/irteus/irtglrgb.l
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="66345"></A>
-<B>combination</B> <EM>lst n  </EM>[関数]
+<A NAME="65651"></A>
+<B>gl::transparent</B> <EM>gl::abody gl::param  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
-<DD> Returns combination of given list
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="66355"></A>
-<B>find-extreams</B> <EM>datum &amp;key (key #'identity) (identity #'=) (bigger #'&gt;)  </EM>[関数]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns the elements of datum which maximizes key function
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="66365"></A>
-<B>eus-server</B> <EM>&amp;optional (port 6666) &amp;key (host (unix:gethostname))  </EM>[関数]
-
-<DL COMPACT>
-<DT> 
-<DD> Create euslisp interpreter server, data sent to socket is evaluated as lisp expression
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="66375"></A>
-<B>connect-server-until-success</B> <EM>host port &amp;key (max-port (+ port 20)) (return-with-port nil)  </EM>[関数]
-
-<DL COMPACT>
-<DT> 
-<DD> Connect euslisp interpreter server until success
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="66385"></A>
-<B>format-array</B> <EM>arr &amp;optional (header ) (in 7) (fl 3) (strm error-output) (use-line-break t)  </EM>[関数]
-
-<DL COMPACT>
-<DT> 
-<DD> print formatted array
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="66395"></A>
-<B>his2rgb</B> <EM>h &amp;optional i s ret  </EM>[関数]
-
-<DL COMPACT>
-<DT> 
-<DD> convert his to rgb (0 &lt;= h &lt;= 360, 0.0 &lt;= i &lt;= 1.0, 0.0 &lt;= s &lt;= 1.0)
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="66405"></A>
-<B>hvs2rgb</B> <EM>h &amp;optional i s ret  </EM>[関数]
-
-<DL COMPACT>
-<DT> 
-<DD> convert hvs to rgb (0 &lt;= h &lt;= 360, 0.0 &lt;= i &lt;= 1.0, 0.0 &lt;= s &lt;= 1.0)
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="66415"></A>
-<B>rgb2his</B> <EM>r &amp;optional g b ret  </EM>[関数]
-
-<DL COMPACT>
-<DT> 
-<DD> convert rgb to his (0 &lt;= r,g,b &lt;= 255)
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="66425"></A>
-<B>rgb2hvs</B> <EM>r &amp;optional g b ret  </EM>[関数]
-
-<DL COMPACT>
-<DT> 
-<DD> convert rt to hvs (0 &lt;= r,g,b &lt;= 255)
+<DD> Set abody to transparent with param
 </DD>
 </DL>
 <BR>
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66435"></A>
-<B>forward-message-to</B> <EM>to args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+<A NAME="65661"></A>
+<B>gl::set-stereo-gl-attribute</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
 
@@ -244,8 +407,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66446"></A>
-<B>forward-message-to-all</B> <EM>to args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+<A NAME="65672"></A>
+<B>gl::reset-gl-attribute</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
 
@@ -260,8 +423,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66457"></A>
-<B>mapjoin</B> <EM>expr seq1 seq2  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+<A NAME="65683"></A>
+<B>gl::delete-displaylist-id</B> <EM>gl::dllst  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
 
@@ -276,8 +439,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66468"></A>
-<B>need-thread</B> <EM>n &amp;optional (lsize (512 1024)) (csize lsize)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+<A NAME="65694"></A>
+<B>gl::draw-globjects</B> <EM>gl::vwr gl::draw-things &amp;key (gl::clear t) (gl::flush t) (gl::draw-origin 150) (gl::draw-floor nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
 
@@ -292,8 +455,201 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66479"></A>
-<B>piped-fork-returns-list</B> <EM>cmd &amp;optional args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+<A NAME="65705"></A>
+<B>gl::draw-glbody</B> <EM>gl::vwr gl::abody  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+               
+ <BR>
+<BR> <BR> 
+<A NAME="66004"></A>
+<BIG CLASS="XLARGE"><B>x::tabbed-panel </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>x:panel</B> 
+<BR>  :slots 		 x::tabbed-buttons x::tabbed-panels x::selected-tabbed-panel 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="66021"></A>
+<B>:create</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="66031"></A>
+<B>:add-tabbed-panel</B> <EM>name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="66041"></A>
+<B>:change-tabbed-panel</B> <EM>x::obj  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="66051"></A>
+<B>:tabbed-button</B> <EM>name &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="66061"></A>
+<B>:tabbed-panel</B> <EM>name &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="66071"></A>
+<B>:resize</B> <EM>x::w h  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+	<BR> 
+<A NAME="66082"></A>
+<BIG CLASS="XLARGE"><B>x::panel-tab-button-item </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>x:button-item</B> 
+<BR>  :slots 		 nil 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="66099"></A>
+<B>:draw-label</B> <EM>&amp;optional (x::state :up) (x::offset 0)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="66109"></A>
+<B>x::window-main-one</B> <EM>&amp;optional fd  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="66120"></A>
+<B>x::event-far</B> <EM>x::e  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="66131"></A>
+<B>x::event-near</B> <EM>x::e  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
 
@@ -310,36 +666,36 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
               
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html3203"
+<A NAME="tex2html3204"
   HREF="jmanual-node184.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3197"
-  HREF="jmanual-node181.html">
+<A NAME="tex2html3198"
+  HREF="jmanual-node182.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3191"
+<A NAME="tex2html3192"
   HREF="jmanual-node182.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3199"
+<A NAME="tex2html3200"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3201"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html3202"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3204"
-  HREF="jmanual-node184.html">数学関数</A>
-<B> Up:</B> <A NAME="tex2html3198"
-  HREF="jmanual-node181.html">irteus拡張</A>
-<B> Previous:</B> <A NAME="tex2html3192"
-  HREF="jmanual-node182.html">GL/X表示</A>
- &nbsp; <B>  <A NAME="tex2html3200"
+<B> Next:</B> <A NAME="tex2html3205"
+  HREF="jmanual-node184.html">ユーティリティ関数</A>
+<B> Up:</B> <A NAME="tex2html3199"
+  HREF="jmanual-node182.html">irteus拡張</A>
+<B> Previous:</B> <A NAME="tex2html3193"
+  HREF="jmanual-node182.html">irteus拡張</A>
+ &nbsp; <B>  <A NAME="tex2html3201"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3202"
-  HREF="jmanual-node186.html">Index</A></B> </DIV>
+ &nbsp; <B>  <A NAME="tex2html3203"
+  HREF="jmanual-node187.html">Index</A></B> </DIV>
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Solaris 2 オペレーティングシステムのマルチスレッド</TITLE>
+<TITLE>マルチスレッドEuslispの設計</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="Solaris 2 オペレーティングシステムのマルチスレッド">
+<META NAME="description" CONTENT="マルチスレッドEuslispの設計">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,7 +19,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="jmanual.css">
 
-<LINK REL="next" HREF="jmanual-node94.html">
+<LINK REL="next" HREF="jmanual-node97.html">
 <LINK REL="previous" HREF="jmanual-node92.html">
 <LINK REL="up" HREF="jmanual-node92.html">
 <LINK REL="next" HREF="jmanual-node94.html">
@@ -28,56 +28,56 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html1837"
+<A NAME="tex2html1835"
   HREF="jmanual-node94.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1831"
+<A NAME="tex2html1829"
   HREF="jmanual-node92.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1825"
+<A NAME="tex2html1823"
   HREF="jmanual-node92.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1833"
+<A NAME="tex2html1831"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html1835"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html1833"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html1838"
-  HREF="jmanual-node94.html">Context Separation</A>
-<B> Up:</B> <A NAME="tex2html1832"
-  HREF="jmanual-node92.html">マルチスレッドEuslispの設計</A>
-<B> Previous:</B> <A NAME="tex2html1826"
-  HREF="jmanual-node92.html">マルチスレッドEuslispの設計</A>
- &nbsp; <B>  <A NAME="tex2html1834"
+<B> Next:</B> <A NAME="tex2html1836"
+  HREF="jmanual-node94.html">Solaris 2 オペレーティングシステムのマルチスレッド</A>
+<B> Up:</B> <A NAME="tex2html1830"
+  HREF="jmanual-node92.html">マルチスレッド</A>
+<B> Previous:</B> <A NAME="tex2html1824"
+  HREF="jmanual-node92.html">マルチスレッド</A>
+ &nbsp; <B>  <A NAME="tex2html1832"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html1836"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html1834"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION04021100000000000000">
- Solaris 2 オペレーティングシステムのマルチスレッド</A>
-</H3>
-マルチスレッドEuslisp(MT-Eus)は、複数のプロセッサを持ったSolaris 2 
-オペレーティングシステム上で動作する。
-Solarisのスレッドは、 共有メモリと異なった環境を持つような従来の
-UNIXプロセスをCPUに配置するためのユニットである。Solaris OSによって提供されるスレッドのライブラリは、
-それぞれのスレッドを単一のLWP(light weight process)に配置する。
-このプロセスがカーネルのリソースである。
-UNIXのカーネルは、それぞれのスレッドに割り当てられたスレッドの優先権に
-基づいて複数の物理CPUにLWPの配置を計画する。
-図<A HREF="jmanual-node94.html#threadmodel"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>は、スレッドとLWPとCPUの関係を表わしたものである。
-Euslispの環境およびメモリ管理の設計について、
-マルチスレッドの能力を引き出すために２つの大きな変更がされた。
+<H2><A NAME="SECTION04021000000000000000">
+マルチスレッドEuslispの設計</A>
+</H2>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
-<P>
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html1837"
+  HREF="jmanual-node94.html">Solaris 2 オペレーティングシステムのマルチスレッド</A>
+<LI><A NAME="tex2html1838"
+  HREF="jmanual-node95.html">Context Separation</A>
+<LI><A NAME="tex2html1839"
+  HREF="jmanual-node96.html">メモリ管理</A>
+</UL>
+<!--End of Table of Child-Links-->
 <BR><HR>
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

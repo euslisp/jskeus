@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>ポイントクラウドデータ</TITLE>
+<TITLE>Colladaデータ</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="ポイントクラウドデータ">
+<META NAME="description" CONTENT="Colladaデータ">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -21,651 +21,123 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="jmanual-node180.html">
 <LINK REL="previous" HREF="jmanual-node178.html">
-<LINK REL="up" HREF="jmanual-node143.html">
+<LINK REL="up" HREF="jmanual-node144.html">
 <LINK REL="next" HREF="jmanual-node180.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html3145"
+<A NAME="tex2html3146"
   HREF="jmanual-node180.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3139"
-  HREF="jmanual-node143.html">
+<A NAME="tex2html3140"
+  HREF="jmanual-node144.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3133"
+<A NAME="tex2html3134"
   HREF="jmanual-node178.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3141"
+<A NAME="tex2html3142"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3143"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html3144"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3146"
-  HREF="jmanual-node180.html">グラフ表現</A>
-<B> Up:</B> <A NAME="tex2html3140"
-  HREF="jmanual-node143.html">irteus 拡張</A>
-<B> Previous:</B> <A NAME="tex2html3134"
-  HREF="jmanual-node178.html">Colladaデータ</A>
- &nbsp; <B>  <A NAME="tex2html3142"
+<B> Next:</B> <A NAME="tex2html3147"
+  HREF="jmanual-node180.html">ポイントクラウドデータ</A>
+<B> Up:</B> <A NAME="tex2html3141"
+  HREF="jmanual-node144.html">irteus 拡張</A>
+<B> Previous:</B> <A NAME="tex2html3135"
+  HREF="jmanual-node178.html">BVHデータ</A>
+ &nbsp; <B>  <A NAME="tex2html3143"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3144"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3145"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION05060000000000000000">
-ポイントクラウドデータ</A>
+<H1><A NAME="SECTION05050000000000000000">
+Colladaデータ</A>
 </H1>
  
  <BR>
-<BR> <BR> 
-<A NAME="62210"></A>
-<BIG CLASS="XLARGE"><B>pointcloud </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>cascaded-coords</B> 
-<BR>  :slots 		 parray carray narray curvature pcolor psize awidth asize box height width view-coords drawnormalmode transparent tcarray 
-</TT></PRE>
-<BR>
-<BR>
+<BR> <A NAME="60465"></A>
+<B>collada::eusmodel-description</B> <EM>collada::model  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
-<DD>
+<DD> convert a `model' to eusmodel-description
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="62227"></A>
-<B>:init</B> <EM>&amp;rest args &amp;key ((:points mat)) ((:colors cary)) ((:normals nary)) ((:curvatures curv)) ((:height ht)) ((:width wd)) (point-color (float-vector 0 1 0)) (point-size 2.0) (fill) (arrow-width 2.0) (arrow-size 0.0)  </EM>[メソッド]
+<A NAME="60475"></A>
+<B>collada::eusmodel-link-specs</B> <EM>collada::links  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
-<DD> Create point cloud object
+<DD> convert `links' to &lt;link-specs&gt;
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="62237"></A>
-<B>:size-change</B> <EM>&amp;optional wd ht  </EM>[メソッド]
+<A NAME="60485"></A>
+<B>collada::eusmodel-joint-specs</B> <EM>collada::joints  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
-<DD> change width and height, this method does not change points data
+<DD> convert `joints' to &lt;joint-specs&gt;
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="62247"></A>
-<B>:points</B> <EM>&amp;optional pts wd ht  </EM>[メソッド]
+<A NAME="60495"></A>
+<B>collada::eusmodel-description-&gt;collada</B> <EM>name collada::description &amp;key (scale 0.001)  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
-<DD> replace points, pts should be list of points or n<SPAN CLASS="MATH"><B><IMG
- WIDTH="17" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img57.png"
- ALT="$ \times$"></B></SPAN> matrix
+<DD> convert eusmodel-descrption to collada sxml
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="62257"></A>
-<B>:colors</B> <EM>&amp;optional cls  </EM>[メソッド]
+<A NAME="60505"></A>
+<B>collada::matrix-&gt;collada-rotate-vector</B> <EM>collada::mat  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
-<DD> replace colors, cls should be list of points or n<SPAN CLASS="MATH"><B><IMG
- WIDTH="17" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img57.png"
- ALT="$ \times$"></B></SPAN> matrix
+<DD> convert a rotation matrix to axis-angle.
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="62267"></A>
-<B>:normals</B> <EM>&amp;optional nmls  </EM>[メソッド]
+<A NAME="60515"></A>
+<B>convert-irtmodel-to-collada</B> <EM>collada::model-file &amp;optional (collada::output-full-dir (send (truename ./) :namestring)) (collada::model-name) (collada::exit-p t)  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
-<DD> replace normals by, nmls should be list of points or n<SPAN CLASS="MATH"><B><IMG
- WIDTH="17" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img57.png"
- ALT="$ \times$"></B></SPAN>3 matrix
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="62277"></A>
-<B>:point-list</B> <EM>&amp;optional (remove-nan)  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> return list of points
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="62287"></A>
-<B>:color-list</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> return list of colors
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="62297"></A>
-<B>:normal-list</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> return list of normals
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="62307"></A>
-<B>:centroid</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> retrun centroid of this point cloud
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="62317"></A>
-<B>:filter</B> <EM>&amp;rest args &amp;key create &amp;allow-other-keys  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> this method can take the same keywords with :filter-with-indices method.
-    if :create is true, return filtered point cloud and original point cloud does not change.
-<BR></DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="62327"></A>
-<B>:filter-with-indices</B> <EM>idx-lst &amp;key (create) (negative)  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> filter point cloud with list of index (points which are indicated by indices will remain).
-<BR>
-if :create is true, return filtered point cloud and original point cloud does not change.
-<BR>
-if :negative is true, points which are indicated by indices will be removed.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="62337"></A>
-<B>:filtered-indices</B> <EM>&amp;key key ckey nkey pckey pnkey pcnkey negative &amp;allow-other-keys  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> create list of index where filter function retrun true.
-<BR>
-key, ckey, nkey are filter function for points, colors, normals. They are expected to take one argument and return t or nil.
-<BR>
-pckey, pnkey are filter function for points and colors, points and normals. They are expected to take two arguments and return t or nil.
-<BR>
-pcnkey is filter function for points, colors and normals. It is expected to take three arguments and return t or nil.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="62347"></A>
-<B>:step</B> <EM>step &amp;key (fixsize) (create)  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> downsample points with step
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="62357"></A>
-<B>:copy-from</B> <EM>pc  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> update object by pc
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="62367"></A>
-<B>:transform-points</B> <EM>coords &amp;key (create)  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> transform points and normals with coords.
-<BR>
-if :create is true, return transformed point cloud and original point cloud does not change.
+<DD> convert irtmodel to collada model. (convert-irtmodel-to-collada irtmodel-file-path &amp;optional (output-full-dir (send (truename ''./'') :namestring)) (model-name))
 </DD>
 </DL>
 <BR>
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="62377"></A>
-<B>:reset-box</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="60525"></A>
+<B>collada::symbol-&gt;string</B> <EM>collada::sym  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62387"></A>
-<B>:box</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62397"></A>
-<B>:vertices</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62407"></A>
-<B>:size</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62417"></A>
-<B>:width</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62427"></A>
-<B>:height</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62437"></A>
-<B>:view-coords</B> <EM>&amp;optional vc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62447"></A>
-<B>:curvatures</B> <EM>&amp;optional curv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62457"></A>
-<B>:curvature-list</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62467"></A>
-<B>:point-color</B> <EM>&amp;optional pc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62477"></A>
-<B>:point-size</B> <EM>&amp;optional ps  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62487"></A>
-<B>:axis-length</B> <EM>&amp;optioanl al  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62497"></A>
-<B>:axis-width</B> <EM>&amp;optional aw  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62507"></A>
-<B>:clear-color</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62517"></A>
-<B>:clear-normal</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62527"></A>
-<B>:append</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62537"></A>
-<B>:append-list</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62547"></A>
-<B>:nfilter</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62557"></A>
-<B>:viewangle-inlier</B> <EM>&amp;key (min-z 0.0) (hangle 44.0) (vangle 35.0)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62567"></A>
-<B>:image-position-inlier</B> <EM>&amp;key (ipkey) (height 144) (width 176) (cy (/ (float (- height 1)) 2)) (cx (/ (float (- width 1)) 2)) negative  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62577"></A>
-<B>:image-circle-filter</B> <EM>dist &amp;key (height 144) (width 176) (cy (/ (float (- height 1)) 2)) (cx (/ (float (- width 1)) 2)) create negative  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62587"></A>
-<B>:step-inlier</B> <EM>step offx offy  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62597"></A>
-<B>:generate-color-histogram-hs</B> <EM>&amp;key (h-step 9) (s-step 7) (hlimits (cons 360.0 0.0)) (vlimits (cons 1.0 0.15)) (slimits (cons 1.0 0.25)) (rotate-hue) (color-scale 255.0) (sizelimits 1)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62607"></A>
-<B>:convert-to-world</B> <EM>&amp;key (create)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62617"></A>
-<B>:drawnormalmode</B> <EM>&amp;optional mode  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62627"></A>
-<B>:transparent</B> <EM>&amp;optional trs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="62637"></A>
-<B>:draw</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
@@ -673,41 +145,1175 @@ if :create is true, return transformed point cloud and original point cloud does
 
 <BR>
 </SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60536"></A>
+<B>collada::-&gt;string</B> <EM>collada::val  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
-<P>
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60547"></A>
+<B>collada::string-append</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60558"></A>
+<B>collada::make-attr</B> <EM>collada::l collada::ac  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60569"></A>
+<B>collada::make-xml</B> <EM>collada::x collada::bef collada::aft  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60580"></A>
+<B>collada::sxml-&gt;xml</B> <EM>collada::sxml  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60591"></A>
+<B>collada::xml-output-to-string-stream</B> <EM>collada::ss collada::l  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60602"></A>
+<B>collada::cat-normal</B> <EM>collada::l collada::s  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60613"></A>
+<B>collada::cat-clark</B> <EM>collada::l collada::s collada::i  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60624"></A>
+<B>collada::verificate-unique-strings</B> <EM>names  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60635"></A>
+<B>collada::eusmodel-link-spec</B> <EM>collada::link  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60646"></A>
+<B>collada::eusmodel-mesh-spec</B> <EM>collada::link  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60657"></A>
+<B>collada::eusmodel-joint-spec</B> <EM>collada::_joint  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60668"></A>
+<B>collada::eusmodel-limit-spec</B> <EM>collada::_joint  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60679"></A>
+<B>collada::eusmodel-endcoords-specs</B> <EM>collada::model  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60690"></A>
+<B>collada::eusmodel-link-description</B> <EM>collada::description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60701"></A>
+<B>collada::eusmodel-joint-description</B> <EM>collada::description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60712"></A>
+<B>collada::eusmodel-endcoords-description</B> <EM>collada::description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60723"></A>
+<B>collada::setup-collada-filesystem</B> <EM>collada::obj-name collada::base-dir  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60734"></A>
+<B>collada::range2</B> <EM>collada::n  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60745"></A>
+<B>eus2collada</B> <EM>collada::obj collada::full-root-dir &amp;key (scale 0.001) (collada::file-suffix .dae)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60756"></A>
+<B>collada::collada-node-id</B> <EM>collada::link-descrption  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60767"></A>
+<B>collada::collada-node-name</B> <EM>collada::link-descrption  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60778"></A>
+<B>collada::links-description-&gt;collada-library-materials</B> <EM>collada::links-desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60789"></A>
+<B>collada::link-description-&gt;collada-materials</B> <EM>collada::link-desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60800"></A>
+<B>collada::mesh-description-&gt;collada-material</B> <EM>collada::mat collada::effect  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60811"></A>
+<B>collada::links-description-&gt;collada-library-effects</B> <EM>collada::links-desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60822"></A>
+<B>collada::link-description-&gt;collada-effects</B> <EM>collada::link-desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60833"></A>
+<B>collada::mesh-description-&gt;collada-effect</B> <EM>collada::mesh id  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60844"></A>
+<B>collada::matrix-&gt;collada-string</B> <EM>collada::mat  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60855"></A>
+<B>collada::find-parent-liks-from-link-description</B> <EM>collada::target-link collada::desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60866"></A>
+<B>collada::eusmodel-description-&gt;collada-node-transformations</B> <EM>collada::target-link collada::desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60877"></A>
+<B>collada::eusmodel-description-&gt;collada-node</B> <EM>collada::target-link collada::desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60888"></A>
+<B>collada::eusmodel-description-&gt;collada-library-visual-scenes</B> <EM>name collada::desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60899"></A>
+<B>collada::mesh-description-&gt;instance-material</B> <EM>collada::s  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60910"></A>
+<B>collada::link-description-&gt;collada-bind-material</B> <EM>collada::link  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60921"></A>
+<B>collada::eusmodel-description-&gt;collada-library-kinematics-scenes</B> <EM>name collada::desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60932"></A>
+<B>collada::eusmodel-description-&gt;collada-library-kinematics-models</B> <EM>name collada::desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60943"></A>
+<B>collada::eusmodel-description-&gt;collada-kinematics-model</B> <EM>name collada::desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60954"></A>
+<B>collada::eusmodel-description-&gt;collada-library-physics-scenes</B> <EM>name collada::desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60965"></A>
+<B>collada::eusmodel-description-&gt;collada-library-physics-models</B> <EM>name collada::desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60976"></A>
+<B>collada::find-root-link-from-joints-description</B> <EM>collada::joints-description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60987"></A>
+<B>collada::find-link-from-links-description</B> <EM>name collada::links-description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="60998"></A>
+<B>collada::eusmodel-description-&gt;collada-links</B> <EM>collada::description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61009"></A>
+<B>collada::find-joint-from-link-description</B> <EM>collada::target collada::joints  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61020"></A>
+<B>collada::find-child-link-descriptions</B> <EM>collada::parent collada::links collada::joints  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61031"></A>
+<B>collada::eusmodel-description-&gt;collada-library-articulated-systems</B> <EM>collada::desc name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61042"></A>
+<B>collada::eusmodel-endcoords-description-&gt;openrave-manipulator</B> <EM>collada::end-coords collada::description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61053"></A>
+<B>collada::eusmodel-description-&gt;collada-links-tree</B> <EM>collada::target collada::links collada::joints  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61064"></A>
+<B>collada::joints-description-&gt;collada-instance-joints</B> <EM>collada::joints-desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61075"></A>
+<B>collada::joint-description-&gt;collada-instance-joint</B> <EM>collada::joint-desc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61086"></A>
+<B>collada::eusmodel-description-&gt;collada-library-joints</B> <EM>collada::description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61097"></A>
+<B>collada::joints-description-&gt;collada-joints</B> <EM>collada::joints-description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61108"></A>
+<B>collada::collada-joint-id</B> <EM>collada::joint-description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61119"></A>
+<B>collada::joint-description-&gt;collada-joint</B> <EM>collada::joint-description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61130"></A>
+<B>collada::linear-joint-description-&gt;collada-joint</B> <EM>collada::joint-description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61141"></A>
+<B>collada::rotational-joint-description-&gt;collada-joint</B> <EM>collada::joint-description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61152"></A>
+<B>collada::eusmodel-description-&gt;collada-scene</B> <EM>collada::description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61163"></A>
+<B>collada::eusmodel-description-&gt;collada-library-geometries</B> <EM>collada::description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61174"></A>
+<B>collada::collada-geometry-id-base</B> <EM>collada::link-descrption  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61185"></A>
+<B>collada::collada-geometry-name-base</B> <EM>collada::link-descrption  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61196"></A>
+<B>collada::links-description-&gt;collada-geometries</B> <EM>collada::links-description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61207"></A>
+<B>collada::mesh-object-&gt;collada-mesh</B> <EM>collada::mesh id  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61218"></A>
+<B>collada::link-description-&gt;collada-geometry</B> <EM>collada::link-description  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61229"></A>
+<B>collada::mesh-&gt;collada-indices</B> <EM>collada::mesh  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61240"></A>
+<B>collada::mesh-vertices-&gt;collada-string</B> <EM>collada::mesh  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61251"></A>
+<B>collada::mesh-normals-&gt;collada-string</B> <EM>collada::mesh  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61262"></A>
+<B>collada::float-vector-&gt;collada-string</B> <EM>collada::v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61273"></A>
+<B>collada::enum-integer-list</B> <EM>collada::n  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61284"></A>
+<B>collada::search-minimum-rotation-matrix</B> <EM>collada::mat  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61295"></A>
+<B>collada::estimate-class-name</B> <EM>collada::model-file  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="61306"></A>
+<B>collada::remove-directory-name</B> <EM>fname  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
              
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html3145"
+<A NAME="tex2html3146"
   HREF="jmanual-node180.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3139"
-  HREF="jmanual-node143.html">
+<A NAME="tex2html3140"
+  HREF="jmanual-node144.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3133"
+<A NAME="tex2html3134"
   HREF="jmanual-node178.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3141"
+<A NAME="tex2html3142"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3143"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html3144"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3146"
-  HREF="jmanual-node180.html">グラフ表現</A>
-<B> Up:</B> <A NAME="tex2html3140"
-  HREF="jmanual-node143.html">irteus 拡張</A>
-<B> Previous:</B> <A NAME="tex2html3134"
-  HREF="jmanual-node178.html">Colladaデータ</A>
- &nbsp; <B>  <A NAME="tex2html3142"
+<B> Next:</B> <A NAME="tex2html3147"
+  HREF="jmanual-node180.html">ポイントクラウドデータ</A>
+<B> Up:</B> <A NAME="tex2html3141"
+  HREF="jmanual-node144.html">irteus 拡張</A>
+<B> Previous:</B> <A NAME="tex2html3135"
+  HREF="jmanual-node178.html">BVHデータ</A>
+ &nbsp; <B>  <A NAME="tex2html3143"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3144"
-  HREF="jmanual-node186.html">Index</A></B> </DIV>
+ &nbsp; <B>  <A NAME="tex2html3145"
+  HREF="jmanual-node187.html">Index</A></B> </DIV>
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

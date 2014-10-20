@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>BVHデータ</TITLE>
+<TITLE>ロボット動作と干渉計算</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="BVHデータ">
+<META NAME="description" CONTENT="ロボット動作と干渉計算">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,785 +19,99 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="jmanual.css">
 
-<LINK REL="next" HREF="jmanual-node178.html">
-<LINK REL="previous" HREF="jmanual-node174.html">
-<LINK REL="up" HREF="jmanual-node143.html">
+<LINK REL="previous" HREF="jmanual-node176.html">
+<LINK REL="up" HREF="jmanual-node175.html">
 <LINK REL="next" HREF="jmanual-node178.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html3117"
+<A NAME="tex2html3118"
   HREF="jmanual-node178.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3111"
-  HREF="jmanual-node143.html">
+<A NAME="tex2html3112"
+  HREF="jmanual-node175.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3105"
+<A NAME="tex2html3108"
   HREF="jmanual-node176.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3113"
+<A NAME="tex2html3114"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3115"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html3116"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3118"
-  HREF="jmanual-node178.html">Colladaデータ</A>
-<B> Up:</B> <A NAME="tex2html3112"
-  HREF="jmanual-node143.html">irteus 拡張</A>
-<B> Previous:</B> <A NAME="tex2html3106"
-  HREF="jmanual-node176.html">ロボット動作と干渉計算</A>
- &nbsp; <B>  <A NAME="tex2html3114"
+<B> Next:</B> <A NAME="tex2html3119"
+  HREF="jmanual-node178.html">BVHデータ</A>
+<B> Up:</B> <A NAME="tex2html3113"
+  HREF="jmanual-node175.html">干渉計算</A>
+<B> Previous:</B> <A NAME="tex2html3109"
+  HREF="jmanual-node176.html">irteusからPQPの呼び出し</A>
+ &nbsp; <B>  <A NAME="tex2html3115"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3116"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3117"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION05040000000000000000">
-BVHデータ</A>
-</H1>
- 
+<H2><A NAME="SECTION05032000000000000000">
+ロボット動作と干渉計算</A>
+</H2>
+
+<P>
+ハンドで物体をつかむ，という動作の静的なシミュレーションを行う場合に
+手（指）のリンクと対象物体の干渉を調べ，これが起こるところで物体をつか
+む動作を停止させるということが出来る．
+
+<P>
+<PRE>
+(objects (list *sarm* *target*))
+
+(send *sarm* :solve-ik *target* :debug-view t)
+(while (&gt; a 0)
+  (if (pqp-collision-check-objects
+       (list (send *sarm* :joint-fr :child-link)
+             (send *sarm* :joint-fl :child-link))
+       (list *target*))
+      (return))
+  (decf a 0.1)
+  (send *irtviewer* :draw-objects)
+  (send *sarm* :move-fingers a))
+(send *sarm* :end-coords :assoc *target*)
+
+(dotimes (i 100)
+  (send *sarm* :joint0 :joint-angle 1 :relative t)
+  (send *irtviewer* :draw-objects))
+(send *sarm* :end-coords :dissoc *target*)
+(dotimes (i 100)
+  (send *sarm* :joint0 :joint-angle -1 :relative t)
+  (send *irtviewer* :draw-objects))
+</PRE>
+
+<P>
+同様の機能が，"irteus/demo/sample-arm-model.l"ファイルの:open-hand,
+:close-handというメソッドで提供されている．
+
+<P>
+
  <BR>
-<BR> <BR> 
-<A NAME="59044"></A>
-<BIG CLASS="XLARGE"><B>bvh-link </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>bodyset-link</B> 
-<BR>  :slots 		 type offset channels neutral 
-</TT></PRE>
-<BR>
-<BR>
+<BR> <A NAME="58811"></A>
+<B>pqp-collision-check-objects</B> <EM>geometry::obj1 geometry::obj2 &amp;key (geometry::fat 0.2)  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="59061"></A>
-<B>:init</B> <EM>name typ offst chs parent children  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> create link for bvh model
+<DD> return nil or t
 </DD>
 </DL>
 <BR>
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59071"></A>
-<B>:type</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59081"></A>
-<B>:offset</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59091"></A>
-<B>:channels</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="59102"></A>
-<BIG CLASS="XLARGE"><B>bvh-sphere-joint </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>sphere-joint</B> 
-<BR>  :slots 		 axis-order bvh-offset-rotation 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="59119"></A>
-<B>:init</B> <EM>&amp;rest args &amp;key (order (list :z :x :y)) ((:bvh-offset-rotation bvh-rotation) (unit-matrix 3)) &amp;allow-other-keys  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> create joint for bvh model
-</DD>
-</DL>
-<BR>
-<BR>
-
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59129"></A>
-<B>:joint-angle-bvh</B> <EM>&amp;optional v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59139"></A>
-<B>:joint-angle-bvh-offset</B> <EM>&amp;optional v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59149"></A>
-<B>:joint-angle-bvh-impl</B> <EM>v bvh-offset  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59159"></A>
-<B>:axis-order</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59169"></A>
-<B>:bvh-offset-rotation</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="59180"></A>
-<BIG CLASS="XLARGE"><B>bvh-6dof-joint </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>6dof-joint</B> 
-<BR>  :slots 		 scale axis-order bvh-offset-rotation 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59197"></A>
-<B>:init</B> <EM>&amp;rest args &amp;key (order (list :x :y :z :z :x :y)) ((:scale scl)) ((:bvh-offset-rotation bvh-rotation) (unit-matrix 3)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59207"></A>
-<B>:joint-angle-bvh</B> <EM>&amp;optional v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59217"></A>
-<B>:joint-angle-bvh-offset</B> <EM>&amp;optional v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59227"></A>
-<B>:joint-angle-bvh-impl</B> <EM>v bvh-offset  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59237"></A>
-<B>:axis-order</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59247"></A>
-<B>:bvh-offset-rotation</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="59258"></A>
-<BIG CLASS="XLARGE"><B>bvh-robot-model </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>robot-model</B> 
-<BR>  :slots 		 nil 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="59275"></A>
-<B>:init</B> <EM>&amp;rest args &amp;key tree coords ((:scale scl))  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> create robot model for bvh model
-</DD>
-</DL>
-<BR>
-<BR>
-
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59285"></A>
-<B>:make-bvh-link</B> <EM>tree &amp;key parent ((:scale scl))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59295"></A>
-<B>:angle-vector</B> <EM>&amp;optional vec (angle-vector (instantiate float-vector (calc-target-joint-dimension joint-list)))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59305"></A>
-<B>:dump-joints</B> <EM>links &amp;key (depth 0) (strm standard-output)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59315"></A>
-<B>:dump-hierarchy</B> <EM>&amp;optional (strm standard-output)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59325"></A>
-<B>:dump-motion</B> <EM>&amp;optional (strm standard-output)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59335"></A>
-<B>:copy-state-to</B> <EM>robot  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59345"></A>
-<B>:fix-joint-angle</B> <EM>i limb joint-name joint-order a  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59355"></A>
-<B>:fix-joint-order</B> <EM>jo limb  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59365"></A>
-<B>:bvh-offset-rotate</B> <EM>name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59375"></A>
-<B>:init-end-coords</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59385"></A>
-<B>:init-root-link</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="59396"></A>
-<BIG CLASS="XLARGE"><B>motion-capture-data </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>propertied-object</B> 
-<BR>  :slots 		 frame model animation 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59413"></A>
-<B>:init</B> <EM>fname &amp;key (coords (make-coords)) ((:scale scl))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59423"></A>
-<B>:model</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59433"></A>
-<B>:animation</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59443"></A>
-<B>:frame</B> <EM>&amp;optional f  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59453"></A>
-<B>:frame-length</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="59463"></A>
-<B>:animate</B> <EM>&amp;rest args &amp;key (start 0) (step 1) (end (send self :frame-length)) (interval 20) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="59474"></A>
-<BIG CLASS="XLARGE"><B>rikiya-bvh-robot-model </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>bvh-robot-model</B> 
-<BR>  :slots 		 nil 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59491"></A>
-<B>:init</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="59502"></A>
-<BIG CLASS="XLARGE"><B>tum-bvh-robot-model </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>bvh-robot-model</B> 
-<BR>  :slots 		 nil 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59519"></A>
-<B>:init</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="59530"></A>
-<BIG CLASS="XLARGE"><B>cmu-bvh-robot-model </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>bvh-robot-model</B> 
-<BR>  :slots 		 nil 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59547"></A>
-<B>:init</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-
-<A NAME="59557"></A>
-<B>read-bvh</B> <EM>fname &amp;key scale  </EM>[関数]
-
-<DL COMPACT>
-<DT> 
-<DD> read bvh file
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="59567"></A>
-<B>bvh2eus</B> <EM>fname &amp;rest args  </EM>[関数]
-
-<DL COMPACT>
-<DT> 
-<DD> read bvh file and anmiate robot model in the viewer
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="59577"></A>
-<B>load-mcd</B> <EM>fname &amp;key (scale) (coords) (bvh-robot-model-class bvh-robot-model)  </EM>[関数]
-
-<DL COMPACT>
-<DT> 
-<DD> load motion capture data
-</DD>
-</DL>
-<BR>
-<BR>
-
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59587"></A>
-<B>parse-bvh-sexp</B> <EM>src &amp;key ((:scale scl))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+<A NAME="58821"></A>
+<B>pqp-collision-check</B> <EM>geometry::model1 geometry::model2 &amp;optional (geometry::flag geometry::pqp_first_contact) &amp;key (geometry::fat 0) (geometry::fat2 nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
 
@@ -812,8 +126,8 @@ BVHデータ</A>
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="59598"></A>
-<B>make-bvh-robot-model</B> <EM>bvh-data &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+<A NAME="58832"></A>
+<B>pqp-collision-distance</B> <EM>geometry::model1 geometry::model2 &amp;key (geometry::fat 0) (geometry::fat2 nil) (geometry::qsize 2)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
 
@@ -828,38 +142,11 @@ BVHデータ</A>
 <BR>
 </SMALL>
              
-<DIV CLASS="navigation"><HR>
-<!--Navigation Panel-->
-<A NAME="tex2html3117"
-  HREF="jmanual-node178.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3111"
-  HREF="jmanual-node143.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3105"
-  HREF="jmanual-node176.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3113"
-  HREF="jmanual-node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3115"
-  HREF="jmanual-node186.html">
-<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
-<BR>
-<B> Next:</B> <A NAME="tex2html3118"
-  HREF="jmanual-node178.html">Colladaデータ</A>
-<B> Up:</B> <A NAME="tex2html3112"
-  HREF="jmanual-node143.html">irteus 拡張</A>
-<B> Previous:</B> <A NAME="tex2html3106"
-  HREF="jmanual-node176.html">ロボット動作と干渉計算</A>
- &nbsp; <B>  <A NAME="tex2html3114"
-  HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3116"
-  HREF="jmanual-node186.html">Index</A></B> </DIV>
-<!--End of Navigation Panel-->
+<P>
+<BR><HR>
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

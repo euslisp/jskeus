@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>逆運動学</TITLE>
+<TITLE>ロボットの動作生成</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="逆運動学">
+<META NAME="description" CONTENT="ロボットの動作生成">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,656 +19,87 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="jmanual.css">
 
-<LINK REL="next" HREF="jmanual-node153.html">
-<LINK REL="previous" HREF="jmanual-node151.html">
-<LINK REL="up" HREF="jmanual-node151.html">
+<LINK REL="next" HREF="jmanual-node166.html">
+<LINK REL="previous" HREF="jmanual-node146.html">
+<LINK REL="up" HREF="jmanual-node145.html">
 <LINK REL="next" HREF="jmanual-node153.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html2770"
+<A NAME="tex2html2758"
   HREF="jmanual-node153.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html2764"
-  HREF="jmanual-node151.html">
+<A NAME="tex2html2752"
+  HREF="jmanual-node145.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html2758"
+<A NAME="tex2html2746"
   HREF="jmanual-node151.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html2766"
+<A NAME="tex2html2754"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html2768"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html2756"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html2771"
-  HREF="jmanual-node153.html">基礎ヤコビ行列</A>
-<B> Up:</B> <A NAME="tex2html2765"
-  HREF="jmanual-node151.html">ロボットの動作生成</A>
-<B> Previous:</B> <A NAME="tex2html2759"
-  HREF="jmanual-node151.html">ロボットの動作生成</A>
- &nbsp; <B>  <A NAME="tex2html2767"
+<B> Next:</B> <A NAME="tex2html2759"
+  HREF="jmanual-node153.html">逆運動学</A>
+<B> Up:</B> <A NAME="tex2html2753"
+  HREF="jmanual-node145.html">ロボットモデリング</A>
+<B> Previous:</B> <A NAME="tex2html2747"
+  HREF="jmanual-node151.html">cascaded-linkを用いたロボット（多リンク系）のモデリング</A>
+ &nbsp; <B>  <A NAME="tex2html2755"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html2769"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2757"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION05012100000000000000">
-逆運動学</A>
-</H3>
-逆運動学においては, エンドエフェクタの位置・姿勢<!-- MATH
- $^0_n\mbox{\boldmath {$H$}}$
- -->
-<SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img111.png"
- ALT="$ ^0_n$"><SPAN CLASS="MATH"><B><IMG
- WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img112.png"
- ALT="$ H$"></B></SPAN></SPAN>から
-マニピュレータの関節角度ベクトル
-<!-- MATH
- $\mbox{\boldmath {$\theta$}}=(\theta_1, \theta_2, ..., \theta_n)^T$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img113.png"
- ALT="$ \theta$"></B></SPAN><IMG
- WIDTH="124" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img114.png"
- ALT="$ =(\theta_1, \theta_2, ..., \theta_n)^T$"></B></SPAN>
-を求める.
+<H2><A NAME="SECTION05012000000000000000">
+ロボットの動作生成</A>
+</H2>
 
 <P>
-ここで, 
-エンドエフェクタの位置・姿勢<!-- MATH
- $\mbox{\boldmath {$r$}}$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img115.png"
- ALT="$ r$"></B></SPAN></B></SPAN>
-は関節角度ベクトルを用いて
-<BR>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:forward-kinematics-functional"></A><!-- MATH
- \begin{eqnarray}
-\mbox{\boldmath {$r$}} = \mbox{\boldmath {$f$}}(\mbox{\boldmath {$\theta$}})
-\end{eqnarray}
- -->
-<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img116.png"
- ALT="$\displaystyle \mbox{\boldmath {$r$}}$"><IMG
- WIDTH="17" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img117.png"
- ALT="$\displaystyle =$">&nbsp; &nbsp;<IMG
- WIDTH="15" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img118.png"
- ALT="$\displaystyle \mbox{\boldmath {$f$}}$"><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img119.png"
- ALT="$\displaystyle ($"><IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img120.png"
- ALT="$\displaystyle \mbox{\boldmath {$\theta$}}$"><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img121.png"
- ALT="$\displaystyle )$"></TD>
-<TD>&nbsp;</TD>
-<TD>&nbsp;</TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">1</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL">
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
-とかける.
-Equation&nbsp;<A HREF="#eq:forward-kinematics-functional"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;はEquation&nbsp;<A HREF="#eq:inverse-kinematics-func"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;
-のように記述し,関節角度ベクトルを求める.
-<BR>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:inverse-kinematics-func"></A><!-- MATH
- \begin{eqnarray}
-\mbox{\boldmath {$\theta$}} = \mbox{\boldmath {$f$}}^{-1}(\mbox{\boldmath {$r$}})
-\end{eqnarray}
- -->
-<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img120.png"
- ALT="$\displaystyle \mbox{\boldmath {$\theta$}}$"><IMG
- WIDTH="17" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img117.png"
- ALT="$\displaystyle =$">&nbsp; &nbsp;<IMG
- WIDTH="15" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img118.png"
- ALT="$\displaystyle \mbox{\boldmath {$f$}}$"><IMG
- WIDTH="28" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img122.png"
- ALT="$\displaystyle ^{-1}($"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img116.png"
- ALT="$\displaystyle \mbox{\boldmath {$r$}}$"><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img121.png"
- ALT="$\displaystyle )$"></TD>
-<TD>&nbsp;</TD>
-<TD>&nbsp;</TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">2</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL">
-
-<P>
-<A NAME="eq:inverse-kinematics-func"></A>における<SPAN CLASS="MATH"><B><IMG
- WIDTH="31" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img123.png"
- ALT="$ f^{-1}$"></B></SPAN>は一般に非線形な関数となる.
-そこで<A NAME="eq:forward-kinematics-functional"></A>を時刻tに関して微分することで,
-線形な式
-<BR>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:inverse-kinematics-base"></A><!-- MATH
- \begin{eqnarray}
-\dot{\mbox{\boldmath {$r$}}} &=& \frac{\partial \mbox{\boldmath {$f$}}}{\partial \mbox{\boldmath {$\theta$}}}
-   (\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}} \\
- &=& \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}
-\end{eqnarray}
- -->
-<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img124.png"
- ALT="$\displaystyle \dot{\mbox{\boldmath {$r$}}}$"></TD>
-<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
- WIDTH="17" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img117.png"
- ALT="$\displaystyle =$"></TD>
-<TD ALIGN="LEFT" NOWRAP WIDTH="50%"><IMG
- WIDTH="60" HEIGHT="52" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img125.png"
- ALT="$\displaystyle \frac{\partial \mbox{\boldmath {$f$}}}{\partial \mbox{\boldmath {$\theta$}}}
-(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}$"></TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">3</SPAN>)</TD></TR>
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT">&nbsp;</TD>
-<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
- WIDTH="17" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img117.png"
- ALT="$\displaystyle =$"></TD>
-<TD ALIGN="LEFT" NOWRAP WIDTH="50%"><IMG
- WIDTH="16" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img126.png"
- ALT="$\displaystyle \mbox{\boldmath {$J$}}$"><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img119.png"
- ALT="$\displaystyle ($"><IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img120.png"
- ALT="$\displaystyle \mbox{\boldmath {$\theta$}}$"><IMG
- WIDTH="20" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img127.png"
- ALT="$\displaystyle )\dot{\mbox{\boldmath {$\theta$}}}$"></TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">4</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL">
-
-を得る.
-ここで, <!-- MATH
- $\mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img128.png"
- ALT="$ J$"></B></SPAN><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img129.png"
- ALT="$ ($"><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img113.png"
- ALT="$ \theta$"></B></SPAN><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img130.png"
- ALT="$ )$"></B></SPAN>は<!-- MATH
- $m \times n$
- -->
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="47" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img131.png"
- ALT="$ m \times n$"></B></SPAN>のヤコビ行列である.
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img132.png"
- ALT="$ m$"></B></SPAN>はベクトル<!-- MATH
- $\mbox{\boldmath {$r$}}$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img115.png"
- ALT="$ r$"></B></SPAN></B></SPAN>の次元, <SPAN CLASS="MATH"><B><IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img133.png"
- ALT="$ n$"></B></SPAN>はベクトル<!-- MATH
- $\mbox{\boldmath {$\theta$}}$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img113.png"
- ALT="$ \theta$"></B></SPAN></B></SPAN>の次元である.
-<!-- MATH
- $\mbox{\boldmath {$\dot{r}$}}$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img134.png"
- ALT="$ \dot{r}$"></B></SPAN></B></SPAN>は速度・角速度ベクトルである.
-
-<P>
-ヤコビ行列が正則であるとき逆行列<!-- MATH
- $\mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})^{-1}$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img128.png"
- ALT="$ J$"></B></SPAN><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img129.png"
- ALT="$ ($"><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img113.png"
- ALT="$ \theta$"></B></SPAN><IMG
- WIDTH="28" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img135.png"
- ALT="$ )^{-1}$"></B></SPAN>を用いて
-以下のようにしてこの線型方程式の解を得ることができる.
-<BR>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:inverse-kinematics"></A><!-- MATH
- \begin{eqnarray}
-\dot{\mbox{\boldmath {$\theta$}}} = \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})^{-1}\dot{\mbox{\boldmath {$r$}}}
-\end{eqnarray}
- -->
-<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="95" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img136.png"
- ALT="$\displaystyle \dot{\mbox{\boldmath {$\theta$}}} = \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})^{-1}\dot{\mbox{\boldmath {$r$}}}$"></TD>
-<TD>&nbsp;</TD>
-<TD>&nbsp;</TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">5</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL">
-
-<P>
-しかし, 一般にヤコビ行列は正則でないので,
-ヤコビ行列の疑似逆行列<!-- MATH
- $\mbox{\boldmath {$J$}}^{\#}(\mbox{\boldmath {$\theta$}})$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img128.png"
- ALT="$ J$"></B></SPAN><IMG
- WIDTH="22" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img137.png"
- ALT="$ ^{\char93 }($"><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img113.png"
- ALT="$ \theta$"></B></SPAN><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img130.png"
- ALT="$ )$"></B></SPAN>
-が用いられる(Equation&nbsp;<A HREF="#eq:psuedo-inverse-matrix"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;).
-<BR>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:psuedo-inverse-matrix"></A><!-- MATH
- \begin{eqnarray}
-\mbox{\boldmath {$A$}}^{\#} = \left\{
-                \begin{array}{l l}
-                 & \mbox{\boldmath {$A$}}^{-1} \ ( m = n = rank \mbox{\boldmath {$A$}}) \\
-                 & \mbox{\boldmath {$A$}}^T \ (\mbox{\boldmath {$A$}}\mbox{\boldmath {$A$}}^T)^{-1} ( n > m = rank \mbox{\boldmath {$A$}}) \\
-                 & (\mbox{\boldmath {$A$}}^T\mbox{\boldmath {$A$}})^{-1}\mbox{\boldmath {$A$}}^T \ ( m > n = rank \mbox{\boldmath {$A$}})
-                \end{array}
-	  \right.
-\end{eqnarray}
- -->
-<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img138.png"
- ALT="$\displaystyle \mbox{\boldmath {$A$}}$"><IMG
- WIDTH="292" HEIGHT="77" BORDER="0"
- SRC="jmanual-img139.png"
- ALT="\begin{displaymath}^{\char93 } = \left\{
-\begin{array}{l l}
-&amp; \mbox{\boldmath {$...
-...}^T \ ( m &gt; n = rank \mbox{\boldmath {$A$}})
-\end{array}\right.\end{displaymath}"></TD>
-<TD>&nbsp;</TD>
-<TD>&nbsp;</TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">6</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL">
-
-<P>
-Equation&nbsp;<A HREF="#eq:inverse-kinematics-base"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;は，
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="49" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img140.png"
- ALT="$ m&gt;n$"></B></SPAN>のときはEquation&nbsp;<A HREF="#eq:inverse-kinematics-error-func"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;を，
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="62" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img141.png"
- ALT="$ n&gt;=m$"></B></SPAN>のときはEquation&nbsp;<A HREF="#eq:inverse-kinematics-min-func"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;を，
-最小化する最小二乗解を求める問題と捉え,解を得る.
-
-<P>
-<BR>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:inverse-kinematics-error-func"></A><!-- MATH
- \begin{eqnarray}
-\min_{\dot{\mbox{\boldmath {$\theta$}}}} \left(\dot{\mbox{\boldmath {$r$}}} - \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}\right)^{T}
-\left(\dot{\mbox{\boldmath {$r$}}} - \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}\right)
-\end{eqnarray}
- -->
-<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="227" HEIGHT="52" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img142.png"
- ALT="$\displaystyle \min_{\dot{\mbox{\boldmath {$\theta$}}}} \left(\dot{\mbox{\boldma...
-...ath {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}\right)$"></TD>
-<TD>&nbsp;</TD>
-<TD>&nbsp;</TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">7</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL">
-
-<BR>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:inverse-kinematics-min-func"></A><!-- MATH
- \begin{eqnarray}
-\min_{\dot{\mbox{\boldmath {$\theta$}}}} & \dot{\mbox{\boldmath {$\theta$}}}^{T}\dot{\mbox{\boldmath {$\theta$}}}\\
-\nonumber s.t. & \dot{\mbox{\boldmath {$r$}}} = \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}
-\end{eqnarray}
- -->
-<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="31" HEIGHT="44" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img143.png"
- ALT="$\displaystyle \min_{\dot{\mbox{\boldmath {$\theta$}}}}$"></TD>
-<TD>&nbsp;</TD>
-<TD ALIGN="LEFT" NOWRAP WIDTH="50%"><IMG
- WIDTH="33" HEIGHT="45" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img144.png"
- ALT="$\displaystyle \dot{\mbox{\boldmath {$\theta$}}}^{T}\dot{\mbox{\boldmath {$\theta$}}}$"></TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">8</SPAN>)</TD></TR>
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img145.png"
- ALT="$\displaystyle s.t.$"></TD>
-<TD>&nbsp;</TD>
-<TD ALIGN="LEFT" NOWRAP WIDTH="50%"><IMG
- WIDTH="78" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img146.png"
- ALT="$\displaystyle \dot{\mbox{\boldmath {$r$}}} = \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}$"></TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-&nbsp;</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL">
-
-<P>
-関節角速度は次のように求まる．
-<BR>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:inverse-kinematics-lagrangian-formula"></A><!-- MATH
- \begin{eqnarray}
-\dot{\mbox{\boldmath {$\theta$}}} = \mbox{\boldmath {$J$}}^{\#}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$r$}}} +
-  \left(\mbox{\boldmath {$E$}}_n - \mbox{\boldmath {$J$}}^{\#}(\mbox{\boldmath {$\theta$}})\mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\right)\mbox{\boldmath {$z$}}
-\end{eqnarray}
- -->
-<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="259" HEIGHT="45" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img147.png"
- ALT="$\displaystyle \dot{\mbox{\boldmath {$\theta$}}} = \mbox{\boldmath {$J$}}^{\char...
-...mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\right)\mbox{\boldmath {$z$}}$"></TD>
-<TD>&nbsp;</TD>
-<TD>&nbsp;</TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">9</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL">
-
-<P>
-しかしながら, Equation&nbsp;<A HREF="#eq:inverse-kinematics-lagrangian-formula"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;に従って解を
-求めると, ヤコビ行列<!-- MATH
- $\mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img128.png"
- ALT="$ J$"></B></SPAN><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img129.png"
- ALT="$ ($"><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img113.png"
- ALT="$ \theta$"></B></SPAN><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img130.png"
- ALT="$ )$"></B></SPAN>がフルランクでなくなる特異点に近づく
-と, <!-- MATH
- $\left|\dot{\mbox{\boldmath {$\theta$}}}\right|$
- -->
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="25" HEIGHT="45" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img148.png"
- ALT="$ \left\vert\dot{\mbox{\boldmath {$\theta$}}}\right\vert$"></B></SPAN>が大きくなり不安定な振舞いが生じる.
-そこで, Nakamura et al.のSR-Inverse<A NAME="tex2html25"
-  HREF="jmanual-footnode.html#foot47781"><SUP><SPAN CLASS="arabic">4</SPAN></SUP></A>を用いること
-で, この特異点を回避する.
-
-<P>
-本研究では
-ヤコビ行列の疑似逆行列<!-- MATH
- $\mbox{\boldmath {$J$}}^{\#}(\mbox{\boldmath {$\theta$}})$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img128.png"
- ALT="$ J$"></B></SPAN><IMG
- WIDTH="22" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img137.png"
- ALT="$ ^{\char93 }($"><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img113.png"
- ALT="$ \theta$"></B></SPAN><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img130.png"
- ALT="$ )$"></B></SPAN>の代わりに,
-Equation&nbsp;<A HREF="#eq:SR-inverse-jacobian"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;に示す<!-- MATH
- $\mbox{\boldmath {$J$}}^{*}(\mbox{\boldmath {$\theta$}})$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img128.png"
- ALT="$ J$"></B></SPAN><IMG
- WIDTH="18" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img149.png"
- ALT="$ ^{*}($"><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img113.png"
- ALT="$ \theta$"></B></SPAN><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img130.png"
- ALT="$ )$"></B></SPAN>
-を用いる.
-<BR>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:SR-inverse-jacobian"></A><!-- MATH
- \begin{eqnarray}
-\mbox{\boldmath {$J$}}^{*}(\mbox{\boldmath {$\theta$}})
-  = \mbox{\boldmath {$J$}}^T\left(\mbox{\boldmath {$J$}}\mbox{\boldmath {$J$}}^T + \epsilon \mbox{\boldmath {$E$}}_m\right)^{-1}
-\end{eqnarray}
- -->
-<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="16" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img126.png"
- ALT="$\displaystyle \mbox{\boldmath {$J$}}$"><IMG
- WIDTH="18" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img150.png"
- ALT="$\displaystyle ^{*}($"><IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img120.png"
- ALT="$\displaystyle \mbox{\boldmath {$\theta$}}$"><IMG
- WIDTH="28" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img151.png"
- ALT="$\displaystyle )
-=$">&nbsp; &nbsp;<IMG
- WIDTH="16" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img126.png"
- ALT="$\displaystyle \mbox{\boldmath {$J$}}$"><IMG
- WIDTH="138" HEIGHT="51" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img152.png"
- ALT="$\displaystyle ^T\left(\mbox{\boldmath {$J$}}\mbox{\boldmath {$J$}}^T + \epsilon \mbox{\boldmath {$E$}}_m\right)^{-1}$"></TD>
-<TD>&nbsp;</TD>
-<TD>&nbsp;</TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">10</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL">
-
-<P>
-これは, Equation&nbsp;<A HREF="#eq:inverse-kinematics-error-func"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;の代わりに,
-Equation&nbsp;<A HREF="#eq:SR-inverse-error-func"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;を最小化する最適化問題を
-解くことにより得られたものである.
-<BR>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:SR-inverse-error-func"></A><!-- MATH
- \begin{eqnarray}
-\min_{\dot{\mbox{\boldmath {$\theta$}}}}
-\{
- \dot{\mbox{\boldmath {$\theta$}}}^T \dot{\mbox{\boldmath {$\theta$}}}
-+
-\epsilon
-\left(\dot{\mbox{\boldmath {$r$}}} - \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}\right)^T
-\left(\dot{\mbox{\boldmath {$r$}}} - \mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}\right)
-\}
-\end{eqnarray}
- -->
-<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="298" HEIGHT="52" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img153.png"
- ALT="$\displaystyle \min_{\dot{\mbox{\boldmath {$\theta$}}}}
-\{
-\dot{\mbox{\boldmath ...
-... {$J$}}(\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}\right)
-\}$"></TD>
-<TD>&nbsp;</TD>
-<TD>&nbsp;</TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">11</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL">
-
-<P>
-ヤコビ行列<!-- MATH
- $\mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}})$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img128.png"
- ALT="$ J$"></B></SPAN><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img129.png"
- ALT="$ ($"><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img113.png"
- ALT="$ \theta$"></B></SPAN><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img130.png"
- ALT="$ )$"></B></SPAN>が特異点に近づいているかの指標には
-可操作度<!-- MATH
- $\kappa(\mbox{\boldmath {$\theta$}})$
- -->
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="20" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img154.png"
- ALT="$ \kappa($"><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img113.png"
- ALT="$ \theta$"></B></SPAN><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img130.png"
- ALT="$ )$"></B></SPAN><A NAME="tex2html26"
-  HREF="jmanual-footnode.html#foot47819"><SUP><SPAN CLASS="arabic">5</SPAN></SUP></A>が用いられる(Equation&nbsp;<A HREF="#eq:manipulability"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;).
-<BR>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:manipulability"></A><!-- MATH
- \begin{eqnarray}
-\kappa(\mbox{\boldmath {$\theta$}}) = \sqrt{\mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}}) \mbox{\boldmath {$J$}}^{T}(\mbox{\boldmath {$\theta$}})}
-\end{eqnarray}
- -->
-<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="20" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img155.png"
- ALT="$\displaystyle \kappa($"><IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img120.png"
- ALT="$\displaystyle \mbox{\boldmath {$\theta$}}$"><IMG
- WIDTH="125" HEIGHT="53" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img156.png"
- ALT="$\displaystyle ) = \sqrt{\mbox{\boldmath {$J$}}(\mbox{\boldmath {$\theta$}}) \mbox{\boldmath {$J$}}^{T}(\mbox{\boldmath {$\theta$}})}$"></TD>
-<TD>&nbsp;</TD>
-<TD>&nbsp;</TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">12</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL">
-
-<P>
-微分運動学方程式における
-タスク空間次元の選択行列<A NAME="tex2html27"
-  HREF="jmanual-footnode.html#foot47830"><SUP><SPAN CLASS="arabic">6</SPAN></SUP></A>は見通しの良い定式化のために省略するが,
-以降で導出する全ての式において
-適用可能であることをあらかじめことわっておく.
-
-<P>
-
-<DIV CLASS="navigation"><HR>
-<!--Navigation Panel-->
-<A NAME="tex2html2770"
-  HREF="jmanual-node153.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html2764"
-  HREF="jmanual-node151.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html2758"
-  HREF="jmanual-node151.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html2766"
-  HREF="jmanual-node1.html">
-<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html2768"
-  HREF="jmanual-node186.html">
-<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
-<BR>
-<B> Next:</B> <A NAME="tex2html2771"
-  HREF="jmanual-node153.html">基礎ヤコビ行列</A>
-<B> Up:</B> <A NAME="tex2html2765"
-  HREF="jmanual-node151.html">ロボットの動作生成</A>
-<B> Previous:</B> <A NAME="tex2html2759"
-  HREF="jmanual-node151.html">ロボットの動作生成</A>
- &nbsp; <B>  <A NAME="tex2html2767"
-  HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html2769"
-  HREF="jmanual-node186.html">Index</A></B> </DIV>
-<!--End of Navigation Panel-->
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html2760"
+  HREF="jmanual-node153.html">逆運動学</A>
+<LI><A NAME="tex2html2761"
+  HREF="jmanual-node154.html">基礎ヤコビ行列</A>
+<LI><A NAME="tex2html2762"
+  HREF="jmanual-node155.html">関節角度限界回避を含む逆運動学</A>
+<LI><A NAME="tex2html2763"
+  HREF="jmanual-node156.html">衝突回避を含む逆運動学</A>
+<LI><A NAME="tex2html2764"
+  HREF="jmanual-node157.html">衝突回避のための関節角速度計算法</A>
+<LI><A NAME="tex2html2765"
+  HREF="jmanual-node158.html">衝突回避計算例</A>
+<LI><A NAME="tex2html2766"
+  HREF="jmanual-node159.html">非ブロック対角ヤコビアンによる全身協調動作生成</A>
+<LI><A NAME="tex2html2767"
+  HREF="jmanual-node160.html">リンク間重複があるヤコビアン計算と関節角度計算</A>
+<LI><A NAME="tex2html2768"
+  HREF="jmanual-node161.html">ベースリンク仮想ジョイントを用いた全身逆運動学法</A>
+<LI><A NAME="tex2html2769"
+  HREF="jmanual-node162.html">ベースリンク仮想ジョイントヤコビアン</A>
+<LI><A NAME="tex2html2770"
+  HREF="jmanual-node163.html">マスプロパティ計算</A>
+<LI><A NAME="tex2html2771"
+  HREF="jmanual-node164.html">運動量・角運動量ヤコビアン</A>
+<LI><A NAME="tex2html2772"
+  HREF="jmanual-node165.html">重心ヤコビアン</A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR><HR>
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>ロボットの動作生成</TITLE>
+<TITLE>cascaded-linkを用いたロボット（多リンク系）のモデリング</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="ロボットの動作生成">
+<META NAME="description" CONTENT="cascaded-linkを用いたロボット（多リンク系）のモデリング">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,87 +19,196 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="jmanual.css">
 
-<LINK REL="next" HREF="jmanual-node165.html">
-<LINK REL="previous" HREF="jmanual-node145.html">
-<LINK REL="up" HREF="jmanual-node144.html">
+<LINK REL="previous" HREF="jmanual-node150.html">
+<LINK REL="up" HREF="jmanual-node146.html">
 <LINK REL="next" HREF="jmanual-node152.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html2743"
+<A NAME="tex2html2744"
   HREF="jmanual-node152.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html2737"
-  HREF="jmanual-node144.html">
+<A NAME="tex2html2738"
+  HREF="jmanual-node146.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html2731"
+<A NAME="tex2html2734"
   HREF="jmanual-node150.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html2739"
+<A NAME="tex2html2740"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html2741"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html2742"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html2744"
-  HREF="jmanual-node152.html">逆運動学</A>
-<B> Up:</B> <A NAME="tex2html2738"
-  HREF="jmanual-node144.html">ロボットモデリング</A>
-<B> Previous:</B> <A NAME="tex2html2732"
-  HREF="jmanual-node150.html">cascaded-linkを用いたロボット（多リンク系）のモデリング</A>
- &nbsp; <B>  <A NAME="tex2html2740"
+<B> Next:</B> <A NAME="tex2html2745"
+  HREF="jmanual-node152.html">ロボットの動作生成</A>
+<B> Up:</B> <A NAME="tex2html2739"
+  HREF="jmanual-node146.html">ロボットのデータ構造とモデリング</A>
+<B> Previous:</B> <A NAME="tex2html2735"
+  HREF="jmanual-node150.html">bodyset-linkとjointを用いたロボット（多リンク系）のモデリング</A>
+ &nbsp; <B>  <A NAME="tex2html2741"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html2742"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2743"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION05012000000000000000">
-ロボットの動作生成</A>
-</H2>
+<H3><A NAME="SECTION05011500000000000000">
+cascaded-linkを用いたロボット（多リンク系）のモデリング</A>
+</H3>
+
+<P>
+一方で多リンク系のモデリング用のクラスとしてcascaded-linkというクラス
+がある．
+これには，links, joint-listというスロット変数があり，ここにbodyset-link,
+ならびにjointのインスタンスのリストをバインドして利用する．
+以下は，
+<code>cascaded-link</code>の子クラスを定義しここでロボットモデリングに
+関する初期化処理を行うという書き方の例である．
+
+<P>
+<PRE>
+(defclass cascaded-link
+  :super cascaded-coords
+  :slots (links joint-list bodies collision-avoidance-links))
+
+(defmethod cascaded-link
+  (:init (&amp;rest args &amp;key name &amp;allow-other-keys)
+         (send-super-lexpr :init args)
+         self)
+  (:init-ending
+   ()
+   (setq bodies (flatten (send-all links :bodies)))
+   (dolist (j joint-list)
+     (send (send j :child-link) :add-joint j)
+     (send (send j :child-link) :add-parent-link (send j :parent-link))
+     (send (send j :parent-link) :add-child-links (send j :child-link)))
+   (send self :update-descendants))
+)
+</PRE>
+
+<P>
+<PRE>
+(defclass servo-model
+  :super cascaded-link
+  :slots (h1 s1 j1))
+(defmethod servo-model
+  (:init ()
+   (let ()
+     (send-super :init)
+     (setq h1 (instance bodyset-link :init (make-cascoords) :bodies (list (make-hinji))))
+     (setq s1 (instance bodyset-link :init (make-cascoords) :bodies (list (make-servo))))
+
+     (setq j1 (instance rotational-joint :init :parent-link h1 :child-link s1 :axis :z))
+
+     ;; instance cascaded coords
+     (setq links (list h1 s1))
+     (setq joint-list (list j1))
+     ;;
+     (send self :assoc h1)
+     (send h1 :assoc s1)
+     ;;
+     (send self :init-ending)
+     self))
+  ;;
+  ;; (send r :j1 :joint-angle 30)
+  (:j1 (&amp;rest args) (forward-message-to j1 args))
+  )
+
+(setq r (instance servo-model :init))
+</PRE>
+
+<P>
+このようなクラスを定義して<code>(setq r (instance servo-model :init))</code>
+としても同じようにロボットモデルのインスタンスを作成することができ，先
+ほどのメソッドを利用できる．クラス定義するメリットは
+<code>(:j1 (&amp;rest args) (forward-message-to j1 args))</code>というメソッド定
+義により，関節モデルのインスタンスへのアクセサを提供することができる．
+これにより，特定の関節だけの値を知りたいとき，あるいは値をセットしたい
+時には<code>(send r :j1 :joint-angle)</code>や
+<code>(send r :j1 :joint-angle 30)</code>
+という指示が可能になっている．
+このロボットを動かす場合は前例と同じように
+
+<P>
+<PRE>
+(objects (list r))
+(dotimes (i 300)
+  (send r :angle-vector (float-vector (* 90 (sin (/ i 100.0)))))
+  (send *irtviewer* :draw-objects))
+</PRE>
+
+<P>
+などとするとよい．
+
+<P>
+<PRE>
+(setq i 0)
+(do-until-key
+  (send r :angle-vector (float-vector (* 90 (sin (/ i 100.0)))))
+  (send *irtviewer* :draw-objects)
+  (incf i))
+</PRE>
+とすると，次にキーボードを押下するまでプログラムは動きつづける．
+
+<P>
+さらに，少し拡張して
+これを用いて３リンク２ジョイントのロボットをモデリングした例が以下にな
+る．:joint-angleというメソッドに#f(0 0)というベクトルを引数に与えるこ
+とで全ての関節角度列を指定することが出来る．
+
+<P>
+<PRE>
+(defclass hinji-servo-robot
+  :super cascaded-link)
+(defmethod hinji-servo-robot
+  (:init
+   ()
+   (let (h1 s1 h2 s2 l1 l2 l3)
+     (send-super :init)
+     (setq h1 (make-hinji))
+     (setq s1 (make-servo))
+     (setq h2 (make-hinji))
+     (setq s2 (make-servo))
+     (send h2 :locate #f(42 0 0))
+     (send s1 :assoc h2)
+     (setq l1 (instance bodyset-link :init (make-cascoords) :bodies (list h1)))
+     (setq l2 (instance bodyset-link :init (make-cascoords) :bodies (list s1 h2)))
+     (setq l3 (instance bodyset-link :init (make-cascoords) :bodies (list s2)))
+     (send l3 :locate #f(42 0 0))
+
+     (send self :assoc l1)
+     (send l1 :assoc l2)
+     (send l2 :assoc l3)
+
+     (setq joint-list
+           (list
+            (instance rotational-joint
+                      :init :parent-link l1 :child-link l2
+                      :axis :z)
+            (instance rotational-joint
+                      :init :parent-link l2 :child-link l3
+                      :axis :z)))
+     (setq links (list l1 l2 l3))
+     (send self :init-ending)
+     )))
+(setq r (instance hinji-servo-robot :init))
+(objects (list r))
+
+(dotimes (i 10000)
+  (send r :angle-vector (float-vector (* 90 (sin (/ i 500.0))) (* 90 (sin (/ i 1000.0)))))
+  (send *irtviewer* :draw-objects))
+</PRE>
 
 <P>
 <BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
-
-<UL CLASS="ChildLinks">
-<LI><A NAME="tex2html2745"
-  HREF="jmanual-node152.html">逆運動学</A>
-<LI><A NAME="tex2html2746"
-  HREF="jmanual-node153.html">基礎ヤコビ行列</A>
-<LI><A NAME="tex2html2747"
-  HREF="jmanual-node154.html">関節角度限界回避を含む逆運動学</A>
-<LI><A NAME="tex2html2748"
-  HREF="jmanual-node155.html">衝突回避を含む逆運動学</A>
-<LI><A NAME="tex2html2749"
-  HREF="jmanual-node156.html">衝突回避のための関節角速度計算法</A>
-<LI><A NAME="tex2html2750"
-  HREF="jmanual-node157.html">衝突回避計算例</A>
-<LI><A NAME="tex2html2751"
-  HREF="jmanual-node158.html">非ブロック対角ヤコビアンによる全身協調動作生成</A>
-<LI><A NAME="tex2html2752"
-  HREF="jmanual-node159.html">リンク間重複があるヤコビアン計算と関節角度計算</A>
-<LI><A NAME="tex2html2753"
-  HREF="jmanual-node160.html">ベースリンク仮想ジョイントを用いた全身逆運動学法</A>
-<LI><A NAME="tex2html2754"
-  HREF="jmanual-node161.html">ベースリンク仮想ジョイントヤコビアン</A>
-<LI><A NAME="tex2html2755"
-  HREF="jmanual-node162.html">マスプロパティ計算</A>
-<LI><A NAME="tex2html2756"
-  HREF="jmanual-node163.html">運動量・角運動量ヤコビアン</A>
-<LI><A NAME="tex2html2757"
-  HREF="jmanual-node164.html">重心ヤコビアン</A>
-</UL>
-<!--End of Table of Child-Links-->
-<BR><HR>
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

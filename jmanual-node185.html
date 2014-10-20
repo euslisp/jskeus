@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>画像関数</TITLE>
+<TITLE>数学関数</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="画像関数">
+<META NAME="description" CONTENT="数学関数">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,76 +19,236 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="jmanual.css">
 
+<LINK REL="next" HREF="jmanual-node186.html">
 <LINK REL="previous" HREF="jmanual-node184.html">
-<LINK REL="up" HREF="jmanual-node181.html">
+<LINK REL="up" HREF="jmanual-node182.html">
 <LINK REL="next" HREF="jmanual-node186.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html3229"
+<A NAME="tex2html3232"
   HREF="jmanual-node186.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3223"
-  HREF="jmanual-node181.html">
+<A NAME="tex2html3226"
+  HREF="jmanual-node182.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3219"
+<A NAME="tex2html3220"
   HREF="jmanual-node184.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3225"
+<A NAME="tex2html3228"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3227"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html3230"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3230"
-  HREF="jmanual-node186.html">Index</A>
-<B> Up:</B> <A NAME="tex2html3224"
-  HREF="jmanual-node181.html">irteus拡張</A>
-<B> Previous:</B> <A NAME="tex2html3220"
-  HREF="jmanual-node184.html">数学関数</A>
- &nbsp; <B>  <A NAME="tex2html3226"
+<B> Next:</B> <A NAME="tex2html3233"
+  HREF="jmanual-node186.html">画像関数</A>
+<B> Up:</B> <A NAME="tex2html3227"
+  HREF="jmanual-node182.html">irteus拡張</A>
+<B> Previous:</B> <A NAME="tex2html3221"
+  HREF="jmanual-node184.html">ユーティリティ関数</A>
+ &nbsp; <B>  <A NAME="tex2html3229"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3228"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3231"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION05084000000000000000">
-画像関数</A>
+<H2><A NAME="SECTION05083000000000000000">
+数学関数</A>
 </H2>
  
  <BR>
-<BR> <A NAME="67021"></A>
-<B>read-image-file</B> <EM>fname  </EM>[関数]
+<BR> <A NAME="66757"></A>
+<B>inverse-matrix</B> <EM>mat  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
-<DD> read image of given fname. It returns instance of <B>grayscale-image</B> or <B>color-image24</B>.
+<DD> returns inverse matrix of mat
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="67033"></A>
-<B>write-image-file</B> <EM>fname image::img  </EM>[関数]
+<A NAME="66767"></A>
+<B>diagonal</B> <EM>v  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
-<DD> write img to given fname
+<DD> make diagonal matrix from given vecgtor, diagonal #f(1 2) -&gt;#2f((1 0)(0 2))
 </DD>
 </DL>
 <BR>
 <BR>
 
-              
- <BR>
-<BR> <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67079"></A>
-<B>read-png-file</B> <EM>fname  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+<A NAME="66777"></A>
+<B>minor-matrix</B> <EM>m ic jc  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> return a matrix removing ic row and jc col elements from m
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66787"></A>
+<B>atan2</B> <EM>y x  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns atan2 of y and x (atan (/ y x))
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66797"></A>
+<B>outer-product-matrix</B> <EM>v &amp;optional (ret (unit-matrix 3))  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns outer product matrix of given v 
+<BR>   <TT>   matrix(a) v = a v 
+<BR>
+0 -w2 w1
+<BR>
+w2 0 -w0
+<BR>   -w1 w0  0
+<BR>   </TT>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66808"></A>
+<B>matrix2quaternion</B> <EM>m  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns quaternion of given matrix
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66818"></A>
+<B>quaternion2matrix</B> <EM>q  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns matrix of given quaternion
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66828"></A>
+<B>matrix-log</B> <EM>m  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns matrix log of given m, it returns [-pi, pi]
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66838"></A>
+<B>matrix-exponent</B> <EM>omega &amp;optional (p 1.0)  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns exponent of given omega
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66848"></A>
+<B>midrot</B> <EM>p r1 r2  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns mid (or p) rotation matrix of given two matrix r1 and r1
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66858"></A>
+<B>pseudo-inverse</B> <EM>mat &amp;optional weight-vector ret wmat mat-tmp  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns pseudo inverse of given mat
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66868"></A>
+<B>sr-inverse</B> <EM>mat &amp;optional (k 1.0) weight-vector ret wmat tmat umat umat2 mat-tmp mat-tmp-rc mat-tmp-rr mat-tmp-rr2  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> returns sr-inverse of given mat
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66878"></A>
+<B>manipulability</B> <EM>jacobi &amp;optional tmp-mrr tmp-mcr  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> return manipulability of given matrix
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66888"></A>
+<B>random-gauss</B> <EM>&amp;optional (m 0) (s 1)  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> make random gauss, m:mean s:standard-deviation
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66898"></A>
+<B>gaussian-random</B> <EM>dim &amp;optional (m 0) (s 1)  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> make random gauss vector, replacement for quasi-random defined in matlib.c
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="66908"></A>
+<B>normalize-vector</B> <EM>v &amp;optional r (eps 1.000000e-20)  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> calculate normalize-vector #f(0 0 0)-&gt;#f(0 0 0).
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="66918"></A>
+<B>pseudo-inverse-org</B> <EM>m &amp;optional ret winv mat-tmp-cr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
 
@@ -103,8 +263,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67090"></A>
-<B>write-png-file</B> <EM>fname image::img  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+<A NAME="66929"></A>
+<B>sr-inverse-org</B> <EM>mat &amp;optional (k 1) me mat-tmp-cr mat-tmp-rr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
 
@@ -118,13 +278,39 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 </SMALL>
-             
-<P>
-
-<BR><HR>
+              
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html3232"
+  HREF="jmanual-node186.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3226"
+  HREF="jmanual-node182.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3220"
+  HREF="jmanual-node184.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3228"
+  HREF="jmanual-node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html3230"
+  HREF="jmanual-node187.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html3233"
+  HREF="jmanual-node186.html">画像関数</A>
+<B> Up:</B> <A NAME="tex2html3227"
+  HREF="jmanual-node182.html">irteus拡張</A>
+<B> Previous:</B> <A NAME="tex2html3221"
+  HREF="jmanual-node184.html">ユーティリティ関数</A>
+ &nbsp; <B>  <A NAME="tex2html3229"
+  HREF="jmanual-node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3231"
+  HREF="jmanual-node187.html">Index</A></B> </DIV>
+<!--End of Navigation Panel-->
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

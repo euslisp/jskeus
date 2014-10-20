@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>ロボット動作と干渉計算</TITLE>
+<TITLE>irteusからPQPの呼び出し</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="ロボット動作と干渉計算">
+<META NAME="description" CONTENT="irteusからPQPの呼び出し">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,134 +19,124 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="jmanual.css">
 
+<LINK REL="next" HREF="jmanual-node177.html">
 <LINK REL="previous" HREF="jmanual-node175.html">
-<LINK REL="up" HREF="jmanual-node174.html">
+<LINK REL="up" HREF="jmanual-node175.html">
 <LINK REL="next" HREF="jmanual-node177.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html3103"
+<A NAME="tex2html3106"
   HREF="jmanual-node177.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3097"
-  HREF="jmanual-node174.html">
+<A NAME="tex2html3100"
+  HREF="jmanual-node175.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3093"
+<A NAME="tex2html3094"
   HREF="jmanual-node175.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3099"
+<A NAME="tex2html3102"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3101"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html3104"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3104"
-  HREF="jmanual-node177.html">BVHデータ</A>
-<B> Up:</B> <A NAME="tex2html3098"
-  HREF="jmanual-node174.html">干渉計算</A>
-<B> Previous:</B> <A NAME="tex2html3094"
-  HREF="jmanual-node175.html">irteusからPQPの呼び出し</A>
- &nbsp; <B>  <A NAME="tex2html3100"
+<B> Next:</B> <A NAME="tex2html3107"
+  HREF="jmanual-node177.html">ロボット動作と干渉計算</A>
+<B> Up:</B> <A NAME="tex2html3101"
+  HREF="jmanual-node175.html">干渉計算</A>
+<B> Previous:</B> <A NAME="tex2html3095"
+  HREF="jmanual-node175.html">干渉計算</A>
+ &nbsp; <B>  <A NAME="tex2html3103"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3102"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3105"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION05032000000000000000">
-ロボット動作と干渉計算</A>
+<H2><A NAME="SECTION05031000000000000000">
+irteusからPQPの呼び出し</A>
 </H2>
 
 <P>
-ハンドで物体をつかむ，という動作の静的なシミュレーションを行う場合に
-手（指）のリンクと対象物体の干渉を調べ，これが起こるところで物体をつか
-む動作を停止させるということが出来る．
+irteusでPQPを使うためのファイルは
+CPQP.C, euspqp.c, pqp.l
+からなる．
+２つの幾何モデルが衝突してしるか否かを判定するためには，
 
 <P>
 <PRE>
-(objects (list *sarm* *target*))
+(defun pqp-collision-check (model1 model2
+				       &amp;optional (flag PQP_FIRST_CONTACT) &amp;key (fat 0) (fat2 nil))
+  (let ((m1 (get model1 :pqpmodel))  (m2 (get model2 :pqpmodel))
+        (r1 (send model1 :worldrot)) (t1 (send model1 :worldpos))
+        (r2 (send model2 :worldrot)) (t2 (send model2 :worldpos)))
+    (if (null fat2) (setq fat2 fat))
+    (if (null m1) (setq m1 (send model1 :make-pqpmodel :fat fat)))
+    (if (null m2) (setq m2 (send model2 :make-pqpmodel :fat fat2)))
+    (pqpcollide r1 t1 m1 r2 t2 m2 flag)))
+</PRE>
+を呼び出せば良い．
+r1,r1,r2,t1はそれぞれの物体の並進ベクトル，回転行列となり，
+(get model1 :pqpmodel)でPQPの幾何モデルへのポインタを参照する．
+このポインタは:make-pqpmodelメソッドの中で以下のよう計算される．
+<PRE>
+(defmethod cascaded-coords
+  (:make-pqpmodel
+   (&amp;key (fat 0))
+   (let ((m (pqpmakemodel))
+         vs v1 v2 v3 (id 0))
+     (setf (get self :pqpmodel) m)
+     (pqpbeginmodel m)
+     (dolist (f (send self :faces))
+       (dolist (poly (face-to-triangle-aux f))
+         (setq vs (send poly :vertices)
+               v1 (send self :inverse-transform-vector (first vs))
+               v2 (send self :inverse-transform-vector (second vs))
+               v3 (send self :inverse-transform-vector (third vs)))
+         (when (not (= fat 0))
+           (setq v1 (v+ v1 (scale fat (normalize-vector v1)))
+                 v2 (v+ v2 (scale fat (normalize-vector v2)))
+                 v3 (v+ v3 (scale fat (normalize-vector v3)))))
+         (pqpaddtri m v1 v2 v3 id)
+         (incf id)))
+     (pqpendmodel m)
+     m)))
+</PRE>
+ここでは，まず(pqpmakemodel)が呼び出されている．
+pqpmakemodelの中では，euqpqp.cで定義されている，
 
-(send *sarm* :solve-ik *target* :debug-view t)
-(while (&gt; a 0)
-  (if (pqp-collision-check-objects
-       (list (send *sarm* :joint-fr :child-link)
-             (send *sarm* :joint-fl :child-link))
-       (list *target*))
-      (return))
-  (decf a 0.1)
-  (send *irtviewer* :draw-objects)
-  (send *sarm* :move-fingers a))
-(send *sarm* :end-coords :assoc *target*)
-
-(dotimes (i 100)
-  (send *sarm* :joint0 :joint-angle 1 :relative t)
-  (send *irtviewer* :draw-objects))
-(send *sarm* :end-coords :dissoc *target*)
-(dotimes (i 100)
-  (send *sarm* :joint0 :joint-angle -1 :relative t)
-  (send *irtviewer* :draw-objects))
+<P>
+<PRE>
+pointer PQPMAKEMODEL(register context *ctx, int n, register pointer *argv)
+{
+    int addr = PQP_MakeModel();
+    return makeint(addr);
+}
 </PRE>
 
 <P>
-同様の機能が，"irteus/demo/sample-arm-model.l"ファイルの:open-hand,
-:close-handというメソッドで提供されている．
+が呼び出されており，これは，CPQP.Cの
+<PRE>
+PQP\_Model *PQP_MakeModel()
+{
+    return new PQP_Model();
+}
+</PRE>
+が呼ばれている．PQP_Model()はPQP.hで定義されているものであり，
+この様にしてeuslisp内の関数が実際のPQPライブラリの関数に渡されてい
+る以降，(pqpbeginmodel m)でPQPの幾何モデルのインスタンスを作成し，
+(pqpaddtri m v1 v2 v3 id)として面情報を登録している．
 
-<P>
-
- <BR>
-<BR> <A NAME="58773"></A>
-<B>pqp-collision-check-objects</B> <EM>geometry::obj1 geometry::obj2 &amp;key (geometry::fat 0.2)  </EM>[関数]
-
-<DL COMPACT>
-<DT> 
-<DD> return nil or t
-</DD>
-</DL>
-<BR>
-<BR>
-
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58783"></A>
-<B>pqp-collision-check</B> <EM>geometry::model1 geometry::model2 &amp;optional (geometry::flag geometry::pqp_first_contact) &amp;key (geometry::fat 0) (geometry::fat2 nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58794"></A>
-<B>pqp-collision-distance</B> <EM>geometry::model1 geometry::model2 &amp;key (geometry::fat 0) (geometry::fat2 nil) (geometry::qsize 2)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-             
 <P>
 <BR><HR>
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

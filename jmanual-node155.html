@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>衝突回避を含む逆運動学</TITLE>
+<TITLE>関節角度限界回避を含む逆運動学</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="衝突回避を含む逆運動学">
+<META NAME="description" CONTENT="関節角度限界回避を含む逆運動学">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -21,62 +21,463 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="jmanual-node156.html">
 <LINK REL="previous" HREF="jmanual-node154.html">
-<LINK REL="up" HREF="jmanual-node151.html">
+<LINK REL="up" HREF="jmanual-node152.html">
 <LINK REL="next" HREF="jmanual-node156.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html2812"
+<A NAME="tex2html2813"
   HREF="jmanual-node156.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html2806"
-  HREF="jmanual-node151.html">
+<A NAME="tex2html2807"
+  HREF="jmanual-node152.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html2800"
+<A NAME="tex2html2801"
   HREF="jmanual-node154.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html2808"
+<A NAME="tex2html2809"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html2810"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html2811"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html2813"
-  HREF="jmanual-node156.html">衝突回避のための関節角速度計算法</A>
-<B> Up:</B> <A NAME="tex2html2807"
-  HREF="jmanual-node151.html">ロボットの動作生成</A>
-<B> Previous:</B> <A NAME="tex2html2801"
-  HREF="jmanual-node154.html">関節角度限界回避を含む逆運動学</A>
- &nbsp; <B>  <A NAME="tex2html2809"
+<B> Next:</B> <A NAME="tex2html2814"
+  HREF="jmanual-node156.html">衝突回避を含む逆運動学</A>
+<B> Up:</B> <A NAME="tex2html2808"
+  HREF="jmanual-node152.html">ロボットの動作生成</A>
+<B> Previous:</B> <A NAME="tex2html2802"
+  HREF="jmanual-node154.html">基礎ヤコビ行列</A>
+ &nbsp; <B>  <A NAME="tex2html2810"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html2811"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2812"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION05012400000000000000">
-衝突回避を含む逆運動学</A>
+<H3><A NAME="SECTION05012300000000000000">
+関節角度限界回避を含む逆運動学</A>
 </H3>
-ロボットの動作中での自己衝突や環境モデルとの衝突は
-幾何形状モデルが存在すれば計算することが可能である.
-ここではSugiura et al. により提案されている効率的な衝突回避計算
-<A NAME="tex2html32"
-  HREF="jmanual-footnode.html#foot47980"><SUP><SPAN CLASS="arabic">11</SPAN></SUP></A><A NAME="tex2html33"
-  HREF="jmanual-footnode.html#foot48516"><SUP><SPAN CLASS="arabic">12</SPAN></SUP></A>を応用した動作生成法を示す.
-実際の実装はSugiura et al. の手法に加え,
-タスク作業空間のNullSpaceの利用を係数により制御できるようにした点や
-擬似逆行列ではなくSR-Inverseを用いて特異点に
-ロバストにしている点などが追加されている.
+ロボットマニピュレータの軌道生成において,
+関節角度限界を考慮することはロボットによる実機実験の際に重要となる.
+本節では,文献<A NAME="tex2html29"
+  HREF="jmanual-footnode.html#foot47898"><SUP><SPAN CLASS="arabic">8</SPAN></SUP></A><A NAME="tex2html30"
+  HREF="jmanual-footnode.html#foot48515"><SUP><SPAN CLASS="arabic">9</SPAN></SUP></A>の式および文章を引用しつつ, 関節角度限界の回避を
+含む逆運動学について説明する.
 
 <P>
-<BR><HR>
+重み付きノルムを以下のように定義する.
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:weighted-norm"></A><!-- MATH
+ \begin{eqnarray}
+\left|\mbox{\boldmath {$\dot{\theta}$}}\right|_{\mbox{\boldmath {$W$}}} =
+  \sqrt{\mbox{\boldmath {$\dot{\theta}$}}^T\mbox{\boldmath {$W$}}\mbox{\boldmath {$\dot{\theta}$}}}
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="131" HEIGHT="60" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img162.png"
+ ALT="$\displaystyle \left\vert\mbox{\boldmath {$\dot{\theta}$}}\right\vert _{\mbox{\b...
+...ath {$\dot{\theta}$}}^T\mbox{\boldmath {$W$}}\mbox{\boldmath {$\dot{\theta}$}}}$"></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">14</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+ここで, <!-- MATH
+ $\mbox{\boldmath {$W$}}$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="22" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img163.png"
+ ALT="$ W$"></B></SPAN></B></SPAN>は<!-- MATH
+ $\mbox{\boldmath {$W$}} \in \mbox{\boldmath {$R$}}^{n \times n}$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="22" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img163.png"
+ ALT="$ W$"></B></SPAN><IMG
+ WIDTH="15" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img164.png"
+ ALT="$ \in$">&nbsp; &nbsp;<SPAN CLASS="MATH"><B><IMG
+ WIDTH="17" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img165.png"
+ ALT="$ R$"></B></SPAN><IMG
+ WIDTH="31" HEIGHT="19" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img166.png"
+ ALT="$ ^{n \times n}$"></B></SPAN>であり, 対象で全ての要
+素が正である重み係数行列である.
+この<!-- MATH
+ $\mbox{\boldmath {$W$}}$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="22" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img163.png"
+ ALT="$ W$"></B></SPAN></B></SPAN>を用いて, <!-- MATH
+ $\mbox{\boldmath {$J$}}_{\mbox{\boldmath {$W$}}}, \mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}}$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img128.png"
+ ALT="$ J$"></B></SPAN><IMG
+ WIDTH="63" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img167.png"
+ ALT="$ _{\mbox{\boldmath {$W$}}}, \mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}}$"></B></SPAN>を以下のよう
+に定義する.
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<!-- MATH
+ \begin{eqnarray}
+\mbox{\boldmath {$J$}}_{\mbox{\boldmath {$W$}}} = \mbox{\boldmath {$J$}}\mbox{\boldmath {$W$}}^{-\frac{1}{2}},
+  \mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}} = \mbox{\boldmath {$W$}}^{\frac{1}{2}}\mbox{\boldmath {$\dot{\theta}$}}
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="16" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img126.png"
+ ALT="$\displaystyle \mbox{\boldmath {$J$}}$"><IMG
+ WIDTH="196" HEIGHT="41" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img168.png"
+ ALT="$\displaystyle _{\mbox{\boldmath {$W$}}} = \mbox{\boldmath {$J$}}\mbox{\boldmath...
+...{$W$}}} = \mbox{\boldmath {$W$}}^{\frac{1}{2}}\mbox{\boldmath {$\dot{\theta}$}}$"></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">15</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+この<!-- MATH
+ $\mbox{\boldmath {$J$}}_{\mbox{\boldmath {$W$}}}, \mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}}$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img128.png"
+ ALT="$ J$"></B></SPAN><IMG
+ WIDTH="63" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img167.png"
+ ALT="$ _{\mbox{\boldmath {$W$}}}, \mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}}$"></B></SPAN>を用いて, 以下の式を得
+る.
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<!-- MATH
+ \begin{eqnarray}
+\dot{\mbox{\boldmath {$r$}}} & = & \mbox{\boldmath {$J$}}_{\mbox{\boldmath {$W$}}}\mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}} \\
+ \left|\dot{\mbox{\boldmath {$\theta$}}}\right|_{\mbox{\boldmath {$W$}}} & = & \sqrt{\mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}}^T\mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}}}
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img124.png"
+ ALT="$\displaystyle \dot{\mbox{\boldmath {$r$}}}$"></TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="17" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img117.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP WIDTH="50%"><IMG
+ WIDTH="16" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img126.png"
+ ALT="$\displaystyle \mbox{\boldmath {$J$}}$"><IMG
+ WIDTH="55" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img169.png"
+ ALT="$\displaystyle _{\mbox{\boldmath {$W$}}}\mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}}$"></TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">16</SPAN>)</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="45" HEIGHT="45" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img170.png"
+ ALT="$\displaystyle \left\vert\dot{\mbox{\boldmath {$\theta$}}}\right\vert _{\mbox{\boldmath {$W$}}}$"></TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="17" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img117.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP WIDTH="50%"><IMG
+ WIDTH="81" HEIGHT="54" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img171.png"
+ ALT="$\displaystyle \sqrt{\mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}}^T\mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}}}$"></TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">17</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+これによって線型方程式の解は@xdefthefnmark<A HREF="#LimitAvoidance:Fung:RA95"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>footnotemarkから
+以下のように記述できる.
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<!-- MATH
+ \begin{eqnarray}
+\mbox{\boldmath {$\dot{\theta}$}}_{\mbox{\boldmath {$W$}}} = \mbox{\boldmath {$W$}}^{-1}\mbox{\boldmath {$J$}}^T
+  \left(\mbox{\boldmath {$J$}}\mbox{\boldmath {$W$}}^{-1}\mbox{\boldmath {$J$}}^T\right)^{-1}\dot{\mbox{\boldmath {$r$}}}
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="14" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img172.png"
+ ALT="$\displaystyle \mbox{\boldmath {$\dot{\theta}$}}$"><IMG
+ WIDTH="226" HEIGHT="51" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img173.png"
+ ALT="$\displaystyle _{\mbox{\boldmath {$W$}}} = \mbox{\boldmath {$W$}}^{-1}\mbox{\bol...
+...ath {$W$}}^{-1}\mbox{\boldmath {$J$}}^T\right)^{-1}\dot{\mbox{\boldmath {$r$}}}$"></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">18</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+また、現在の関節角度<SPAN CLASS="MATH"><B><IMG
+ WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img113.png"
+ ALT="$ \theta$"></B></SPAN>が関節角度限界<!-- MATH
+ $\theta_{i,\max},
+\theta_{i, \min}$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="89" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img174.png"
+ ALT="$ \theta_{i,\max},
+\theta_{i, \min}$"></B></SPAN>に対してどの程度余裕があるかを評価する
+ための関数<!-- MATH
+ $H(\mbox{\boldmath {$\theta$}})$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="25" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img175.png"
+ ALT="$ H($"><SPAN CLASS="MATH"><B><IMG
+ WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img113.png"
+ ALT="$ \theta$"></B></SPAN><IMG
+ WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img130.png"
+ ALT="$ )$"></B></SPAN>は以下のようになる<A NAME="tex2html31"
+  HREF="jmanual-footnode.html#foot47965"><SUP><SPAN CLASS="arabic">10</SPAN></SUP></A>).
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:joint-performance-func"></A><!-- MATH
+ \begin{eqnarray}
+H(\mbox{\boldmath {$\theta$}}) = \sum_{i = 1}^n\frac{1}{4}
+  \frac{(\theta_{i,\max} - \theta_{i,\min})^2}
+  {(\theta_{i,\max} - \theta_i)(\theta_i - \theta_{i,\min})}
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="25" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img176.png"
+ ALT="$\displaystyle H($"><IMG
+ WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img120.png"
+ ALT="$\displaystyle \mbox{\boldmath {$\theta$}}$"><IMG
+ WIDTH="240" HEIGHT="62" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img177.png"
+ ALT="$\displaystyle ) = \sum_{i = 1}^n\frac{1}{4}
+\frac{(\theta_{i,\max} - \theta_{i,\min})^2}
+{(\theta_{i,\max} - \theta_i)(\theta_i - \theta_{i,\min})}$"></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">19</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+次にEquation&nbsp;<A HREF="#eq:joint-weight-matrix"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;に示すような<!-- MATH
+ $n \times n$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="43" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img178.png"
+ ALT="$ n \times n$"></B></SPAN>の重み係数行列
+<!-- MATH
+ $\mbox{\boldmath {$W$}}$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="22" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img163.png"
+ ALT="$ W$"></B></SPAN></B></SPAN>を考える.
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:joint-weight-matrix"></A><!-- MATH
+ \begin{eqnarray}
+\mbox{\boldmath {$W$}} = \left[
+           \begin{array}{ccccc}
+            w_1 & 0 & 0 & \cdots & 0 \\
+            0 & w_2 & 0 & \cdots & 0 \\
+            \cdots & \cdots  & \cdots & \ddots & \cdots \\
+            0 & 0 & 0 & \cdots & w_n \\
+           \end{array}
+          \right]
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="24" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img179.png"
+ ALT="$\displaystyle \mbox{\boldmath {$W$}}$"><IMG
+ WIDTH="216" HEIGHT="103" BORDER="0"
+ SRC="jmanual-img180.png"
+ ALT="\begin{displaymath}= \left[
+\begin{array}{ccccc}
+w_1 &amp; 0 &amp; 0 &amp; \cdots &amp; 0 \\
+0 ...
+...ts &amp; \cdots \\
+0 &amp; 0 &amp; 0 &amp; \cdots &amp; w_n \\
+\end{array}\right]\end{displaymath}"></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">20</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+ここで<SPAN CLASS="MATH"><B><IMG
+ WIDTH="21" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img181.png"
+ ALT="$ w_i$"></B></SPAN>は
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<!-- MATH
+ \begin{eqnarray}
+w_i = 1 + \left|\frac{\partial \mbox{\boldmath {$H$}}(\mbox{\boldmath {$\theta$}})}{\partial \theta_i}\right|
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="132" HEIGHT="54" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img182.png"
+ ALT="$\displaystyle w_i = 1 + \left\vert\frac{\partial \mbox{\boldmath {$H$}}(\mbox{\boldmath {$\theta$}})}{\partial \theta_i}\right\vert$"></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">21</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+である.
+
+<P>
+さらにEquation&nbsp;<A HREF="#eq:joint-performance-func"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;から次の式を得る.
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<!-- MATH
+ \begin{eqnarray}
+\frac{\partial H(\mbox{\boldmath {$\theta$}})}{\partial \theta_i}
+  = \frac{(\theta_{i,\max} - \theta_{i,\min})^2(2\theta_i -
+  \theta_{i,\max} - \theta_{i,\min})}
+  {4(\theta_{i,\max} - \theta_i)^2(\theta_i - \theta_{i,\min})^2}
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="345" HEIGHT="57" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img183.png"
+ ALT="$\displaystyle \frac{\partial H(\mbox{\boldmath {$\theta$}})}{\partial \theta_i}...
+...heta_{i,\min})}
+{4(\theta_{i,\max} - \theta_i)^2(\theta_i - \theta_{i,\min})^2}$"></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">22</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+関節角度限界から遠ざかる向きに関節角度が動いている場合には重み係数行列を
+変化させる必要はないので,<SPAN CLASS="MATH"><B><IMG
+ WIDTH="21" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img181.png"
+ ALT="$ w_i$"></B></SPAN>を以下のように定義しなおす.
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<!-- MATH
+ \begin{eqnarray}
+w_i =
+  \left\{
+   \begin{array}{l l}
+   1 + \left|\frac{\partial \mbox{\boldmath {$H$}}(\mbox{\boldmath {$\theta$}})}{\partial \theta_i}\right|
+    & if \left|\frac{\partial \mbox{\boldmath {$H$}}(\mbox{\boldmath {$\theta$}})}{\partial
+          \theta_i}\right| \geq 0 \\
+    1 & if \left|\frac{\partial \mbox{\boldmath {$H$}}(\mbox{\boldmath {$\theta$}})}{\partial
+          \theta_i}\right| < 0
+    \end{array}
+  \right.
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
+ WIDTH="266" HEIGHT="74" BORDER="0"
+ SRC="jmanual-img184.png"
+ ALT="\begin{displaymath}w_i =
+\left\{
+\begin{array}{l l}
+1 + \left\vert\frac{\partial...
+...theta$}})}{\partial
+\theta_i}\right\vert &lt; 0
+\end{array}\right.\end{displaymath}"></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">23</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+この<SPAN CLASS="MATH"><B><IMG
+ WIDTH="21" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img181.png"
+ ALT="$ w_i$"></B></SPAN>および<!-- MATH
+ $\mbox{\boldmath {$W$}}$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="22" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img163.png"
+ ALT="$ W$"></B></SPAN></B></SPAN>を用いることで関節角度限界回避を含む逆運動学を解くこ
+とができる.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html2813"
+  HREF="jmanual-node156.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html2807"
+  HREF="jmanual-node152.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html2801"
+  HREF="jmanual-node154.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html2809"
+  HREF="jmanual-node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html2811"
+  HREF="jmanual-node187.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html2814"
+  HREF="jmanual-node156.html">衝突回避を含む逆運動学</A>
+<B> Up:</B> <A NAME="tex2html2808"
+  HREF="jmanual-node152.html">ロボットの動作生成</A>
+<B> Previous:</B> <A NAME="tex2html2802"
+  HREF="jmanual-node154.html">基礎ヤコビ行列</A>
+ &nbsp; <B>  <A NAME="tex2html2810"
+  HREF="jmanual-node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2812"
+  HREF="jmanual-node187.html">Index</A></B> </DIV>
+<!--End of Navigation Panel-->
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

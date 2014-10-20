@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>非ブロック対角ヤコビアンによる全身協調動作生成</TITLE>
+<TITLE>衝突回避計算例</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="非ブロック対角ヤコビアンによる全身協調動作生成">
+<META NAME="description" CONTENT="衝突回避計算例">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -21,101 +21,142 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="jmanual-node159.html">
 <LINK REL="previous" HREF="jmanual-node157.html">
-<LINK REL="up" HREF="jmanual-node151.html">
+<LINK REL="up" HREF="jmanual-node152.html">
 <LINK REL="next" HREF="jmanual-node159.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html2854"
+<A NAME="tex2html2855"
   HREF="jmanual-node159.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html2848"
-  HREF="jmanual-node151.html">
+<A NAME="tex2html2849"
+  HREF="jmanual-node152.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html2842"
+<A NAME="tex2html2843"
   HREF="jmanual-node157.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html2850"
+<A NAME="tex2html2851"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html2852"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html2853"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html2855"
-  HREF="jmanual-node159.html">リンク間重複があるヤコビアン計算と関節角度計算</A>
-<B> Up:</B> <A NAME="tex2html2849"
-  HREF="jmanual-node151.html">ロボットの動作生成</A>
-<B> Previous:</B> <A NAME="tex2html2843"
-  HREF="jmanual-node157.html">衝突回避計算例</A>
- &nbsp; <B>  <A NAME="tex2html2851"
+<B> Next:</B> <A NAME="tex2html2856"
+  HREF="jmanual-node159.html">非ブロック対角ヤコビアンによる全身協調動作生成</A>
+<B> Up:</B> <A NAME="tex2html2850"
+  HREF="jmanual-node152.html">ロボットの動作生成</A>
+<B> Previous:</B> <A NAME="tex2html2844"
+  HREF="jmanual-node157.html">衝突回避のための関節角速度計算法</A>
+ &nbsp; <B>  <A NAME="tex2html2852"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html2853"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2854"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION05012700000000000000">
-非ブロック対角ヤコビアンによる全身協調動作生成</A>
+<H3><A NAME="SECTION05012600000000000000">
+衝突回避計算例</A>
 </H3>
-ヒューマノイドは枝分かれのある複雑な構造を持ち,
-複数のマニピュレータで協調して動作を行う必要がある
-(Fig.<A HREF="#fig:duplicate-link"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;)．
+以下ではロボットモデル・環境モデルを用いた衝突回避例を示す.
+本研究では,
+ロボットのリンク同士,またはリンクと物体の衝突判定には,衝突判定ライブラリ
+PQP(A Proximity Query Package)
+<A NAME="tex2html34"
+  HREF="jmanual-footnode.html#foot48078"><SUP><SPAN CLASS="arabic">13</SPAN></SUP></A>を用いた.
+
+<P>
+Fig.<A HREF="#fig:collision-avoidance-example"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;では
+<!-- MATH
+ $d_a = 200[mm]$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="102" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img200.png"
+ ALT="$ d_a = 200[mm]$"></B></SPAN>,<!-- MATH
+ $d_b = 0.1 * d_a = 20[mm]$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="166" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img201.png"
+ ALT="$ d_b = 0.1 * d_a = 20[mm]$"></B></SPAN>,
+<!-- MATH
+ $k_{joint} = k_{null} = 1.0$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="138" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img202.png"
+ ALT="$ k_{joint} = k_{null} = 1.0$"></B></SPAN>と設定した.
+
+<P>
+この衝突判定計算では,衝突判定をリンクの設定を
+
+<OL>
+<LI>リンクのリスト<SPAN CLASS="MATH"><B><IMG
+ WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img203.png"
+ ALT="$ n_{ca}$"></B></SPAN>を登録
+</LI>
+<LI>登録されたリンクのリストから全リンクのペア<!-- MATH
+ $_{n_{ca}}C_2$
+ -->
+<SPAN CLASS="MATH"><B><IMG
+ WIDTH="44" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img204.png"
+ ALT="$ _{n_{ca}}C_2$"></B></SPAN>を計算
+</LI>
+<LI>隣接するリンクのペア,常に交わりを持つリンクのペアなどを除外
+</LI>
+</OL>
+のように行うという工夫を行っている.
+
+<P>
+Fig.<A HREF="#fig:collision-avoidance-example"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;例では衝突判定をするリンクを
+「前腕リンク」「上腕リンク」「体幹リンク」「ベースリンク」
+の4つとして登録した.
+この場合, <SPAN CLASS="MATH"><B><IMG
+ WIDTH="30" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img205.png"
+ ALT="$ _4C_2$"></B></SPAN>通りのリンクのペア数から
+隣接するリンクが除外され,全リンクペアは
+「前腕リンク-体幹リンク」
+「前腕リンク-ベースリンク」
+「上腕リンク-ベースリンク」
+の3通りとなる.
+
+<P>
+Fig.<A HREF="#fig:collision-avoidance-example"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;の3本の線(赤1本,緑2本)が
+衝突形状モデル間での最近傍点同士をつないだ
+最短距離ベクトルである.
+全リンクペアのうち赤い線が最も距離が近いペアであり,
+このリンクペアより衝突回避のための
+逆運動学計算を行っている.
 
 <P>
 
-<DIV ALIGN="CENTER"><A NAME="fig:duplicate-link"></A><A NAME="48063"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:collision-avoidance-example"></A><A NAME="48091"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
-Duplicate Link Sequence</CAPTION>
+Example of Collision Avoidance</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
 <IMG
-  WIDTH="528" HEIGHT="500" ALIGN="BOTTOM" BORDER="0"
- SRC="./normal.jpg"
- ALT="Image normal">
-    <IMG
-  WIDTH="528" HEIGHT="500" ALIGN="BOTTOM" BORDER="0"
- SRC="./linklist.jpg"
- ALT="Image linklist">
+  WIDTH="427" HEIGHT="428" ALIGN="BOTTOM" BORDER="0"
+ SRC="./collision-avoidance-example.jpg"
+ ALT="Image collision-avoidance-example">
     
 </DIV></TD></TR>
 </TABLE>
 </DIV>
 
 <P>
-複数マニピュレータの動作例として,
-
-<UL>
-<LI>リンク間に重複がない場合
-<BR>それぞれのマニピュレータについて
-Equation&nbsp;<A HREF="jmanual-node152.html#eq:inverse-kinematics"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;式を用いて関節角速度を求める.
-もしくは,複数の式を連立した方程式(ヤコビアンはブロック対角行列となる)
-を用いて関節角速度を求めても良い.
-</LI>
-<LI>リンク間に重複がある場合
-<BR>リンク間に重複がある場合は,
-リンク間の重複を考慮したヤコビアンを考える必要がある.
-例えば,双腕動作を行う場合,左腕のマニピュレータのリンク系列と
-右腕のマニピュレータのリンク系列とで,体幹部リンク系列が重複し,
-その部位は左右で協調して関節角速度を求める必要がある.
-</LI>
-</UL>
-次節ではリンク間に重複がある場合の
-非ブロック対角なヤコビアンの計算法
-および
-それを用いた関節角速度計算法を述べる
-(前者の重複がない場合も以下の計算方法により後者の一部として計算可能で
-ある).
-
-<P>
 <BR><HR>
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

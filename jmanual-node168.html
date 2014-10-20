@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>実際のロボットモデル</TITLE>
+<TITLE>irteusのサンプルプログラムにおける例</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="実際のロボットモデル">
+<META NAME="description" CONTENT="irteusのサンプルプログラムにおける例">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,196 +19,118 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="jmanual.css">
 
+<LINK REL="next" HREF="jmanual-node169.html">
 <LINK REL="previous" HREF="jmanual-node167.html">
-<LINK REL="up" HREF="jmanual-node165.html">
+<LINK REL="up" HREF="jmanual-node166.html">
 <LINK REL="next" HREF="jmanual-node169.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html2993"
+<A NAME="tex2html2996"
   HREF="jmanual-node169.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html2987"
-  HREF="jmanual-node165.html">
+<A NAME="tex2html2990"
+  HREF="jmanual-node166.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html2983"
+<A NAME="tex2html2984"
   HREF="jmanual-node167.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html2989"
+<A NAME="tex2html2992"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html2991"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html2994"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html2994"
-  HREF="jmanual-node169.html">ロボットモデル</A>
-<B> Up:</B> <A NAME="tex2html2988"
-  HREF="jmanual-node165.html">ロボットの動作生成プログラミング</A>
-<B> Previous:</B> <A NAME="tex2html2984"
-  HREF="jmanual-node167.html">irteusのサンプルプログラムにおける例</A>
- &nbsp; <B>  <A NAME="tex2html2990"
+<B> Next:</B> <A NAME="tex2html2997"
+  HREF="jmanual-node169.html">実際のロボットモデル</A>
+<B> Up:</B> <A NAME="tex2html2991"
+  HREF="jmanual-node166.html">ロボットの動作生成プログラミング</A>
+<B> Previous:</B> <A NAME="tex2html2985"
+  HREF="jmanual-node167.html">三軸関節ロボットを使ったヤコビアン，逆運動学の例</A>
+ &nbsp; <B>  <A NAME="tex2html2993"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html2992"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2995"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION05013300000000000000">
-実際のロボットモデル</A>
+<H3><A NAME="SECTION05013200000000000000">
+irteusのサンプルプログラムにおける例</A>
 </H3>
 
 <P>
-実際のロボットや環境を利用した実践的なサンプルプログラムを見てみよう．
+cascaded-coordsクラスでは
+
+<UL>
+<LI>(:link-list (to &amp;optional form))
+</LI>
+<LI>(:calc-jacobian-from-link-list (link-list &amp;key move-target
+  (rotation-axis nil)))
+</LI>
+</UL>
+というメソッドが用意されている．
 
 <P>
-まず，最初はロボットや環境のモデルファイルを読み込む．これらのファイル
-は$EUSDIR/modelsに，これらのファイルをロードしインスタンスを生成す
-るプログラムは以下のように書くことができる．<code>(room73b2)</code>や
-<code>(h7)</code>はこれらのファイル内で定義されている関数である．
-ロボットのモデル(<code>robot-model</code>)は<code>irtrobot.l</code>ファイルで定義
-されており，<code>cascaded-link</code>クラスの子クラスになっている．
-ロボットとは<code>larm,rarm,lleg,rleg,head</code>のリンクのツリーからなる
-ものとして定義されており，
-<code>(send *robot* :larm)</code>や<code>(send *robot* :head)</code>として
-ロボットのリム(limb)にアクセスでき，右手の逆運動学，左手の逆運動学等と
-いう利用方法が可能になっている．
+前者はリンクを引数として，ルートリンクからこのリンクまでの経路を計算し，
+リンクのリストとして返す．後者はこのリンクのリストを引数とし，
+move-target座標系をに対するヤコビアンを計算する．
 
 <P>
-<PRE>
-(load "models/room73b2-scene.l")
-(load "models/h7-robot.l")
-(setq *room* (room73b2))
-(setq *robot* (h7))
-(objects (list *robot* *room*))
-</PRE>
-
-<P>
-ロボットには<code>:reset-pose</code>というメソッドがありこれで初期姿勢をとる
-ことができる．
-<PRE>
-(send *robot* :reset-pose)
-</PRE>
-
-<P>
-次に，ロボットを部屋の中で移動させたい．部屋内の代表的な座標は
-<code>(send *room* :spots)</code>で取得できる．この中から目的の座標を得る
-場合はその座標の名前を引数として<code>:spot</code>メソッドを呼び出す．
-ちなみに，このメソッドの定義は<code>prog/jskeus/irteus/irtscene.l</code>
-にあり
-<PRE>
-(defmethod scene-model
-  (:spots
-   (&amp;optional name)
-   (append
-    (mapcan
-     #'(lambda(x)(if (derivedp x scene-model) (send x :spots name) nil))
-     objs)
-    (mapcan #'(lambda (o)
-		(if (and (eq (class o) cascaded-coords)
-			 (or (null name) (string= name (send o :name))))
-		    (list o)))
-	    objs)))
-  (:spot
-   (name)
-   (let ((r (send self :spots name)))
-     (case (length r)
-       (0 (warning-message 1 "could not found spot(~A)" name) nil)
-       (1 (car r))
-       (t (warning-message 1 "found multiple spot ~A for given name(~A)" r name) (car r)))))
-  )
-</PRE>
-となっている．
-
-<P>
-ロボットもまた<code>coordinates</code>クラスの子クラスなので<code>:move-to</code>
-メソッドを利用できる．また，このロボットの原点は腰にあるので足が地面に
-つくように<code>:locate</code>メソッドを使って移動する．
-<PRE>
-(send *robot* :move-to (send *room* :spot "cook-spot") :world)
-(send *robot* :locate #f(0 0 550))
-</PRE>
-
-<P>
-現状では<code>*irtviewer*</code>の画面上でロボットが小さくなっているので，
-以下のメソッド利用し，ロボットが画面いっぱいになるように調整する．
-<PRE>
-(send *irtviewer* :look-all
-      (geo::make-bounding-box
-       (flatten (send-all (send *robot* :bodies) :vertices))))
-</PRE>
-
-<P>
-次に環境中の物体を選択する．ここでは<code>:object</code>メソッドを利用する．
-これは，<code>:spots, :spot</code>と同様の振る舞いをするため，
-どのような物体があるかは，<code>(send-all (send *room* :objects) :name)</code>
-として知ることができる．
-<code>room73b2-kettle</code>の他に
-<code>room73b2-mug-cup</code>や<code>room73b2-knife</code>等を利用するとよい．
+concatenate result-type a bは a bを
+連結しresult-type型に変換し返し，scale a b はベクトルbの全ての要素をス
+カラーa倍し，matrix-logは行列対数関数を計算する．
 
 <P>
 <PRE>
-(setq *kettle* (send *room* :object "room73b2-kettle"))
+(if (not (boundp '*irtviewer*)) (make-irtviewer))
+
+(load "irteus/demo/sample-arm-model.l")
+(setq *sarm* (instance sarmclass :init))
+(send *sarm* :reset-pose)
+(setq *target* (make-coords :pos #f(350 200 400)))
+(objects (list *sarm* *target*))
+
+(do-until-key
+  ;; step 3
+  (setq c (send *sarm* :end-coords))
+  (send c :draw-on :flush t)
+  ;; step 4
+  ;; step 4
+  (setq dp (scale 0.001 (v- (send *target* :worldpos) (send c :worldpos))) ;; mm-&gt;m
+        dw (matrix-log (m* (transpose (send c :worldrot)) (send *target* :worldrot))))
+  (format t "dp = ~7,3f ~7,3f ~7,3f, dw = ~7,3f ~7,3f ~7,3f~%"
+          (elt dp 0) (elt dp 1) (elt dp 2)
+          (elt dw 0) (elt dw 1) (elt dw 2))
+  ;; step 5
+  (when (&lt; (+ (norm dp) (norm dw)) 0.01) (return))
+  ;; step 6
+  (setq ll (send *sarm* :link-list (send *sarm* :end-coords :parent)))
+  (setq j (send *sarm* :calc-jacobian-from-link-list
+                ll :move-target (send *sarm* :end-coords)
+                :trnaslation-axis t :rotation-axis t))
+  (setq q (scale 1.0 (transform (pseudo-inverse j) (concatenate float-vector dp dw))))
+  ;; step 7
+  (dotimes (i (length ll))
+    (send (send (elt ll i) :joint) :joint-angle (elt q i) :relative t))
+  ;; draw
+  (send *irtviewer* :draw-objects)
+  (x::window-main-one))
 </PRE>
 
 <P>
-環境モデルの初期化直後は物体は部屋にassocされているため，以下の用に
-親子関係を解消しておく．こうしないと物体を把持するなどの場合に問題が生
-じる．
-<PRE>
-(if (send *kettle* :parent) (send (send *kettle* :parent) :dissoc *kettle*))
-</PRE>
-
-<P>
-ロボットの視線を対象物に向けるためのメソッドとして以下のようなものがあ
-る．
-<PRE>
-(send *robot* :head :look-at (send *kettle* :worldpos))
-</PRE>
-
-<P>
-対象物体には，その物体を把持するための利用したらよい座標系が
-<code>:handle</code>メソッドとして記述されている場合がある．このメソッドは
-リストを返すため以下の様に<code>(car (send *kettle* :handle))</code>として
-その座標系を知ることができる．この座標がどこにあるか確認するためには
-<code>(send (car (send *kettle* :handle)) :draw-on :flush t)</code>とすると
-よい．
-
-<P>
-したがってこの物体手を伸ばすためには
-<PRE>
-(send *robot* :larm :inverse-kinematics
-      (car (send *kettle* :handle))
-      :link-list (send *robot* :link-list (send *robot* :larm :end-coords :parent))
-      :move-target (send *robot* :larm :end-coords)
-      :rotation-axis :z
-      :debug-view t)
-</PRE>
-となる．
-
-<P>
-ここで，ロボットの手先と対象物体の座標系を連結し，
-<PRE>
-(send *robot* :larm :end-coords :assoc *kettle*)
-</PRE>
-
-<P>
-以下の様にして世界座標系で100[mm]持ち上げることができる．
-<PRE>
-(send *robot* :larm :move-end-pos #f(0 0 100) :world
-        :debug-view t :look-at-target t)
-</PRE>
-<code>:look-at-target</code>は移動中に首の向きを常に対象を見つづけるようにす
-るという指令である．
+実際のプログラミングでは:inverse-kinematicsというメソッドが用意されて
+おり，ここでは特異点や関節リミットの回避，あるいは自己衝突回避等の機能
+が追加されている．
 
 <P>
 <BR><HR>
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

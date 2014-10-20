@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>センサモデル</TITLE>
+<TITLE>ロボットモデル</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="センサモデル">
+<META NAME="description" CONTENT="ロボットモデル">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,54 +20,70 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <LINK REL="STYLESHEET" HREF="jmanual.css">
 
 <LINK REL="next" HREF="jmanual-node171.html">
-<LINK REL="previous" HREF="jmanual-node169.html">
-<LINK REL="up" HREF="jmanual-node144.html">
+<LINK REL="previous" HREF="jmanual-node166.html">
+<LINK REL="up" HREF="jmanual-node145.html">
 <LINK REL="next" HREF="jmanual-node171.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html3021"
+<A NAME="tex2html3022"
   HREF="jmanual-node171.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3015"
-  HREF="jmanual-node144.html">
+<A NAME="tex2html3016"
+  HREF="jmanual-node145.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3009"
+<A NAME="tex2html3010"
   HREF="jmanual-node169.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3017"
+<A NAME="tex2html3018"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3019"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html3020"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3022"
-  HREF="jmanual-node171.html">環境モデル</A>
-<B> Up:</B> <A NAME="tex2html3016"
-  HREF="jmanual-node144.html">ロボットモデリング</A>
-<B> Previous:</B> <A NAME="tex2html3010"
-  HREF="jmanual-node169.html">ロボットモデル</A>
- &nbsp; <B>  <A NAME="tex2html3018"
+<B> Next:</B> <A NAME="tex2html3023"
+  HREF="jmanual-node171.html">センサモデル</A>
+<B> Up:</B> <A NAME="tex2html3017"
+  HREF="jmanual-node145.html">ロボットモデリング</A>
+<B> Previous:</B> <A NAME="tex2html3011"
+  HREF="jmanual-node169.html">実際のロボットモデル</A>
+ &nbsp; <B>  <A NAME="tex2html3019"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3020"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3021"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION05015000000000000000">
-センサモデル</A>
+<H2><A NAME="SECTION05014000000000000000">
+ロボットモデル</A>
 </H2>
-  
+
+<P>
+ロボットの身体はリンクとジョイントから構成されるが、それぞれ
+<code>bodyset-link</code>と<code>joint</code>クラスを利用しモデル絵を作成する。ロ
+ボットの身体はこれらの要素を含んだ<code>cascaded-link</code>という，連結リン
+クとしてモデルを生成する．
+
+<P>
+実際には<code>joint</code>は抽象クラスであり
+<code>rotational-joint</code>,<code>linear-joint</code>,
+<code>wheel-joint</code>,<code>omniwheel-joint</code>,
+<code>sphere-joint</code>を選択肢、また四肢を持つロボットの場合は
+<code>cascaded-link</code>
+ではなく<code>robot-model</code>クラスを利用する。
+
+<P>
+
  <BR>
 <BR> <BR> 
-<A NAME="56010"></A>
-<BIG CLASS="XLARGE"><B>sensor-model </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>body</B> 
-<BR>  :slots 		 data profile 
+<A NAME="51584"></A>
+<BIG CLASS="XLARGE"><B>joint </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>propertied-object</B> 
+<BR>  :slots 		 parent-link child-link joint-angle min-angle max-angle default-coords joint-velocity joint-acceleration joint-torque max-joint-velocity max-joint-torque joint-min-max-table joint-min-max-target 
 </TT></PRE>
 <BR>
 <BR>
@@ -79,9 +95,66 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </DL>
 <BR>
 <BR>
+
+<A NAME="51601"></A>
+<B>:init</B> <EM>&amp;key (name (intern (format nil joint&nbsp;A (system:address self)) KEYWORD)) ((:child-link clink)) ((:parent-link plink)) (min -90) (max 90) ((:max-joint-velocity mjv)) ((:max-joint-torque mjt)) ((:joint-min-max-table mm-table)) ((:joint-min-max-target mm-target)) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> abstract class of joint, users need to use rotational-joint, linear-joint, sphere-joint, 6dof-joint, wheel-joint or omniwheel-joint.
+          use :parent-link/:child-link for specifying links that this joint connect to and :min/:min for range of joint angle in degree.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="51611"></A>
+<B>:min-angle</B> <EM>&amp;optional v  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> If v is set, it updates min-angle of this instance. :min-angle returns minimal angle of this joint in degree.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="51621"></A>
+<B>:max-angle</B> <EM>&amp;optional v  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> If v is set, it updates max-angle of this instance. :max-angle returns maximum angle of this joint in degree.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="51631"></A>
+<B>:parent-link</B> <EM>&amp;rest args  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns parent link of this joint. if any arguments is set, it is passed to the parent-link.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="51641"></A>
+<B>:child-link</B> <EM>&amp;rest args  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns child link of this joint. if any arguments is set, it is passed to the child-link.
+</DD>
+</DL>
+<BR>
+<BR>
+
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56027"></A>
-<B>:profile</B> <EM>&amp;optional p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="51651"></A>
+<B>:calc-dav-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -95,8 +168,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56037"></A>
-<B>:signal</B> <EM>rawinfo  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="51661"></A>
+<B>:joint-dof</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -110,8 +183,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56047"></A>
-<B>:simulate</B> <EM>model  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="51671"></A>
+<B>:speed-to-angle</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -125,8 +198,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56057"></A>
-<B>:read</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="51681"></A>
+<B>:angle-to-speed</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -140,8 +213,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56067"></A>
-<B>:draw-sensor</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="51691"></A>
+<B>:calc-jacobian</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -155,8 +228,143 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56077"></A>
-<B>:init</B> <EM>shape &amp;key name &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="51701"></A>
+<B>:joint-velocity</B> <EM>&amp;optional jv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="51711"></A>
+<B>:joint-acceleration</B> <EM>&amp;optional ja  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="51721"></A>
+<B>:joint-torque</B> <EM>&amp;optional jt  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="51731"></A>
+<B>:max-joint-velocity</B> <EM>&amp;optional mjv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="51741"></A>
+<B>:max-joint-torque</B> <EM>&amp;optional mjt  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="51751"></A>
+<B>:joint-min-max-table</B> <EM>&amp;optional mm-table  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="51761"></A>
+<B>:joint-min-max-target</B> <EM>&amp;optional mm-target  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="51771"></A>
+<B>:joint-min-max-table-angle-interpolate</B> <EM>target-angle car-or-cadr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="51781"></A>
+<B>:joint-min-max-table-min-angle</B> <EM>&amp;optional (target-angle (send joint-min-max-target :joint-angle))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="51791"></A>
+<B>:joint-min-max-table-max-angle</B> <EM>&amp;optional (target-angle (send joint-min-max-target :joint-angle))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -173,10 +381,10 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="56088"></A>
-<BIG CLASS="XLARGE"><B>bumper-model </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>sensor-model</B> 
-<BR>  :slots 		 bumper-threshold 
+<A NAME="51802"></A>
+<BIG CLASS="XLARGE"><B>rotational-joint </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>joint</B> 
+<BR>  :slots 		 axis 
 </TT></PRE>
 <BR>
 <BR>
@@ -189,31 +397,42 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56105"></A>
-<B>:init</B> <EM>b &amp;rest args &amp;key ((:bumper-threshold bt) 20) name  </EM>[メソッド]
+<A NAME="51819"></A>
+<B>:init</B> <EM>&amp;rest args &amp;key ((:axis ax) :z) ((:max-joint-velocity mjv) 5) ((:max-joint-torque mjt) 100) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> Create bumper model, b is the shape of an object and bt is the threshold in distance[mm].
+<DD> create instance of rotational-joint. :axis is either (:x, :y, :z) or vector. :min-angle and :max-angle takes in radius, but velocity and torque are given in SI units.
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="56115"></A>
-<B>:simulate</B> <EM>objs  </EM>[メソッド]
+<A NAME="51829"></A>
+<B>:joint-angle</B> <EM>&amp;optional v &amp;key relative &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> Simulate bumper, with given objects, return 1 if the sensor detects an object and 0 if not.
+<DD> Return joint-angle if v is not set, if v is given, set joint angle. v is rotational value in degree.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="51839"></A>
+<B>:joint-dof</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns DOF of rotational joint, 1.
 </DD>
 </DL>
 <BR>
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56125"></A>
-<B>:draw</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="51849"></A>
+<B>:calc-angle-speed-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -227,8 +446,38 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56135"></A>
-<B>:draw-sensor</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="51859"></A>
+<B>:speed-to-angle</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="51869"></A>
+<B>:angle-to-speed</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="51879"></A>
+<B>:calc-jacobian</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -245,10 +494,10 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="56146"></A>
-<BIG CLASS="XLARGE"><B>camera-model </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>sensor-model</B> 
-<BR>  :slots 		 (vwing :forward (:projection :newprojection :view :viewpoint :view-direction :viewdistance :yon :hither)) pwidth pheight 
+<A NAME="51890"></A>
+<BIG CLASS="XLARGE"><B>linear-joint </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>joint</B> 
+<BR>  :slots 		 axis 
 </TT></PRE>
 <BR>
 <BR>
@@ -261,130 +510,42 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56163"></A>
-<B>:init</B> <EM>b &amp;rest args &amp;key ((:width pw) 320) ((:height ph) 240) (view-up #f(0.0 1.0 0.0)) (viewdistance 5.0) (hither 100.0) (yon 10000.0) &amp;allow-other-keys  </EM>[メソッド]
+<A NAME="51907"></A>
+<B>:init</B> <EM>&amp;rest args &amp;key ((:axis ax) :z) ((:max-joint-velocity mjv) (/ pi 4)) ((:max-joint-torque mjt) 100) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> Create camera model. b is the shape of an object
+<DD> Create instance of linear-joint. :axis is either (:x, :y, :z) or vector. :min-angle and :max-angle takes in [mm], but velocity and torque are given in SI units.
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="56173"></A>
-<B>:width</B> [メソッド]
+<A NAME="51917"></A>
+<B>:joint-angle</B> <EM>&amp;optional v &amp;key relative &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> Returns width of the camera in pixel.
+<DD> return joint-angle if v is not set, if v is given, set joint angle. v is linear value in [mm].
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="56183"></A>
-<B>:height</B> [メソッド]
+<A NAME="51927"></A>
+<B>:joint-dof</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> Returns height of the camera in pixel.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="56193"></A>
-<B>:fovy</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns field of view in degree
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="56203"></A>
-<B>:cx</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns center x.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="56213"></A>
-<B>:cy</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns center y.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="56223"></A>
-<B>:fx</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns focal length of x.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="56233"></A>
-<B>:fy</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns focal length of y.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="56243"></A>
-<B>:screen-point</B> <EM>pos  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns point in screen corresponds to the given pos.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="56253"></A>
-<B>:3d-point</B> <EM>x y d  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns 3d position
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="56263"></A>
-<B>:ray</B> <EM>x y  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns ray vector of given x and y.
+<DD> Returns DOF of linear joint, 1.
 </DD>
 </DL>
 <BR>
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56273"></A>
-<B>:viewing</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="51937"></A>
+<B>:calc-angle-speed-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -398,8 +559,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56283"></A>
-<B>:draw-on</B> <EM>&amp;rest args &amp;key ((:viewer vwer) viewer) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="51947"></A>
+<B>:speed-to-angle</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -413,8 +574,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56293"></A>
-<B>:draw-sensor</B> <EM>vwer &amp;key flush (width 1) (color (float-vector 1 1 1))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="51957"></A>
+<B>:angle-to-speed</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -428,8 +589,76 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56303"></A>
-<B>:draw-objects</B> <EM>vwr objs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="51967"></A>
+<B>:calc-jacobian</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+	<BR> 
+<A NAME="51978"></A>
+<BIG CLASS="XLARGE"><B>wheel-joint </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>joint</B> 
+<BR>  :slots 		 axis 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="51995"></A>
+<B>:init</B> <EM>&amp;rest args &amp;key (min (float-vector -inf-inf)) (max (float-vector infinf)) ((:max-joint-velocity mjv) (float-vector (/ 0.08 0.05) (/ pi 4))) ((:max-joint-torque mjt) (float-vector 100 100)) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Create instance of wheel-joint.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52005"></A>
+<B>:joint-angle</B> <EM>&amp;optional v &amp;key relative &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> return joint-angle if v is not set, if v is given, set joint angle. v is  joint-angle vector, which is  (float-vector translation-x[mm] rotation-z[deg])
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52015"></A>
+<B>:joint-dof</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns DOF of linear joint, 2.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="52025"></A>
+<B>:calc-angle-speed-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -443,8 +672,1231 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56313"></A>
-<B>:get-image</B> <EM>vwr &amp;key (points) (colors)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="52035"></A>
+<B>:speed-to-angle</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52045"></A>
+<B>:angle-to-speed</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52055"></A>
+<B>:calc-jacobian</B> <EM>fik row column joint paxis child-link world-default-coords child-reverse move-target transform-coords rotation-axis translation-axis tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+	<BR> 
+<A NAME="52066"></A>
+<BIG CLASS="XLARGE"><B>omniwheel-joint </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>joint</B> 
+<BR>  :slots 		 axis 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52083"></A>
+<B>:init</B> <EM>&amp;rest args &amp;key (min (float-vector -inf-inf-inf)) (max (float-vector infinfinf)) ((:max-joint-velocity mjv) (float-vector (/ 0.08 0.05) (/ 0.08 0.05) (/ pi 4))) ((:max-joint-torque mjt) (float-vector 100 100 100)) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> create instance of omniwheel-joint.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52093"></A>
+<B>:joint-angle</B> <EM>&amp;optional v &amp;key relative &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> return joint-angle if v is not set, if v is given, set joint angle. v is joint-angle vector, which is (float-vector translation-x[mm] translation-y[mm] rotation-z[deg])
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52103"></A>
+<B>:joint-dof</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns DOF of linear joint, 3.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="52113"></A>
+<B>:calc-angle-speed-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52123"></A>
+<B>:speed-to-angle</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52133"></A>
+<B>:angle-to-speed</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52143"></A>
+<B>:calc-jacobian</B> <EM>fik row column joint paxis child-link world-default-coords child-reverse move-target transform-coords rotation-axis translation-axis tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+	<BR> 
+<A NAME="52154"></A>
+<BIG CLASS="XLARGE"><B>sphere-joint </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>joint</B> 
+<BR>  :slots 		 axis 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52171"></A>
+<B>:init</B> <EM>&amp;rest args &amp;key (min (float-vector -inf-inf-inf)) (max (float-vector infinfinf)) ((:max-joint-velocity mjv) (float-vector (/ pi 4) (/ pi 4) (/ pi 4))) ((:max-joint-torque mjt) (float-vector 100 100 100)) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Create instance of sphere-joint. min/max are defiend as a region of angular velocity in degree.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52181"></A>
+<B>:joint-angle</B> <EM>&amp;optional v &amp;key relative &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> return joint-angle if v is not set, if v is given, set joint angle. v is joint-angle vector by axis-angle representation, i.e (scale rotation-angle-from-default-coords[deg] axis-unit-vector)
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52191"></A>
+<B>:joint-angle-rpy</B> <EM>&amp;optional v &amp;key relative  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Return joint-angle if v is not set, if v is given, set joint-angle vector by RPY representation, i.e. (float-vector yaw[deg] roll[deg] pitch[deg])
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52201"></A>
+<B>:joint-dof</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns DOF of linear joint, 3.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52211"></A>
+<B>:joint-euler-angle</B> <EM>&amp;key (axis-order '(:z :y :x)) ((:child-rot m) (send child-link :rot))  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Return joint-angle if v is not set, if v is given, set joint-angle vector by euler representation.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="52221"></A>
+<B>:calc-angle-speed-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52231"></A>
+<B>:speed-to-angle</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52241"></A>
+<B>:angle-to-speed</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52251"></A>
+<B>:calc-jacobian</B> <EM>fik row column joint paxis child-link world-default-coords child-reverse move-target transform-coords rotation-axis translation-axis tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+	<BR> 
+<A NAME="52262"></A>
+<BIG CLASS="XLARGE"><B>6dof-joint </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>joint</B> 
+<BR>  :slots 		 axis 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52279"></A>
+<B>:init</B> <EM>&amp;rest args &amp;key (min (float-vector -inf-inf-inf-inf-inf-inf)) (max (float-vector infinfinfinfinfinf)) ((:max-joint-velocity mjv) (float-vector (/ 0.08 0.05) (/ 0.08 0.05) (/ 0.08 0.05) (/ pi 4) (/ pi 4) (/ pi 4))) ((:max-joint-mjt mjt) (float-vector 100 100 100 100 100 100)) (absolute-p nil) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Create instance of 6dof-joint.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52289"></A>
+<B>:joint-angle</B> <EM>&amp;optional v &amp;key relative &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Return joint-angle if v is not set, if v is given, set joint angle vector, which is 6D vector of 3D translation[mm] and 3D rotation[deg], i.e. (find-if #'(lambda (x) (eq (send (car x) :name) 'sphere-joint)) (documentation :joint-angle))
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52299"></A>
+<B>:joint-angle-rpy</B> <EM>&amp;optional v &amp;key relative  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Return joint-angle if v is not set, if v is given, set joint angle. v is joint-angle vector, which is 6D vector of 3D translation[mm] and 3D rotation[deg], for rotation, please see (find-if #'(lambda (x) (eq (send (car x) :name) 'sphere-joint)) (documentation :joint-angle-rpy))
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52309"></A>
+<B>:joint-dof</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns DOF of linear joint, 6.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="52319"></A>
+<B>:calc-angle-speed-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52329"></A>
+<B>:speed-to-angle</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52339"></A>
+<B>:angle-to-speed</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52349"></A>
+<B>:calc-jacobian</B> <EM>fik row column joint paxis child-link world-default-coords child-reverse move-target transform-coords rotation-axis translation-axis tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+	<BR> 
+<A NAME="52360"></A>
+<BIG CLASS="XLARGE"><B>bodyset-link </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>bodyset</B> 
+<BR>  :slots 		 joint parent-link child-links analysis-level default-coords weight acentroid inertia-tensor angular-velocity angular-acceleration spacial-velocity spacial-acceleration momentum-velocity angular-momentum-velocity momentum angular-momentum force moment ext-force ext-moment 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52377"></A>
+<B>:init</B> <EM>coords &amp;rest args &amp;key ((:analysis-level level) :body) ((:weight w) 1) ((:centroid c) #f(0.0 0.0 0.0)) ((:inertia-tensor i) (unit-matrix 3)) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Create instance of bodyset-link.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52387"></A>
+<B>:worldcoords</B> <EM>&amp;optional (level analysis-level)  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns a coordinates object which represents this coord in the world by concatenating all the cascoords from the root to this coords.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52397"></A>
+<B>:analysis-level</B> <EM>&amp;optional v  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Change analysis level :coords only changes kinematics level and :body changes geometry too.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52407"></A>
+<B>:weight</B> <EM>&amp;optional w  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns a weight of the link. If w is given, set weight.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52417"></A>
+<B>:centroid</B> <EM>&amp;optional c  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns a centroid of the link. If c is given, set new centroid.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52427"></A>
+<B>:inertia-tensor</B> <EM>&amp;optional i  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns a inertia tensor of the link. If c is given, set new intertia tensor.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52437"></A>
+<B>:joint</B> <EM>&amp;rest args  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns a joint associated with this link. If args is given, args are forward to the joint.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52447"></A>
+<B>:add-joint</B> <EM>j  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Set j as joint of this link
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52457"></A>
+<B>:del-joint</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Remove current joint of this link
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52467"></A>
+<B>:parent-link</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns parent link
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52477"></A>
+<B>:child-links</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns child links
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52487"></A>
+<B>:add-child-links</B> <EM>l  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Add l to child links
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52497"></A>
+<B>:add-parent-link</B> <EM>l  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Set l as parent link
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52507"></A>
+<B>:del-child-link</B> <EM>l  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Delete l from child links
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52517"></A>
+<B>:del-parent-link</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Delete parent link
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="52527"></A>
+<B>:default-coords</B> <EM>&amp;optional c  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+	<BR> 
+<A NAME="52538"></A>
+<BIG CLASS="XLARGE"><B>cascaded-link </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>cascaded-coords</B> 
+<BR>  :slots 		 links joint-list bodies collision-avoidance-links 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52555"></A>
+<B>:init</B> <EM>&amp;rest args &amp;key name &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Create cascaded-link.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52565"></A>
+<B>:init-ending</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> This method is to called finalize the instantiation of the cascaded-link. This update bodies and child-link and parent link from joint-list
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52575"></A>
+<B>:links</B> <EM>&amp;rest args  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns links, or args is passed to links
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52585"></A>
+<B>:joint-list</B> <EM>&amp;rest args  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns joint list, or args is passed to joints
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52595"></A>
+<B>:link</B> <EM>name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Return a link with given name.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52605"></A>
+<B>:joint</B> <EM>name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Return a joint with given name.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52615"></A>
+<B>:bodies</B> <EM>&amp;rest args  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Return bodies of this object. If args is given it passed to all bodies
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52625"></A>
+<B>:faces</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Return faces of this object.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52635"></A>
+<B>:angle-vector</B> <EM>&amp;optional vec (angle-vector (instantiate float-vector (calc-target-joint-dimension joint-list)))  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns angle-vector of this object, if vec is given, it updates angles of all joint. If given angle-vector violate min/max range, the value is modified.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52645"></A>
+<B>:link-list</B> <EM>to &amp;optional from  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Find link list from to link to from link.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52655"></A>
+<B>:inverse-kinematics</B> <EM>target-coords &amp;rest args &amp;key (stop 50) (link-list) (move-target) (debug-view) (warnp t) (revert-if-fail t) (rotation-axis (cond ((atom move-target) t) (t (make-list (length move-target) :initial-element t)))) (translation-axis (cond ((atom move-target) t) (t (make-list (length move-target) :initial-element t)))) (joint-args) (thre (cond ((atom move-target) 1) (t (make-list (length move-target) :initial-element 1)))) (rthre (cond ((atom move-target) (deg2rad 1)) (t (make-list (length move-target) :initial-element (deg2rad 1))))) (union-link-list) (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (dump-command t) (periodic-time 0.5) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Move move-target to target-coords.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="52665"></A>
+<B>:update-descendants</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52675"></A>
+<B>:find-link-route</B> <EM>to &amp;optional from  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52685"></A>
+<B>:calc-target-axis-dimension</B> <EM>rotation-axis translation-axis  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52695"></A>
+<B>:calc-union-link-list</B> <EM>link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52705"></A>
+<B>:calc-target-joint-dimension</B> <EM>link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52715"></A>
+<B>:calc-inverse-jacobian</B> <EM>jacobi &amp;rest args &amp;key ((:manipulability-limit ml) 0.1) ((:manipulability-gain mg) 0.001) weight debug-view ret wmat tmat umat umat2 mat-tmp mat-tmp-rc tmp-mrr tmp-mrr2 &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52725"></A>
+<B>:calc-gradh-from-link-list</B> <EM>link-list &amp;optional (res (instantiate float-vector (length link-list)))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52735"></A>
+<B>:calc-jacobian-from-link-list</B> <EM>link-list &amp;rest args &amp;key move-target (transform-coords move-target) (rotation-axis (cond ((atom move-target) nil) (t (make-list (length move-target))))) (translation-axis (cond ((atom move-target) t) (t (make-list (length move-target) :initial-element t)))) (col-offset 0) (dim (send self :calc-target-axis-dimension rotation-axis translation-axis)) (fik-len (send self :calc-target-joint-dimension link-list)) fik (tmp-v0 (instantiate float-vector 0)) (tmp-v1 (instantiate float-vector 1)) (tmp-v2 (instantiate float-vector 2)) (tmp-v3 (instantiate float-vector 3)) (tmp-v3a (instantiate float-vector 3)) (tmp-v3b (instantiate float-vector 3)) (tmp-m33 (make-matrix 3 3)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52745"></A>
+<B>:calc-joint-angle-speed</B> <EM>union-vel &amp;rest args &amp;key angle-speed (angle-speed-blending 0.5) jacobi jacobi# null-space i-j#j debug-view weight wmat tmp-len tmp-len2 fik-len &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52755"></A>
+<B>:calc-joint-angle-speed-gain</B> <EM>union-link-list dav periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52765"></A>
+<B>:collision-avoidance-links</B> <EM>&amp;optional l  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52775"></A>
+<B>:collision-avoidance-link-pair-from-link-list</B> <EM>link-lists &amp;key obstacles ((:collision-avoidance-links collision-links) collision-avoidance-links) debug  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52785"></A>
+<B>:collision-avoidance-calc-distance</B> <EM>&amp;rest args &amp;key union-link-list (warnp t) ((:collision-avoidance-link-pair pair-list)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52795"></A>
+<B>:collision-avoidance-args</B> <EM>pair link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52805"></A>
+<B>:collision-avoidance</B> <EM>&amp;rest args &amp;key avoid-collision-distance avoid-collision-joint-gain avoid-collision-null-gain ((:collision-avoidance-link-pair pair-list)) (union-link-list) (link-list) (weight) (fik-len (send self :calc-target-joint-dimension union-link-list)) debug-view &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52815"></A>
+<B>:move-joints</B> <EM>union-vel &amp;rest args &amp;key union-link-list (periodic-time 0.05) (joint-args) (debug-view nil) (move-joints-hook) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52825"></A>
+<B>:find-joint-angle-limit-weight-old-from-union-link-list</B> <EM>union-link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52835"></A>
+<B>:reset-joint-angle-limit-weight-old</B> <EM>union-link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52845"></A>
+<B>:calc-weight-from-joint-limit</B> <EM>avoid-weight-gain fik-len link-list union-link-list debug-view weight tmp-weight tmp-len  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52855"></A>
+<B>:calc-inverse-kinematics-weight-from-link-list</B> <EM>link-list &amp;key (avoid-weight-gain 1.0) (union-link-list (send self :calc-union-link-list link-list)) (fik-len (send self :calc-target-joint-dimension union-link-list)) (weight (fill (instantiate float-vector fik-len) 1)) (additional-weight-list) (debug-view) (tmp-weight (instantiate float-vector fik-len)) (tmp-len (instantiate float-vector fik-len))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52865"></A>
+<B>:calc-nspace-from-joint-limit</B> <EM>avoid-nspace-gain union-link-list weight debug-view tmp-nspace  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52875"></A>
+<B>:calc-inverse-kinematics-nspace-from-link-list</B> <EM>link-list &amp;key (avoid-nspace-gain 0.01) (union-link-list (send self :calc-union-link-list link-list)) (fik-len (send self :calc-target-joint-dimension union-link-list)) (null-space) (debug-view) (additional-nspace-list) (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (weight (fill (instantiate float-vector fik-len) 1.0)) (update-mass-properties t) (tmp-nspace (instantiate float-vector fik-len))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52885"></A>
+<B>:move-joints-avoidance</B> <EM>union-vel &amp;rest args &amp;key union-link-list link-list (fik-len (send self :calc-target-joint-dimension union-link-list)) (weight (fill (instantiate float-vector fik-len) 1)) (null-space) (avoid-nspace-gain 0.01) (avoid-weight-gain 1.0) (avoid-collision-distance 200) (avoid-collision-null-gain 1.0) (avoid-collision-joint-gain 1.0) ((:collision-avoidance-link-pair pair-list) (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args)))) (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (additional-weight-list) (additional-nspace-list) (tmp-len (instantiate float-vector fik-len)) (tmp-len2 (instantiate float-vector fik-len)) (tmp-weight (instantiate float-vector fik-len)) (tmp-nspace (instantiate float-vector fik-len)) (tmp-mcc (make-matrix fik-len fik-len)) (tmp-mcc2 (make-matrix fik-len fik-len)) (debug-view) (jacobi) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52895"></A>
+<B>:inverse-kinematics-args</B> <EM>&amp;rest args &amp;key union-link-list rotation-axis translation-axis &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52905"></A>
+<B>:draw-collision-debug-view</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52915"></A>
+<B>:inverse-kinematics-loop</B> <EM>dif-pos dif-rot &amp;rest args &amp;key (stop 1) (loop 0) link-list move-target (rotation-axis (cond ((atom move-target) t) (t (make-list (length move-target) :initial-element t)))) (translation-axis (cond ((atom move-target) t) (t (make-list (length move-target) :initial-element t)))) (thre (cond ((atom move-target) 1) (t (make-list (length move-target) :initial-element 1)))) (rthre (cond ((atom move-target) (deg2rad 1)) (t (make-list (length move-target) :initial-element (deg2rad 1))))) (dif-pos-ratio 1.0) (dif-rot-ratio 1.0) union-link-list target-coords (jacobi) (additional-check) (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) debug-view ik-args &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52925"></A>
+<B>:ik-convergence-check</B> <EM>success dif-pos dif-rot rotation-axis translation-axis thre rthre centroid-thre target-centroid-pos centroid-offset-func cog-translation-axis &amp;key (update-mass-properties t)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52935"></A>
+<B>:calc-vel-from-pos</B> <EM>dif-pos translation-axis &amp;rest args &amp;key (p-limit 100.0) (tmp-v0 (instantiate float-vector 0)) (tmp-v1 (instantiate float-vector 1)) (tmp-v2 (instantiate float-vector 2)) (tmp-v3 (instantiate float-vector 3)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52945"></A>
+<B>:calc-vel-from-rot</B> <EM>dif-rot rotation-axis &amp;rest args &amp;key (r-limit 0.5) (tmp-v0 (instantiate float-vector 0)) (tmp-v1 (instantiate float-vector 1)) (tmp-v2 (instantiate float-vector 2)) (tmp-v3 (instantiate float-vector 3)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52955"></A>
+<B>:collision-check-pairs</B> <EM>&amp;key ((:links ls) (cons (car links) (all-child-links (car links))))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52965"></A>
+<B>:self-collision-check</B> <EM>&amp;key (mode :all) (pairs (send self :collision-check-pairs)) (collision-func 'pqp-collision-check)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52975"></A>
+<B>:calc-grasp-matrix</B> <EM>contact-points &amp;optional (ret (make-matrix 6 (6 (length contact-points))))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -461,50 +1913,1196 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<A NAME="56323"></A>
-<B>make-camera-from-param</B> <EM>&amp;key pwidth pheight fx fy cx cy (tx 0) (ty 0) parent-coords name  </EM>[関数]
+<A NAME="52985"></A>
+<B>eusmodel-validity-check</B> <EM>robot  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
-<DD> Create camera object from given parameters.
+<DD> Check if the robot model is validate
 </DD>
 </DL>
 <BR>
 <BR>
 
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="52995"></A>
+<B>calc-jacobian-default-rotate-vector</B> <EM>paxis world-default-coords child-reverse transform-coords tmp-v3 tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53006"></A>
+<B>calc-jacobian-rotational</B> <EM>fik row column joint paxis child-link world-default-coords child-reverse move-target transform-coords rotation-axis translation-axis tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53017"></A>
+<B>calc-jacobian-linear</B> <EM>fik row column joint paxis child-link world-default-coords child-reverse move-target transform-coords rotation-axis translation-axis tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53028"></A>
+<B>calc-angle-speed-gain-scalar</B> <EM>j dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53039"></A>
+<B>calc-angle-speed-gain-vector</B> <EM>j dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53050"></A>
+<B>all-child-links</B> <EM>s &amp;optional (pred #'identity)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53061"></A>
+<B>calc-dif-with-axis</B> <EM>dif axis &amp;optional tmp-v0 tmp-v1 tmp-v2  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53072"></A>
+<B>calc-target-joint-dimension</B> <EM>joint-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53083"></A>
+<B>calc-joint-angle-min-max-for-limit-calculation</B> <EM>j kk jamm  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53094"></A>
+<B>joint-angle-limit-weight</B> <EM>j-l &amp;optional (res (instantiate float-vector (calc-target-joint-dimension j-l)))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53105"></A>
+<B>joint-angle-limit-nspace</B> <EM>j-l &amp;optional (res (instantiate float-vector (calc-target-joint-dimension j-l)))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53116"></A>
+<B>calc-jacobian-from-link-list-including-robot-and-obj-virtual-joint</B> <EM>link-list move-target obj-move-target robot &amp;key (rotation-axis '(t t)) (translation-axis '(t t)) (fik (make-matrix (send robot :calc-target-axis-dimension rotation-axis translation-axis) (send robot :calc-target-joint-dimension link-list)))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53127"></A>
+<B>append-obj-virtual-joint</B> <EM>link-list target-coords &amp;key (joint-class 6dof-joint) (joint-args) (vplink) (vplink-coords) (vclink-coords)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53138"></A>
+<B>append-multiple-obj-virtual-joint</B> <EM>link-list target-coords &amp;key (joint-class '(6dof-joint)) (joint-args '(nil)) (vplink) (vplink-coords) (vclink-coords)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="53149"></A>
+<B>eusmodel-validity-check-one</B> <EM>robot  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+               
+ <BR>
+<BR> <BR> 
+<A NAME="54519"></A>
+<BIG CLASS="XLARGE"><B>bodyset </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>cascaded-coords</B> 
+<BR>  :slots 		 (geometry::bodies :type cons) 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54536"></A>
+<B>:init</B> <EM>coords &amp;rest args &amp;key (name (intern (format nil bodyset&nbsp;A (system:address self)) KEYWORD)) ((:bodies geometry::bs)) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Create bodyset object
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="54546"></A>
+<B>:bodies</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="54556"></A>
+<B>:faces</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="54566"></A>
+<B>:worldcoords</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="54576"></A>
+<B>:draw-on</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+
+<A NAME="54586"></A>
+<B>midcoords</B> <EM>geometry::p geometry::c1 geometry::c2  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns mid (or p) coordinates of given two cooridnates c1 and c2
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54596"></A>
+<B>orient-coords-to-axis</B> <EM>geometry::target-coords geometry::v &amp;optional (geometry::axis :z)  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> orient 'axis' in 'target-coords' to the direction specified by 'v' destructively.
+   'v' must be non-zero vector.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54606"></A>
+<B>geometry::face-to-triangle-aux</B> <EM>geometry::f  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> triangulate the face.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54616"></A>
+<B>geometry::face-to-triangle</B> <EM>geometry::f  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> convert face to set of triangles.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54626"></A>
+<B>geometry::face-to-tessel-triangle</B> <EM>geometry::f geometry::num  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> return polygon if triangable, return nil if it is not.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54636"></A>
+<B>body-to-faces</B> <EM>geometry::abody  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> return triangled faces of given body
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54646"></A>
+<B>make-sphere</B> <EM>geometry::r &amp;rest args  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> make sphere of given r
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54656"></A>
+<B>make-ring</B> <EM>geometry::ring-radius geometry::pipe-radius &amp;rest args &amp;key (geometry::segments 16)  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> make ring of given ring and pipe radius
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54666"></A>
+<B>x-of-cube</B> <EM>geometry::cub  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> return x of cube.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54676"></A>
+<B>y-of-cube</B> <EM>geometry::cub  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> return y of cube.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54686"></A>
+<B>z-of-cube</B> <EM>geometry::cub  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> return z of cube.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54696"></A>
+<B>height-of-cylinder</B> <EM>geometry::cyl  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> return height of cylinder.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54706"></A>
+<B>radius-of-cylinder</B> <EM>geometry::cyl  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> return radius of cylinder.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54716"></A>
+<B>radius-of-sphere</B> <EM>geometry::sp  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> return radius of shape.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54726"></A>
+<B>geometry::make-faceset-from-vertices</B> <EM>geometry::vs  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> create faceset from vertices.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="54736"></A>
+<B>matrix-to-euler-angle</B> <EM>geometry::m geometry::axis-order  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> return euler angle from matrix.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="54746"></A>
+<B>transform-coords</B> <EM>geometry::c1 geometry::c2 &amp;optional (geometry::c3 (let ((geometry::dim (send geometry::c1 :dimension))) (instance coordinates :newcoords (unit-matrix geometry::dim) (instantiate float-vector geometry::dim))))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="54757"></A>
+<B>geometry::face-to-triangle-rest-polygon</B> <EM>geometry::f geometry::num geometry::edgs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="54768"></A>
+<B>geometry::face-to-triangle-make-simple</B> <EM>geometry::f  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="54779"></A>
+<B>body-to-triangles</B> <EM>geometry::abody &amp;optional (geometry::limit 50)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="54790"></A>
+<B>geometry::triangle-to-triangle</B> <EM>geometry::aface &amp;optional (geometry::limit 50)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+               
+ <BR>
+<BR> <BR> 
+<A NAME="55182"></A>
+<BIG CLASS="XLARGE"><B>robot-model </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>cascaded-link</B> 
+<BR>  :slots 		 larm-end-coords rarm-end-coords lleg-end-coords rleg-end-coords head-end-coords torso-end-coords larm-root-link rarm-root-link lleg-root-link rleg-root-link head-root-link torso-root-link larm-collision-avoidance-links rarm-collision-avoidance-links larm rarm lleg rleg torso head force-sensors imu-sensors cameras 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55199"></A>
+<B>:camera</B> <EM>sensor-name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns camera with given name
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55209"></A>
+<B>:force-sensor</B> <EM>sensor-name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns force sensor with given name
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55219"></A>
+<B>:imu-sensor</B> <EM>sensor-name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns imu sensor of given name
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55229"></A>
+<B>:force-sensors</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns force sensors.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55239"></A>
+<B>:imu-sensors</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns imu sensors.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55249"></A>
+<B>:cameras</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns camera sensors.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55259"></A>
+<B>:look-at-hand</B> <EM>l/r  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> look at hand position, l/r supports :rarm, :larm, :arms, and '(:rarm :larm)
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55269"></A>
+<B>:inverse-kinematics</B> <EM>target-coords &amp;rest args &amp;key look-at-target (move-target) (link-list (if (atom move-target) (send self :link-list (send move-target :parent)) (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target))) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> solve inverse kinematics, move move-target to target-coords
+    look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords
+    link-list is set by default based on move-target -&gt;root link link-list
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55279"></A>
+<B>:inverse-kinematics-loop</B> <EM>dif-pos dif-rot &amp;rest args &amp;key target-coords debug-view look-at-target (move-target) (link-list (if (atom move-target) (send self :link-list (send move-target :parent)) (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target))) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> move move-target using dif-pos and dif-rot,
+    look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords
+    link-list is set by default based on move-target -&gt;root link link-list
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55289"></A>
+<B>:look-at-target</B> <EM>look-at-target &amp;key (target-coords)  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> move robot head to look at targets, look-at-target support t/nil float-vector coordinates, center of list of float-vector or list of coordinates
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55299"></A>
+<B>:init-pose</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Set robot to initial posture.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55309"></A>
+<B>:torque-vector</B> <EM>&amp;key (force-list) (moment-list) (target-coords) (debug-view nil) (calc-statics-p t) (dt 0.005) (av (send self :angle-vector)) (root-coords (send (car (send self :links)) :copy-worldcoords)) (calc-torque-buffer-args (send self :calc-torque-buffer-args))  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns torque vector
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55319"></A>
+<B>:fullbody-inverse-kinematics</B> <EM>target-coords &amp;rest args &amp;key (move-target) (link-list) (min (float-vector -500 -500 -500 -20 -20 -10)) (max (float-vector 500 500 25 20 20 10)) (root-link-virtual-joint-weight #f(0.1 0.1 0.1 0.1 0.5 0.5)) (target-centroid-pos (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos))) (cog-gain 1.0) (centroid-thre 5.0) (additional-weight-list) (joint-args nil) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> fullbody inverse kinematics for legged robot.
+     necessary args : target-coords, move-target, and link-list must include legs' (or leg's) parameters
+                      ex. (send robot:fullbody-inverse-kinematics (list rarm-tc rleg-tc lleg-tc) :move-target (list rarm-mt rleg-mt lleg-mt) :link-list (list rarm-ll rleg-ll lleg-ll))
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55329"></A>
+<B>:calc-zmp-from-forces-moments</B> <EM>forces moments &amp;key (wrt :world) (limbs '(:rleg :lleg)) (force-sensors (mapcar #'(lambda (l) (send self :force-sensor l)) limbs)) (cop-coords (mapcar #'(lambda (l) (send self l :end-coords)) limbs)) (fz-thre 0.001) (limb-cop-fz-list (mapcar #'(lambda (fs f m cc) (let ((fsp (scale 0.001 (send fs :worldpos))) (nf (send fs :rotate-vector f)) (nm (send fs :rotate-vector m))) (send self :calc-cop-from-force-moment nf nm fs cc :fz-thre fz-thre :return-all-values t))) force-sensors forces moments cop-coords))  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Calculate zmp[mm] from sensor local forces and moments
+       If force_z is large, zmp can be defined and returns 3D zmp.
+       Otherwise, zmp cannot be defined and returns nil.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55339"></A>
+<B>:foot-midcoords</B> <EM>&amp;optional (mid 0.5)  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Calculate midcoords of :rleg and :lleg end-coords.
+    In the following codes, leged robot is assumed.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55349"></A>
+<B>:fix-leg-to-coords</B> <EM>fix-coords &amp;optional (l/r :both) &amp;key (mid 0.5) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Fix robot's legs to a coords
+    In the following codes, leged robot is assumed.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55359"></A>
+<B>:move-centroid-on-foot</B> <EM>leg fix-limbs &amp;rest args &amp;key (thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) 1 5)) fix-limbs)) (rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) 1 5))) fix-limbs)) (mid 0.5) (target-centroid-pos (if (eq leg :both) (apply #'midpoint mid (mapcar #'(lambda (tmp-leg) (send self tmp-leg :end-coords :worldpos)) (remove-if-not #'(lambda (x) (memq x '(:rleg :lleg))) fix-limbs))) (send self leg :end-coords :worldpos))) (fix-limbs-target-coords (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) fix-limbs)) (root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5)) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Move robot COG to change centroid-on-foot location,
+    leg : legs for target of robot's centroid, which should be :both, :rleg, and :lleg.
+    fix-limbs : limb names which are fixed in this IK.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55369"></A>
+<B>:calc-walk-pattern-from-footstep-list</B> <EM>footstep-list &amp;key (default-step-height 50) (dt 0.1) (default-step-time 1.0) (solve-angle-vector-args) (debug-view nil) ((:all-limbs al) '(:rleg :lleg)) ((:default-zmp-offsets dzo) (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) (init-pose-function #'(lambda nil (send self :move-centroid-on-foot :both '(:rleg :lleg)))) (start-with-double-support t) (end-with-double-support t)  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Calculate walking pattern from foot step list and return pattern list as a list of angle-vector, root-coords, time, and so on.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55379"></A>
+<B>:gen-footstep-parameter</B> <EM>&amp;key (ratio 1.0)  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Generate footstep parameter
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55389"></A>
+<B>:go-pos-params-&gt;footstep-list</B> <EM>xx yy th &amp;key ((:footstep-parameter prm) (send self :footstep-parameter)) ((:default-half-offset defp) (cadr (memq :default-half-offset prm))) ((:forward-offset-length xx-max) (cadr (memq :forward-offset-length prm))) ((:outside-offset-length yy-max) (cadr (memq :outside-offset-length prm))) ((:rotate-rad th-max) (abs (rad2deg (cadr (memq :rotate-rad prm))))) (gen-go-pos-step-node-func #'(lambda (mc leg leg-translate-pos) (let ((cc (send (send mc :copy-worldcoords) :translate (cadr (assoc leg leg-translate-pos))))) (send cc :name leg) cc)))  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Calculate foot step list from goal x position [mm], goal y position [mm], and goal yaw orientation [deg].
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="55399"></A>
+<B>:limb</B> <EM>limb method &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55409"></A>
+<B>:inverse-kinematics-loop-for-look-at</B> <EM>limb &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55419"></A>
+<B>:gripper</B> <EM>limb &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55429"></A>
+<B>:get-sensor-method</B> <EM>sensor-type sensor-name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55439"></A>
+<B>:get-sensors-method-by-limb</B> <EM>sensors-type limb  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55449"></A>
+<B>:larm</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55459"></A>
+<B>:rarm</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55469"></A>
+<B>:lleg</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55479"></A>
+<B>:rleg</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55489"></A>
+<B>:head</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55499"></A>
+<B>:torso</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55509"></A>
+<B>:arms</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55519"></A>
+<B>:legs</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55529"></A>
+<B>:calc-force-from-joint-torque</B> <EM>limb all-torque &amp;key (move-target (send self limb :end-coords)) (use-torso)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55539"></A>
+<B>:joint-angle-limit-nspace-for-6dof</B> <EM>&amp;key (avoid-nspace-gain 0.01) (limbs '(:rleg :lleg))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55549"></A>
+<B>:joint-order</B> <EM>limb &amp;optional jname-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55559"></A>
+<B>:print-vector-for-robot-limb</B> <EM>vec  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55569"></A>
+<B>:draw-gg-debug-view</B> <EM>end-coords-list contact-state rz cog pz czmp dt  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="55579"></A>
+<B>:footstep-parameter</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="55589"></A>
+<B>make-default-robot-link</B> <EM>len radius axis name &amp;optional extbody  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
               
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html3021"
+<A NAME="tex2html3022"
   HREF="jmanual-node171.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3015"
-  HREF="jmanual-node144.html">
+<A NAME="tex2html3016"
+  HREF="jmanual-node145.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3009"
+<A NAME="tex2html3010"
   HREF="jmanual-node169.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3017"
+<A NAME="tex2html3018"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3019"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html3020"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3022"
-  HREF="jmanual-node171.html">環境モデル</A>
-<B> Up:</B> <A NAME="tex2html3016"
-  HREF="jmanual-node144.html">ロボットモデリング</A>
-<B> Previous:</B> <A NAME="tex2html3010"
-  HREF="jmanual-node169.html">ロボットモデル</A>
- &nbsp; <B>  <A NAME="tex2html3018"
+<B> Next:</B> <A NAME="tex2html3023"
+  HREF="jmanual-node171.html">センサモデル</A>
+<B> Up:</B> <A NAME="tex2html3017"
+  HREF="jmanual-node145.html">ロボットモデリング</A>
+<B> Previous:</B> <A NAME="tex2html3011"
+  HREF="jmanual-node169.html">実際のロボットモデル</A>
+ &nbsp; <B>  <A NAME="tex2html3019"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3020"
-  HREF="jmanual-node186.html">Index</A></B> </DIV>
+ &nbsp; <B>  <A NAME="tex2html3021"
+  HREF="jmanual-node187.html">Index</A></B> </DIV>
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

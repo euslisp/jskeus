@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>環境モデル</TITLE>
+<TITLE>センサモデル</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="環境モデル">
+<META NAME="description" CONTENT="センサモデル">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -21,53 +21,53 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="jmanual-node172.html">
 <LINK REL="previous" HREF="jmanual-node170.html">
-<LINK REL="up" HREF="jmanual-node144.html">
+<LINK REL="up" HREF="jmanual-node145.html">
 <LINK REL="next" HREF="jmanual-node172.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html3035"
+<A NAME="tex2html3036"
   HREF="jmanual-node172.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3029"
-  HREF="jmanual-node144.html">
+<A NAME="tex2html3030"
+  HREF="jmanual-node145.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3023"
+<A NAME="tex2html3024"
   HREF="jmanual-node170.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3031"
+<A NAME="tex2html3032"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3033"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html3034"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3036"
-  HREF="jmanual-node172.html">動力学計算・歩行動作生成</A>
-<B> Up:</B> <A NAME="tex2html3030"
-  HREF="jmanual-node144.html">ロボットモデリング</A>
-<B> Previous:</B> <A NAME="tex2html3024"
-  HREF="jmanual-node170.html">センサモデル</A>
- &nbsp; <B>  <A NAME="tex2html3032"
+<B> Next:</B> <A NAME="tex2html3037"
+  HREF="jmanual-node172.html">環境モデル</A>
+<B> Up:</B> <A NAME="tex2html3031"
+  HREF="jmanual-node145.html">ロボットモデリング</A>
+<B> Previous:</B> <A NAME="tex2html3025"
+  HREF="jmanual-node170.html">ロボットモデル</A>
+ &nbsp; <B>  <A NAME="tex2html3033"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3034"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3035"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION05016000000000000000">
-環境モデル</A>
+<H2><A NAME="SECTION05015000000000000000">
+センサモデル</A>
 </H2>
   
  <BR>
 <BR> <BR> 
-<A NAME="56617"></A>
-<BIG CLASS="XLARGE"><B>scene-model </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>cascaded-coords</B> 
-<BR>  :slots 		 name objs 
+<A NAME="56048"></A>
+<BIG CLASS="XLARGE"><B>sensor-model </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>body</B> 
+<BR>  :slots 		 data profile 
 </TT></PRE>
 <BR>
 <BR>
@@ -79,76 +79,84 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </DL>
 <BR>
 <BR>
-
-<A NAME="56634"></A>
-<B>:init</B> <EM>&amp;rest args &amp;key ((:name n) scene) ((:objects o))  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Create scene model
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="56644"></A>
-<B>:objects</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns objects in the scene.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="56654"></A>
-<B>:find-object</B> <EM>name  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns objects with given name.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="56664"></A>
-<B>:spots</B> <EM>&amp;optional name  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns spots in the scene. If name is given returns spot of given name.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="56674"></A>
-<B>:object</B> <EM>name  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns object of given name.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="56684"></A>
-<B>:spot</B> <EM>name  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns scene of given name.
-</DD>
-</DL>
-<BR>
-<BR>
-
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56694"></A>
-<B>:bodies</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="56065"></A>
+<B>:profile</B> <EM>&amp;optional p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="56075"></A>
+<B>:signal</B> <EM>rawinfo  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="56085"></A>
+<B>:simulate</B> <EM>model  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="56095"></A>
+<B>:read</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="56105"></A>
+<B>:draw-sensor</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="56115"></A>
+<B>:init</B> <EM>shape &amp;key name &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -164,39 +172,339 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </SMALL>
 
 <P>
+	<BR> 
+<A NAME="56126"></A>
+<BIG CLASS="XLARGE"><B>bumper-model </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>sensor-model</B> 
+<BR>  :slots 		 bumper-threshold 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56143"></A>
+<B>:init</B> <EM>b &amp;rest args &amp;key ((:bumper-threshold bt) 20) name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Create bumper model, b is the shape of an object and bt is the threshold in distance[mm].
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56153"></A>
+<B>:simulate</B> <EM>objs  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Simulate bumper, with given objects, return 1 if the sensor detects an object and 0 if not.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="56163"></A>
+<B>:draw</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="56173"></A>
+<B>:draw-sensor</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+	<BR> 
+<A NAME="56184"></A>
+<BIG CLASS="XLARGE"><B>camera-model </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>sensor-model</B> 
+<BR>  :slots 		 (vwing :forward (:projection :newprojection :view :viewpoint :view-direction :viewdistance :yon :hither)) pwidth pheight 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56201"></A>
+<B>:init</B> <EM>b &amp;rest args &amp;key ((:width pw) 320) ((:height ph) 240) (view-up #f(0.0 1.0 0.0)) (viewdistance 5.0) (hither 100.0) (yon 10000.0) &amp;allow-other-keys  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Create camera model. b is the shape of an object
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56211"></A>
+<B>:width</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns width of the camera in pixel.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56221"></A>
+<B>:height</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns height of the camera in pixel.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56231"></A>
+<B>:fovy</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns field of view in degree
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56241"></A>
+<B>:cx</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns center x.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56251"></A>
+<B>:cy</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns center y.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56261"></A>
+<B>:fx</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns focal length of x.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56271"></A>
+<B>:fy</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns focal length of y.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56281"></A>
+<B>:screen-point</B> <EM>pos  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns point in screen corresponds to the given pos.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56291"></A>
+<B>:3d-point</B> <EM>x y d  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns 3d position
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56301"></A>
+<B>:ray</B> <EM>x y  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns ray vector of given x and y.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="56311"></A>
+<B>:viewing</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="56321"></A>
+<B>:draw-on</B> <EM>&amp;rest args &amp;key ((:viewer vwer) viewer) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="56331"></A>
+<B>:draw-sensor</B> <EM>vwer &amp;key flush (width 1) (color (float-vector 1 1 1))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="56341"></A>
+<B>:draw-objects</B> <EM>vwr objs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="56351"></A>
+<B>:get-image</B> <EM>vwr &amp;key (points) (colors)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+
+<A NAME="56361"></A>
+<B>make-camera-from-param</B> <EM>&amp;key pwidth pheight fx fy cx cy (tx 0) (ty 0) parent-coords name  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> Create camera object from given parameters.
+</DD>
+</DL>
+<BR>
+<BR>
+
               
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html3035"
+<A NAME="tex2html3036"
   HREF="jmanual-node172.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3029"
-  HREF="jmanual-node144.html">
+<A NAME="tex2html3030"
+  HREF="jmanual-node145.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3023"
+<A NAME="tex2html3024"
   HREF="jmanual-node170.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3031"
+<A NAME="tex2html3032"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3033"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html3034"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3036"
-  HREF="jmanual-node172.html">動力学計算・歩行動作生成</A>
-<B> Up:</B> <A NAME="tex2html3030"
-  HREF="jmanual-node144.html">ロボットモデリング</A>
-<B> Previous:</B> <A NAME="tex2html3024"
-  HREF="jmanual-node170.html">センサモデル</A>
- &nbsp; <B>  <A NAME="tex2html3032"
+<B> Next:</B> <A NAME="tex2html3037"
+  HREF="jmanual-node172.html">環境モデル</A>
+<B> Up:</B> <A NAME="tex2html3031"
+  HREF="jmanual-node145.html">ロボットモデリング</A>
+<B> Previous:</B> <A NAME="tex2html3025"
+  HREF="jmanual-node170.html">ロボットモデル</A>
+ &nbsp; <B>  <A NAME="tex2html3033"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3034"
-  HREF="jmanual-node186.html">Index</A></B> </DIV>
+ &nbsp; <B>  <A NAME="tex2html3035"
+  HREF="jmanual-node187.html">Index</A></B> </DIV>
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

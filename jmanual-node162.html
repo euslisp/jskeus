@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>マスプロパティ計算</TITLE>
+<TITLE>ベースリンク仮想ジョイントヤコビアン</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="マスプロパティ計算">
+<META NAME="description" CONTENT="ベースリンク仮想ジョイントヤコビアン">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -21,212 +21,129 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="jmanual-node163.html">
 <LINK REL="previous" HREF="jmanual-node161.html">
-<LINK REL="up" HREF="jmanual-node151.html">
+<LINK REL="up" HREF="jmanual-node152.html">
 <LINK REL="next" HREF="jmanual-node163.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html2910"
+<A NAME="tex2html2911"
   HREF="jmanual-node163.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html2904"
-  HREF="jmanual-node151.html">
+<A NAME="tex2html2905"
+  HREF="jmanual-node152.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html2898"
+<A NAME="tex2html2899"
   HREF="jmanual-node161.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html2906"
+<A NAME="tex2html2907"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html2908"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html2909"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html2911"
-  HREF="jmanual-node163.html">運動量・角運動量ヤコビアン</A>
-<B> Up:</B> <A NAME="tex2html2905"
-  HREF="jmanual-node151.html">ロボットの動作生成</A>
-<B> Previous:</B> <A NAME="tex2html2899"
-  HREF="jmanual-node161.html">ベースリンク仮想ジョイントヤコビアン</A>
- &nbsp; <B>  <A NAME="tex2html2907"
+<B> Next:</B> <A NAME="tex2html2912"
+  HREF="jmanual-node163.html">マスプロパティ計算</A>
+<B> Up:</B> <A NAME="tex2html2906"
+  HREF="jmanual-node152.html">ロボットの動作生成</A>
+<B> Previous:</B> <A NAME="tex2html2900"
+  HREF="jmanual-node161.html">ベースリンク仮想ジョイントを用いた全身逆運動学法</A>
+ &nbsp; <B>  <A NAME="tex2html2908"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html2909"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2910"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION050121100000000000000">
-マスプロパティ計算</A>
+<H3><A NAME="SECTION050121000000000000000">
+ベースリンク仮想ジョイントヤコビアン</A>
 </H3>
-複数の質量・重心・慣性行列を統合し
-単一の質量・重心・慣性行列の組
-<!-- MATH
- $[m_{new}, \mbox{\boldmath {$c$}}_{new}, \mbox{\boldmath {$I$}}_{new}]$
- -->
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="52" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img232.png"
- ALT="$ [m_{new},$">&nbsp; &nbsp;<SPAN CLASS="MATH"><B><IMG
- WIDTH="11" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img233.png"
- ALT="$ c$"></B></SPAN><IMG
- WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img234.png"
- ALT="$ _{new},$">&nbsp; &nbsp;<SPAN CLASS="MATH"><B><IMG
+ベースリンク仮想ジョイントのヤコビアンは
+基礎ヤコビ行列の計算(Equation&nbsp;<A HREF="jmanual-node154.html#eq:basic-jacobian-column-vector"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;)
+を利用し，
+絶対座標系<SPAN CLASS="MATH"><B><IMG
+ WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img226.png"
+ ALT="$ x$"></B></SPAN>，<SPAN CLASS="MATH"><B><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img227.png"
+ ALT="$ y$"></B></SPAN>，<SPAN CLASS="MATH"><B><IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img235.png"
- ALT="$ I$"></B></SPAN><IMG
- WIDTH="33" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img236.png"
- ALT="$ _{new}]$"></B></SPAN>
-を計算する演算関数を次のように定義する．
-<P></P>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><!-- MATH
- \begin{equation}
-[m_{new}, \mbox{\boldmath {$c$}}_{new}, \mbox{\boldmath {$I$}}_{new}]
-= AddMassProperty(
-[m_{1}, \mbox{\boldmath {$c$}}_{1}, \mbox{\boldmath {$I$}}_{1}]
-,\hdots,
-[m_{K}, \mbox{\boldmath {$c$}}_{K}, \mbox{\boldmath {$I$}}_{K}]
-)
-\end{equation}
+ SRC="jmanual-img64.png"
+ ALT="$ z$"></B></SPAN>軸の直動関節と
+絶対座標系<SPAN CLASS="MATH"><B><IMG
+ WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img226.png"
+ ALT="$ x$"></B></SPAN>，<SPAN CLASS="MATH"><B><IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img227.png"
+ ALT="$ y$"></B></SPAN>，<SPAN CLASS="MATH"><B><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img64.png"
+ ALT="$ z$"></B></SPAN>軸回りの回転関節を
+それぞれ連結した<SPAN CLASS="MATH"><B><IMG
+ WIDTH="40" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img228.png"
+ ALT="$ 6\times6$"></B></SPAN>行列である．
+ちなみに,並進・回転成分のルートリンク仮想ジョイントのヤコビアンは
+以下のように書き下すこともできる.
+<BR>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:virtual-joint-jacobian"></A><!-- MATH
+ \begin{eqnarray}
+\mbox{\boldmath {$J$}}_{B,l} =
+\left[
+\begin{array}{cc}
+\mbox{\boldmath {$E$}}_3 &
+-\hat{\mbox{\boldmath {$p$}}}_{B\to l}\\
+\mbox{\boldmath {$0$}} & \mbox{\boldmath {$E$}}_3
+\end{array}
+\right]
+\end{eqnarray}
  -->
-<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
-<TR VALIGN="MIDDLE">
-<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
- WIDTH="52" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img237.png"
- ALT="$\displaystyle [m_{new},$">&nbsp; &nbsp;<IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img238.png"
- ALT="$\displaystyle \mbox{\boldmath {$c$}}$"><IMG
- WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img239.png"
- ALT="$\displaystyle _{new},$">&nbsp; &nbsp;<IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img240.png"
- ALT="$\displaystyle \mbox{\boldmath {$I$}}$"><IMG
- WIDTH="224" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img241.png"
- ALT="$\displaystyle _{new}] = AddMassProperty( [m_{1},$">&nbsp; &nbsp;<IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img238.png"
- ALT="$\displaystyle \mbox{\boldmath {$c$}}$"><IMG
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
  WIDTH="16" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img242.png"
- ALT="$\displaystyle _{1},$">&nbsp; &nbsp;<IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img240.png"
- ALT="$\displaystyle \mbox{\boldmath {$I$}}$"><IMG
- WIDTH="87" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img243.png"
- ALT="$\displaystyle _{1}] ,\hdots, [m_{K},$">&nbsp; &nbsp;<IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img238.png"
- ALT="$\displaystyle \mbox{\boldmath {$c$}}$"><IMG
- WIDTH="21" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img244.png"
- ALT="$\displaystyle _{K},$">&nbsp; &nbsp;<IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img240.png"
- ALT="$\displaystyle \mbox{\boldmath {$I$}}$"><IMG
- WIDTH="27" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img245.png"
- ALT="$\displaystyle _{K}] )$"></SPAN></TD>
-<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
-(<SPAN CLASS="arabic">30</SPAN>)</TD></TR>
+ SRC="jmanual-img126.png"
+ ALT="$\displaystyle \mbox{\boldmath {$J$}}$"><IMG
+ WIDTH="156" HEIGHT="54" BORDER="0"
+ SRC="jmanual-img229.png"
+ ALT="\begin{displaymath}_{B,l} =
+\left[
+\begin{array}{cc}
+\mbox{\boldmath {$E$}}_3 &amp;
+...
+...{\boldmath {$0$}} &amp; \mbox{\boldmath {$E$}}_3
+\end{array}\right]\end{displaymath}"></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
+(<SPAN CLASS="arabic">29</SPAN>)</TD></TR>
 </TABLE></DIV>
-<BR CLEAR="ALL"><P></P>
-これは次のような演算である．
-<P></P>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><!-- MATH
- \begin{equation}
-m_{new} = \sum_{j=1}^{K}m_{j}
-\end{equation}
- -->
-<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
-<TR VALIGN="MIDDLE">
-<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
- WIDTH="110" HEIGHT="68" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img246.png"
- ALT="$\displaystyle m_{new} = \sum_{j=1}^{K}m_{j}$"></SPAN></TD>
-<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
-(<SPAN CLASS="arabic">31</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL"><P></P>
-<P></P>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><!-- MATH
- \begin{equation}
-\mbox{\boldmath {$c$}}_{new} = \frac{1}{m_{new}}\sum_{j=1}^{K} m_j \mbox{\boldmath {$c$}}_j
-\end{equation}
- -->
-<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
-<TR VALIGN="MIDDLE">
-<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img238.png"
- ALT="$\displaystyle \mbox{\boldmath {$c$}}$"><IMG
- WIDTH="141" HEIGHT="68" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img247.png"
- ALT="$\displaystyle _{new} = \frac{1}{m_{new}}\sum_{j=1}^{K} m_j$">&nbsp; &nbsp;<IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img238.png"
- ALT="$\displaystyle \mbox{\boldmath {$c$}}$"><IMG
- WIDTH="11" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img248.png"
- ALT="$\displaystyle _j$"></SPAN></TD>
-<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
-(<SPAN CLASS="arabic">32</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL"><P></P>
-<P></P>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><!-- MATH
- \begin{equation}
-\mbox{\boldmath {$I$}}_{new} = \sum_{j=1}^{K}
-\left(
-\mbox{\boldmath {$I$}}_j + m_j \mbox{\boldmath {$D$}}(\mbox{\boldmath {$c$}}_{j} - \mbox{\boldmath {$c$}}_{new})
-\right)
-\end{equation}
- -->
-<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
-<TR VALIGN="MIDDLE">
-<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img240.png"
- ALT="$\displaystyle \mbox{\boldmath {$I$}}$"><IMG
- WIDTH="239" HEIGHT="68" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img249.png"
- ALT="$\displaystyle _{new} = \sum_{j=1}^{K} \left( \mbox{\boldmath {$I$}}_j + m_j \mb...
-...dmath {$D$}}(\mbox{\boldmath {$c$}}_{j} - \mbox{\boldmath {$c$}}_{new}) \right)$"></SPAN></TD>
-<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
-(<SPAN CLASS="arabic">33</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL"><P></P>
-ここで，<!-- MATH
- $\mbox{\boldmath {$D$}}(\mbox{\boldmath {$r$}})=\hat{\mbox{\boldmath {$r$}}}^T\hat{\mbox{\boldmath {$r$}}}$
+<BR CLEAR="ALL">
+
+<!-- MATH
+ $\mbox{\boldmath {$p$}}_{B\to l}$
  -->
 <SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img250.png"
- ALT="$ D$"></B></SPAN><IMG
- WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img129.png"
- ALT="$ ($"><SPAN CLASS="MATH"><B><IMG
- WIDTH="12" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img115.png"
- ALT="$ r$"></B></SPAN><IMG
- WIDTH="60" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img251.png"
- ALT="$ )=\hat{\mbox{\boldmath {$r$}}}^T\hat{\mbox{\boldmath {$r$}}}$"></B></SPAN>とする．
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img160.png"
+ ALT="$ p$"></B></SPAN><IMG
+ WIDTH="32" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img230.png"
+ ALT="$ _{B\to l}$"></B></SPAN>はベースリンク位置から添字<SPAN CLASS="MATH"><B><IMG
+ WIDTH="10" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img231.png"
+ ALT="$ l$"></B></SPAN>で表現する位置までの
+差分ベクトルである．
 
 <P>
 <BR><HR>
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

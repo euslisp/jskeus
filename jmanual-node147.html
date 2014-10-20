@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>EusLispによる幾何情報のモデリング</TITLE>
+<TITLE>ロボットのデータ構造と順運動学</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="EusLispによる幾何情報のモデリング">
+<META NAME="description" CONTENT="ロボットのデータ構造と順運動学">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -21,96 +21,203 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="jmanual-node148.html">
 <LINK REL="previous" HREF="jmanual-node146.html">
-<LINK REL="up" HREF="jmanual-node145.html">
+<LINK REL="up" HREF="jmanual-node146.html">
 <LINK REL="next" HREF="jmanual-node148.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html2689"
+<A NAME="tex2html2690"
   HREF="jmanual-node148.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html2683"
-  HREF="jmanual-node145.html">
+<A NAME="tex2html2684"
+  HREF="jmanual-node146.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html2677"
+<A NAME="tex2html2678"
   HREF="jmanual-node146.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html2685"
+<A NAME="tex2html2686"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html2687"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html2688"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html2690"
-  HREF="jmanual-node148.html">幾何情報の親子関係を利用したサンプルプログラム</A>
-<B> Up:</B> <A NAME="tex2html2684"
-  HREF="jmanual-node145.html">ロボットのデータ構造とモデリング</A>
-<B> Previous:</B> <A NAME="tex2html2678"
-  HREF="jmanual-node146.html">ロボットのデータ構造と順運動学</A>
- &nbsp; <B>  <A NAME="tex2html2686"
+<B> Next:</B> <A NAME="tex2html2691"
+  HREF="jmanual-node148.html">EusLispによる幾何情報のモデリング</A>
+<B> Up:</B> <A NAME="tex2html2685"
+  HREF="jmanual-node146.html">ロボットのデータ構造とモデリング</A>
+<B> Previous:</B> <A NAME="tex2html2679"
+  HREF="jmanual-node146.html">ロボットのデータ構造とモデリング</A>
+ &nbsp; <B>  <A NAME="tex2html2687"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html2688"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2689"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION05011200000000000000">
-EusLispによる幾何情報のモデリング</A>
+<H3><A NAME="SECTION05011100000000000000">
+ロボットのデータ構造と順運動学</A>
 </H3>
 
 <P>
-Euslispの幾何モデリングでは，基本モデル(body)の生成，bodyの合成関数，複
-合モデル(bodyset)の生成と3つの段階がある．
+ロボットの構造はリンクと関節から構成されていると考えることが出来るが，
+ロボットを関節とリンクに分割する方法として
+
+<UL>
+<LI>(a)切り離されるリンクの側に関節を含める
+</LI>
+<LI>(b)胴体，あるいは胴体に近いほうに関節を含める
+</LI>
+</UL>
+が考えられる．コンピュータのデータ構造を考慮し，
+(a)が利用されている．その理由は胴体以外のすべてのリンクにおいて，
+必ず関節を一つ含んだ構造となり，すべてのリンクを同一のアルゴリズムで扱う
+ことが出きるためである．
 
 <P>
-これまでに以下のような基本モデルの生成，合成が可能な事を見てきている．
-<PRE>
-(setq c1 (make-cube 100 100 100))
-(send c1 :locate #f(0 0 50))
-(send c1 :rotate (deg2rad 30) :x)
-(send c1 :set-color :yellow)
-(objects (list c1))
-
-(setq c2 (make-cylinder 50 100))
-(send c2 :move-to
-      (make-coords
-       :pos #f(20 30 40)
-       :rpy (float-vector 0 0 (deg2rad 90)))
-      :world)
-(send c2 :set-color :green)
-(objects (list c1 c2))
-
-(setq c3 (body+ c1 c2))
-(setq c4 (body- c1 c2))
-(setq c5 (body* c1 c2))
-</PRE>
+この様に分割されたリンクを計算機上で表現するためにはツリー構造を利用する
+ことが出来る．一般的にはツリー構造を作るときに二分木にすることでデータ構
+造を簡略化することが多い．
 
 <P>
-bodysetはirteusで導入された複合モデルであり，bodyで扱えない複数の物体や
-複数の色を扱うためのものである．
+ロボットのリンクにおける同次変換行列の求め方としては，関節回転座標系上に
+原点をもつ<SPAN CLASS="MATH"><IMG
+ WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img98.png"
+ ALT="$ \Sigma_j$"></SPAN>を設定し，親リンク座標系からみた回転軸ベクトルが
+<SPAN CLASS="MATH"><IMG
+ WIDTH="20" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img99.png"
+ ALT="$ a_j$"></SPAN>, <SPAN CLASS="MATH"><IMG
+ WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img98.png"
+ ALT="$ \Sigma_j$"></SPAN>の原点が<SPAN CLASS="MATH"><IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img100.png"
+ ALT="$ b_j$"></SPAN>であり，回転の関節角度を<SPAN CLASS="MATH"><IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img101.png"
+ ALT="$ q_j$"></SPAN>とする．
 
 <P>
-<PRE>
-(setq c1 (make-cube 100 100 100))
-(send c1 :set-color :red)
-(setq c2 (make-cylinder 30 100))
-(send c2 :set-color :green)
-(send c1 :assoc c2)           ;;; これを忘れいように
-(setq b1 (instance bodyset :init
-                   (make-cascoords)
-                   :bodies (list c1 c2)))
-(objects (list b1))
-</PRE>
+このとき<SPAN CLASS="MATH"><IMG
+ WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img98.png"
+ ALT="$ \Sigma_j$"></SPAN>の親リンク相対の同次変換行列は
+<P><!-- MATH
+ \begin{displaymath}
+{}^iT_j =
+ \left[
+ \begin{array}{cc}
+  e^{\hat{a}_jq_j} & b_j \\
+  0~0~0 & 1
+ \end{array}
+ \right]
+\end{displaymath}
+ -->
+</P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<IMG
+ WIDTH="144" HEIGHT="56" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img102.png"
+ ALT="$\displaystyle {}^iT_j =
+\left[
+\begin{array}{cc}
+e^{\hat{a}_jq_j} &amp; b_j \\
+0~0~0 &amp; 1
+\end{array} \right]
+$">
+</DIV><P></P>
+と書くことが出来る．
+
+<P>
+ここで，<!-- MATH
+ $e^{\hat{a}_jq_j}$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="37" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img103.png"
+ ALT="$ e^{\hat{a}_jq_j}$"></SPAN>は，一定速度の角速度ベクトルによって生ずる回
+転行列を与える以下のRodriguesの式を用いている．これを回転軸<SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img104.png"
+ ALT="$ a$"></SPAN>周りに
+<SPAN CLASS="MATH"><IMG
+ WIDTH="55" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img105.png"
+ ALT="$ wt[rad]$"></SPAN>だけ回転する回転行列を与えるものとして利用している．
+<P><!-- MATH
+ \begin{displaymath}
+e^{\hat{\omega}t} = E + \hat{a} sin (wt) + \hat{a}^2 (1 - cos(wt))
+\end{displaymath}
+ -->
+</P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<IMG
+ WIDTH="267" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img106.png"
+ ALT="$\displaystyle e^{\hat{\omega}t} = E + \hat{a} sin (wt) + \hat{a}^2 (1 - cos(wt))
+$">
+</DIV><P></P>
+
+<P>
+親リンクの位置姿勢<SPAN CLASS="MATH"><IMG
+ WIDTH="42" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img107.png"
+ ALT="$ p_i, R_i$"></SPAN>が既知だとすると，<SPAN CLASS="MATH"><IMG
+ WIDTH="21" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img108.png"
+ ALT="$ \Sigma_i$"></SPAN>の同次変換行列を
+<P><!-- MATH
+ \begin{displaymath}
+T_i =
+ \left[
+ \begin{array}{cc}
+  R_i & p_i \\
+  0~0~0 & 1
+ \end{array}
+ \right]
+\end{displaymath}
+ -->
+</P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<IMG
+ WIDTH="137" HEIGHT="54" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img109.png"
+ ALT="$\displaystyle T_i =
+\left[
+\begin{array}{cc}
+R_i &amp; p_i \\
+0~0~0 &amp; 1
+\end{array} \right]
+$">
+</DIV><P></P>
+と作ることができ，ここから
+<P><!-- MATH
+ \begin{displaymath}
+T_j = T_i ~ {}^iT_j
+\end{displaymath}
+ -->
+</P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay">
+<IMG
+ WIDTH="83" HEIGHT="36" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img110.png"
+ ALT="$\displaystyle T_j = T_i ~ {}^iT_j
+$">
+</DIV><P></P>
+として計算できる．これをロボットのルートリンクから初めてすべてのリンクに
+順次適用することでロボットの全身の関節角度情報から姿勢情報を算出すること
+ができ，これを順運動学と呼ぶ．
 
 <P>
 <BR><HR>
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

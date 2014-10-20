@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>ベースリンク仮想ジョイントヤコビアン</TITLE>
+<TITLE>ベースリンク仮想ジョイントを用いた全身逆運動学法</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="ベースリンク仮想ジョイントヤコビアン">
+<META NAME="description" CONTENT="ベースリンク仮想ジョイントを用いた全身逆運動学法">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -21,129 +21,103 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="jmanual-node162.html">
 <LINK REL="previous" HREF="jmanual-node160.html">
-<LINK REL="up" HREF="jmanual-node151.html">
+<LINK REL="up" HREF="jmanual-node152.html">
 <LINK REL="next" HREF="jmanual-node162.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html2896"
+<A NAME="tex2html2897"
   HREF="jmanual-node162.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html2890"
-  HREF="jmanual-node151.html">
+<A NAME="tex2html2891"
+  HREF="jmanual-node152.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html2884"
+<A NAME="tex2html2885"
   HREF="jmanual-node160.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html2892"
+<A NAME="tex2html2893"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html2894"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html2895"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html2897"
-  HREF="jmanual-node162.html">マスプロパティ計算</A>
-<B> Up:</B> <A NAME="tex2html2891"
-  HREF="jmanual-node151.html">ロボットの動作生成</A>
-<B> Previous:</B> <A NAME="tex2html2885"
-  HREF="jmanual-node160.html">ベースリンク仮想ジョイントを用いた全身逆運動学法</A>
- &nbsp; <B>  <A NAME="tex2html2893"
+<B> Next:</B> <A NAME="tex2html2898"
+  HREF="jmanual-node162.html">ベースリンク仮想ジョイントヤコビアン</A>
+<B> Up:</B> <A NAME="tex2html2892"
+  HREF="jmanual-node152.html">ロボットの動作生成</A>
+<B> Previous:</B> <A NAME="tex2html2886"
+  HREF="jmanual-node160.html">リンク間重複があるヤコビアン計算と関節角度計算</A>
+ &nbsp; <B>  <A NAME="tex2html2894"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html2895"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2896"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION050121000000000000000">
-ベースリンク仮想ジョイントヤコビアン</A>
+<H3><A NAME="SECTION05012900000000000000">
+ベースリンク仮想ジョイントを用いた全身逆運動学法</A>
 </H3>
-ベースリンク仮想ジョイントのヤコビアンは
-基礎ヤコビ行列の計算(Equation&nbsp;<A HREF="jmanual-node153.html#eq:basic-jacobian-column-vector"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;)
-を利用し，
-絶対座標系<SPAN CLASS="MATH"><B><IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img226.png"
- ALT="$ x$"></B></SPAN>，<SPAN CLASS="MATH"><B><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img227.png"
- ALT="$ y$"></B></SPAN>，<SPAN CLASS="MATH"><B><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img64.png"
- ALT="$ z$"></B></SPAN>軸の直動関節と
-絶対座標系<SPAN CLASS="MATH"><B><IMG
- WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img226.png"
- ALT="$ x$"></B></SPAN>，<SPAN CLASS="MATH"><B><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img227.png"
- ALT="$ y$"></B></SPAN>，<SPAN CLASS="MATH"><B><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img64.png"
- ALT="$ z$"></B></SPAN>軸回りの回転関節を
-それぞれ連結した<SPAN CLASS="MATH"><B><IMG
- WIDTH="40" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img228.png"
- ALT="$ 6\times6$"></B></SPAN>行列である．
-ちなみに,並進・回転成分のルートリンク仮想ジョイントのヤコビアンは
-以下のように書き下すこともできる.
-<BR>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:virtual-joint-jacobian"></A><!-- MATH
- \begin{eqnarray}
-\mbox{\boldmath {$J$}}_{B,l} =
-\left[
-\begin{array}{cc}
-\mbox{\boldmath {$E$}}_3 &
--\hat{\mbox{\boldmath {$p$}}}_{B\to l}\\
-\mbox{\boldmath {$0$}} & \mbox{\boldmath {$E$}}_3
-\end{array}
-\right]
-\end{eqnarray}
- -->
-<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="16" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img126.png"
- ALT="$\displaystyle \mbox{\boldmath {$J$}}$"><IMG
- WIDTH="156" HEIGHT="54" BORDER="0"
- SRC="jmanual-img229.png"
- ALT="\begin{displaymath}_{B,l} =
-\left[
-\begin{array}{cc}
-\mbox{\boldmath {$E$}}_3 &amp;
-...
-...{\boldmath {$0$}} &amp; \mbox{\boldmath {$E$}}_3
-\end{array}\right]\end{displaymath}"></TD>
-<TD>&nbsp;</TD>
-<TD>&nbsp;</TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">29</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL">
+一般に関節数が<SPAN CLASS="MATH"><B><IMG
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img207.png"
+ ALT="$ N$"></B></SPAN>であるのロボットの運動を表現するためには
+ベースリンクの位置姿勢と関節角自由度を合わせた<SPAN CLASS="MATH"><B><IMG
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img225.png"
+ ALT="$ N+6$"></B></SPAN>個の変数が必要であ
+る．
+ベースリンクとなる位置姿勢の変数を用いたロボットの運動の定式化は
+宇宙ロボット<A NAME="tex2html38"
+  HREF="jmanual-footnode.html#foot48163"><SUP><SPAN CLASS="arabic">15</SPAN></SUP></A>だけでなく,
+環境に固定されないヒューマノイドロボット
+<A NAME="tex2html39"
+  HREF="jmanual-footnode.html#foot48164"><SUP><SPAN CLASS="arabic">16</SPAN></SUP></A>の場合にも重要である.
 
-<!-- MATH
- $\mbox{\boldmath {$p$}}_{B\to l}$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img160.png"
- ALT="$ p$"></B></SPAN><IMG
- WIDTH="32" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img230.png"
- ALT="$ _{B\to l}$"></B></SPAN>はベースリンク位置から添字<SPAN CLASS="MATH"><B><IMG
- WIDTH="10" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img231.png"
- ALT="$ l$"></B></SPAN>で表現する位置までの
-差分ベクトルである．
+<P>
+ここでは
+腕・脚といったマニピュレータに
+ベースリンクに3自由度の直動関節と
+3自由度の回転関節が仮想的に付随したマニピュレータ構成を考える
+(Fig.<A HREF="#fig:base-link-virtual-joint"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;).
+上記の仮想的な6自由度関節を
+本研究ではベースリンク仮想ジョイントと名づける.
+ベースリンク仮想ジョイントを用いることにより
+ヒューマノイドの腰が動き全身関節が駆動され,
+運動学,ひいては動力学的な解空間が拡充されることが期待できる.
+
+<DIV ALIGN="CENTER"><A NAME="fig:base-link-virtual-joint"></A><A NAME="48170"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
+Concept of the Virtual Joint of the Base Link
+<BR>
+      (Left figure) Overview of the Robot Model
+<BR>
+      (Right figure) Skeleton Figure of Robot Model with the Virtual Joint
+    </CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+<IMG
+  WIDTH="427" HEIGHT="428" ALIGN="BOTTOM" BORDER="0"
+ SRC="./6dof-manip-glview.jpg"
+ ALT="Image 6dof-manip-glview">
+    <IMG
+  WIDTH="427" HEIGHT="428" ALIGN="BOTTOM" BORDER="0"
+ SRC="./6dof-manip-skelton.jpg"
+ ALT="Image 6dof-manip-skelton">
+    
+</DIV></TD></TR>
+</TABLE>
+</DIV>
 
 <P>
 <BR><HR>
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>

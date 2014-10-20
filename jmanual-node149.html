@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>bodyset-linkとjointを用いたロボット（多リンク系）のモデリング</TITLE>
+<TITLE>幾何情報の親子関係を利用したサンプルプログラム</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="bodyset-linkとjointを用いたロボット（多リンク系）のモデリング">
+<META NAME="description" CONTENT="幾何情報の親子関係を利用したサンプルプログラム">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -21,190 +21,68 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="jmanual-node150.html">
 <LINK REL="previous" HREF="jmanual-node148.html">
-<LINK REL="up" HREF="jmanual-node145.html">
+<LINK REL="up" HREF="jmanual-node146.html">
 <LINK REL="next" HREF="jmanual-node150.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html2717"
+<A NAME="tex2html2718"
   HREF="jmanual-node150.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html2711"
-  HREF="jmanual-node145.html">
+<A NAME="tex2html2712"
+  HREF="jmanual-node146.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html2705"
+<A NAME="tex2html2706"
   HREF="jmanual-node148.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html2713"
+<A NAME="tex2html2714"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html2715"
-  HREF="jmanual-node186.html">
+<A NAME="tex2html2716"
+  HREF="jmanual-node187.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html2718"
-  HREF="jmanual-node150.html">cascaded-linkを用いたロボット（多リンク系）のモデリング</A>
-<B> Up:</B> <A NAME="tex2html2712"
-  HREF="jmanual-node145.html">ロボットのデータ構造とモデリング</A>
-<B> Previous:</B> <A NAME="tex2html2706"
-  HREF="jmanual-node148.html">幾何情報の親子関係を利用したサンプルプログラム</A>
- &nbsp; <B>  <A NAME="tex2html2714"
+<B> Next:</B> <A NAME="tex2html2719"
+  HREF="jmanual-node150.html">bodyset-linkとjointを用いたロボット（多リンク系）のモデリング</A>
+<B> Up:</B> <A NAME="tex2html2713"
+  HREF="jmanual-node146.html">ロボットのデータ構造とモデリング</A>
+<B> Previous:</B> <A NAME="tex2html2707"
+  HREF="jmanual-node148.html">EusLispによる幾何情報のモデリング</A>
+ &nbsp; <B>  <A NAME="tex2html2715"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html2716"
-  HREF="jmanual-node186.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2717"
+  HREF="jmanual-node187.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION05011400000000000000">
-bodyset-linkとjointを用いたロボット（多リンク系）のモデリング</A>
+<H3><A NAME="SECTION05011300000000000000">
+幾何情報の親子関係を利用したサンプルプログラム</A>
 </H3>
 
 <P>
-irteusではロボットリンクを記述するクラスとしてbodyset-link(irtmodel.l)
-というクラスが用意されている．これは機構情報と幾何情報をもち，一般的な木
-構造でロボットの構造が表現されている．また，jointクラスを用いて関節情報
-を扱っている．
-
-<P>
 <PRE>
-(defclass bodyset-link
-  :super bodyset
-  :slots (joint parent-link child-links analysis-level default-coords
-                weight acentroid inertia-tensor
-                angular-velocity angular-acceleration
-                spacial-velocity spacial-acceleration
-                momentum-velocity angular-momentum-velocity
-                momentum angular-momentum
-                force moment ext-force ext-moment))
-</PRE>
-
-<P>
-ジョイント（関節）のモデリングはjointクラス(irtmodel.l)を用いる．jointクラスは基底ク
-ラスであり，実際にはrotational-joint, linear-joint等を利用する．
-jointの子クラスで作られた関節は，:joint-angleメソッドで関節角度を指定す
-ることが出来る．
-
-<P>
-<PRE>
-(defclass joint
-  :super propertied-object
-  :slots (parent-link child-link joint-angle min-angle max-angle
-	default-coords))
-(defmethod joint
-  (:init (&amp;key name
-               ((:child-link clink)) ((:parent-link plink))
-               (min -90) (max 90) &amp;allow-other-keys)
-         (send self :name name)
-         (setq parent-link plink child-link clink
-               min-angle min max-angle max)
-         self))
-
-(defclass rotational-joint
-  :super joint
-  :slots (axis))
-(defmethod rotational-joint
-  (:init (&amp;rest args &amp;key ((:axis ax) :z) &amp;allow-other-keys)
-         (setq axis ax joint-angle 0.0)
-         (send-super* :init args)
-         self)
-  (:joint-angle
-   (&amp;optional v)
-   (when v
-        (setq relang (- v joint-angle) joint-angle v)
-        (send child-link :rotate (deg2rad relang) axis)))
-     joint-angle))
-</PRE>
-
-<P>
-ここでは，joint, parent-link, child-links, defualt-coordsを利用する．
-
-<P>
-簡単な１関節ロボットの例としてサーボモジュールを作ってみると
-<PRE>
-(defun make-servo nil
-  (let (b1 b2)
-    (setq b1 (make-cube 35 20 46))
-    (send b1 :locate #f(9.5 0 0))
-    (setq b2 (make-cylinder 3 60))
-    (send b2 :locate #f(0 0 -30))
-    (setq b1 (body+ b1 b2))
-    (send b1 :set-color :gray20)
-    b1))
-
-(defun make-hinji nil
-  (let ((b2 (make-cube 22 16 58))
-        (b1 (make-cube 26 20 54)))
-    (send b2 :locate #f(-4 0 0))
-    (setq b2 (body- b2 b1))
-    (send b1 :set-color :gray80)
-    b2))
-
-(setq h1 (instance bodyset-link :init (make-cascoords) :bodies (list (make-hinji))))
-(setq s1 (instance bodyset-link :init (make-cascoords) :bodies (list (make-servo))))
-(setq j1 (instance rotational-joint :init :parent-link h1 :child-link s1 :axis :z))
-;; instance cascaded coords
-(setq r (instance cascaded-link :init))
-(send r :assoc h1)
-(send h1 :assoc s1)
-(setq (r . links) (list h1 s1))
-(setq (r . joint-list) (list j1))
-(send r :init-ending)
-</PRE>
-
-<P>
-となる．
-
-<P>
-ここでは，<code>h1</code>，<code>s1</code>という<code>bodyset-link</code>と，
-<code>j1</code>という<code>rotational-joint</code>を作成し，ここから
-<code>cascaded-link</code>という，連結リンクからなるモデルを生成している．
-<code>cascaded-link</code>は<code>cascaded-coords</code>の子クラスであるため，
-<code>r (cascaded-link)</code>，<code>h1</code>，<code>s1</code>の座標系の親子関係を
-<code>:assoc</code>を利用して設定している．
-
-<P>
-<code>(r . links)</code>という記法は<code>r</code>というオブジェクトのスロット変数
-     （メンバ変数）である<code>links</code>にアクセスしている．ここでは，
-<code>links</code>および<code>joint-list</code>に適切な値をセットし，
-<code>(send r :init-ending)</code>として必要な初期設定を行っている．
-
-<P>
-これで<code>r</code>という2つのリンクと１つの関節情報
-を含んだ1つのオブジェクトを生成できる．これで例えば
-<code>(objects (list h1 s1))</code>ではなく，
-<code>(objects (list r))</code>としてロボットをビューワに表示できる．
-また，<code>(send r :locate #f(100 0 0))</code>などの利用も可能になっている．
-
-<P>
-<code>cascaded-link</code>クラスのメソッドの利用例としては以下ある．
-<code>:joint-list</code>，<code>:links</code>といった関節リストやリンクリストへの
-アクセサに加え，関節角度ベクトルへのアクセスを提供する
-<code>:angle-vector</code>メソッドが重要である．これを引数なしで呼び出せば現
-在の関節角度が得られ，これに関節角度ベクトルを引数に与えて呼び出せば，その引
-数が示す関節角度ベクトルをロボットモデルに反映させることができる．
-<PRE>
-$ (objects (list r))
-(#&lt;servo-model #X628abb0  0.0 0.0 0.0 / 0.0 0.0 0.0&gt;)
-;; useful cascaded-link methods
-$ (send r :joint-list)
-(#&lt;rotational-joint #X6062990 :joint101067152&gt;)
-$ (send r :links)
-(#&lt;bodyset-link #X62ccb10 :bodyset103598864  0.0 0.0 0.0 / 0.0 0.0 0.0&gt;
- #&lt;bodyset-link #X6305830 :bodyset103831600  0.0 0.0 0.0 / 0.524 0.0 0.0&gt;)
-$ (send r :angle-vector)
-#f(0.0)
-$ (send r :angle-vector (float-vector 30))
-#f(30.0)
+(setq c1 (make-cube 100 100 100))
+(setq c2 (make-cube 50 50 50))
+(send c1 :set-color :red)
+(send c2 :set-color :blue)
+(send c2 :locate #f(300 0 0))
+(send c1 :assoc c2)
+(objects (list c1 c2))
+(do-until-key
+ (send c1 :rotate (deg2rad 5) :z)
+ (send *irtviewer* :draw-objects)
+ (x::window-main-one) ;; process window event
+ )
 </PRE>
 
 <P>
 <BR><HR>
 <ADDRESS>
 
-2014-09-29
+2014-10-20
 </ADDRESS>
 </BODY>
 </HTML>
