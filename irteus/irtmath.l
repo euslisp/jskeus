@@ -297,6 +297,22 @@
     (if (null tmp-mcr) (setq tmp-mcr (make-matrix c r)))
     (sqrt (max 0.0 (matrix-determinant (m* jacobi (transpose jacobi tmp-mcr) tmp-mrr))))))
 
+;; random
+(defun random-gauss (&optional (m 0) (s 1))
+  "make random gauss, m:mean s:standard-deviation"
+  (let ((x1 (random 1.0)) (x2 (random 1.0)))
+    (+ (* (sqrt (* -2.0 s s (log x1))) (cos (* 2 pi x2))) m)))
+
+(defun gaussian-random (dim &optional (m 0) (s 1))
+  "make random gauss vector, replacement for quasi-random defined in matlib.c"
+  (let ((res (instantiate float-vector dim)))
+    (if (numberp m) (setq m (make-list dim :initial-element m)))
+    (if (numberp s) (setq s (make-list dim :initial-element s)))
+    (dotimes (i dim)
+      (setf (aref res i) (random-gauss (elt m i) (elt s i))))
+    res))
+
+
 ;;
 ;; re-define
 ;;
