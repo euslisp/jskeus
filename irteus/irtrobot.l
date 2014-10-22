@@ -351,6 +351,7 @@
    )
   (:calc-force-from-joint-torque
    (limb all-torque &key (move-target (send self limb :end-coords)) (use-torso))
+   "Calculates end-effector force and moment from joint torques."
    (let* ((link-list
 	   (send self :link-list
 		 (send move-target :parent)
