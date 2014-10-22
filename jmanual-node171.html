@@ -64,7 +64,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   
  <BR>
 <BR> <BR> 
-<A NAME="56048"></A>
+<A NAME="56047"></A>
 <BIG CLASS="XLARGE"><B>sensor-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>body</B> 
 <BR>  :slots 		 data profile 
@@ -80,7 +80,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56065"></A>
+<A NAME="56064"></A>
 <B>:profile</B> <EM>&amp;optional p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -95,7 +95,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56075"></A>
+<A NAME="56074"></A>
 <B>:signal</B> <EM>rawinfo  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -110,7 +110,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56085"></A>
+<A NAME="56084"></A>
 <B>:simulate</B> <EM>model  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -125,7 +125,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56095"></A>
+<A NAME="56094"></A>
 <B>:read</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -140,7 +140,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56105"></A>
+<A NAME="56104"></A>
 <B>:draw-sensor</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -155,7 +155,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56115"></A>
+<A NAME="56114"></A>
 <B>:init</B> <EM>shape &amp;key name &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -173,7 +173,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="56126"></A>
+<A NAME="56125"></A>
 <BIG CLASS="XLARGE"><B>bumper-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>sensor-model</B> 
 <BR>  :slots 		 bumper-threshold 
@@ -189,7 +189,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56143"></A>
+<A NAME="56142"></A>
 <B>:init</B> <EM>b &amp;rest args &amp;key ((:bumper-threshold bt) 20) name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -200,7 +200,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56153"></A>
+<A NAME="56152"></A>
 <B>:simulate</B> <EM>objs  </EM>[メソッド]
 
 <DL COMPACT>
@@ -212,7 +212,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56163"></A>
+<A NAME="56162"></A>
 <B>:draw</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -227,7 +227,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56173"></A>
+<A NAME="56172"></A>
 <B>:draw-sensor</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -245,7 +245,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="56184"></A>
+<A NAME="56183"></A>
 <BIG CLASS="XLARGE"><B>camera-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>sensor-model</B> 
 <BR>  :slots 		 (vwing :forward (:projection :newprojection :view :viewpoint :view-direction :viewdistance :yon :hither)) pwidth pheight 
@@ -261,7 +261,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56201"></A>
+<A NAME="56200"></A>
 <B>:init</B> <EM>b &amp;rest args &amp;key ((:width pw) 320) ((:height ph) 240) (view-up #f(0.0 1.0 0.0)) (viewdistance 5.0) (hither 100.0) (yon 10000.0) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -272,7 +272,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56211"></A>
+<A NAME="56210"></A>
 <B>:width</B> [メソッド]
 
 <DL COMPACT>
@@ -283,7 +283,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56221"></A>
+<A NAME="56220"></A>
 <B>:height</B> [メソッド]
 
 <DL COMPACT>
@@ -294,7 +294,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56231"></A>
+<A NAME="56230"></A>
 <B>:fovy</B> [メソッド]
 
 <DL COMPACT>
@@ -305,7 +305,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56241"></A>
+<A NAME="56240"></A>
 <B>:cx</B> [メソッド]
 
 <DL COMPACT>
@@ -316,7 +316,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56251"></A>
+<A NAME="56250"></A>
 <B>:cy</B> [メソッド]
 
 <DL COMPACT>
@@ -327,7 +327,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56261"></A>
+<A NAME="56260"></A>
 <B>:fx</B> [メソッド]
 
 <DL COMPACT>
@@ -338,7 +338,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56271"></A>
+<A NAME="56270"></A>
 <B>:fy</B> [メソッド]
 
 <DL COMPACT>
@@ -349,7 +349,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56281"></A>
+<A NAME="56280"></A>
 <B>:screen-point</B> <EM>pos  </EM>[メソッド]
 
 <DL COMPACT>
@@ -360,7 +360,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56291"></A>
+<A NAME="56290"></A>
 <B>:3d-point</B> <EM>x y d  </EM>[メソッド]
 
 <DL COMPACT>
@@ -371,7 +371,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56301"></A>
+<A NAME="56300"></A>
 <B>:ray</B> <EM>x y  </EM>[メソッド]
 
 <DL COMPACT>
@@ -383,7 +383,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56311"></A>
+<A NAME="56310"></A>
 <B>:viewing</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -398,7 +398,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56321"></A>
+<A NAME="56320"></A>
 <B>:draw-on</B> <EM>&amp;rest args &amp;key ((:viewer vwer) viewer) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -413,7 +413,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56331"></A>
+<A NAME="56330"></A>
 <B>:draw-sensor</B> <EM>vwer &amp;key flush (width 1) (color (float-vector 1 1 1))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -428,7 +428,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56341"></A>
+<A NAME="56340"></A>
 <B>:draw-objects</B> <EM>vwr objs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -443,7 +443,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="56351"></A>
+<A NAME="56350"></A>
 <B>:get-image</B> <EM>vwr &amp;key (points) (colors)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -461,7 +461,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<A NAME="56361"></A>
+<A NAME="56360"></A>
 <B>make-camera-from-param</B> <EM>&amp;key pwidth pheight fx fy cx cy (tx 0) (ty 0) parent-coords name  </EM>[関数]
 
 <DL COMPACT>
@@ -504,7 +504,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2014-10-20
+2014-10-22
 </ADDRESS>
 </BODY>
 </HTML>

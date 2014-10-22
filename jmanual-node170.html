@@ -2518,7 +2518,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
                
  <BR>
 <BR> <BR> 
-<A NAME="55182"></A>
+<A NAME="55181"></A>
 <BIG CLASS="XLARGE"><B>robot-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>cascaded-link</B> 
 <BR>  :slots 		 larm-end-coords rarm-end-coords lleg-end-coords rleg-end-coords head-end-coords torso-end-coords larm-root-link rarm-root-link lleg-root-link rleg-root-link head-root-link torso-root-link larm-collision-avoidance-links rarm-collision-avoidance-links larm rarm lleg rleg torso head force-sensors imu-sensors cameras 
@@ -2534,7 +2534,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55199"></A>
+<A NAME="55198"></A>
 <B>:camera</B> <EM>sensor-name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2545,7 +2545,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55209"></A>
+<A NAME="55208"></A>
 <B>:force-sensor</B> <EM>sensor-name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2556,7 +2556,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55219"></A>
+<A NAME="55218"></A>
 <B>:imu-sensor</B> <EM>sensor-name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2567,7 +2567,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55229"></A>
+<A NAME="55228"></A>
 <B>:force-sensors</B> [メソッド]
 
 <DL COMPACT>
@@ -2578,7 +2578,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55239"></A>
+<A NAME="55238"></A>
 <B>:imu-sensors</B> [メソッド]
 
 <DL COMPACT>
@@ -2589,7 +2589,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55249"></A>
+<A NAME="55248"></A>
 <B>:cameras</B> [メソッド]
 
 <DL COMPACT>
@@ -2600,7 +2600,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55259"></A>
+<A NAME="55258"></A>
 <B>:look-at-hand</B> <EM>l/r  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2611,7 +2611,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55269"></A>
+<A NAME="55268"></A>
 <B>:inverse-kinematics</B> <EM>target-coords &amp;rest args &amp;key look-at-target (move-target) (link-list (if (atom move-target) (send self :link-list (send move-target :parent)) (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target))) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2624,7 +2624,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55279"></A>
+<A NAME="55278"></A>
 <B>:inverse-kinematics-loop</B> <EM>dif-pos dif-rot &amp;rest args &amp;key target-coords debug-view look-at-target (move-target) (link-list (if (atom move-target) (send self :link-list (send move-target :parent)) (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target))) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2637,7 +2637,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55289"></A>
+<A NAME="55288"></A>
 <B>:look-at-target</B> <EM>look-at-target &amp;key (target-coords)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2648,7 +2648,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55299"></A>
+<A NAME="55298"></A>
 <B>:init-pose</B> [メソッド]
 
 <DL COMPACT>
@@ -2659,7 +2659,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55309"></A>
+<A NAME="55308"></A>
 <B>:torque-vector</B> <EM>&amp;key (force-list) (moment-list) (target-coords) (debug-view nil) (calc-statics-p t) (dt 0.005) (av (send self :angle-vector)) (root-coords (send (car (send self :links)) :copy-worldcoords)) (calc-torque-buffer-args (send self :calc-torque-buffer-args))  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2670,7 +2670,18 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55319"></A>
+<A NAME="55318"></A>
+<B>:calc-force-from-joint-torque</B> <EM>limb all-torque &amp;key (move-target (send self limb :end-coords)) (use-torso)  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Calculates end-effector force and moment from joint torques.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55328"></A>
 <B>:fullbody-inverse-kinematics</B> <EM>target-coords &amp;rest args &amp;key (move-target) (link-list) (min (float-vector -500 -500 -500 -20 -20 -10)) (max (float-vector 500 500 25 20 20 10)) (root-link-virtual-joint-weight #f(0.1 0.1 0.1 0.1 0.5 0.5)) (target-centroid-pos (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos))) (cog-gain 1.0) (centroid-thre 5.0) (additional-weight-list) (joint-args nil) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2683,7 +2694,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55329"></A>
+<A NAME="55338"></A>
 <B>:calc-zmp-from-forces-moments</B> <EM>forces moments &amp;key (wrt :world) (limbs '(:rleg :lleg)) (force-sensors (mapcar #'(lambda (l) (send self :force-sensor l)) limbs)) (cop-coords (mapcar #'(lambda (l) (send self l :end-coords)) limbs)) (fz-thre 0.001) (limb-cop-fz-list (mapcar #'(lambda (fs f m cc) (let ((fsp (scale 0.001 (send fs :worldpos))) (nf (send fs :rotate-vector f)) (nm (send fs :rotate-vector m))) (send self :calc-cop-from-force-moment nf nm fs cc :fz-thre fz-thre :return-all-values t))) force-sensors forces moments cop-coords))  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2696,7 +2707,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55339"></A>
+<A NAME="55348"></A>
 <B>:foot-midcoords</B> <EM>&amp;optional (mid 0.5)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2708,7 +2719,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55349"></A>
+<A NAME="55358"></A>
 <B>:fix-leg-to-coords</B> <EM>fix-coords &amp;optional (l/r :both) &amp;key (mid 0.5) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2720,7 +2731,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55359"></A>
+<A NAME="55368"></A>
 <B>:move-centroid-on-foot</B> <EM>leg fix-limbs &amp;rest args &amp;key (thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) 1 5)) fix-limbs)) (rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) 1 5))) fix-limbs)) (mid 0.5) (target-centroid-pos (if (eq leg :both) (apply #'midpoint mid (mapcar #'(lambda (tmp-leg) (send self tmp-leg :end-coords :worldpos)) (remove-if-not #'(lambda (x) (memq x '(:rleg :lleg))) fix-limbs))) (send self leg :end-coords :worldpos))) (fix-limbs-target-coords (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) fix-limbs)) (root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5)) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2733,7 +2744,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55369"></A>
+<A NAME="55378"></A>
 <B>:calc-walk-pattern-from-footstep-list</B> <EM>footstep-list &amp;key (default-step-height 50) (dt 0.1) (default-step-time 1.0) (solve-angle-vector-args) (debug-view nil) ((:all-limbs al) '(:rleg :lleg)) ((:default-zmp-offsets dzo) (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) (init-pose-function #'(lambda nil (send self :move-centroid-on-foot :both '(:rleg :lleg)))) (start-with-double-support t) (end-with-double-support t)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2744,7 +2755,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55379"></A>
+<A NAME="55388"></A>
 <B>:gen-footstep-parameter</B> <EM>&amp;key (ratio 1.0)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2755,7 +2766,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="55389"></A>
+<A NAME="55398"></A>
 <B>:go-pos-params-&gt;footstep-list</B> <EM>xx yy th &amp;key ((:footstep-parameter prm) (send self :footstep-parameter)) ((:default-half-offset defp) (cadr (memq :default-half-offset prm))) ((:forward-offset-length xx-max) (cadr (memq :forward-offset-length prm))) ((:outside-offset-length yy-max) (cadr (memq :outside-offset-length prm))) ((:rotate-rad th-max) (abs (rad2deg (cadr (memq :rotate-rad prm))))) (gen-go-pos-step-node-func #'(lambda (mc leg leg-translate-pos) (let ((cc (send (send mc :copy-worldcoords) :translate (cadr (assoc leg leg-translate-pos))))) (send cc :name leg) cc)))  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2767,7 +2778,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="55399"></A>
+<A NAME="55408"></A>
 <B>:limb</B> <EM>limb method &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2782,7 +2793,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55409"></A>
+<A NAME="55418"></A>
 <B>:inverse-kinematics-loop-for-look-at</B> <EM>limb &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2797,7 +2808,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55419"></A>
+<A NAME="55428"></A>
 <B>:gripper</B> <EM>limb &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2812,7 +2823,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55429"></A>
+<A NAME="55438"></A>
 <B>:get-sensor-method</B> <EM>sensor-type sensor-name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2827,7 +2838,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55439"></A>
+<A NAME="55448"></A>
 <B>:get-sensors-method-by-limb</B> <EM>sensors-type limb  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2842,7 +2853,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55449"></A>
+<A NAME="55458"></A>
 <B>:larm</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2857,7 +2868,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55459"></A>
+<A NAME="55468"></A>
 <B>:rarm</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2872,7 +2883,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55469"></A>
+<A NAME="55478"></A>
 <B>:lleg</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2887,7 +2898,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55479"></A>
+<A NAME="55488"></A>
 <B>:rleg</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2902,7 +2913,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55489"></A>
+<A NAME="55498"></A>
 <B>:head</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2917,7 +2928,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55499"></A>
+<A NAME="55508"></A>
 <B>:torso</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2932,7 +2943,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55509"></A>
+<A NAME="55518"></A>
 <B>:arms</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2947,7 +2958,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55519"></A>
+<A NAME="55528"></A>
 <B>:legs</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2962,22 +2973,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55529"></A>
-<B>:calc-force-from-joint-torque</B> <EM>limb all-torque &amp;key (move-target (send self limb :end-coords)) (use-torso)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD> 
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-
-<A NAME="55539"></A>
+<A NAME="55538"></A>
 <B>:joint-angle-limit-nspace-for-6dof</B> <EM>&amp;key (avoid-nspace-gain 0.01) (limbs '(:rleg :lleg))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2992,7 +2988,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55549"></A>
+<A NAME="55548"></A>
 <B>:joint-order</B> <EM>limb &amp;optional jname-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3007,7 +3003,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55559"></A>
+<A NAME="55558"></A>
 <B>:print-vector-for-robot-limb</B> <EM>vec  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3022,7 +3018,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55569"></A>
+<A NAME="55568"></A>
 <B>:draw-gg-debug-view</B> <EM>end-coords-list contact-state rz cog pz czmp dt  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3037,7 +3033,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="55579"></A>
+<A NAME="55578"></A>
 <B>:footstep-parameter</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3055,7 +3051,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="55589"></A>
+<A NAME="55588"></A>
 <B>make-default-robot-link</B> <EM>len radius axis name &amp;optional extbody  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -3102,7 +3098,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2014-10-20
+2014-10-22
 </ADDRESS>
 </BODY>
 </HTML>
