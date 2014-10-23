@@ -924,6 +924,7 @@
 	      (tmp-v3b (instantiate float-vector 3))
 	      (tmp-m33 (make-matrix 3 3))
 	      &allow-other-keys)
+   "Calculate jacobian matrix from link-list and move-target. Unit system is [m] or [rad], not [mm] or [deg]."
    (let* (len ul row
 	  child-reverse union-link-list
 	  j)
