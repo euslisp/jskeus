@@ -51,7 +51,7 @@
   (:draw-objects
     (&rest args)
     (send* (get self :pickviewer) :draw-objects args)))
-
+(defvar gl::*light3*)
 (defclass irtviewer
   :super x::panel
   :slots (viewer
@@ -93,27 +93,42 @@
      (setf (get viewer :pickviewer) self)
      (setq user::*viewer* viewer)
 
-     (setq gl::*light0* 
-       (instance gl::lightsource :create 0
-		 :ambient (float-vector 0.2 0.2 0.2 1.0)
-		 :diffuse (float-vector 0.6 0.6 0.6 1.0)
-		 :specular (float-vector 0.4 0.4 0.4 1.0)
-		 :position (float-vector 1.0 2.0 1.5 0.0)))
-     (setq gl::*light1*
-       (instance gl::lightsource :create 1
-		 :ambient (float-vector 0.1 0.1 0.1 1.0)
-		 :diffuse (float-vector 0.2 0.2 0.2 1.0)
-		 :specular (float-vector 0.4 0.4 0.4 1.0)
-		 :position (float-vector -1.0 -2.0 0.0 0.0)))
-     (setq  gl::*light2*
-       (instance gl::lightsource :create 2
-		 :ambient (float-vector 0.1 0.1 0.1 1.0)
-		 :diffuse (float-vector 0.2 0.2 0.2 1.0)
-		 :specular (float-vector 0.4 0.4 0.4 1.0)
-		 :position (float-vector -1.0 -2.0 -1.0 0.0)))
+     (let ((default-ambient (float-vector 0.1 0.1 0.1 1.0))
+           (default-diffuse (float-vector 1.0 1.0 1.0 1.0))
+           (default-specular (float-vector 0.1 0.1 0.1 1.0))
+           (scale-light0 1.00)
+           (scale-light1 0.70)
+           (scale-light2 0.40)
+           (scale-light3 0.25))
+       (setq gl::*light0* ;; from back
+             (instance gl::lightsource :create 0
+                       :ambient (scale scale-light0 default-ambient)
+                       :diffuse (scale scale-light0 default-diffuse)
+                       :specular (scale scale-light0 default-specular)
+                       :position (float-vector 4000.0 3000.0 0.0 0.0)))
+       (setq gl::*light1* ;; from front-left
+             (instance gl::lightsource :create 1
+                       :ambient (scale scale-light1 default-ambient)
+                       :diffuse (scale scale-light1 default-diffuse)
+                       :specular (scale scale-light1 default-specular)
+                       :position (float-vector -4000.0 -2000.0 -2000.0 0.0)))
+       (setq gl::*light2* ;; from front-left
+             (instance gl::lightsource :create 2
+                       :ambient (scale scale-light2 default-ambient)
+                       :diffuse (scale scale-light2 default-diffuse)
+                       :specular (scale scale-light2 default-specular)
+                       :position (float-vector -2000.0 -2000.0 2500.0 0.0)))
+       (setq gl::*light3*
+             (instance gl::lightsource :create 3
+                       :ambient (scale scale-light3 default-ambient)
+                       :diffuse (scale scale-light3 default-diffuse)
+                       :specular (scale scale-light3 default-specular)
+                       :position (float-vector 0.0 0.0 0.0 1.0)))
+       )
      (send gl::*light0* :opengl)
      (send gl::*light1* :opengl)
      (send gl::*light2* :opengl)
+     (send gl::*light3* :opengl)
      ;;
      (send viewer :viewsurface :set-event-proc
 	   :buttonrelease-left :draw-event self)
