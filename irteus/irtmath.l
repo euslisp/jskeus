@@ -138,6 +138,8 @@
 (defun quaternion2matrix (q)
   "returns matrix of given quaternion"
   (let ((q0 (elt q 0)) (q1 (elt q 1)) (q2 (elt q 2)) (q3 (elt q 3)))
+    (unless (eps= (v. q q) 1.0 0.01)
+        (warning-message 1 ";; quaternion2matrix : invalid input ~A, the norm is not 1~%" q))
     (make-matrix 
      3 3
      (list
