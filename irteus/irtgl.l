@@ -1057,6 +1057,61 @@
    bbox)
   )
 
+;;; glvertices utility
+(defun make-glvertices-from-faceset (fs &key (material))
+  "returns glvertices instance
+fs is geomatry::faceset"
+  (let (mat)
+    (cond
+     (material (setq mat material))
+     ((get fs :face-color)
+      (let ((col (get fs :face-color)))
+        (unless (vectorp col)
+          (setq col (gl::find-color col)))
+        (setq mat
+              (list (list :ambient (float-vector (elt col 0) (elt col 1) (elt col 2)))
+                    (list :diffuse (float-vector (elt col 0) (elt col 1) (elt col 2)))))))
+     (t ;; use default material
+      (setq mat
+            (list (list :ambient (float-vector 0.65 0.65 0.65))
+                  (list :diffuse (float-vector 0.65 0.65 0.65))))))
+    (make-glvertices-from-faces (send fs :faces) :material mat)))
+
+(defun make-glvertices-from-faces (flst &key (material))
+  "returns glvertices instance
+flst is list of geomatry::face"
+  (setq flst (flatten (mapcar #'(lambda (f) (geometry::face-to-triangle-aux f)) flst)))
+  (let ((mat (make-matrix (* 3 (length flst)) 3))
+        (nom (make-matrix (* 3 (length flst)) 3))
+        (idx (instantiate integer-vector (* 3 (length flst))))
+        (cntr 0))
+    (dolist (f flst)
+      (let ((nm (normalize-vector (send f :normal)))
+            (vsl (send f :vertices)))
+        ;;
+        (user::c-matrix-row mat cntr (car vsl) t)
+        (user::c-matrix-row nom cntr nm t)
+        (incf cntr)
+        ;;
+        (user::c-matrix-row mat cntr (cadr vsl) t)
+        (user::c-matrix-row nom cntr nm t)
+        (incf cntr)
+        ;;
+        (user::c-matrix-row mat cntr (caddr vsl) t)
+        (user::c-matrix-row nom cntr nm t)
+        (incf cntr)
+        ))
+    (dotimes (i (length idx)) (setf (elt idx i) i))
+    (let ((msh
+           (list (list :type :triangles)
+                 (list :vertices mat)
+                 (list :normals nom)
+                 (list :indices idx))))
+      (when material
+        (push (list :material material) msh))
+      (instance gl::glvertices :init (list msh)))
+    ))
+
 #| ;; sample of glvertices
 (setq ver-lst (list
 (float-vector 0 0 0) (float-vector 1 0 0) (float-vector 1 1 0) (float-vector 0 1 0)
