@@ -499,7 +499,7 @@
   )
 
 (defmethod faceset
-  (:set-color    
+  (:set-color
    (color &optional (transparent))
    "Set color of given color name, color sample and color name are referenced from http://en.wikipedia.org/wiki/X11_color_names"
    (delete-displaylist-id (get self :GL-DISPLAYLIST-ID))
