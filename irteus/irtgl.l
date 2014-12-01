@@ -445,7 +445,7 @@
        ((symbolp color)
 	(setq c (find-if #'(lambda (o) (eq (send o :name) color))
 			 *face-colors*))
-	(when c (send c :diffuse)))
+	(if c (send c :diffuse) (warn "Color name not found ")))
        (t color)))
     (unless v (setq v (float-vector 0.5 0.5 0.5)))
     v))
@@ -501,6 +501,7 @@
 (defmethod faceset
   (:set-color
    (color &optional (transparent))
+   "Set color of given color name, color sample and color name are referenced from http://en.wikipedia.org/wiki/X11_color_names"
    (delete-displaylist-id (get self :GL-DISPLAYLIST-ID))
    (setf (get self :GL-DISPLAYLIST-ID) nil)
    (cond
