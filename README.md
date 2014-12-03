@@ -53,7 +53,7 @@ for Raspberry Pi users using debian(Raspbian "wheezy")
 ```
 $ sudo apt-get install git gcc g++ libjpeg62-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi
 ## additional install for using OpenGL on raspberry pi
-$ sudo apt-get libgl1-mesa-dri xserver-xorg-video-vesa xutil
+$ sudo apt-get install libgl1-mesa-dri xserver-xorg-video-vesa xutils
 ```
 for Cygwin(now working with 32bit only)
 ```
