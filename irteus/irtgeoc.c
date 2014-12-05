@@ -356,12 +356,12 @@ pointer C_ISNAN (ctx,n,argv)
 pointer ___irtgeoc(ctx,n, argv, env)
      register context *ctx;int n;pointer *argv;pointer env;
 {
-  defun(ctx,"C-COORDS-TRANSFORM-VECTOR",argv[0],C_COORDS_TRNSFORM_VECTOR);
-  defun(ctx,"C-MATRIX-ROW",argv[0],C_MATRIX_ROW);
-  defun(ctx,"VECTOR-ARRAY-MEAN",argv[0],VECTOR_ARRAY_MEAN);
-  defun(ctx,"VECTOR-ARRAY-VARIANCE",argv[0],VECTOR_ARRAY_VARIANCE);
-  defun(ctx,"VECTOR-ARRAY-MAX-MIN",argv[0],VECTOR_ARRAY_MAX_MIN);
-  defun(ctx,"FVECTOR-REPLACE", argv[0], FVECTOR_REPLACE);
+  defun(ctx,"C-COORDS-TRANSFORM-VECTOR",argv[0],C_COORDS_TRNSFORM_VECTOR,NULL);
+  defun(ctx,"C-MATRIX-ROW",argv[0],C_MATRIX_ROW,NULL);
+  defun(ctx,"VECTOR-ARRAY-MEAN",argv[0],VECTOR_ARRAY_MEAN,NULL);
+  defun(ctx,"VECTOR-ARRAY-VARIANCE",argv[0],VECTOR_ARRAY_VARIANCE,NULL);
+  defun(ctx,"VECTOR-ARRAY-MAX-MIN",argv[0],VECTOR_ARRAY_MAX_MIN,NULL);
+  defun(ctx,"FVECTOR-REPLACE", argv[0], FVECTOR_REPLACE,NULL);
 
-  defun(ctx,"C-ISNAN", argv[0], C_ISNAN);
+  defun(ctx,"C-ISNAN", argv[0], C_ISNAN,NULL);
 }

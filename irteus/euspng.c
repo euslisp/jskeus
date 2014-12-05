@@ -172,7 +172,7 @@ pointer ___euspng(register context *ctx, int n, register pointer *argv)
 {
     pointer mod=argv[0];
 
-    defun(ctx, "PNG-READ-IMAGE",  mod, PNG_READ_IMAGE);
-    defun(ctx, "PNG-WRITE-IMAGE", mod, PNG_WRITE_IMAGE);
+    defun(ctx, "PNG-READ-IMAGE",  mod, PNG_READ_IMAGE,NULL);
+    defun(ctx, "PNG-WRITE-IMAGE", mod, PNG_WRITE_IMAGE,NULL);
 }
 

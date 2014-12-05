@@ -174,13 +174,13 @@ pointer ___euspqp(register context *ctx, int n, register pointer *argv)
 {
     pointer mod=argv[0];
 
-    defun(ctx, "PQPMAKEMODEL", mod, PQPMAKEMODEL);
-    defun(ctx, "PQPDELETEMODEL", mod, PQPDELETEMODEL);
-    defun(ctx, "PQPBEGINMODEL", mod, PQPBEGINMODEL);
-    defun(ctx, "PQPENDMODEL", mod, PQPENDMODEL);
-    defun(ctx, "PQPADDTRI", mod, PQPADDTRI);
-    defun(ctx, "PQPCOLLIDE", mod, PQPCOLLIDE);
-    defun(ctx, "PQPDISTANCE", mod, PQPDISTANCE);
+    defun(ctx, "PQPMAKEMODEL", mod, PQPMAKEMODEL,NULL);
+    defun(ctx, "PQPDELETEMODEL", mod, PQPDELETEMODEL,NULL);
+    defun(ctx, "PQPBEGINMODEL", mod, PQPBEGINMODEL,NULL);
+    defun(ctx, "PQPENDMODEL", mod, PQPENDMODEL,NULL);
+    defun(ctx, "PQPADDTRI", mod, PQPADDTRI,NULL);
+    defun(ctx, "PQPCOLLIDE", mod, PQPCOLLIDE,NULL);
+    defun(ctx, "PQPDISTANCE", mod, PQPDISTANCE,NULL);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
