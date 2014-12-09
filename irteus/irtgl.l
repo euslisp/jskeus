@@ -786,14 +786,15 @@
                           (:local (nreverse vs))
                           (t )))
                (push
-                (if ns
-                    (instance face :init :vertices vs :normal ns)
-                  (instance face :init :vertices vs))
+                (cond
+                 ;;((and ns check-vertices-order) )
+                 ;;(ns (instance face :init :vertices vs :normal ns))
+                 (t (instance face :init :vertices vs)))
                 lst))))
           ) ;; /cond
          (push (nreverse lst) ret)))
      (nreverse ret)))
-  (:faces () (flatten (send self :convert-to-faces)))
+  (:faces () (flatten (send self :convert-to-faces :wrt :world)))
   (:convert-to-faceset (&rest args)
    (let ((fs
           (instance faceset :init :faces
