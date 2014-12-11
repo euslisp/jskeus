@@ -152,6 +152,10 @@
    (send viewer :viewsurface :resize newwidth newheight)
    (send viewer :viewsurface :makecurrent)
    (send viewer :viewsurface :3d-mode)
+   (let ((wh-max (max newwidth newheight)))
+     (send (send viewer :viewport)
+           :resize :width wh-max :height (- wh-max)
+           :xcenter (/ newwidth 2) :ycenter (/ newheight 2)))
    (send self :redraw))
   (:configureNotify
    (event)
