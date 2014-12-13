@@ -254,7 +254,7 @@
       (send robot :move-centroid-on-foot :both '(:lleg :rleg))
       (push (list :angle-vector (send robot :angle-vector)
                   :root-coords (send (car (send robot :links)) :copy-worldcoords)
-                  :refzmp (apply #'midpoint 0.5 (send robot :legs :end-coords :worldpos)))
+                  :zmp (apply #'midpoint 0.5 (send robot :legs :end-coords :worldpos)))
             avs))
     (setq avs (reverse avs))
     ;; filtering

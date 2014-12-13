@@ -606,7 +606,7 @@
          (push
           (list :angle-vector (car ret)
                 :root-coords (cadr ret)
-                :czmp czmp :refzmp (elt ret 5) :cog (elt ret 6)
+                :czmp czmp :zmp (elt ret 5) :cog (elt ret 6)
                 :time tm
                 :pz (elt ret 7)
                 :contact-state contact-state
