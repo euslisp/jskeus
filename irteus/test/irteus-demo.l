@@ -64,5 +64,13 @@
           (mapcar #'(lambda (rs-list) (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x))) rs-list))))
                   (walk-motion-for-robots)))))
 
+(deftest test-test-preview-control
+  (assert
+   (every #'identity (test-preview-control))))
+
+(deftest test-test-preview-control-dynamics-filter-for-sample-robot
+  (assert
+   (every #'identity (test-preview-control-dynamics-filter-for-sample-robot))))
+
 (run-all-tests)
 (exit)

@@ -223,17 +223,21 @@
                  (format f "~A ~A ~A ~A~%" tm zmp cog refzmp))
              tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
      )
-    ;; gnuplot sample
-    ;; $ gnuplot
-    ;; gnuplot> set xlabel "Time [s]"
-    ;; gnuplot> set ylabel "ZMP X [mm]"
-    ;; gnuplot> plot '/tmp/test-preview-control-data.dat' using 1:2 title "cart zmp" with lines
-    ;; gnuplot> replot '/tmp/test-preview-control-data.dat' using 1:3 title "cog" with lines
-    ;; gnuplot> replot '/tmp/test-preview-control-data.dat' using 1:4 title "refzmp" with lines
+    (unless (or (null x::*display*) (= x::*display* 0))
+      (let ((gp-command-list (list
+                              "set xlabel 'Time [s]';"
+                              "set ylabel 'ZMP X [mm]';"
+                              "plot '/tmp/test-preview-control-data.dat' using 1:2 title 'cart zmp' with lines;"
+                              "replot '/tmp/test-preview-control-data.dat' using 1:3 title 'cog' with lines;"
+                              "replot '/tmp/test-preview-control-data.dat' using 1:4 title 'refzmp' with lines;"
+                              "pause -1;")))
+        (unix:system (format nil "gnuplot -e \"~A\""
+                             (let ((str "")) (dolist (gpc gp-command-list) (setq str (format nil "~A ~A" str gpc))) str)))))
     (mapcar #'(lambda (tm zmp cog refzmp)
                 (list :time tm :zmp zmp :cog cog :refzmp refzmp))
             tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
     ))
+(warn "(test-preview-control)~%")
 
 ;; dynamics filter by using preview control
 ;;   input motion : control ZMP at 0 based on COG model
@@ -269,14 +273,17 @@
                (mapcar #'(lambda (x) (elt (cadr (memq :output-cog x)) 1)) data)
                (mapcar #'(lambda (x) (elt (cadr (memq :input-cog x)) 1)) data)
                ))
-      ;; gnuplot sample
-      ;; $ gnuplot
-      ;; gnuplot> set xlabel "Time [s]"
-      ;; gnuplot> set ylabel "ZMP X [mm]"
-      ;; gnuplot> plot '/tmp/test-preview-control-data-2.dat' using 1:2 title "output zmp" with lines
-      ;; gnuplot> replot '/tmp/test-preview-control-data-2.dat' using 1:3 title "input zmp" with lines
-      ;; gnuplot> replot '/tmp/test-preview-control-data-2.dat' using 1:4 title "output cog" with lines
-      ;; gnuplot> replot '/tmp/test-preview-control-data-2.dat' using 1:5 title "input cog" with lines
+      (unless (or (null x::*display*) (= x::*display* 0))
+        (let ((gp-command-list (list
+                                "set xlabel 'Time [s]';"
+                                "set ylabel 'ZMP X [mm]';"
+                                "plot '/tmp/test-preview-control-data-2.dat' using 1:2 title 'output zmp' with lines;"
+                                "replot '/tmp/test-preview-control-data-2.dat' using 1:3 title 'input zmp' with lines;"
+                                "replot '/tmp/test-preview-control-data-2.dat' using 1:4 title 'output cog' with lines;"
+                                "replot '/tmp/test-preview-control-data-2.dat' using 1:5 title 'input cog' with lines;"
+                                "pause -1;")))
+          (unix:system (format nil "gnuplot -e \"~A\""
+                               (let ((str "")) (dolist (gpc gp-command-list) (setq str (format nil "~A ~A" str gpc))) str)))))
       data
       )))
 
@@ -286,4 +293,4 @@
     (setq *robot* (instance sample-robot :init)))
   (test-preview-control-dynamics-filter *robot*)
   )
-
+(warn "(test-preview-control-dynamics-filter-for-sample-robot)~%")
