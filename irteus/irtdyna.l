@@ -1082,7 +1082,7 @@
                              (send self :angle-vector)
                              (send self :copy-worldcoords)
                              :dt dt))
-                  (rzmp (let ((tmp-zmp (cadr (memq :refzmp av))))
+                  (rzmp (let ((tmp-zmp (cadr (memq :zmp av))))
                           (if tmp-zmp (setq last-zmp tmp-zmp) last-zmp)))
                   (dzmp (v- zmp rzmp)))
              (setq r (send df :update (list av zmp (copy-object (send self :centroid)) rzmp) (if av dzmp nil)))
