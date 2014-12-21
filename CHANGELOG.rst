@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2014-12-22)
+------------------
 
 * (irtdyna, irtrobot, walk-motion) : Fix :refzmp->:zmp
 * (irteus-demo.l, walk-motion.l) : Add PrevewController testing and update plotting
