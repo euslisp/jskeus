@@ -2,6 +2,12 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix for when euslisp is already installed as deb, if objdir is given from upper script, we use them
+* use INSTALL{BIN,LIB,OBJ}DIR  and IRTEUSDIR when euslisp and jskeus is separately installed
+* Contributors: Kei Okada
+
 1.0.0 (2014-12-22)
 ------------------
 
