@@ -23,9 +23,10 @@
 ;;;
 
 
-(setq *objdir*
-  (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
-  )
+(unless (boundp '*objdir*)
+  (setq *objdir*
+        (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
+  ))
 
 (in-package "X")
 (comp:compile-file-if-src-newer "irtx.l" user::*objdir*)

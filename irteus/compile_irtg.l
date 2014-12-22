@@ -22,22 +22,23 @@
 ;;; above copyright notice remains intact.  
 ;;;
 
+(unless (boundp '*objdir*)
+  (setq *objdir*
+        (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
+  ))
+
 (in-package "GEOMETRY")
 
-(setq *objdir*
-  (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
-  )
-
-(comp:compile-file-if-src-newer "irtgeo.l" *objdir*)
-(comp:compile-file-if-src-newer "pqp.l" *objdir*)
-(comp:compile-file-if-src-newer "irtscene.l" *objdir*)
-(comp:compile-file-if-src-newer "irtmodel.l" *objdir*)
-(comp:compile-file-if-src-newer "irtsensor.l" *objdir*)
-(comp:compile-file-if-src-newer "irtdyna.l" *objdir*)
-(comp:compile-file-if-src-newer "irtrobot.l" *objdir*)
-(comp:compile-file-if-src-newer "irtbvh.l" *objdir*)
-(comp:compile-file-if-src-newer "irtcollada.l" *objdir*)
-(comp:compile-file-if-src-newer "irtpointcloud.l" *objdir*)
+(comp:compile-file-if-src-newer "irtgeo.l" user::*objdir*)
+(comp:compile-file-if-src-newer "pqp.l" user::*objdir*)
+(comp:compile-file-if-src-newer "irtscene.l" user::*objdir*)
+(comp:compile-file-if-src-newer "irtmodel.l" user::*objdir*)
+(comp:compile-file-if-src-newer "irtsensor.l" user::*objdir*)
+(comp:compile-file-if-src-newer "irtdyna.l" user::*objdir*)
+(comp:compile-file-if-src-newer "irtrobot.l" user::*objdir*)
+(comp:compile-file-if-src-newer "irtbvh.l" user::*objdir*)
+(comp:compile-file-if-src-newer "irtcollada.l" user::*objdir*)
+(comp:compile-file-if-src-newer "irtpointcloud.l" user::*objdir*)
 
 (exit 0)
 
