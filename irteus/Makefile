@@ -24,6 +24,12 @@
 
 include ./Makefile.$(ARCHDIR)
 
+# directory where this package install object file to
+IRTEUSDIR=$(EUSDIR)
+INSTALLBINDIR=$(IRTEUSDIR)/$(ARCHDIR)/bin
+INSTALLOBJDIR=$(IRTEUSDIR)/$(ARCHDIR)/obj
+INSTALLLIBDIR=$(IRTEUSDIR)/$(ARCHDIR)/lib
+
 # common
 BINDIR=$(EUSDIR)/$(ARCHDIR)/bin
 OBJDIR=$(EUSDIR)/$(ARCHDIR)/obj
@@ -42,52 +48,52 @@ IRTEUSIMG=irtimage eusjpeg png
 IRTEUSGL=irtgl irtglrgb irtviewer
 NR=nr
 
-LIBIRTEUS=$(LIBDIR)/$(LPFX)irteus.$(LSFX)
-LIBIRTEUSG=$(LIBDIR)/$(LPFX)irteusg.$(LSFX)
-LIBIRTEUSX=$(LIBDIR)/$(LPFX)irteusx.$(LSFX)
-LIBIRTEUSIMG=$(LIBDIR)/$(LPFX)irteusimg.$(LSFX)
-LIBIRTEUSGL=$(LIBDIR)/$(LPFX)irteusgl.$(LSFX)
-LIBNR=$(LIBDIR)/$(LPFX)nr.$(LSFX)
+LIBIRTEUS=$(INSTALLLIBDIR)/$(LPFX)irteus.$(LSFX)
+LIBIRTEUSG=$(INSTALLLIBDIR)/$(LPFX)irteusg.$(LSFX)
+LIBIRTEUSX=$(INSTALLLIBDIR)/$(LPFX)irteusx.$(LSFX)
+LIBIRTEUSIMG=$(INSTALLLIBDIR)/$(LPFX)irteusimg.$(LSFX)
+LIBIRTEUSGL=$(INSTALLLIBDIR)/$(LPFX)irteusgl.$(LSFX)
+LIBNR=$(INSTALLLIBDIR)/$(LPFX)nr.$(LSFX)
 
 IRTEUS_OSFX=$(addsuffix .$(OSFX),$(IRTEUS))
 IRTEUS_LSFX=$(addsuffix .$(LSFX),$(IRTEUS))
-IRTEUSOBJS=$(addprefix $(OBJDIR)/,$(IRTEUS_OSFX))
-IRTEUSDLLS=$(addprefix $(OBJDIR)/,$(IRTEUS_LSFX))
+IRTEUSOBJS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUS_OSFX))
+IRTEUSDLLS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUS_LSFX))
 IRTEUS_C=$(addsuffix .c,$(IRTEUS))
 IRTEUS_H=$(addsuffix .h,$(IRTEUS))
 
 IRTEUSG_OSFX=$(addsuffix .$(OSFX),$(IRTEUSG))
 IRTEUSG_LSFX=$(addsuffix .$(LSFX),$(IRTEUSG))
-IRTEUSGOBJS=$(addprefix $(OBJDIR)/,$(IRTEUSG_OSFX))
-IRTEUSGDLLS=$(addprefix $(OBJDIR)/,$(IRTEUSG_LSFX))
+IRTEUSGOBJS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSG_OSFX))
+IRTEUSGDLLS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSG_LSFX))
 IRTEUSG_C=$(addsuffix .c,$(IRTEUSG))
 IRTEUSG_H=$(addsuffix .h,$(IRTEUSG))
 
 IRTEUSX_OSFX=$(addsuffix .$(OSFX),$(IRTEUSX))
 IRTEUSX_LSFX=$(addsuffix .$(LSFX),$(IRTEUSX))
-IRTEUSXOBJS=$(addprefix $(OBJDIR)/,$(IRTEUSX_OSFX))
-IRTEUSXDLLS=$(addprefix $(OBJDIR)/,$(IRTEUSX_LSFX))
+IRTEUSXOBJS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSX_OSFX))
+IRTEUSXDLLS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSX_LSFX))
 IRTEUSX_C=$(addsuffix .c,$(IRTEUSX))
 IRTEUSX_H=$(addsuffix .h,$(IRTEUSX))
 
 IRTEUSIMG_OSFX=$(addsuffix .$(OSFX),$(IRTEUSIMG))
 IRTEUSIMG_LSFX=$(addsuffix .$(LSFX),$(IRTEUSIMG))
-IRTEUSIMGOBJS=$(addprefix $(OBJDIR)/,$(IRTEUSIMG_OSFX))
-IRTEUSIMGDLLS=$(addprefix $(OBJDIR)/,$(IRTEUSIMG_LSFX))
+IRTEUSIMGOBJS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSIMG_OSFX))
+IRTEUSIMGDLLS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSIMG_LSFX))
 IRTEUSIMG_C=$(addsuffix .c,$(IRTEUSIMG))
 IRTEUSIMG_H=$(addsuffix .h,$(IRTEUSIMG))
 
 IRTEUSGL_OSFX=$(addsuffix .$(OSFX),$(IRTEUSGL))
 IRTEUSGL_LSFX=$(addsuffix .$(LSFX),$(IRTEUSGL))
-IRTEUSGLOBJS=$(addprefix $(OBJDIR)/,$(IRTEUSGL_OSFX))
-IRTEUSGLDLLS=$(addprefix $(OBJDIR)/,$(IRTEUSGL_LSFX))
+IRTEUSGLOBJS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSGL_OSFX))
+IRTEUSGLDLLS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSGL_LSFX))
 IRTEUSGL_C=$(addsuffix .c,$(IRTEUSGL))
 IRTEUSGL_H=$(addsuffix .h,$(IRTEUSGL))
 
-IRTCOBJECTS=$(OBJDIR)/irtc.$(OSFX) $(OBJDIR)/irtgeoc.$(OSFX)
-IRTGCOBJECTS=$(OBJDIR)/CPQP.$(OSFX) $(OBJDIR)/euspqp.$(OSFX)
-IRTIMGCOBJECTS=$(OBJDIR)/euspng.$(OSFX)
-NROBJECTS=$(OBJDIR)/nr.$(OSFX)
+IRTCOBJECTS=$(INSTALLOBJDIR)/irtc.$(OSFX) $(INSTALLOBJDIR)/irtgeoc.$(OSFX)
+IRTGCOBJECTS=$(INSTALLOBJDIR)/CPQP.$(OSFX) $(INSTALLOBJDIR)/euspqp.$(OSFX)
+IRTIMGCOBJECTS=$(INSTALLOBJDIR)/euspng.$(OSFX)
+NROBJECTS=$(INSTALLOBJDIR)/nr.$(OSFX)
 
 all: $(LIBNR) $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSIMG) $(LIBIRTEUSGL) make-link install-irtext.l
 
@@ -102,30 +108,30 @@ $(LIBIRTEUSG): $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a
 $(LIBIRTEUSX): $(IRTEUSXOBJS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSX) $(IRTEUSXOBJS) $(IMPLIB)
 
-$(LIBIRTEUSIMG): $(LIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS)
+$(LIBIRTEUSIMG): $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSIMG) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IMPLIB) $(IMPLIBIMG)
 
 $(LIBIRTEUSGL): $(IRTEUSGLOBJS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSGL) $(IRTEUSGLOBJS) $(IMPLIB)
 
 $(IRTEUSOBJS):
-	$(BINDIR)/eus2$(ESFX) < ./compile_irt.l
+	$(BINDIR)/eus2$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irt.l
 	-rm -f $(IRTEUS_C) $(IRTEUS_H)
 
 $(IRTEUSGOBJS):
-	$(BINDIR)/eusgl$(ESFX) < ./compile_irtg.l
+	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l
 	-rm -f $(IRTEUSG_C) $(IRTEUSG_H)
 
 $(IRTEUSXOBJS) :
-	$(BINDIR)/eusx$(ESFX) < ./compile_irtx.l
+	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtx.l
 	-rm -f $(IRTEUSX_C) $(IRTEUSX_H)
 
 $(IRTEUSIMGOBJS) :
-	$(BINDIR)/eusx$(ESFX) < ./compile_irtimg.l
+	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtimg.l
 	-rm -f $(IRTEUSIMG_C) $(IRTEUSIMG_H)
 
 $(IRTEUSGLOBJS):
-	$(BINDIR)/eusgl$(ESFX) < ./compile_irtgl.l
+	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtgl.l
 	-rm -f $(IRTEUSGL_C) $(IRTEUSGL_H)
 
 PQP/$(ARCHDIR)/libPQP-static.a:
@@ -137,10 +143,10 @@ $(LIBNR): $(NROBJECTS)
 BINS=$(BINDIR)/irteus$(ESFX) $(BINDIR)/irteusgl$(ESFX)
 make-link: $(BINS) $(EUSDIR)/irteus
 $(BINS):
-	ln -sf eus$(ESFX) $(BINDIR)/irteus$(ESFX)
-	ln -sf eusgl$(ESFX) $(BINDIR)/irteusgl$(ESFX)
+	(cd $(INSTALLBINDIR); ln -sf eus$(ESFX) irteus$(ESFX))
+	(cd $(INSTALLBINDIR); ln -sf eusgl$(ESFX) irteusgl$(ESFX))
 $(EUSDIR)/irteus:
-	ln -sf ../irteus $(EUSDIR)/irteus
+	(cd $(IRTEUSDIR); ln -sf ../jskeus/irteus irteus)
 
 install-irtext.l: $(EUSDIR)/lib/irtext.l
 $(EUSDIR)/lib/irtext.l: irtext.l
@@ -154,7 +160,7 @@ clean:
 	-rm -f $(IRTEUSXOBJS) $(IRTEUSXDLLS) $(IRTEUSX_C) $(IRTEUSX_H)
 	-rm -f $(IRTEUSIMGOBJS) $(IRTEUSIMGDLLS) $(IRTEUSIMG_C) $(IRTEUSIMG_H)
 	-rm -f $(IRTEUSGLOBJS) $(IRTEUSGLDLLS) $(IRTEUSGL_C) $(IRTEUSGL_H)
-	-rm -f $(LIBDIR)/jpegmemcd.$(LSFX) $(LIBNR) $(NROBJECTS)
+	-rm -f $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(LIBNR) $(NROBJECTS)
 	-rm -f *~ *.stackdump
 	-rm -f $(EUSDIR)/irteus
 	chmod a-x Makefile* *.l *.c
@@ -162,40 +168,40 @@ clean:
 	(cd $(EUSDIR)/lisp/image/jpeg/; make clean)
 	-rm -f $(EUSDIR)/lib/llib/pgsql.c $(EUSDIR)/lib/llib/pgsql.h
 
-$(OBJDIR)/irtmath.$(OSFX): irtmath.l
-$(OBJDIR)/irtutil.$(OSFX): irtutil.l
-$(OBJDIR)/irtgraph.$(OSFX): irtgraph.l
-$(OBJDIR)/irtgeo.$(OSFX): irtgeo.l
-$(OBJDIR)/irtscene.$(OSFX): irtscene.l
-$(OBJDIR)/irtmodel.$(OSFX): irtmodel.l
-$(OBJDIR)/irtdyna.$(OSFX): irtdyna.l
-$(OBJDIR)/irtcollada.$(OSFX): irtcollada.l
-$(OBJDIR)/irtsensor.$(OSFX): irtsensor.l
-$(OBJDIR)/irtpointcloud.$(OSFX): irtpointcloud.l
-$(OBJDIR)/irtrobot.$(OSFX): irtrobot.l
-$(OBJDIR)/irtbvh.$(OSFX): irtbvh.l
-$(OBJDIR)/irtx.$(OSFX): irtx.l
-$(OBJDIR)/irtgl.$(OSFX): irtgl.l
-$(OBJDIR)/irtglrgb.$(OSFX): irtglrgb.l
-$(OBJDIR)/irtviewer.$(OSFX): irtviewer.l
-$(OBJDIR)/irtimage.$(OSFX): irtimage.l
-$(OBJDIR)/pqp.$(OSFX): pqp.l
-$(OBJDIR)/png.$(OSFX): png.l
-$(OBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l
-$(OBJDIR)/eusjpeg.$(OSFX): $(EUSDIR)/lisp/image/jpeg/eusjpeg.l
+$(INSTALLOBJDIR)/irtmath.$(OSFX): irtmath.l
+$(INSTALLOBJDIR)/irtutil.$(OSFX): irtutil.l
+$(INSTALLOBJDIR)/irtgraph.$(OSFX): irtgraph.l
+$(INSTALLOBJDIR)/irtgeo.$(OSFX): irtgeo.l
+$(INSTALLOBJDIR)/irtscene.$(OSFX): irtscene.l
+$(INSTALLOBJDIR)/irtmodel.$(OSFX): irtmodel.l
+$(INSTALLOBJDIR)/irtdyna.$(OSFX): irtdyna.l
+$(INSTALLOBJDIR)/irtcollada.$(OSFX): irtcollada.l
+$(INSTALLOBJDIR)/irtsensor.$(OSFX): irtsensor.l
+$(INSTALLOBJDIR)/irtpointcloud.$(OSFX): irtpointcloud.l
+$(INSTALLOBJDIR)/irtrobot.$(OSFX): irtrobot.l
+$(INSTALLOBJDIR)/irtbvh.$(OSFX): irtbvh.l
+$(INSTALLOBJDIR)/irtx.$(OSFX): irtx.l
+$(INSTALLOBJDIR)/irtgl.$(OSFX): irtgl.l
+$(INSTALLOBJDIR)/irtglrgb.$(OSFX): irtglrgb.l
+$(INSTALLOBJDIR)/irtviewer.$(OSFX): irtviewer.l
+$(INSTALLOBJDIR)/irtimage.$(OSFX): irtimage.l
+$(INSTALLOBJDIR)/pqp.$(OSFX): pqp.l
+$(INSTALLOBJDIR)/png.$(OSFX): png.l
+$(INSTALLOBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l
+$(INSTALLOBJDIR)/eusjpeg.$(OSFX): $(EUSDIR)/lisp/image/jpeg/eusjpeg.l
 
-$(OBJDIR)/irtc.$(OSFX): irtc.c $(filter-out $(OBJDIR)/irtc.$(OSFX),$(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(LIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS))
-	$(CC) $(CFLAGS) -c irtc.c $(OBJOPT)$(OBJDIR)/irtc.$(OSFX)
-$(OBJDIR)/irtgeoc.$(OSFX): irtgeoc.c $(filter-out $(OBJDIR)/irtgeoc.$(OSFX), $(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(LIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS))
-	$(CC) $(CFLAGS) -c irtgeoc.c $(OBJOPT)$(OBJDIR)/irtgeoc.$(OSFX)
-$(OBJDIR)/CPQP.$(OSFX): CPQP.C
-	$(CXX) $(CXXFLAGS) -c CPQP.C $(OBJOPT)$(OBJDIR)/CPQP.$(OSFX)
-$(OBJDIR)/euspqp.$(OSFX): euspqp.c
-	$(CC) $(CFLAGS) -c euspqp.c $(OBJOPT)$(OBJDIR)/euspqp.$(OSFX)
-$(OBJDIR)/euspng.$(OSFX): euspng.c
-	$(CC) $(CFLAGS) -c euspng.c $(OBJOPT)$(OBJDIR)/euspng.$(OSFX)
-$(OBJDIR)/nr.$(OSFX): nr.c
-	$(CC) $(CFLAGS) -c nr.c $(OBJOPT)$(OBJDIR)/nr.$(OSFX)
+$(INSTALLOBJDIR)/irtc.$(OSFX): irtc.c $(filter-out $(INSTALLOBJDIR)/irtc.$(OSFX),$(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS))
+	$(CC) $(CFLAGS) -c irtc.c $(OBJOPT)$(INSTALLOBJDIR)/irtc.$(OSFX)
+$(INSTALLOBJDIR)/irtgeoc.$(OSFX): irtgeoc.c $(filter-out $(INSTALLOBJDIR)/irtgeoc.$(OSFX), $(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS))
+	$(CC) $(CFLAGS) -c irtgeoc.c $(OBJOPT)$(INSTALLOBJDIR)/irtgeoc.$(OSFX)
+$(INSTALLOBJDIR)/CPQP.$(OSFX): CPQP.C
+	$(CXX) $(CXXFLAGS) -c CPQP.C $(OBJOPT)$(INSTALLOBJDIR)/CPQP.$(OSFX)
+$(INSTALLOBJDIR)/euspqp.$(OSFX): euspqp.c
+	$(CC) $(CFLAGS) -c euspqp.c $(OBJOPT)$(INSTALLOBJDIR)/euspqp.$(OSFX)
+$(INSTALLOBJDIR)/euspng.$(OSFX): euspng.c
+	$(CC) $(CFLAGS) -c euspng.c $(OBJOPT)$(INSTALLOBJDIR)/euspng.$(OSFX)
+$(INSTALLOBJDIR)/nr.$(OSFX): nr.c
+	$(CC) $(CFLAGS) -c nr.c $(OBJOPT)$(INSTALLOBJDIR)/nr.$(OSFX)
 
-$(LIBDIR)/jpegmemcd.$(LSFX): $(EUSDIR)/lisp/image/jpeg/jpegmemcd.c
-	(cd $(EUSDIR)/lisp/image/jpeg/;make)
+$(INSTALLLIBDIR)/jpegmemcd.$(LSFX): $(EUSDIR)/lisp/image/jpeg/jpegmemcd.c
+	(cd $(EUSDIR)/lisp/image/jpeg/;make ARCH=$(ARCHDIR) LIBDIR=$(INSTALLLIBDIR) OBJDIR=$(INSTALLOBJDIR))
