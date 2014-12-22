@@ -22,15 +22,16 @@
 ;;; above copyright notice remains intact.  
 ;;;
 
+(unless (boundp '*objdir*)
+  (setq *objdir*
+        (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
+  ))
+
 (in-package "GL")
 
-(setq *objdir*
-  (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
-  )
-
-(comp:compile-file-if-src-newer "irtgl.l" *objdir*)
-(comp:compile-file-if-src-newer "irtglrgb.l" *objdir*)
-(comp:compile-file-if-src-newer "irtviewer.l" *objdir*)
+(comp:compile-file-if-src-newer "irtgl.l" user::*objdir*)
+(comp:compile-file-if-src-newer "irtglrgb.l" user::*objdir*)
+(comp:compile-file-if-src-newer "irtviewer.l" user::*objdir*)
 
 (exit 0)
 
