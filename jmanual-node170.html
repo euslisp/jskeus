@@ -80,7 +80,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
  <BR>
 <BR> <BR> 
-<A NAME="51591"></A>
+<A NAME="51598"></A>
 <BIG CLASS="XLARGE"><B>joint </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
 <BR>  :slots 		 parent-link child-link joint-angle min-angle max-angle default-coords joint-velocity joint-acceleration joint-torque max-joint-velocity max-joint-torque joint-min-max-table joint-min-max-target 
@@ -96,7 +96,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="51608"></A>
+<A NAME="51615"></A>
 <B>:init</B> <EM>&amp;key (name (intern (format nil joint&nbsp;A (system:address self)) KEYWORD)) ((:child-link clink)) ((:parent-link plink)) (min -90) (max 90) ((:max-joint-velocity mjv)) ((:max-joint-torque mjt)) ((:joint-min-max-table mm-table)) ((:joint-min-max-target mm-target)) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -108,7 +108,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="51618"></A>
+<A NAME="51625"></A>
 <B>:min-angle</B> <EM>&amp;optional v  </EM>[メソッド]
 
 <DL COMPACT>
@@ -119,7 +119,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="51628"></A>
+<A NAME="51635"></A>
 <B>:max-angle</B> <EM>&amp;optional v  </EM>[メソッド]
 
 <DL COMPACT>
@@ -130,7 +130,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="51638"></A>
+<A NAME="51645"></A>
 <B>:parent-link</B> <EM>&amp;rest args  </EM>[メソッド]
 
 <DL COMPACT>
@@ -141,7 +141,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="51648"></A>
+<A NAME="51655"></A>
 <B>:child-link</B> <EM>&amp;rest args  </EM>[メソッド]
 
 <DL COMPACT>
@@ -153,7 +153,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="51658"></A>
+<A NAME="51665"></A>
 <B>:calc-dav-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -168,7 +168,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51668"></A>
+<A NAME="51675"></A>
 <B>:joint-dof</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -183,7 +183,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51678"></A>
+<A NAME="51685"></A>
 <B>:speed-to-angle</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -198,7 +198,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51688"></A>
+<A NAME="51695"></A>
 <B>:angle-to-speed</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -213,7 +213,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51698"></A>
+<A NAME="51705"></A>
 <B>:calc-jacobian</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -228,7 +228,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51708"></A>
+<A NAME="51715"></A>
 <B>:joint-velocity</B> <EM>&amp;optional jv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -243,7 +243,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51718"></A>
+<A NAME="51725"></A>
 <B>:joint-acceleration</B> <EM>&amp;optional ja  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -258,7 +258,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51728"></A>
+<A NAME="51735"></A>
 <B>:joint-torque</B> <EM>&amp;optional jt  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -273,7 +273,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51738"></A>
+<A NAME="51745"></A>
 <B>:max-joint-velocity</B> <EM>&amp;optional mjv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -288,7 +288,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51748"></A>
+<A NAME="51755"></A>
 <B>:max-joint-torque</B> <EM>&amp;optional mjt  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -303,7 +303,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51758"></A>
+<A NAME="51765"></A>
 <B>:joint-min-max-table</B> <EM>&amp;optional mm-table  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -318,7 +318,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51768"></A>
+<A NAME="51775"></A>
 <B>:joint-min-max-target</B> <EM>&amp;optional mm-target  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -333,7 +333,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51778"></A>
+<A NAME="51785"></A>
 <B>:joint-min-max-table-angle-interpolate</B> <EM>target-angle min-or-max  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -348,7 +348,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51788"></A>
+<A NAME="51795"></A>
 <B>:joint-min-max-table-min-angle</B> <EM>&amp;optional (target-angle (send joint-min-max-target :joint-angle))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -363,7 +363,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51798"></A>
+<A NAME="51805"></A>
 <B>:joint-min-max-table-max-angle</B> <EM>&amp;optional (target-angle (send joint-min-max-target :joint-angle))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -381,7 +381,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="51809"></A>
+<A NAME="51816"></A>
 <BIG CLASS="XLARGE"><B>rotational-joint </B></BIG> [クラス]  <PRE><TT>
   :super   <B>joint</B> 
 <BR>  :slots 		 axis 
@@ -397,7 +397,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="51826"></A>
+<A NAME="51833"></A>
 <B>:init</B> <EM>&amp;rest args &amp;key ((:axis ax) :z) ((:max-joint-velocity mjv) 5) ((:max-joint-torque mjt) 100) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -408,7 +408,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="51836"></A>
+<A NAME="51843"></A>
 <B>:joint-angle</B> <EM>&amp;optional v &amp;key relative &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -419,7 +419,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="51846"></A>
+<A NAME="51853"></A>
 <B>:joint-dof</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -431,7 +431,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="51856"></A>
+<A NAME="51863"></A>
 <B>:calc-angle-speed-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -446,7 +446,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51866"></A>
+<A NAME="51873"></A>
 <B>:speed-to-angle</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -461,7 +461,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51876"></A>
+<A NAME="51883"></A>
 <B>:angle-to-speed</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -476,7 +476,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51886"></A>
+<A NAME="51893"></A>
 <B>:calc-jacobian</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -494,7 +494,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="51897"></A>
+<A NAME="51904"></A>
 <BIG CLASS="XLARGE"><B>linear-joint </B></BIG> [クラス]  <PRE><TT>
   :super   <B>joint</B> 
 <BR>  :slots 		 axis 
@@ -510,7 +510,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="51914"></A>
+<A NAME="51921"></A>
 <B>:init</B> <EM>&amp;rest args &amp;key ((:axis ax) :z) ((:max-joint-velocity mjv) (/ pi 4)) ((:max-joint-torque mjt) 100) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -521,7 +521,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="51924"></A>
+<A NAME="51931"></A>
 <B>:joint-angle</B> <EM>&amp;optional v &amp;key relative &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -532,7 +532,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="51934"></A>
+<A NAME="51941"></A>
 <B>:joint-dof</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -544,7 +544,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="51944"></A>
+<A NAME="51951"></A>
 <B>:calc-angle-speed-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -559,7 +559,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51954"></A>
+<A NAME="51961"></A>
 <B>:speed-to-angle</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -574,7 +574,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51964"></A>
+<A NAME="51971"></A>
 <B>:angle-to-speed</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -589,7 +589,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="51974"></A>
+<A NAME="51981"></A>
 <B>:calc-jacobian</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -607,7 +607,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="51985"></A>
+<A NAME="51992"></A>
 <BIG CLASS="XLARGE"><B>wheel-joint </B></BIG> [クラス]  <PRE><TT>
   :super   <B>joint</B> 
 <BR>  :slots 		 axis 
@@ -623,7 +623,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52002"></A>
+<A NAME="52009"></A>
 <B>:init</B> <EM>&amp;rest args &amp;key (min (float-vector -inf-inf)) (max (float-vector infinf)) ((:max-joint-velocity mjv) (float-vector (/ 0.08 0.05) (/ pi 4))) ((:max-joint-torque mjt) (float-vector 100 100)) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -634,7 +634,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52012"></A>
+<A NAME="52019"></A>
 <B>:joint-angle</B> <EM>&amp;optional v &amp;key relative &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -645,7 +645,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52022"></A>
+<A NAME="52029"></A>
 <B>:joint-dof</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -657,7 +657,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="52032"></A>
+<A NAME="52039"></A>
 <B>:calc-angle-speed-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -672,7 +672,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52042"></A>
+<A NAME="52049"></A>
 <B>:speed-to-angle</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -687,7 +687,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52052"></A>
+<A NAME="52059"></A>
 <B>:angle-to-speed</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -702,7 +702,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52062"></A>
+<A NAME="52069"></A>
 <B>:calc-jacobian</B> <EM>fik row column joint paxis child-link world-default-coords child-reverse move-target transform-coords rotation-axis translation-axis tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -720,7 +720,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="52073"></A>
+<A NAME="52080"></A>
 <BIG CLASS="XLARGE"><B>omniwheel-joint </B></BIG> [クラス]  <PRE><TT>
   :super   <B>joint</B> 
 <BR>  :slots 		 axis 
@@ -736,7 +736,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52090"></A>
+<A NAME="52097"></A>
 <B>:init</B> <EM>&amp;rest args &amp;key (min (float-vector -inf-inf-inf)) (max (float-vector infinfinf)) ((:max-joint-velocity mjv) (float-vector (/ 0.08 0.05) (/ 0.08 0.05) (/ pi 4))) ((:max-joint-torque mjt) (float-vector 100 100 100)) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -747,7 +747,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52100"></A>
+<A NAME="52107"></A>
 <B>:joint-angle</B> <EM>&amp;optional v &amp;key relative &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -758,7 +758,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52110"></A>
+<A NAME="52117"></A>
 <B>:joint-dof</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -770,7 +770,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="52120"></A>
+<A NAME="52127"></A>
 <B>:calc-angle-speed-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -785,7 +785,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52130"></A>
+<A NAME="52137"></A>
 <B>:speed-to-angle</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -800,7 +800,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52140"></A>
+<A NAME="52147"></A>
 <B>:angle-to-speed</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -815,7 +815,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52150"></A>
+<A NAME="52157"></A>
 <B>:calc-jacobian</B> <EM>fik row column joint paxis child-link world-default-coords child-reverse move-target transform-coords rotation-axis translation-axis tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -833,7 +833,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="52161"></A>
+<A NAME="52168"></A>
 <BIG CLASS="XLARGE"><B>sphere-joint </B></BIG> [クラス]  <PRE><TT>
   :super   <B>joint</B> 
 <BR>  :slots 		 axis 
@@ -849,7 +849,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52178"></A>
+<A NAME="52185"></A>
 <B>:init</B> <EM>&amp;rest args &amp;key (min (float-vector -inf-inf-inf)) (max (float-vector infinfinf)) ((:max-joint-velocity mjv) (float-vector (/ pi 4) (/ pi 4) (/ pi 4))) ((:max-joint-torque mjt) (float-vector 100 100 100)) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -860,7 +860,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52188"></A>
+<A NAME="52195"></A>
 <B>:joint-angle</B> <EM>&amp;optional v &amp;key relative &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -871,7 +871,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52198"></A>
+<A NAME="52205"></A>
 <B>:joint-angle-rpy</B> <EM>&amp;optional v &amp;key relative  </EM>[メソッド]
 
 <DL COMPACT>
@@ -882,7 +882,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52208"></A>
+<A NAME="52215"></A>
 <B>:joint-dof</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -893,7 +893,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52218"></A>
+<A NAME="52225"></A>
 <B>:joint-euler-angle</B> <EM>&amp;key (axis-order '(:z :y :x)) ((:child-rot m) (send child-link :rot))  </EM>[メソッド]
 
 <DL COMPACT>
@@ -905,7 +905,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="52228"></A>
+<A NAME="52235"></A>
 <B>:calc-angle-speed-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -920,7 +920,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52238"></A>
+<A NAME="52245"></A>
 <B>:speed-to-angle</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -935,7 +935,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52248"></A>
+<A NAME="52255"></A>
 <B>:angle-to-speed</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -950,7 +950,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52258"></A>
+<A NAME="52265"></A>
 <B>:calc-jacobian</B> <EM>fik row column joint paxis child-link world-default-coords child-reverse move-target transform-coords rotation-axis translation-axis tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -968,7 +968,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="52269"></A>
+<A NAME="52276"></A>
 <BIG CLASS="XLARGE"><B>6dof-joint </B></BIG> [クラス]  <PRE><TT>
   :super   <B>joint</B> 
 <BR>  :slots 		 axis 
@@ -984,7 +984,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52286"></A>
+<A NAME="52293"></A>
 <B>:init</B> <EM>&amp;rest args &amp;key (min (float-vector -inf-inf-inf-inf-inf-inf)) (max (float-vector infinfinfinfinfinf)) ((:max-joint-velocity mjv) (float-vector (/ 0.08 0.05) (/ 0.08 0.05) (/ 0.08 0.05) (/ pi 4) (/ pi 4) (/ pi 4))) ((:max-joint-mjt mjt) (float-vector 100 100 100 100 100 100)) (absolute-p nil) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -995,7 +995,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52296"></A>
+<A NAME="52303"></A>
 <B>:joint-angle</B> <EM>&amp;optional v &amp;key relative &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1006,7 +1006,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52306"></A>
+<A NAME="52313"></A>
 <B>:joint-angle-rpy</B> <EM>&amp;optional v &amp;key relative  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1017,7 +1017,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52316"></A>
+<A NAME="52323"></A>
 <B>:joint-dof</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -1029,7 +1029,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="52326"></A>
+<A NAME="52333"></A>
 <B>:calc-angle-speed-gain</B> <EM>dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1044,7 +1044,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52336"></A>
+<A NAME="52343"></A>
 <B>:speed-to-angle</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1059,7 +1059,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52346"></A>
+<A NAME="52353"></A>
 <B>:angle-to-speed</B> <EM>dv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1074,7 +1074,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52356"></A>
+<A NAME="52363"></A>
 <B>:calc-jacobian</B> <EM>fik row column joint paxis child-link world-default-coords child-reverse move-target transform-coords rotation-axis translation-axis tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1092,7 +1092,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="52367"></A>
+<A NAME="52374"></A>
 <BIG CLASS="XLARGE"><B>bodyset-link </B></BIG> [クラス]  <PRE><TT>
   :super   <B>bodyset</B> 
 <BR>  :slots 		 joint parent-link child-links analysis-level default-coords weight acentroid inertia-tensor angular-velocity angular-acceleration spacial-velocity spacial-acceleration momentum-velocity angular-momentum-velocity momentum angular-momentum force moment ext-force ext-moment 
@@ -1108,7 +1108,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52384"></A>
+<A NAME="52391"></A>
 <B>:init</B> <EM>coords &amp;rest args &amp;key ((:analysis-level level) :body) ((:weight w) 1) ((:centroid c) #f(0.0 0.0 0.0)) ((:inertia-tensor i) (unit-matrix 3)) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1119,7 +1119,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52394"></A>
+<A NAME="52401"></A>
 <B>:worldcoords</B> <EM>&amp;optional (level analysis-level)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1130,7 +1130,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52404"></A>
+<A NAME="52411"></A>
 <B>:analysis-level</B> <EM>&amp;optional v  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1141,7 +1141,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52414"></A>
+<A NAME="52421"></A>
 <B>:weight</B> <EM>&amp;optional w  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1152,7 +1152,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52424"></A>
+<A NAME="52431"></A>
 <B>:centroid</B> <EM>&amp;optional c  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1163,7 +1163,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52434"></A>
+<A NAME="52441"></A>
 <B>:inertia-tensor</B> <EM>&amp;optional i  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1174,7 +1174,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52444"></A>
+<A NAME="52451"></A>
 <B>:joint</B> <EM>&amp;rest args  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1185,7 +1185,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52454"></A>
+<A NAME="52461"></A>
 <B>:add-joint</B> <EM>j  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1196,7 +1196,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52464"></A>
+<A NAME="52471"></A>
 <B>:del-joint</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -1207,7 +1207,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52474"></A>
+<A NAME="52481"></A>
 <B>:parent-link</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -1218,7 +1218,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52484"></A>
+<A NAME="52491"></A>
 <B>:child-links</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -1229,7 +1229,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52494"></A>
+<A NAME="52501"></A>
 <B>:add-child-links</B> <EM>l  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1240,7 +1240,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52504"></A>
+<A NAME="52511"></A>
 <B>:add-parent-link</B> <EM>l  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1251,7 +1251,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52514"></A>
+<A NAME="52521"></A>
 <B>:del-child-link</B> <EM>l  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1262,7 +1262,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52524"></A>
+<A NAME="52531"></A>
 <B>:del-parent-link</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -1274,7 +1274,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="52534"></A>
+<A NAME="52541"></A>
 <B>:default-coords</B> <EM>&amp;optional c  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1292,7 +1292,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="52545"></A>
+<A NAME="52552"></A>
 <BIG CLASS="XLARGE"><B>cascaded-link </B></BIG> [クラス]  <PRE><TT>
   :super   <B>cascaded-coords</B> 
 <BR>  :slots 		 links joint-list bodies collision-avoidance-links 
@@ -1308,7 +1308,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52562"></A>
+<A NAME="52569"></A>
 <B>:init</B> <EM>&amp;rest args &amp;key name &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1319,7 +1319,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52572"></A>
+<A NAME="52579"></A>
 <B>:init-ending</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -1330,7 +1330,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52582"></A>
+<A NAME="52589"></A>
 <B>:links</B> <EM>&amp;rest args  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1341,7 +1341,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52592"></A>
+<A NAME="52599"></A>
 <B>:joint-list</B> <EM>&amp;rest args  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1352,7 +1352,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52602"></A>
+<A NAME="52609"></A>
 <B>:link</B> <EM>name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1363,7 +1363,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52612"></A>
+<A NAME="52619"></A>
 <B>:joint</B> <EM>name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1374,7 +1374,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52622"></A>
+<A NAME="52629"></A>
 <B>:bodies</B> <EM>&amp;rest args  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1385,7 +1385,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52632"></A>
+<A NAME="52639"></A>
 <B>:faces</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -1396,7 +1396,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52642"></A>
+<A NAME="52649"></A>
 <B>:angle-vector</B> <EM>&amp;optional vec (angle-vector (instantiate float-vector (calc-target-joint-dimension joint-list)))  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1407,7 +1407,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52652"></A>
+<A NAME="52659"></A>
 <B>:link-list</B> <EM>to &amp;optional from  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1418,7 +1418,18 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52662"></A>
+<A NAME="52669"></A>
+<B>:plot-joint-min-max-table</B> <EM>joint0 joint1  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Plot joint min max table on Euslisp window.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52679"></A>
 <B>:calc-jacobian-from-link-list</B> <EM>link-list &amp;rest args &amp;key move-target (transform-coords move-target) (rotation-axis (cond ((atom move-target) nil) (t (make-list (length move-target))))) (translation-axis (cond ((atom move-target) t) (t (make-list (length move-target) :initial-element t)))) (col-offset 0) (dim (send self :calc-target-axis-dimension rotation-axis translation-axis)) (fik-len (send self :calc-target-joint-dimension link-list)) fik (tmp-v0 (instantiate float-vector 0)) (tmp-v1 (instantiate float-vector 1)) (tmp-v2 (instantiate float-vector 2)) (tmp-v3 (instantiate float-vector 3)) (tmp-v3a (instantiate float-vector 3)) (tmp-v3b (instantiate float-vector 3)) (tmp-m33 (make-matrix 3 3)) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1429,7 +1440,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="52672"></A>
+<A NAME="52689"></A>
 <B>:inverse-kinematics</B> <EM>target-coords &amp;rest args &amp;key (stop 50) (link-list) (move-target) (debug-view) (warnp t) (revert-if-fail t) (rotation-axis (cond ((atom move-target) t) (t (make-list (length move-target) :initial-element t)))) (translation-axis (cond ((atom move-target) t) (t (make-list (length move-target) :initial-element t)))) (joint-args) (thre (cond ((atom move-target) 1) (t (make-list (length move-target) :initial-element 1)))) (rthre (cond ((atom move-target) (deg2rad 1)) (t (make-list (length move-target) :initial-element (deg2rad 1))))) (union-link-list) (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (dump-command t) (periodic-time 0.5) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1441,7 +1452,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="52682"></A>
+<A NAME="52699"></A>
 <B>:update-descendants</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1456,7 +1467,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52692"></A>
+<A NAME="52709"></A>
 <B>:find-link-route</B> <EM>to &amp;optional from  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1471,7 +1482,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52702"></A>
+<A NAME="52719"></A>
 <B>:make-joint-min-max-table</B> <EM>l0 l1 joint0 joint1 &amp;key (fat 0) (fat2 nil) (debug nil) (margin 0.0) (overwrite-collision-model nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1486,7 +1497,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52712"></A>
+<A NAME="52729"></A>
 <B>:make-min-max-table-using-collision-check</B> <EM>l0 l1 joint0 joint1 joint-range0 joint-range1 min-joint0 min-joint1 fat fat2 debug margin  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1501,7 +1512,22 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52722"></A>
+<A NAME="52739"></A>
+<B>:plot-joint-min-max-table-common</B> <EM>joint0 joint1  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+
+<A NAME="52749"></A>
 <B>:calc-target-axis-dimension</B> <EM>rotation-axis translation-axis  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1516,7 +1542,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52732"></A>
+<A NAME="52759"></A>
 <B>:calc-union-link-list</B> <EM>link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1531,7 +1557,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52742"></A>
+<A NAME="52769"></A>
 <B>:calc-target-joint-dimension</B> <EM>link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1546,7 +1572,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52752"></A>
+<A NAME="52779"></A>
 <B>:calc-inverse-jacobian</B> <EM>jacobi &amp;rest args &amp;key ((:manipulability-limit ml) 0.1) ((:manipulability-gain mg) 0.001) weight debug-view ret wmat tmat umat umat2 mat-tmp mat-tmp-rc tmp-mrr tmp-mrr2 &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1561,7 +1587,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52762"></A>
+<A NAME="52789"></A>
 <B>:calc-gradh-from-link-list</B> <EM>link-list &amp;optional (res (instantiate float-vector (length link-list)))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1576,7 +1602,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52772"></A>
+<A NAME="52799"></A>
 <B>:calc-joint-angle-speed</B> <EM>union-vel &amp;rest args &amp;key angle-speed (angle-speed-blending 0.5) jacobi jacobi# null-space i-j#j debug-view weight wmat tmp-len tmp-len2 fik-len &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1591,7 +1617,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52782"></A>
+<A NAME="52809"></A>
 <B>:calc-joint-angle-speed-gain</B> <EM>union-link-list dav periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1606,7 +1632,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52792"></A>
+<A NAME="52819"></A>
 <B>:collision-avoidance-links</B> <EM>&amp;optional l  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1621,7 +1647,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52802"></A>
+<A NAME="52829"></A>
 <B>:collision-avoidance-link-pair-from-link-list</B> <EM>link-lists &amp;key obstacles ((:collision-avoidance-links collision-links) collision-avoidance-links) debug  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1636,7 +1662,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52812"></A>
+<A NAME="52839"></A>
 <B>:collision-avoidance-calc-distance</B> <EM>&amp;rest args &amp;key union-link-list (warnp t) ((:collision-avoidance-link-pair pair-list)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1651,7 +1677,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52822"></A>
+<A NAME="52849"></A>
 <B>:collision-avoidance-args</B> <EM>pair link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1666,7 +1692,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52832"></A>
+<A NAME="52859"></A>
 <B>:collision-avoidance</B> <EM>&amp;rest args &amp;key avoid-collision-distance avoid-collision-joint-gain avoid-collision-null-gain ((:collision-avoidance-link-pair pair-list)) (union-link-list) (link-list) (weight) (fik-len (send self :calc-target-joint-dimension union-link-list)) debug-view &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1681,7 +1707,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52842"></A>
+<A NAME="52869"></A>
 <B>:move-joints</B> <EM>union-vel &amp;rest args &amp;key union-link-list (periodic-time 0.05) (joint-args) (debug-view nil) (move-joints-hook) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1696,7 +1722,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52852"></A>
+<A NAME="52879"></A>
 <B>:find-joint-angle-limit-weight-old-from-union-link-list</B> <EM>union-link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1711,7 +1737,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52862"></A>
+<A NAME="52889"></A>
 <B>:reset-joint-angle-limit-weight-old</B> <EM>union-link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1726,7 +1752,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52872"></A>
+<A NAME="52899"></A>
 <B>:calc-weight-from-joint-limit</B> <EM>avoid-weight-gain fik-len link-list union-link-list debug-view weight tmp-weight tmp-len  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1741,7 +1767,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52882"></A>
+<A NAME="52909"></A>
 <B>:calc-inverse-kinematics-weight-from-link-list</B> <EM>link-list &amp;key (avoid-weight-gain 1.0) (union-link-list (send self :calc-union-link-list link-list)) (fik-len (send self :calc-target-joint-dimension union-link-list)) (weight (fill (instantiate float-vector fik-len) 1)) (additional-weight-list) (debug-view) (tmp-weight (instantiate float-vector fik-len)) (tmp-len (instantiate float-vector fik-len))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1756,7 +1782,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52892"></A>
+<A NAME="52919"></A>
 <B>:calc-nspace-from-joint-limit</B> <EM>avoid-nspace-gain union-link-list weight debug-view tmp-nspace  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1771,7 +1797,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52902"></A>
+<A NAME="52929"></A>
 <B>:calc-inverse-kinematics-nspace-from-link-list</B> <EM>link-list &amp;key (avoid-nspace-gain 0.01) (union-link-list (send self :calc-union-link-list link-list)) (fik-len (send self :calc-target-joint-dimension union-link-list)) (null-space) (debug-view) (additional-nspace-list) (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (weight (fill (instantiate float-vector fik-len) 1.0)) (update-mass-properties t) (tmp-nspace (instantiate float-vector fik-len))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1786,7 +1812,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52912"></A>
+<A NAME="52939"></A>
 <B>:move-joints-avoidance</B> <EM>union-vel &amp;rest args &amp;key union-link-list link-list (fik-len (send self :calc-target-joint-dimension union-link-list)) (weight (fill (instantiate float-vector fik-len) 1)) (null-space) (avoid-nspace-gain 0.01) (avoid-weight-gain 1.0) (avoid-collision-distance 200) (avoid-collision-null-gain 1.0) (avoid-collision-joint-gain 1.0) ((:collision-avoidance-link-pair pair-list) (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args)))) (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (additional-weight-list) (additional-nspace-list) (tmp-len (instantiate float-vector fik-len)) (tmp-len2 (instantiate float-vector fik-len)) (tmp-weight (instantiate float-vector fik-len)) (tmp-nspace (instantiate float-vector fik-len)) (tmp-mcc (make-matrix fik-len fik-len)) (tmp-mcc2 (make-matrix fik-len fik-len)) (debug-view) (jacobi) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1801,7 +1827,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52922"></A>
+<A NAME="52949"></A>
 <B>:inverse-kinematics-args</B> <EM>&amp;rest args &amp;key union-link-list rotation-axis translation-axis &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1816,7 +1842,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52932"></A>
+<A NAME="52959"></A>
 <B>:draw-collision-debug-view</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1831,7 +1857,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52942"></A>
+<A NAME="52969"></A>
 <B>:inverse-kinematics-loop</B> <EM>dif-pos dif-rot &amp;rest args &amp;key (stop 1) (loop 0) link-list move-target (rotation-axis (cond ((atom move-target) t) (t (make-list (length move-target) :initial-element t)))) (translation-axis (cond ((atom move-target) t) (t (make-list (length move-target) :initial-element t)))) (thre (cond ((atom move-target) 1) (t (make-list (length move-target) :initial-element 1)))) (rthre (cond ((atom move-target) (deg2rad 1)) (t (make-list (length move-target) :initial-element (deg2rad 1))))) (dif-pos-ratio 1.0) (dif-rot-ratio 1.0) union-link-list target-coords (jacobi) (additional-check) (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) debug-view ik-args &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1846,7 +1872,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52952"></A>
+<A NAME="52979"></A>
 <B>:ik-convergence-check</B> <EM>success dif-pos dif-rot rotation-axis translation-axis thre rthre centroid-thre target-centroid-pos centroid-offset-func cog-translation-axis &amp;key (update-mass-properties t)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1861,7 +1887,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52962"></A>
+<A NAME="52989"></A>
 <B>:calc-vel-from-pos</B> <EM>dif-pos translation-axis &amp;rest args &amp;key (p-limit 100.0) (tmp-v0 (instantiate float-vector 0)) (tmp-v1 (instantiate float-vector 1)) (tmp-v2 (instantiate float-vector 2)) (tmp-v3 (instantiate float-vector 3)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1876,7 +1902,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52972"></A>
+<A NAME="52999"></A>
 <B>:calc-vel-from-rot</B> <EM>dif-rot rotation-axis &amp;rest args &amp;key (r-limit 0.5) (tmp-v0 (instantiate float-vector 0)) (tmp-v1 (instantiate float-vector 1)) (tmp-v2 (instantiate float-vector 2)) (tmp-v3 (instantiate float-vector 3)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1891,7 +1917,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52982"></A>
+<A NAME="53009"></A>
 <B>:collision-check-pairs</B> <EM>&amp;key ((:links ls) (cons (car links) (all-child-links (car links))))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1906,7 +1932,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="52992"></A>
+<A NAME="53019"></A>
 <B>:self-collision-check</B> <EM>&amp;key (mode :all) (pairs (send self :collision-check-pairs)) (collision-func 'pqp-collision-check)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1921,7 +1947,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="53002"></A>
+<A NAME="53029"></A>
 <B>:calc-grasp-matrix</B> <EM>contact-points &amp;optional (ret (make-matrix 6 (6 (length contact-points))))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1939,7 +1965,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<A NAME="53012"></A>
+<A NAME="53039"></A>
 <B>eusmodel-validity-check</B> <EM>robot  </EM>[関数]
 
 <DL COMPACT>
@@ -1951,7 +1977,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53022"></A>
+<A NAME="53049"></A>
 <B>calc-jacobian-default-rotate-vector</B> <EM>paxis world-default-coords child-reverse transform-coords tmp-v3 tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -1967,7 +1993,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53033"></A>
+<A NAME="53060"></A>
 <B>calc-jacobian-rotational</B> <EM>fik row column joint paxis child-link world-default-coords child-reverse move-target transform-coords rotation-axis translation-axis tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -1983,7 +2009,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53044"></A>
+<A NAME="53071"></A>
 <B>calc-jacobian-linear</B> <EM>fik row column joint paxis child-link world-default-coords child-reverse move-target transform-coords rotation-axis translation-axis tmp-v0 tmp-v1 tmp-v2 tmp-v3 tmp-v3a tmp-v3b tmp-m33  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -1999,7 +2025,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53055"></A>
+<A NAME="53082"></A>
 <B>calc-angle-speed-gain-scalar</B> <EM>j dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2015,7 +2041,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53066"></A>
+<A NAME="53093"></A>
 <B>calc-angle-speed-gain-vector</B> <EM>j dav i periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2031,7 +2057,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53077"></A>
+<A NAME="53104"></A>
 <B>all-child-links</B> <EM>s &amp;optional (pred #'identity)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2047,7 +2073,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53088"></A>
+<A NAME="53115"></A>
 <B>calc-dif-with-axis</B> <EM>dif axis &amp;optional tmp-v0 tmp-v1 tmp-v2  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2063,7 +2089,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53099"></A>
+<A NAME="53126"></A>
 <B>calc-target-joint-dimension</B> <EM>joint-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2079,7 +2105,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53110"></A>
+<A NAME="53137"></A>
 <B>calc-joint-angle-min-max-for-limit-calculation</B> <EM>j kk jamm  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2095,7 +2121,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53121"></A>
+<A NAME="53148"></A>
 <B>joint-angle-limit-weight</B> <EM>j-l &amp;optional (res (instantiate float-vector (calc-target-joint-dimension j-l)))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2111,7 +2137,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53132"></A>
+<A NAME="53159"></A>
 <B>joint-angle-limit-nspace</B> <EM>j-l &amp;optional (res (instantiate float-vector (calc-target-joint-dimension j-l)))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2127,7 +2153,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53143"></A>
+<A NAME="53170"></A>
 <B>calc-jacobian-from-link-list-including-robot-and-obj-virtual-joint</B> <EM>link-list move-target obj-move-target robot &amp;key (rotation-axis '(t t)) (translation-axis '(t t)) (fik (make-matrix (send robot :calc-target-axis-dimension rotation-axis translation-axis) (send robot :calc-target-joint-dimension link-list)))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2143,7 +2169,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53154"></A>
+<A NAME="53181"></A>
 <B>append-obj-virtual-joint</B> <EM>link-list target-coords &amp;key (joint-class 6dof-joint) (joint-args) (vplink) (vplink-coords) (vclink-coords)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2159,7 +2185,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53165"></A>
+<A NAME="53192"></A>
 <B>append-multiple-obj-virtual-joint</B> <EM>link-list target-coords &amp;key (joint-class '(6dof-joint)) (joint-args '(nil)) (vplink) (vplink-coords) (vclink-coords)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2175,7 +2201,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53176"></A>
+<A NAME="53203"></A>
 <B>eusmodel-validity-check-one</B> <EM>robot  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2193,7 +2219,7 @@ nil
                
  <BR>
 <BR> <BR> 
-<A NAME="54562"></A>
+<A NAME="54605"></A>
 <BIG CLASS="XLARGE"><B>bodyset </B></BIG> [クラス]  <PRE><TT>
   :super   <B>cascaded-coords</B> 
 <BR>  :slots 		 (geometry::bodies :type cons) 
@@ -2209,7 +2235,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54579"></A>
+<A NAME="54622"></A>
 <B>:init</B> <EM>coords &amp;rest args &amp;key (name (intern (format nil bodyset&nbsp;A (system:address self)) KEYWORD)) ((:bodies geometry::bs)) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2221,7 +2247,7 @@ nil
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="54589"></A>
+<A NAME="54632"></A>
 <B>:bodies</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2236,7 +2262,7 @@ nil
 
 <BR>
 
-<A NAME="54599"></A>
+<A NAME="54642"></A>
 <B>:faces</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2251,7 +2277,7 @@ nil
 
 <BR>
 
-<A NAME="54609"></A>
+<A NAME="54652"></A>
 <B>:worldcoords</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2266,7 +2292,7 @@ nil
 
 <BR>
 
-<A NAME="54619"></A>
+<A NAME="54662"></A>
 <B>:draw-on</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2284,7 +2310,7 @@ nil
 
 <P>
 
-<A NAME="54629"></A>
+<A NAME="54672"></A>
 <B>midcoords</B> <EM>geometry::p geometry::c1 geometry::c2  </EM>[関数]
 
 <DL COMPACT>
@@ -2295,7 +2321,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54639"></A>
+<A NAME="54682"></A>
 <B>orient-coords-to-axis</B> <EM>geometry::target-coords geometry::v &amp;optional (geometry::axis :z)  </EM>[関数]
 
 <DL COMPACT>
@@ -2307,7 +2333,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54649"></A>
+<A NAME="54692"></A>
 <B>geometry::face-to-triangle-aux</B> <EM>geometry::f  </EM>[関数]
 
 <DL COMPACT>
@@ -2318,7 +2344,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54659"></A>
+<A NAME="54702"></A>
 <B>geometry::face-to-triangle</B> <EM>geometry::f  </EM>[関数]
 
 <DL COMPACT>
@@ -2329,7 +2355,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54669"></A>
+<A NAME="54712"></A>
 <B>geometry::face-to-tessel-triangle</B> <EM>geometry::f geometry::num  </EM>[関数]
 
 <DL COMPACT>
@@ -2340,7 +2366,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54679"></A>
+<A NAME="54722"></A>
 <B>body-to-faces</B> <EM>geometry::abody  </EM>[関数]
 
 <DL COMPACT>
@@ -2351,7 +2377,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54689"></A>
+<A NAME="54732"></A>
 <B>make-sphere</B> <EM>geometry::r &amp;rest args  </EM>[関数]
 
 <DL COMPACT>
@@ -2362,7 +2388,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54699"></A>
+<A NAME="54742"></A>
 <B>make-ring</B> <EM>geometry::ring-radius geometry::pipe-radius &amp;rest args &amp;key (geometry::segments 16)  </EM>[関数]
 
 <DL COMPACT>
@@ -2373,7 +2399,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54709"></A>
+<A NAME="54752"></A>
 <B>x-of-cube</B> <EM>geometry::cub  </EM>[関数]
 
 <DL COMPACT>
@@ -2384,7 +2410,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54719"></A>
+<A NAME="54762"></A>
 <B>y-of-cube</B> <EM>geometry::cub  </EM>[関数]
 
 <DL COMPACT>
@@ -2395,7 +2421,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54729"></A>
+<A NAME="54772"></A>
 <B>z-of-cube</B> <EM>geometry::cub  </EM>[関数]
 
 <DL COMPACT>
@@ -2406,7 +2432,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54739"></A>
+<A NAME="54782"></A>
 <B>height-of-cylinder</B> <EM>geometry::cyl  </EM>[関数]
 
 <DL COMPACT>
@@ -2417,7 +2443,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54749"></A>
+<A NAME="54792"></A>
 <B>radius-of-cylinder</B> <EM>geometry::cyl  </EM>[関数]
 
 <DL COMPACT>
@@ -2428,7 +2454,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54759"></A>
+<A NAME="54802"></A>
 <B>radius-of-sphere</B> <EM>geometry::sp  </EM>[関数]
 
 <DL COMPACT>
@@ -2439,7 +2465,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54769"></A>
+<A NAME="54812"></A>
 <B>geometry::make-faceset-from-vertices</B> <EM>geometry::vs  </EM>[関数]
 
 <DL COMPACT>
@@ -2450,7 +2476,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="54779"></A>
+<A NAME="54822"></A>
 <B>matrix-to-euler-angle</B> <EM>geometry::m geometry::axis-order  </EM>[関数]
 
 <DL COMPACT>
@@ -2462,7 +2488,7 @@ nil
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="54789"></A>
+<A NAME="54832"></A>
 <B>transform-coords</B> <EM>geometry::c1 geometry::c2 &amp;optional (geometry::c3 (let ((geometry::dim (send geometry::c1 :dimension))) (instance coordinates :newcoords (unit-matrix geometry::dim) (instantiate float-vector geometry::dim))))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2478,7 +2504,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="54800"></A>
+<A NAME="54843"></A>
 <B>geometry::face-to-triangle-rest-polygon</B> <EM>geometry::f geometry::num geometry::edgs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2494,7 +2520,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="54811"></A>
+<A NAME="54854"></A>
 <B>geometry::face-to-triangle-make-simple</B> <EM>geometry::f  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2510,7 +2536,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="54822"></A>
+<A NAME="54865"></A>
 <B>body-to-triangles</B> <EM>geometry::abody &amp;optional (geometry::limit 50)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2526,7 +2552,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="54833"></A>
+<A NAME="54876"></A>
 <B>geometry::triangle-to-triangle</B> <EM>geometry::aface &amp;optional (geometry::limit 50)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2544,7 +2570,7 @@ nil
                
  <BR>
 <BR> <BR> 
-<A NAME="55224"></A>
+<A NAME="55267"></A>
 <BIG CLASS="XLARGE"><B>robot-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>cascaded-link</B> 
 <BR>  :slots 		 larm-end-coords rarm-end-coords lleg-end-coords rleg-end-coords head-end-coords torso-end-coords larm-root-link rarm-root-link lleg-root-link rleg-root-link head-root-link torso-root-link larm-collision-avoidance-links rarm-collision-avoidance-links larm rarm lleg rleg torso head force-sensors imu-sensors cameras 
@@ -2560,7 +2586,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55241"></A>
+<A NAME="55284"></A>
 <B>:camera</B> <EM>sensor-name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2571,7 +2597,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55251"></A>
+<A NAME="55294"></A>
 <B>:force-sensor</B> <EM>sensor-name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2582,7 +2608,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55261"></A>
+<A NAME="55304"></A>
 <B>:imu-sensor</B> <EM>sensor-name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2593,7 +2619,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55271"></A>
+<A NAME="55314"></A>
 <B>:force-sensors</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -2604,7 +2630,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55281"></A>
+<A NAME="55324"></A>
 <B>:imu-sensors</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -2615,7 +2641,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55291"></A>
+<A NAME="55334"></A>
 <B>:cameras</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -2626,7 +2652,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55301"></A>
+<A NAME="55344"></A>
 <B>:look-at-hand</B> <EM>l/r  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2637,7 +2663,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55311"></A>
+<A NAME="55354"></A>
 <B>:inverse-kinematics</B> <EM>target-coords &amp;rest args &amp;key look-at-target (move-target) (link-list (if (atom move-target) (send self :link-list (send move-target :parent)) (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target))) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2650,7 +2676,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55321"></A>
+<A NAME="55364"></A>
 <B>:inverse-kinematics-loop</B> <EM>dif-pos dif-rot &amp;rest args &amp;key target-coords debug-view look-at-target (move-target) (link-list (if (atom move-target) (send self :link-list (send move-target :parent)) (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target))) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2663,7 +2689,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55331"></A>
+<A NAME="55374"></A>
 <B>:look-at-target</B> <EM>look-at-target &amp;key (target-coords)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2674,7 +2700,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55341"></A>
+<A NAME="55384"></A>
 <B>:init-pose</B> <EM>nil </EM>[メソッド]
 
 <DL COMPACT>
@@ -2685,7 +2711,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55351"></A>
+<A NAME="55394"></A>
 <B>:torque-vector</B> <EM>&amp;key (force-list) (moment-list) (target-coords) (debug-view nil) (calc-statics-p t) (dt 0.005) (av (send self :angle-vector)) (root-coords (send (car (send self :links)) :copy-worldcoords)) (calc-torque-buffer-args (send self :calc-torque-buffer-args))  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2696,7 +2722,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55361"></A>
+<A NAME="55404"></A>
 <B>:calc-force-from-joint-torque</B> <EM>limb all-torque &amp;key (move-target (send self limb :end-coords)) (use-torso)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2707,7 +2733,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55371"></A>
+<A NAME="55414"></A>
 <B>:fullbody-inverse-kinematics</B> <EM>target-coords &amp;rest args &amp;key (move-target) (link-list) (min (float-vector -500 -500 -500 -20 -20 -10)) (max (float-vector 500 500 25 20 20 10)) (root-link-virtual-joint-weight #f(0.1 0.1 0.1 0.1 0.5 0.5)) (target-centroid-pos (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos))) (cog-gain 1.0) (centroid-thre 5.0) (additional-weight-list) (joint-args nil) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2720,7 +2746,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55381"></A>
+<A NAME="55424"></A>
 <B>:calc-zmp-from-forces-moments</B> <EM>forces moments &amp;key (wrt :world) (limbs '(:rleg :lleg)) (force-sensors (mapcar #'(lambda (l) (send self :force-sensor l)) limbs)) (cop-coords (mapcar #'(lambda (l) (send self l :end-coords)) limbs)) (fz-thre 0.001) (limb-cop-fz-list (mapcar #'(lambda (fs f m cc) (let ((fsp (scale 0.001 (send fs :worldpos))) (nf (send fs :rotate-vector f)) (nm (send fs :rotate-vector m))) (send self :calc-cop-from-force-moment nf nm fs cc :fz-thre fz-thre :return-all-values t))) force-sensors forces moments cop-coords))  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2733,7 +2759,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55391"></A>
+<A NAME="55434"></A>
 <B>:foot-midcoords</B> <EM>&amp;optional (mid 0.5)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2745,7 +2771,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55401"></A>
+<A NAME="55444"></A>
 <B>:fix-leg-to-coords</B> <EM>fix-coords &amp;optional (l/r :both) &amp;key (mid 0.5) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2757,7 +2783,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55411"></A>
+<A NAME="55454"></A>
 <B>:move-centroid-on-foot</B> <EM>leg fix-limbs &amp;rest args &amp;key (thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) 1 5)) fix-limbs)) (rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) 1 5))) fix-limbs)) (mid 0.5) (target-centroid-pos (if (eq leg :both) (apply #'midpoint mid (mapcar #'(lambda (tmp-leg) (send self tmp-leg :end-coords :worldpos)) (remove-if-not #'(lambda (x) (memq x '(:rleg :lleg))) fix-limbs))) (send self leg :end-coords :worldpos))) (fix-limbs-target-coords (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) fix-limbs)) (root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5)) &amp;allow-other-keys  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2770,7 +2796,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55421"></A>
+<A NAME="55464"></A>
 <B>:calc-walk-pattern-from-footstep-list</B> <EM>footstep-list &amp;key (default-step-height 50) (dt 0.1) (default-step-time 1.0) (solve-angle-vector-args) (debug-view nil) ((:all-limbs al) '(:rleg :lleg)) ((:default-zmp-offsets dzo) (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) (init-pose-function #'(lambda nil (send self :move-centroid-on-foot :both '(:rleg :lleg)))) (start-with-double-support t) (end-with-double-support t)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2781,7 +2807,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55431"></A>
+<A NAME="55474"></A>
 <B>:gen-footstep-parameter</B> <EM>&amp;key (ratio 1.0)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2792,7 +2818,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="55441"></A>
+<A NAME="55484"></A>
 <B>:go-pos-params-&gt;footstep-list</B> <EM>xx yy th &amp;key ((:footstep-parameter prm) (send self :footstep-parameter)) ((:default-half-offset defp) (cadr (memq :default-half-offset prm))) ((:forward-offset-length xx-max) (cadr (memq :forward-offset-length prm))) ((:outside-offset-length yy-max) (cadr (memq :outside-offset-length prm))) ((:rotate-rad th-max) (abs (rad2deg (cadr (memq :rotate-rad prm))))) (gen-go-pos-step-node-func #'(lambda (mc leg leg-translate-pos) (let ((cc (send (send mc :copy-worldcoords) :translate (cadr (assoc leg leg-translate-pos))))) (send cc :name leg) cc)))  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2804,7 +2830,7 @@ nil
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="55451"></A>
+<A NAME="55494"></A>
 <B>:limb</B> <EM>limb method &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2819,7 +2845,7 @@ nil
 
 <BR>
 
-<A NAME="55461"></A>
+<A NAME="55504"></A>
 <B>:inverse-kinematics-loop-for-look-at</B> <EM>limb &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2834,7 +2860,7 @@ nil
 
 <BR>
 
-<A NAME="55471"></A>
+<A NAME="55514"></A>
 <B>:gripper</B> <EM>limb &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2849,7 +2875,7 @@ nil
 
 <BR>
 
-<A NAME="55481"></A>
+<A NAME="55524"></A>
 <B>:get-sensor-method</B> <EM>sensor-type sensor-name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2864,7 +2890,7 @@ nil
 
 <BR>
 
-<A NAME="55491"></A>
+<A NAME="55534"></A>
 <B>:get-sensors-method-by-limb</B> <EM>sensors-type limb  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2879,7 +2905,7 @@ nil
 
 <BR>
 
-<A NAME="55501"></A>
+<A NAME="55544"></A>
 <B>:larm</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2894,7 +2920,7 @@ nil
 
 <BR>
 
-<A NAME="55511"></A>
+<A NAME="55554"></A>
 <B>:rarm</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2909,7 +2935,7 @@ nil
 
 <BR>
 
-<A NAME="55521"></A>
+<A NAME="55564"></A>
 <B>:lleg</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2924,7 +2950,7 @@ nil
 
 <BR>
 
-<A NAME="55531"></A>
+<A NAME="55574"></A>
 <B>:rleg</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2939,7 +2965,7 @@ nil
 
 <BR>
 
-<A NAME="55541"></A>
+<A NAME="55584"></A>
 <B>:head</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2954,7 +2980,7 @@ nil
 
 <BR>
 
-<A NAME="55551"></A>
+<A NAME="55594"></A>
 <B>:torso</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2969,7 +2995,7 @@ nil
 
 <BR>
 
-<A NAME="55561"></A>
+<A NAME="55604"></A>
 <B>:arms</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2984,7 +3010,7 @@ nil
 
 <BR>
 
-<A NAME="55571"></A>
+<A NAME="55614"></A>
 <B>:legs</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2999,7 +3025,7 @@ nil
 
 <BR>
 
-<A NAME="55581"></A>
+<A NAME="55624"></A>
 <B>:joint-angle-limit-nspace-for-6dof</B> <EM>&amp;key (avoid-nspace-gain 0.01) (limbs '(:rleg :lleg))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3014,7 +3040,7 @@ nil
 
 <BR>
 
-<A NAME="55591"></A>
+<A NAME="55634"></A>
 <B>:joint-order</B> <EM>limb &amp;optional jname-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3029,7 +3055,7 @@ nil
 
 <BR>
 
-<A NAME="55601"></A>
+<A NAME="55644"></A>
 <B>:print-vector-for-robot-limb</B> <EM>vec  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3044,7 +3070,7 @@ nil
 
 <BR>
 
-<A NAME="55611"></A>
+<A NAME="55654"></A>
 <B>:draw-gg-debug-view</B> <EM>end-coords-list contact-state rz cog pz czmp dt  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3059,7 +3085,7 @@ nil
 
 <BR>
 
-<A NAME="55621"></A>
+<A NAME="55664"></A>
 <B>:footstep-parameter</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3077,7 +3103,7 @@ nil
 
 <P>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="55631"></A>
+<A NAME="55674"></A>
 <B>make-default-robot-link</B> <EM>len radius axis name &amp;optional extbody  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -3124,7 +3150,7 @@ nil
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2014-12-22
+2015-01-08
 </ADDRESS>
 </BODY>
 </HTML>
