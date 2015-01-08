@@ -856,6 +856,10 @@
          (overwrite-collision-model nil))
    ;; initialize for :make-joint-min-max-table
    (if (null debug) (send-all (send self :links) :analysis-level :coords))
+   ;; for debug
+   (dolist (jj (list joint0 joint1))
+     (send jj :put :org-min-angle (send jj :min-angle))
+     (send jj :put :org-max-angle (send jj :max-angle)))
    (let* ((pc (send self :copy-worldcoords))
           (pav (send self :angle-vector))
           (min-joint0 (truncate (- (send joint0 :min-angle) 1e-4)))
@@ -952,6 +956,40 @@
          (send joint0 :joint-min-max-target joint1)
          (send joint0 :joint-min-max-table table1))
        )))
+  ;; plot function for min max table
+  (:plot-joint-min-max-table-common
+   (joint0 joint1)
+   (let ((ret))
+     (null-output
+      (do ((j0 (get joint0 :org-min-angle) (+ 1 j0))) ((> j0 (get joint0 :org-max-angle)))
+          (send self :init-pose)
+          (send joint0 :joint-angle j0)
+          (let ((flg0 (eps= (float (send joint0 :joint-angle)) (float j0))))
+            (do ((j1 (get joint1 :org-min-angle)(+ 1 j1))) ((> j1 (get joint1 :org-max-angle)))
+                (send joint1 :joint-angle j1)
+                (let ((flg1 (eps= (float (send joint1 :joint-angle)) (float j1))))
+                  (if (and flg0 flg1) (push (list j0 j1) ret))
+                  ))
+            )))
+     (reverse ret)))
+  (:plot-joint-min-max-table
+   (joint0 joint1)
+   "Plot joint min max table on Euslisp window."
+   (let* ((min-max-table-view
+           (instance x::panel :create
+                     :width  (round (- (send joint0 :get :org-max-angle) (send joint0 :get :org-min-angle)))
+                     :height (round (- (send joint1 :get :org-max-angle) (send joint1 :get :org-min-angle)))
+                     :atitle "min-max-table-view"))
+          (ret (send self :plot-joint-min-max-table-common joint0 joint1)))
+     (send min-max-table-view :color #xffffff)
+     (send min-max-table-view :flush)
+     (send min-max-table-view :color #xff0000)
+     (dolist (jj ret)
+       (send min-max-table-view :draw-line
+             (float-vector (- (round (car jj)) (get joint0 :org-min-angle)) (- (round (cadr jj)) (get joint1 :org-min-angle)))
+             (float-vector (- (round (car jj)) (get joint0 :org-min-angle)) (- (round (cadr jj)) (get joint1 :org-min-angle)))))
+     (send min-max-table-view :flush)
+     ))
   )
 
 ;;;

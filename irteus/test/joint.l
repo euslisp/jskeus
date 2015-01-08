@@ -192,33 +192,6 @@
             (send *robot* :joint-list))
     ))
 
-(defun plot-joint-min-max-table
-  (robot joint0 joint1)
-  (let ((min-max-table-view
-         (instance x::panel :create
-                   :width  (round (- (send joint0 :get :org-max-angle) (send joint0 :get :org-min-angle)))
-                   :height (round (- (send joint1 :get :org-max-angle) (send joint1 :get :org-min-angle)))
-                   :atitle "min-max-table-view")))
-    (send min-max-table-view :color #xffffff)
-    (send min-max-table-view :flush)
-    (null-output
-     (do ((j0 (get joint0 :org-min-angle) (+ 1 j0))) ((> j0 (get joint0 :org-max-angle)))
-         (send robot :init-pose)
-         (send joint0 :joint-angle j0)
-         (let ((flg0 (eps= (float (send joint0 :joint-angle)) (float j0))))
-           (do ((j1 (get joint1 :org-min-angle)(+ 1 j1))) ((> j1 (get joint1 :org-max-angle)))
-               (send joint1 :joint-angle j1)
-               (let ((flg1 (eps= (float (send joint1 :joint-angle)) (float j1))))
-                 (send min-max-table-view :color #xff0000)
-                 (if (and flg0 flg1)
-                     (send min-max-table-view :draw-line
-                           (float-vector (- (round j0) (get joint0 :org-min-angle)) (- (round j1) (get joint1 :org-min-angle)))
-                           (float-vector (- (round j0) (get joint0 :org-min-angle)) (- (round j1) (get joint1 :org-min-angle)))))
-                 ))
-           )))
-    (send min-max-table-view :flush)
-    ))
-
 (defun check-link-collision-for-joint-min-max-table
   (robot link0 link1 joint0 joint1
    &key (margin 0.0) ;; margin [deg] is margin angle from collision-based min-angle and max-angle
@@ -276,7 +249,7 @@
         (send (send *robot* :j1) :parent-link) (send (send *robot* :j2) :child-link) (send *robot* :j1) (send *robot* :j2)
         :margin margin)
   (unless (or (null x::*display*) (= x::*display* 0))
-    (plot-joint-min-max-table *robot* (send *robot* :j1) (send *robot* :j2))
+    (send *robot* :plot-joint-min-max-table (send *robot* :j1) (send *robot* :j2))
     ";; plot joint-min-max-table")
   (prog1
       (every #'identity (check-link-collision-for-joint-min-max-table
