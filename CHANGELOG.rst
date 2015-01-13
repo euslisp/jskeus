@@ -2,6 +2,12 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Set ${EUSDIR}/irteus as symlink
+* Move plot joint min max function to irtmodel.l and define it as method
+* Contributors: Kei Okada, Shunichi Nozawa
+
 1.0.1 (2014-12-22)
 ------------------
 * Fix for when euslisp is already installed as deb, if objdir is given from upper script, we use them
