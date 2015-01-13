@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.2 (2015-01-13)
+------------------
 * Set ${EUSDIR}/irteus as symlink
 * Move plot joint min max function to irtmodel.l and define it as method
 * Contributors: Kei Okada, Shunichi Nozawa
