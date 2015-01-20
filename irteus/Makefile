@@ -148,9 +148,9 @@ $(BINS):
 $(EUSDIR)/irteus:
 	(cd $(IRTEUSDIR); ln -sf ../irteus irteus)
 
-install-irtext.l: $(EUSDIR)/lib/irtext.l
-$(EUSDIR)/lib/irtext.l: irtext.l
-	-cp -f irtext.l $(EUSDIR)/lib
+install-irtext.l: $(IRTEUSDIR)/lib/irtext.l
+$(IRTEUSDIR)/lib/irtext.l: irtext.l
+	-cp -f irtext.l $(IRTEUSDIR)/lib
 
 clean:
 	-rm -f $(IRTCOBJECTS) $(IRTGCOBJECTS)
