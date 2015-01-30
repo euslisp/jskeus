@@ -375,8 +375,7 @@
       (dolist (klass klasses)
         (let ((klass-name (string-downcase (send klass :name))))
         (if (or (string= klass-name name)
-                (string= (format nil "~A-robot" name) klass-name)
-                (string= (format nil "~A-robot-model" name) klass-name))
+                (string= (format nil "~A-robot" name) klass-name))
             (return-from make-robot-model-from-name (instance* klass :init args)))))
       nil)))
 
