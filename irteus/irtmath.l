@@ -315,6 +315,227 @@
     res))
 
 
+(defun eigen-decompose (m)
+  ;; m is real symmetrix matrix we can use (ql-decompose m)
+  (let* ((evalue (car (qr-decompose m)))
+	 (l (length evalue))
+	 (evector (make-matrix l l)) mm mmm tv ttv pv r w j (j-max 10) k d)
+    (setq evalue (sort evalue #'>=))
+    (dotimes (i l)
+      (setq mm (m+ m (scale-matrix (- (elt evalue i)) (unit-matrix l))))
+      (setq mmm (copy-matrix mm))
+      ;; inverse iteration
+      ;; using lu
+      (when (setq pv (lu-decompose mm))
+	;; make rondom vector
+	(setq tv (instantiate float-vector l))
+	;; generate non-zero random vector
+	(while (eps= (norm tv)  0)
+	  (dotimes (i l) (setf (elt tv i) (- (random 1.0) 0.5)))
+	  (setq tv (normalize-vector tv)))
+	;;
+	(setq ttv tv j 0)
+	(loop
+	 (setq tv (lu-solve mm pv tv))
+	 (setq tv (normalize-vector tv))
+	 ;; exit loop when no updates
+	 (if (or (>= (incf j) j-max) (eps= (distance ttv tv) 0))
+	     (return-from nil))
+	 ;; update eigen vector
+	 (when (> j (/ j-max 2))
+	   (setq d (/ 1.0
+		      (v. (coerce pv float-vector)
+			  (lu-solve mm pv tv)))) ;; non-normlaized value
+	   ;;(setq k 1)
+	   ;;(while (eps= (- (elt evalue i) (+ (elt evalue i) (* k d))) 0)
+	   ;;  (incf k))
+	   ;;(incf (elt evalue i) (* k d))
+	   (incf (elt evalue i) d)
+	   (setq mm (m+ m (scale-matrix (- (elt evalue i)) (unit-matrix l))))
+	   (setq pv (lu-decompose mm))
+	   (if (null pv) (return-from nil))
+	   )
+	 (setq ttv tv))
+        (when (>= j j-max)
+          ;;(warn ";; eigen decompose did not converge ~A:~A~%;; ~A~%" i (elt evalue i) m)
+          (setq pv nil))
+        )
+      (unless pv
+	(setq r (sv-decompose mmm))
+	(setq w (elt r 1))
+	(dotimes (j (length w))
+	  (if (< (abs (elt w j)) 1e-4)
+	      (setq tv (matrix-column (elt r 2) j))
+	    )))
+      (setf (matrix-column evector i) tv))
+    (list evalue evector)))
+
+;; lmeds
+;;http://www-pse.cheme.kyoto-u.ac.jp/~kano/document/text-PCA.pdf
+(defun lms (point-list)
+  (let ((v^ (vector-mean point-list))
+        (point-length (length point-list))
+	delx x v eigen-res eigen-val eigen-vec min-lam min-vec)
+    (setq x (make-matrix point-length (length v^)))
+    (dotimes (i point-length)
+      (setf (matrix-row x i) (v- (elt point-list i) v^)))
+    (setq v  (scale-matrix (/ 1.0 (- point-length 1)) (m* (transpose x) x)))
+    (setq eigen-res (eigen-decompose v))
+    (setq eigen-val (car eigen-res) eigen-vec (cadr eigen-res))
+    (setq min-lam (elt eigen-val 0)
+          min-vec (matrix-column eigen-vec 0))
+    (dotimes (i (length eigen-val))
+      (when (> min-lam (elt eigen-val i))
+        (setq min-lam (elt eigen-val i))
+        (setq min-vec (matrix-column eigen-vec i))
+        ))
+    (list min-vec (- (v. v^ min-vec)))
+    ))
+
+(defun lms-estimate (res point-)
+  (+ (v. point- (car res)) (cadr res))
+  )
+
+(defun lms-error (result point-list)
+  (let ((ret-err 0) tmp-err)
+    (dolist (l point-list)
+      (setq tmp-err (lms-estimate result l))
+      (incf ret-err (* tmp-err tmp-err))
+      )
+    (/ ret-err (length point-list))
+    ))
+
+;; choose num points randomly and apply lms to find the souliton with smallest errors
+;; to use ransac ransac
+;;   :lmeds-error-func -> set to ransac-error
+;;   :ransac-threshold err^2 (square of the distance from the plane)
+(defun lmeds (point-list &key (num 5) (err-rate 0.3) (iteration) (ransac-threshold)
+			 (lms-func #'lms) (lmeds-error-func #'lmeds-error)
+			 (lms-estimate-func #'lms-estimate))
+  (let (point-num r result result-list error-list iter
+		  comb-index comb-index-list point-list-tmp)
+    ;; initialize variables
+    (setq point-num (length point-list) num (min (max 2 num) point-num)
+	  result-list nil error-list nil point-list-tmp nil)
+    ;; make comb index list
+    ;; (setq comb-index-list (cadr (combination num point-num)))
+    ;; lmeds
+    (if iteration (setq iter iteration)
+      (setq iter (ceiling (/ (log 0.01) (log (- 1 (expt (- 1 err-rate) num)))))))
+    (dotimes (j iter)
+      (setq comb-index nil)
+      (dotimes (i num)
+	(setq r (random point-num))
+	(while (find r comb-index)
+	  (setq r (random point-num)))
+	(push r comb-index))
+      (push comb-index comb-index-list))
+    ;; lms using comb-index-listload
+    (dolist (ci comb-index-list)
+      ;; make point-list-tmp
+      (setq point-list-tmp nil)
+      (dolist (c ci)
+	(push (elt point-list c) point-list-tmp))
+      (setq result (funcall lms-func point-list-tmp))
+      (push result result-list)
+      (if ransac-threshold
+          (push (funcall lmeds-error-func result point-list ransac-threshold
+                         :lms-estimate-func lms-estimate-func) error-list)
+        (push (funcall lmeds-error-func result point-list
+                       :lms-estimate-func lms-estimate-func) error-list))
+      )
+    (elt result-list
+         (position (find-extream error-list #'(lambda (x) x) (if ransac-threshold #'> #'<)) error-list))
+    ))
+
+(defun lmeds-error (result point-list &key (lms-estimate-func #'lms-estimate))
+  (let (tmp-err err)
+    (dolist (l point-list)
+      (setq tmp-err (funcall lms-estimate-func result l))
+      (push (* tmp-err tmp-err) err)
+      )
+    (elt (sort err #'<) (/ (length err) 2))
+    ))
+
+(defun lmeds-error-mat (result mat &key (lms-estimate-func #'lms-estimate))
+  (let ((size (array-dimension mat 0))
+        (p (float-vector 0 0 0))
+        tmp-err  err)
+    (dotimes (i size)
+      (c-matrix-row mat i p)
+      (setq tmp-err (funcall lms-estimate-func result p))
+      (push (* tmp-err tmp-err) err))
+    (elt (sort err #'<) (/ (length err) 2))
+    ))
+
+
+#|
+(defun lms-draw (r point-list)
+  (let (bs b str)
+    (setq bs nil)
+    (setq str "plot [0:80][0:50] '< echo \"")
+    (dotimes (i (length point-list))
+      (setq str (concatenate string str (format nil "~A ~A\\n"
+						(elt (elt point-list i) 0)
+						(elt (elt point-list i) 1)
+						)))
+      )
+    (setq str (concatenate string str (format nil "\"' title \"data\"~%")))
+    (format *gnuplot* "~a~%" str)
+
+    (setq str (format nil "replot ~A * x + ~A title \"regression\""
+		      (/ (elt (car r) 0) (- (elt (car r) 1)))
+		      (/ (cadr r) (- (elt (car r) 1)))
+		      ))
+    (format *gnuplot* "~a~%" str)
+    t))
+
+(defun lms-demo (num)
+  (let (r 
+	(data1 '(#f(28.0 22.0) #f(46.0 36.0) #f(39.0 24.0) #f(25.0 22.0)
+		   #f(34.0 27.0) #f(29.0 29.0) #f(38.0 26.0) #f(23.0 23.0)
+		   #f(42.0 31.0) #f(27.0 24.0) #f(35.0 23.0) #f(39.0 27.0)
+		   #f(38.0 31.0) #f(32.0 25.0) #f(25.0 23.0)))
+	(data1o '(#f(28.0 22.0) #f(46.0 36.0) #f(39.0 24.0) #f(25.0 22.0)
+		    #f(34.0 27.0) #f(29.0 29.0) #f(38.0 26.0) #f(23.0 23.0)
+		    #f(72.0 2.0) #f(42.0 31.0) #f(27.0 24.0) #f(35.0 23.0)
+		    #f(39.0 27.0) #f(38.0 31.0) #f(32.0 25.0)))
+	)
+    (when (not (boundp '*gnuplot*))
+      (setq *gnuplot* (piped-fork "gnuplot")))
+
+    (format t "apply lms with data~%")
+    (setq r (lms data1))
+    (format t "lms result~%")
+    (lms-draw r data1)
+    (format t ";; lms-error   ~10,3f, ~A~%" (lms-error r data1) r)
+    (format t ";; >> input any key~%")
+    (read-line)
+    ;;
+    (format t "apply lmeds with data~%")
+    (setq r (lmeds data1))
+    (format t "lmeds result~%")
+    (lms-draw r data1)
+    (format t ";; lmeds-error ~10,3f, ~A~%" (lmeds-error r data1) r)
+    (format t ";; >> input any key~%")
+    (read-line)
+    ;;
+    (format t "apply lms when outlier~%")
+    (setq r (lms data1o))
+    (format t "lms result when outlier~%")
+    (lms-draw r data1o)
+    (format t ";; lms-error   ~10,3f, ~A~%" (lms-error r data1o) r)
+    (format t ";; >> input any key~%")
+    (read-line)
+    ;;
+    (format t "apply lmeds when outlier~%")
+    (setq r (lmeds data1o))
+    (format t "lmeds result when outlier~%")
+    (lms-draw r data1o)
+    (format t ";; lmeds-error   ~10,3f, ~A~%" (lmeds-error r data1) r)
+    ))
+|#
+
 ;;
 ;; re-define
 ;;
