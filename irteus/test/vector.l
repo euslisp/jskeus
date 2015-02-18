@@ -82,6 +82,11 @@
     (dotimes (i 360)
       (setq a (rotate-vector a (deg2rad 1) :x)))
     (assert (eps-v= a b) "rotate-vector")
+
+    (assert (eps-v= (vplus (list a b a b)) (scale 2 (v+ a b))) "vplus")
+
+    (assert (eps-v= (vector-mean (list a b b a)) (scale 0.5 (v+ a b))) "vector-mean")
+
     ))
 
 (deftest reader
