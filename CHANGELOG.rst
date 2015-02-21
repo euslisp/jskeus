@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.3 (2015-02-22)
+------------------
 * [PQP.cpp, euspng.c] cast for printf
 * [irteus/irtgeo.c] inlucde math.c for function prototype
 * output euscomp results to dev/null
