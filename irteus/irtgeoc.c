@@ -1,5 +1,6 @@
 #pragma init (register_irtgeoc)
 #include "eus.h"
+#include <math.h>
 
 extern pointer ___irtgeoc();
 static register_irtgeoc()

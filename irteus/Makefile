@@ -115,23 +115,23 @@ $(LIBIRTEUSGL): $(IRTEUSGLOBJS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSGL) $(IRTEUSGLOBJS) $(IMPLIB)
 
 $(IRTEUSOBJS):
-	$(BINDIR)/eus2$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irt.l
+	$(BINDIR)/eus2$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irt.l > /dev/null
 	-rm -f $(IRTEUS_C) $(IRTEUS_H)
 
 $(IRTEUSGOBJS):
-	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l
+	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l > /dev/null
 	-rm -f $(IRTEUSG_C) $(IRTEUSG_H)
 
 $(IRTEUSXOBJS) :
-	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtx.l
+	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtx.l > /dev/null
 	-rm -f $(IRTEUSX_C) $(IRTEUSX_H)
 
 $(IRTEUSIMGOBJS) :
-	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtimg.l
+	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtimg.l > /dev/null
 	-rm -f $(IRTEUSIMG_C) $(IRTEUSIMG_H)
 
 $(IRTEUSGLOBJS):
-	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtgl.l
+	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtgl.l > /dev/null
 	-rm -f $(IRTEUSGL_C) $(IRTEUSGL_H)
 
 PQP/$(ARCHDIR)/libPQP-static.a:

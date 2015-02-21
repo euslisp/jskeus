@@ -127,7 +127,7 @@ pointer PNG_WRITE_IMAGE(register context *ctx, int n, register pointer *argv)
   height = ckintval(argv[2]);
   channels  = ckintval(argv[3]);
   image_ptr = argv[4]->c.str.chars;
-  fprintf(stderr, "%d %d %d %x\n", width, height, channels, image_ptr);
+  fprintf(stderr, "%d %d %d %p\n", width, height, channels, image_ptr);
   FILE *fp = fopen(file_name, "wb");
   if (!fp) {
     error(E_OPENFILE);
