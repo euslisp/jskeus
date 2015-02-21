@@ -2,6 +2,20 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [PQP.cpp, euspng.c] cast for printf
+* [irteus/irtgeo.c] inlucde math.c for function prototype
+* output euscomp results to dev/null
+* add test code for vplus/vector-mean
+* [irteus/irtmath.l] add lms/lmeds and sv-decompose from euslib
+* [irtc.c] add ql-decompose and qr-decompose
+* Check only {name} and {name}-robot in maek-robot-model-from-name
+* Add make-robot-model-from-name function to create instance of
+  robot-model from the name of the robot
+* Disable DISPLAY environmental variable during compilation
+* Contributors: Kei Okada, Ryohei Ueda
+
 1.0.2 (2015-01-13)
 ------------------
 * Set ${EUSDIR}/irteus as symlink
