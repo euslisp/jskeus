@@ -717,6 +717,19 @@
 	  ))))
     (list a0 a1 a2)))
 
+(defun quaternion-from-two-vectors (a b)
+  "Comupute quaternion which rotate vector a into b."
+  (let* ((v0 (normalize-vector a))
+         (v1 (normalize-vector b))
+         (c (v. v1 v0)))
+    (let* ((axis (v* v0 v1))
+           (s (sqrt (* 2 (+ 1 c))))
+           (invs (/ 1.0 s)))
+      (let ((vec (scale invs axis))
+            (w (* 0.5 s)))
+        (normalize-vector
+	 (float-vector w (elt vec 0) (elt vec 1) (elt vec 2)))))))
+
 (provide :irtgeo "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
