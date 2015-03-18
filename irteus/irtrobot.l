@@ -448,6 +448,13 @@
      (nreverse result)))
   (:print-vector-for-robot-limb
    (vec)
+   "Print angle vector with limb alingment and limb indent.
+    For example, if robot is rarm, larm, and torso, print result is:
+    #f(
+       rarm-j0 ... rarm-jN
+       larm-j0 ... larm-jN
+       torso-j0 ... torso-jN
+       )"
    (let ((tmp-limbs
           (remove-duplicates
            (mapcar #'(lambda (l)
