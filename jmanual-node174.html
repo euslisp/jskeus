@@ -64,7 +64,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
  
  <BR>
 <BR> <BR> 
-<A NAME="58248"></A>
+<A NAME="58269"></A>
 <BIG CLASS="XLARGE"><B>x::irtviewer </B></BIG> [クラス]  <PRE><TT>
   :super   <B>x:panel</B> 
 <BR>  :slots 		 x::viewer x::objects x::draw-things x::previous-cursor-pos x::left-right-angle x::up-down-angle x::viewpoint x::viewtarget x::drawmode x::draw-origin x::draw-floor 
@@ -80,7 +80,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58265"></A>
+<A NAME="58286"></A>
 <B>:create</B> <EM>&amp;rest args &amp;key (x::title IRT viewer) (x::view-name (gensym title)) (x::hither 200.0) (x::yon 50000.0) (x::width 500) (x::height 500) ((:draw-origin do) 150) ((:draw-floor x::df) nil) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -95,7 +95,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58275"></A>
+<A NAME="58296"></A>
 <B>:viewer</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -110,7 +110,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58285"></A>
+<A NAME="58306"></A>
 <B>:redraw</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -125,7 +125,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58295"></A>
+<A NAME="58316"></A>
 <B>:expose</B> <EM>x:event  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -140,7 +140,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58305"></A>
+<A NAME="58326"></A>
 <B>:resize</B> <EM>x::newwidth x::newheight  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -155,7 +155,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58315"></A>
+<A NAME="58336"></A>
 <B>:configurenotify</B> <EM>x:event  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -170,7 +170,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58325"></A>
+<A NAME="58346"></A>
 <B>:viewtarget</B> <EM>&amp;optional x::p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -185,7 +185,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58335"></A>
+<A NAME="58356"></A>
 <B>:viewpoint</B> <EM>&amp;optional x::p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -200,7 +200,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58345"></A>
+<A NAME="58366"></A>
 <B>:look1</B> <EM>&amp;optional (x::vt x::viewtarget) (x::lra x::left-right-angle) (x::uda x::up-down-angle)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -215,7 +215,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58355"></A>
+<A NAME="58376"></A>
 <B>:look-all</B> <EM>&amp;optional x::bbox  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -230,7 +230,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58365"></A>
+<A NAME="58386"></A>
 <B>:move-viewing-around-viewtarget</B> <EM>x:event x::x x::y x::dx x::dy x::vwr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -245,7 +245,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58375"></A>
+<A NAME="58396"></A>
 <B>:set-cursor-pos-event</B> <EM>x:event  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -260,7 +260,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58385"></A>
+<A NAME="58406"></A>
 <B>:move-coords-event</B> <EM>x:event  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -275,7 +275,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58395"></A>
+<A NAME="58416"></A>
 <B>:draw-event</B> <EM>x:event  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -290,7 +290,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58405"></A>
+<A NAME="58426"></A>
 <B>:draw-objects</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -305,7 +305,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58415"></A>
+<A NAME="58436"></A>
 <B>:objects</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -320,7 +320,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58425"></A>
+<A NAME="58446"></A>
 <B>:select-drawmode</B> <EM>x::mode  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -335,7 +335,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58435"></A>
+<A NAME="58456"></A>
 <B>:flush</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -350,7 +350,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58445"></A>
+<A NAME="58466"></A>
 <B>:change-background</B> <EM>x::col  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -368,7 +368,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="58456"></A>
+<A NAME="58477"></A>
 <BIG CLASS="XLARGE"><B>viewer-dummy </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
 <BR>  :slots 		 nil 
@@ -384,7 +384,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58473"></A>
+<A NAME="58494"></A>
 <B>:nomethod</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -402,7 +402,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="58484"></A>
+<A NAME="58505"></A>
 <BIG CLASS="XLARGE"><B>irtviewer-dummy </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
 <BR>  :slots 		 objects draw-things 
@@ -418,7 +418,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58501"></A>
+<A NAME="58522"></A>
 <B>:objects</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -433,7 +433,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="58511"></A>
+<A NAME="58532"></A>
 <B>:nomethod</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -451,7 +451,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<A NAME="58521"></A>
+<A NAME="58542"></A>
 <B>make-irtviewer</B> <EM>&amp;rest args  </EM>[関数]
 
 <DL COMPACT>
@@ -463,7 +463,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58531"></A>
+<A NAME="58552"></A>
 <B>x::make-lr-ud-coords</B> <EM>x::lra x::uda  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -479,7 +479,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58542"></A>
+<A NAME="58563"></A>
 <B>x::draw-things</B> <EM>x::objs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -495,7 +495,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58553"></A>
+<A NAME="58574"></A>
 <B>objects</B> <EM>&amp;optional (objs t) vw  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -511,7 +511,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58564"></A>
+<A NAME="58585"></A>
 <B>make-irtviewer-dummy</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -560,7 +560,7 @@ nil
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-02-21
+2015-03-18
 </ADDRESS>
 </BODY>
 </HTML>
