@@ -78,9 +78,21 @@
 	  rarm-collision-avoidance-links
 	  larm rarm lleg rleg torso head
           ;; sensor slots
-          force-sensors imu-sensors cameras))
+          force-sensors imu-sensors cameras
+          ;;
+          support-polygons
+          ))
 
 (defmethod robot-model
+  (:init-ending
+   ()
+   (prog1
+       (send-super :init-ending)
+     (if (and (not (every #'null (send self :legs))) ;; for legged robot
+              (not (every #'null (send self :legs :end-coords)))) ;; for robot with legs end-coords
+       (send self :make-support-polygons))
+     )
+   )
   (:limb
    (limb method &rest args)
    (let (ret)
@@ -761,6 +773,43 @@
                             (setq dx (+ dx ddx) dy (+ dy ddy) dth (+ dth ddth)))))
        (push (funcall gen-go-pos-step-node-func mc leg leg-translate-pos) ret)
        (reverse ret))))
+  ;; Support polygon methods
+  (:support-polygons
+   ()
+   "Return support polygons."
+   (send-all (send-all support-polygons :body) :worldcoords)
+   support-polygons)
+  (:support-polygon
+   (name)
+   "Return support polygon with given name."
+   (find name (send self :support-polygons) :test #'equal :key #'(lambda (x) (send x :name))))
+  (:make-support-polygons
+   ()
+   (setq support-polygons
+         (list
+          (send self :make-sole-polygon :rleg)
+          (send self :make-sole-polygon :lleg)))
+   )
+  ;; TODO
+  ;;  1. Sole polygon change according to toe joint usage is not supported.
+  ;;  2. Sole body is bounding box. This should be convex hull (https://github.com/euslisp/EusLisp/issues/17)
+  (:make-sole-polygon
+   (name)
+   (let* ((target-nm (read-from-string (format nil "~A-sole-body" name)))
+          (b (send
+              (make-bounding-box
+               (remove-if
+                #'(lambda (p) (> (elt (send self name :end-coords :inverse-transform-vector p) 2) 5.0))
+                (remove-duplicates
+                 (flatten (send-all (flatten (send-all (send self name :links) :bodies)) :vertices))
+                 :test #'(lambda (x y) (eps-v= x y *epsilon*)))))
+              :body)))
+     (send (send self name :end-coords :parent) :assoc b)
+     (send self :put target-nm b)
+     (send b :worldcoords)
+     (let ((f (find-if #'(lambda (x) (memq :bottom (send x :id))) (send b :faces))))
+       (send f :name name)
+       f)))
   )
 (in-package "GEOMETRY")
 
