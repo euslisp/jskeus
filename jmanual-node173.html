@@ -63,7 +63,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   
  <BR>
 <BR> <BR> 
-<A NAME="57135"></A>
+<A NAME="57243"></A>
 <BIG CLASS="XLARGE"><B>riccati-equation </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
 <BR>  :slots 		 a b c p q r k a-bkt r+btpb-1 
@@ -79,7 +79,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57152"></A>
+<A NAME="57260"></A>
 <B>:init</B> <EM>aa bb cc qq rr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -94,7 +94,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57162"></A>
+<A NAME="57270"></A>
 <B>:solve</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -112,7 +112,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="57173"></A>
+<A NAME="57281"></A>
 <BIG CLASS="XLARGE"><B>preview-control </B></BIG> [クラス]  <PRE><TT>
   :super   <B>riccati-equation</B> 
 <BR>  :slots 		 xk uk delay f1-n p1-n dim cog-z zmp-z 
@@ -128,7 +128,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57190"></A>
+<A NAME="57298"></A>
 <B>:init</B> <EM>dt _zc &amp;key (q 1) (r 1.000000e-06) ((:delay d) 1.6) (init-xk (float-vector 0 0 0)) ((:a _a) (make-matrix 3 3 (list (list 1 dt (0.5 dt dt)) (list 0 1 dt) (list 0 0 1)))) ((:b _b) (make-matrix 3 1 (list (list ((/ 1.0 6.0) dt dt dt)) (list (0.5 dt dt)) (list dt)))) ((:c _c) (make-matrix 1 3 (list (list 1.0 0.0 (- (/ _zc (elt g-vec2)))))))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -143,7 +143,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57200"></A>
+<A NAME="57308"></A>
 <B>:delay</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -158,7 +158,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57210"></A>
+<A NAME="57318"></A>
 <B>:refcog</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -173,7 +173,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57220"></A>
+<A NAME="57328"></A>
 <B>:cart-zmp</B> <EM>&amp;optional (_c c)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -188,7 +188,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57230"></A>
+<A NAME="57338"></A>
 <B>:last-refzmp</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -203,7 +203,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57240"></A>
+<A NAME="57348"></A>
 <B>:current-refzmp</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -218,7 +218,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57250"></A>
+<A NAME="57358"></A>
 <B>:calc-f</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -233,7 +233,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57260"></A>
+<A NAME="57368"></A>
 <B>:calc-u</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -248,7 +248,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57270"></A>
+<A NAME="57378"></A>
 <B>:calc-xk</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -263,7 +263,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57280"></A>
+<A NAME="57388"></A>
 <B>:update-xk</B> <EM>p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -278,7 +278,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57290"></A>
+<A NAME="57398"></A>
 <B>:cog-z</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -293,7 +293,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57300"></A>
+<A NAME="57408"></A>
 <B>:update-cog-z</B> <EM>zc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -311,7 +311,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="57311"></A>
+<A NAME="57419"></A>
 <BIG CLASS="XLARGE"><B>extended-preview-control </B></BIG> [クラス]  <PRE><TT>
   :super   <B>preview-control</B> 
 <BR>  :slots 		 orga orgb orgc xk
@@ -327,7 +327,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57328"></A>
+<A NAME="57436"></A>
 <B>:init</B> <EM>dt zc &amp;key (q 1.0) (r 1.000000e-06) ((:delay d) 1.6) (init-xk (float-vector 0 0 0))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -342,7 +342,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57338"></A>
+<A NAME="57446"></A>
 <B>:cart-zmp</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -357,7 +357,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57348"></A>
+<A NAME="57456"></A>
 <B>:calc-f</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -372,7 +372,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57358"></A>
+<A NAME="57466"></A>
 <B>:calc-u</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -387,7 +387,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57368"></A>
+<A NAME="57476"></A>
 <B>:calc-xk</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -405,7 +405,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="57379"></A>
+<A NAME="57487"></A>
 <BIG CLASS="XLARGE"><B>preview-dynamics-filter </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
 <BR>  :slots 		 avs counter finishedp preview-controller 
@@ -421,7 +421,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57396"></A>
+<A NAME="57504"></A>
 <B>:init</B> <EM>dt zc &amp;optional (preview-class preview-control) &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -436,7 +436,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57406"></A>
+<A NAME="57514"></A>
 <B>:finishedp</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -451,7 +451,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57416"></A>
+<A NAME="57524"></A>
 <B>:av</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -466,7 +466,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57426"></A>
+<A NAME="57534"></A>
 <B>:cart-zmp</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -481,7 +481,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57436"></A>
+<A NAME="57544"></A>
 <B>:refcog</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -496,7 +496,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57446"></A>
+<A NAME="57554"></A>
 <B>:cog-z</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -511,7 +511,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57456"></A>
+<A NAME="57564"></A>
 <B>:update</B> <EM>av p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -529,7 +529,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="57467"></A>
+<A NAME="57575"></A>
 <BIG CLASS="XLARGE"><B>gait-generator </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
 <BR>  :slots 		 robot dt footstep-node-list support-leg-list support-leg-coords-list swing-leg-dst-coords-list swing-leg-src-coords refzmp-cur-list refzmp-next refzmp-prev step-height-list one-step-len index-count default-step-height default-double-support-ratio default-zmp-offsets finalize-p preview-controller all-limbs end-with-double-support 
@@ -545,7 +545,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57484"></A>
+<A NAME="57592"></A>
 <B>:init</B> <EM>rb _dt  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -560,7 +560,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57494"></A>
+<A NAME="57602"></A>
 <B>:get-footstep-limbs</B> <EM>fs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -575,7 +575,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57504"></A>
+<A NAME="57612"></A>
 <B>:get-counter-footstep-limbs</B> <EM>fs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -590,7 +590,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57514"></A>
+<A NAME="57622"></A>
 <B>:get-limbs-zmp-list</B> <EM>limb-coords limb-names  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -605,7 +605,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57524"></A>
+<A NAME="57632"></A>
 <B>:get-limbs-zmp</B> <EM>limb-coords limb-names  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -620,7 +620,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57534"></A>
+<A NAME="57642"></A>
 <B>:get-swing-limbs</B> <EM>limbs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -635,7 +635,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57544"></A>
+<A NAME="57652"></A>
 <B>:initialize-gait-parameter</B> <EM>fsl time cog &amp;key ((:default-step-height dsh) 50) ((:default-double-support-ratio ddsr) 0.2) (delay 1.6) ((:all-limbs al) '(:rleg :lleg)) ((:default-zmp-offsets dzo) (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) (q 1.0) (r 1.000000e-06) (start-with-double-support t) ((:end-with-double-support ewds) t)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -650,7 +650,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57554"></A>
+<A NAME="57662"></A>
 <B>:finalize-gait-parameter</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -665,7 +665,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57564"></A>
+<A NAME="57672"></A>
 <B>:make-gait-parameter</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -680,7 +680,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57574"></A>
+<A NAME="57682"></A>
 <B>:calc-current-swing-leg-coords</B> <EM>ratio src dst &amp;key (type :shuffling) (step-height default-step-height)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -695,7 +695,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57584"></A>
+<A NAME="57692"></A>
 <B>:calc-ratio-from-double-support-ratio</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -710,7 +710,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57594"></A>
+<A NAME="57702"></A>
 <B>:calc-current-refzmp</B> <EM>prev cur next  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -725,7 +725,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57604"></A>
+<A NAME="57712"></A>
 <B>:calc-one-tick-gait-parameter</B> <EM>type  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -740,7 +740,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57614"></A>
+<A NAME="57722"></A>
 <B>:proc-one-tick</B> <EM>&amp;key (type :shuffling) (solve-angle-vector :solve-av-by-move-centroid-on-foot) (solve-angle-vector-args) (debug nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -755,7 +755,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57624"></A>
+<A NAME="57732"></A>
 <B>:update-current-gait-parameter</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -770,7 +770,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57634"></A>
+<A NAME="57742"></A>
 <B>:solve-angle-vector</B> <EM>support-leg support-leg-coords swing-leg-coords cog &amp;key (solve-angle-vector :solve-av-by-move-centroid-on-foot) (solve-angle-vector-args)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -785,7 +785,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57644"></A>
+<A NAME="57752"></A>
 <B>:solve-av-by-move-centroid-on-foot</B> <EM>support-leg support-leg-coords swing-leg-coords cog robot &amp;rest args &amp;key (cog-gain 3.5) (stop 100) (additional-nspace-list) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -800,7 +800,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57654"></A>
+<A NAME="57762"></A>
 <B>:cycloid-midpoint</B> <EM>ratio start goal height &amp;key (top-ratio 0.5)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -815,7 +815,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BR>
 
-<A NAME="57664"></A>
+<A NAME="57772"></A>
 <B>:cycloid-midcoords</B> <EM>ratio start goal height &amp;key (top-ratio 0.5)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -833,7 +833,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57674"></A>
+<A NAME="57782"></A>
 <B>calc-inertia-matrix-rotational</B> <EM>mat row column paxis m-til c-til i-til axis-for-angular child-link world-default-coords translation-axis rotation-axis tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -849,7 +849,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57685"></A>
+<A NAME="57793"></A>
 <B>calc-inertia-matrix-linear</B> <EM>mat row column paxis m-til c-til i-til axis-for-angular child-link world-default-coords translation-axis rotation-axis tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -898,7 +898,7 @@ nil
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-03-18
+2015-03-19
 </ADDRESS>
 </BODY>
 </HTML>
