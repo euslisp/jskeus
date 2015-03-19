@@ -273,6 +273,13 @@
       ret)
      (t (list h i s)))))
 
+(defun color-category10 (i)
+  "Choose good color from 10 colors"
+  (his2rgb (* (mod i 10) 100) 1.0 0.8))
+(defun color-category20 (i)
+  "Choose good color from 20 colors"
+  (his2rgb (* (mod i 20) 100) 1.0 0.8))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; macros for calculating execution time using mtimer
 ;; bench  : args -> arbitrary S-exp.
