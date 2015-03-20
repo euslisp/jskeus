@@ -208,10 +208,10 @@
      ,@bodies))
 
 ;; color utils
-(defun his2rgb (h &optional i s ret)
+(defun his2rgb (h &optional (i 1.0) (s 1.0) ret)
   "convert his to rgb (0 <= h <= 360, 0.0 <= i <= 1.0, 0.0 <= s <= 1.0)"
   (hvs2rgb h i s ret))
-(defun hvs2rgb (h &optional i s ret)
+(defun hvs2rgb (h &optional (i 1.0) (s 1.0) ret)
   "convert hvs to rgb (0 <= h <= 360, 0.0 <= i <= 1.0, 0.0 <= s <= 1.0)"
   (when (or (listp h) (vectorp h))
     (setq ret i)
