@@ -19,7 +19,7 @@
 /// and non-profit purposes, without fee, and without a written
 /// agreement is hereby granted to all researchers working on
 /// the IRT project at the University of Tokyo, provided that the
-/// above copyright notice remains intact.  
+/// above copyright notice remains intact.
 ///
 
 #include "eus.h"
@@ -44,7 +44,7 @@ register context *ctx;
 int n;
 pointer argv[];
 /* (SV_SOLVE mat vec &optional ret) */
-{ 
+{
   pointer a,b,x;
   eusfloat_t **aa, *bb, *xx;
   int i, j, s;
@@ -75,7 +75,7 @@ pointer argv[];
   if ( svdsolve(aa, s, s, bb, xx) < 0 ) {
     return NIL;
   }
-  
+
   for (i = 0; i < s; i++){
     x->c.fvec.fv[i] = xx[i+1];
   }
@@ -91,7 +91,7 @@ register context *ctx;
 int n;
 pointer argv[];
 /* (SV_DECOMPOSE mat) */
-{ 
+{
   pointer a,ru,rv,rw, rr;
   eusfloat_t **u, **v, *w, y;
   int c, r, i, j, *idx, k, pc=0;;
@@ -132,7 +132,7 @@ pointer argv[];
       }
     }
   }
-  
+
   for (i = 0; i < c; i++){
     for (j = 0; j < r; j++){
       ru->c.ary.entity->c.fvec.fv[j*c+i] = u[j+1][idx[i+1]];
@@ -152,10 +152,10 @@ pointer argv[];
   free_nr_vector(w,1,c);
 
   free(idx);
-  
+
   while(pc-->0) vpop();
   return(cons(ctx,ru,cons(ctx,rw,(cons(ctx,rv,NIL)))));}
-  
+
 /*
  *
  */
@@ -192,7 +192,7 @@ pointer argv[];
   for (i=0; i<s; i++) cols[i+1] = b->c.fvec.fv[i];
   lubksb(aa,s,indx,cols);
   for (i=0; i<s; i++) x->c.fvec.fv[i] = cols[i+1];
-  
+
   free_nr_matrix(aa,1,s,1,s);
   free_nr_vector(cols,1,s);
   free(indx);
@@ -218,7 +218,7 @@ pointer argv[];
     result=argv[1];
     if (!ismatrix(result)) error(E_NOVECTOR);
     if (s!=colsize(result)) error(E_VECSIZE);
-    copymat(result,a,s); 
+    copymat(result,a,s);
   }
   if (n==3) {
     pv=argv[2];
@@ -265,7 +265,7 @@ pointer argv[];
     result=argv[1];
     if (!ismatrix(result)) error(E_NOVECTOR);
     if (s!=colsize(result)) error(E_VECSIZE);
-    copymat(result,a,s); 
+    copymat(result,a,s);
   }
 
   aa = nr_matrix(1,s,1,s);
@@ -315,7 +315,7 @@ pointer argv[];
     }
   }
   if ( svdcmp(u, r, c, w, v) < 0 ) {
-    nrerror("svdcmp() returns error"); 
+    nrerror("svdcmp() returns error");
     free_nr_matrix(u,1,r,1,c);
     free_nr_matrix(v,1,c,1,c);
     free_nr_vector(w,1,c);
@@ -332,7 +332,7 @@ pointer argv[];
       }
     }
   }
-  
+
   // A* = v w ut
   for (i=1;i<=c;i++) {
     if (w[i]>0.0001) w[i] = 1.0/w[i];
@@ -439,7 +439,7 @@ pointer MATTIMES3(ctx,n,argv)
   register pointer p,result;
   eusfloat_t *c1,*c2,*c3;
   eusfloat_t q1[4], q2[4], q3[4], q;
-  
+
   ckarg2(2,3);
   c1 = argv[0]->c.ary.entity->c.fvec.fv;
   c2 = argv[1]->c.ary.entity->c.fvec.fv;
@@ -448,9 +448,9 @@ pointer MATTIMES3(ctx,n,argv)
   c3 = result->c.ary.entity->c.fvec.fv;
 
   /*
-     (setf c3 (quaternion2matrix 
+     (setf c3 (quaternion2matrix
 	       (normalize-vector (quaternion*
-				  (matrix2quaternion c1) 
+				  (matrix2quaternion c1)
 				  (matrix2quaternion c2)))))
   */
   matrix2quaternion(c1, q1);
@@ -472,12 +472,12 @@ pointer MATPLUS(ctx,n,argv)
   register int i, j, row, col;
   register pointer p,result;
   eusfloat_t *c1,*c2,*c3;
-  
+
   ckarg2(2,3);
   if (!ismatrix(argv[0]) || !ismatrix(argv[1])) error(E_NOVECTOR);
   c1 = argv[0]->c.ary.entity->c.fvec.fv;
   c2 = argv[1]->c.ary.entity->c.fvec.fv;
-  row = rowsize(argv[0]); col = colsize(argv[0]); 
+  row = rowsize(argv[0]); col = colsize(argv[0]);
   if (!((row==rowsize(argv[1])) && (col==colsize(argv[1]))) )
     error(E_VECINDEX);
   if (n==3) {
@@ -506,12 +506,12 @@ pointer MATMINUS(ctx,n,argv)
   register int i, j, row, col;
   register pointer p,result;
   eusfloat_t *c1,*c2,*c3;
-  
+
   ckarg2(2,3);
   if (!ismatrix(argv[0]) || !ismatrix(argv[1])) error(E_NOVECTOR);
   c1 = argv[0]->c.ary.entity->c.fvec.fv;
   c2 = argv[1]->c.ary.entity->c.fvec.fv;
-  row = rowsize(argv[0]); col = colsize(argv[0]); 
+  row = rowsize(argv[0]); col = colsize(argv[0]);
   if (!((row==rowsize(argv[1])) && (col==colsize(argv[1]))) )
     error(E_VECINDEX);
   if (n==3) {
@@ -609,7 +609,7 @@ int hqr(eusfloat_t **a, int n, eusfloat_t wr[], eusfloat_t wi[])
 {
   int nn,m,l,k,j,its,i,mmin;
   eusfloat_t z,y,x,w,v,u,t,s,r,q,p,anorm;
-  anorm=0.0; // Compute matrix norm for possible use inlocating  single small subdiagonal element. 
+  anorm=0.0; // Compute matrix norm for possible use inlocating  single small subdiagonal element.
   for (i=1;i<=n;i++)
     for (j=max(i-1,1);j<=n;j++)
       anorm += fabs(a[i][j]);
@@ -618,7 +618,7 @@ int hqr(eusfloat_t **a, int n, eusfloat_t wr[], eusfloat_t wi[])
   while (nn >= 1) { // Begin search for next eigenvalue.
     its=0;
     do {
-      for (l=nn;l>=2;l--) { // Begin iteration: look for single small subdiagonal element. 
+      for (l=nn;l>=2;l--) { // Begin iteration: look for single small subdiagonal element.
 	s=fabs(a[l-1][l-1])+fabs(a[l][l]);
 	if (s == 0.0) s=anorm;
 	if ((eusfloat_t)(fabs(a[l][l-1]) + s) == s) {
@@ -840,6 +840,40 @@ pointer argv[];
   while(pc-->0) vpop();
   return (cons(ctx,rr,cons(ctx,ri,NIL)));};
 
+pointer CRANGE(ctx, n, argv)
+     context *ctx;
+     int n;
+     pointer argv[];
+{
+  int start, end, step, i;
+  pointer result = NIL;
+  ckarg2(1,3);
+
+  if (n == 1) {
+    start = 0;
+    end = ckintval(argv[0]) - 1;
+  } else {
+    start = ckintval(argv[0]);
+    end = ckintval(argv[1]) - 1;
+    if(start > end) return NIL;
+  }
+
+  if (n == 3) {
+    step = abs(ckintval(argv[2]));
+    if (step == 0) step = 1;
+    end = step * ((end - start) / step) + start;
+  } else {
+    step = 1;
+  }
+
+  for (i = end; i >= start; i -= step) {
+    result = cons(ctx, makeint(i), result);
+  }
+
+  return(result);
+}
+
+
 pointer ___irtc(ctx,n,argv, env)
 register context *ctx;
 int n;
@@ -858,7 +892,7 @@ pointer env;
   defun(ctx,"PSEUDO-INVERSE2",mod,PSEUDO_INVERSE2);
   defun(ctx,"QL-DECOMPOSE",mod,QL_DECOMPOSE);
   defun(ctx,"QR-DECOMPOSE",mod,QR_DECOMPOSE);
-
+  defun(ctx,"RANGE",argv[0],CRANGE);
   /* irteus-version */
   extern pointer QVERSION;
   pointer p, v = speval(QVERSION);
