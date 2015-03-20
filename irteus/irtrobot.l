@@ -797,13 +797,20 @@
   ;;  2. Sole body is bounding box. This should be convex hull (https://github.com/euslisp/EusLisp/issues/17)
   (:make-sole-polygon
    (name)
+
+   (labels ((all-descendant-links
+             (l)
+             (if (and l (send l :descendants))
+                 (append (list l) (flatten (mapcar #'all-descendant-links (remove-if-not #'(lambda (x) (derivedp x bodyset-link)) (send l :descendants)))))
+               )))
+     (send-all (all-descendant-links (car (send self name :links))) :worldcoords)
    (let* ((target-nm (read-from-string (format nil "~A-sole-body" name)))
           (b (send
               (make-bounding-box
                (remove-if
                 #'(lambda (p) (> (elt (send self name :end-coords :inverse-transform-vector p) 2) 5.0))
                 (remove-duplicates
-                 (flatten (send-all (flatten (send-all (send self name :links) :bodies)) :vertices))
+                 (flatten (send-all (flatten (send-all (all-descendant-links (car (send self name :links))) :bodies)) :vertices))
                  :test #'(lambda (x y) (eps-v= x y *epsilon*)))))
               :body)))
      (send (send self name :end-coords :parent) :assoc b)
@@ -811,7 +818,7 @@
      (send b :worldcoords)
      (let ((f (find-if #'(lambda (x) (memq :bottom (send x :id))) (send b :faces))))
        (send f :name name)
-       f)))
+       f))))
   )
 (in-package "GEOMETRY")
 
