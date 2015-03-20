@@ -589,7 +589,8 @@
           (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) ;; [mm]
          (init-pose-function #'(lambda () (send self :move-centroid-on-foot :both '(:rleg :lleg))))
          (start-with-double-support t)
-         (end-with-double-support t))
+         (end-with-double-support t)
+         (calc-zmp t))
    "Calculate walking pattern from foot step list and return pattern list as a list of angle-vector, root-coords, time, and so on."
    (let* ((res) (ret) (tm 0)
           (gg (instance gait-generator :init self dt)))
@@ -602,15 +603,16 @@
            :start-with-double-support start-with-double-support :end-with-double-support end-with-double-support)
 
      (while (null (setq ret (send gg :proc-one-tick :type :cycloid :debug t :solve-angle-vector-args solve-angle-vector-args))))
-     (dotimes (i 2) (send self :calc-zmp)) ;; for zmp initialization
+     (if calc-zmp (dotimes (i 2) (send self :calc-zmp))) ;; for zmp initialization
 
      ;; following are in control loop
      (while (setq ret (send gg :proc-one-tick :type :cycloid :debug t :solve-angle-vector-args solve-angle-vector-args))
        ;; only for debug view
-       (let ((czmp (send self :calc-zmp
-                         (send self :angle-vector)
-                         (send (car (send self :links)) :copy-worldcoords)
-                         :dt dt :pZMPz (elt (elt ret 5) 2)))
+       (let ((czmp (if calc-zmp
+                       (send self :calc-zmp
+                             (send self :angle-vector)
+                             (send (car (send self :links)) :copy-worldcoords)
+                             :dt dt :pZMPz (elt (elt ret 5) 2))))
              (end-coords-list (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) (gg . all-limbs)))
              (contact-state (elt ret 8))
              )
@@ -650,7 +652,7 @@
                        (if (eq :swing cs) #f(0 1 0) #f(1 0 0))))
              end-coords-list contact-state)
      (send rz :draw-on :flush nil :size 300 :color #f(0 0 1))
-     (send czmp :draw-on :flush nil :size 200 :width 5)
+     (if czmp (send czmp :draw-on :flush nil :size 200 :width 5))
      (with-modify-color
       #f(1 0 0)
       #'(lambda () (send *viewer* :viewsurface :string 20 20 "red = support leg")))
