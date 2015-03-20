@@ -442,6 +442,8 @@
       (cond
        ((null color) nil)
        ((derivedp color colormaterial) (send color :diffuse))
+       ((vectorp color) color)
+       ((listp color) (float-vector (/ (elt color 0) 255.0) (/ (elt color 1) 255.0) (/ (elt color 2) 255.0)))
        ((symbolp color)
 	(setq c (find-if #'(lambda (o) (eq (send o :name) color))
 			 *face-colors*))
