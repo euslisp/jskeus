@@ -77,6 +77,7 @@
 	  larm-collision-avoidance-links
 	  rarm-collision-avoidance-links
 	  larm rarm lleg rleg torso head
+          end-coords-list
           ;; sensor slots
           force-sensors imu-sensors cameras
           ;;
@@ -91,6 +92,10 @@
      (if (and (not (every #'null (send self :legs))) ;; for legged robot
               (not (every #'null (send self :legs :end-coords)))) ;; for robot with legs end-coords
        (send self :make-support-polygons))
+     (setq end-coords-list (remove nil (append end-coords-list
+                                               (list larm-end-coords rarm-end-coords
+                                                     lleg-end-coords rleg-end-coords
+                                                     head-end-coords torso-end-coords))))
      )
    )
   (:limb
@@ -250,6 +255,11 @@
   (:force-sensors () "Returns force sensors." force-sensors)
   (:imu-sensors () "Returns imu sensors." imu-sensors)
   (:cameras () "Returns camera sensors." cameras)
+  ;;
+  (:end-coords
+   (name)
+   "Returns end-coords with given name"
+   (find name end-coords-list :test #'equal :key #'(lambda (x) (send x :name))))
   ;;
   (:larm (&rest args) 
 	 (unless args (setq args (list nil))) (send* self :limb :larm args))
