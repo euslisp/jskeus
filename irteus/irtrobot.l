@@ -828,6 +828,66 @@
        (let ((f (find-if #'(lambda (x) (memq :bottom (send x :id))) (send b :faces))))
          (send f :name name)
          f))))
+  (:make-default-linear-link-joint-between-attach-coords
+   (attach-coords-0 attach-coords-1 end-coords-name linear-joint-name)
+   "Make default linear arctuator module such as muscle and cylinder and append lins and joint-list.
+    Module includes parent-link => (j0) => l0 => (j1) => l1 (linear actuator) => (j2) => l2 => end-coords.
+    attach-coords-0 is root side coords which linear actulator is attached to.
+    attach-coords-1 is end side coords which linear actulator is attached to.
+    end-coords-name is the name of end-coords.
+    linear-joint-name is the name of linear actuator."
+   (let ((l0) (l1) (l2) (j0) (j1) (j2)
+         (linear-link-len (distance (send attach-coords-1 :worldpos) (send attach-coords-0 :worldpos))))
+     ;; Make links
+     (setq l0 (instance bodyset-link :init (make-cascoords)
+                        :bodies (list (let ((b0 (make-cylinder 5 (* 0.5 linear-link-len))))
+                                        (send b0 :set-color :red)
+                                        b0))))
+     (send l0 :newcoords (send attach-coords-0 :copy-worldcoords))
+     (orient-coords-to-axis l0 (normalize-vector (v- (send attach-coords-1 :worldpos) (send attach-coords-0 :worldpos))))
+
+     (setq l1 (instance bodyset-link :init (make-cascoords)
+                        :bodies (list (let ((b0 (make-cylinder 5 (* 0.5 linear-link-len))))
+                                        (send b0 :set-color :red)
+                                        (send b0 :translate (float-vector 0 0 (* -0.5 linear-link-len)))
+                                        b0))))
+     (send l1 :newcoords (send attach-coords-1 :copy-worldcoords))
+     (orient-coords-to-axis l1 (normalize-vector (v- (send attach-coords-1 :worldpos) (send attach-coords-0 :worldpos))))
+
+     (setq l2 (instance bodyset-link :init (make-cascoords)
+                        :bodies (list (let ((b0 (make-cube 5 5 5))) (send b0 :set-color :red) b0))))
+     (send l2 :newcoords (send attach-coords-1 :copy-worldcoords))
+
+     ;; Make end-coords
+     (push (make-cascoords :coords (send attach-coords-1 :copy-worldcoords) :name end-coords-name)
+           end-coords-list)
+
+     ;; Assoc links
+     (send (send attach-coords-0 :parent) :assoc l0)
+     (send l0 :assoc l1)
+     (send l1 :assoc l2)
+     (send l2 :assoc (car end-coords-list))
+     (send l1 :translate (float-vector 0 0 (* -1 linear-link-len))) ;; move to length = 0 position
+
+     ;; Make joint
+     (setq j0 (instance sphere-joint :init
+                        :parent-link (send l0 :parent) :child-link l0
+                        :min (float-vector -360 -360 -360)
+                        :max (float-vector 360 360 360)))
+     (setq j1 (instance linear-joint :init
+                        :parent-link (send l1 :parent) :child-link l1
+                        :name linear-joint-name
+                        :axis :z :min 0 :max 1000))
+     (setq j2 (instance sphere-joint :init
+                        :parent-link (send l2 :parent) :child-link l2
+                        :min (float-vector -360 -360 -360)
+                        :max (float-vector 360 360 360)))
+     (send j1 :joint-angle linear-link-len) ;; set linear joint angle to default length
+
+     ;; Append joint-list and links
+     (setq links (append links (list l0 l1 l2)))
+     (setq joint-list (append joint-list (list j0 j1 j2)))
+     ))
   )
 (in-package "GEOMETRY")
 
