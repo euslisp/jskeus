@@ -727,7 +727,9 @@
 (defclass cascaded-link
   :super cascaded-coords
   :slots (links joint-list bodies
-		collision-avoidance-links))
+		collision-avoidance-links
+                end-coords-list
+                ))
 
 (defmethod cascaded-link
   (:init (&rest args
@@ -750,6 +752,10 @@
   (:joint-list (&rest args) "Returns joint list, or args is passed to joints" (user::forward-message-to-all joint-list args))
   (:link (name) "Return a link with given name." (find name links :test #'equal :key #'(lambda (x) (send x :name))))
   (:joint (name) "Return a joint with given name." (find name joint-list :test #'equal :key #'(lambda (x) (send x :name))))
+  (:end-coords
+   (name)
+   "Returns end-coords with given name"
+   (find name end-coords-list :test #'equal :key #'(lambda (x) (send x :name))))
 
   (:bodies (&rest args) "Return bodies of this object. If args is given it passed to all bodies" (user::forward-message-to-all bodies args))
   (:faces () "Return faces of this object." (flatten (send-all bodies :faces)))
