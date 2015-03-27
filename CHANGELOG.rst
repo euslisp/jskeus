@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.4 (2015-03-27)
+------------------
 * add closed-loop support
 
  * [demo/closed-loop.l] Add sample program for closed-loop robots
