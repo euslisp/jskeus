@@ -2,6 +2,38 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add closed-loop support
+
+ * [demo/closed-loop.l] Add sample program for closed-loop robots
+ * [irtrobot.l] Add example method to generate default link function such as make-default-robot-link function
+ * [irtmodel.l] Add inverese-kinematics method for closed loop forward kinematics
+ * [irtmodel.l] Add end-coords-list for list of end-coords in  cascaded-link slots
+
+* make support-polygon in init-endinghttps://github.com/euslisp/jskeus/pull/177/files
+
+ * [irtrobot.l] :make-sole-polygon  Trace all descendants bodies (fix for hrp4r and ystleg)
+ * [irtrobot.l] :init-ending Add support polygon methods and make support polygon in :init-ending if legged robots
+
+* Utility function to choose good color for 10 and 20 categories https://github.com/euslisp/jskeus/pull/178
+
+ * [irtutil.l] hvs2rgv set default value for i, s
+ * [irtgl.l] find-color: add new rule, float-vecto [0-1], list [0-255]
+ * [irtutil.l] add color-category10, color-category20: Utility function to choose good color for 10 and 20 categories and add  function to convert from hex color to colormaterial
+
+* misc updates
+
+ * [irteus/nr.c] add tred2, this fixed https://github.com/euslisp/jskeus/issues/186
+ * [test/mathtest.l] add mathtest.l
+ * [irtrobot.l] :calc-walk-pattern-from-foot-step-list Enable to choose  use :calc-zmp or not. Without calc-zmp, we can calculate pattern  fast.
+ * [irtrobot.l] :print-vector-for-robot-limb / Add print vector method documentation
+ * [irtgeo.l] quaternion-from-two-vector / Add function to compute quaternion from two vectors
+ * [package.xml] removed, it is now stored in release repository
+   https://github.com/tork-a/jskeus-release/tree/master/patches
+
+* Contributors: Kei Okada, Ryohei Ueda, Shunichi Nozawa
+
 1.0.3 (2015-02-22)
 ------------------
 * [PQP.cpp, euspng.c] cast for printf
