@@ -406,7 +406,7 @@
   (:add-object-to-open-list (lst)
     (warn "you have to override :add-object-to-open-list method~%")
     nil)
-  (:pop-from-open-list ()
+  (:pop-from-open-list (&key (debug))
     (warn "you have to override :pop-from-open-list method~%")
     nil)
   ;; accessors
@@ -439,7 +439,7 @@
     ;; add to the tail of open-list
     (setq open-list (nconc open-list (list obj)))
     open-list)
-  (:pop-from-open-list ()
+  (:pop-from-open-list (&key (debug))
     (pop open-list))
   )
 
@@ -464,7 +464,7 @@
     ;; add to the head of open-list
     (push obj open-list)
     open-list)
-  (:pop-from-open-list ()
+  (:pop-from-open-list (&key (debug))
     (pop open-list))
   )
 
