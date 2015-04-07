@@ -25,7 +25,7 @@ ifeq ($(OS),Linux)
   export ARCHDIR=Linux64
   export MAKEFILE=Makefile.Linux64
  else
- ifeq ($(MACHINE),armv6l)
+ ifneq (, $(findstring armv,$(MACHINE)))
   export ARCHDIR=LinuxARM
   export MAKEFILE=Makefile.LinuxARM
  else
