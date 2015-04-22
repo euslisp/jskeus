@@ -1425,6 +1425,8 @@
           preview-controller ;; preview controller for ZMP -> COG
           all-limbs
           end-with-double-support
+          ik-thre ;; position thre for ik
+          ik-rthre ;; rotaiotn thre fo rik
           )
   )
 
@@ -1494,6 +1496,7 @@
           ((:default-zmp-offsets dzo)
            (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) ;; [mm]
           (q 1.0) (r 1e-6)
+          (thre 1) (rthre (deg2rad 1)) ;; see :move-centroid-on-foot (thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) 1 5)) fix-limbs))
           (start-with-double-support t)
           ((:end-with-double-support ewds) t)
           )
@@ -1510,6 +1513,7 @@
           index-count one-step-len
           finalize-p nil
           all-limbs al
+          ik-thre thre ik-rthre rthre
           end-with-double-support ewds)
     (let ((current-swing-limbs
            (send self :get-footstep-limbs (car footstep-node-list))))
@@ -1745,6 +1749,10 @@
           (append (send self :get-counter-footstep-limbs support-leg)
                   support-leg))
          (fix-coords (append swing-leg-coords support-leg-coords)))
+     (unless (memq :thre args)
+       (append args (list :thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) ik-thre (* 5 ik-thre))) legs))))
+     (unless (memq :rthre args)
+       (append args (list :rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) ik-rthre (* 5 ik-rthre)))) legs))))
      (send* robot :move-centroid-on-foot
             :both legs :target-centroid-pos cog
             :fix-limbs-target-coords fix-coords
