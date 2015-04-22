@@ -2851,7 +2851,7 @@ nil
 <BR>
 
 <A NAME="55557"></A>
-<B>:calc-walk-pattern-from-footstep-list</B> <EM>footstep-list &amp;key (default-step-height 50) (dt 0.1) (default-step-time 1.0) (solve-angle-vector-args) (debug-view nil) ((:all-limbs al) '(:rleg :lleg)) ((:default-zmp-offsets dzo) (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) (init-pose-function #'(lambda nil (send self :move-centroid-on-foot :both '(:rleg :lleg)))) (start-with-double-support t) (end-with-double-support t) (calc-zmp t)  </EM>[メソッド]
+<B>:calc-walk-pattern-from-footstep-list</B> <EM>footstep-list &amp;key (default-step-height 50) (dt 0.1) (default-step-time 1.0) (solve-angle-vector-args) (debug-view nil) ((:all-limbs al) '(:rleg :lleg)) ((:default-zmp-offsets dzo) (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) (init-pose-function #'(lambda nil (send self :move-centroid-on-foot :both '(:rleg :lleg)))) (start-with-double-support t) (end-with-double-support t) (ik-thre 1) (ik-rthre (deg2rad 1)) (calc-zmp t)  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
@@ -3272,7 +3272,7 @@ nil
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-04-19
+2015-04-22
 </ADDRESS>
 </BODY>
 </HTML>
