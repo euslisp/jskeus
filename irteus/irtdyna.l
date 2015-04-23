@@ -1546,7 +1546,9 @@
                                        :init-xk cog
                                        )
           swing-leg-src-coords current-swing-leg-dst-coords
-          refzmp-next (send self :get-limbs-zmp current-support-leg-coords current-support-limbs)
+          refzmp-next (send self :get-limbs-zmp
+                            (mapcar #'(lambda (l) (send robot l :end-coords :copy-worldcoords)) (send self :get-counter-footstep-limbs (send-all (car footstep-node-list) :name)))
+                            (send self :get-counter-footstep-limbs (send-all (car footstep-node-list) :name)))
           refzmp-prev (car refzmp-cur-list))
     (send self :make-gait-parameter)
     t))))
