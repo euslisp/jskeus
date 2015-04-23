@@ -2,6 +2,17 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
+* fix minor bugs
+
+  * [irteus/PQP/Makefile.LinuxARM] add -fPIC for arm
+  * [Makefile] add .PHONE: doc
+  * [irtrobot.l] Fix initial refzmp pos.
+
+* Contributors: Kei Okada, Shunichi Nozawa
+
 1.0.5 (2015-04-22)
 ------------------
 
