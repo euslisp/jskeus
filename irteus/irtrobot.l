@@ -808,14 +808,13 @@
                )))
      (send-all (all-descendant-links (car (send self name :links))) :worldcoords)
      (let* ((target-nm (read-from-string (format nil "~A-sole-body" name)))
-            (b (send
-                (make-bounding-box
-                 (remove-if
-                  #'(lambda (p) (> (elt (send self name :end-coords :inverse-transform-vector p) 2) 5.0))
-                  (remove-duplicates
-                   (flatten (send-all (flatten (send-all (all-descendant-links (car (send self name :links))) :bodies)) :vertices))
-                   :test #'(lambda (x y) (eps-v= x y *epsilon*)))))
-                :body)))
+	    (v-dup (remove-duplicates
+		    (flatten (send-all (flatten (send-all (all-descendant-links (car (send self name :links))) :bodies)) :vertices))
+		    :test #'(lambda (x y) (eps-v= x y *epsilon*))))
+	    (v-sml (remove-if
+		    #'(lambda (p) (print (list p (float-vector-p p)))(> (elt (send self name :end-coords :inverse-transform-vector p) 2) 5.0))
+		    v-dup))
+            (b (if v-sml (send (make-bounding-box v-dup) :body) (make-cube 1 1 1))))
        (send (send self name :end-coords :parent) :assoc b)
        (send self :put target-nm b)
        (send b :worldcoords)
