@@ -65,7 +65,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
  <BR>
 <BR> <BR> 
-<A NAME="41332"></A>
+<A NAME="41339"></A>
 <BIG CLASS="XLARGE"><B>colormap </B></BIG> [クラス]  <PRE><TT>
   :super   <B>object</B> 
 <BR>  :slots 		 (cmapid planes pixels LUT-list) 
@@ -152,7 +152,7 @@ LUTは、Xserverが認識できるように、アプリケーションが指定�
  <BR>
 <BR> <P>
 
-<A NAME="41350"></A>
+<A NAME="41357"></A>
 <B>:id</B> [メソッド]
 
 <DL COMPACT>
@@ -163,7 +163,7 @@ LUTは、Xserverが認識できるように、アプリケーションが指定�
 <BR>
 <BR>
 
-<A NAME="41361"></A>
+<A NAME="41368"></A>
 <B>:query</B> <EM>pix </EM>[メソッド]
 
 <DL COMPACT>
@@ -174,7 +174,7 @@ LUTは、Xserverが認識できるように、アプリケーションが指定�
 <BR>
 <BR>
 
-<A NAME="41371"></A>
+<A NAME="41378"></A>
 <B>:alloc</B> <EM>pix r g b </EM>[メソッド]
 
 <DL COMPACT>
@@ -187,7 +187,7 @@ LUTは、Xserverが認識できるように、アプリケーションが指定�
 <BR>
 <BR>
 
-<A NAME="41382"></A>
+<A NAME="41389"></A>
 <B>:store</B> <EM>pix r g b </EM>[メソッド]
 
 <DL COMPACT>
@@ -198,7 +198,7 @@ LUTは、Xserverが認識できるように、アプリケーションが指定�
 <BR>
 <BR>
 
-<A NAME="41393"></A>
+<A NAME="41400"></A>
 <B>:store</B> <EM>pix color-name </EM>[メソッド]
 
 <DL COMPACT>
@@ -219,7 +219,7 @@ LUTは、Xserverが認識できるように、アプリケーションが指定�
 
 <P>
 
-<A NAME="41406"></A>
+<A NAME="41413"></A>
 <B>:store-hls</B> <EM>pix hue lightness saturation </EM>[メソッド]
 
 <DL COMPACT>
@@ -236,7 +236,7 @@ HLS(Hue, Lightness and Saturation)で
 
 <P>
 
-<A NAME="41419"></A>
+<A NAME="41426"></A>
 <B>:destroy</B> [メソッド]
 
 <DL COMPACT>
@@ -247,7 +247,7 @@ HLS(Hue, Lightness and Saturation)で
 <BR>
 <BR>
 
-<A NAME="41430"></A>
+<A NAME="41437"></A>
 <B>:pixel</B> <EM>LUT-name id </EM>[メソッド]
 
 <DL COMPACT>
@@ -262,7 +262,7 @@ HLS(Hue, Lightness and Saturation)で
 
 <P>
 
-<A NAME="41444"></A>
+<A NAME="41451"></A>
 <B>:allocate-private-colors</B> <EM>num </EM>[メソッド]
 
 <DL COMPACT>
@@ -276,7 +276,7 @@ HLS(Hue, Lightness and Saturation)で
 
 <P>
 
-<A NAME="41455"></A>
+<A NAME="41462"></A>
 <B>:allocate-colors</B> <EM>rgb-list [private] </EM>[メソッド]
 
 <DL COMPACT>
@@ -292,7 +292,7 @@ HLS(Hue, Lightness and Saturation)で
 
 <P>
 
-<A NAME="41466"></A>
+<A NAME="41473"></A>
 <B>:define-LUT</B> <EM>LUT-name rgb-list [private] </EM>[メソッド]
 
 <DL COMPACT>
@@ -308,7 +308,7 @@ LUTが<EM>LUT-name</EM>のシンボリック名で登録される。
 
 <P>
 
-<A NAME="41479"></A>
+<A NAME="41486"></A>
 <B>:define-gray-scale-LUT</B> <EM>LUT-name levels [private] </EM>[メソッド]
 
 <DL COMPACT>
@@ -328,7 +328,7 @@ LUTが<EM>LUT-name</EM>のシンボリック名で登録される。
 
 <P>
 
-<A NAME="41494"></A>
+<A NAME="41501"></A>
 <B>:define-rgb-LUT</B> <EM>LUT-name red green blue [private] </EM>[メソッド]
 
 <DL COMPACT>
@@ -339,7 +339,7 @@ RGB表現を縮小したLUTを定義する。
  $2^{2+2+2}=2^6=64$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="125" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="558" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
  SRC="jmanual-img78.png"
  ALT="$ 2^{2+2+2}=2^6=64$"></SPAN>
 が割り当てられる。
@@ -348,7 +348,7 @@ RGB表現を縮小したLUTを定義する。
 <BR>
 <BR>
 
-<A NAME="41508"></A>
+<A NAME="41515"></A>
 <B>:define-hls-LUT</B> <EM>LUT-name count hue low-brightness
 high-brightness saturation [private] </EM>[メソッド]
 
@@ -366,10 +366,10 @@ HLSで使用する<EM>count</EM>数のカラーを配置する。
 
 <P>
 
-<A NAME="41524"></A>
+<A NAME="41531"></A>
 <BR>
 <IMG
- WIDTH="552" HEIGHT="73" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="127" HEIGHT="20" ALIGN="BOTTOM" BORDER="0"
  SRC="jmanual-img79.png"
  ALT="\begin{emtabbing}
 {\bf :define-rainbow-LUT}
@@ -396,7 +396,7 @@ HLSで使用する<EM>count</EM>数のカラーを配置する。
 
 <P>
 
-<A NAME="41541"></A>
+<A NAME="41548"></A>
 <B>:LUT-list</B> [メソッド]
 
 <DL COMPACT>
@@ -408,7 +408,7 @@ HLSで使用する<EM>count</EM>数のカラーを配置する。
 <BR>
 <BR>
 
-<A NAME="41551"></A>
+<A NAME="41558"></A>
 <B>:LUT-names</B> [メソッド]
 
 <DL COMPACT>
@@ -419,7 +419,7 @@ HLSで使用する<EM>count</EM>数のカラーを配置する。
 <BR>
 <BR>
 
-<A NAME="41561"></A>
+<A NAME="41568"></A>
 <B>:LUT</B> <EM>name </EM>[メソッド]
 
 <DL COMPACT>
@@ -430,7 +430,7 @@ HLSで使用する<EM>count</EM>数のカラーを配置する。
 <BR>
 <BR>
 
-<A NAME="41572"></A>
+<A NAME="41579"></A>
 <B>:size</B> <EM>LUT </EM>[メソッド]
 
 <DL COMPACT>
@@ -441,7 +441,7 @@ HLSで使用する<EM>count</EM>数のカラーを配置する。
 <BR>
 <BR>
 
-<A NAME="41583"></A>
+<A NAME="41590"></A>
 <B>:planes</B> [メソッド]
 
 <DL COMPACT>
@@ -454,7 +454,7 @@ HLSで使用する<EM>count</EM>数のカラーを配置する。
 
 <P>
 
-<A NAME="41593"></A>
+<A NAME="41600"></A>
 <B>:set-window</B> <EM>xwin </EM>[メソッド]
 
 <DL COMPACT>
@@ -467,7 +467,7 @@ HLSで使用する<EM>count</EM>数のカラーを配置する。
 <BR>
 <BR>
 
-<A NAME="41605"></A>
+<A NAME="41612"></A>
 <B>:free</B> <EM>pixel | LUT </EM>[メソッド]
 
 <DL COMPACT>
@@ -479,7 +479,7 @@ HLSで使用する<EM>count</EM>数のカラーを配置する。
 <BR>
 <BR>
 
-<A NAME="41617"></A>
+<A NAME="41624"></A>
 <B>:init</B> <EM>[cmapid] </EM>[メソッド]
 
 <DL COMPACT>
@@ -492,7 +492,7 @@ HLSで使用する<EM>count</EM>数のカラーを配置する。
 <BR>
 <BR>
 
-<A NAME="41628"></A>
+<A NAME="41635"></A>
 <B>:create</B> <EM>&amp;key (planes 0) (colors 1) (visual *visual*) (contiguous i
 l) </EM>[メソッド]
 
@@ -506,7 +506,7 @@ l) </EM>[メソッド]
 
 <P>
 	<BR> 
-<A NAME="41639"></A>
+<A NAME="41646"></A>
 <BIG CLASS="XLARGE"><B>XColor </B></BIG> [クラス]  <PRE><TT>
   :super   <B>cstruct</B> 
 <BR>  :slots 		 ((pixel        :integer) 
@@ -524,7 +524,7 @@ l) </EM>[メソッド]
 <DD>RGBモデルのカラーを定義する。
 それぞれのスロットに値を割り当てるには、<B>setf</B>を用いる。
 RGB値は、符合拡張され、最大値は<SPAN CLASS="MATH"><IMG
- WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="552" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img80.png"
  ALT="$ -1$"></SPAN>と表現される。
 </DD>
@@ -534,7 +534,7 @@ RGB値は、符合拡張され、最大値は<SPAN CLASS="MATH"><IMG
 
 <P>
 
-<A NAME="41657"></A>
+<A NAME="41664"></A>
 <B>:red</B> [メソッド]
 
 <DL COMPACT>
@@ -545,7 +545,7 @@ RGB値は、符合拡張され、最大値は<SPAN CLASS="MATH"><IMG
 <BR>
 <BR>
 
-<A NAME="41668"></A>
+<A NAME="41675"></A>
 <B>:blue</B> [メソッド]
 
 <DL COMPACT>
@@ -556,7 +556,7 @@ RGB値は、符合拡張され、最大値は<SPAN CLASS="MATH"><IMG
 <BR>
 <BR>
 
-<A NAME="41679"></A>
+<A NAME="41686"></A>
 <B>:green</B> [メソッド]
 
 <DL COMPACT>
@@ -567,7 +567,7 @@ RGB値は、符合拡張され、最大値は<SPAN CLASS="MATH"><IMG
 <BR>
 <BR>
 
-<A NAME="41690"></A>
+<A NAME="41697"></A>
 <B>:color</B> [メソッド]
 
 <DL COMPACT>
@@ -578,7 +578,7 @@ RGB値は、符合拡張され、最大値は<SPAN CLASS="MATH"><IMG
 <BR>
 <BR>
 
-<A NAME="41701"></A>
+<A NAME="41708"></A>
 <B>:init</B> <EM>pix R G B &amp;optional (f 7) </EM>[メソッド]
 
 <DL COMPACT>
@@ -592,7 +592,7 @@ RGB値は、符合拡張され、最大値は<SPAN CLASS="MATH"><IMG
 
 <P>
 
-<A NAME="41712"></A>
+<A NAME="41719"></A>
 <B>find-visual</B> <EM>type depth &amp;optional (screen 0) </EM>[関数]
 
 <DL COMPACT>
@@ -642,7 +642,7 @@ RGB値は、符合拡張され、最大値は<SPAN CLASS="MATH"><IMG
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-04-23
+2015-04-30
 </ADDRESS>
 </BODY>
 </HTML>

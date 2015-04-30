@@ -65,7 +65,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
  <BR>
 <BR> <BR> 
-<A NAME="4302"></A>
+<A NAME="4309"></A>
 <BIG CLASS="XLARGE"><B>object </B></BIG> [クラス]  <PRE><TT>
   :super    
 <BR>  :slots 		 
@@ -85,7 +85,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<A NAME="4320"></A>
+<A NAME="4327"></A>
 <B>:prin1</B> <EM>&amp;optional stream &amp;rest mesg </EM>[メソッド]
 
 <DL COMPACT>
@@ -98,7 +98,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 を使ってもっと広範囲な情報と一緒にそれ自身を印刷するのにこの方法を
 使用することができる。
 オブジェクトは、もし<TT>#<SPAN CLASS="MATH"><IMG
- WIDTH="17" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="556" HEIGHT="89" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img9.png"
  ALT="$ &lt;$"></SPAN></TT>で始まるなら、再読み込み可能である。
 そのクラス名・正確なアドレス・どのLispでも読み込可能な情報・<code>&gt;</code>をあとに
@@ -116,7 +116,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<A NAME="4335"></A>
+<A NAME="4342"></A>
 <B>:slots</B> [メソッド]
 
 <DL COMPACT>
@@ -132,7 +132,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="4347"></A>
+<A NAME="4354"></A>
 <BIG CLASS="XLARGE"><B>propertied-object </B></BIG> [クラス]  <PRE><TT>
   :super   <B>object</B> 
 <BR>  :slots 		 plist 
@@ -154,7 +154,7 @@ EusLispは、たとえ、symbolでなかったとしても、property-listを持
 
 <P>
 
-<A NAME="4365"></A>
+<A NAME="4372"></A>
 <B>:plist</B> <EM>&amp;optional plist </EM>[メソッド]
 
 <DL COMPACT>
@@ -174,7 +174,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4383"></A>
+<A NAME="4390"></A>
 <B>:get</B> <EM>indicator </EM>[メソッド]
 
 <DL COMPACT>
@@ -187,7 +187,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4395"></A>
+<A NAME="4402"></A>
 <B>:put</B> <EM>indicator value </EM>[メソッド]
 
 <DL COMPACT>
@@ -199,7 +199,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4408"></A>
+<A NAME="4415"></A>
 <B>:remprop</B> <EM>indicator </EM>[メソッド]
 
 <DL COMPACT>
@@ -212,7 +212,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4421"></A>
+<A NAME="4428"></A>
 <B>:name</B> <EM>&amp;optional name </EM>[メソッド]
 
 <DL COMPACT>
@@ -225,7 +225,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4433"></A>
+<A NAME="4440"></A>
 <B>:prin1</B> <EM>&amp;optional stream &amp;rest mesg </EM>[メソッド]
 
 <DL COMPACT>
@@ -241,7 +241,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 
 <P>
 	<BR> 
-<A NAME="4445"></A>
+<A NAME="4452"></A>
 <BIG CLASS="XLARGE"><B>metaclass </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
 <BR>  :slots 		 name super cix vars types forwards methods 
@@ -258,7 +258,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4464"></A>
+<A NAME="4471"></A>
 <B>:new</B> [メソッド]
 
 <DL COMPACT>
@@ -270,7 +270,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4474"></A>
+<A NAME="4481"></A>
 <B>:super</B> [メソッド]
 
 <DL COMPACT>
@@ -283,7 +283,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4484"></A>
+<A NAME="4491"></A>
 <B>:methods</B> [メソッド]
 
 <DL COMPACT>
@@ -297,7 +297,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4494"></A>
+<A NAME="4501"></A>
 <B>:method</B> <EM>name </EM>[メソッド]
 
 <DL COMPACT>
@@ -310,7 +310,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4505"></A>
+<A NAME="4512"></A>
 <B>:method-names</B> <EM>subname </EM>[メソッド]
 
 <DL COMPACT>
@@ -323,7 +323,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4516"></A>
+<A NAME="4523"></A>
 <B>:all-methods</B> [メソッド]
 
 <DL COMPACT>
@@ -338,7 +338,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4526"></A>
+<A NAME="4533"></A>
 <B>:all-method-names</B> <EM>subname </EM>[メソッド]
 
 <DL COMPACT>
@@ -351,7 +351,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4538"></A>
+<A NAME="4545"></A>
 <B>:slots</B> [メソッド]
 
 <DL COMPACT>
@@ -363,7 +363,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4548"></A>
+<A NAME="4555"></A>
 <B>:name</B> [メソッド]
 
 <DL COMPACT>
@@ -375,7 +375,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4558"></A>
+<A NAME="4565"></A>
 <B>:cid</B> [メソッド]
 
 <DL COMPACT>
@@ -390,7 +390,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4568"></A>
+<A NAME="4575"></A>
 <B>:subclasses</B> [メソッド]
 
 <DL COMPACT>
@@ -402,7 +402,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4578"></A>
+<A NAME="4585"></A>
 <B>:hierarchy</B> [メソッド]
 
 <DL COMPACT>
@@ -416,7 +416,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <BR>
 <BR>
 
-<A NAME="4589"></A>
+<A NAME="4596"></A>
 <B>find-method</B> <EM>object selector </EM>[関数]
 
 <DL COMPACT>
@@ -463,7 +463,7 @@ symbolが<TT>indicator</TT>として用いられたとき、内部パッケー�
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-04-23
+2015-04-30
 </ADDRESS>
 </BODY>
 </HTML>

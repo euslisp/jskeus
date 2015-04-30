@@ -99,11 +99,11 @@ Readerのデフォルトマクロ文字は：
  $\backslash$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="12" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="20" HEIGHT="17" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img32.png"
  ALT="$ \backslash$"></SPAN></B>   単一文字エスケープ
 <BR><B><SPAN CLASS="MATH"><IMG
- WIDTH="27" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="12" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img33.png"
  ALT="$ \vert...\vert$"></SPAN></B> 		  多重文字エスケープ
 <BR>
@@ -116,17 +116,17 @@ Readerのデフォルトマクロ文字は：
 例えば、'abcと'ABCは同じsymbolとみなされる。
 エスケープは、それらを区別するのに必要である。
 '<SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="368" HEIGHT="940" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img7.png"
  ALT="$ \vert$"></SPAN>ABC<SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="368" HEIGHT="940" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img7.png"
  ALT="$ \vert$"></SPAN>, 'ABCと'abcは同一であるが、
 '<SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="368" HEIGHT="940" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img7.png"
  ALT="$ \vert$"></SPAN>abc<SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="368" HEIGHT="940" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img7.png"
  ALT="$ \vert$"></SPAN>と'abcは違うsymbolである。
 デフォルトとして、大文字のsymbolを入力したときでさえ、
@@ -140,7 +140,7 @@ EusLispのプリンタが内部の大文字表現から小文字に変換する�
 10.は整数の10として読まれ、実数の10.0ではない。
 ':'がパッケージマーカーとして予約されているので、
 '<SPAN CLASS="MATH"><IMG
- WIDTH="73" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="554" HEIGHT="92" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img37.png"
  ALT="$ \vert g:pcube\vert$"></SPAN>のようにsymbolを構成するものとして使うとき、エスケープ化しなければ
 ならない。
@@ -169,10 +169,10 @@ Cの様な関数呼出や行列参照も、lisp形式に変換される。
 <TT>func(a,b,c)</TT>や<TT>ary[1][2][3]</TT>のように書かない。
 相対表現や割り当てもまた、正しく扱われる。
 それで、<TT>%(a <SPAN CLASS="MATH"><IMG
- WIDTH="17" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="556" HEIGHT="89" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img9.png"
  ALT="$ &lt;$"></SPAN> b)</TT>は<TT>(<SPAN CLASS="MATH"><IMG
- WIDTH="17" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="556" HEIGHT="89" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img9.png"
  ALT="$ &lt;$"></SPAN> a b)</TT>に変換され、
 <TT>%(a[0] = b[0] * c[0])</TT>は 
@@ -245,7 +245,7 @@ Cの様な関数呼出や行列参照も、lisp形式に変換される。
  $\backslash$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="12" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="20" HEIGHT="17" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img32.png"
  ALT="$ \backslash$"></SPAN></TT></STRONG></DT>
 <DD>文字
@@ -266,10 +266,10 @@ Cの様な関数呼出や行列参照も、lisp形式に変換される。
 <DD>収容されてないsymbol
 </DD>
 <DT><STRONG><TT>#<SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="368" HEIGHT="940" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img7.png"
  ALT="$ \vert$"></SPAN>...<SPAN CLASS="MATH"><IMG
- WIDTH="9" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="368" HEIGHT="940" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img7.png"
  ALT="$ \vert$"></SPAN>#</TT></STRONG></DT>
 <DD>コメント; 入れ子可能
@@ -304,7 +304,7 @@ eofの発生を知りたかったり、snatch controlにシステムエラーを
  <BR>
 <BR> <P>
 
-<A NAME="15291"></A>
+<A NAME="15298"></A>
 <B>read</B> <EM>&amp;optional stream (eof-error-p t) (eof-value nil) recursive-p </EM>[関数]
 
 <DL COMPACT>
@@ -318,7 +318,7 @@ s表現を1つ読み込む。
 
 <P>
 
-<A NAME="15301"></A>
+<A NAME="15308"></A>
 <B>read-delimited-list</B> <EM>delim-char &amp;optional stream recursive-p </EM>[関数]
 
 <DL COMPACT>
@@ -330,7 +330,7 @@ s表現を1つ読み込む。
  $\backslash$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="12" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="20" HEIGHT="17" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img32.png"
  ALT="$ \backslash$"></SPAN>]</TT>のような特殊文字で終る数列を読むために役立つ。
 </DD>
@@ -340,7 +340,7 @@ s表現を1つ読み込む。
 
 <P>
 
-<A NAME="15313"></A>
+<A NAME="15320"></A>
 <B>read-line</B> <EM>&amp;optional stream (eof-error-p t) (eof-value nil) </EM>[関数]
 
 <DL COMPACT>
@@ -350,7 +350,7 @@ s表現を1つ読み込む。
  $\backslash$
  -->
 <SPAN CLASS="MATH"><IMG
- WIDTH="12" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="20" HEIGHT="17" ALIGN="MIDDLE" BORDER="0"
  SRC="jmanual-img32.png"
  ALT="$ \backslash$"></SPAN>newline</TT>(改行)で終了する1行を読み込む。
 返された文字列には、最後の改行文字を含まない。
@@ -361,7 +361,7 @@ s表現を1つ読み込む。
 
 <P>
 
-<A NAME="15324"></A>
+<A NAME="15331"></A>
 <B>read-char</B> <EM>&amp;optional stream (eof-error-p t) (eof-value nil) </EM>[関数]
 
 <DL COMPACT>
@@ -375,7 +375,7 @@ s表現を1つ読み込む。
 
 <P>
 
-<A NAME="15334"></A>
+<A NAME="15341"></A>
 <B>read-from-string</B> <EM>string &amp;optional (eof-error-p t) (eof-value nil) </EM>[関数]
 
 <DL COMPACT>
@@ -392,7 +392,7 @@ s表現を1つ読み込む。
 
 <P>
 
-<A NAME="15347"></A>
+<A NAME="15354"></A>
 <B>unread-char</B> <EM>char &amp;optional stream </EM>[関数]
 
 <DL COMPACT>
@@ -407,7 +407,7 @@ s表現を1つ読み込む。
 
 <P>
 
-<A NAME="15359"></A>
+<A NAME="15366"></A>
 <B>peek-char</B> <EM>&amp;optional stream (eof-error-p t) (eof-value nil) </EM>[関数]
 
 <DL COMPACT>
@@ -423,7 +423,7 @@ s表現を1つ読み込む。
 
 <P>
 
-<A NAME="15373"></A>
+<A NAME="15380"></A>
 <B>y-or-n-p</B> <EM>&amp;optional format-string &amp;rest args </EM>[関数]
 
 <DL COMPACT>
@@ -439,7 +439,7 @@ yならTそしてnならNILを返す。 それ以外は起こらない。
 
 <P>
 
-<A NAME="15385"></A>
+<A NAME="15392"></A>
 <B>yes-or-no-p</B> <EM>&amp;optional stream </EM>[関数]
 
 <DL COMPACT>
@@ -463,7 +463,7 @@ yesならTそしてnoならNILを返す。 それ以外は起こらない。
  <BR>
 <BR> <P>
 
-<A NAME="15397"></A>
+<A NAME="15404"></A>
 <B>readtable-p</B> <EM>x </EM>[関数]
 
 <DL COMPACT>
@@ -475,7 +475,7 @@ yesならTそしてnoならNILを返す。 それ以外は起こらない。
 <BR>
 <BR>
 
-<A NAME="15408"></A>
+<A NAME="15415"></A>
 <B>copy-readtable</B> <EM>&amp;optional from-readtable to-readtable </EM>[関数]
 
 <DL COMPACT>
@@ -492,7 +492,7 @@ dispatch-macro tableでそれぞれ256個の要素を持つ。
 
 <P>
 
-<A NAME="15421"></A>
+<A NAME="15428"></A>
 <B>set-syntax-from-char</B> <EM>from-char to-char [from-readtable to-readtable] </EM>[関数]
 
 <DL COMPACT>
@@ -506,7 +506,7 @@ dispatch-macro tableでそれぞれ256個の要素を持つ。
 
 <P>
 
-<A NAME="15435"></A>
+<A NAME="15442"></A>
 <B>set-macro-character</B> <EM>char func [non-teminating-p readtable] </EM>[関数]
 
 <DL COMPACT>
@@ -518,7 +518,7 @@ dispatch-macro tableでそれぞれ256個の要素を持つ。
 <BR>
 <BR>
 
-<A NAME="15447"></A>
+<A NAME="15454"></A>
 <B>get-macro-character</B> <EM>char [readtable] </EM>[関数]
 
 <DL COMPACT>
@@ -530,7 +530,7 @@ dispatch-macro tableでそれぞれ256個の要素を持つ。
 <BR>
 <BR>
 
-<A NAME="15458"></A>
+<A NAME="15465"></A>
 <B>set-dispatch-macro-character</B> <EM>dispchar char func [readtable] </EM>[関数]
 
 <DL COMPACT>
@@ -543,7 +543,7 @@ dispatch read-macro関数として<EM>func</EM>を定義する。
 <BR>
 <BR>
 
-<A NAME="15471"></A>
+<A NAME="15478"></A>
 <B>get-dispatch-macro-character</B> <EM>dispchar char [readtable] </EM>[関数]
 
 <DL COMPACT>
@@ -591,7 +591,7 @@ dispatch read-macro関数を返す。
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-04-23
+2015-04-30
 </ADDRESS>
 </BODY>
 </HTML>

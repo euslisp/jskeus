@@ -68,7 +68,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
  <BR>
 <BR> <P>
 
-<A NAME="32713"></A>
+<A NAME="32720"></A>
 <B>make-plane</B> <EM>&amp;key :normal :point :distance </EM>[関数]
 
 <DL COMPACT>
@@ -83,7 +83,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<A NAME="32728"></A>
+<A NAME="32735"></A>
 <B>*xy-plane*</B> [変数]
 
 <DL COMPACT>
@@ -94,7 +94,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="32739"></A>
+<A NAME="32746"></A>
 <B>*yz-plane*</B> [変数]
 
 <DL COMPACT>
@@ -105,7 +105,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="32750"></A>
+<A NAME="32757"></A>
 <B>*zx-plane*</B> [変数]
 
 <DL COMPACT>
@@ -118,12 +118,12 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<DIV ALIGN="CENTER"><A NAME="30483"></A>
+<DIV ALIGN="CENTER"><A NAME="30490"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
 基本body</CAPTION>
 <TR><TD><IMG
- WIDTH="580" HEIGHT="851" BORDER="0"
+ WIDTH="97" HEIGHT="34" BORDER="0"
  SRC="jmanual-img63.png"
  ALT="\begin{figure}\begin{center}
 \epsfile{file=fig/fig1.ps,height=19cm}
@@ -134,7 +134,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<A NAME="32761"></A>
+<A NAME="32768"></A>
 <B>make-cube</B> <EM>xsize ysize zsize &amp;key :name :color </EM>[関数]
 
 <DL COMPACT>
@@ -149,7 +149,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32775"></A>
+<A NAME="32782"></A>
 <B>make-prism</B> <EM>bottom-points sweep-vector &amp;key :name :color </EM>[関数]
 
 <DL COMPACT>
@@ -158,7 +158,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 <EM>sweep-vector</EM>に沿った<EM>bottom-points</EM>により定義される
 形状を積み上げることにより角柱を作る。
 もし、<EM>sweep-vector</EM>が実数ベクトルでなく数字であれば、<SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="580" HEIGHT="851" ALIGN="BOTTOM" BORDER="0"
  SRC="jmanual-img64.png"
  ALT="$ z$"></SPAN>方向の
 角柱の高さとして扱われる。
@@ -173,7 +173,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32791"></A>
+<A NAME="32798"></A>
 <B>make-cylinder</B> <EM>radius height &amp;key (:segments 12) :name :color </EM>[関数]
 
 <DL COMPACT>
@@ -188,7 +188,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32803"></A>
+<A NAME="32810"></A>
 <B>make-cone</B> <EM>top bottom &amp;key (:segments 16) :color :name </EM>[関数]
 
 <DL COMPACT>
@@ -207,7 +207,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32817"></A>
+<A NAME="32824"></A>
 <B>make-solid-of-revolution</B> <EM>points &amp;key (:segments 16) :name :color </EM>[関数]
 
 <DL COMPACT>
@@ -221,7 +221,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 <TT>(make-solid-of-revolution '(#f(1 0 1) #f(1 0 0)))</TT>
 は、円柱を作る。
 <EM>points</EM>は、順番が重要であり、<SPAN CLASS="MATH"><IMG
- WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="580" HEIGHT="851" ALIGN="BOTTOM" BORDER="0"
  SRC="jmanual-img64.png"
  ALT="$ z$"></SPAN>軸の高い方から低い方へ
 整列しておくことが望まれる。
@@ -232,7 +232,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32832"></A>
+<A NAME="32839"></A>
 <B>make-torus</B> <EM>points &amp;key (:segments 16) :name :color </EM>[関数]
 
 <DL COMPACT>
@@ -247,7 +247,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32843"></A>
+<A NAME="32850"></A>
 <B>make-icosahedron</B> <EM>&amp;optional (radius 1.0) </EM>[関数]
 
 <DL COMPACT>
@@ -261,7 +261,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32853"></A>
+<A NAME="32860"></A>
 <B>make-dodecahedron</B> <EM>&amp;optional (radius 1.0) </EM>[関数]
 
 <DL COMPACT>
@@ -275,7 +275,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32863"></A>
+<A NAME="32870"></A>
 <B>make-gdome</B> <EM>abody </EM>[関数]
 
 <DL COMPACT>
@@ -301,7 +301,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32877"></A>
+<A NAME="32884"></A>
 <B>grahamhull</B> <EM>vertices &amp;optional (normal #f(0 0 1)) </EM>[関数]
 
 <DL COMPACT>
@@ -316,7 +316,7 @@ Grahamのアルゴリズムを用いて，2次元上で凸状の覆いを計算�
 
 <P>
 
-<A NAME="32888"></A>
+<A NAME="32895"></A>
 <B>quickhull</B> <EM>vertices &amp;optional (normal #f(0 0 1)) </EM>[関数]
 
 <DL COMPACT>
@@ -330,7 +330,7 @@ Grahamのアルゴリズムを用いて，2次元上で凸状の覆いを計算�
 
 <P>
 
-<A NAME="32898"></A>
+<A NAME="32905"></A>
 <B>convex-hull-3d</B> <EM>vertices </EM>[関数]
 
 <DL COMPACT>
@@ -342,7 +342,7 @@ gift-wrapping法を用いて3次元上で凸面の覆いを計算する。
 <BR>
 <BR>
 
-<A NAME="32908"></A>
+<A NAME="32915"></A>
 <B>make-body-from-vertices</B> <EM>vertices-list </EM>[関数]
 
 <DL COMPACT>
@@ -388,7 +388,7 @@ gift-wrapping法を用いて3次元上で凸面の覆いを計算する。
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-04-23
+2015-04-30
 </ADDRESS>
 </BODY>
 </HTML>
