@@ -12,6 +12,7 @@ notifications:
 env:
   - secure: "u0lUaQ+BR5IH2bJNmGPZ8Yp5/iroJiHNkADN6lvMMqS9FQc8kcEe74UgsTjMdteQXRsDTtJVmwB7UFB83bwwcKoVYwrGAdOfBkWM702hTgmEIqKTkBkaVyUjkzR/VrnVCHCLhQMysAuHQyPrEPjLlvmKiJJ/OYfRg2QCd74ef1I="
 before_install: # Use this to prepare the system to install prerequisites or dependencies
+  - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   # Define some config vars
   - export CI_SOURCE_PATH=$(pwd)
   - export REPOSITORY_NAME=${PWD##*/}
@@ -46,6 +47,12 @@ after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then git add -f .;                     fi
   - if [ "$TRAVIS_BRANCH" == "master" ]; then git commit -m "Build documents from $TRAVIS_COMMIT" . ;   fi
   - if [ "$TRAVIS_BRANCH" == "master" ]; then git push -f --quiet https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git gh-pages; fi
+# upload to euslisp-docs
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then git clone https://k-okada:$GH_TOKEN@github.com/jsk-ros-pkg/euslisp-docs.git /tmp/euslisp-docs; fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then cd /tmp/euslisp-docs; git remote rm origin; git remote add origin https://k-okada:$GH_TOKEN@github.com/jsk-ros-pkg/euslisp-docs.git; fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then cd ${CI_SOURCE_PATH}/doc; git clean -xfd; sed -i 's@rm -fr@#rm -fr@g' Makefile; sed -i 's@\euslisptrue@\euslispfalse@g' jmanual.tex; awk 'BEGIN{flg=1}; {if (/^\\ifeuslisp/) {flg=0}; if(flg>0)print; if (/^\\fi/) {flg=1} };' jmanual.tex > jmanual.tex.tmp; mv jmanual.tex.tmp jmanual.tex ; rm -fr html; make TMPDIR=/tmp; cp /tmp/*.tex ./; ${CI_SOURCE_PATH}/.upload-doc.sh; fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then mkdir -p /tmp/euslisp-docs/docs/jskeus; cd /tmp/euslisp-docs/docs; cp /tmp/html/*.{png,md} jskeus/; fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then git add jskeus/*.md; git commit -m "Update jskeus form https://github.com/$TRAVIS_REPO_SLUG/tree/$TRAVIS_COMMIT"; git push -fq origin master; fi
 after_failure:
   - echo "failure"
 
