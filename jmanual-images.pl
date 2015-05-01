@@ -1015,6 +1015,20 @@ $cached_env_img{$key} = q|<IMG
  ALT="$\displaystyle \frac{\partial \mbox{\boldmath {$f$}}}{\partial \mbox{\boldmath {$\theta$}}}
 (\mbox{\boldmath {$\theta$}})\dot{\mbox{\boldmath {$\theta$}}}$">|; 
 
+$key = q/{figure}{small{preform{<verbatim_mark>verbatim58#preform{{normalsize{{{{figure};FSF=1.6;AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="633" HEIGHT="185" BORDER="0"
+ SRC="|."$dir".q|jmanual-img6.png"
+ ALT="\begin{figure}\small
+\begin{verbatim}object
+cons
+propertied-object
+symbol -...
+...h-table
+surrounding-box
+stereo-viewing\end{verbatim}
+\normalsize\end{figure}">|; 
+
 $key = q/{displaymath}^{#}=left{{array}{ll}&mbox{boldmath{A}}^{-1}(m=n=rankmbox{boldmath{{boldmath{A}}^T(m>n=rankmbox{boldmath{A}}){array}right.{displaymath};MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="14" HEIGHT="30" BORDER="0"
@@ -1232,20 +1246,6 @@ $cached_env_img{$key} = q|<IMG
  WIDTH="368" HEIGHT="940" ALIGN="MIDDLE" BORDER="0"
  SRC="|."$dir".q|jmanual-img7.png"
  ALT="$ \vert$">|; 
-
-$key = q/{figure}{small{preform{<verbatim_mark>verbatim59#preform{{normalsize{{{{figure};FSF=1.6;AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="633" HEIGHT="185" BORDER="0"
- SRC="|."$dir".q|jmanual-img6.png"
- ALT="\begin{figure}\small
-\begin{verbatim}object
-cons
-propertied-object
-symbol -...
-...h-table
-surrounding-box
-stereo-viewing\end{verbatim}
-\normalsize\end{figure}">|; 
 
 $key = q/{displaymath}=left{{array}{ll}0&ifleft|mbox{boldmath{p}}right|>d_{a}(d_{a}slashloldmath{p}}right|-1)mbox{boldmath{p}}&else{array}right.{displaymath};MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
