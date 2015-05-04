@@ -64,7 +64,7 @@ GL/X表示</A>
   
  <BR>
 <BR> <BR> 
-<A NAME="65430"></A>
+<A NAME="65454"></A>
 <BIG CLASS="XLARGE"><B>gl::glvertices </B></BIG> [クラス]  <PRE><TT>
   :super   <B>cascaded-coords</B> 
 <BR>  :slots 		 gl::mesh-list gl::filename gl::bbox 
@@ -80,7 +80,7 @@ GL/X表示</A>
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65447"></A>
+<A NAME="65471"></A>
 <B>:init</B> <EM>gl::mlst &amp;rest args &amp;key ((:filename gl::fn)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -93,7 +93,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65457"></A>
+<A NAME="65481"></A>
 <B>:filename</B> <EM>&amp;optional gl::nm  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -106,7 +106,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65467"></A>
+<A NAME="65491"></A>
 <B>:set-color</B> <EM>gl::color &amp;optional (gl::transparent)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -119,7 +119,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65477"></A>
+<A NAME="65501"></A>
 <B>:actual-vertices</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -132,7 +132,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65487"></A>
+<A NAME="65511"></A>
 <B>:calc-bounding-box</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -145,7 +145,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65497"></A>
+<A NAME="65521"></A>
 <B>:vertices</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -158,7 +158,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65507"></A>
+<A NAME="65531"></A>
 <B>:reset-offset-from-parent</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -171,7 +171,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65517"></A>
+<A NAME="65541"></A>
 <B>:expand-vertices</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -184,8 +184,8 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65527"></A>
-<B>:calc-normals</B> <EM>&amp;optional (gl::force nil) (gl::expand t)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="65551"></A>
+<B>:expand-vertices-info</B> <EM>gl::minfo  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -197,7 +197,46 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65537"></A>
+<A NAME="65561"></A>
+<B>:use-flat-shader</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<A NAME="65571"></A>
+<B>:use-smooth-shader</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<A NAME="65581"></A>
+<B>:calc-normals</B> <EM>&amp;optional (gl::force nil) (gl::expand t) (gl::flat t)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<A NAME="65591"></A>
 <B>:convert-to-faces</B> <EM>&amp;rest args &amp;key (gl::wrt :local) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -210,7 +249,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65547"></A>
+<A NAME="65601"></A>
 <B>:faces</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -223,7 +262,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65557"></A>
+<A NAME="65611"></A>
 <B>:convert-to-faceset</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -236,7 +275,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65567"></A>
+<A NAME="65621"></A>
 <B>:set-offset</B> <EM>gl::cds  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -249,7 +288,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65577"></A>
+<A NAME="65631"></A>
 <B>:glvertices</B> <EM>&amp;optional (name) (gl::test #'string=)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -262,7 +301,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65587"></A>
+<A NAME="65641"></A>
 <B>:append-glvertices</B> <EM>gl::glv-lst  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -275,7 +314,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65597"></A>
+<A NAME="65651"></A>
 <B>:draw-on</B> <EM>&amp;key ((:viewer gl::vwer) viewer)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -288,7 +327,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65607"></A>
+<A NAME="65661"></A>
 <B>:draw</B> <EM>gl::vwr &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -301,7 +340,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65617"></A>
+<A NAME="65671"></A>
 <B>:collision-check-objects</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -314,7 +353,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65627"></A>
+<A NAME="65681"></A>
 <B>:box</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -331,8 +370,68 @@ GL/X表示</A>
 </SMALL>
 
 <P>
+	<BR> 
+<A NAME="65692"></A>
+<BIG CLASS="XLARGE"><B>gl::glbody </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>body</B> 
+<BR>  :slots 		 gl::glvertices 
+</TT></PRE>
+<BR>
+<BR>
 
-<A NAME="65637"></A>
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="65709"></A>
+<B>:glvertices</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<A NAME="65719"></A>
+<B>:draw</B> <EM>gl::vwr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<A NAME="65729"></A>
+<B>:set-color</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD> 
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+
+<A NAME="65739"></A>
 <B>gl::find-color</B> <EM>gl::color  </EM>[関数]
 
 <DL COMPACT>
@@ -343,7 +442,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65647"></A>
+<A NAME="65749"></A>
 <B>gl::transparent</B> <EM>gl::abody gl::param  </EM>[関数]
 
 <DL COMPACT>
@@ -354,7 +453,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65657"></A>
+<A NAME="65759"></A>
 <B>gl::make-glvertices-from-faceset</B> <EM>gl::fs &amp;key (gl::material)  </EM>[関数]
 
 <DL COMPACT>
@@ -366,7 +465,7 @@ fs is geomatry::faceset
 <BR>
 <BR>
 
-<A NAME="65667"></A>
+<A NAME="65769"></A>
 <B>gl::make-glvertices-from-faces</B> <EM>gl::flst &amp;key (gl::material)  </EM>[関数]
 
 <DL COMPACT>
@@ -379,7 +478,7 @@ flst is list of geomatry::face
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65677"></A>
+<A NAME="65779"></A>
 <B>gl::set-stereo-gl-attribute</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -395,7 +494,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65688"></A>
+<A NAME="65790"></A>
 <B>gl::reset-gl-attribute</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -411,7 +510,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65699"></A>
+<A NAME="65801"></A>
 <B>gl::delete-displaylist-id</B> <EM>gl::dllst  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -427,7 +526,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65710"></A>
+<A NAME="65812"></A>
 <B>gl::draw-globjects</B> <EM>gl::vwr gl::draw-things &amp;key (gl::clear t) (gl::flush t) (gl::draw-origin 150) (gl::draw-floor nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -443,7 +542,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65721"></A>
+<A NAME="65823"></A>
 <B>gl::draw-glbody</B> <EM>gl::vwr gl::abody  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -461,7 +560,7 @@ nil
                
  <BR>
 <BR> <BR> 
-<A NAME="66031"></A>
+<A NAME="66193"></A>
 <BIG CLASS="XLARGE"><B>x::tabbed-panel </B></BIG> [クラス]  <PRE><TT>
   :super   <B>x:panel</B> 
 <BR>  :slots 		 x::tabbed-buttons x::tabbed-panels x::selected-tabbed-panel 
@@ -477,7 +576,7 @@ nil
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66048"></A>
+<A NAME="66210"></A>
 <B>:create</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -490,7 +589,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="66058"></A>
+<A NAME="66220"></A>
 <B>:add-tabbed-panel</B> <EM>name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -503,7 +602,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="66068"></A>
+<A NAME="66230"></A>
 <B>:change-tabbed-panel</B> <EM>x::obj  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -516,7 +615,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="66078"></A>
+<A NAME="66240"></A>
 <B>:tabbed-button</B> <EM>name &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -529,7 +628,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="66088"></A>
+<A NAME="66250"></A>
 <B>:tabbed-panel</B> <EM>name &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -542,7 +641,7 @@ nil
 <BR>
 <BR>
 
-<A NAME="66098"></A>
+<A NAME="66260"></A>
 <B>:resize</B> <EM>x::w h  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -560,7 +659,7 @@ nil
 
 <P>
 	<BR> 
-<A NAME="66109"></A>
+<A NAME="66271"></A>
 <BIG CLASS="XLARGE"><B>x::panel-tab-button-item </B></BIG> [クラス]  <PRE><TT>
   :super   <B>x:button-item</B> 
 <BR>  :slots 		 nil 
@@ -576,7 +675,7 @@ nil
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66126"></A>
+<A NAME="66288"></A>
 <B>:draw-label</B> <EM>&amp;optional (x::state :up) (x::offset 0)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -594,7 +693,7 @@ nil
 
 <P>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66136"></A>
+<A NAME="66298"></A>
 <B>x::window-main-one</B> <EM>&amp;optional fd  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -610,7 +709,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66147"></A>
+<A NAME="66309"></A>
 <B>x::event-far</B> <EM>x::e  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -626,7 +725,7 @@ nil
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66158"></A>
+<A NAME="66320"></A>
 <B>x::event-near</B> <EM>x::e  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -673,7 +772,7 @@ nil
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-05-01
+2015-05-04
 </ADDRESS>
 </BODY>
 </HTML>
