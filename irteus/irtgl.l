@@ -639,6 +639,7 @@
    self)
   (:filename (&optional nm) (if nm (setq filename nm)) filename)
   (:set-color (color &optional (transparent))
+   "set color as float vector of 3 elements, and transparent as float, all values are betwenn 0 to 1"
    (delete-displaylist-id (get self :GL-DISPLAYLIST-ID))
    (setf (get self :GL-DISPLAYLIST-ID) nil)
    (setf (get self :transparent) transparent)
@@ -648,6 +649,7 @@
   ;; (:check-normal ())
   ;; (:update ()) ;; call update when updating coordinates
   (:actual-vertices ()
+   "return list of vertices(float-vector), it returns all vertices of this object"
    (let (ret)
      (dolist (minfo mesh-list)
        (let ((v (cadr (assoc :vertices minfo))))
@@ -656,18 +658,22 @@
              (push (user::c-matrix-row v i) ret)))))
      ret))
   (:calc-bounding-box ()
+   "calculate and set bounding box of this object"
    (setq bbox (make-bounding-box (send self :actual-vertices) 0.0))
    bbox)
   (:vertices ()
+   "return list of vertices(float-vector), it returns vertices of bounding box of this object"
    (unless bbox
      (send self :calc-bounding-box))
    (send (send bbox :body) :vertices))
   (:reset-offset-from-parent ()
+   "move vertices in this object using self transformation, this method change values of vertices. coordinates's method such as :transform just change view of this object"
    (let ((cds (send self :copy-coords)))
      (send self :set-offset cds)
      (send self :reset-coords))
    self)
   (:expand-vertices ()
+   "expand vertices number as same number of indices, it enable to set individual normal to every vertices"
    (let (new-mesh)
      (dolist (minfo mesh-list)
        (push (send self :expand-vertices-info minfo) new-mesh))
@@ -691,13 +697,19 @@
          minfo)
        minfo)))
   (:use-flat-shader ()
+   "use flat shader mode, use opengl function of glShadeModel(GL_FLAT)"
    (dolist (minfo mesh-list)
      (nconc minfo (list (list :flat t)))))
   (:use-smooth-shader ()
+   "use smooth shader mode, use opengl function of glShadeModel(GL_SMOOTH) {default}"
    (dolist (minfo mesh-list)
      (let ((a (assoc :flat minfo)))
        (if a (delete a minfo)))))
   (:calc-normals (&optional (force nil) (expand t) (flat t))
+   "normal calculation
+if force option is true, clear current normalset.
+if exapnd option is ture, do :expand-vertices.
+if flat option is true, use-flat-shader"
    (dolist (minfo mesh-list)
      (let ((nmat (cadr (assoc :normals minfo)))
            (tp (cadr (assoc :type minfo)))
@@ -750,6 +762,7 @@
            ))
        )))
   (:convert-to-faces (&rest args &key (wrt :local) &allow-other-keys) ;; check-normal <-> check-vertices-order, add face-color
+   "create list of faces using vertices of this object"
    (let (ret)
      (dolist (mesh mesh-list)
        (let* ((vlst (cadr (assoc :vertices mesh)))
@@ -807,12 +820,14 @@
      (nreverse ret)))
   (:faces () (flatten (send self :convert-to-faces :wrt :world)))
   (:convert-to-faceset (&rest args)
+   "create faceset using vertices of this object"
    (let ((fs
           (instance faceset :init :faces
                     (flatten (send* self :convert-to-faces args)))))
      (send fs :transform (send self :worldcoords))
      fs))
-  (:set-offset (cds) ;; not checked
+  (:set-offset (cds)
+   "move vertices in this object using given coordinates, this method change values of vertices. coordinates's method such as :transform just change view of this object"
    (let* ((zero (float-vector 0 0 0))
           (wpos (send cds :worldpos))
           (wrot (send cds :worldrot)))
@@ -826,6 +841,7 @@
             zero wrot nmat nmat))))
      self))
   (:glvertices (&optional (name) (test #'string=))
+   "create individual glvertices objects from mesh-list. if name is given, search mesh has the same name"
    (let (ret)
      (cond
       (name
@@ -837,7 +853,8 @@
        (setq ret (nreverse ret))
        ))
      ret))
-  (:append-glvertices (glv-lst) ;; not checked
+  (:append-glvertices (glv-lst)
+   "append list of glvertices to this object"
    (if (atom glv-lst) (setq glv-lst (list glv-lst)))
    (let (ret (sw (send self :worldcoords)))
      (dolist (glv glv-lst)
