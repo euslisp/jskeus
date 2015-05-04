@@ -1077,6 +1077,21 @@
    bbox)
   )
 
+;;;
+(defclass glbody
+  :super body
+  :slots (glvertices)
+  )
+(defmethod glbody
+  (:glvertices (&rest args) (forward-message-to glvertices args))
+  (:draw (vwr)
+   (when glvertices
+     (send glvertices :draw vwr)))
+  (:set-color (&rest args)
+   (send-super* :set-color args)
+   (when glvertices (send* glvertices :set-color args)))
+  )
+
 ;;; glvertices utility
 (defun make-glvertices-from-faceset (fs &key (material))
   "returns glvertices instance
