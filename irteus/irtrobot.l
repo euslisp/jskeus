@@ -794,9 +794,9 @@
   (:make-support-polygons
    ()
    (setq support-polygons
-         (list
+         (remove nil (list
           (send self :make-sole-polygon :rleg)
-          (send self :make-sole-polygon :lleg)))
+          (send self :make-sole-polygon :lleg))))
    )
   ;; TODO
   ;;  1. Sole polygon change according to toe joint usage is not supported.
@@ -808,6 +808,7 @@
              (if (and l (send l :descendants))
                  (append (list l) (flatten (mapcar #'all-descendant-links (remove-if-not #'(lambda (x) (derivedp x bodyset-link)) (send l :descendants)))))
                )))
+     (unless (send self name :links) (return-from :make-sole-polygon nil))
      (send-all (all-descendant-links (car (send self name :links))) :worldcoords)
      (let* ((target-nm (read-from-string (format nil "~A-sole-body" name)))
             (vs (remove-duplicates
