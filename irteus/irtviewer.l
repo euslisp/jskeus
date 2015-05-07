@@ -359,7 +359,9 @@
 ;;
 (proclaim '(special *irtviewer*))
 (defun make-irtviewer (&rest args)
-  "Create irtviewer"
+  "Create irtviewer
+  :draw-origin size of origin arrow, use nil to disable it
+  :draw-floor  use t to view floor"
   (cond
    ((or (null x::*display*) (= x::*display* 0))
     (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")
