@@ -360,6 +360,11 @@
 (proclaim '(special *irtviewer*))
 (defun make-irtviewer (&rest args)
   "Create irtviewer
+  :view-name title
+  :hither    near cropping plane
+  :yon       far cropping plane
+  :width     width of the window
+  :height    height of the window
   :draw-origin size of origin arrow, use nil to disable it
   :draw-floor  use t to view floor"
   (cond
