@@ -61,7 +61,7 @@
 
 (deftest test-copy-object-list
   (setq vmrss-orig (elt (unix::getrusage 0) 2))
-   (dotimes (j 5)
+   (dotimes (j 10)
     (dotimes (i i-max)
       (setq a (list 10 20 30 40 50 60 70 80 90 100))
       (setq b (copy-object a))
@@ -71,7 +71,7 @@
     ;;
     (setq vmrss (elt (unix::getrusage 0) 2))
     (format *error-output* "~A gc:~A, vmrss:~A -> ~A~%" j (sys::gc) vmrss-orig vmrss)
-    (assert (< vmrss (* 10 vmrss-orig)) "copy-object list")))
+    (assert (< vmrss (* 20 vmrss-orig)) "copy-object list")))
 
 (deftest test-copy-object-vector
   (setq vmrss-orig (elt (unix::getrusage 0) 2))
