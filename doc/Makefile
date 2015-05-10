@@ -19,9 +19,9 @@ copy_eus_tex:
 	cp ../eus/doc/jlatex/*.tex ${TMPDIR}
 	cp ../eus/doc/jlatex/*.sty ${TMPDIR}
 	cp -r ../eus/doc/jlatex/fig/* ./fig/* ${TMPDIR}/fig/
-	for x in ${TMPDIR}/fig/*.jpg; do ebb -b $$x ;done
+	for x in ${TMPDIR}/fig/*.jpg; do ebb -b $$x; extractbb $$x;done
 	cp *.tex ${TMPDIR}
-	nkf --in-place -e ${TMPDIR}/*.tex
+	platex --version | grep utf8 || nkf --in-place -e ${TMPDIR}/*.tex
 	for x in irtrobot irtmodel irtsensor irtscene irtdyna irtgeo irtgl irtutil irtviewer irtx irtmath irtbvh irtcollada irtgraph irtimage irtpointcloud png pqp; do\
 		irteusgl ../eus/lib/llib/documentation.l "(make-document \"../irteus/$$x.l\" \"${TMPDIR}/$$x-func.tex\")" "(exit)"; \
         done
