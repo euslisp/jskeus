@@ -253,7 +253,7 @@ $cached_env_img{$key} = q|<IMG
 
 $key = q/{emtabbing}{{bf{:init}{it{&key=:targethspace{12mm}=#f(000)`[メソッド]>:view-nil>:view-up>#f(0.00.01.0))>:view-right>nil>&allow-other-keys{rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
- WIDTH="656" HEIGHT="443" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="655" HEIGHT="443" ALIGN="BOTTOM" BORDER="0"
  SRC="|."$dir".q|jmanual-img68.png"
  ALT="\begin{emtabbing}
 {\bf :init}
@@ -490,7 +490,7 @@ $cached_env_img{$key} = q|<IMG
 
 $key = q/z;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
- WIDTH="580" HEIGHT="851" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="578" HEIGHT="851" ALIGN="BOTTOM" BORDER="0"
  SRC="|."$dir".q|jmanual-img64.png"
  ALT="$ z$">|; 
 
@@ -1461,7 +1461,7 @@ $cached_env_img{$key} = q|<IMG
 
 $key = q/{figure}center{epsfile{file=figslashfig-peg-naname-m1.ps,width=7.9cm}epsfile{filfile{file=figslashfig-peg-naname-m4.ps,width=7.9cm}center{{{{figure};FSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
- WIDTH="357" HEIGHT="1435" BORDER="0"
+ WIDTH="244" HEIGHT="1406" BORDER="0"
  SRC="|."$dir".q|jmanual-img66.png"
  ALT="\begin{figure}\begin{center}
 \epsfile{file=fig/fig-peg-naname-m1.ps,width=7.9cm}...
@@ -1685,7 +1685,7 @@ $cached_env_img{$key} = q|<IMG
 
 $key = q/{figure}center{epsfile{file=figslashviewcoords.ps,height=10cm}center{{{{figure};FSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
- WIDTH="358" HEIGHT="1435" BORDER="0"
+ WIDTH="251" HEIGHT="1409" BORDER="0"
  SRC="|."$dir".q|jmanual-img67.png"
  ALT="\begin{figure}\begin{center}
 \epsfile{file=fig/viewcoords.ps,height=10cm}
@@ -1724,7 +1724,7 @@ $cached_env_img{$key} = q|<IMG
 
 $key = q/-;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
- WIDTH="393" HEIGHT="140" ALIGN="MIDDLE" BORDER="0"
+ WIDTH="392" HEIGHT="140" ALIGN="MIDDLE" BORDER="0"
  SRC="|."$dir".q|jmanual-img4.png"
  ALT="$ -$">|; 
 

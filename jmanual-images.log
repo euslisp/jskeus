@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2015.5.8)  8 MAY 2015 16:15
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2015.5.10)  10 MAY 2015 08:13
 entering extended mode
  %&-line parsing enabled.
 **./jmanual-images.tex
@@ -69,7 +69,7 @@ File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
 ) (/usr/share/texmf-texlive/tex/latex/base/makeidx.sty
 Package: makeidx 2000/03/29 v1.0m Standard LaTeX package
-) (/tmp/tmp.rkqhgmmzM0/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
+) (/tmp/tmp.fLGnYNdANR/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
 hdr/fancyheadings.sty
 Package: fancyheadings 2008/02/04 1.99 Dummy package to call fancyhdr
 
@@ -107,9 +107,9 @@ Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
 ) (/etc/texmf/tex/latex/config/graphics.cfg
 File: graphics.cfg 2009/08/28 v1.8 graphics configuration of TeX Live
 )
-Package graphics Info: Driver file: dvipdfm.def on input line 91.
-(/usr/share/texmf-texlive/tex/latex/dvipdfm/dvipdfm.def
-File: dvipdfm.def 1999/9/6 vx.x Driver-dependant file
+Package graphics Info: Driver file: dvipdfmx.def on input line 91.
+(/usr/share/texmf-texlive/tex/latex/dvipdfmx-def/dvipdfmx.def
+File: dvipdfmx.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
 ))
 \Gin@req@height=\dimen103
 \Gin@req@width=\dimen104
@@ -118,7 +118,7 @@ Package: color 2005/11/14 v1.0j Standard LaTeX Color (DPC)
 (/etc/texmf/tex/latex/config/color.cfg
 File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
 )
-Package color Info: Driver file: dvipdfm.def on input line 130.
+Package color Info: Driver file: dvipdfmx.def on input line 130.
 (/usr/share/texmf-texlive/tex/latex/graphics/dvipsnam.def
 File: dvipsnam.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
 )) (/usr/share/texmf-texlive/tex/latex/graphics/epsfig.sty
@@ -2082,12 +2082,12 @@ l2hSize :tex2html_wrap_indisplay70436:13.70952pt::13.70952pt::106.64531pt.
 
 ] (./jmanual-images.aux) ) 
 Here is how much of TeX's memory you used:
- 2031 strings out of 495062
- 24479 string characters out of 1182645
- 84740 words of memory out of 3000000
- 5164 multiletter control sequences out of 15000+50000
+ 2062 strings out of 495062
+ 24932 string characters out of 1182644
+ 85597 words of memory out of 3000000
+ 5195 multiletter control sequences out of 15000+50000
  8908 words of font info for 34 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 28i,17n,45p,398b,413s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 28i,17n,45p,398b,412s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on jmanual-images.dvi (275 pages, 79788 bytes).
+Output written on jmanual-images.dvi (275 pages, 78552 bytes).
