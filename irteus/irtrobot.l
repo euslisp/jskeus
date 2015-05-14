@@ -352,7 +352,8 @@
    (unless (every #'null (send self :legs)) ;; for legged robot, set default external force and moment at the end-effectors
      (unless target-coords
        (dolist (limb '(:rleg :lleg))
-         (push (send self limb :end-coords) target-coords)))
+         (if (send self limb)
+             (push (send self limb :end-coords) target-coords))))
      (unless (or force-list moment-list) ;; force [N], moment [Nm]
        ;; set default force & moment by solving mimimum internal forces
        (let* ((ret-fm (send self :calc-contact-wrenches-from-total-wrench (send-all target-coords :worldpos))))
