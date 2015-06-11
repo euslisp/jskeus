@@ -64,7 +64,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
  
  <BR>
 <BR> <BR> 
-<A NAME="62323"></A>
+<A NAME="62470"></A>
 <BIG CLASS="XLARGE"><B>pointcloud </B></BIG> [クラス]  <PRE><TT>
   :super   <B>cascaded-coords</B> 
 <BR>  :slots 		 parray carray narray curvature pcolor psize awidth asize box height width view-coords drawnormalmode transparent tcarray 
@@ -80,18 +80,31 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62340"></A>
-<B>:init</B> <EM>&amp;rest args &amp;key ((:points mat)) ((:colors cary)) ((:normals nary)) ((:curvatures curv)) ((:height ht)) ((:width wd)) (point-color (float-vector 0 1 0)) (point-size 2.0) (fill) (arrow-width 2.0) (arrow-size 0.0)  </EM>[メソッド]
+<A NAME="62487"></A>
+<BR>
+<IMG
+ WIDTH="553" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img306.png"
+ ALT="\begin{emtabbing}
+{\bf :init}
+\it\&amp;rest args \&amp;key \= ((:points mat)) \\lq  [metho...
+...
+\&gt; (fill) \\
+\&gt; (arrow-width 2.0) \\
+\&gt; (arrow-size 0.0)
+\rm
+\end{emtabbing}">
+<BR>
 
 <DL COMPACT>
 <DT> 
-<DD> Create point cloud object
+<DD>Create point cloud object
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="62350"></A>
+<A NAME="62498"></A>
 <B>:size-change</B> <EM>&amp;optional wd ht  </EM>[メソッド]
 
 <DL COMPACT>
@@ -102,7 +115,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62360"></A>
+<A NAME="62508"></A>
 <B>:points</B> <EM>&amp;optional pts wd ht  </EM>[メソッド]
 
 <DL COMPACT>
@@ -116,7 +129,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62370"></A>
+<A NAME="62518"></A>
 <B>:colors</B> <EM>&amp;optional cls  </EM>[メソッド]
 
 <DL COMPACT>
@@ -130,7 +143,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62380"></A>
+<A NAME="62528"></A>
 <B>:normals</B> <EM>&amp;optional nmls  </EM>[メソッド]
 
 <DL COMPACT>
@@ -144,7 +157,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62390"></A>
+<A NAME="62538"></A>
 <B>:point-list</B> <EM>&amp;optional (remove-nan)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -155,8 +168,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62400"></A>
-<B>:color-list</B> <EM>nil </EM>[メソッド]
+<A NAME="62548"></A>
+<B>:color-list</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
@@ -166,8 +179,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62410"></A>
-<B>:normal-list</B> <EM>nil </EM>[メソッド]
+<A NAME="62558"></A>
+<B>:normal-list</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
@@ -177,8 +190,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62420"></A>
-<B>:centroid</B> <EM>nil </EM>[メソッド]
+<A NAME="62568"></A>
+<B>:centroid</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
@@ -188,26 +201,49 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62430"></A>
-<B>:filter</B> <EM>&amp;rest args &amp;key create &amp;allow-other-keys  </EM>[メソッド]
+<A NAME="62578"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="207" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img307.png"
+ ALT="\begin{emtabbing}
+{\bf :filter}
+\it\&amp;rest args \&amp;key \= create \\lq  [method]\\
+\&gt; \&amp;allow-other-keys
+\rm
+\end{emtabbing}">
+<BR>
 
 <DL COMPACT>
 <DT> 
-<DD> this method can take the same keywords with :filter-with-indices method.
-    if :create is true, return filtered point cloud and original point cloud does not change.
+<DD>this method can take the same keywords with :filter-with-indices method.
+<BR>
+if :create is true, return filtered point cloud and original point cloud does not change.
 <BR></DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="62440"></A>
-<B>:filter-with-indices</B> <EM>idx-lst &amp;key (create) (negative)  </EM>[メソッド]
+<A NAME="62589"></A>
+<BR>
+<IMG
+ WIDTH="553" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img308.png"
+ ALT="\begin{emtabbing}
+{\bf :filter-with-indices}
+\it idx-lst \&amp;key \= (create) \\lq  [method]\\
+\&gt; (negative)
+\rm
+\end{emtabbing}">
+<BR>
 
 <DL COMPACT>
 <DT> 
-<DD> filter point cloud with list of index (points which are indicated by indices will remain).
+<DD>filter point cloud with list of index (points which are indicated by indices will remain).
+<BR>
 <BR>
 if :create is true, return filtered point cloud and original point cloud does not change.
+<BR>
 <BR>
 if :negative is true, points which are indicated by indices will be removed.
 </DD>
@@ -215,16 +251,33 @@ if :negative is true, points which are indicated by indices will be removed.
 <BR>
 <BR>
 
-<A NAME="62450"></A>
-<B>:filtered-indices</B> <EM>&amp;key key ckey nkey pckey pnkey pcnkey negative &amp;allow-other-keys  </EM>[メソッド]
+<A NAME="62600"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img309.png"
+ ALT="\begin{emtabbing}
+{\bf :filtered-indices}
+\it\&amp;key \= key \\lq  [method]\\
+\&gt; cke...
+...key \\
+\&gt; pcnkey \\
+\&gt; negative \\
+\&gt; \&amp;allow-other-keys
+\rm
+\end{emtabbing}">
+<BR>
 
 <DL COMPACT>
 <DT> 
-<DD> create list of index where filter function retrun true.
+<DD>create list of index where filter function retrun true.
+<BR>
 <BR>
 key, ckey, nkey are filter function for points, colors, normals. They are expected to take one argument and return t or nil.
 <BR>
+<BR>
 pckey, pnkey are filter function for points and colors, points and normals. They are expected to take two arguments and return t or nil.
+<BR>
 <BR>
 pcnkey is filter function for points, colors and normals. It is expected to take three arguments and return t or nil.
 </DD>
@@ -232,18 +285,28 @@ pcnkey is filter function for points, colors and normals. It is expected to take
 <BR>
 <BR>
 
-<A NAME="62460"></A>
-<B>:step</B> <EM>step &amp;key (fixsize) (create)  </EM>[メソッド]
+<A NAME="62611"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="149" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img310.png"
+ ALT="\begin{emtabbing}
+{\bf :step}
+\it step \&amp;key \= (fixsize) \\lq  [method]\\
+\&gt; (create)
+\rm
+\end{emtabbing}">
+<BR>
 
 <DL COMPACT>
 <DT> 
-<DD> downsample points with step
+<DD>downsample points with step
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="62470"></A>
+<A NAME="62622"></A>
 <B>:copy-from</B> <EM>pc  </EM>[メソッド]
 
 <DL COMPACT>
@@ -254,12 +317,13 @@ pcnkey is filter function for points, colors and normals. It is expected to take
 <BR>
 <BR>
 
-<A NAME="62480"></A>
+<A NAME="62632"></A>
 <B>:transform-points</B> <EM>coords &amp;key (create)  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
 <DD> transform points and normals with coords.
+<BR>
 <BR>
 if :create is true, return transformed point cloud and original point cloud does not change.
 </DD>
@@ -268,352 +332,378 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="62490"></A>
-<B>:reset-box</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="62642"></A>
+<B>:reset-box</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62500"></A>
-<B>:box</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+<A NAME="62653"></A>
+<B>:box</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62510"></A>
-<B>:vertices</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+<A NAME="62664"></A>
+<B>:vertices</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62520"></A>
-<B>:size</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+<A NAME="62675"></A>
+<B>:size</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62530"></A>
-<B>:width</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+<A NAME="62686"></A>
+<B>:width</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62540"></A>
-<B>:height</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+<A NAME="62697"></A>
+<B>:height</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62550"></A>
+
+<A NAME="62708"></A>
 <B>:view-coords</B> <EM>&amp;optional vc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62560"></A>
+
+<A NAME="62719"></A>
 <B>:curvatures</B> <EM>&amp;optional curv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62570"></A>
-<B>:curvature-list</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+<A NAME="62730"></A>
+<B>:curvature-list</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62580"></A>
+
+<A NAME="62741"></A>
 <B>:point-color</B> <EM>&amp;optional pc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62590"></A>
+
+<A NAME="62752"></A>
 <B>:point-size</B> <EM>&amp;optional ps  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62600"></A>
+
+<A NAME="62763"></A>
 <B>:axis-length</B> <EM>&amp;optioanl al  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62610"></A>
+
+<A NAME="62774"></A>
 <B>:axis-width</B> <EM>&amp;optional aw  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62620"></A>
-<B>:clear-color</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+<A NAME="62785"></A>
+<B>:clear-color</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62630"></A>
-<B>:clear-normal</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+<A NAME="62796"></A>
+<B>:clear-normal</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62640"></A>
-<B>:append</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+<A NAME="62807"></A>
+<B>:append</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62650"></A>
-<B>:append-list</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+<A NAME="62818"></A>
+<B>:append-list</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62660"></A>
+
+<A NAME="62829"></A>
 <B>:nfilter</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62670"></A>
+
+<A NAME="62840"></A>
 <B>:viewangle-inlier</B> <EM>&amp;key (min-z 0.0) (hangle 44.0) (vangle 35.0)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62680"></A>
+
+<A NAME="62851"></A>
 <B>:image-position-inlier</B> <EM>&amp;key (ipkey) (height 144) (width 176) (cy (/ (float (- height 1)) 2)) (cx (/ (float (- width 1)) 2)) negative  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62690"></A>
+
+<A NAME="62862"></A>
 <B>:image-circle-filter</B> <EM>dist &amp;key (height 144) (width 176) (cy (/ (float (- height 1)) 2)) (cx (/ (float (- width 1)) 2)) create negative  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62700"></A>
+
+<A NAME="62873"></A>
 <B>:step-inlier</B> <EM>step offx offy  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62710"></A>
+
+<A NAME="62884"></A>
 <B>:generate-color-histogram-hs</B> <EM>&amp;key (h-step 9) (s-step 7) (hlimits (cons 360.0 0.0)) (vlimits (cons 1.0 0.15)) (slimits (cons 1.0 0.25)) (rotate-hue) (color-scale 255.0) (sizelimits 1)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62720"></A>
+
+<A NAME="62895"></A>
 <B>:convert-to-world</B> <EM>&amp;key (create)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62730"></A>
+
+<A NAME="62906"></A>
 <B>:drawnormalmode</B> <EM>&amp;optional mode  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62740"></A>
+
+<A NAME="62917"></A>
 <B>:transparent</B> <EM>&amp;optional trs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="62750"></A>
+
+<A NAME="62928"></A>
 <B>:draw</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
@@ -655,7 +745,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-05-10
+2015-06-11
 </ADDRESS>
 </BODY>
 </HTML>

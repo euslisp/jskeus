@@ -64,7 +64,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   
  <BR>
 <BR> <BR> 
-<A NAME="56234"></A>
+<A NAME="56341"></A>
 <BIG CLASS="XLARGE"><B>sensor-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>body</B> 
 <BR>  :slots 		 data profile 
@@ -80,79 +80,84 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56251"></A>
+<A NAME="56358"></A>
 <B>:profile</B> <EM>&amp;optional p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="56261"></A>
+
+<A NAME="56369"></A>
 <B>:signal</B> <EM>rawinfo  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="56271"></A>
+
+<A NAME="56380"></A>
 <B>:simulate</B> <EM>model  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="56281"></A>
-<B>:read</B> <EM>nil </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+<A NAME="56391"></A>
+<B>:read</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="56291"></A>
+
+<A NAME="56402"></A>
 <B>:draw-sensor</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="56301"></A>
+
+<A NAME="56413"></A>
 <B>:init</B> <EM>shape &amp;key name &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
@@ -163,7 +168,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="56312"></A>
+<A NAME="56425"></A>
 <BIG CLASS="XLARGE"><B>bumper-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>sensor-model</B> 
 <BR>  :slots 		 bumper-threshold 
@@ -179,18 +184,28 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56329"></A>
-<B>:init</B> <EM>b &amp;rest args &amp;key ((:bumper-threshold bt) 20) name  </EM>[メソッド]
+<A NAME="56442"></A>
+<BR>
+<IMG
+ WIDTH="1607" HEIGHT="111" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img299.png"
+ ALT="\begin{emtabbing}
+{\bf :init}
+\it b \&amp;rest args \&amp;key \= ((:bumper-threshold bt) 20) \\lq  [method]\\
+\&gt; name
+\rm
+\end{emtabbing}">
+<BR>
 
 <DL COMPACT>
 <DT> 
-<DD> Create bumper model, b is the shape of an object and bt is the threshold in distance[mm].
+<DD>Create bumper model, b is the shape of an object and bt is the threshold in distance[mm].
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="56339"></A>
+<A NAME="56453"></A>
 <B>:simulate</B> <EM>objs  </EM>[メソッド]
 
 <DL COMPACT>
@@ -202,27 +217,28 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56349"></A>
+<A NAME="56463"></A>
 <B>:draw</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="56359"></A>
+
+<A NAME="56474"></A>
 <B>:draw-sensor</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
@@ -233,7 +249,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="56370"></A>
+<A NAME="56486"></A>
 <BIG CLASS="XLARGE"><B>camera-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>sensor-model</B> 
 <BR>  :slots 		 (vwing :forward (:projection :newprojection :view :viewpoint :view-direction :viewdistance :yon :hither)) pwidth pheight 
@@ -249,19 +265,31 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56387"></A>
-<B>:init</B> <EM>b &amp;rest args &amp;key ((:width pw) 320) ((:height ph) 240) (view-up #f(0.0 1.0 0.0)) (viewdistance 5.0) (hither 100.0) (yon 10000.0) &amp;allow-other-keys  </EM>[メソッド]
+<A NAME="56503"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="32" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img300.png"
+ ALT="\begin{emtabbing}
+{\bf :init}
+\it b \&amp;rest args \&amp;key \= ((:width pw) 320) \\lq  [...
+...ither 100.0) \\
+\&gt; (yon 10000.0) \\
+\&gt; \&amp;allow-other-keys
+\rm
+\end{emtabbing}">
+<BR>
 
 <DL COMPACT>
 <DT> 
-<DD> Create camera model. b is the shape of an object
+<DD>Create camera model. b is the shape of an object
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="56397"></A>
-<B>:width</B> <EM>nil </EM>[メソッド]
+<A NAME="56514"></A>
+<B>:width</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
@@ -271,8 +299,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56407"></A>
-<B>:height</B> <EM>nil </EM>[メソッド]
+<A NAME="56524"></A>
+<B>:height</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
@@ -282,8 +310,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56417"></A>
-<B>:fovy</B> <EM>nil </EM>[メソッド]
+<A NAME="56534"></A>
+<B>:fovy</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
@@ -293,8 +321,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56427"></A>
-<B>:cx</B> <EM>nil </EM>[メソッド]
+<A NAME="56544"></A>
+<B>:cx</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
@@ -304,8 +332,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56437"></A>
-<B>:cy</B> <EM>nil </EM>[メソッド]
+<A NAME="56554"></A>
+<B>:cy</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
@@ -315,8 +343,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56447"></A>
-<B>:fx</B> <EM>nil </EM>[メソッド]
+<A NAME="56564"></A>
+<B>:fx</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
@@ -326,8 +354,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56457"></A>
-<B>:fy</B> <EM>nil </EM>[メソッド]
+<A NAME="56574"></A>
+<B>:fy</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
@@ -337,7 +365,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56467"></A>
+<A NAME="56584"></A>
 <B>:screen-point</B> <EM>pos  </EM>[メソッド]
 
 <DL COMPACT>
@@ -348,7 +376,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56477"></A>
+<A NAME="56594"></A>
 <B>:3d-point</B> <EM>x y d  </EM>[メソッド]
 
 <DL COMPACT>
@@ -359,7 +387,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56487"></A>
+<A NAME="56604"></A>
 <B>:ray</B> <EM>x y  </EM>[メソッド]
 
 <DL COMPACT>
@@ -371,66 +399,70 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56497"></A>
+<A NAME="56614"></A>
 <B>:viewing</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="56507"></A>
+
+<A NAME="56625"></A>
 <B>:draw-on</B> <EM>&amp;rest args &amp;key ((:viewer vwer) viewer) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="56517"></A>
+
+<A NAME="56636"></A>
 <B>:draw-sensor</B> <EM>vwer &amp;key flush (width 1) (color (float-vector 1 1 1))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="56527"></A>
+
+<A NAME="56647"></A>
 <B>:draw-objects</B> <EM>vwr objs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
 
-<A NAME="56537"></A>
+
+<A NAME="56658"></A>
 <B>:get-image</B> <EM>vwr &amp;key (points) (colors)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
 <DL COMPACT>
 <DT> 
-<DD> 
+<DD>  
 </DD>
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
@@ -441,12 +473,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<A NAME="56547"></A>
-<B>make-camera-from-param</B> <EM>&amp;key pwidth pheight fx fy cx cy (tx 0) (ty 0) parent-coords name  </EM>[関数]
+<A NAME="56669"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="130" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img301.png"
+ ALT="\begin{emtabbing}
+{\bf make-camera-from-param}
+\it\&amp;key \= pwidth \\lq  [function]...
+...\
+\&gt; (tx 0) \\
+\&gt; (ty 0) \\
+\&gt; parent-coords \\
+\&gt; name
+\rm
+\end{emtabbing}">
+<BR>
 
 <DL COMPACT>
 <DT> 
-<DD> Create camera object from given parameters.
+<DD>Create camera object from given parameters.
 </DD>
 </DL>
 <BR>
@@ -484,7 +530,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-05-10
+2015-06-11
 </ADDRESS>
 </BODY>
 </HTML>

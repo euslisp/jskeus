@@ -63,7 +63,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </H2>
  
  <BR>
-<BR> <A NAME="67047"></A>
+<BR> <A NAME="67306"></A>
 <B>inverse-matrix</B> <EM>mat  </EM>[関数]
 
 <DL COMPACT>
@@ -74,7 +74,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="67057"></A>
+<A NAME="67316"></A>
 <B>diagonal</B> <EM>v  </EM>[関数]
 
 <DL COMPACT>
@@ -85,7 +85,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="67067"></A>
+<A NAME="67326"></A>
 <B>minor-matrix</B> <EM>m ic jc  </EM>[関数]
 
 <DL COMPACT>
@@ -96,7 +96,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="67077"></A>
+<A NAME="67336"></A>
 <B>atan2</B> <EM>y x  </EM>[関数]
 
 <DL COMPACT>
@@ -107,25 +107,32 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="67087"></A>
+<A NAME="67346"></A>
 <B>outer-product-matrix</B> <EM>v &amp;optional (ret (unit-matrix 3))  </EM>[関数]
 
 <DL COMPACT>
 <DT> 
 <DD> returns outer product matrix of given v 
-<BR>   <TT>   matrix(a) v = a v 
+<BR>
+<BR>   <TT>
+<BR>
+matrix(a) v = a v 
+<BR>
 <BR>
 0 -w2 w1
 <BR>
+<BR>
 w2 0 -w0
+<BR>
 <BR>   -w1 w0  0
+<BR>
 <BR>   </TT>
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="67098"></A>
+<A NAME="67357"></A>
 <B>matrix2quaternion</B> <EM>m  </EM>[関数]
 
 <DL COMPACT>
@@ -136,7 +143,7 @@ w2 0 -w0
 <BR>
 <BR>
 
-<A NAME="67108"></A>
+<A NAME="67367"></A>
 <B>quaternion2matrix</B> <EM>q  </EM>[関数]
 
 <DL COMPACT>
@@ -147,7 +154,7 @@ w2 0 -w0
 <BR>
 <BR>
 
-<A NAME="67118"></A>
+<A NAME="67377"></A>
 <B>matrix-log</B> <EM>m  </EM>[関数]
 
 <DL COMPACT>
@@ -158,7 +165,7 @@ w2 0 -w0
 <BR>
 <BR>
 
-<A NAME="67128"></A>
+<A NAME="67387"></A>
 <B>matrix-exponent</B> <EM>omega &amp;optional (p 1.0)  </EM>[関数]
 
 <DL COMPACT>
@@ -169,7 +176,7 @@ w2 0 -w0
 <BR>
 <BR>
 
-<A NAME="67138"></A>
+<A NAME="67397"></A>
 <B>midrot</B> <EM>p r1 r2  </EM>[関数]
 
 <DL COMPACT>
@@ -180,7 +187,7 @@ w2 0 -w0
 <BR>
 <BR>
 
-<A NAME="67148"></A>
+<A NAME="67407"></A>
 <B>pseudo-inverse</B> <EM>mat &amp;optional weight-vector ret wmat mat-tmp  </EM>[関数]
 
 <DL COMPACT>
@@ -191,7 +198,7 @@ w2 0 -w0
 <BR>
 <BR>
 
-<A NAME="67158"></A>
+<A NAME="67417"></A>
 <B>sr-inverse</B> <EM>mat &amp;optional (k 1.0) weight-vector ret wmat tmat umat umat2 mat-tmp mat-tmp-rc mat-tmp-rr mat-tmp-rr2  </EM>[関数]
 
 <DL COMPACT>
@@ -202,7 +209,7 @@ w2 0 -w0
 <BR>
 <BR>
 
-<A NAME="67168"></A>
+<A NAME="67427"></A>
 <B>manipulability</B> <EM>jacobi &amp;optional tmp-mrr tmp-mcr  </EM>[関数]
 
 <DL COMPACT>
@@ -213,7 +220,7 @@ w2 0 -w0
 <BR>
 <BR>
 
-<A NAME="67178"></A>
+<A NAME="67437"></A>
 <B>random-gauss</B> <EM>&amp;optional (m 0) (s 1)  </EM>[関数]
 
 <DL COMPACT>
@@ -224,7 +231,7 @@ w2 0 -w0
 <BR>
 <BR>
 
-<A NAME="67188"></A>
+<A NAME="67447"></A>
 <B>gaussian-random</B> <EM>dim &amp;optional (m 0) (s 1)  </EM>[関数]
 
 <DL COMPACT>
@@ -235,7 +242,7 @@ w2 0 -w0
 <BR>
 <BR>
 
-<A NAME="67198"></A>
+<A NAME="67457"></A>
 <B>normalize-vector</B> <EM>v &amp;optional r (eps 1.000000e-20)  </EM>[関数]
 
 <DL COMPACT>
@@ -247,7 +254,7 @@ w2 0 -w0
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67208"></A>
+<A NAME="67467"></A>
 <B>pseudo-inverse-org</B> <EM>m &amp;optional ret winv mat-tmp-cr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -259,11 +266,11 @@ w2 0 -w0
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
-nil
+
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67219"></A>
+<A NAME="67478"></A>
 <B>sr-inverse-org</B> <EM>mat &amp;optional (k 1) me mat-tmp-cr mat-tmp-rr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -275,11 +282,11 @@ nil
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
-nil
+
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67230"></A>
+<A NAME="67489"></A>
 <B>eigen-decompose</B> <EM>m  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -291,11 +298,11 @@ nil
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
-nil
+
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67241"></A>
+<A NAME="67500"></A>
 <B>lms</B> <EM>point-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -307,11 +314,11 @@ nil
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
-nil
+
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67252"></A>
+<A NAME="67511"></A>
 <B>lms-estimate</B> <EM>res point-  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -323,11 +330,11 @@ nil
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
-nil
+
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67263"></A>
+<A NAME="67522"></A>
 <B>lms-error</B> <EM>result point-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -339,11 +346,11 @@ nil
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
-nil
+
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67274"></A>
+<A NAME="67533"></A>
 <B>lmeds</B> <EM>point-list &amp;key (num 5) (err-rate 0.3) (iteration) (ransac-threshold) (lms-func #'lms) (lmeds-error-func #'lmeds-error) (lms-estimate-func #'lms-estimate)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -355,11 +362,11 @@ nil
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
-nil
+
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67285"></A>
+<A NAME="67544"></A>
 <B>lmeds-error</B> <EM>result point-list &amp;key (lms-estimate-func #'lms-estimate)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -371,11 +378,11 @@ nil
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
-nil
+
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="67296"></A>
+<A NAME="67555"></A>
 <B>lmeds-error-mat</B> <EM>result mat &amp;key (lms-estimate-func #'lms-estimate)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -387,7 +394,7 @@ nil
 </DL><SMALL CLASS="FOOTNOTESIZE">
 <BR>
 <BR>
-nil
+
 <BR>
 </SMALL>
               
@@ -422,7 +429,7 @@ nil
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-05-10
+2015-06-11
 </ADDRESS>
 </BODY>
 </HTML>
