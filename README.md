@@ -94,6 +94,7 @@ and type any command, such as '(crank-motion)' or '(dual-arm-ik)'
 [![hand-grasp](images/Hand-grasp.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/hand-grasp-ik.l)
 [![hanoi-arm](images/Hanoi-arm.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/hanoi-arm.l)
 [![particle](images/Particle.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/particle.l)
+[![null-space-ik](images/Null-space-ik.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/null-space-ik.l)
 
 ### 2.2 Robots and objects models
 ```
