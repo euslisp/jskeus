@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.8 (2015-06-19)
+------------------
 * [README.md] add documents of null-space-ik
 
   * downsized null-space-ik.png
