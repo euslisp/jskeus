@@ -51,5 +51,23 @@
               (format nil "~A accessor" sensor-type))))
   )
 
+(deftest test-lookat
+  (let ((ret) (gaze-dir) (target-dir))
+    (dolist (yaw (list -150 150))
+      (dolist (target (list #f(-100 -200 350) #f(0 -200 350) #f(200 -200 350)
+                            #f(200 0 350)
+                            #f(200 200 350) #f(0 200 350) #f(-100 200 350)))
+        (send *robot* :head :neck-p :joint-angle 0)
+        (send *robot* :head :neck-y :joint-angle yaw)
+        ;;(send *irtviewer* :draw-objects)
+        (setq ret (send *robot* :head :look-at target :debug-view t))
+        (setq gaze-dir (matrix-column (send *robot* :head :end-coords :worldrot) 2))
+        (setq target-dir (normalize-vector (v- target (send *robot* :head :end-coords :worldpos))))
+        (format t "ret = ~A, (v. gaze-dir target-dir) = ~A~%" ret (v. gaze-dir target-dir))
+        (assert (and ret (> (v. gaze-dir target-dir) 0.9)) "look-at-ik failed")
+        ))
+    ))
+
+
 (run-all-tests)
 (exit)
