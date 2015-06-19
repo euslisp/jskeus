@@ -2,6 +2,26 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [README.md] add documents of null-space-ik
+
+  * downsized null-space-ik.png
+  * added null-space-ik sample in README.md
+  * added null-space-ik sample image
+  * Update README.md
+
+* [irtrobot] fix torque-vector for those who does not have two leg, ex) pepper
+* [irteus/test/const.l] add code to check intern/shadow/defconst
+* [irteus/irtrobot.l] fix :look-at problem (https://github.com/jsk-ros-pkg/jsk_pr2eus/issues/72)
+
+  * fix :look-at, check othre direction
+  * add test code for :look-at
+  * check if look-at try to across non-valid joint angle
+  * set +-150 for neck-p range
+
+* Contributors: Kazuhiro Sasabuchi, Kei Okada
+
 1.0.7 (2015-06-11)
 ------------------
 
