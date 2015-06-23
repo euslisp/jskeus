@@ -1948,6 +1948,7 @@
     ;;                  but ":additional-check" is neglected in the final :inverse-kinematics return.
     (additional-check)
     (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
+    (min-loop)
     debug-view ik-args
     &allow-other-keys)
    (if target-centroid-pos (send self :update-mass-properties))
@@ -2013,7 +2014,8 @@
        ;; convergence check
        (setq success
 	     (send self :ik-convergence-check
-		   (>= loop (/ stop 10)) dif-pos dif-rot
+		   (if min-loop (>= loop min-loop) t)
+                   dif-pos dif-rot
 		   rotation-axis translation-axis thre rthre
 		   centroid-thre target-centroid-pos centroid-offset-func cog-translation-axis
                    :update-mass-properties nil))
