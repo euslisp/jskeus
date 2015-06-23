@@ -2936,6 +2936,37 @@ $\displaystyle _{G} =  \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath 
 {\newpage\clearpage
 \lthtmlfigureA{emtabbing52719}%
 \begin{emtabbing}
+{\bf :inverse-kinematics-loop} 
+\it dif-pos dif-rot \&rest args \&key \= (stop 1) \` [method]\\
+\> (loop 0) \\
+\> link-list \\
+\> move-target \\
+\> (rotation-axis (cond ((atom move-target) t) (t (make-list (length move-target) :initial-element t)))) \\
+\> (translation-axis (cond ((atom move-target) t) (t (make-list (length move-target) :initial-element t)))) \\
+\> (thre (cond ((atom move-target) 1) (t (make-list (length move-target) :initial-element 1)))) \\
+\> (rthre (cond ((atom move-target) (deg2rad 1)) (t (make-list (length move-target) :initial-element (deg2rad 1))))) \\
+\> (dif-pos-ratio 1.0) \\
+\> (dif-rot-ratio 1.0) \\
+\> union-link-list \\
+\> target-coords \\
+\> (jacobi) \\
+\> (additional-check) \\
+\> (centroid-thre 1.0) \\
+\> (target-centroid-pos) \\
+\> (centroid-offset-func) \\
+\> (cog-translation-axis :z) \\
+\> (min-loop (/ stop 10)) \\
+\> debug-view \\
+\> ik-args \\
+\> \&allow-other-keys 
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing52730}%
+\begin{emtabbing}
 {\bf :inverse-kinematics} 
 \it target-coords \&rest args \&key \= (stop 50) \` [method]\\
 \> (link-list) \\
@@ -2962,7 +2993,7 @@ $\displaystyle _{G} =  \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath 
 \lthtmlcheckvsize\clearpage}
 
 {\newpage\clearpage
-\lthtmlfigureA{emtabbing52730}%
+\lthtmlfigureA{emtabbing52741}%
 \begin{emtabbing}
 {\bf :inverse-kinematics-for-closed-loop-forward-kinematics} 
 \it target-coords \&rest args \&key \= (move-target) \` [method]\\
