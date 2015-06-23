@@ -64,7 +64,7 @@ GL/X表示</A>
   
  <BR>
 <BR> <BR> 
-<A NAME="65739"></A>
+<A NAME="65754"></A>
 <BIG CLASS="XLARGE"><B>gl::glvertices </B></BIG> [クラス]  <PRE><TT>
   :super   <B>cascaded-coords</B> 
 <BR>  :slots 		 gl::mesh-list gl::filename gl::bbox 
@@ -80,7 +80,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65756"></A>
+<A NAME="65771"></A>
 <B>:set-color</B> <EM>gl::color &amp;optional (gl::transparent)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -91,7 +91,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65766"></A>
+<A NAME="65781"></A>
 <B>:actual-vertices</B> [メソッド]
 
 <DL COMPACT>
@@ -102,7 +102,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65776"></A>
+<A NAME="65791"></A>
 <B>:calc-bounding-box</B> [メソッド]
 
 <DL COMPACT>
@@ -113,7 +113,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65786"></A>
+<A NAME="65801"></A>
 <B>:vertices</B> [メソッド]
 
 <DL COMPACT>
@@ -124,7 +124,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65796"></A>
+<A NAME="65811"></A>
 <B>:reset-offset-from-parent</B> [メソッド]
 
 <DL COMPACT>
@@ -135,7 +135,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65806"></A>
+<A NAME="65821"></A>
 <B>:expand-vertices</B> [メソッド]
 
 <DL COMPACT>
@@ -146,7 +146,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65816"></A>
+<A NAME="65831"></A>
 <B>:use-flat-shader</B> [メソッド]
 
 <DL COMPACT>
@@ -157,7 +157,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65826"></A>
+<A NAME="65841"></A>
 <B>:use-smooth-shader</B> [メソッド]
 
 <DL COMPACT>
@@ -168,7 +168,7 @@ GL/X表示</A>
 <BR>
 <BR>
 
-<A NAME="65837"></A>
+<A NAME="65852"></A>
 <B>:calc-normals</B> <EM>&amp;optional (gl::force nil) (gl::expand t) (gl::flat t)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -185,11 +185,33 @@ if flat option is true, use-flat-shader
 <BR>
 <BR>
 
-<A NAME="65847"></A>
+<A NAME="65862"></A>
 <BR>
 <IMG
  WIDTH="553" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
  SRC="jmanual-img312.png"
+ ALT="\begin{emtabbing}
+{\bf :mirror-axis}
+\it\&amp;key \= (gl::create t) \\lq  [method]\\
+\&gt; (gl::invert-faces t) \\
+\&gt; (gl::axis :y)
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>creating mirror vertices respect to :axis
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="65873"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img313.png"
  ALT="\begin{emtabbing}
 {\bf :convert-to-faces}
 \it\&amp;rest args \&amp;key \= (gl::wrt :local) \\lq  [method]\\
@@ -206,7 +228,7 @@ if flat option is true, use-flat-shader
 <BR>
 <BR>
 
-<A NAME="65858"></A>
+<A NAME="65884"></A>
 <B>:convert-to-faceset</B> <EM>&amp;rest args  </EM>[メソッド]
 
 <DL COMPACT>
@@ -217,7 +239,7 @@ if flat option is true, use-flat-shader
 <BR>
 <BR>
 
-<A NAME="65868"></A>
+<A NAME="65894"></A>
 <B>:set-offset</B> <EM>gl::cds  </EM>[メソッド]
 
 <DL COMPACT>
@@ -228,7 +250,7 @@ if flat option is true, use-flat-shader
 <BR>
 <BR>
 
-<A NAME="65878"></A>
+<A NAME="65904"></A>
 <B>:glvertices</B> <EM>&amp;optional (name) (gl::test #'string=)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -239,7 +261,7 @@ if flat option is true, use-flat-shader
 <BR>
 <BR>
 
-<A NAME="65888"></A>
+<A NAME="65914"></A>
 <B>:append-glvertices</B> <EM>gl::glv-lst  </EM>[メソッド]
 
 <DL COMPACT>
@@ -251,7 +273,7 @@ if flat option is true, use-flat-shader
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65898"></A>
+<A NAME="65924"></A>
 <B>:init</B> <EM>gl::mlst &amp;rest args &amp;key ((:filename gl::fn)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -265,7 +287,7 @@ if flat option is true, use-flat-shader
 <BR>
 
 
-<A NAME="65909"></A>
+<A NAME="65935"></A>
 <B>:filename</B> <EM>&amp;optional gl::nm  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -279,7 +301,63 @@ if flat option is true, use-flat-shader
 <BR>
 
 
-<A NAME="65920"></A>
+<A NAME="65946"></A>
+<B>:get-meshinfo</B> <EM>gl::key &amp;optional (pos -1)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="65957"></A>
+<B>:set-meshinfo</B> <EM>gl::key gl::info &amp;optional (pos -1)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="65968"></A>
+<B>:get-material</B> <EM>&amp;optional (pos -1)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="65979"></A>
+<B>:set-material</B> <EM>gl::mat &amp;optional (pos -1)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="65990"></A>
 <B>:expand-vertices-info</B> <EM>gl::minfo  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -293,7 +371,7 @@ if flat option is true, use-flat-shader
 <BR>
 
 
-<A NAME="65931"></A>
+<A NAME="66001"></A>
 <B>:faces</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -307,7 +385,7 @@ if flat option is true, use-flat-shader
 <BR>
 
 
-<A NAME="65942"></A>
+<A NAME="66012"></A>
 <B>:draw-on</B> <EM>&amp;key ((:viewer gl::vwer) viewer)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -321,7 +399,7 @@ if flat option is true, use-flat-shader
 <BR>
 
 
-<A NAME="65953"></A>
+<A NAME="66023"></A>
 <B>:draw</B> <EM>gl::vwr &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -335,7 +413,7 @@ if flat option is true, use-flat-shader
 <BR>
 
 
-<A NAME="65964"></A>
+<A NAME="66034"></A>
 <B>:collision-check-objects</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -349,7 +427,7 @@ if flat option is true, use-flat-shader
 <BR>
 
 
-<A NAME="65975"></A>
+<A NAME="66045"></A>
 <B>:box</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -367,7 +445,7 @@ if flat option is true, use-flat-shader
 
 <P>
 	<BR> 
-<A NAME="65987"></A>
+<A NAME="66057"></A>
 <BIG CLASS="XLARGE"><B>gl::glbody </B></BIG> [クラス]  <PRE><TT>
   :super   <B>body</B> 
 <BR>  :slots 		 gl::glvertices 
@@ -383,7 +461,7 @@ if flat option is true, use-flat-shader
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66004"></A>
+<A NAME="66074"></A>
 <B>:glvertices</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -397,7 +475,7 @@ if flat option is true, use-flat-shader
 <BR>
 
 
-<A NAME="66015"></A>
+<A NAME="66085"></A>
 <B>:draw</B> <EM>gl::vwr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -411,7 +489,7 @@ if flat option is true, use-flat-shader
 <BR>
 
 
-<A NAME="66026"></A>
+<A NAME="66096"></A>
 <B>:set-color</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -429,7 +507,7 @@ if flat option is true, use-flat-shader
 
 <P>
 
-<A NAME="66037"></A>
+<A NAME="66107"></A>
 <B>gl::find-color</B> <EM>gl::color  </EM>[関数]
 
 <DL COMPACT>
@@ -440,7 +518,7 @@ if flat option is true, use-flat-shader
 <BR>
 <BR>
 
-<A NAME="66047"></A>
+<A NAME="66117"></A>
 <B>gl::transparent</B> <EM>gl::abody gl::param  </EM>[関数]
 
 <DL COMPACT>
@@ -451,7 +529,7 @@ if flat option is true, use-flat-shader
 <BR>
 <BR>
 
-<A NAME="66057"></A>
+<A NAME="66127"></A>
 <B>gl::make-glvertices-from-faceset</B> <EM>gl::fs &amp;key (gl::material)  </EM>[関数]
 
 <DL COMPACT>
@@ -464,7 +542,7 @@ fs is geomatry::faceset
 <BR>
 <BR>
 
-<A NAME="66067"></A>
+<A NAME="66137"></A>
 <B>gl::make-glvertices-from-faces</B> <EM>gl::flst &amp;key (gl::material)  </EM>[関数]
 
 <DL COMPACT>
@@ -478,7 +556,7 @@ flst is list of geomatry::face
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66077"></A>
+<A NAME="66147"></A>
 <B>gl::set-stereo-gl-attribute</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -494,7 +572,7 @@ flst is list of geomatry::face
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66088"></A>
+<A NAME="66158"></A>
 <B>gl::reset-gl-attribute</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -510,7 +588,7 @@ flst is list of geomatry::face
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66099"></A>
+<A NAME="66169"></A>
 <B>gl::delete-displaylist-id</B> <EM>gl::dllst  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -526,7 +604,7 @@ flst is list of geomatry::face
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66110"></A>
+<A NAME="66180"></A>
 <B>gl::draw-globjects</B> <EM>gl::vwr gl::draw-things &amp;key (gl::clear t) (gl::flush t) (gl::draw-origin 150) (gl::draw-floor nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -542,7 +620,7 @@ flst is list of geomatry::face
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66121"></A>
+<A NAME="66191"></A>
 <B>gl::draw-glbody</B> <EM>gl::vwr gl::abody  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -560,7 +638,7 @@ flst is list of geomatry::face
                
  <BR>
 <BR> <BR> 
-<A NAME="66488"></A>
+<A NAME="66598"></A>
 <BIG CLASS="XLARGE"><B>x::tabbed-panel </B></BIG> [クラス]  <PRE><TT>
   :super   <B>x:panel</B> 
 <BR>  :slots 		 x::tabbed-buttons x::tabbed-panels x::selected-tabbed-panel 
@@ -576,7 +654,7 @@ flst is list of geomatry::face
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66505"></A>
+<A NAME="66615"></A>
 <B>:create</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -590,7 +668,7 @@ flst is list of geomatry::face
 <BR>
 
 
-<A NAME="66516"></A>
+<A NAME="66626"></A>
 <B>:add-tabbed-panel</B> <EM>name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -604,7 +682,7 @@ flst is list of geomatry::face
 <BR>
 
 
-<A NAME="66527"></A>
+<A NAME="66637"></A>
 <B>:change-tabbed-panel</B> <EM>x::obj  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -618,7 +696,7 @@ flst is list of geomatry::face
 <BR>
 
 
-<A NAME="66538"></A>
+<A NAME="66648"></A>
 <B>:tabbed-button</B> <EM>name &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -632,7 +710,7 @@ flst is list of geomatry::face
 <BR>
 
 
-<A NAME="66549"></A>
+<A NAME="66659"></A>
 <B>:tabbed-panel</B> <EM>name &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -646,7 +724,7 @@ flst is list of geomatry::face
 <BR>
 
 
-<A NAME="66560"></A>
+<A NAME="66670"></A>
 <B>:resize</B> <EM>x::w h  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -664,7 +742,7 @@ flst is list of geomatry::face
 
 <P>
 	<BR> 
-<A NAME="66572"></A>
+<A NAME="66682"></A>
 <BIG CLASS="XLARGE"><B>x::panel-tab-button-item </B></BIG> [クラス]  <PRE><TT>
   :super   <B>x:button-item</B> 
 <BR>  :slots 		 nil 
@@ -680,7 +758,7 @@ flst is list of geomatry::face
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66589"></A>
+<A NAME="66699"></A>
 <B>:draw-label</B> <EM>&amp;optional (x::state :up) (x::offset 0)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -698,7 +776,7 @@ flst is list of geomatry::face
 
 <P>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66600"></A>
+<A NAME="66710"></A>
 <B>x::window-main-one</B> <EM>&amp;optional fd  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -714,7 +792,7 @@ flst is list of geomatry::face
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66611"></A>
+<A NAME="66721"></A>
 <B>x::event-far</B> <EM>x::e  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -730,7 +808,7 @@ flst is list of geomatry::face
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="66622"></A>
+<A NAME="66732"></A>
 <B>x::event-near</B> <EM>x::e  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>

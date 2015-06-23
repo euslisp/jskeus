@@ -2,6 +2,18 @@
 # Associate images original text with physical files.
 
 
+$key = q/{emtabbing}{{bf{:mirror-axis}{it{&key=(gl::createt)`[method]>(gl::invert-facest)>(gl::axis:y){rm{{emtabbing};AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="553" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img312.png"
+ ALT="\begin{emtabbing}
+{\bf :mirror-axis}
+\it\&amp;key \= (gl::create t) \\\\lq  [method]\\\\
+\&gt; (gl::invert-faces t) \\\\
+\&gt; (gl::axis :y)
+\rm
+\end{emtabbing}">|; 
+
 $key = q/{numcases}{mbox{{boldmath{{{m{}}_j=}array{{cl}mbox{{boldmath{{{a{}}_jtimes(tildebox{{boldmath{{{a{}}_jtilde{m}_j&text{iflinearjoint}array{{numcases};MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="21" HEIGHT="40" ALIGN="BOTTOM" BORDER="0"
@@ -208,8 +220,8 @@ $cached_env_img{$key} = q|<IMG
 
 $key = q/{emtabbing}{{bf{:convert-to-faces}{it{&restargs&key=(gl::wrt:local)`[method]>&allow-other-keys{rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
- WIDTH="553" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img312.png"
+ WIDTH="552" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img313.png"
  ALT="\begin{emtabbing}
 {\bf :convert-to-faces}
 \it\&amp;rest args \&amp;key \= (gl::wrt :local) \\\\lq  [method]\\\\
@@ -470,6 +482,12 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img34.png"
  ALT="$ N=0,1,\cdots$">|; 
 
+$key = q/displaystylembox{boldmath{{{r{}};MSF=1.6;AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="12" HEIGHT="14" ALIGN="MIDDLE" BORDER="0"
+ SRC="|."$dir".q|jmanual-img116.png"
+ ALT="$\displaystyle \mbox{\boldmath {$r$}}$">|; 
+
 $key = q/{emtabbing}{{bf{:filter}{it{&restargs&key=create`[method]>&allow-other-keys{rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="552" HEIGHT="207" ALIGN="BOTTOM" BORDER="0"
@@ -492,12 +510,6 @@ $cached_env_img{$key} = q|<IMG
 ...lc-torque-buffer-args (send self :calc-torque-buffer-args))
 \rm
 \end{emtabbing}">|; 
-
-$key = q/displaystylembox{boldmath{{{r{}};MSF=1.6;AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="12" HEIGHT="14" ALIGN="MIDDLE" BORDER="0"
- SRC="|."$dir".q|jmanual-img116.png"
- ALT="$\displaystyle \mbox{\boldmath {$r$}}$">|; 
 
 $key = q/a_j;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
@@ -603,7 +615,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{connect-server-until-success}{it{hostport&key=(max-port(+port20))`[function]>(return-with-portnil){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="553" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img314.png"
+ SRC="|."$dir".q|jmanual-img315.png"
  ALT="\begin{emtabbing}
 {\bf connect-server-until-success}
 \it host port \&amp;key \= (max-port (+ port 20)) \\\\lq  [function]\\\\
@@ -989,17 +1001,17 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img98.png"
  ALT="$ \Sigma_j$">|; 
 
-$key = q/<;MSF=1.6;AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="556" HEIGHT="89" ALIGN="MIDDLE" BORDER="0"
- SRC="|."$dir".q|jmanual-img9.png"
- ALT="$ &lt;$">|; 
-
 $key = q/theta;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
  SRC="|."$dir".q|jmanual-img113.png"
  ALT="$ \theta$">|; 
+
+$key = q/<;MSF=1.6;AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="556" HEIGHT="89" ALIGN="MIDDLE" BORDER="0"
+ SRC="|."$dir".q|jmanual-img9.png"
+ ALT="$ &lt;$">|; 
 
 $key = q/pislash2;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
@@ -1049,7 +1061,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{find-extreams}{it{datum&key=(key#'identity)`[function]>(identity#'=)>(bigger#'textgreater){rm{{emtabbing};MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img313.png"
+ SRC="|."$dir".q|jmanual-img314.png"
  ALT="\begin{emtabbing}
 {\bf find-extreams}
 \it datum \&amp;key \= (key \char93 'identity...
