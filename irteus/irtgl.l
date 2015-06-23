@@ -648,6 +648,25 @@
      (setf (get self :face-color) nil)))
   ;; (:check-normal ())
   ;; (:update ()) ;; call update when updating coordinates
+  (:get-meshinfo (key &optional (pos -1))
+   (when (< pos 0)
+     (return-from :get-meshinfo (mapcar #'(lambda (info) (cadr (assoc key info))) mesh-list)))
+   (cadr (assoc key (elt mesh-list pos))))
+  (:set-meshinfo (key info &optional (pos -1))
+   (when (< pos 0)
+     (dolist (meshinfo mesh-list)
+       (delete (assoc key meshinfo) meshinfo)
+       (nconc meshinfo (list (list key info))))
+     (return-from :set-meshinfo))
+   (let ((meshinfo (elt mesh-list pos)))
+     (delete (assoc key meshinfo) meshinfo)
+     (nconc meshinfo (list (list key info)))
+     (send self :get-meshinfo key pos)))
+  (:get-material (&optional (pos -1))
+   (send self :get-meshinfo :material pos))
+  (:set-material
+   (mat &optional (pos -1))
+   (send self :set-meshinfo :material mat pos))
   (:actual-vertices ()
    "return list of vertices(float-vector), it returns all vertices of this object"
    (let (ret)
@@ -761,6 +780,42 @@ if flat option is true, use-flat-shader"
              (nconc minfo (list (list :flat t))))
            ))
        )))
+  (:mirror-axis
+   (&key (create t) (invert-faces t) (axis :y))
+   "creating mirror vertices respect to :axis"
+   (case axis
+     (:x (setq axis 0))
+     (:y (setq axis 1))
+     (:z (setq axis 2)))
+   (let ((ret (copy-object mesh-list))
+         (p (instantiate float-vector 3)))
+     (dolist (mesh ret)
+       (let* ((vts (cadr (assoc :vertices mesh)))
+              (len (array-dimension vts 0)))
+         (when len
+           (dotimes (j len)
+             (user::c-matrix-row vts j p)
+             (setf (elt p axis) (- (elt p axis)))
+             (user::c-matrix-row vts j p t))
+           (when invert-faces
+             (let* ((idx (cadr (assoc :indices mesh)))
+                    (idx-len (/ (length idx) 3)) ;; mesh should be triangle
+                    i0 i1 i2)
+               (dotimes (i idx-len)
+                 (setq i0 (elt idx (* i 3))
+                       i1 (elt idx (+ (* i 3) 1))
+                       i2 (elt idx (+ (* i 3) 2)))
+                 (setf (elt idx (* i 3))       i2)
+                 (setf (elt idx (+ (* i 3) 1)) i1)
+                 (setf (elt idx (+ (* i 3) 2)) i0))
+               )))
+         ))
+     (if create
+         (instance glvertices :init ret)
+       (progn
+         (setq mesh-list ret)
+         self))
+     ))
   (:convert-to-faces (&rest args &key (wrt :local) &allow-other-keys) ;; check-normal <-> check-vertices-order, add face-color
    "create list of faces using vertices of this object"
    (let (ret)
