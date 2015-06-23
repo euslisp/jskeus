@@ -1941,7 +1941,7 @@
     (jacobi)
     (additional-check)
     (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
-    (min-loop)
+    (min-loop (/ stop 10))
     debug-view ik-args
     &allow-other-keys)
    ":inverse-kinematics-loop is one loop calculation for :inverse-kinematics.
