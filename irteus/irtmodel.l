@@ -1939,17 +1939,26 @@
     union-link-list
     target-coords                 ;required for debug-view
     (jacobi)
-    ;; :additional-check
-    ;;   This argument is to add optional best-effort convergence conditions.
-    ;;   ":additional-check" should be function or lambda.
-    ;;   best-effort => In :inverse-kinematics-loop, "success" is overwritten by "(and success additional-check)"
-    ;;                  In :inverse-kinematics, "success" is not overwritten.
-    ;;                  So, :inverse-kinematics-loop wait until ":additional-check" becomes "t" as possible,
-    ;;                  but ":additional-check" is neglected in the final :inverse-kinematics return.
     (additional-check)
     (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
+    (min-loop (/ stop 10))
     debug-view ik-args
     &allow-other-keys)
+   ":inverse-kinematics-loop is one loop calculation for :inverse-kinematics.
+    In this method, joint position difference satisfying workspace difference (dif-pos, dif-rot) are calculated and euslisp model joint angles are updated.
+    Optional arguments:
+     :additional-check
+       This argument is to add optional best-effort convergence conditions.
+       :additional-check should be function or lambda.
+       best-effort => In :inverse-kinematics-loop, 'success' is overwritten by '(and success additional-check)'
+                      In :inverse-kinematics, 'success is not overwritten.
+                      So, :inverse-kinematics-loop wait until ':additional-check' becomes 't' as possible,
+                      but ':additional-check' is neglected in the final :inverse-kinematics return.
+     :min-loop
+       Minimam loop count (nil by default).
+       If integer is specified, :inverse-kinematics-loop does returns :ik-continues and continueing solving IK.
+       If min-loop is nil, do not consider loop counting for IK convergence.
+    "
    (if target-centroid-pos (send self :update-mass-properties))
    ;; dif-pos, dif-rot, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
@@ -2013,7 +2022,8 @@
        ;; convergence check
        (setq success
 	     (send self :ik-convergence-check
-		   (>= loop (/ stop 10)) dif-pos dif-rot
+		   (if min-loop (>= loop min-loop) t)
+                   dif-pos dif-rot
 		   rotation-axis translation-axis thre rthre
 		   centroid-thre target-centroid-pos centroid-offset-func cog-translation-axis
                    :update-mass-properties nil))
