@@ -976,13 +976,17 @@ if flat option is true, use-flat-shader"
            (cond
             (fcol ;; use :face-color
              (glColor3fv fcol)
-             (glMaterialfv GL_BACK  GL_AMBIENT_AND_DIFFUSE
-                           (if stransparent
-                               (concatenate float-vector fcol (float-vector stransparent))
-                             fcol))
-             (glMaterialfv GL_FRONT GL_AMBIENT_AND_DIFFUSE (if stransparent
-                                                               (float-vector 0.8 0.0 0.54 1)
-                                                             (float-vector 0.8 0.0 0.54)))
+             (cond
+              (stransparent
+               (glMaterialfv GL_BACK
+                             GL_AMBIENT_AND_DIFFUSE
+                             (concatenate float-vector fcol (float-vector stransparent)))
+               (glMaterialfv GL_FRONT
+                             GL_AMBIENT_AND_DIFFUSE (float-vector 0 0 0 0)))
+              (t
+               (glMaterialfv GL_BACK  GL_AMBIENT_AND_DIFFUSE fcol)
+               (glMaterialfv GL_FRONT GL_AMBIENT_AND_DIFFUSE (float-vector 0.8 0.0 0.54))
+               ))
              ;;(glMaterialfv GL_FRONT_AND_BACK GL_SPECULAR (float-vector 0.2 0.2 0.2 0.1))
              ;;(glMaterialfv GL_FRONT_AND_BACK GL_EMISSION (float-vector 0.1 0.1 0.1 0.1))
              )
@@ -1006,19 +1010,19 @@ if flat option is true, use-flat-shader"
                                  col)))
                (when amb
                  (if stransparent
-                     (setf (elt amb 3) (float-vector stransparent)))
+                     (setf (elt amb 3) stransparent))
                  (glMaterialfv GL_BACK GL_AMBIENT amb))
                (when diff
                  (if stransparent
-                     (setf (elt diff 3) (float-vector stransparent)))
+                     (setf (elt diff 3) stransparent))
                  (glMaterialfv GL_BACK GL_DIFFUSE diff))
                (when spec
                  (if stransparent
-                     (setf (elt spec 3) (float-vector stransparent)))
+                     (setf (elt spec 3) stransparent))
                  (glMaterialfv GL_BACK GL_SPECULAR spec))
                (when emi
                  (if stransparent
-                     (setf (elt emi 3) (float-vector stransparent)))
+                     (setf (elt emi 3) stransparent))
                  (glMaterialfv GL_BACK GL_EMISSION emi))
                (cond
                 (shin
@@ -1057,6 +1061,9 @@ if flat option is true, use-flat-shader"
                    (glTexEnvi GL_TEXTURE_ENV GL_TEXTURE_ENV_MODE GL_MODULATE)
                    (glEnable GL_TEXTURE_2D)
                    ))
+               (when stransparent
+                 (glMaterialfv GL_FRONT
+                               GL_AMBIENT_AND_DIFFUSE (float-vector 0 0 0 0)))
                ))
             (t ;; default color
              ;; Font face was set CW at glview.l (glFrontFace GL_CW)
