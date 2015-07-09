@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.9 (2015-07-09)
+------------------
 * irtpointcloud.l: impliment :append methods on pointcloud
 
 * irtgl.l:
