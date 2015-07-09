@@ -2,6 +2,23 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* irtpointcloud.l: impliment :append methods on pointcloud
+
+* irtgl.l:
+
+  * fix transparent method on glvertices
+  * add :mirror-axis method to glvertices
+
+* irtmodel.l:
+
+  * Set (/ stop 10) as min-loop default value not to change ik behavior
+  * Update documentations for :inverse-kinematics-loop and add  documentations for min-loop argument
+   * Remove unncessary loop checking and add min-loop argument  discussed in https://github.com/euslisp/jskeus/issues/107
+
+* Contributors: Kei Okada, Shunichi Nozawa, Yohei Kakiuchi
+
 1.0.8 (2015-06-19)
 ------------------
 * [README.md] add documents of null-space-ik
