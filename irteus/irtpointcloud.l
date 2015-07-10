@@ -248,7 +248,7 @@
        (incf psize (or (array-dimension (send p :points)  0) 0))
        (incf csize (or (array-dimension (send p :colors)  0) 0))
        (incf nsize (or (array-dimension (send p :normals) 0) 0)))
-     (let (pmat cmat nmat (cntr 0) size)
+     (let (pmat cmat nmat pp cc nn (cntr 0) size)
        (setq pmat (if (> psize 0) (make-matrix asize 3))
              cmat (if (> csize 0) (make-matrix asize 3))
              nmat (if (> nsize 0) (make-matrix asize 3)))
