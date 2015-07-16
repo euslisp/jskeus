@@ -747,7 +747,10 @@
      (send (send j :child-link) :add-parent-link (send j :parent-link))
      (send (send j :parent-link) :add-child-links (send j :child-link))
      )
-   (send self :update-descendants))
+   (send self :update-descendants)
+   ;; Make default collision shape by pqp
+   (dolist (l (send self :links)) (send l :make-pqpmodel))
+   )
   (:links (&rest args) "Returns links, or args is passed to links" (user::forward-message-to-all links args))
   (:joint-list (&rest args) "Returns joint list, or args is passed to joints" (user::forward-message-to-all joint-list args))
   (:link (name) "Return a link with given name." (find name links :test #'equal :key #'(lambda (x) (send x :name))))
