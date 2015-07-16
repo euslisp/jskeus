@@ -2104,6 +2104,7 @@
                   (union-link-list)
 		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
 		  (dump-command t) (periodic-time 0.5) ;; [s]
+                  (check-collision)
 		  &allow-other-keys)
    "Move move-target to target-coords."
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
@@ -2119,7 +2120,7 @@
 	  ;;
           (success t) 
 	  (old-analysis-level (send-all union-link-list :analysis-level))
-          command-directory command-filename command-id ik-args)       
+          command-directory command-filename command-id ik-args collision-status)       
      (send-all union-link-list :analysis-level :coords)
      ;; argument check
      (when (or (null link-list) (null move-target))
@@ -2230,8 +2231,9 @@
        (unix::rename (format nil "~A/~A.l" command-directory command-id ) (setq command-filename (format nil "~A/~A-~A.l" command-directory command-id (if (or success (not revert-if-fail)) "success" "failure")))))
      ;; reset weight
      (send self :reset-joint-angle-limit-weight-old union-link-list)
+     (if check-collision (setq collision-status (send self :self-collision-check)))
      ;; check solved or not
-     (if (or success (not revert-if-fail))
+     (if (and (or success (not revert-if-fail)) (not collision-status))
          (send self :angle-vector)
        (progn
 	 (when warnp
@@ -2245,6 +2247,7 @@
            (warn ";;  coords : ~a~%" 
                  (send (let ((p self)) (while (send p :parent) (setq p (send p :parent))) p) :worldcoords))
 	   (warn ";;  angles : ~a~%" av0)
+	   (if check-collision (warn ";;  collision : ~a~%" collision-status))
 	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   (when dump-command
 	     (let (i print-args command-init command-setup command-args)
