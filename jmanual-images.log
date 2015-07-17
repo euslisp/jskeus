@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2015.7.10)  10 JUL 2015 04:15
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2015.7.17)  17 JUL 2015 02:47
 entering extended mode
  %&-line parsing enabled.
 **./jmanual-images.tex
@@ -69,7 +69,7 @@ File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
 ) (/usr/share/texmf-texlive/tex/latex/base/makeidx.sty
 Package: makeidx 2000/03/29 v1.0m Standard LaTeX package
-) (/tmp/tmp.ufyyM8t0aS/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
+) (/tmp/tmp.Qd84JlXv9Z/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
 hdr/fancyheadings.sty
 Package: fancyheadings 2008/02/04 1.99 Dummy package to call fancyhdr
 
@@ -2149,12 +2149,12 @@ l2hSize :emtabbing52719:286.84526pt::0.0pt::754.1586pt.
 
 
 ]
-l2hSize :emtabbing52730:250.84526pt::0.0pt::724.7059pt.
+l2hSize :emtabbing52730:262.84526pt::0.0pt::724.7059pt.
 [287
 
 
 ]
-Overfull \hbox (163.06923pt too wide) detected at line 2999
+Overfull \hbox (163.06923pt too wide) detected at line 3000
 [] [] []
  []
 
@@ -2163,7 +2163,7 @@ l2hSize :emtabbing52741:106.84526pt::0.0pt::534.5354pt.
 
 
 ]
-Overfull \hbox (147.58998pt too wide) detected at line 3015
+Overfull \hbox (147.58998pt too wide) detected at line 3016
 [] [] []
  []
 
@@ -2177,7 +2177,7 @@ l2hSize :emtabbing55464:70.84526pt::0.0pt::929.40454pt.
 
 
 ]
-Overfull \hbox (11.62842pt too wide) detected at line 3040
+Overfull \hbox (11.62842pt too wide) detected at line 3041
 [] [] []
  []
 
@@ -2191,7 +2191,7 @@ l2hSize :emtabbing55506:130.84526pt::0.0pt::369.94196pt.
 
 
 ]
-Overfull \hbox (115.36815pt too wide) detected at line 3073
+Overfull \hbox (115.36815pt too wide) detected at line 3074
 [] [] []
  []
 
@@ -2200,7 +2200,7 @@ l2hSize :emtabbing55517:46.84526pt::0.0pt::349.0pt.
 
 
 ]
-Overfull \hbox (31.49773pt too wide) detected at line 3084
+Overfull \hbox (31.49773pt too wide) detected at line 3085
 [] [] []
  []
 
@@ -2209,7 +2209,7 @@ l2hSize :emtabbing55528:154.84526pt::0.0pt::639.47891pt.
 
 
 ]
-Overfull \hbox (5.34398pt too wide) detected at line 3104
+Overfull \hbox (5.34398pt too wide) detected at line 3105
 [] [] []
  []
 
@@ -2223,7 +2223,7 @@ l2hSize :emtabbing55570:46.84526pt::0.0pt::349.0pt.
 
 
 ]
-Overfull \hbox (254.36858pt too wide) detected at line 3130
+Overfull \hbox (254.36858pt too wide) detected at line 3131
 [] [] []
  []
 
@@ -2232,7 +2232,7 @@ l2hSize :emtabbing55581:106.84526pt::0.0pt::1281.0745pt.
 
 
 ]
-Overfull \hbox (60.9908pt too wide) detected at line 3146
+Overfull \hbox (60.9908pt too wide) detected at line 3147
 [] [] []
  []
 
@@ -2241,16 +2241,16 @@ l2hSize :emtabbing55592:178.84526pt::0.0pt::648.1443pt.
 
 
 ]
-LaTeX Font Info:    Try loading font information for OML+cmr on input line 3167
+LaTeX Font Info:    Try loading font information for OML+cmr on input line 3168
 .
 (/usr/share/texmf-texlive/tex/latex/base/omlcmr.fd
 File: omlcmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OML/cmr/bx/n' in size <10> not available
-(Font)              Font shape `OML/cmm/b/it' tried instead on input line 3167.
+(Font)              Font shape `OML/cmm/b/it' tried instead on input line 3168.
 
 
-Overfull \hbox (168.52046pt too wide) detected at line 3168
+Overfull \hbox (168.52046pt too wide) detected at line 3169
 [] [] []
  []
 
@@ -2330,14 +2330,14 @@ l2hSize :emtabbing65898:46.84526pt::0.0pt::349.0pt.
 
 ]
 LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <10> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 3385.
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 3386.
 
 l2hSize :emtabbing67024:58.84526pt::0.0pt::349.0pt.
 [314
 
 
 ]
-Overfull \hbox (10.30089pt too wide) detected at line 3395
+Overfull \hbox (10.30089pt too wide) detected at line 3396
 [] [] []
  []
 
@@ -2355,4 +2355,4 @@ Here is how much of TeX's memory you used:
  28 hyphenation exceptions out of 8191
  28i,17n,45p,400b,412s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on jmanual-images.dvi (316 pages, 100840 bytes).
+Output written on jmanual-images.dvi (316 pages, 100876 bytes).
