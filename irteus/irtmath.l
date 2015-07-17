@@ -468,6 +468,50 @@
     (elt (sort err #'<) (/ (length err) 2))
     ))
 
+(defun concatenate-matrix-column (&rest args)
+  "Concatenate matrix in column direction."
+  (let (m ml (size-of-column (array-dimension (car args) 1)))
+    (dolist (mat args)
+      (unless (= (array-dimension mat 1) size-of-column)
+        (error ";; concatenate-matrix-column matrix size error (size=~A)~%" (mapcar #'(lambda (x) (array-dimension x 1)) args)))
+      (setq m (if mat (length (matrix-column mat 0)) 0))
+      (dotimes (i m)
+        (push (matrix-row mat i) ml)))
+    (when ml (apply #'matrix (reverse ml)))
+    ))
+
+(defun concatenate-matrix-row (&rest args)
+  "Concatenate matrix in row direction."
+  (let (m ml (size-of-column (array-dimension (car args) 0)))
+    (dolist (mat args)
+      (unless (= (array-dimension mat 0) size-of-column)
+        (error ";; concatenate-matrix-row matrix size error (size=~A)~%" (mapcar #'(lambda (x) (array-dimension x 0)) args)))
+      (setq m (if mat (length (matrix-row mat 0)) 0))
+      (dotimes (i m)
+        (push (matrix-column mat i) ml)))
+    (when ml (transpose (apply #'matrix (reverse ml))))
+    ))
+
+(defun concatenate-matrix-diagonal (&rest args)
+  "Concatenate matrix in diagonal."
+  (let (mat m ll ml vl)
+    (dolist (mm args)
+      (push (if mm (length (matrix-row mm 0)) 0) ll))
+    (setq ll (reverse ll))
+    (dotimes (i (length args))
+      (setq mat (nth i args))
+      (setq m (if mat (length (matrix-column mat 0)) 0))
+      (dotimes (j m)
+        (setq vl nil)
+        (dotimes (k (length ll))
+          (if (= i k) (push (matrix-row mat j) vl)
+            (push (make-array (nth k ll)
+                              :element-type float-vector
+                              :initial-element 0) vl)))
+        (push (apply #'concatenate
+                     (cons float-vector (reverse vl))) ml)))
+    (when ml (apply #'matrix (reverse ml)))
+    ))
 
 #|
 (defun lms-draw (r point-list)
