@@ -747,7 +747,10 @@
      (send (send j :child-link) :add-parent-link (send j :parent-link))
      (send (send j :parent-link) :add-child-links (send j :child-link))
      )
-   (send self :update-descendants))
+   (send self :update-descendants)
+   ;; Make default collision shape by pqp
+   (dolist (l (send self :links)) (send l :make-pqpmodel))
+   )
   (:links (&rest args) "Returns links, or args is passed to links" (user::forward-message-to-all links args))
   (:joint-list (&rest args) "Returns joint list, or args is passed to joints" (user::forward-message-to-all joint-list args))
   (:link (name) "Return a link with given name." (find name links :test #'equal :key #'(lambda (x) (send x :name))))
@@ -2104,6 +2107,7 @@
                   (union-link-list)
 		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
 		  (dump-command t) (periodic-time 0.5) ;; [s]
+                  (check-collision)
 		  &allow-other-keys)
    "Move move-target to target-coords."
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
@@ -2119,7 +2123,7 @@
 	  ;;
           (success t) 
 	  (old-analysis-level (send-all union-link-list :analysis-level))
-          command-directory command-filename command-id ik-args)       
+          command-directory command-filename command-id ik-args collision-status)       
      (send-all union-link-list :analysis-level :coords)
      ;; argument check
      (when (or (null link-list) (null move-target))
@@ -2230,8 +2234,9 @@
        (unix::rename (format nil "~A/~A.l" command-directory command-id ) (setq command-filename (format nil "~A/~A-~A.l" command-directory command-id (if (or success (not revert-if-fail)) "success" "failure")))))
      ;; reset weight
      (send self :reset-joint-angle-limit-weight-old union-link-list)
+     (if check-collision (setq collision-status (send self :self-collision-check)))
      ;; check solved or not
-     (if (or success (not revert-if-fail))
+     (if (and (or success (not revert-if-fail)) (not collision-status))
          (send self :angle-vector)
        (progn
 	 (when warnp
@@ -2245,6 +2250,7 @@
            (warn ";;  coords : ~a~%" 
                  (send (let ((p self)) (while (send p :parent) (setq p (send p :parent))) p) :worldcoords))
 	   (warn ";;  angles : ~a~%" av0)
+	   (if check-collision (warn ";;  collision : ~a~%" collision-status))
 	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   (when dump-command
 	     (let (i print-args command-init command-setup command-args)

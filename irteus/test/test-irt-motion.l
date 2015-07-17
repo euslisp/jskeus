@@ -674,6 +674,29 @@
         (every #'identity check-results)
         ))))
 
+;; test for collision check
+(defun test-self-collision-check-IK
+  ()
+  (defmethod sample-robot
+    (:collision-check-pairs
+     (&key ((:links ls) (list (car (send self :links))
+                              (elt (send self :rarm :links) 2)
+                              (elt (send self :rarm :links) 3))))
+     (send-super :collision-check-pairs :links ls)))
+  (labels ((test-ik
+            (check-collision)
+            (send *sample-robot* :reset-pose)
+            (send *sample-robot* :fix-leg-to-coords (make-coords))
+            (send *sample-robot* :rarm :move-end-pos #f(50 300 0) :world :rotation-axis nil :check-collision check-collision :warnp nil)))
+    (prog1
+        (and (test-ik nil) (not (test-ik t)))
+      (defmethod sample-robot
+        (:collision-check-pairs
+         (&key ((:links ls) (cons (car links) (all-child-links (car links)))))
+         (send-super :collision-check-pairs :links ls)))
+      )
+    ))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; unit tests
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -735,6 +758,10 @@
 (deftest test-all-for-sample-robot-static-2
   (assert
    (test-all-for-sample-robot :static-p t :fix-pos #f(100 200 300))))
+
+(deftest test-self-collision-check-IK-test
+  (assert
+   (test-self-collision-check-IK)))
 
 (run-all-tests)
 (exit 0)
