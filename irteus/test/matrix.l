@@ -39,5 +39,146 @@
         ))
     ))
 
+;;;;;;;;;;;;;;;;
+;; Test functions for matrix concatenation
+;;;;;;;;;;;;;;;;
+(defun make-random-matrix
+  (row-dim column-dim &key (random-range 1e10))
+  "Make matrix with given row dimension and column dimension.
+   Component of matrix is random value."
+  (make-matrix row-dim column-dim
+               (mapcar #'(lambda (row)
+                           (mapcar #'(lambda (column) (random random-range)) (make-list column-dim)))
+                       (make-list row-dim))))
+
+(defun make-random-matrix-list
+  (length
+   &key (same-row-p nil) (same-column-p nil)
+        (random-max-dim 100))
+  "Make matrix list with given length.
+   Component of matrix is random value and dimensions are random.
+   random-max-dim is max dimensions to be checked."
+  (let ((row-dim (if same-row-p (1+ (random random-max-dim))))
+        (col-dim (if same-column-p (1+ (random random-max-dim)))))
+    (mapcar
+     #'(lambda (x)
+         (make-random-matrix
+          (if same-row-p row-dim (1+ (random random-max-dim)))
+          (if same-column-p col-dim (1+ (random random-max-dim)))))
+     (make-list length))))
+
+;; Naive implementation of concatenate matrix for comparing values.
+(defun concatenate-matrix-column-naive-impl
+  (&rest args)
+  (if (> (length args) 2)
+      (concatenate-matrix-column-naive-impl
+       (car args)
+       (apply #'concatenate-matrix-column-naive-impl (cdr args)))
+    (let* ((mat0 (car args)) (mat1 (cadr args))
+           (mat0-row-dim (array-dimension mat0 0))
+           (mat1-row-dim (array-dimension mat1 0))
+           (col-dim (array-dimension mat0 1))
+           (con-mat1 (make-matrix (+ mat0-row-dim mat1-row-dim) col-dim)))
+      (dotimes (row-index0 mat0-row-dim)
+        (dotimes (column-index col-dim)
+          (setf (aref con-mat1 row-index0 column-index) (aref mat0 row-index0 column-index))))
+      (dotimes (row-index1 mat1-row-dim)
+        (dotimes (column-index col-dim)
+          (setf (aref con-mat1 (+ mat0-row-dim row-index1) column-index) (aref mat1 row-index1 column-index))))
+      con-mat1)))
+
+(defun concatenate-matrix-row-naive-impl
+  (&rest args)
+  (if (> (length args) 2)
+      (concatenate-matrix-row-naive-impl
+       (car args)
+       (apply #'concatenate-matrix-row-naive-impl (cdr args)))
+    (let* ((mat0 (car args)) (mat1 (cadr args))
+           (mat0-col-dim (array-dimension mat0 1))
+           (mat1-col-dim (array-dimension mat1 1))
+           (row-dim (array-dimension mat0 0))
+           (con-mat1 (make-matrix row-dim (+ mat0-col-dim mat1-col-dim))))
+      (dotimes (row-index row-dim)
+        (dotimes (column-index mat0-col-dim)
+          (setf (aref con-mat1 row-index column-index) (aref mat0 row-index column-index))))
+      (dotimes (row-index row-dim)
+        (dotimes (column-index mat1-col-dim)
+          (setf (aref con-mat1 row-index (+ mat0-col-dim column-index)) (aref mat1 row-index column-index))))
+      con-mat1)))
+
+(defun concatenate-matrix-diagonal-naive-impl
+  (&rest args)
+  (if (> (length args) 2)
+      (concatenate-matrix-diagonal-naive-impl
+       (car args)
+       (apply #'concatenate-matrix-diagonal-naive-impl(cdr args)))
+    (let* ((mat0 (car args)) (mat1 (cadr args))
+           (mat0-row-dim (array-dimension mat0 0))
+           (mat0-col-dim (array-dimension mat0 1))
+           (mat1-row-dim (array-dimension mat1 0))
+           (mat1-col-dim (array-dimension mat1 1))
+           (con-mat1 (make-matrix (+ mat0-row-dim mat1-row-dim) (+ mat0-col-dim mat1-col-dim))))
+      (dotimes (row-index mat0-row-dim)
+        (dotimes (column-index mat0-col-dim)
+          (setf (aref con-mat1 row-index column-index) (aref mat0 row-index column-index))))
+      (dotimes (row-index mat1-row-dim)
+        (dotimes (column-index mat1-col-dim)
+          (setf (aref con-mat1 (+ mat0-row-dim row-index) (+ mat0-col-dim column-index)) (aref mat1 row-index column-index))))
+      con-mat1)))
+
+;; Test functions
+(defun test-matrix-concatenate-single-common
+  (func
+   &key (random-max-dim 100)
+        (mat-row-dim (1+ (random random-max-dim))) (mat-column-dim (1+ (random random-max-dim))))
+  "Test matrix concatenate functions for single matrix argument."
+  (let ((mat (make-random-matrix mat-row-dim mat-column-dim)))
+    (= (norm (array-entity (m- (funcall func mat) mat))) 0.0)))
+
+(defun test-matrix-concatenate-matrix-column
+  (&key (matrix-list-length (+ 2 (random 5))))
+  (let ((mats (make-random-matrix-list matrix-list-length :same-column-p t)))
+    (=
+     (norm (array-entity
+            (m- (apply #'concatenate-matrix-column mats)
+                (apply #'concatenate-matrix-column-naive-impl mats))))
+     0)))
+
+(defun test-matrix-concatenate-matrix-row
+  (&key (matrix-list-length (+ 2 (random 5))))
+  (let ((mats (make-random-matrix-list matrix-list-length :same-row-p t)))
+    (=
+     (norm (array-entity
+            (m- (apply #'concatenate-matrix-row mats)
+                (apply #'concatenate-matrix-row-naive-impl mats))))
+     0)))
+
+(defun test-matrix-concatenate-matrix-diagonal
+  (&key (matrix-list-length (+ 2 (random 5))))
+  (let ((mats (make-random-matrix-list matrix-list-length)))
+    (=
+     (norm (array-entity
+            (m- (apply #'concatenate-matrix-diagonal mats)
+                (apply #'concatenate-matrix-diagonal-naive-impl mats))))
+     0)))
+
+(deftest test-matrix-concatenate-noargs
+  (assert (and (not (concatenate-matrix-column))
+               (not (concatenate-matrix-row))
+               (not (concatenate-matrix-diagonal)))))
+
+(deftest test-matrix-concatenate-single-matrix
+  (assert (and
+           (test-matrix-concatenate-single-common #'concatenate-matrix-column)
+           (test-matrix-concatenate-single-common #'concatenate-matrix-row)
+           (test-matrix-concatenate-single-common #'concatenate-matrix-diagonal))))
+
+(deftest test-matrix-concatenate-multiple-matrices
+  (assert (and
+           (every #'identity (mapcar #'(lambda (x) (test-matrix-concatenate-matrix-row)) (make-list 50)))
+           (every #'identity (mapcar #'(lambda (x) (test-matrix-concatenate-matrix-column)) (make-list 50)))
+           (every #'identity (mapcar #'(lambda (x) (test-matrix-concatenate-matrix-diagonal)) (make-list 50)))
+           )))
+
 (run-all-tests)
 (exit)
