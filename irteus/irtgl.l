@@ -881,12 +881,17 @@ if flat option is true, use-flat-shader"
                     (flatten (send* self :convert-to-faces args)))))
      (send fs :transform (send self :worldcoords))
      fs))
-  (:set-offset (cds)
+  (:set-offset (cds &key (create))
    "move vertices in this object using given coordinates, this method change values of vertices. coordinates's method such as :transform just change view of this object"
    (let* ((zero (float-vector 0 0 0))
           (wpos (send cds :worldpos))
-          (wrot (send cds :worldrot)))
-     (dolist (minfo mesh-list)
+          (wrot (send cds :worldrot))
+          ret)
+     (if create
+         (setq ret
+               (instance glvertices :init (copy-object mesh-list)))
+       (setq ret self))
+     (dolist (minfo (ret . mesh-list))
        (let ((vmat (cadr (assoc :vertices minfo)))
              (nmat (cadr (assoc :normals minfo))))
          (user::c-coords-transform-vector
@@ -894,7 +899,13 @@ if flat option is true, use-flat-shader"
          (when nmat
            (user::c-coords-transform-vector
             zero wrot nmat nmat))))
-     self))
+     ret))
+  (:convert-to-world (&key (create))
+   "move vertices in this object using self's coordinates. vertices data should be moved as the same as displayed"
+   (let ((ret (send self :set-offset (send self :worldcoords) :create create)))
+     (send ret :reset-coords)
+     (send self :worldcoords)
+     ret))
   (:glvertices (&optional (name) (test #'string=))
    "create individual glvertices objects from mesh-list. if name is given, search mesh has the same name"
    (let (ret)
