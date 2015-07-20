@@ -1623,7 +1623,7 @@
           (null-space) (debug-view)
           (additional-nspace-list) ;; (list (list link1 var1) (list link2 var2) ...) ;; var is value or function (lambda)
 	  ;; if user wants to use cog-jacobian as null-space, please set cog-gain(> 0.0) and target-centroid-pos
-	  (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
+	  (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
           (weight (fill (instantiate float-vector fik-len) 1.0))
           (update-mass-properties t)
           (tmp-nspace (instantiate float-vector fik-len)))
@@ -1632,13 +1632,15 @@
           (send self :calc-nspace-from-joint-limit
                 avoid-nspace-gain union-link-list weight debug-view tmp-nspace))
     ;; add null-space from cog-jacobian
-    (if (and (> cog-gain 0.0) target-centroid-pos)
-	(setq tmp-nspace
-	      (v+ (send self :cog-jacobian-balance-nspace union-link-list
-			:weight weight :centroid-offset-func centroid-offset-func
-                        :update-mass-properties update-mass-properties
-			:target-centroid-pos target-centroid-pos :cog-gain cog-gain :translation-axis cog-translation-axis)
-		  tmp-nspace tmp-nspace)))
+    ;;   when cog-null-space is nil, null-space from cog-jacobian is not added
+    (when cog-null-space
+      (if (and (> cog-gain 0.0) target-centroid-pos)
+          (setq tmp-nspace
+                (v+ (send self :cog-jacobian-balance-nspace union-link-list
+                          :weight weight :centroid-offset-func centroid-offset-func
+                          :update-mass-properties update-mass-properties
+                          :target-centroid-pos target-centroid-pos :cog-gain cog-gain :translation-axis cog-translation-axis)
+                    tmp-nspace tmp-nspace))))
     ;; add null-space from arguments
     (dolist (ls additional-nspace-list)
       (let ((ll-pos (position (car ls) union-link-list :test #'equal)))
@@ -1673,7 +1675,7 @@
               (avoid-collision-joint-gain 1.0)
               ((:collision-avoidance-link-pair pair-list)
                (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
-	      (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
+	      (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
               (additional-weight-list) (additional-nspace-list)
               (tmp-len (instantiate float-vector fik-len))
               (tmp-len2 (instantiate float-vector fik-len))
@@ -1784,7 +1786,7 @@
            (send self :calc-inverse-kinematics-nspace-from-link-list
                  link-list :union-link-list union-link-list
                  :avoid-nspace-gain avoid-nspace-gain :debug-view debug-view
-		 :cog-gain cog-gain :target-centroid-pos target-centroid-pos :centroid-offset-func centroid-offset-func
+		 :cog-gain cog-gain :target-centroid-pos target-centroid-pos :centroid-offset-func centroid-offset-func :cog-null-space cog-null-space
                  :update-mass-properties nil
                  :cog-translation-axis cog-translation-axis
                  :weight weight :fik-len fik-len :null-space null-space :tmp-nspace tmp-nspace
@@ -1945,7 +1947,7 @@
     (jacobi)
     (additional-check)
     (additional-jacobi) (additional-vel)
-    (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
+    (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
     (min-loop (/ stop 10))
     debug-view ik-args
     &allow-other-keys)
@@ -2128,7 +2130,7 @@
                           ((atom move-target) (deg2rad 1))
                           (t (make-list (length move-target) :initial-element (deg2rad 1)))))
                   (union-link-list)
-		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
+		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
 		  (dump-command t) (periodic-time 0.5) ;; [s]
                   (check-collision)
                   (additional-jacobi) (additional-vel)
