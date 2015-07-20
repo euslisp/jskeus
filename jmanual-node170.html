@@ -1654,13 +1654,13 @@ If min-loop is nil, do not consider loop counting for IK convergence.
 <A NAME="52729"></A>
 <BR>
 <IMG
- WIDTH="1198" HEIGHT="417" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="1198" HEIGHT="474" ALIGN="BOTTOM" BORDER="0"
  SRC="jmanual-img287.png"
  ALT="\begin{emtabbing}
 {\bf :inverse-kinematics}
 \it target-coords \&amp;rest args \&amp;key...
-...ime 0.5) \\
-\&gt; (check-collision) \\
+...l-jacobi) \\
+\&gt; (additional-vel) \\
 \&gt; \&amp;allow-other-keys
 \rm
 \end{emtabbing}">
@@ -1677,7 +1677,7 @@ If min-loop is nil, do not consider loop counting for IK convergence.
 <A NAME="52740"></A>
 <BR>
 <IMG
- WIDTH="1151" HEIGHT="379" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="1151" HEIGHT="436" ALIGN="BOTTOM" BORDER="0"
  SRC="jmanual-img288.png"
  ALT="\begin{emtabbing}
 {\bf :inverse-kinematics-for-closed-loop-forward-kinematics}
@@ -2028,7 +2028,7 @@ constrained-joint-angle-list is list of joint-angle for constrained-joint-list.
 
 
 <A NAME="53004"></A>
-<B>:calc-inverse-kinematics-nspace-from-link-list</B> <EM>link-list &amp;key (avoid-nspace-gain 0.01) (union-link-list (send self :calc-union-link-list link-list)) (fik-len (send self :calc-target-joint-dimension union-link-list)) (null-space) (debug-view) (additional-nspace-list) (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (weight (fill (instantiate float-vector fik-len) 1.0)) (update-mass-properties t) (tmp-nspace (instantiate float-vector fik-len))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<B>:calc-inverse-kinematics-nspace-from-link-list</B> <EM>link-list &amp;key (avoid-nspace-gain 0.01) (union-link-list (send self :calc-union-link-list link-list)) (fik-len (send self :calc-target-joint-dimension union-link-list)) (null-space) (debug-view) (additional-nspace-list) (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil) (weight (fill (instantiate float-vector fik-len) 1.0)) (update-mass-properties t) (tmp-nspace (instantiate float-vector fik-len))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -2042,7 +2042,7 @@ constrained-joint-angle-list is list of joint-angle for constrained-joint-list.
 
 
 <A NAME="53015"></A>
-<B>:move-joints-avoidance</B> <EM>union-vel &amp;rest args &amp;key union-link-list link-list (fik-len (send self :calc-target-joint-dimension union-link-list)) (weight (fill (instantiate float-vector fik-len) 1)) (null-space) (avoid-nspace-gain 0.01) (avoid-weight-gain 1.0) (avoid-collision-distance 200) (avoid-collision-null-gain 1.0) (avoid-collision-joint-gain 1.0) ((:collision-avoidance-link-pair pair-list) (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args)))) (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (additional-weight-list) (additional-nspace-list) (tmp-len (instantiate float-vector fik-len)) (tmp-len2 (instantiate float-vector fik-len)) (tmp-weight (instantiate float-vector fik-len)) (tmp-nspace (instantiate float-vector fik-len)) (tmp-mcc (make-matrix fik-len fik-len)) (tmp-mcc2 (make-matrix fik-len fik-len)) (debug-view) (jacobi) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<B>:move-joints-avoidance</B> <EM>union-vel &amp;rest args &amp;key union-link-list link-list (fik-len (send self :calc-target-joint-dimension union-link-list)) (weight (fill (instantiate float-vector fik-len) 1)) (null-space) (avoid-nspace-gain 0.01) (avoid-weight-gain 1.0) (avoid-collision-distance 200) (avoid-collision-null-gain 1.0) (avoid-collision-joint-gain 1.0) ((:collision-avoidance-link-pair pair-list) (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args)))) (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil) (additional-weight-list) (additional-nspace-list) (tmp-len (instantiate float-vector fik-len)) (tmp-len2 (instantiate float-vector fik-len)) (tmp-weight (instantiate float-vector fik-len)) (tmp-nspace (instantiate float-vector fik-len)) (tmp-mcc (make-matrix fik-len fik-len)) (tmp-mcc2 (make-matrix fik-len fik-len)) (debug-view) (jacobi) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -2056,7 +2056,7 @@ constrained-joint-angle-list is list of joint-angle for constrained-joint-list.
 
 
 <A NAME="53026"></A>
-<B>:inverse-kinematics-args</B> <EM>&amp;rest args &amp;key union-link-list rotation-axis translation-axis &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<B>:inverse-kinematics-args</B> <EM>&amp;rest args &amp;key union-link-list rotation-axis translation-axis additional-jacobi-dimension &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -3015,8 +3015,8 @@ link-list is set by default based on move-target -&gt;root link link-list
  ALT="\begin{emtabbing}
 {\bf :fullbody-inverse-kinematics}
 \it target-coords \&amp;rest a...
-...ght-list) \\
-\&gt; (joint-args nil) \\
+...l-jacobi) \\
+\&gt; (additional-vel) \\
 \&gt; \&amp;allow-other-keys
 \rm
 \end{emtabbing}">
@@ -3058,7 +3058,7 @@ torso-j0 ... torso-jN
 <A NAME="55548"></A>
 <BR>
 <IMG
- WIDTH="1016" HEIGHT="207" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="1016" HEIGHT="302" ALIGN="BOTTOM" BORDER="0"
  SRC="jmanual-img295.png"
  ALT="\begin{emtabbing}
 {\bf :calc-zmp-from-forces-moments}
@@ -3572,7 +3572,7 @@ linear-joint-name is the name of linear actuator.
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-07-17
+2015-07-20
 </ADDRESS>
 </BODY>
 </HTML>

@@ -2951,10 +2951,13 @@ $\displaystyle _{G} =  \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath 
 \> target-coords \\
 \> (jacobi) \\
 \> (additional-check) \\
+\> (additional-jacobi) \\
+\> (additional-vel) \\
 \> (centroid-thre 1.0) \\
 \> (target-centroid-pos) \\
 \> (centroid-offset-func) \\
 \> (cog-translation-axis :z) \\
+\> (cog-null-space nil) \\
 \> (min-loop (/ stop 10)) \\
 \> debug-view \\
 \> ik-args \\
@@ -2984,9 +2987,12 @@ $\displaystyle _{G} =  \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath 
 \> (target-centroid-pos) \\
 \> (centroid-offset-func) \\
 \> (cog-translation-axis :z) \\
+\> (cog-null-space nil) \\
 \> (dump-command t) \\
 \> (periodic-time 0.5) \\
 \> (check-collision) \\
+\> (additional-jacobi) \\
+\> (additional-vel) \\
 \> \&allow-other-keys 
 \rm
 \end{emtabbing}%
@@ -3089,9 +3095,14 @@ $\displaystyle _{G} =  \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath 
 \> (root-link-virtual-joint-weight \#f(0.1 0.1 0.1 0.1 0.5 0.5)) \\
 \> (target-centroid-pos (apply \#'midpoint 0.5 (send self :legs :end-coords :worldpos))) \\
 \> (cog-gain 1.0) \\
+\> (cog-translation-axis :z) \\
+\> (centroid-offset-func nil) \\
 \> (centroid-thre 5.0) \\
 \> (additional-weight-list) \\
 \> (joint-args nil) \\
+\> (cog-null-space t) \\
+\> (additional-jacobi) \\
+\> (additional-vel) \\
 \> \&allow-other-keys 
 \rm
 \end{emtabbing}%
