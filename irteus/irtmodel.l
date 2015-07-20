@@ -1623,7 +1623,7 @@
           (null-space) (debug-view)
           (additional-nspace-list) ;; (list (list link1 var1) (list link2 var2) ...) ;; var is value or function (lambda)
 	  ;; if user wants to use cog-jacobian as null-space, please set cog-gain(> 0.0) and target-centroid-pos
-	  (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
+	  (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
           (weight (fill (instantiate float-vector fik-len) 1.0))
           (update-mass-properties t)
           (tmp-nspace (instantiate float-vector fik-len)))
@@ -1632,13 +1632,15 @@
           (send self :calc-nspace-from-joint-limit
                 avoid-nspace-gain union-link-list weight debug-view tmp-nspace))
     ;; add null-space from cog-jacobian
-    (if (and (> cog-gain 0.0) target-centroid-pos)
-	(setq tmp-nspace
-	      (v+ (send self :cog-jacobian-balance-nspace union-link-list
-			:weight weight :centroid-offset-func centroid-offset-func
-                        :update-mass-properties update-mass-properties
-			:target-centroid-pos target-centroid-pos :cog-gain cog-gain :translation-axis cog-translation-axis)
-		  tmp-nspace tmp-nspace)))
+    ;;   when cog-null-space is nil, null-space from cog-jacobian is not added
+    (when cog-null-space
+      (if (and (> cog-gain 0.0) target-centroid-pos)
+          (setq tmp-nspace
+                (v+ (send self :cog-jacobian-balance-nspace union-link-list
+                          :weight weight :centroid-offset-func centroid-offset-func
+                          :update-mass-properties update-mass-properties
+                          :target-centroid-pos target-centroid-pos :cog-gain cog-gain :translation-axis cog-translation-axis)
+                    tmp-nspace tmp-nspace))))
     ;; add null-space from arguments
     (dolist (ls additional-nspace-list)
       (let ((ll-pos (position (car ls) union-link-list :test #'equal)))
@@ -1673,7 +1675,7 @@
               (avoid-collision-joint-gain 1.0)
               ((:collision-avoidance-link-pair pair-list)
                (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
-	      (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
+	      (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
               (additional-weight-list) (additional-nspace-list)
               (tmp-len (instantiate float-vector fik-len))
               (tmp-len2 (instantiate float-vector fik-len))
@@ -1784,7 +1786,7 @@
            (send self :calc-inverse-kinematics-nspace-from-link-list
                  link-list :union-link-list union-link-list
                  :avoid-nspace-gain avoid-nspace-gain :debug-view debug-view
-		 :cog-gain cog-gain :target-centroid-pos target-centroid-pos :centroid-offset-func centroid-offset-func
+		 :cog-gain cog-gain :target-centroid-pos target-centroid-pos :centroid-offset-func centroid-offset-func :cog-null-space cog-null-space
                  :update-mass-properties nil
                  :cog-translation-axis cog-translation-axis
                  :weight weight :fik-len fik-len :null-space null-space :tmp-nspace tmp-nspace
@@ -1822,10 +1824,11 @@
      t))
   ;;
   (:inverse-kinematics-args
-   (&rest args &key union-link-list rotation-axis translation-axis
+   (&rest args &key union-link-list rotation-axis translation-axis additional-jacobi-dimension
           &allow-other-keys)
    (let* ((c (send self :calc-target-joint-dimension union-link-list))
-          (r (send self :calc-target-axis-dimension rotation-axis translation-axis))
+          ;; add dimensions of additonal-jacobi
+          (r (+ (send self :calc-target-axis-dimension rotation-axis translation-axis) additional-jacobi-dimension))
           (fik (make-matrix r c))
           (ret (make-matrix c r))
           (wmat (make-matrix c c))
@@ -1943,7 +1946,8 @@
     target-coords                 ;required for debug-view
     (jacobi)
     (additional-check)
-    (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
+    (additional-jacobi) (additional-vel)
+    (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
     (min-loop (/ stop 10))
     debug-view ik-args
     &allow-other-keys)
@@ -2053,6 +2057,27 @@
            (setf (elt tmp-dim (+ j vec-count)) (elt (elt tmp-dims i) j)))
          (incf vec-count (length (elt tmp-dims i))))
        
+       ;; append additional-jacobi and additional-vel
+       (let (add-vel-list (row0) add-vel add-jacobi)
+         (when additional-jacobi
+           (setq add-vel-list (mapcar #'(lambda (x) (if (functionp x) (funcall x link-list) x)) additional-vel))
+           (setq row0 (- (length tmp-dim) (reduce #'+ (mapcar #'length add-vel-list))))
+           (dotimes (i-add-jacobi (length additional-jacobi))
+             (setq add-jacobi (elt additional-jacobi i-add-jacobi))
+             (setq add-jacobi (if (functionp add-jacobi) (funcall add-jacobi link-list) add-jacobi))
+             (setq add-vel (elt add-vel-list i-add-jacobi))
+             (dotimes (i-row (array-dimension add-jacobi 0))
+               ;; set additional-jacobi
+               (dotimes (i-col (array-dimension jacobi 1))
+                 (setf (aref jacobi (+ row0 i-row) i-col) (aref add-jacobi i-row i-col)))
+               (setf (elt tmp-dim (+ row0 i-row)) (elt add-vel i-row))
+               )
+             (setq row0 (+ row0 (length add-vel)))
+             (when (and debug-view (not (memq :no-message debug-view)))
+               (format-array add-jacobi (format nil "add-J~a    :" i-add-jacobi))
+               (format-array add-vel (format nil "add-v~a    :" i-add-jacobi)))
+             )))
+
        ;; check loop end
        (if success
            :ik-succeed
@@ -2105,9 +2130,10 @@
                           ((atom move-target) (deg2rad 1))
                           (t (make-list (length move-target) :initial-element (deg2rad 1)))))
                   (union-link-list)
-		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
+		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
 		  (dump-command t) (periodic-time 0.5) ;; [s]
                   (check-collision)
+                  (additional-jacobi) (additional-vel)
 		  &allow-other-keys)
    "Move move-target to target-coords."
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
@@ -2166,6 +2192,8 @@
      (if (atom translation-axis) (setq translation-axis (list translation-axis)))
      (if (atom thre) (setq thre (list thre)))
      (if (atom rthre) (setq rthre (list rthre)))
+     (if (and additional-jacobi (or (atom additional-jacobi) (functionp additional-jacobi))) (setq additional-jacobi (list additional-jacobi)))
+     (if (and additional-vel (or (atom additional-vel) (functionp additional-vel))) (setq additional-vel (list additional-vel)))
      ;; argument check
      (unless (= (length translation-axis) (length rotation-axis)
                 (length move-target) (length link-list) (length target-coords))
@@ -2173,10 +2201,17 @@
              (length translation-axis) (length rotation-axis)
              (length move-target) (length link-list) (length target-coords))
        (return-from :inverse-kinematics t))
-     (setq ik-args (nconc (send* self :inverse-kinematics-args
-				      :translation-axis translation-axis
-				      :rotation-axis rotation-axis
-				      :union-link-list union-link-list args) args))
+     (unless (= (length additional-jacobi) (length additional-vel))
+       (warn ";; ERROR: list length differ : additional-jacobi ~A additional-vel ~A~%"
+             (length additional-jacobi) (length additional-vel))
+       (return-from :inverse-kinematics t))
+     (let ((tmp-additional-jacobi (mapcar #'(lambda (aj) (if (functionp aj) (funcall aj link-list) aj)) additional-jacobi)))
+       (setq ik-args (nconc (send* self :inverse-kinematics-args
+                                   :translation-axis translation-axis
+                                   :rotation-axis rotation-axis
+                                   ;; evaluate additional-jacobi function and calculate row dimension of additional-jacobi
+                                   :additional-jacobi-dimension (reduce #'+ (mapcar #'(lambda (aj) (array-dimension (if (functionp aj) (funcall aj link-list) aj) 0)) tmp-additional-jacobi))
+                                   :union-link-list union-link-list args) args)))
      (send self :reset-joint-angle-limit-weight-old union-link-list) ;; reset weight
      
      ;; inverse kinematics loop
@@ -2205,6 +2240,8 @@
                               :move-target move-target
                               :union-link-list union-link-list
                               :thre thre :rthre rthre
+                              :additional-jacobi additional-jacobi
+                              :additional-vel additional-vel
                               :debug-view debug-view
                               :ik-args ik-args args))
          (when (eq success :ik-succeed)

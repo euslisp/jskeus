@@ -424,9 +424,14 @@
           ;; default cog-jacobian parameters : target-centroid-pos, cog-gain, and centroid-thre
           (target-centroid-pos (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos))) ;; <- target centroid position.
           (cog-gain 1.0) ;; <- cog gain for null-space calculation. cog-gain should be over zero.
+          (cog-translation-axis :z) ;; translation-axis of cog
+          (centroid-offset-func nil) ;; offset function for cog
           (centroid-thre 5.0) ;; cog convergence threshould [mm]
           (additional-weight-list)
           (joint-args nil)
+          (cog-null-space t)
+          (additional-jacobi)
+          (additional-vel)
      &allow-other-keys)
     "fullbody inverse kinematics for legged robot.
      necessary args : target-coords, move-target, and link-list must include legs' (or leg's) parameters
@@ -438,6 +443,27 @@
      (send* self :inverse-kinematics target-coords
             :move-target move-target :link-list link-list-with-robot-6dof
             :cog-gain cog-gain :centroid-thre centroid-thre :target-centroid-pos target-centroid-pos
+            :cog-translation-axis cog-translation-axis :centroid-offset-func centroid-offset-func :cog-null-space cog-null-space
+            :additional-jacobi
+            (append
+             (if (not cog-null-space)
+                 (list #'(lambda (ll)
+                           (if (> cog-gain 1.0) (setq cog-gain 1.0))
+                           (send self :calc-cog-jacobian-from-link-list
+                                 :centroid-offset-func centroid-offset-func
+                                 :update-mass-properties t
+                                 :link-list (send self :calc-union-link-list ll)
+                                 :target-centroid-pos target-centroid-pos :cog-gain cog-gain :translation-axis cog-translation-axis))))
+             additional-jacobi)
+            :additional-vel
+            (append
+             (if (not cog-null-space)
+                 (list #'(lambda (ll)
+                           (if (> cog-gain 1.0) (setq cog-gain 1.0))
+                           (send self :calc-vel-for-cog cog-gain cog-translation-axis target-centroid-pos
+                                 :centroid-offset-func centroid-offset-func
+                                 :update-mass-properties nil))
+                       )))
             :additional-weight-list
             (append
              additional-weight-list
