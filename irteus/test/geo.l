@@ -61,6 +61,42 @@
     bottom-frame
     ))
 
+(deftest test-pqp-collision
+ (let (b1 b2 t0 t1 r (l 100) (tm (instance mtimer :init)))
+   (dolist (p (list (list t 0.0 #f(-50 50 50) (list 0.0 0.0 0.0)) (list nil 50.0 #f(-150 50 50) (list 0.0 0.0 0.0))
+                    (list t 0.0 #f(-50 50 50) (list 0.3 0.3 0.3)) (list nil 30.8431 #f(-150 50 50) (list 0.3 0.3 0.3))))  ;; (collidep distance  pos rot)
+     (send tm :start)
+     (dotimes (i l)
+       (setq b1 (make-cube 100 100 100))
+       (setq b2 (make-cube 100 100 100 :pos (caddr p) :rpy (cadddr p))))
+     (setq t0 (send tm :stop))
+     (objects (list b1 b2))
+     (format t "create model (base line time) ~7,3f (~A)~%" t0 p)
+     ;;
+     (send tm :start)
+     (dotimes (i l)
+       (setq b1 (make-cube 100 100 100))
+       (setq b2 (make-cube 100 100 100 :pos (caddr p) :rpy (cadddr p)))
+       (setq r (/= (pqp-collision-check b1 b2) 0)) ;; pqp-collision-check returns 1 if collide
+       (assert (equal r (car p)) (format nil "check collision check r = ~A, p = ~A" r p))
+       )
+     (objects (list b1 b2))
+     (setq t1 (send tm :stop))
+     (format t "pqp collision check ~7,3f (~A msec/check)~%" t1 (/ (- t1 t0) l))
+     ;;
+     (send tm :start)
+     (dotimes (i l)
+       (setq b1 (make-cube 100 100 100))
+       (setq b2 (make-cube 100 100 100 :pos (caddr p) :rpy (cadddr p)))
+       (setq r (pqp-collision-distance b1 b2))
+       (assert (eps= (car r) (cadr p)) (format nil "check collision distance r = ~A, p = ~A" r p))
+       )
+     (objects (list b1 b2))
+     (setq t1 (send tm :stop))
+     (format t "pqp collision distance ~7,3f (~A msec/check)~%" t1 (/ (- t1 t0) l))
+     ) ;; dolist
+   ))
+
 (run-all-tests)
 (exit)
 
