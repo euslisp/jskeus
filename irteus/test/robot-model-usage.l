@@ -68,6 +68,14 @@
         ))
     ))
 
+(deftest test-collision-check
+  (let ()
+    (send *robot* :reset-pose)
+    (assert (null (send *robot* :self-collision-check :pairs (list (cons (send *robot* :link :lleg-link5) (send *robot* :link :rleg-link5))))) "this is saf pose")
+    (assert (null (send *robot* :self-collision-check :pairs (list (cons (send *robot* :link :lleg-link5) (send *robot* :link :rleg-link5))) :min-distance 49)) "distance value is 50 > 49")
+    (assert (send *robot* :self-collision-check :pairs (list (cons (send *robot* :link :lleg-link5) (send *robot* :link :rleg-link5))) :min-distance 51) "closest distance is 50 < 51")
+    ))
+
 
 (run-all-tests)
 (exit)

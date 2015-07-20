@@ -2396,10 +2396,19 @@
        )
      pairs))
   (:self-collision-check
-   (&key (mode :all) (pairs (send self :collision-check-pairs)) (collision-func 'pqp-collision-check))
+   (&key (mode :all) (pairs (send self :collision-check-pairs)) (collision-func 'pqp-collision-check) (distance-func 'pqp-collision-distance) (fat 0.0) (min-distance))
+   "calculate self collision chaeck
+      :mode (:all or :first) ; returns first collided link pair of all collided link pair
+      :pairs (list (cons <link1> <link2>) ....) ; linke pair to be checked
+      :min-distance (number) if number is set, any link pair that has smaller distance than this fat threshold will regard as collided
+      :fat : fatten collision model"
    (let ((cpairs) (col-count 0))
      (dolist (p pairs)
-       (let ((colp (/= (funcall collision-func (car p) (cdr p)) 0)))
+       (let ((colp
+              (cond ((numberp min-distance)
+                     (< (car (funcall distance-func (car p) (cdr p) :fat fat)) min-distance))
+                    (t
+                     (/= (funcall collision-func (car p) (cdr p) geo::PQP_FIRST_CONTACT :fat fat) 0)))))
 	 (when colp
 	   (incf col-count)
 	   (if (eq mode :first)
