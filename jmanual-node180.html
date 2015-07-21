@@ -64,7 +64,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
  
  <BR>
 <BR> <BR> 
-<A NAME="62503"></A>
+<A NAME="62506"></A>
 <BIG CLASS="XLARGE"><B>pointcloud </B></BIG> [クラス]  <PRE><TT>
   :super   <B>cascaded-coords</B> 
 <BR>  :slots 		 parray carray narray curvature pcolor psize awidth asize box height width view-coords drawnormalmode transparent tcarray 
@@ -80,7 +80,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62520"></A>
+<A NAME="62523"></A>
 <BR>
 <IMG
  WIDTH="553" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
@@ -104,7 +104,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62531"></A>
+<A NAME="62534"></A>
 <B>:size-change</B> <EM>&amp;optional wd ht  </EM>[メソッド]
 
 <DL COMPACT>
@@ -115,7 +115,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62541"></A>
+<A NAME="62544"></A>
 <B>:points</B> <EM>&amp;optional pts wd ht  </EM>[メソッド]
 
 <DL COMPACT>
@@ -129,7 +129,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62551"></A>
+<A NAME="62554"></A>
 <B>:colors</B> <EM>&amp;optional cls  </EM>[メソッド]
 
 <DL COMPACT>
@@ -143,7 +143,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62561"></A>
+<A NAME="62564"></A>
 <B>:normals</B> <EM>&amp;optional nmls  </EM>[メソッド]
 
 <DL COMPACT>
@@ -157,7 +157,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62571"></A>
+<A NAME="62574"></A>
 <B>:point-list</B> <EM>&amp;optional (remove-nan)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -168,7 +168,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62581"></A>
+<A NAME="62584"></A>
 <B>:color-list</B> [メソッド]
 
 <DL COMPACT>
@@ -179,7 +179,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62591"></A>
+<A NAME="62594"></A>
 <B>:normal-list</B> [メソッド]
 
 <DL COMPACT>
@@ -190,7 +190,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62601"></A>
+<A NAME="62604"></A>
 <B>:centroid</B> [メソッド]
 
 <DL COMPACT>
@@ -201,7 +201,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="62611"></A>
+<A NAME="62614"></A>
 <B>:append</B> <EM>point-list &amp;key (create t)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -215,7 +215,7 @@ if :create is true, return appended point cloud and original point cloud does no
 <BR>
 <BR>
 
-<A NAME="62621"></A>
+<A NAME="62624"></A>
 <BR>
 <IMG
  WIDTH="552" HEIGHT="207" ALIGN="BOTTOM" BORDER="0"
@@ -239,7 +239,7 @@ if :create is true, return filtered point cloud and original point cloud does no
 <BR>
 <BR>
 
-<A NAME="62632"></A>
+<A NAME="62635"></A>
 <BR>
 <IMG
  WIDTH="553" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
@@ -266,7 +266,7 @@ if :negative is true, points which are indicated by indices will be removed.
 <BR>
 <BR>
 
-<A NAME="62643"></A>
+<A NAME="62646"></A>
 <BR>
 <IMG
  WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
@@ -300,7 +300,7 @@ pcnkey is filter function for points, colors and normals. It is expected to take
 <BR>
 <BR>
 
-<A NAME="62654"></A>
+<A NAME="62657"></A>
 <BR>
 <IMG
  WIDTH="552" HEIGHT="149" ALIGN="BOTTOM" BORDER="0"
@@ -321,7 +321,7 @@ pcnkey is filter function for points, colors and normals. It is expected to take
 <BR>
 <BR>
 
-<A NAME="62665"></A>
+<A NAME="62668"></A>
 <B>:copy-from</B> <EM>pc  </EM>[メソッド]
 
 <DL COMPACT>
@@ -332,7 +332,7 @@ pcnkey is filter function for points, colors and normals. It is expected to take
 <BR>
 <BR>
 
-<A NAME="62675"></A>
+<A NAME="62678"></A>
 <B>:transform-points</B> <EM>coords &amp;key (create)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -346,8 +346,19 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 <BR>
 
+<A NAME="62688"></A>
+<B>:convert-to-world</B> <EM>&amp;key (create)  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> transform points and normals with self coords. points data should be the same as displayed
+</DD>
+</DL>
+<BR>
+<BR>
+
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="62685"></A>
+<A NAME="62698"></A>
 <B>:reset-box</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -361,7 +372,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62696"></A>
+<A NAME="62709"></A>
 <B>:box</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -375,7 +386,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62707"></A>
+<A NAME="62720"></A>
 <B>:vertices</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -389,7 +400,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62718"></A>
+<A NAME="62731"></A>
 <B>:size</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -403,7 +414,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62729"></A>
+<A NAME="62742"></A>
 <B>:width</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -417,7 +428,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62740"></A>
+<A NAME="62753"></A>
 <B>:height</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -431,7 +442,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62751"></A>
+<A NAME="62764"></A>
 <B>:view-coords</B> <EM>&amp;optional vc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -445,7 +456,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62762"></A>
+<A NAME="62775"></A>
 <B>:curvatures</B> <EM>&amp;optional curv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -459,7 +470,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62773"></A>
+<A NAME="62786"></A>
 <B>:curvature-list</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -473,7 +484,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62784"></A>
+<A NAME="62797"></A>
 <B>:set-color</B> <EM>col &amp;optional (_transparent)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -487,7 +498,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62795"></A>
+<A NAME="62808"></A>
 <B>:point-color</B> <EM>&amp;optional pc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -501,7 +512,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62806"></A>
+<A NAME="62819"></A>
 <B>:point-size</B> <EM>&amp;optional ps  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -515,7 +526,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62817"></A>
+<A NAME="62830"></A>
 <B>:axis-length</B> <EM>&amp;optional al  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -529,7 +540,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62828"></A>
+<A NAME="62841"></A>
 <B>:axis-width</B> <EM>&amp;optional aw  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -543,7 +554,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62839"></A>
+<A NAME="62852"></A>
 <B>:clear-color</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -557,7 +568,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62850"></A>
+<A NAME="62863"></A>
 <B>:clear-normal</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -571,7 +582,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62861"></A>
+<A NAME="62874"></A>
 <B>:nfilter</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -585,7 +596,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62872"></A>
+<A NAME="62885"></A>
 <B>:viewangle-inlier</B> <EM>&amp;key (min-z 0.0) (hangle 44.0) (vangle 35.0)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -599,7 +610,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62883"></A>
+<A NAME="62896"></A>
 <B>:image-position-inlier</B> <EM>&amp;key (ipkey) (height 144) (width 176) (cy (/ (float (- height 1)) 2)) (cx (/ (float (- width 1)) 2)) negative  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -613,7 +624,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62894"></A>
+<A NAME="62907"></A>
 <B>:image-circle-filter</B> <EM>dist &amp;key (height 144) (width 176) (cy (/ (float (- height 1)) 2)) (cx (/ (float (- width 1)) 2)) create negative  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -627,7 +638,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62905"></A>
+<A NAME="62918"></A>
 <B>:step-inlier</B> <EM>step offx offy  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -641,7 +652,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62916"></A>
+<A NAME="62929"></A>
 <B>:generate-color-histogram-hs</B> <EM>&amp;key (h-step 9) (s-step 7) (hlimits (cons 360.0 0.0)) (vlimits (cons 1.0 0.15)) (slimits (cons 1.0 0.25)) (rotate-hue) (color-scale 255.0) (sizelimits 1)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -655,8 +666,8 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62927"></A>
-<B>:convert-to-world</B> <EM>&amp;key (create)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="62940"></A>
+<B>:set-offset</B> <EM>cds &amp;key (create)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -669,7 +680,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62938"></A>
+<A NAME="62951"></A>
 <B>:drawnormalmode</B> <EM>&amp;optional mode  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -683,7 +694,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62949"></A>
+<A NAME="62962"></A>
 <B>:transparent</B> <EM>&amp;optional trs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -697,7 +708,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <BR>
 
 
-<A NAME="62960"></A>
+<A NAME="62973"></A>
 <B>:draw</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -715,7 +726,7 @@ if :create is true, return transformed point cloud and original point cloud does
 
 <P>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="62971"></A>
+<A NAME="62984"></A>
 <B>make-random-pointcloud</B> <EM>&amp;key (num 1000) (with-color) (with-normal) (scale 100.0)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -762,7 +773,7 @@ if :create is true, return transformed point cloud and original point cloud does
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-07-20
+2015-07-21
 </ADDRESS>
 </BODY>
 </HTML>
