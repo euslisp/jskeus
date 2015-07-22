@@ -463,7 +463,8 @@
                            (send self :calc-vel-for-cog cog-gain cog-translation-axis target-centroid-pos
                                  :centroid-offset-func centroid-offset-func
                                  :update-mass-properties nil))
-                       )))
+                       ))
+             additional-vel)
             :additional-weight-list
             (append
              additional-weight-list
