@@ -72,5 +72,21 @@
   (assert
    (every #'identity (test-preview-control-dynamics-filter-for-sample-robot))))
 
+(deftest test-test-sample-1dof-closed-link-robot
+  (assert
+   (every #'identity (test-sample-1dof-closed-link-robot))))
+
+(deftest test-test-sample-2dof-closed-link-robot
+  (assert
+   (every #'identity (test-sample-2dof-closed-link-robot))))
+
+(deftest test-test-interlocking-joint-arm
+  (assert
+   (test-interlocking-joint-arm)))
+
+(deftest test-test-sample-legged-robot-with-interlocking-joints
+  (assert
+   (test-sample-legged-robot-with-interlocking-joints)))
+
 (run-all-tests)
 (exit)

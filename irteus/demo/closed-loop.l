@@ -202,7 +202,7 @@
                 )
             (reverse cylinder-length-list) (reverse link-angle-list))
     ))
-(warn ";; (test-sample-1dof-closed-link-robot)~%")
+(warn "(test-sample-1dof-closed-link-robot)~%")
 
 (defun test-sample-2dof-closed-link-robot
   ()
@@ -251,5 +251,5 @@
                 )
             (reverse cylinder-length-list) (reverse link-angle-list))
     ))
-(warn ";; (test-sample-2dof-closed-link-robot)~%")
+(warn "(test-sample-2dof-closed-link-robot)~%")
 

@@ -2501,6 +2501,45 @@
                   (mapcar #'(lambda (jnt) (list (send jnt :child-link) 0.0)) constrained-joint-list))
           args)
    )
+  (:calc-jacobian-for-interlocking-joints
+   (link-list &key (interlocking-joint-pairs (send self :interlocking-joint-pairs)))
+   "Calculate jacobian to keep interlocking joint velocity same.
+    d\theta_0 = d\theta_1 => [... 0 1 0 ... 0 -1 0 .... ][...d\theta_0...d\theta_1...]"
+   (let* ((union-link-list (send self :calc-union-link-list link-list))
+          (jl (send-all union-link-list :joint))
+          (pairs (remove-if-not #'(lambda (pair) (and (find (car pair) jl) (find (cdr pair) jl))) interlocking-joint-pairs))
+          (jacobi (make-matrix (length pairs) (send self :calc-target-joint-dimension union-link-list))))
+     (mapcar #'(lambda (pair)
+                 (let ((idx (reduce #'+ (send-all (subseq jl 0 (position (car pair) jl)) :joint-dof))))
+                   (setf (aref jacobi (position pair pairs) idx) 1.0))
+                 (let ((idx (reduce #'+ (send-all (subseq jl 0 (position (cdr pair) jl)) :joint-dof))))
+                   (setf (aref jacobi (position pair pairs) idx) -1.0)))
+             pairs)
+     jacobi))
+  (:set-midpoint-for-interlocking-joints
+   (&key (interlocking-joint-pairs (send self :interlocking-joint-pairs)))
+   "Set interlocking joints at mid point of each joint angle."
+   (mapcar #'(lambda (pair)
+               (let ((mid (* 0.5 (+ (send (car pair) :joint-angle) (send (cdr pair) :joint-angle)))))
+                 (send (car pair) :joint-angle mid)
+                 (send (cdr pair) :joint-angle mid)))
+           interlocking-joint-pairs)
+   )
+  (:interlocking-joint-pairs
+   ()
+   "Interlocking joint pairs.
+    pairs are (list (cons joint0 joint1) ... )
+    If users want to use interlocking joints, please overwrite this method."
+   )
+  (:check-interlocking-joint-angle-validity
+   (&key (angle-thre 0.001) ;; [deg]
+         (interlocking-joint-pairs (send self :interlocking-joint-pairs)))
+   "Check if all interlocking joint pairs are same values."
+   (let ((ret
+          (mapcar #'(lambda (pair)
+                      (> angle-thre (abs (- (send (car pair) :joint-angle) (send (cdr pair) :joint-angle)))))
+                  interlocking-joint-pairs)))
+     (every #'identity ret)))
   )
 
 (defun all-child-links (s &optional (pred #'identity))
