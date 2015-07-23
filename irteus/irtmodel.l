@@ -2516,6 +2516,13 @@
                    (setf (aref jacobi (position pair pairs) idx) -1.0)))
              pairs)
      jacobi))
+  (:calc-vel-for-interlocking-joints
+   (link-list &key (interlocking-joint-pairs (send self :interlocking-joint-pairs)))
+   "Calculate 0 velocity for keeping interlocking joint at the same joint angle."
+   (let* ((jl (send-all (send self :calc-union-link-list link-list) :joint))
+          (pairs (remove-if-not #'(lambda (pair) (and (find (car pair) jl) (find (cdr pair) jl))) interlocking-joint-pairs))
+          (vel (instantiate float-vector (length pairs))))
+     vel))
   (:set-midpoint-for-interlocking-joints
    (&key (interlocking-joint-pairs (send self :interlocking-joint-pairs)))
    "Set interlocking joints at mid point of each joint angle."
