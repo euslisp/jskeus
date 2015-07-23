@@ -150,5 +150,5 @@
       )
     (every #'identity (reverse ret))
     ))
-(warn ";; (test-interlocking-joint-arm)~%")
-(warn ";; (test-sample-legged-robot-with-interlocking-joints)~%")
+(warn "(test-interlocking-joint-arm)~%")
+(warn "(test-sample-legged-robot-with-interlocking-joints)~%")
