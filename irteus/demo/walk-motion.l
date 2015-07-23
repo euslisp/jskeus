@@ -77,8 +77,8 @@
   (unless (boundp '*robot*)
     (setq *robot* (instance sample-robot :init)))
   (walk-motion-single-support *robot*))
-(warn "(walk-motion-for-sample-robot) for walking motion~%")
-(warn "(walk-motion-single-support-for-sample-robot) for walking motion~%")
+(warn "(walk-motion-for-sample-robot) ;; for walking motion~%")
+(warn "(walk-motion-single-support-for-sample-robot) ;; for walking motion~%")
 
 (defun quad-walk-motion-for-sample-robot
   (gen-footstep-func &key (go-backward-over t))
@@ -159,7 +159,7 @@
                    (make-coords :coords (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world) :name :rarm))
              ))
    :go-backward-over go-backward-over))
-(warn "(trot-walk-motion-for-sample-robot) for walking motion~%")
+(warn "(trot-walk-motion-for-sample-robot) ;; for walking motion~%")
 
 (defun crawl-walk-motion-for-sample-robot
   (&key (go-backward-over t))
@@ -172,7 +172,7 @@
              (list (make-coords :coords (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world) :name :lleg))
              ))
    :go-backward-over go-backward-over))
-(warn "(crawl-walk-motion-for-sample-robot) for walking motion~%")
+(warn "(crawl-walk-motion-for-sample-robot) ;; for walking motion~%")
 
 (defun walk-motion-for-robots ()
   (unless (boundp '*robots*)
@@ -189,7 +189,7 @@
               (walk-motion rb))
           *robots*)
   )
-(warn "(walk-motion-for-robots) for walking motion for several robot models~%")
+(warn "(walk-motion-for-robots) ;; for walking motion for several robot models~%")
 
 ;; preview control example
 (defun test-preview-control

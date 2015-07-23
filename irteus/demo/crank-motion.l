@@ -119,4 +119,4 @@
       )))
 
 (unless (boundp '*irtviewer*) (make-irtviewer))
-(warn "(crank-motion) for fullbody motion~%")
+(warn "(crank-motion) ;; for fullbody motion~%")

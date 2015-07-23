@@ -98,4 +98,4 @@
      )
     ))
 (unless (boundp '*irtviewer*) (make-irtviewer))
-(warn "(dual-arm-ik) for tool usage~%")
+(warn "(dual-arm-ik) ;; for tool usage~%")
