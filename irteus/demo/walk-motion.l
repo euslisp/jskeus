@@ -237,7 +237,7 @@
                 (list :time tm :zmp zmp :cog cog :refzmp refzmp))
             tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
     ))
-(warn "(test-preview-control)~%")
+(warn "(test-preview-control) ;; Example for preview controller~%")
 
 ;; dynamics filter by using preview control
 ;;   input motion : control ZMP at 0 based on COG model
@@ -293,4 +293,4 @@
     (setq *robot* (instance sample-robot :init)))
   (test-preview-control-dynamics-filter *robot*)
   )
-(warn "(test-preview-control-dynamics-filter-for-sample-robot)~%")
+(warn "(test-preview-control-dynamics-filter-for-sample-robot) ;; Example for dynamics filter using preview controller~%")
