@@ -448,12 +448,10 @@
             (append
              (if (not cog-null-space)
                  (list #'(lambda (ll)
-                           (if (> cog-gain 1.0) (setq cog-gain 1.0))
                            (send self :calc-cog-jacobian-from-link-list
-                                 :centroid-offset-func centroid-offset-func
-                                 :update-mass-properties t
+                                 :update-mass-properties nil
                                  :link-list (send self :calc-union-link-list ll)
-                                 :target-centroid-pos target-centroid-pos :cog-gain cog-gain :translation-axis cog-translation-axis))))
+                                 :translation-axis cog-translation-axis))))
              additional-jacobi)
             :additional-vel
             (append
