@@ -87,13 +87,14 @@ $ irteusgl irteus/demo/demo.l
 and type any command, such as '(crank-motion)' or '(dual-arm-ik)'
 
 
-![full-body-ik](images/Full-body-ik.png)
-![dual-arm-ik](images/Dual-arm-ik.png)
-![dual-manip-ik](images/Dual-manip-ik.png)
-![crank-motion](images/Crank-motion.png)
-![hand-grasp](images/Hand-grasp.png)
-![hanoi-arm](images/Hanoi-arm.png)
-![particle](images/Particle.png)
+[![full-body-ik](images/Full-body-ik.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/full-body-ik.l)
+[![dual-arm-ik](images/Dual-arm-ik.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/dual-arm-ik.l)
+[![dual-manip-ik](images/Dual-manip-ik.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/dual-manip-ik.l)
+[![crank-motion](images/Crank-motion.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/crank-motion.l)
+[![hand-grasp](images/Hand-grasp.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/hand-grasp-ik.l)
+[![hanoi-arm](images/Hanoi-arm.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/hanoi-arm.l)
+[![particle](images/Particle.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/particle.l)
+[![null-space-ik](images/Null-space-ik.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/null-space-ik.l)
 
 ### 2.2 Robots and objects models
 ```

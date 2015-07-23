@@ -198,10 +198,36 @@
        (let* ((target-coords
                (orient-coords-to-axis ;; orient target-coords to look-at direction
                 (make-coords :pos (car args))
-                (v- (car args) (send move-target :worldpos)))))
+                (v- (car args) (send move-target :worldpos))))
+              target-orient move-orient axis-orient axis-orient2 head-weight head-nspace jid)
+         ;; this code assuming that the robot does not have contenious rotatoin joint for neck-y
          (setq p-dif-rot dif-rot
                dif-pos (send move-target :difference-position target-coords :translation-axis nil)
                dif-rot (send move-target :difference-rotation target-coords :rotation-axis :z))
+         (setq head-weight (instantiate float-vector (send self :calc-target-joint-dimension link-list))
+               head-nspace (instantiate float-vector (send self :calc-target-joint-dimension link-list)))
+         (fill head-weight 1)
+         (setq target-orient (matrix-column (send target-coords :worldrot) 2)
+               move-orient (matrix-column (send move-target :worldrot) 2))
+         (setq jid 0)
+         (dolist (j (send self :head :joint-list))
+           (setq axis-orient (send j :parent-link :rotate-vector (case (j . axis) (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1)) (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1)) (t (j . axis)))))
+           ;; direciton of non continuous area
+           (setq axis-orient2 (send j :parent-link :rotate-vector #f(-1 0 0)))
+           (when  (or (and  (< (v.* axis-orient move-orient target-orient) 0.0)
+                            (< (v.* axis-orient move-orient axis-orient2) 0.0)
+                            (< (v.* axis-orient axis-orient2 target-orient) 0.0))
+                      (and  (> (v.* axis-orient move-orient target-orient) 0.0)
+                            (> (v.* axis-orient move-orient axis-orient2) 0.0)
+                            (> (v.* axis-orient axis-orient2 target-orient) 0.0)))
+
+             (if (> (v.* axis-orient move-orient target-orient) 0)
+                 (setf (elt head-nspace jid) -1)
+               (setf (elt head-nspace jid) 1))
+             (fill head-weight 0.01)
+             (setf (elt head-weight jid) 0.0)
+             (return nil))
+           (incf jid))
          (send self :inverse-kinematics-loop dif-pos dif-rot
                :move-target move-target
                :collision-avoidance-link-pair nil
@@ -210,6 +236,8 @@
                :link-list link-list
                :loop count :stop stop ;;:thre nil
                :target-coords target-coords ;; for debug-view
+               :null-space head-nspace
+               :weight head-weight
                :debug-view (cadr (memq :debug-view args))))
        )
      (if (and p-dif-rot (<= (norm (v- p-dif-rot dif-rot)) 1e-3))
@@ -352,7 +380,8 @@
    (unless (every #'null (send self :legs)) ;; for legged robot, set default external force and moment at the end-effectors
      (unless target-coords
        (dolist (limb '(:rleg :lleg))
-         (push (send self limb :end-coords) target-coords)))
+         (if (send self limb)
+             (push (send self limb :end-coords) target-coords))))
      (unless (or force-list moment-list) ;; force [N], moment [Nm]
        ;; set default force & moment by solving mimimum internal forces
        (let* ((ret-fm (send self :calc-contact-wrenches-from-total-wrench (send-all target-coords :worldpos))))
@@ -395,9 +424,14 @@
           ;; default cog-jacobian parameters : target-centroid-pos, cog-gain, and centroid-thre
           (target-centroid-pos (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos))) ;; <- target centroid position.
           (cog-gain 1.0) ;; <- cog gain for null-space calculation. cog-gain should be over zero.
+          (cog-translation-axis :z) ;; translation-axis of cog
+          (centroid-offset-func nil) ;; offset function for cog
           (centroid-thre 5.0) ;; cog convergence threshould [mm]
           (additional-weight-list)
           (joint-args nil)
+          (cog-null-space t)
+          (additional-jacobi)
+          (additional-vel)
      &allow-other-keys)
     "fullbody inverse kinematics for legged robot.
      necessary args : target-coords, move-target, and link-list must include legs' (or leg's) parameters
@@ -409,6 +443,28 @@
      (send* self :inverse-kinematics target-coords
             :move-target move-target :link-list link-list-with-robot-6dof
             :cog-gain cog-gain :centroid-thre centroid-thre :target-centroid-pos target-centroid-pos
+            :cog-translation-axis cog-translation-axis :centroid-offset-func centroid-offset-func :cog-null-space cog-null-space
+            :additional-jacobi
+            (append
+             (if (not cog-null-space)
+                 (list #'(lambda (ll)
+                           (if (> cog-gain 1.0) (setq cog-gain 1.0))
+                           (send self :calc-cog-jacobian-from-link-list
+                                 :centroid-offset-func centroid-offset-func
+                                 :update-mass-properties t
+                                 :link-list (send self :calc-union-link-list ll)
+                                 :target-centroid-pos target-centroid-pos :cog-gain cog-gain :translation-axis cog-translation-axis))))
+             additional-jacobi)
+            :additional-vel
+            (append
+             (if (not cog-null-space)
+                 (list #'(lambda (ll)
+                           (if (> cog-gain 1.0) (setq cog-gain 1.0))
+                           (send self :calc-vel-for-cog cog-gain cog-translation-axis target-centroid-pos
+                                 :centroid-offset-func centroid-offset-func
+                                 :update-mass-properties nil))
+                       ))
+             additional-vel)
             :additional-weight-list
             (append
              additional-weight-list

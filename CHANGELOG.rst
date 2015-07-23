@@ -2,6 +2,43 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.9 (2015-07-09)
+------------------
+* irtpointcloud.l: impliment :append methods on pointcloud
+
+* irtgl.l:
+
+  * fix transparent method on glvertices
+  * add :mirror-axis method to glvertices
+
+* irtmodel.l:
+
+  * Set (/ stop 10) as min-loop default value not to change ik behavior
+  * Update documentations for :inverse-kinematics-loop and add  documentations for min-loop argument
+   * Remove unncessary loop checking and add min-loop argument  discussed in https://github.com/euslisp/jskeus/issues/107
+
+* Contributors: Kei Okada, Shunichi Nozawa, Yohei Kakiuchi
+
+1.0.8 (2015-06-19)
+------------------
+* [README.md] add documents of null-space-ik
+
+  * downsized null-space-ik.png
+  * added null-space-ik sample in README.md
+  * added null-space-ik sample image
+  * Update README.md
+
+* [irtrobot] fix torque-vector for those who does not have two leg, ex) pepper
+* [irteus/test/const.l] add code to check intern/shadow/defconst
+* [irteus/irtrobot.l] fix :look-at problem (https://github.com/jsk-ros-pkg/jsk_pr2eus/issues/72)
+
+  * fix :look-at, check othre direction
+  * add test code for :look-at
+  * check if look-at try to across non-valid joint angle
+  * set +-150 for neck-p range
+
+* Contributors: Kazuhiro Sasabuchi, Kei Okada
+
 1.0.7 (2015-06-11)
 ------------------
 

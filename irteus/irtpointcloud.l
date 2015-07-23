@@ -225,17 +225,63 @@
    (let ((ret (float-vector 0 0 0)))
      (vector-array-mean parray ret)
      ret))
+  (:set-color
+   (col &optional (_transparent))
+   (if col (send self :point-color))
+   (if _transparent (send self :transparent _transparent)))
   (:point-color (&optional pc) (if pc (setq pcolor pc)) pcolor)
   (:point-size (&optional ps) (if ps (setq psize ps)) psize)
-  (:axis-length (&optioanl al) (if al (setq asize al)) asize)
+  (:axis-length (&optional al) (if al (setq asize al)) asize)
   (:axis-width (&optional aw) (if aw (setq awidth aw)) awidth)
+  (:append
+   (point-list &key (create t))
+   "append point cloud list to this point cloud. \\\\
+    if :create is true, return appended point cloud and original point cloud does not change."
+   (if (atom point-list) (setq point-list (list point-list)))
+   (let ((psize 0) (csize 0) (nsize 0) (asize 0) ret)
+     (dolist (p (append (list self) point-list))
+       (incf asize
+             (max
+              (or (array-dimension (send p :points)  0) 0)
+              (or (array-dimension (send p :colors)  0) 0)
+              (or (array-dimension (send p :normals) 0) 0)))
+       (incf psize (or (array-dimension (send p :points)  0) 0))
+       (incf csize (or (array-dimension (send p :colors)  0) 0))
+       (incf nsize (or (array-dimension (send p :normals) 0) 0)))
+     (let (pmat cmat nmat pp cc nn (cntr 0) size)
+       (setq pmat (if (> psize 0) (make-matrix asize 3))
+             cmat (if (> csize 0) (make-matrix asize 3))
+             nmat (if (> nsize 0) (make-matrix asize 3)))
+       (dolist (p (append (list self) point-list))
+         (setq pp (send p :points)
+               cc (send p :colors)
+               nn (send p :normals))
+         (setq size (max (or (array-dimension pp 0) 0)
+                         (or (array-dimension cc 0) 0)
+                         (or (array-dimension nn 0) 0)))
+         (if pp (sys::vector-replace (array-entity pmat) (array-entity pp) (* 3 cntr)))
+         (if cc (sys::vector-replace (array-entity cmat) (array-entity cc) (* 3 cntr)))
+         (if nn (sys::vector-replace (array-entity nmat) (array-entity nn) (* 3 cntr)))
+         (incf cntr size))
+       (if create
+           (setq ret (instance pointcloud :init))
+         (setq ret self))
+       (send ret :points  pmat)
+       (send ret :colors  cmat)
+       (send ret :normals nmat)
+       (send ret :size-change)
+       (send ret :view-coords (send (send self :view-coords) :copy-worldcoords))
+       (send ret :point-color (send self :point-color))
+       (send ret :point-size  (send self :point-size))
+       (send ret :axis-length (send self :axis-length))
+       (send ret :axis-width  (send self :axis-width))
+       ret
+       )))
   (:clear-color () (warn ";; this method has not been implemented !!!"))
   (:clear-normal () (warn ";; this method has not been implemented !!!"))
-  (:append () (warn ";; this method has not been implemented !!!"))
-  (:append-list () (warn ";; this method has not been implemented !!!"))
   (:nfilter (&rest args) (send* self :filter args)) ;; compatibility to 3dpointcloud
   (:filter (&rest args &key create &allow-other-keys)
-   "this method can take the same keywords with :filter-with-indices method.
+   "this method can take the same keywords with :filter-with-indices method.\\\\
     if :create is true, return filtered point cloud and original point cloud does not change.\\\\"
    (let ((indices (send* self :filtered-indices args)))
      (send self :filter-with-indices indices :create create)))
@@ -500,11 +546,14 @@
           mat mat)))
      ret))
   (:convert-to-world (&key (create))
+   "transform points and normals with self coords. points data should be the same as displayed"
    (let ((ret
           (send self :transform-points (send self :worldcoords) :create create)))
      (send ret :reset-coords)
      (send self :worldcoords)
      ret))
+  (:set-offset (cds &key (create))
+   (send self :transform-points cds :create create))
   ;; (:add-normal ())
   (:drawnormalmode (&optional mode)
    (case mode
@@ -648,18 +697,24 @@
      (gl::glDepthMask gl::GL_TRUE)
      (gl::glDisable gl::GL_BLEND)))
   )
+
+(defun make-random-pointcloud
+  (&key (num 1000) (with-color)
+        (with-normal) (scale 100.0))
+  (let (pts col nom ret)
+    (dotimes (i num)
+      (push (random-vector scale) pts))
+    (when with-color
+      (let ((mid (float-vector 0.5 0.5 0.5)))
+        (dotimes (i num)
+          (push (v+ mid (random-vector 1.0)) col))))
+    (when with-normal
+      (dotimes (i num)
+        (push (normalize-vector (random-vector 1.0)) nom)))
+    (setq ret (instance pointcloud :init
+                        :points pts :colors col :normals nom))
+    ret))
+
 (in-package "GEOMETRY")
 
 (provide :irtpointcloud "$Id: $")
-;;
-;; test
-;;
-#|
-(defun pointcloud-data ()
-  (setq m (make-matrix 1000 3))
-  (setq c (make-matrix 1000 3))
-  (dotimes (i 1000)
-    (setf (matrix-row m i) (scale 1000 (random-vector)))
-    (setf (matrix-row c i)  (v+ (random-vector) #f(0.5 0.5 0.5))))
-  (instance pointcloud :init :points m :colors c))
-|#
