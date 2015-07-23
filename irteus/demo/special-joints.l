@@ -29,7 +29,7 @@
             :additional-jacobi
             (list #'(lambda (ll)
                       (send *robot* :calc-jacobian-for-interlocking-joints ll)))
-            :additional-vel (list #'(lambda (ll) (float-vector 0 0 0)))
+            :additional-vel (list #'(lambda (ll) (send *robot* :calc-vel-for-interlocking-joints ll)))
             :move-joints-hook
             #'(lambda ()
                 (send *robot* :set-midpoint-for-interlocking-joints)
@@ -137,7 +137,7 @@
             :additional-jacobi
             (list #'(lambda (ll)
                       (send *robot* :calc-jacobian-for-interlocking-joints ll)))
-            :additional-vel (list #'(lambda (ll) (float-vector 0 0)))
+            :additional-vel (list #'(lambda (ll) (send *robot* :calc-vel-for-interlocking-joints ll)))
             :move-joints-hook
             #'(lambda ()
                 (send *robot* :set-midpoint-for-interlocking-joints)
