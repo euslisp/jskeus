@@ -2131,11 +2131,15 @@
                           (t (make-list (length move-target) :initial-element (deg2rad 1)))))
                   (union-link-list)
 		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
-		  (dump-command t) (periodic-time 0.5) ;; [s]
+		  (dump-command :fail-only) (periodic-time 0.5) ;; [s]
                   (check-collision)
                   (additional-jacobi) (additional-vel)
 		  &allow-other-keys)
-   "Move move-target to target-coords."
+   "Move move-target to target-coords.
+    dump-command should be t, nil, or :fail-only.
+      t          : dump log both in success and fail.
+      :fail-only : dump log only in fail.
+      nil        : do not dump log."
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
    (let* ((loop 0)
