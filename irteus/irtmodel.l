@@ -2261,14 +2261,19 @@
                    :update-mass-properties nil)))
         ;; update difference
      (mapcar #'(lambda (l a) (send l :analysis-level a)) union-link-list old-analysis-level)
-     ;; rename log file
+     ;; reset weight
+     (send self :reset-joint-angle-limit-weight-old union-link-list)
+     ;; Get final ik success result flag
+     (if check-collision (setq collision-status (send self :self-collision-check)))
+     (setq success (and (or success (not revert-if-fail)) (not collision-status)))
+     ;; Dump log
      (when (or (eq dump-command t)
-               (and (eq dump-command :fail-only) (not (or success (not revert-if-fail)))))
+               (and (eq dump-command :fail-only) (not success)))
        (setq command-directory
 	     (format nil "/tmp/irtmodel-ik-~A" (unix::getpid))
 	     command-id
 	     (let ((lt (unix::localtime))) (substitute #\0 #\  (format nil "~A-~04d-~02d-~02d-~02d-~02d-~02d" (send (class self) :name) (+ 1900 (elt lt 5)) (+ 1 (elt lt 4)) (elt lt 3) (elt lt 2) (elt lt 1) (elt lt 0))))
-             command-filename (format nil "~A/~A-~A.l" command-directory command-id (if (or success (not revert-if-fail)) "success" "failure")))
+             command-filename (format nil "~A/~A-~A.l" command-directory command-id (if success "success" "failure")))
        (unix::mkdir command-directory)
        (with-open-file
 	(f command-filename :direction :output)
@@ -2276,11 +2281,8 @@
         (dump-structure f initial-target-coords)
         (dump-structure f initial-av)
         ))
-     ;; reset weight
-     (send self :reset-joint-angle-limit-weight-old union-link-list)
-     (if check-collision (setq collision-status (send self :self-collision-check)))
      ;; check solved or not
-     (if (and (or success (not revert-if-fail)) (not collision-status))
+     (if success
          (send self :angle-vector)
        (progn
 	 (when warnp
