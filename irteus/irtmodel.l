@@ -2131,11 +2131,15 @@
                           (t (make-list (length move-target) :initial-element (deg2rad 1)))))
                   (union-link-list)
 		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
-		  (dump-command t) (periodic-time 0.5) ;; [s]
+		  (dump-command :fail-only) (periodic-time 0.5) ;; [s]
                   (check-collision)
                   (additional-jacobi) (additional-vel)
 		  &allow-other-keys)
-   "Move move-target to target-coords."
+   "Move move-target to target-coords.
+    dump-command should be t, nil, or :fail-only.
+      t          : dump log both in success and fail.
+      :fail-only : dump log only in fail.
+      nil        : do not dump log."
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
    (let* ((loop 0)
@@ -2149,7 +2153,11 @@
 	  ;;
           (success t) 
 	  (old-analysis-level (send-all union-link-list :analysis-level))
-          command-directory command-filename command-id ik-args collision-status)       
+          ik-args collision-status
+          ;; Parameters for log file
+          command-directory command-filename command-id
+          initial-target-coords initial-av initial-log-str
+          )       
      (send-all union-link-list :analysis-level :coords)
      ;; argument check
      (when (or (null link-list) (null move-target))
@@ -2157,27 +2165,18 @@
        (return-from :inverse-kinematics t))
      (if (and (null translation-axis) (null rotation-axis))
          (return-from :inverse-kinematics t))
-     ;; setup fname for log
+     ;; setup initial parameters for logging
      (when dump-command
-       (setq command-directory
-	     (format nil "/tmp/irtmodel-ik-~A" (unix::getpid))
-	     command-id
-	     (let ((lt (unix::localtime))) (substitute #\0 #\  (format nil "~A-~04d-~02d-~02d-~02d-~02d-~02d" (send (class self) :name) (+ 1900 (elt lt 5)) (+ 1 (elt lt 4)) (elt lt 3) (elt lt 2) (elt lt 1) (elt lt 0))))
-	     command-filename
-	     (format nil "~A/~A.l" command-directory command-id))
-       (unix::mkdir command-directory)
-       (with-open-file
-	(f (format nil "~A/~A.l" command-directory command-id) :direction :output)
-	(format f ";; ik ~A log at ~A on ~A~%;;~%" (if success "success" "fail") (string-trim '(10) (unix:asctime (unix:localtime))) lisp::lisp-implementation-version)
-	(format f ";; link-list ~A~%" link-list)
-	(format f ";; move-target ~A~%" move-target)
-	(format f ";; rotatoin-axis ~A, translation-axis ~A~%" rotation-axis translation-axis)
-	(format f ";; thre ~A, rthre ~A, stop ~A~%" thre rthre stop)
-	(if (atom target-coords)
-	    (dump-structure f `(setq c0 ,target-coords))
-	  (dump-structure f `(setq c0 ',(mapcar #'(lambda (x) x) target-coords))))
-	(dump-structure f `(setq av0 ,(send self :angle-vector)))
-	))
+	(setq initial-log-str
+              (format nil ";; ik ~A log at ~A on ~A~%;;~%" (if success "success" "fail") (string-trim '(10) (unix:asctime (unix:localtime))) lisp::lisp-implementation-version))
+        (setq initial-log-str (format nil "~A;; link-list ~A~%" initial-log-str link-list))
+	(setq initial-log-str (format nil "~A;; move-target ~A~%" initial-log-str move-target))
+	(setq initial-log-str (format nil "~A;; rotatoin-axis ~A, translation-axis ~A~%" initial-log-str rotation-axis translation-axis))
+	(setq initial-log-str (format nil "~A;; thre ~A, rthre ~A, stop ~A~%" initial-log-str thre rthre stop))
+        (if (atom target-coords)
+            (setq initial-target-coords `(setq c0 ,target-coords))
+          (setq initial-target-coords `(setq c0 ',(mapcar #'(lambda (x) x) target-coords))))
+        (setq initial-av `(setq av0 ,(send self :angle-vector))))
      ;; atom -> list
      (when debug-view
        (if (atom debug-view) (setq debug-view (list debug-view)))
@@ -2266,14 +2265,28 @@
                    :update-mass-properties nil)))
         ;; update difference
      (mapcar #'(lambda (l a) (send l :analysis-level a)) union-link-list old-analysis-level)
-     ;; rename log file
-     (when dump-command
-       (unix::rename (format nil "~A/~A.l" command-directory command-id ) (setq command-filename (format nil "~A/~A-~A.l" command-directory command-id (if (or success (not revert-if-fail)) "success" "failure")))))
      ;; reset weight
      (send self :reset-joint-angle-limit-weight-old union-link-list)
+     ;; Get final ik success result flag
      (if check-collision (setq collision-status (send self :self-collision-check)))
+     (setq success (and (or success (not revert-if-fail)) (not collision-status)))
+     ;; Dump log
+     (when (or (eq dump-command t)
+               (and (eq dump-command :fail-only) (not success)))
+       (setq command-directory
+	     (format nil "/tmp/irtmodel-ik-~A" (unix::getpid))
+	     command-id
+	     (let ((lt (unix::localtime))) (substitute #\0 #\  (format nil "~A-~04d-~02d-~02d-~02d-~02d-~02d" (send (class self) :name) (+ 1900 (elt lt 5)) (+ 1 (elt lt 4)) (elt lt 3) (elt lt 2) (elt lt 1) (elt lt 0))))
+             command-filename (format nil "~A/~A-~A.l" command-directory command-id (if success "success" "failure")))
+       (unix::mkdir command-directory)
+       (with-open-file
+	(f command-filename :direction :output)
+        (format f "~A" initial-log-str)
+        (dump-structure f initial-target-coords)
+        (dump-structure f initial-av)
+        ))
      ;; check solved or not
-     (if (and (or success (not revert-if-fail)) (not collision-status))
+     (if success
          (send self :angle-vector)
        (progn
 	 (when warnp
