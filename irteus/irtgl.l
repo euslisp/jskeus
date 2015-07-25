@@ -1170,16 +1170,16 @@ if flat option is true, use-flat-shader"
 ;;;
 (defclass glbody
   :super body
-  :slots (glvertices)
+  :slots (aglvertices)
   )
 (defmethod glbody
-  (:glvertices (&rest args) (forward-message-to glvertices args))
+  (:glvertices (&rest args) (user::forward-message-to aglvertices args))
   (:draw (vwr)
-   (when glvertices
-     (send glvertices :draw vwr)))
+   (when aglvertices
+     (send aglvertices :draw vwr)))
   (:set-color (&rest args)
    (send-super* :set-color args)
-   (when glvertices (send* glvertices :set-color args)))
+   (when aglvertices (send* aglvertices :set-color args)))
   )
 
 ;;; glvertices utility
