@@ -258,7 +258,7 @@
             avs))
     (setq avs (reverse avs))
     ;; filtering
-    (let ((data (subseq (send robot :preview-control-dynamics-filter dt avs) 4)))
+    (let ((data (subseq (send robot :preview-control-dynamics-filter dt avs :preview-class preview-class) 4)))
       (with-open-file
        (f "/tmp/test-preview-control-data-2.dat" :direction :output)
        (mapcar #'(lambda (tm ozmp-x izmp-x ocog-x icog-x ozmp-y izmp-y ocog-y icog-y)
@@ -288,9 +288,9 @@
       )))
 
 (defun test-preview-control-dynamics-filter-for-sample-robot
-  ()
+  (&key (preview-class preview-control))
   (unless (boundp '*robot*)
     (setq *robot* (instance sample-robot :init)))
-  (test-preview-control-dynamics-filter *robot*)
+  (test-preview-control-dynamics-filter *robot* :preview-class preview-class)
   )
 (warn "(test-preview-control-dynamics-filter-for-sample-robot)~%")

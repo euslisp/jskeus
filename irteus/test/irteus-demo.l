@@ -68,9 +68,17 @@
   (assert
    (every #'identity (test-preview-control))))
 
+(deftest test-test-extended-preview-control
+  (assert
+   (every #'identity (test-preview-control :preview-class extended-preview-control))))
+
 (deftest test-test-preview-control-dynamics-filter-for-sample-robot
   (assert
    (every #'identity (test-preview-control-dynamics-filter-for-sample-robot))))
+
+(deftest test-test-extended-preview-control-dynamics-filter-for-sample-robot
+  (assert
+   (every #'identity (test-preview-control-dynamics-filter-for-sample-robot :preview-class extended-preview-control))))
 
 (deftest test-test-sample-1dof-closed-link-robot
   (assert
