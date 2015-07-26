@@ -1184,6 +1184,67 @@
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; preview-control class
+;;;  A, b, c -> system configuration matrices
+;;;  uk -> input for controller at the time "k"
+;;;  xk -> state variable
+;;;  delay -> preview step calculated from predictive time (delay = N)
+;;;  y1-n -> reference queue (time is k, k+1, ... k+N)
+;;;  state equation of this system is
+;;;   xk+1 = A xk + b uk
+;;;   yk   = c xk
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass preview-controller-base
+  :super riccati-equation
+  :slots (xk uk delay f1-n y1-n dim))
+(defmethod preview-controller-base
+  (:init
+    (dt ; dt -> sampling time[s]
+     &key (q) (r)
+          ((:delay d)) ;; [s]
+          ((:dim tmp-dim))
+          (init-xk (float-vector 0 0 0))
+          ((:A _A))
+          ((:B _B))
+          ((:C _C))
+          (state-dim (array-dimension _A 0)))
+    (setq delay (round (/ d dt)) dim tmp-dim)
+    (send-super :init _A _B _C q r)
+    (when (null xk)
+      (setq xk (make-matrix state-dim dim))
+      (setf (matrix-row xk 0) (subseq init-xk 0 dim)))
+    (send self :solve)
+    (send self :calc-f)
+    self)
+  ;; getter methods
+  (:delay () delay)
+  (:calc-f () ;; calculate preview gain for k+1, ... k+N.
+    (setq f1-n (make-matrix 1 (1+ delay))) ;; (matrix-row f1-n 0) is dummy to being mutiplied by p1-n
+    (let* ((gsi (unit-matrix (array-dimension c 1)))
+	   (bt (transpose b))
+	   (ct (transpose c)))
+      (dotimes (i delay)
+	(let* ((qt (scale-matrix Q ct))
+	       (fa (scale-matrix R+btPb-1 (m* bt (m* gsi qt)))))
+          (setq gsi (m* A-bKt gsi))
+          (setf (aref f1-n 0 (1+ i)) (aref fa 0 0))
+          ))))
+  (:calc-u () (m- (m* f1-n y1-n) (m* K xk)))
+  (:calc-xk () ;; update xk+1
+    (setq xk (m+ (m* A xk) (m* b (send self :calc-u)))))
+  ;;
+  (:update-xk (p)
+    ;; update y1-n
+    (when (null y1-n)
+      (setq y1-n (make-matrix (1+ delay) dim))
+      (dotimes (i (1+ delay)) (setf (matrix-row y1-n i) (subseq p 0 dim))))
+    (dotimes (i delay) (setf (matrix-row y1-n i) (matrix-row y1-n (1+ i))))
+    (setf (matrix-row y1-n delay) (subseq p 0 dim))
+    ;;
+    (send self :calc-xk))
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; preview-control class to compute reference COG from reference ZMP
 ;;;  (refer to "Biped Walking Pattern Generation by using Preview Control of Zero-Moment Point", ICRA 2003, p.1620-1626, Shuuji KAJITA, Fumio KANEHIRO, Kenji KANEKO, Kiyoshi FUJIWARA, Kensuke HARADA, Kazuhito YOKOI and Hirohisa HIRUKAWA
 ;;;            "Humanoid Robot (in Japanese)", Ohmsha, 2005, Shuji Kajita, ISBN 4-274-20058-2)
@@ -1198,8 +1259,8 @@
 ;;;  unit system -> [mm], [s]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass preview-control
-  :super riccati-equation
-  :slots (xk uk delay f1-n p1-n dim cog-z zmp-z))
+  :super preview-controller-base ;;riccati-equation
+  :slots (cog-z zmp-z))
 (defmethod preview-control
   (:init
     (dt _zc ;; dt -> sampling time[s], _zc is height of COG[mm]
@@ -1213,16 +1274,12 @@
                                           (list (* 0.5 dt dt))
                                           (list dt))))
           ((:C _C) (make-matrix 1 3 (list (list 1.0 0.0 (- (/ _zc (elt *g-vec* 2))))))))
-    (setq delay (round (/ d dt)) dim 2 cog-z _zc)
-    (send-super :init _A _B _C q r)
-    (when (null xk)
-      (setq xk (make-matrix 3 dim))
-      (setf (matrix-row xk 0) (subseq init-xk 0 dim)))
-    (send self :solve)
-    (send self :calc-f)
+    (send-super :init dt :q q :r r :delay d
+                :init-xk init-xk :dim 2
+                :A _A :B _B :C _C :state-dim 3)
+    (setq cog-z _zc)
     self)
   ;; getter methods
-  (:delay () delay)
   (:refcog () (float-vector (elt (matrix-row xk 0) 0)
                             (elt (matrix-row xk 0) 1)
                             cog-z))
@@ -1232,41 +1289,19 @@
                     (aref p 0 1)
                     zmp-z)))
   (:last-refzmp ()
-    (let ((p (matrix-row p1-n delay))) ;; tail of refzmp queue
+    (let ((p (matrix-row y1-n delay))) ;; tail of refzmp queue
       (float-vector (elt p 0)
                     (elt p 1)
                     zmp-z)))
   (:current-refzmp ()
-    (let ((p (matrix-row p1-n 0))) ;; head of refzmp queue
+    (let ((p (matrix-row y1-n 0))) ;; head of refzmp queue
       (float-vector (elt p 0)
                     (elt p 1)
                     zmp-z)))
   ;;
-  (:calc-f () ;; calculate preview gain for k+1, ... k+N.
-    (setq f1-n (make-matrix 1 (1+ delay))) ;; (matrix-row f1-n 0) is dummy to being mutiplied by p1-n
-    (let* ((gsi (unit-matrix (array-dimension c 1)))
-	   (bt (transpose b))
-	   (ct (transpose c)))
-      (dotimes (i delay)
-	(let* ((qt (scale-matrix Q ct))
-	       (fa (scale-matrix R+btPb-1 (m* bt (m* gsi qt)))))
-          (setq gsi (m* A-bKt gsi))
-          (setf (aref f1-n 0 (1+ i)) (aref fa 0 0))
-          ))))
-  (:calc-u () (m- (m* f1-n p1-n) (m* K xk)))
-  (:calc-xk () ;; update xk+1
-    (setq xk (m+ (m* A xk) (m* b (send self :calc-u)))))
-  ;;
   (:update-xk (p)
     (setq zmp-z (elt p 2))
-    ;; update p1-n
-    (when (null p1-n)
-      (setq p1-n (make-matrix (1+ delay) dim))
-      (dotimes (i (1+ delay)) (setf (matrix-row p1-n i) (subseq p 0 dim))))
-    (dotimes (i delay) (setf (matrix-row p1-n i) (matrix-row p1-n (1+ i))))
-    (setf (matrix-row p1-n delay) (subseq p 0 dim))
-    ;;
-    (send self :calc-xk))
+    (send-super :update-xk p))
   (:cog-z () cog-z)
   (:update-cog-z (zc)
     (setf (aref c 0 2) (- (/ zc (elt *g-vec* 2))))
@@ -1343,7 +1378,7 @@
           (setq gsi (m* A-bKt gsi))
 	  (setf (aref f1-n 0 (1+ i)) (aref fa 0 0))
           ))))
-  (:calc-u () (m- (m* f1-n p1-n) (m* K xk*)))
+  (:calc-u () (m- (m* f1-n y1-n) (m* K xk*)))
   (:calc-xk ()
     (setq xk* (m+ (m* A xk*) (m* b (send self :calc-u))))
     (dotimes (i 3)
