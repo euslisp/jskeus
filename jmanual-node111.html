@@ -74,7 +74,7 @@ Euslisp内で座標系は、高速性と一般性のために
  <BR>
 <BR> <P>
 	<BR> 
-<A NAME="27459"></A>
+<A NAME="27603"></A>
 <BIG CLASS="XLARGE"><B>coordinates </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
 <BR>  :slots 		 (pos :type float-vector 
@@ -94,7 +94,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27476"></A>
+<A NAME="27620"></A>
 <B>coordinates-p</B> <EM>obj </EM>[関数]
 
 <DL COMPACT>
@@ -109,7 +109,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27488"></A>
+<A NAME="27632"></A>
 <B>:rot</B> [メソッド]
 
 <DL COMPACT>
@@ -123,7 +123,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27498"></A>
+<A NAME="27642"></A>
 <B>:pos</B> [メソッド]
 
 <DL COMPACT>
@@ -137,7 +137,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27508"></A>
+<A NAME="27652"></A>
 <B>:newcoords</B> <EM>newrot &amp;optional newpos </EM>[メソッド]
 
 <DL COMPACT>
@@ -156,7 +156,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27523"></A>
+<A NAME="27667"></A>
 <B>:replace-coords</B> <EM>newrot &amp;optional newpos </EM>[メソッド]
 
 <DL COMPACT>
@@ -169,7 +169,7 @@ rot :type array)
 <BR>
 <BR>
 
-<A NAME="27538"></A>
+<A NAME="27682"></A>
 <B>:coords</B> [メソッド]
 
 <DL COMPACT>
@@ -182,7 +182,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27549"></A>
+<A NAME="27693"></A>
 <B>:copy-coords</B> <EM>&amp;optional dest </EM>[メソッド]
 
 <DL COMPACT>
@@ -199,7 +199,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27565"></A>
+<A NAME="27709"></A>
 <B>:reset-coords</B> [メソッド]
 
 <DL COMPACT>
@@ -213,7 +213,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27575"></A>
+<A NAME="27719"></A>
 <B>:worldpos</B> [メソッド]
 
 <DL COMPACT>
@@ -224,7 +224,7 @@ rot :type array)
 <BR>
 <BR>
 
-<A NAME="27586"></A>
+<A NAME="27730"></A>
 <B>:worldrot</B> [メソッド]
 
 <DL COMPACT>
@@ -235,7 +235,7 @@ rot :type array)
 <BR>
 <BR>
 
-<A NAME="27597"></A>
+<A NAME="27741"></A>
 <B>:worldcoords</B> [メソッド]
 
 <DL COMPACT>
@@ -254,7 +254,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27612"></A>
+<A NAME="27756"></A>
 <B>:copy-worldcoords</B> <EM>&amp;optional dest </EM>[メソッド]
 
 <DL COMPACT>
@@ -270,7 +270,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27625"></A>
+<A NAME="27769"></A>
 <B>:rotate-vector</B> <EM>vec </EM>[メソッド]
 
 <DL COMPACT>
@@ -287,7 +287,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27636"></A>
+<A NAME="27780"></A>
 <B>:transform-vector</B> <EM>vec </EM>[メソッド]
 
 <DL COMPACT>
@@ -301,7 +301,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27647"></A>
+<A NAME="27791"></A>
 <B>:inverse-transform-vector</B> <EM>vec </EM>[メソッド]
 
 <DL COMPACT>
@@ -315,7 +315,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27658"></A>
+<A NAME="27802"></A>
 <B>:transform</B> <EM>trans &amp;optional (wrt :local) </EM>[メソッド]
 
 <DL COMPACT>
@@ -337,7 +337,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27684"></A>
+<A NAME="27828"></A>
 <B>:move-to</B> <EM>trans &amp;optional (wrt :local) </EM>[メソッド]
 
 <DL COMPACT>
@@ -352,7 +352,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27698"></A>
+<A NAME="27842"></A>
 <B>:translate</B> <EM>p &amp;optional (wrt :local) </EM>[メソッド]
 
 <DL COMPACT>
@@ -366,7 +366,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27709"></A>
+<A NAME="27853"></A>
 <B>:locate</B> <EM>p &amp;optional (wrt :local) </EM>[メソッド]
 
 <DL COMPACT>
@@ -382,7 +382,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27723"></A>
+<A NAME="27867"></A>
 <B>:rotate</B> <EM>theta axis &amp;optional (wrt :local) </EM>[メソッド]
 
 <DL COMPACT>
@@ -412,7 +412,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27757"></A>
+<A NAME="27901"></A>
 <B>:orient</B> <EM>theta axis &amp;optional (wrt :local) </EM>[メソッド]
 
 <DL COMPACT>
@@ -426,7 +426,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27769"></A>
+<A NAME="27913"></A>
 <B>:inverse-transformation</B> [メソッド]
 
 <DL COMPACT>
@@ -440,7 +440,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27779"></A>
+<A NAME="27923"></A>
 <B>:transformation</B> <EM>coords (wrt :local) </EM>[メソッド]
 
 <DL COMPACT>
@@ -458,7 +458,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27797"></A>
+<A NAME="27941"></A>
 <B>:Euler</B> <EM>az1 ay az2 </EM>[メソッド]
 
 <DL COMPACT>
@@ -473,7 +473,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27809"></A>
+<A NAME="27953"></A>
 <B>:roll-pitch-yaw</B> <EM>roll pitch yaw </EM>[メソッド]
 
 <DL COMPACT>
@@ -487,7 +487,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27820"></A>
+<A NAME="27964"></A>
 <B>:4x4</B> <EM>&amp;optional mat44 </EM>[メソッド]
 
 <DL COMPACT>
@@ -504,7 +504,7 @@ rot :type array)
 
 <P>
 
-<A NAME="27832"></A>
+<A NAME="27976"></A>
 <BR>
 <IMG
  WIDTH="19" HEIGHT="31" ALIGN="BOTTOM" BORDER="0"
@@ -607,7 +607,7 @@ rot :type array)
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-07-30
+2015-08-03
 </ADDRESS>
 </BODY>
 </HTML>

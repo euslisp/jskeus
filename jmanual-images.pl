@@ -117,19 +117,6 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img185.png"
  ALT="$ ca$">|; 
 
-$key = q/{emtabbing}{{bf{:fullbody-inverse-kinematics}{it{target-coords&restargs&key=(movpacet)>(additional-jacobi)>(additional-vel)>&allow-other-keys{rm{{emtabbing};AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="736" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img295.png"
- ALT="\begin{emtabbing}
-{\bf :fullbody-inverse-kinematics}
-\it target-coords \&amp;rest a...
-...l-jacobi) \\\\
-\&gt; (additional-vel) \\\\
-\&gt; \&amp;allow-other-keys
-\rm
-\end{emtabbing}">|; 
-
 $key = q/^{ntimesn};MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="17" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
@@ -138,7 +125,7 @@ $cached_env_img{$key} = q|<IMG
 
 $key = q/{emtabbing}{{bf{:calc-zmp-from-forces-moments}{it{forcesmoments&key=(wrt:world)`e:return-all-valuest)))force-sensorsforcesmomentscop-coords)){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
- WIDTH="1016" HEIGHT="302" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="1016" HEIGHT="264" ALIGN="BOTTOM" BORDER="0"
  SRC="|."$dir".q|jmanual-img296.png"
  ALT="\begin{emtabbing}
 {\bf :calc-zmp-from-forces-moments}
@@ -308,7 +295,7 @@ $cached_env_img{$key} = q|<IMG
 
 $key = q/{emtabbing}{{bf{:inverse-kinematics}{it{target-coords&restargs&key=(stop50)`[metision)>(additional-jacobi)>(additional-vel)>&allow-other-keys{rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
- WIDTH="1198" HEIGHT="474" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="1198" HEIGHT="493" ALIGN="BOTTOM" BORDER="0"
  SRC="|."$dir".q|jmanual-img287.png"
  ALT="\begin{emtabbing}
 {\bf :inverse-kinematics}
@@ -501,6 +488,17 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img116.png"
  ALT="$\displaystyle \mbox{\boldmath {$r$}}$">|; 
 
+$key = q/{emtabbing}{{bf{:filter}{it{&restargs&key=create`[method]>&allow-other-keys{rm{{emtabbing};AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="552" HEIGHT="207" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img309.png"
+ ALT="\begin{emtabbing}
+{\bf :filter}
+\it\&amp;rest args \&amp;key \= create \\\\lq  [method]\\\\
+\&gt; \&amp;allow-other-keys
+\rm
+\end{emtabbing}">|; 
+
 $key = q/{emtabbing}{{bf{:torque-vector}{it{&key=(force-list)`[method]>(moment-list)>(tar)>(calc-torque-buffer-args(sendself:calc-torque-buffer-args)){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="1524" HEIGHT="111" ALIGN="BOTTOM" BORDER="0"
@@ -510,17 +508,6 @@ $cached_env_img{$key} = q|<IMG
 \it\&amp;key \= (force-list) \\\\lq  [method]\\\\
 ...
 ...lc-torque-buffer-args (send self :calc-torque-buffer-args))
-\rm
-\end{emtabbing}">|; 
-
-$key = q/{emtabbing}{{bf{:filter}{it{&restargs&key=create`[method]>&allow-other-keys{rm{{emtabbing};AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="552" HEIGHT="207" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img309.png"
- ALT="\begin{emtabbing}
-{\bf :filter}
-\it\&amp;rest args \&amp;key \= create \\\\lq  [method]\\\\
-\&gt; \&amp;allow-other-keys
 \rm
 \end{emtabbing}">|; 
 
@@ -1001,17 +988,17 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img98.png"
  ALT="$ \Sigma_j$">|; 
 
-$key = q/theta;MSF=1.6;AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img113.png"
- ALT="$ \theta$">|; 
-
 $key = q/<;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="556" HEIGHT="89" ALIGN="MIDDLE" BORDER="0"
  SRC="|."$dir".q|jmanual-img9.png"
  ALT="$ &lt;$">|; 
+
+$key = q/theta;MSF=1.6;AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img113.png"
+ ALT="$ \theta$">|; 
 
 $key = q/pislash2;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
@@ -2196,6 +2183,19 @@ $cached_env_img{$key} = q|<IMG
  WIDTH="12" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="|."$dir".q|jmanual-img62.png"
  ALT="$ \vert normal\vert=1$">|; 
+
+$key = q/{emtabbing}{{bf{:fullbody-inverse-kinematics}{it{target-coords&restargs&key=(movght-list)>(joint-argsnil)>(cog-null-spacet)>&allow-other-keys{rm{{emtabbing};AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="736" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img295.png"
+ ALT="\begin{emtabbing}
+{\bf :fullbody-inverse-kinematics}
+\it target-coords \&amp;rest a...
+...gs nil) \\\\
+\&gt; (cog-null-space t) \\\\
+\&gt; \&amp;allow-other-keys
+\rm
+\end{emtabbing}">|; 
 
 $key = q/f^{-1};MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG

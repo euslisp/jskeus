@@ -68,7 +68,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
  <BR>
 <BR> <P>
 
-<A NAME="32749"></A>
+<A NAME="32893"></A>
 <B>make-plane</B> <EM>&amp;key :normal :point :distance </EM>[関数]
 
 <DL COMPACT>
@@ -83,7 +83,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<A NAME="32764"></A>
+<A NAME="32908"></A>
 <B>*xy-plane*</B> [変数]
 
 <DL COMPACT>
@@ -94,7 +94,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="32775"></A>
+<A NAME="32919"></A>
 <B>*yz-plane*</B> [変数]
 
 <DL COMPACT>
@@ -105,7 +105,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="32786"></A>
+<A NAME="32930"></A>
 <B>*zx-plane*</B> [変数]
 
 <DL COMPACT>
@@ -118,7 +118,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<DIV ALIGN="CENTER"><A NAME="30519"></A>
+<DIV ALIGN="CENTER"><A NAME="30663"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
 基本body</CAPTION>
@@ -134,7 +134,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<A NAME="32797"></A>
+<A NAME="32941"></A>
 <B>make-cube</B> <EM>xsize ysize zsize &amp;key :name :color </EM>[関数]
 
 <DL COMPACT>
@@ -149,7 +149,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32811"></A>
+<A NAME="32955"></A>
 <B>make-prism</B> <EM>bottom-points sweep-vector &amp;key :name :color </EM>[関数]
 
 <DL COMPACT>
@@ -173,7 +173,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32827"></A>
+<A NAME="32971"></A>
 <B>make-cylinder</B> <EM>radius height &amp;key (:segments 12) :name :color </EM>[関数]
 
 <DL COMPACT>
@@ -188,7 +188,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32839"></A>
+<A NAME="32983"></A>
 <B>make-cone</B> <EM>top bottom &amp;key (:segments 16) :color :name </EM>[関数]
 
 <DL COMPACT>
@@ -207,7 +207,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32853"></A>
+<A NAME="32997"></A>
 <B>make-solid-of-revolution</B> <EM>points &amp;key (:segments 16) :name :color </EM>[関数]
 
 <DL COMPACT>
@@ -232,7 +232,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32868"></A>
+<A NAME="33012"></A>
 <B>make-torus</B> <EM>points &amp;key (:segments 16) :name :color </EM>[関数]
 
 <DL COMPACT>
@@ -247,7 +247,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32879"></A>
+<A NAME="33023"></A>
 <B>make-icosahedron</B> <EM>&amp;optional (radius 1.0) </EM>[関数]
 
 <DL COMPACT>
@@ -261,7 +261,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32889"></A>
+<A NAME="33033"></A>
 <B>make-dodecahedron</B> <EM>&amp;optional (radius 1.0) </EM>[関数]
 
 <DL COMPACT>
@@ -275,7 +275,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32899"></A>
+<A NAME="33043"></A>
 <B>make-gdome</B> <EM>abody </EM>[関数]
 
 <DL COMPACT>
@@ -301,7 +301,7 @@ x,y,z軸の方向に大きさが<EM>xsize</EM>,<EM>ysize</EM>,<EM>zsize</EM>で�
 
 <P>
 
-<A NAME="32913"></A>
+<A NAME="33057"></A>
 <B>grahamhull</B> <EM>vertices &amp;optional (normal #f(0 0 1)) </EM>[関数]
 
 <DL COMPACT>
@@ -316,7 +316,7 @@ Grahamのアルゴリズムを用いて，2次元上で凸状の覆いを計算�
 
 <P>
 
-<A NAME="32924"></A>
+<A NAME="33068"></A>
 <B>quickhull</B> <EM>vertices &amp;optional (normal #f(0 0 1)) </EM>[関数]
 
 <DL COMPACT>
@@ -330,7 +330,7 @@ Grahamのアルゴリズムを用いて，2次元上で凸状の覆いを計算�
 
 <P>
 
-<A NAME="32934"></A>
+<A NAME="33078"></A>
 <B>convex-hull-3d</B> <EM>vertices </EM>[関数]
 
 <DL COMPACT>
@@ -342,7 +342,7 @@ gift-wrapping法を用いて3次元上で凸面の覆いを計算する。
 <BR>
 <BR>
 
-<A NAME="32944"></A>
+<A NAME="33088"></A>
 <B>make-body-from-vertices</B> <EM>vertices-list </EM>[関数]
 
 <DL COMPACT>
@@ -388,7 +388,7 @@ gift-wrapping法を用いて3次元上で凸面の覆いを計算する。
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-07-30
+2015-08-03
 </ADDRESS>
 </BODY>
 </HTML>
