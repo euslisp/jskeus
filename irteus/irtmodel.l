@@ -1947,7 +1947,8 @@
     (jacobi)
     (additional-check)
     (additional-jacobi) (additional-vel)
-    (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
+    ;; Cog convergence params
+    (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil) (cog-gain 1.0)
     (min-loop (/ stop 10))
     debug-view ik-args
     &allow-other-keys)
@@ -2057,6 +2058,21 @@
            (setf (elt tmp-dim (+ j vec-count)) (elt (elt tmp-dims i) j)))
          (incf vec-count (length (elt tmp-dims i))))
        
+       ;; Use cog jacobian as first task
+       (when (and (not cog-null-space) target-centroid-pos)
+         (setq additional-jacobi
+               (append (list (send self :calc-cog-jacobian-from-link-list
+                                   :update-mass-properties nil
+                                   :link-list union-link-list
+                                   :translation-axis cog-translation-axis))
+                       additional-jacobi))
+         (let ((tmp-cog-gain (if (> cog-gain 1.0) 1.0 cog-gain)))
+           (setq additional-vel
+                 (append (list
+                          (send self :calc-vel-for-cog tmp-cog-gain cog-translation-axis target-centroid-pos
+                                :centroid-offset-func centroid-offset-func
+                                :update-mass-properties nil))
+                         additional-vel))))
        ;; append additional-jacobi and additional-vel
        (let (add-vel-list (row0) add-vel add-jacobi)
          (when additional-jacobi
@@ -2209,7 +2225,14 @@
                                    :translation-axis translation-axis
                                    :rotation-axis rotation-axis
                                    ;; evaluate additional-jacobi function and calculate row dimension of additional-jacobi
-                                   :additional-jacobi-dimension (reduce #'+ (mapcar #'(lambda (aj) (array-dimension (if (functionp aj) (funcall aj link-list) aj) 0)) tmp-additional-jacobi))
+                                   :additional-jacobi-dimension
+                                   (+ (if (and (not cog-null-space) target-centroid-pos)
+                                          (case cog-translation-axis
+                                                ((:x :y :z :xx :yy :zz) 2)
+                                                ((:xy :yx :yz :zy :zx :xz) 1)
+                                                (nil 0))
+                                        0)
+                                      (reduce #'+ (mapcar #'(lambda (aj) (array-dimension (if (functionp aj) (funcall aj link-list) aj) 0)) tmp-additional-jacobi)))
                                    :union-link-list union-link-list args) args)))
      (send self :reset-joint-angle-limit-weight-old union-link-list) ;; reset weight
      
