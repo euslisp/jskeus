@@ -86,8 +86,10 @@
     (setq *robot* (instance sample-robot :init)))
   ;; initial quad pose
   (send *robot* :reset-pose)
-  (send *robot* :fix-leg-to-coords (make-coords))
-  (send *robot* :rotate (if go-backward-over -pi/2 pi/2) :y)
+  (send *robot* :move-coords
+        (make-coords :rpy (list 0 (if go-backward-over -pi/2 pi/2) 0)
+                     :pos (float-vector 0 0 300))
+        (car (send *robot* :links)))
   (let ((tc
          (if go-backward-over
              (list
@@ -96,21 +98,22 @@
               (make-coords :pos #f(-200 -120 0) :rpy (list 0 pi/2 0))
               (make-coords :pos #f(-200 120 0) :rpy (list 0 pi/2 0)))
            (list
-            (make-coords :pos #f(-300 -120 0))
-            (make-coords :pos #f(-300 120 0))
+            (make-coords :pos #f(-200 -120 0))
+            (make-coords :pos #f(-200 120 0))
             (make-coords :pos #f(200 -120 0) :rpy (list 0 pi/2 0))
             (make-coords :pos #f(200 120 0) :rpy (list 0 pi/2 0)))))
         (ik-args
-         (list :min (float-vector -1000 -1000 -1000 -90 -90 -90)
-               :max (float-vector  1000  1000  1000  90  90  90)
+         (list :min (float-vector -1e10 -1e10 -1e10 -180 -180 -180)
+               :max (float-vector  1e10  1e10  1e10  180  180  180)
                :joint-args '(:absolute-p t)
                :additional-nspace-list
                (list
                 (list (car (send *robot* :links))
                       #'(lambda () (send *robot* :joint-angle-limit-nspace-for-6dof :limbs '(:rarm :larm :rleg :lleg))))
                 )
+               ;;:min-loop 2 :cog-null-space nil
                :root-link-virtual-joint-weight #F(0.1 0.1 0.1 0.5 0.5 0.5)
-               :cog-gain 5.0 :stop 200 :centroid-thre 15
+               :cog-gain 5.0 :centroid-thre 15
                ;;:debug-view :no-message
                :collision-avoidance-link-pair nil)))
     (with-move-target-link-list
@@ -119,7 +122,6 @@
             tc
             :move-target mt :link-list ll
             :target-centroid-pos (vector-mean (send-all tc :worldpos))
-            :stop 400
             ik-args))
     ;; prepare footsteps
     (let ((footstep-list (funcall gen-footstep-func)))
@@ -135,9 +137,8 @@
                        (vector-mean (append (send *robot* :arms :end-coords :worldpos) (send *robot* :legs :end-coords :worldpos)))
                        ik-args))
             :solve-angle-vector-args
-            (append (list ;;:debug-view :no-message
-                          :centroid-thre 100
-                          :thre '(10 10 10 10)) ik-args)
+            ;;(append (list :debug-view :no-message) ik-args)
+            ik-args
             :default-step-height 70)
       )))
 
