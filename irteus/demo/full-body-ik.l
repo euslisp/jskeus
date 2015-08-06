@@ -54,5 +54,5 @@
 
 ;;
 (unless (boundp '*irtviewer*) (make-irtviewer))
-(warn "(full-body-ik) for humanoid~%")
+(warn "(full-body-ik) ;; for humanoid~%")
 

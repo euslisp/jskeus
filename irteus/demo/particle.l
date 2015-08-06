@@ -225,5 +225,5 @@
   (sim-stop)
   (all-status))
 
-(warn "(particle) for particle simulation~%")
+(warn "(particle) ;; for particle simulation~%")
 

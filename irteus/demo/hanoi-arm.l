@@ -89,7 +89,7 @@
     ))
 
 (unless (boundp '*irtviewer*) (make-irtviewer))
-(warn "(hanoi-arm) for arm solving hanoi tower~%")
+(warn "(hanoi-arm) ;; for arm solving hanoi tower~%")
 
 
 

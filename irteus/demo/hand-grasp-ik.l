@@ -78,4 +78,4 @@
     ))
 
 (unless (boundp '*irtviewer*) (make-irtviewer))
-(warn "(hand-grasp) for hand model~%")
+(warn "(hand-grasp) ;; for hand model~%")
