@@ -1065,8 +1065,8 @@
              (send self :angle-vector (cadr (memq :angle-vector av)))
              (send self :move-coords (cadr (memq :root-coords av)) (car (send self :links)))))
      (update-robot-state (car avs))
-     (let ((df (instance preview-dynamics-filter
-                         :init dt (elt (send self :centroid) 2) preview-class :delay delay :initialize-queue-p t))
+     (let ((df (instance preview-class
+                         :init dt (elt (send self :centroid) 2) :delay delay :initialize-queue-p t))
            (r))
        (dotimes (i 2) (send self :calc-zmp))
        (let ((ret-list) (last-av) (ret-avs) (last-zmp) (av)
@@ -1085,12 +1085,12 @@
                   (rzmp (let ((tmp-zmp (cadr (memq :zmp av))))
                           (if tmp-zmp (setq last-zmp tmp-zmp) last-zmp)))
                   (dzmp (v- zmp rzmp)))
-             (setq r (send df :update (list av zmp (copy-object (send self :centroid)) rzmp) (if av dzmp nil)))
+             (setq r (send df :update-xk (if av dzmp nil) (list av zmp (copy-object (send self :centroid)) rzmp)))
              (when r
-               (push (list (send df :av) r) ret-list)
+               (push (list (send df :current-additional-data) r) ret-list)
                (let ((pav (send self :angle-vector))
                      (prc (send self :copy-worldcoords)))
-                 (update-robot-state (car (send df :av)))
+                 (update-robot-state (car (send df :current-additional-data)))
                  (case cog-method
                    (:move-centroid-on-foot
                     (send self :move-centroid-on-foot :both '(:lleg :rleg)
@@ -1272,6 +1272,7 @@
         (cons (send self :current-reference-output-vector)
               (send self :current-state-vector)))
     )
+  (:finishedp () finishedp)
   (:last-reference-output-vector
    ()
    (matrix-row y1-n delay)) ;; tail of queue
@@ -1429,7 +1430,11 @@
   ;;
   (:update-xk (p &optional (add-data))
     (if p (setq zmp-z (elt p 2)))
-    (send-super :update-xk p add-data))
+    (let ((ret (send-super :update-xk p add-data)))
+      (if ret
+          (cons
+           (send self :current-refzmp)
+           (send self :refcog)))))
   (:cog-z () cog-z)
   (:update-cog-z (zc)
     (setf (aref c 0 2) (- (/ zc (elt *g-vec* 2))))
@@ -1516,36 +1521,6 @@
    ()
    (matrix-row xk* 0)
    )
-  )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; preview-dynamics-filter class to handle variables about preview control
-;;;  avs -> queue of variables for preview control (k, k+1, ..., k+N)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defclass preview-dynamics-filter
-  :super propertied-object
-  :slots (preview-controller))
-
-(defmethod preview-dynamics-filter
-  (:init (dt zc &optional (preview-class preview-control)
-                &rest args)
-    (setq preview-controller (instance* preview-class :init dt zc args))
-    self)
-  ;;
-  (:finishedp () (preview-controller . finishedp))
-  (:av () (send preview-controller :current-additional-data)) ;; get parameters at "k"
-  (:cart-zmp () (send preview-controller :cart-zmp))
-  (:refcog () (send preview-controller :refcog))
-  (:cog-z () (send preview-controller :cog-z))
-  ;;
-  (:update (av p)
-    (let (r)
-      (setq r (send preview-controller :update-xk p av))
-      (if r
-          (cons
-           (send preview-controller :current-refzmp)
-           (send preview-controller :refcog)))
-      ))
   )
 
 ;;
@@ -1691,9 +1666,8 @@
     (send self :append-step-height-list 0.0)
     (pop footstep-node-list)
     ;; currently, not error system
-    (setq preview-controller (instance preview-dynamics-filter :init
+    (setq preview-controller (instance extended-preview-control :init
                                        dt (- (elt cog 2) (elt (car refzmp-cur-list) 2))
-                                       extended-preview-control
                                        :delay delay
                                        :q q :r r
                                        :init-xk cog
@@ -1834,9 +1808,9 @@
     (let* ((preview-data ;; data to push to preview-controller's que
             (if support-leg-coords-list
                 (send self :calc-one-tick-gait-parameter type)))
-           (dd (send preview-controller :update ;; return value from preview-controller
-                     preview-data (if preview-data (elt preview-data 3))))
-           (gp (send preview-controller :av))) ;; gait parameter
+           (dd (send preview-controller :update-xk ;; return value from preview-controller
+                     (if preview-data (elt preview-data 3)) preview-data))
+           (gp (send preview-controller :current-additional-data))) ;; gait parameter
       (if dd (setf (elt (cdr dd) 2) (elt gp 4))) ;; overwrite 
       (let ((ret (if (and dd solve-angle-vector)
                      (append (send self :solve-angle-vector
