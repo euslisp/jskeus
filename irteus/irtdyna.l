@@ -1196,7 +1196,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass preview-controller-base
   :super riccati-equation
-  :slots (xk uk delay f1-n y1-n dim queue-index initialize-queue-p))
+  :slots (xk uk delay f1-n y1-n dim queue-index initialize-queue-p additional-data-queue))
 (defmethod preview-controller-base
   (:init
     (dt ; dt -> sampling time[s]
@@ -1235,21 +1235,30 @@
   (:calc-xk () ;; update xk+1
     (setq xk (m+ (m* A xk) (m* b (send self :calc-u)))))
   ;;
-  (:update-xk (p)
+  (:update-xk (p &optional (add-data))
     ;; update y1-n
     (if initialize-queue-p
         (when (null y1-n)
           (setq y1-n (make-matrix (1+ delay) dim))
-          (dotimes (i (1+ delay)) (setf (matrix-row y1-n i) (subseq p 0 dim))))
+          (setq additional-data-queue (make-list (1+ delay)))
+          (dotimes (i (1+ delay))
+            (setf (matrix-row y1-n i) (subseq p 0 dim))
+            (setf (elt additional-data-queue i) add-data)
+            ))
       (progn
         (when (null y1-n)
-          (setq y1-n (make-matrix (1+ delay) dim)))
+          (setq y1-n (make-matrix (1+ delay) dim))
+          (setq additional-data-queue (make-list (1+ delay))))
         (when (< queue-index (1+ delay))
           (setf (matrix-row y1-n queue-index) (subseq p 0 dim))
+          (setf (elt additional-data-queue queue-index) add-data)
           (incf queue-index)
           (return-from :update-xk nil))))
-    (dotimes (i delay) (setf (matrix-row y1-n i) (matrix-row y1-n (1+ i))))
+    (dotimes (i delay)
+      (setf (matrix-row y1-n i) (matrix-row y1-n (1+ i)))
+      (setf (elt additional-data-queue i) (elt additional-data-queue (1+ i))))
     (setf (matrix-row y1-n delay) (subseq p 0 dim))
+    (setf (elt additional-data-queue delay) add-data)
     ;;
     (send self :calc-xk))
   (:last-reference-output-vector
@@ -1264,6 +1273,10 @@
   (:current-output-vector
    ()
    (m* c xk))
+  (:current-additional-data
+   ()
+   (car additional-data-queue)
+   )
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1403,9 +1416,9 @@
                     (elt p 1)
                     zmp-z)))
   ;;
-  (:update-xk (p)
+  (:update-xk (p &optional (add-data))
     (setq zmp-z (elt p 2))
-    (send-super :update-xk p))
+    (send-super :update-xk p add-data))
   (:cog-z () cog-z)
   (:update-cog-z (zc)
     (setf (aref c 0 2) (- (/ zc (elt *g-vec* 2))))
@@ -1500,35 +1513,33 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass preview-dynamics-filter
   :super propertied-object
-  :slots (avs counter finishedp preview-controller))
+  :slots (counter finishedp preview-controller))
 
 (defmethod preview-dynamics-filter
   (:init (dt zc &optional (preview-class preview-control)
                 &rest args)
     (setq counter 0
           finishedp nil
-          preview-controller (instance* preview-class :init dt zc args)
-          avs (make-list (1+ (send preview-controller :delay))))
+          preview-controller (instance* preview-class :init dt zc args))
     self)
   ;;
   (:finishedp () finishedp)
-  (:av () (car avs)) ;; get parameters at "k"
+  (:av () (send preview-controller :current-additional-data)) ;; get parameters at "k"
   (:cart-zmp () (send preview-controller :cart-zmp))
   (:refcog () (send preview-controller :refcog))
   (:cog-z () (send preview-controller :cog-z))
   ;;
   (:update (av p)
     (let (r)
-      (dotimes (i (send preview-controller :delay)) (setf (elt avs i) (elt avs (1+ i))))
-      (setf (elt avs (send preview-controller :delay)) av)
       (cond (p
-	     (send preview-controller :update-xk p)
+	     (send preview-controller :update-xk p av)
 	     (if (< counter (send preview-controller :delay)) 	     
 		 (incf counter)
 	       (setq r t)))
 	    (t ;; (null p)
 	     (send preview-controller :update-xk
-                   (send preview-controller :last-refzmp))
+                   (send preview-controller :last-refzmp)
+                   av)
 	     (if (> counter 0) (setq r (decf counter)))))
       (if (<= counter 0) (setq finishedp t))
       (if r (cons (send preview-controller :current-refzmp)
