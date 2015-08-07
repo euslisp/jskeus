@@ -1239,22 +1239,22 @@
     ;; initialize
     (if p
         (progn
-      (unless initialized-p
-        (incf queue-index)
-        (setq initialized-p (>= queue-index (1+ delay))))
-      (when (null y1-n)
-        (setq y1-n (make-matrix (1+ delay) dim))
-        (setq additional-data-queue (make-list (1+ delay)))
-        (if initialize-queue-p
-            (dotimes (i (1+ delay))
-              (setf (matrix-row y1-n i) (subseq p 0 dim))
-              (setf (elt additional-data-queue i) add-data)))
-        )
-      (unless initialize-queue-p
-        (when (< queue-index (1+ delay))
-          (setf (matrix-row y1-n queue-index) (subseq p 0 dim))
-          (setf (elt additional-data-queue queue-index) add-data)
-          (return-from :update-xk nil))))
+          (unless initialized-p
+            (incf queue-index)
+            (setq initialized-p (>= queue-index (1+ delay))))
+          (when (null y1-n)
+            (setq y1-n (make-matrix (1+ delay) dim))
+            (setq additional-data-queue (make-list (1+ delay)))
+            (if initialize-queue-p
+                (dotimes (i (1+ delay))
+                  (setf (matrix-row y1-n i) (subseq p 0 dim))
+                  (setf (elt additional-data-queue i) add-data)))
+            )
+          (unless initialize-queue-p
+            (when (< queue-index (1+ delay))
+              (setf (matrix-row y1-n queue-index) (subseq p 0 dim))
+              (setf (elt additional-data-queue queue-index) add-data)
+              (return-from :update-xk nil))))
       (progn
         (decf queue-index)
         (setq p (send self :last-reference-output-vector))
