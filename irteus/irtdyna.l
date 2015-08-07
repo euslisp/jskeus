@@ -1291,6 +1291,17 @@
    ()
    (car additional-data-queue)
    )
+  (:pass-preview-controller
+   (reference-output-vector-list)
+   (let ((r) (ret))
+     ;; Wait until initialize
+     (while (not (setq r (send self :update-xk (pop reference-output-vector-list) nil))))
+     (push r ret)
+     ;; Get value until finish
+     (while (setq r (send self :update-xk (pop reference-output-vector-list) nil))
+       (push r ret))
+     (reverse ret)
+     ))
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1442,6 +1453,17 @@
            (send self :cart-zmp)))))
   (:finishedp () (send pc :finishedp))
   (:current-additional-data () (send pc :current-additional-data))
+  (:pass-preview-controller
+   (reference-output-vector-list)
+   (let ((r) (ret))
+     ;; Wait until initialize
+     (while (not (setq r (send self :update-xk (pop reference-output-vector-list) nil))))
+     (push r ret)
+     ;; Get value until finish
+     (while (setq r (send self :update-xk (pop reference-output-vector-list) nil))
+       (push r ret))
+     (reverse ret)
+     ))
   (:cog-z () cog-z)
   (:update-cog-z (zc)
     (setf (aref (pc . c) 0 2) (- (/ zc (elt *g-vec* 2))))

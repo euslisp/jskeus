@@ -207,17 +207,15 @@
                             ((< tm 6) #f(20 -20 0))
                             (t #f(0 -20 0))))
                   tm-list))
-         zmp-list cog-list ref-zmp-list2)
+         zmp-list cog-list ref-zmp-list2
+         ret)
     (mapcar
-     #'(lambda (ref-zmp tm)
-         (let ((xk (send pc :update-xk ref-zmp)))
-           ;; (format t ";tm=~7,3f, u=~7,3f, p=~7,3f, xk=~30A~%"
-           ;;         tm (elt (matrix-row (send pc :calc-u) 0) 0) (elt (send pc :cart-zmp) 0) (elt (send pc :refcog) 0))
-           (push (elt (send pc :cart-zmp) 0) zmp-list) ;; zmp ;; this zmp is "zmp as a table-cart model"
-           (push (elt (send pc :refcog) 0) cog-list)                   ;; cog
-           (push (elt (send pc :current-refzmp) 0) ref-zmp-list2) ;; ref zmp ;; ref-zmp-list2 should be equal to ref-zmp-list
-           ))
-     ref-zmp-list tm-list)
+     #'(lambda (ret tm)
+         (push (elt (caddr ret) 0) zmp-list) ;; zmp ;; this zmp is "zmp as a table-cart model"
+         (push (elt (cadr ret) 0) cog-list)                   ;; cog
+         (push (elt (car ret) 0) ref-zmp-list2) ;; ref zmp ;; ref-zmp-list2 should be equal to ref-zmp-list
+         )
+     (send pc :pass-preview-controller ref-zmp-list) tm-list)
     (with-open-file
      (f "/tmp/test-preview-control-data.dat" :direction :output)
      (mapcar #'(lambda (tm zmp cog refzmp)
