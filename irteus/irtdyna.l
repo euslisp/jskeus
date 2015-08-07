@@ -1065,8 +1065,9 @@
              (send self :angle-vector (cadr (memq :angle-vector av)))
              (send self :move-coords (cadr (memq :root-coords av)) (car (send self :links)))))
      (update-robot-state (car avs))
-     (let ((df (instance preview-class
-                         :init dt (elt (send self :centroid) 2) :delay delay :initialize-queue-p t))
+     (let ((df (instance preview-control
+                         :init dt (elt (send self :centroid) 2) :delay delay :initialize-queue-p t
+                         :preview-controller-class preview-class))
            (r))
        (dotimes (i 2) (send self :calc-zmp))
        (let ((ret-list) (last-av) (ret-avs) (last-zmp) (av)
@@ -1386,8 +1387,8 @@
 ;;;  unit system -> [mm], [s]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass preview-control
-  :super preview-controller-base ;;riccati-equation
-  :slots (cog-z zmp-z))
+  :super propertied-object
+  :slots (pc cog-z zmp-z))
 (defmethod preview-control
   (:init
     (dt _zc ;; dt -> sampling time[s], _zc is height of COG[mm]
@@ -1401,126 +1402,49 @@
                                           (list (* 0.5 dt dt))
                                           (list dt))))
           ((:C _C) (make-matrix 1 3 (list (list 1.0 0.0 (- (/ _zc (elt *g-vec* 2)))))))
-          ((:initialize-queue-p iqp)))
-    (send-super :init dt :q q :r r :delay d
-                :init-xk init-xk :dim 2
-                :A _A :B _B :C _C :state-dim 3 :initialize-queue-p iqp)
+          ((:initialize-queue-p iqp))
+          (preview-controller-class preview-controller-base))
+    (setq pc (instance preview-controller-class
+                       :init dt :q q :r r :delay d
+                       :init-xk init-xk :dim 2
+                       :A _A :B _B :C _C :state-dim 3 :initialize-queue-p iqp))
     (setq cog-z _zc)
     self)
   ;; getter methods
   (:refcog
    ()
-   (let ((cv (send self :current-state-vector)))
+   (let ((cv (send pc :current-state-vector)))
      (float-vector (elt cv 0) (elt cv 1) cog-z)))
   (:cart-zmp () ;; table-cart zmp as an output variable
-    (let ((p (send self :current-output-vector)))
+    (let ((p (send pc :current-output-vector)))
       (float-vector (aref p 0 0)
                     (aref p 0 1)
                     zmp-z)))
   (:last-refzmp ()
-    (let ((p (send self :last-reference-output-vector))) ;; tail of refzmp queue
+    (let ((p (send pc :last-reference-output-vector))) ;; tail of refzmp queue
       (float-vector (elt p 0)
                     (elt p 1)
                     zmp-z)))
   (:current-refzmp ()
-    (let ((p (send self :current-reference-output-vector))) ;; head of refzmp queue
+    (let ((p (send pc :current-reference-output-vector))) ;; head of refzmp queue
       (float-vector (elt p 0)
                     (elt p 1)
                     zmp-z)))
   ;;
   (:update-xk (p &optional (add-data))
     (if p (setq zmp-z (elt p 2)))
-    (let ((ret (send-super :update-xk p add-data)))
+    (let ((ret (send pc :update-xk p add-data)))
       (if ret
           (cons
            (send self :current-refzmp)
            (send self :refcog)))))
+  (:finishedp () (send pc :finishedp))
+  (:current-additional-data () (send pc :current-additional-data))
   (:cog-z () cog-z)
   (:update-cog-z (zc)
-    (setf (aref c 0 2) (- (/ zc (elt *g-vec* 2))))
-    (send self :solve)
-    (send self :calc-f))
-  )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; extended-preview-control class to compute reference COG from reference ZMP
-;;;  this class is error system of preview-control class
-;;;  (refer to "Digital Preview Control (in Japanese)", SangyoToshoKabusikiGaisha, Takeshi Tsuchiya and Tadashi Egami)
-;;;  orgA, orgb, orgc -> system configuration matrices for original table-cart model
-;;;  xk* -> [p^T, dxk^T]^T, (1+3) x 2 matrix
-;;;  state equation of this system is
-;;;   xk+1* = A xk* + b duk
-;;;   pk   = c xk*
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defclass extended-preview-control
-  :super preview-control
-  :slots (orgA orgB orgC xk*))
-
-(defmethod extended-preview-control
-  (:init
-    (dt zc &key (q 1.0) (r 1.0e-6) ((:delay d) 1.6) (init-xk (float-vector 0 0 0)) ((:initialize-queue-p iqp)))
-    (setq orgA (make-matrix 3 3 (list (list 1 dt (* 0.5 dt dt))
-                                    (list 0 1 dt)
-                                    (list 0 0 1)))
-          orgb (make-matrix 3 1 (list (list (* (/ 1.0 6.0) dt dt dt))
-                                    (list (* 0.5 dt dt))
-                                    (list dt)))
-          orgc (make-matrix 1 3 (list (list 1.0 0.0 (- (/ zc (elt *g-vec* 2)))))))
-    (let* ((tmpAc (m* orgc orgA))
-           (newA (make-matrix
-                  (+ 1 (cadr (array-dimensions tmpAc)))
-                  (+ 3 (car (array-dimensions tmpAc)))))
-           (tmpcb (m* orgc orgb))
-           (newb (make-matrix
-                  (+ 1 (car (array-dimensions orgb))) 1)))
-      (setf (aref newA 0 0) 1.0)
-      (dotimes (i (cadr (array-dimensions tmpAc)))
-        (setf (aref newA 0 (+ 1 i)) (aref tmpAc 0 i)))
-      (dotimes (i (car (array-dimensions orgA)))
-        (dotimes (j (cadr (array-dimensions orgA)))
-          (setf (aref newA (+ 1 i) (+ 1 j)) (aref orgA i j))))
-      (setf (aref newb 0 0) (aref tmpcb 0 0))
-      (dotimes (i (car (array-dimensions orgb)))
-        (setf (aref newb (+ 1 i) 0) (aref orgb i 0)))
-      ;; (concatenate-matrix-column
-      ;;  (concatenate-matrix-row (make-matrix 1 1 (list (list 1.0))) (m* orgc orgA))
-      ;;  (concatenate-matrix-row (make-matrix 3 1 (list (list 0) (list 0) (list 0))) orgA))
-      ;; (concatenate-matrix-column (m* orgc orgb) orgb)
-      (send-super :init
-                  dt zc
-                  :A newA :b newb
-                  :c (make-matrix 1 4 (list (list 1.0 0.0 0.0 0.0)))
-                  :q q :r r :delay d :init-xk init-xk :initialize-queue-p iqp))
-    (when (null xk*)
-      (setq xk* (make-matrix 4 dim))
-      (setf (matrix-row xk* 0) (subseq init-xk 0 dim)))
-    self)
-  ;;
-  (:calc-f ()
-    (setq f1-n (make-matrix 1 (1+ delay)))
-    (let* ((gsi (unit-matrix (array-dimension c 1)))
-	   (bt (transpose b))
-	   (ct (transpose c))
-	   (R+btPb-1bt (scale-matrix R+btPb-1 bt))
-	   (qt (scale-matrix Q ct)))
-      (dotimes (i delay)
-	(let* ((qt (if (= i (1- delay)) (m* P qt) qt))
-               (fa (scale-matrix R+btPb-1 (m* bt (m* gsi qt)))))
-          (setq gsi (m* A-bKt gsi))
-	  (setf (aref f1-n 0 (1+ i)) (aref fa 0 0))
-          ))))
-  (:calc-u () (m- (m* f1-n y1-n) (m* K xk*)))
-  (:calc-xk ()
-    (setq xk* (m+ (m* A xk*) (m* b (send self :calc-u))))
-    (dotimes (i 3)
-      (setf (matrix-row xk i)
-            (v+ (matrix-row xk i)
-                (matrix-row xk* (1+ i)))))
-    )
-  (:current-output-vector
-   ()
-   (matrix-row xk* 0)
-   )
+    (setf (aref (pc . c) 0 2) (- (/ zc (elt *g-vec* 2))))
+    (send pc :solve)
+    (send pc :calc-f))
   )
 
 ;;
@@ -1666,11 +1590,12 @@
     (send self :append-step-height-list 0.0)
     (pop footstep-node-list)
     ;; currently, not error system
-    (setq preview-controller (instance extended-preview-control :init
+    (setq preview-controller (instance preview-control :init
                                        dt (- (elt cog 2) (elt (car refzmp-cur-list) 2))
                                        :delay delay
                                        :q q :r r
                                        :init-xk cog
+                                       :preview-controller-class extended-preview-controller-base
                                        )
           swing-leg-src-coords current-swing-leg-dst-coords
           refzmp-next (send self :get-limbs-zmp

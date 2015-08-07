@@ -194,10 +194,10 @@
 
 ;; preview control example
 (defun test-preview-control
-  (&key (preview-class preview-control)
+  (&key (preview-class preview-controller-base)
         (q 1) (r 1e-6))
   (let* ((dt 0.010) (max-tm 10.0)
-         (pc (instance preview-class :init dt 800 :q q :r r))
+         (pc (instance preview-control :init dt 800 :q q :r r :preview-controller-class preview-class))
          (tm-list (mapcar #'(lambda (x) (* x dt))
                           (let ((i 0)) (mapcar #'(lambda (x) (incf i)) (make-list (round (/ max-tm dt)))))))
          (ref-zmp-list
@@ -211,8 +211,8 @@
     (mapcar
      #'(lambda (ref-zmp tm)
          (let ((xk (send pc :update-xk ref-zmp)))
-           (format t ";tm=~7,3f, u=~7,3f, p=~7,3f, xk=~30A~%"
-                   tm (elt (matrix-row (send pc :calc-u) 0) 0) (elt (send pc :cart-zmp) 0) (elt (send pc :refcog) 0))
+           ;; (format t ";tm=~7,3f, u=~7,3f, p=~7,3f, xk=~30A~%"
+           ;;         tm (elt (matrix-row (send pc :calc-u) 0) 0) (elt (send pc :cart-zmp) 0) (elt (send pc :refcog) 0))
            (push (elt (send pc :cart-zmp) 0) zmp-list) ;; zmp ;; this zmp is "zmp as a table-cart model"
            (push (elt (send pc :refcog) 0) cog-list)                   ;; cog
            (push (elt (send pc :current-refzmp) 0) ref-zmp-list2) ;; ref zmp ;; ref-zmp-list2 should be equal to ref-zmp-list
@@ -244,7 +244,7 @@
 ;;   input motion : control ZMP at 0 based on COG model
 ;;   output motion : control ZMP at 0 based on multi-body model
 (defun test-preview-control-dynamics-filter
-  (robot &key (preview-class preview-control) (cog-method :move-base-pos) (dt 0.025))
+  (robot &key (preview-class preview-controller-base) (cog-method :move-base-pos) (dt 0.025))
   (let ((avs))
     (objects (list robot))
     ;; generate input motion control ZMP at 0, which corresponds to COG at 0 in this case
@@ -289,7 +289,7 @@
       )))
 
 (defun test-preview-control-dynamics-filter-for-sample-robot
-  (&key (preview-class preview-control))
+  (&key (preview-class preview-controller-base))
   (unless (boundp '*robot*)
     (setq *robot* (instance sample-robot :init)))
   (test-preview-control-dynamics-filter *robot* :preview-class preview-class)
