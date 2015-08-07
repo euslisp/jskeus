@@ -1196,7 +1196,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass preview-controller-base
   :super riccati-equation
-  :slots (xk uk delay f1-n y1-n dim))
+  :slots (xk uk delay f1-n y1-n dim queue-index))
 (defmethod preview-controller-base
   (:init
     (dt ; dt -> sampling time[s]
@@ -1210,6 +1210,7 @@
           (state-dim (array-dimension _A 0)))
     (setq delay (round (/ d dt)) dim tmp-dim)
     (send-super :init _A _B _C q r)
+    (setq queue-index 0)
     (when (null xk)
       (setq xk (make-matrix state-dim dim))
       (setf (matrix-row xk 0) (subseq init-xk 0 dim)))
@@ -1236,12 +1237,27 @@
   (:update-xk (p)
     ;; update y1-n
     (when (null y1-n)
-      (setq y1-n (make-matrix (1+ delay) dim))
-      (dotimes (i (1+ delay)) (setf (matrix-row y1-n i) (subseq p 0 dim))))
+      (setq y1-n (make-matrix (1+ delay) dim)))
+    (when (< queue-index (1+ delay))
+      (setf (matrix-row y1-n queue-index) (subseq p 0 dim))
+      (incf queue-index)
+      (return-from :update-xk nil))
     (dotimes (i delay) (setf (matrix-row y1-n i) (matrix-row y1-n (1+ i))))
     (setf (matrix-row y1-n delay) (subseq p 0 dim))
     ;;
     (send self :calc-xk))
+  (:last-reference-output-vector
+   ()
+   (matrix-row y1-n (1+ delay))) ;; tail of queue
+  (:current-reference-output-vector
+   ()
+   (matrix-row y1-n 0)) ;; head of queue
+  (:current-state-vector
+   ()
+   (matrix-row xk 0))
+  (:current-output-vector
+   (&optional (_c c))
+   (m* _c xk))
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
