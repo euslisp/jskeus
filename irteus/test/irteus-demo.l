@@ -70,7 +70,7 @@
 
 (deftest test-test-extended-preview-control
   (assert
-   (every #'identity (test-preview-control :preview-class extended-preview-control))))
+   (every #'identity (test-preview-control :preview-controller-class extended-preview-controller))))
 
 (deftest test-test-preview-control-dynamics-filter-for-sample-robot
   (assert
@@ -78,7 +78,7 @@
 
 (deftest test-test-extended-preview-control-dynamics-filter-for-sample-robot
   (assert
-   (every #'identity (test-preview-control-dynamics-filter-for-sample-robot :preview-class extended-preview-control))))
+   (every #'identity (test-preview-control-dynamics-filter-for-sample-robot :preview-controller-class extended-preview-controller))))
 
 (deftest test-test-sample-1dof-closed-link-robot
   (assert

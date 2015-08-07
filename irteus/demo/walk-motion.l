@@ -194,10 +194,10 @@
 
 ;; preview control example
 (defun test-preview-control
-  (&key (preview-class preview-controller-base)
+  (&key (preview-controller-class preview-controller)
         (q 1) (r 1e-6))
   (let* ((dt 0.010) (max-tm 10.0)
-         (pc (instance preview-control :init dt 800 :q q :r r :preview-controller-class preview-class))
+         (pc (instance preview-control-cogxy-trajectory-generator :init dt 800 :q q :r r :preview-controller-class preview-controller-class))
          (tm-list (mapcar #'(lambda (x) (* x dt))
                           (let ((i 0)) (mapcar #'(lambda (x) (incf i)) (make-list (round (/ max-tm dt)))))))
          (ref-zmp-list
@@ -244,7 +244,7 @@
 ;;   input motion : control ZMP at 0 based on COG model
 ;;   output motion : control ZMP at 0 based on multi-body model
 (defun test-preview-control-dynamics-filter
-  (robot &key (preview-class preview-controller-base) (cog-method :move-base-pos) (dt 0.025))
+  (robot &key (preview-controller-class preview-controller) (cog-method :move-base-pos) (dt 0.025))
   (let ((avs))
     (objects (list robot))
     ;; generate input motion control ZMP at 0, which corresponds to COG at 0 in this case
@@ -259,7 +259,7 @@
             avs))
     (setq avs (reverse avs))
     ;; filtering
-    (let ((data (subseq (send robot :preview-control-dynamics-filter dt avs :preview-class preview-class) 4)))
+    (let ((data (subseq (send robot :preview-control-dynamics-filter dt avs :preview-controller-class preview-controller-class) 4)))
       (with-open-file
        (f "/tmp/test-preview-control-data-2.dat" :direction :output)
        (mapcar #'(lambda (tm ozmp-x izmp-x ocog-x icog-x ozmp-y izmp-y ocog-y icog-y)
@@ -289,9 +289,9 @@
       )))
 
 (defun test-preview-control-dynamics-filter-for-sample-robot
-  (&key (preview-class preview-controller-base))
+  (&key (preview-controller-class preview-controller))
   (unless (boundp '*robot*)
     (setq *robot* (instance sample-robot :init)))
-  (test-preview-control-dynamics-filter *robot* :preview-class preview-class)
+  (test-preview-control-dynamics-filter *robot* :preview-controller-class preview-controller-class)
   )
 (warn "(test-preview-control-dynamics-filter-for-sample-robot) ;; Example for dynamics filter using preview controller~%")

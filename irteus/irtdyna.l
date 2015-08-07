@@ -1056,7 +1056,7 @@
   (:preview-control-dynamics-filter
    (dt ;; [s]
     avs ;; input motion : (list (list :angle-vector av :root-coords rc) ....)
-    &key (preview-class preview-control)
+    &key (preview-controller-class preview-controller)
          (cog-method :move-base-pos)
          (delay 0.8)) ;; [s]
    ;; generate av-list
@@ -1065,9 +1065,9 @@
              (send self :angle-vector (cadr (memq :angle-vector av)))
              (send self :move-coords (cadr (memq :root-coords av)) (car (send self :links)))))
      (update-robot-state (car avs))
-     (let ((df (instance preview-control
+     (let ((df (instance preview-control-cogxy-trajectory-generator
                          :init dt (elt (send self :centroid) 2) :delay delay :initialize-queue-p t
-                         :preview-controller-class preview-class))
+                         :preview-controller-class preview-controller-class))
            (r))
        (dotimes (i 2) (send self :calc-zmp))
        (let ((ret-list) (last-av) (ret-avs) (last-zmp) (av)
@@ -1195,10 +1195,10 @@
 ;;;   xk+1 = A xk + b uk
 ;;;   yk   = c xk
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defclass preview-controller-base
+(defclass preview-controller
   :super riccati-equation
   :slots (xk uk delay f1-n y1-n dim queue-index initialize-queue-p additional-data-queue finishedp initialized-p))
-(defmethod preview-controller-base
+(defmethod preview-controller
   (:init
     (dt ; dt -> sampling time[s]
      &key (q) (r)
@@ -1302,11 +1302,11 @@
 ;;;   xk+1* = A xk* + b duk
 ;;;   yk   = c xk*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defclass extended-preview-controller-base
-  :super preview-controller-base
+(defclass extended-preview-controller
+  :super preview-controller
   :slots (orgA orgB orgC xk*))
 
-(defmethod extended-preview-controller-base
+(defmethod extended-preview-controller
   (:init
     (dt
      &key (q) (r) ((:delay d)) ((:dim tmp-dim))
@@ -1386,10 +1386,10 @@
 ;;;   pk   = c xk
 ;;;  unit system -> [mm], [s]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defclass preview-control
+(defclass preview-control-cogxy-trajectory-generator
   :super propertied-object
   :slots (pc cog-z zmp-z))
-(defmethod preview-control
+(defmethod preview-control-cogxy-trajectory-generator
   (:init
     (dt _zc ;; dt -> sampling time[s], _zc is height of COG[mm]
      &key (q 1) (r 1e-6)
@@ -1403,7 +1403,7 @@
                                           (list dt))))
           ((:C _C) (make-matrix 1 3 (list (list 1.0 0.0 (- (/ _zc (elt *g-vec* 2)))))))
           ((:initialize-queue-p iqp))
-          (preview-controller-class preview-controller-base))
+          (preview-controller-class preview-controller))
     (setq pc (instance preview-controller-class
                        :init dt :q q :r r :delay d
                        :init-xk init-xk :dim 2
@@ -1474,7 +1474,7 @@
           default-zmp-offsets ;; zmp offset list in the legs' end-coords ;; (list rleg-zmp-offset lleg-zmp-offset)
           finalize-p ;; Are all footstep-node-list executed? finalize flag for make-gait-parameter. Is this necessary?
           ;; preview controller parameters
-          preview-controller ;; preview controller for ZMP -> COG
+          apreview-controller ;; preview controller for ZMP -> COG
           all-limbs
           end-with-double-support
           ik-thre ;; position thre for ik
@@ -1590,12 +1590,12 @@
     (send self :append-step-height-list 0.0)
     (pop footstep-node-list)
     ;; currently, not error system
-    (setq preview-controller (instance preview-control :init
+    (setq apreview-controller (instance preview-control-cogxy-trajectory-generator :init
                                        dt (- (elt cog 2) (elt (car refzmp-cur-list) 2))
                                        :delay delay
                                        :q q :r r
                                        :init-xk cog
-                                       :preview-controller-class extended-preview-controller-base
+                                       :preview-controller-class extended-preview-controller
                                        )
           swing-leg-src-coords current-swing-leg-dst-coords
           refzmp-next (send self :get-limbs-zmp
@@ -1710,7 +1710,7 @@
                (limbs
                 (append (send self :get-counter-footstep-limbs (car support-leg-list))
                         (car support-leg-list))))
-           (+ (send preview-controller :cog-z)
+           (+ (send apreview-controller :cog-z)
               (elt (send self :get-limbs-zmp
                          (append swing-leg-proj-coords (car support-leg-coords-list))
                          limbs) 2))
@@ -1733,9 +1733,9 @@
     (let* ((preview-data ;; data to push to preview-controller's que
             (if support-leg-coords-list
                 (send self :calc-one-tick-gait-parameter type)))
-           (dd (send preview-controller :update-xk ;; return value from preview-controller
+           (dd (send apreview-controller :update-xk ;; return value from preview-controller
                      (if preview-data (elt preview-data 3)) preview-data))
-           (gp (send preview-controller :current-additional-data))) ;; gait parameter
+           (gp (send apreview-controller :current-additional-data))) ;; gait parameter
       (if dd (setf (elt (cdr dd) 2) (elt gp 4))) ;; overwrite 
       (let ((ret (if (and dd solve-angle-vector)
                      (append (send self :solve-angle-vector
@@ -1743,7 +1743,7 @@
                                    :solve-angle-vector solve-angle-vector
                                    :solve-angle-vector-args solve-angle-vector-args)
                              (if debug (append (butlast gp 2) (list (cdr dd)
-                                                                  (send preview-controller :cart-zmp))
+                                                                  (send apreview-controller :cart-zmp))
                                                (last gp)
                                                ))))))
         (when (>= 0 (decf index-count))
