@@ -1196,7 +1196,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass preview-controller-base
   :super riccati-equation
-  :slots (xk uk delay f1-n y1-n dim queue-index initialize-queue-p additional-data-queue))
+  :slots (xk uk delay f1-n y1-n dim queue-index initialize-queue-p additional-data-queue finishedp initialized-p))
 (defmethod preview-controller-base
   (:init
     (dt ; dt -> sampling time[s]
@@ -1236,7 +1236,11 @@
     (setq xk (m+ (m* A xk) (m* b (send self :calc-u)))))
   ;;
   (:update-xk (p &optional (add-data))
-    ;; update y1-n
+    ;; initialize
+    (when p
+      (unless initialized-p
+        (incf queue-index)
+        (setq initialized-p (>= queue-index (1+ delay))))
     (if initialize-queue-p
         (when (null y1-n)
           (setq y1-n (make-matrix (1+ delay) dim))
@@ -1252,15 +1256,23 @@
         (when (< queue-index (1+ delay))
           (setf (matrix-row y1-n queue-index) (subseq p 0 dim))
           (setf (elt additional-data-queue queue-index) add-data)
-          (incf queue-index)
-          (return-from :update-xk nil))))
+          (return-from :update-xk nil)))))
+    (unless p
+      (decf queue-index)
+      (setq p (send self :last-reference-output-vector))
+      (if (<= queue-index 0) (setq finishedp t)))
+    ;; update y1-n
     (dotimes (i delay)
       (setf (matrix-row y1-n i) (matrix-row y1-n (1+ i)))
       (setf (elt additional-data-queue i) (elt additional-data-queue (1+ i))))
     (setf (matrix-row y1-n delay) (subseq p 0 dim))
     (setf (elt additional-data-queue delay) add-data)
     ;;
-    (send self :calc-xk))
+    (send self :calc-xk)
+    (if (and initialized-p (not finishedp))
+        (cons (send self :current-reference-output-vector)
+              (send self :current-state-vector)))
+    )
   (:last-reference-output-vector
    ()
    (matrix-row y1-n delay)) ;; tail of queue
@@ -1417,7 +1429,7 @@
                     zmp-z)))
   ;;
   (:update-xk (p &optional (add-data))
-    (setq zmp-z (elt p 2))
+    (if p (setq zmp-z (elt p 2)))
     (send-super :update-xk p add-data))
   (:cog-z () cog-z)
   (:update-cog-z (zc)
@@ -1513,17 +1525,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass preview-dynamics-filter
   :super propertied-object
-  :slots (counter finishedp preview-controller))
+  :slots (preview-controller))
 
 (defmethod preview-dynamics-filter
   (:init (dt zc &optional (preview-class preview-control)
                 &rest args)
-    (setq counter 0
-          finishedp nil
-          preview-controller (instance* preview-class :init dt zc args))
+    (setq preview-controller (instance* preview-class :init dt zc args))
     self)
   ;;
-  (:finishedp () finishedp)
+  (:finishedp () (preview-controller . finishedp))
   (:av () (send preview-controller :current-additional-data)) ;; get parameters at "k"
   (:cart-zmp () (send preview-controller :cart-zmp))
   (:refcog () (send preview-controller :refcog))
@@ -1531,19 +1541,11 @@
   ;;
   (:update (av p)
     (let (r)
-      (cond (p
-	     (send preview-controller :update-xk p av)
-	     (if (< counter (send preview-controller :delay)) 	     
-		 (incf counter)
-	       (setq r t)))
-	    (t ;; (null p)
-	     (send preview-controller :update-xk
-                   (send preview-controller :last-refzmp)
-                   av)
-	     (if (> counter 0) (setq r (decf counter)))))
-      (if (<= counter 0) (setq finishedp t))
-      (if r (cons (send preview-controller :current-refzmp)
-		  (send preview-controller :refcog)) nil)
+      (setq r (send preview-controller :update-xk p av))
+      (if r
+          (cons
+           (send preview-controller :current-refzmp)
+           (send preview-controller :refcog)))
       ))
   )
 
