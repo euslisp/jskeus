@@ -1185,7 +1185,7 @@
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; preview-control class
+;;; preview-controller class
 ;;;  A, b, c -> system configuration matrices
 ;;;  uk -> input for controller at the time "k"
 ;;;  xk -> state variable
@@ -1200,9 +1200,9 @@
   :slots (xk uk delay f1-n y1-n dim queue-index initialize-queue-p additional-data-queue finishedp initialized-p))
 (defmethod preview-controller
   (:init
-    (dt ; dt -> sampling time[s]
+    (dt
      &key (q) (r)
-          ((:delay d)) ;; [s]
+          ((:delay d))
           ((:dim tmp-dim))
           (init-xk (float-vector 0 0 0))
           ((:A _A))
@@ -1210,6 +1210,13 @@
           ((:C _C))
           (state-dim (array-dimension _A 0))
           ((:initialize-queue-p iqp)))
+    "Initialize preview-controller.
+     Q is weighting of output error and R is weighting of input.
+     dt is sampling time [s].
+     delay is preview time [s].
+     init-xk is initial state value.
+     A, B, C are state eq matrices.
+     If initialize-queue-p is t, fill all queue by the first input at the begenning, otherwise, do not fill queue at the first."
     (setq delay (round (/ d dt)) dim tmp-dim initialize-queue-p iqp)
     (send-super :init _A _B _C q r)
     (setq queue-index 0)
@@ -1219,8 +1226,6 @@
     (send self :solve)
     (send self :calc-f)
     self)
-  ;; getter methods
-  (:delay () delay)
   (:calc-f () ;; calculate preview gain for k+1, ... k+N.
     (setq f1-n (make-matrix 1 (1+ delay))) ;; (matrix-row f1-n 0) is dummy to being mutiplied by p1-n
     (let* ((gsi (unit-matrix (array-dimension c 1)))
@@ -1236,7 +1241,11 @@
   (:calc-xk () ;; update xk+1
     (setq xk (m+ (m* A xk) (m* b (send self :calc-u)))))
   ;;
-  (:update-xk (p &optional (add-data))
+  (:update-xk
+   (p &optional (add-data))
+   "Update xk by inputting reference output.
+    Return value : nil (initializing) => return values (middle) => nil (finished)
+    If p is nil, automatically the last value in queue is used as input and preview controller starts finishing."
     ;; initialize
     (if p
         (progn
@@ -1274,25 +1283,37 @@
               (send self :current-state-vector)
               (send self :current-output-vector)))
     )
-  (:finishedp () finishedp)
+  (:finishedp
+   ()
+   "Finished or not."
+   finishedp)
   (:last-reference-output-vector
    ()
+   "Last value of reference output queue vector (y_{k+N}^{ref}).
+    Last value is latest future value."
    (matrix-row y1-n delay)) ;; tail of queue
   (:current-reference-output-vector
    ()
+   "First value of reference output queue vector (y_k^{ref}).
+    First value is oldest future value and it can be used as current reference value."
    (matrix-row y1-n 0)) ;; head of queue
   (:current-state-vector
    ()
+   "Current state value (xk)."
    (matrix-row xk 0))
   (:current-output-vector
    ()
+   "Current output value (yk)."
    (m* c xk))
   (:current-additional-data
    ()
+   "Current additional data value.
+    First value of additional-data-queue."
    (car additional-data-queue)
    )
   (:pass-preview-controller
    (reference-output-vector-list)
+   "Get preview controller results from reference-output-vector-list and returns list."
    (let ((r) (ret))
      ;; Wait until initialize
      (while (not (setq r (send self :update-xk (pop reference-output-vector-list) nil))))
@@ -1305,10 +1326,10 @@
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; extended-preview-control class
+;;; extended-preview-controller class
 ;;;  this class is error system of preview-control class
 ;;;  (refer to "Digital Preview Control (in Japanese)", SangyoToshoKabusikiGaisha, Takeshi Tsuchiya and Tadashi Egami)
-;;;  orgA, orgb, orgc -> system configuration matrices for original table-cart model
+;;;  orgA, orgb, orgc -> system configuration matrices
 ;;;  xk* -> [y_k^T, dxk^T]^T
 ;;;  state equation of this system is
 ;;;   xk+1* = A xk* + b duk
@@ -1326,6 +1347,13 @@
           ((:A _orgA)) ((:B _orgB)) ((:C _orgC))
           (state-dim (array-dimension _orgA 0))
           ((:initialize-queue-p iqp)))
+    "Initialize preview-controller in extended system (error system).
+     Q is weighting of output error and R is weighting of input.
+     dt is sampling time [s].
+     delay is preview time [s].
+     init-xk is initial state value.
+     A, B, C are state eq matrices for original system and slot variables A,B,C are used for error system matrices.
+     If initialize-queue-p is t, fill all queue by the first input at the begenning, otherwise, do not fill queue at the first."
     (setq orgA _orgA orgB _orgB orgC _orgC)
     (let* ((output-dim (array-dimension orgC 0))
            (org-state-dim (array-dimension orgA 0))
@@ -1380,30 +1408,28 @@
     )
   (:current-output-vector
    ()
+   "Current additional data value.
+    First value of additional-data-queue."
    (matrix-row xk* 0)
    )
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; preview-control class to compute reference COG from reference ZMP
+;;; COG (xy) trajectory generator using preview-control convert reference ZMP from reference COG
 ;;;  (refer to "Biped Walking Pattern Generation by using Preview Control of Zero-Moment Point", ICRA 2003, p.1620-1626, Shuuji KAJITA, Fumio KANEHIRO, Kenji KANEKO, Kiyoshi FUJIWARA, Kensuke HARADA, Kazuhito YOKOI and Hirohisa HIRUKAWA
 ;;;            "Humanoid Robot (in Japanese)", Ohmsha, 2005, Shuji Kajita, ISBN 4-274-20058-2)
-;;;  A, b, c -> system configuration matrices
-;;;  xk, uk  -> COG() and input for controller at "k"
-;;;             xk -> 3 x 2 matrix, uk -> 1 x 2 matrix (2 represents x and y)
-;;;  delay -> preview step calculated from predictive time (delay = N)
-;;;  p1-n -> reference ZMP queue (time is k, k+1, ... k+N)
-;;;  state equation of this system is
-;;;   xk+1 = A xk + b uk
-;;;   pk   = c xk
-;;;  unit system -> [mm], [s]
+;;; A,B,C -> Table-cart system
+;;; xk -> 3 x 2 matrix (3 = COG pos, vel, acc, 2 = x, y)
+;;; uk -> 1 x 2 matrix (COG jark of x and y)
+;;  yk -> zmp
+;;; unit system -> [mm], [s]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass preview-control-cogxy-trajectory-generator
   :super propertied-object
   :slots (pc cog-z zmp-z))
 (defmethod preview-control-cogxy-trajectory-generator
   (:init
-    (dt _zc ;; dt -> sampling time[s], _zc is height of COG[mm]
+    (dt _zc
      &key (q 1) (r 1e-6)
           ((:delay d) 1.6)
           (init-xk (float-vector 0 0 0))
@@ -1415,7 +1441,11 @@
                                           (list dt))))
           ((:C _C) (make-matrix 1 3 (list (list 1.0 0.0 (- (/ _zc (elt *g-vec* 2)))))))
           ((:initialize-queue-p iqp))
-          (preview-controller-class preview-controller))
+          (preview-controller-class extended-preview-controller))
+    "COG (xy) trajectory generator using preview-control convert reference ZMP from reference COG.
+     dt -> sampling time[s], _zc is height of COG [mm].
+     preview-controller-class is preview controller class (extended-preview-controller by default).
+     For other arguments, please see preview-controller and extended-preview-controller :init documentation."
     (setq pc (instance preview-controller-class
                        :init dt :q q :r r :delay d
                        :init-xk init-xk :dim 2
@@ -1425,25 +1455,32 @@
   ;; getter methods
   (:refcog
    ()
+   "Reference COG [mm]."
    (let ((cv (send pc :current-state-vector)))
      (float-vector (elt cv 0) (elt cv 1) cog-z)))
-  (:cart-zmp () ;; table-cart zmp as an output variable
+  (:cart-zmp ()
+   "Cart-table system ZMP[mm] as an output variable."
     (let ((p (send pc :current-output-vector)))
       (float-vector (aref p 0 0)
                     (aref p 0 1)
                     zmp-z)))
   (:last-refzmp ()
-    (let ((p (send pc :last-reference-output-vector))) ;; tail of refzmp queue
+   "Reference zmp at the last of queue."
+    (let ((p (send pc :last-reference-output-vector)))
       (float-vector (elt p 0)
                     (elt p 1)
                     zmp-z)))
   (:current-refzmp ()
+   "Current reference zmp at the first of queue."
     (let ((p (send pc :current-reference-output-vector))) ;; head of refzmp queue
       (float-vector (elt p 0)
                     (elt p 1)
                     zmp-z)))
   ;;
-  (:update-xk (p &optional (add-data))
+  (:update-xk
+   (p &optional (add-data))
+   "Update xk and returns zmp and cog values.
+    For arguments, please see preview-controller and extended-preview-controller :update-xk."
     (if p (setq zmp-z (elt p 2)))
     (let ((ret (send pc :update-xk p add-data)))
       (if ret
@@ -1451,10 +1488,11 @@
            (send self :current-refzmp)
            (send self :refcog)
            (send self :cart-zmp)))))
-  (:finishedp () (send pc :finishedp))
-  (:current-additional-data () (send pc :current-additional-data))
+  (:finishedp () "Finished or not." (send pc :finishedp))
+  (:current-additional-data () "Current additional data value." (send pc :current-additional-data))
   (:pass-preview-controller
    (reference-output-vector-list)
+   "Get preview controller results from reference-output-vector-list and returns list."
    (let ((r) (ret))
      ;; Wait until initialize
      (while (not (setq r (send self :update-xk (pop reference-output-vector-list) nil))))
@@ -1464,7 +1502,7 @@
        (push r ret))
      (reverse ret)
      ))
-  (:cog-z () cog-z)
+  (:cog-z () "COG Z [mm]." cog-z)
   (:update-cog-z (zc)
     (setf (aref (pc . c) 0 2) (- (/ zc (elt *g-vec* 2))))
     (send pc :solve)
