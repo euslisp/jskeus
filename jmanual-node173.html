@@ -112,9 +112,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <P>
 	<BR> 
 <A NAME="57630"></A>
-<BIG CLASS="XLARGE"><B>preview-controller-base </B></BIG> [クラス]  <PRE><TT>
+<BIG CLASS="XLARGE"><B>preview-controller </B></BIG> [クラス]  <PRE><TT>
   :super   <B>riccati-equation</B> 
-<BR>  :slots 		 xk uk delay f1-n y1-n dim 
+<BR>  :slots 		 xk uk delay f1-n y1-n dim queue-index initialize-queue-p additional-data-queue finishedp initialized-p 
 </TT></PRE>
 <BR>
 <BR>
@@ -126,36 +126,143 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </DL>
 <BR>
 <BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57647"></A>
-<B>:init</B> <EM>dt &amp;key (q) (r) ((:delay d)) ((:dim tmp-dim)) (init-xk (float-vector 0 0 0)) ((:a _a)) ((:b _b)) ((:c _c)) (state-dim (array-dimension _a 0))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
-</SMALL>
+<A NAME="57647"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img305.png"
+ ALT="\begin{emtabbing}
+{\bf :init}
+\it dt \&amp;key \= (q) \\lq  [method]\\
+\&gt; (r) \\
+\&gt; ...
+...(array-dimension \_a 0)) \\
+\&gt; ((:initialize-queue-p iqp))
+\rm
+\end{emtabbing}">
+<BR>
 
 <DL COMPACT>
 <DT> 
-<DD>  
+<DD>Initialize preview-controller.
+<BR>
+Q is weighting of output error and R is weighting of input.
+<BR>
+dt is sampling time [s].
+<BR>
+delay is preview time [s].
+<BR>
+init-xk is initial state value.
+<BR>
+A, B, C are state eq matrices.
+<BR>
+If initialize-queue-p is t, fill all queue by the first input at the begenning, otherwise, do not fill queue at the first.
 </DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
+</DL>
 <BR>
 <BR>
-
 
 <A NAME="57658"></A>
-<B>:delay</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
+<B>:update-xk</B> <EM>p &amp;optional (add-data)  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD>  
+<DD> Update xk by inputting reference output.
+<BR>
+Return value : nil (initializing) =&gt;return values (middle) =&gt;nil (finished)
+<BR>
+If p is nil, automatically the last value in queue is used as input and preview controller starts finishing.
 </DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
+</DL>
 <BR>
 <BR>
 
+<A NAME="57668"></A>
+<B>:finishedp</B> [メソッド]
 
-<A NAME="57669"></A>
+<DL COMPACT>
+<DT> 
+<DD> Finished or not.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57678"></A>
+<B>:last-reference-output-vector</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Last value of reference output queue vector (y_k+N_ref).
+<BR>
+Last value is latest future value.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57688"></A>
+<B>:current-reference-output-vector</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> First value of reference output queue vector (y_k_ref).
+<BR>
+First value is oldest future value and it can be used as current reference value.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57698"></A>
+<B>:current-state-vector</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Current state value (xk).
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57708"></A>
+<B>:current-output-vector</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Current output value (yk).
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57718"></A>
+<B>:current-additional-data</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Current additional data value.
+<BR>
+First value of additional-data-queue.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57728"></A>
+<B>:pass-preview-controller</B> <EM>reference-output-vector-list  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Get preview controller results from reference-output-vector-list and returns list.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="57738"></A>
 <B>:calc-f</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -169,7 +276,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="57680"></A>
+<A NAME="57749"></A>
 <B>:calc-u</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -183,22 +290,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="57691"></A>
+<A NAME="57760"></A>
 <B>:calc-xk</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57702"></A>
-<B>:update-xk</B> <EM>p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -215,10 +308,10 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="57714"></A>
-<BIG CLASS="XLARGE"><B>preview-control </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>preview-controller-base</B> 
-<BR>  :slots 		 cog-z zmp-z 
+<A NAME="57772"></A>
+<BIG CLASS="XLARGE"><B>extended-preview-controller </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>preview-controller</B> 
+<BR>  :slots 		 orga orgb orgc xk
 </TT></PRE>
 <BR>
 <BR>
@@ -230,9 +323,59 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </DL>
 <BR>
 <BR>
+
+<A NAME="57789"></A>
+<BR>
+<IMG
+ WIDTH="553" HEIGHT="188" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img306.png"
+ ALT="\begin{emtabbing}
+{\bf :init}
+\it dt \&amp;key \= (q) \\lq  [method]\\
+\&gt; (r) \\
+\&gt; ...
+...ray-dimension \_orga 0)) \\
+\&gt; ((:initialize-queue-p iqp))
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>Initialize preview-controller in extended system (error system).
+<BR>
+Q is weighting of output error and R is weighting of input.
+<BR>
+dt is sampling time [s].
+<BR>
+delay is preview time [s].
+<BR>
+init-xk is initial state value.
+<BR>
+A, B, C are state eq matrices for original system and slot variables A,B,C are used for error system matrices.
+<BR>
+If initialize-queue-p is t, fill all queue by the first input at the begenning, otherwise, do not fill queue at the first.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57800"></A>
+<B>:current-output-vector</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Current additional data value.
+<BR>
+First value of additional-data-queue.
+</DD>
+</DL>
+<BR>
+<BR>
+
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57731"></A>
-<B>:init</B> <EM>dt _zc &amp;key (q 1) (r 1.000000e-06) ((:delay d) 1.6) (init-xk (float-vector 0 0 0)) ((:a _a) (make-matrix 3 3 (list (list 1 dt (0.5 dt dt)) (list 0 1 dt) (list 0 0 1)))) ((:b _b) (make-matrix 3 1 (list (list ((/ 1.0 6.0) dt dt dt)) (list (0.5 dt dt)) (list dt)))) ((:c _c) (make-matrix 1 3 (list (list 1.0 0.0 (- (/ _zc (elt g-vec2)))))))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="57810"></A>
+<B>:calc-f</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -245,8 +388,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="57742"></A>
-<B>:refcog</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="57821"></A>
+<B>:calc-u</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -259,8 +402,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="57753"></A>
-<B>:cart-zmp</B> <EM>&amp;optional (_c c)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="57832"></A>
+<B>:calc-xk</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -272,64 +415,159 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-
-<A NAME="57764"></A>
-<B>:last-refzmp</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
+<BR>
 </SMALL>
+
+<P>
+	<BR> 
+<A NAME="57844"></A>
+<BIG CLASS="XLARGE"><B>preview-control-cart-table-cog-trajectory-generator </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>propertied-object</B> 
+<BR>  :slots 		 pc cog-z zmp-z 
+</TT></PRE>
+<BR>
+<BR>
 
 <DL COMPACT>
 <DT> 
-<DD>  
+<DD>
 </DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
+</DL>
 <BR>
 <BR>
 
-
-<A NAME="57775"></A>
-<B>:current-refzmp</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
+<A NAME="57861"></A>
+<BR>
+<IMG
+ WIDTH="553" HEIGHT="188" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img307.png"
+ ALT="\begin{emtabbing}
+{\bf :init}
+\it dt \_zc \&amp;key \= (q 1) \\lq  [method]\\
+\&gt; (r 1...
+...
+\&gt; (preview-controller-class extended-preview-controller)
+\rm
+\end{emtabbing}">
+<BR>
 
 <DL COMPACT>
 <DT> 
-<DD>  
+<DD>COG (xy) trajectory generator using preview-control convert reference ZMP from reference COG.
+<BR>
+dt -&gt;sampling time[s], _zc is height of COG [mm].
+<BR>
+preview-controller-class is preview controller class (extended-preview-controller by default).
+<BR>
+For other arguments, please see preview-controller and extended-preview-controller :init documentation.
 </DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
+</DL>
 <BR>
 <BR>
 
-
-<A NAME="57786"></A>
-<B>:update-xk</B> <EM>p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
+<A NAME="57872"></A>
+<B>:refcog</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD>  
+<DD> Reference COG [mm].
 </DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
+</DL>
 <BR>
 <BR>
 
-
-<A NAME="57797"></A>
-<B>:cog-z</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
+<A NAME="57882"></A>
+<B>:cart-zmp</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD>  
+<DD> Cart-table system ZMP[mm] as an output variable.
 </DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
+</DL>
 <BR>
 <BR>
 
+<A NAME="57892"></A>
+<B>:last-refzmp</B> [メソッド]
 
-<A NAME="57808"></A>
+<DL COMPACT>
+<DT> 
+<DD> Reference zmp at the last of queue.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57902"></A>
+<B>:current-refzmp</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Current reference zmp at the first of queue.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57912"></A>
+<B>:update-xk</B> <EM>p &amp;optional (add-data)  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Update xk and returns zmp and cog values.
+<BR>
+For arguments, please see preview-controller and extended-preview-controller :update-xk.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57922"></A>
+<B>:finishedp</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Finished or not.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57932"></A>
+<B>:current-additional-data</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Current additional data value.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57942"></A>
+<B>:pass-preview-controller</B> <EM>reference-output-vector-list  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Get preview controller results from reference-output-vector-list and returns list.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57952"></A>
+<B>:cog-z</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> COG Z [mm].
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="57962"></A>
 <B>:update-cog-z</B> <EM>zc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -347,218 +585,10 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="57820"></A>
-<BIG CLASS="XLARGE"><B>extended-preview-control </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>preview-control</B> 
-<BR>  :slots 		 orga orgb orgc xk
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57837"></A>
-<B>:init</B> <EM>dt zc &amp;key (q 1.0) (r 1.000000e-06) ((:delay d) 1.6) (init-xk (float-vector 0 0 0))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57848"></A>
-<B>:cart-zmp</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57859"></A>
-<B>:calc-f</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57870"></A>
-<B>:calc-u</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57881"></A>
-<B>:calc-xk</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="57893"></A>
-<BIG CLASS="XLARGE"><B>preview-dynamics-filter </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>propertied-object</B> 
-<BR>  :slots 		 avs counter finishedp preview-controller 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57910"></A>
-<B>:init</B> <EM>dt zc &amp;optional (preview-class preview-control) &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57921"></A>
-<B>:finishedp</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57932"></A>
-<B>:av</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57943"></A>
-<B>:cart-zmp</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57954"></A>
-<B>:refcog</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57965"></A>
-<B>:cog-z</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57976"></A>
-<B>:update</B> <EM>av p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="57988"></A>
+<A NAME="57974"></A>
 <BIG CLASS="XLARGE"><B>gait-generator </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
-<BR>  :slots 		 robot dt footstep-node-list support-leg-list support-leg-coords-list swing-leg-dst-coords-list swing-leg-src-coords refzmp-cur-list refzmp-next refzmp-prev step-height-list one-step-len index-count default-step-height default-double-support-ratio default-zmp-offsets finalize-p preview-controller all-limbs end-with-double-support ik-thre ik-rthre 
+<BR>  :slots 		 robot dt footstep-node-list support-leg-list support-leg-coords-list swing-leg-dst-coords-list swing-leg-src-coords refzmp-cur-list refzmp-next refzmp-prev step-height-list one-step-len index-count default-step-height default-double-support-ratio default-zmp-offsets finalize-p apreview-controller all-limbs end-with-double-support ik-thre ik-rthre 
 </TT></PRE>
 <BR>
 <BR>
@@ -571,7 +601,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58005"></A>
+<A NAME="57991"></A>
 <B>:init</B> <EM>rb _dt  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -585,7 +615,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58016"></A>
+<A NAME="58002"></A>
 <B>:get-footstep-limbs</B> <EM>fs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -599,7 +629,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58027"></A>
+<A NAME="58013"></A>
 <B>:get-counter-footstep-limbs</B> <EM>fs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -613,7 +643,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58038"></A>
+<A NAME="58024"></A>
 <B>:get-limbs-zmp-list</B> <EM>limb-coords limb-names  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -627,7 +657,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58049"></A>
+<A NAME="58035"></A>
 <B>:get-limbs-zmp</B> <EM>limb-coords limb-names  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -641,7 +671,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58060"></A>
+<A NAME="58046"></A>
 <B>:get-swing-limbs</B> <EM>limbs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -655,7 +685,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58071"></A>
+<A NAME="58057"></A>
 <B>:initialize-gait-parameter</B> <EM>fsl time cog &amp;key ((:default-step-height dsh) 50) ((:default-double-support-ratio ddsr) 0.2) (delay 1.6) ((:all-limbs al) '(:rleg :lleg)) ((:default-zmp-offsets dzo) (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) (q 1.0) (r 1.000000e-06) (thre 1) (rthre (deg2rad 1)) (start-with-double-support t) ((:end-with-double-support ewds) t)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -669,7 +699,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58082"></A>
+<A NAME="58068"></A>
 <B>:finalize-gait-parameter</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -683,7 +713,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58093"></A>
+<A NAME="58079"></A>
 <B>:make-gait-parameter</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -697,7 +727,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58104"></A>
+<A NAME="58090"></A>
 <B>:calc-current-swing-leg-coords</B> <EM>ratio src dst &amp;key (type :shuffling) (step-height default-step-height)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -711,7 +741,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58115"></A>
+<A NAME="58101"></A>
 <B>:calc-ratio-from-double-support-ratio</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -725,7 +755,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58126"></A>
+<A NAME="58112"></A>
 <B>:calc-current-refzmp</B> <EM>prev cur next  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -739,7 +769,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58137"></A>
+<A NAME="58123"></A>
 <B>:calc-one-tick-gait-parameter</B> <EM>type  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -753,7 +783,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58148"></A>
+<A NAME="58134"></A>
 <B>:proc-one-tick</B> <EM>&amp;key (type :shuffling) (solve-angle-vector :solve-av-by-move-centroid-on-foot) (solve-angle-vector-args) (debug nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -767,7 +797,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58159"></A>
+<A NAME="58145"></A>
 <B>:update-current-gait-parameter</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -781,7 +811,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58170"></A>
+<A NAME="58156"></A>
 <B>:solve-angle-vector</B> <EM>support-leg support-leg-coords swing-leg-coords cog &amp;key (solve-angle-vector :solve-av-by-move-centroid-on-foot) (solve-angle-vector-args)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -795,7 +825,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58181"></A>
+<A NAME="58167"></A>
 <B>:solve-av-by-move-centroid-on-foot</B> <EM>support-leg support-leg-coords swing-leg-coords cog robot &amp;rest args &amp;key (cog-gain 3.5) (stop 100) (additional-nspace-list) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -809,7 +839,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58192"></A>
+<A NAME="58178"></A>
 <B>:cycloid-midpoint</B> <EM>ratio start goal height &amp;key (top-ratio 0.5)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -823,7 +853,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58203"></A>
+<A NAME="58189"></A>
 <B>:cycloid-midcoords</B> <EM>ratio start goal height &amp;key (top-ratio 0.5)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -841,7 +871,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58214"></A>
+<A NAME="58200"></A>
 <B>calc-inertia-matrix-rotational</B> <EM>mat row column paxis m-til c-til i-til axis-for-angular child-link world-default-coords translation-axis rotation-axis tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -857,7 +887,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58225"></A>
+<A NAME="58211"></A>
 <B>calc-inertia-matrix-linear</B> <EM>mat row column paxis m-til c-til i-til axis-for-angular child-link world-default-coords translation-axis rotation-axis tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -906,7 +936,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-08-06
+2015-08-07
 </ADDRESS>
 </BODY>
 </HTML>
