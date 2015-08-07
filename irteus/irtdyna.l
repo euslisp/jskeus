@@ -1270,8 +1270,9 @@
     (send self :calc-xk)
     ;; return
     (if (and initialized-p (not finishedp))
-        (cons (send self :current-reference-output-vector)
-              (send self :current-state-vector)))
+        (list (send self :current-reference-output-vector)
+              (send self :current-state-vector)
+              (send self :current-output-vector)))
     )
   (:finishedp () finishedp)
   (:last-reference-output-vector
@@ -1435,9 +1436,10 @@
     (if p (setq zmp-z (elt p 2)))
     (let ((ret (send pc :update-xk p add-data)))
       (if ret
-          (cons
+          (list
            (send self :current-refzmp)
-           (send self :refcog)))))
+           (send self :refcog)
+           (send self :cart-zmp)))))
   (:finishedp () (send pc :finishedp))
   (:current-additional-data () (send pc :current-additional-data))
   (:cog-z () cog-z)
@@ -1736,13 +1738,13 @@
            (dd (send apreview-controller :update-xk ;; return value from preview-controller
                      (if preview-data (elt preview-data 3)) preview-data))
            (gp (send apreview-controller :current-additional-data))) ;; gait parameter
-      (if dd (setf (elt (cdr dd) 2) (elt gp 4))) ;; overwrite 
+      (if dd (setf (elt (cadr dd) 2) (elt gp 4))) ;; overwrite 
       (let ((ret (if (and dd solve-angle-vector)
                      (append (send self :solve-angle-vector
-                                   (elt gp 0) (elt gp 1) (elt gp 2) (cdr dd)
+                                   (elt gp 0) (elt gp 1) (elt gp 2) (cadr dd)
                                    :solve-angle-vector solve-angle-vector
                                    :solve-angle-vector-args solve-angle-vector-args)
-                             (if debug (append (butlast gp 2) (list (cdr dd)
+                             (if debug (append (butlast gp 2) (list (cadr dd)
                                                                   (send apreview-controller :cart-zmp))
                                                (last gp)
                                                ))))))
