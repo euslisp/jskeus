@@ -1289,12 +1289,12 @@
    finishedp)
   (:last-reference-output-vector
    ()
-   "Last value of reference output queue vector (y_{k+N}^{ref}).
+   "Last value of reference output queue vector (y_k+N_ref).
     Last value is latest future value."
    (matrix-row y1-n delay)) ;; tail of queue
   (:current-reference-output-vector
    ()
-   "First value of reference output queue vector (y_k^{ref}).
+   "First value of reference output queue vector (y_k_ref).
     First value is oldest future value and it can be used as current reference value."
    (matrix-row y1-n 0)) ;; head of queue
   (:current-state-vector
