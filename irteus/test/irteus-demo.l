@@ -64,13 +64,37 @@
           (mapcar #'(lambda (rs-list) (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x))) rs-list))))
                   (walk-motion-for-robots)))))
 
-(deftest test-test-preview-control
+(deftest test-test-preview-control-0
   (assert
-   (every #'identity (test-preview-control))))
+   (every #'identity (test-preview-control-0))))
 
-(deftest test-test-extended-preview-control
+(deftest test-test-extended-preview-control-0
   (assert
-   (every #'identity (test-preview-control :preview-class extended-preview-control))))
+   (every #'identity (test-preview-control-0 :preview-controller-class extended-preview-controller))))
+
+(deftest test-test-preview-control-1
+  (assert
+   (every #'identity (test-preview-control-1))))
+
+(deftest test-test-extended-preview-control-1
+  (assert
+   (every #'identity (test-preview-control-1 :preview-controller-class extended-preview-controller))))
+
+(deftest test-test-preview-control-2
+  (assert
+   (every #'identity (test-preview-control-2))))
+
+(deftest test-test-extended-preview-control-2
+  (assert
+   (every #'identity (test-preview-control-2 :preview-controller-class extended-preview-controller))))
+
+(deftest test-test-preview-control-3
+  (assert
+   (every #'identity (test-preview-control-3))))
+
+(deftest test-test-extended-preview-control-3
+  (assert
+   (every #'identity (test-preview-control-3 :preview-controller-class extended-preview-controller))))
 
 (deftest test-test-preview-control-dynamics-filter-for-sample-robot
   (assert
@@ -78,7 +102,7 @@
 
 (deftest test-test-extended-preview-control-dynamics-filter-for-sample-robot
   (assert
-   (every #'identity (test-preview-control-dynamics-filter-for-sample-robot :preview-class extended-preview-control))))
+   (every #'identity (test-preview-control-dynamics-filter-for-sample-robot :preview-controller-class extended-preview-controller))))
 
 (deftest test-test-sample-1dof-closed-link-robot
   (assert
