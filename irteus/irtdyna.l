@@ -1254,7 +1254,7 @@
     (send self :calc-xk))
   (:last-reference-output-vector
    ()
-   (matrix-row y1-n (1+ delay))) ;; tail of queue
+   (matrix-row y1-n delay)) ;; tail of queue
   (:current-reference-output-vector
    ()
    (matrix-row y1-n 0)) ;; head of queue
@@ -1383,21 +1383,22 @@
     (setq cog-z _zc)
     self)
   ;; getter methods
-  (:refcog () (float-vector (elt (matrix-row xk 0) 0)
-                            (elt (matrix-row xk 0) 1)
-                            cog-z))
-  (:cart-zmp (&optional (_c c)) ;; table-cart zmp as an output variable
-    (let ((p (m* _c xk)))
+  (:refcog
+   ()
+   (let ((cv (send self :current-state-vector)))
+     (float-vector (elt cv 0) (elt cv 1) cog-z)))
+  (:cart-zmp () ;; table-cart zmp as an output variable
+    (let ((p (send self :current-output-vector)))
       (float-vector (aref p 0 0)
                     (aref p 0 1)
                     zmp-z)))
   (:last-refzmp ()
-    (let ((p (matrix-row y1-n delay))) ;; tail of refzmp queue
+    (let ((p (send self :last-reference-output-vector))) ;; tail of refzmp queue
       (float-vector (elt p 0)
                     (elt p 1)
                     zmp-z)))
   (:current-refzmp ()
-    (let ((p (matrix-row y1-n 0))) ;; head of refzmp queue
+    (let ((p (send self :current-reference-output-vector))) ;; head of refzmp queue
       (float-vector (elt p 0)
                     (elt p 1)
                     zmp-z)))
@@ -1465,8 +1466,6 @@
       (setq xk* (make-matrix 4 dim))
       (setf (matrix-row xk* 0) (subseq init-xk 0 dim)))
     self)
-  ;; getter methods
-  (:cart-zmp () (send-super :cart-zmp orgc))
   ;;
   (:calc-f ()
     (setq f1-n (make-matrix 1 (1+ delay)))
@@ -1489,6 +1488,10 @@
             (v+ (matrix-row xk i)
                 (matrix-row xk* (1+ i)))))
     )
+  (:current-output-vector
+   ()
+   (matrix-row xk* 0)
+   )
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
