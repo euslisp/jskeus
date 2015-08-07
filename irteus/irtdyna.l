@@ -1256,8 +1256,87 @@
    ()
    (matrix-row xk 0))
   (:current-output-vector
-   (&optional (_c c))
-   (m* _c xk))
+   ()
+   (m* c xk))
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; extended-preview-control class
+;;;  this class is error system of preview-control class
+;;;  (refer to "Digital Preview Control (in Japanese)", SangyoToshoKabusikiGaisha, Takeshi Tsuchiya and Tadashi Egami)
+;;;  orgA, orgb, orgc -> system configuration matrices for original table-cart model
+;;;  xk* -> [y_k^T, dxk^T]^T
+;;;  state equation of this system is
+;;;   xk+1* = A xk* + b duk
+;;;   yk   = c xk*
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass extended-preview-controller-base
+  :super preview-controller-base
+  :slots (orgA orgB orgC xk*))
+
+(defmethod extended-preview-controller-base
+  (:init
+    (dt
+     &key (q) (r) ((:delay d)) ((:dim tmp-dim))
+          (init-xk (float-vector 0 0 0))
+          ((:A _orgA)) ((:B _orgB)) ((:C _orgC))
+          (state-dim (array-dimension _orgA 0)))
+    (setq orgA _orgA orgB _orgB orgC _orgC)
+    (let* ((output-dim (array-dimension orgC 0))
+           (org-state-dim (array-dimension orgA 0))
+           (new-state-dim (+ output-dim org-state-dim))
+           (tmpcA (m* orgc orgA))
+           (newA (make-matrix new-state-dim new-state-dim))
+           (tmpcb (m* orgc orgB))
+           (newb (make-matrix new-state-dim (array-dimension orgB 1)))
+           (newC (make-matrix output-dim new-state-dim)))
+      (setf (aref newA 0 0) 1.0)
+      (dotimes (i output-dim)
+        (dotimes (j org-state-dim)
+          (setf (aref newA i (+ output-dim j)) (aref tmpcA i j))))
+      (dotimes (i org-state-dim)
+        (dotimes (j org-state-dim)
+          (setf (aref newA (+ 1 i) (+ 1 j)) (aref orgA i j))))
+      (setf (aref newb 0 0) (aref tmpcb 0 0))
+      (dotimes (i org-state-dim)
+        (setf (aref newb (+ output-dim i) 0) (aref orgb i 0)))
+      (dotimes (i output-dim)
+        (setf (aref newC i i) 1.0))
+      (send-super :init
+                  dt
+                  :A newA :b newb :c newC :dim tmp-dim :state-dim state-dim
+                  :q q :r r :delay d :init-xk init-xk)
+      (when (null xk*)
+        (setq xk* (make-matrix new-state-dim dim))
+        (setf (matrix-row xk* 0) (subseq init-xk 0 dim))
+        )
+      self))
+  ;;
+  (:calc-f ()
+    (setq f1-n (make-matrix 1 (1+ delay)))
+    (let* ((gsi (unit-matrix (array-dimension c 1)))
+	   (bt (transpose b))
+	   (ct (transpose c))
+	   (R+btPb-1bt (scale-matrix R+btPb-1 bt))
+	   (qt (scale-matrix Q ct)))
+      (dotimes (i delay)
+	(let* ((qt (if (= i (1- delay)) (m* P qt) qt))
+               (fa (scale-matrix R+btPb-1 (m* bt (m* gsi qt)))))
+          (setq gsi (m* A-bKt gsi))
+	  (setf (aref f1-n 0 (1+ i)) (aref fa 0 0))
+          ))))
+  (:calc-u () (m- (m* f1-n y1-n) (m* K xk*)))
+  (:calc-xk ()
+    (setq xk* (m+ (m* A xk*) (m* b (send self :calc-u))))
+    (dotimes (i (array-dimension orgA 0))
+      (setf (matrix-row xk i)
+            (v+ (matrix-row xk i)
+                (matrix-row xk* (1+ i)))))
+    )
+  (:current-output-vector
+   ()
+   (matrix-row xk* 0)
+   )
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
