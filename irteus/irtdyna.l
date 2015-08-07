@@ -1066,7 +1066,7 @@
              (send self :move-coords (cadr (memq :root-coords av)) (car (send self :links)))))
      (update-robot-state (car avs))
      (let ((df (instance preview-dynamics-filter
-                         :init dt (elt (send self :centroid) 2) preview-class :delay delay))
+                         :init dt (elt (send self :centroid) 2) preview-class :delay delay :initialize-queue-p t))
            (r))
        (dotimes (i 2) (send self :calc-zmp))
        (let ((ret-list) (last-av) (ret-avs) (last-zmp) (av)
@@ -1196,7 +1196,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass preview-controller-base
   :super riccati-equation
-  :slots (xk uk delay f1-n y1-n dim queue-index))
+  :slots (xk uk delay f1-n y1-n dim queue-index initialize-queue-p))
 (defmethod preview-controller-base
   (:init
     (dt ; dt -> sampling time[s]
@@ -1207,8 +1207,9 @@
           ((:A _A))
           ((:B _B))
           ((:C _C))
-          (state-dim (array-dimension _A 0)))
-    (setq delay (round (/ d dt)) dim tmp-dim)
+          (state-dim (array-dimension _A 0))
+          ((:initialize-queue-p iqp)))
+    (setq delay (round (/ d dt)) dim tmp-dim initialize-queue-p iqp)
     (send-super :init _A _B _C q r)
     (setq queue-index 0)
     (when (null xk)
@@ -1236,12 +1237,17 @@
   ;;
   (:update-xk (p)
     ;; update y1-n
-    (when (null y1-n)
-      (setq y1-n (make-matrix (1+ delay) dim)))
-    (when (< queue-index (1+ delay))
-      (setf (matrix-row y1-n queue-index) (subseq p 0 dim))
-      (incf queue-index)
-      (return-from :update-xk nil))
+    (if initialize-queue-p
+        (when (null y1-n)
+          (setq y1-n (make-matrix (1+ delay) dim))
+          (dotimes (i (1+ delay)) (setf (matrix-row y1-n i) (subseq p 0 dim))))
+      (progn
+        (when (null y1-n)
+          (setq y1-n (make-matrix (1+ delay) dim)))
+        (when (< queue-index (1+ delay))
+          (setf (matrix-row y1-n queue-index) (subseq p 0 dim))
+          (incf queue-index)
+          (return-from :update-xk nil))))
     (dotimes (i delay) (setf (matrix-row y1-n i) (matrix-row y1-n (1+ i))))
     (setf (matrix-row y1-n delay) (subseq p 0 dim))
     ;;
@@ -1280,7 +1286,8 @@
      &key (q) (r) ((:delay d)) ((:dim tmp-dim))
           (init-xk (float-vector 0 0 0))
           ((:A _orgA)) ((:B _orgB)) ((:C _orgC))
-          (state-dim (array-dimension _orgA 0)))
+          (state-dim (array-dimension _orgA 0))
+          ((:initialize-queue-p iqp)))
     (setq orgA _orgA orgB _orgB orgC _orgC)
     (let* ((output-dim (array-dimension orgC 0))
            (org-state-dim (array-dimension orgA 0))
@@ -1305,7 +1312,7 @@
       (send-super :init
                   dt
                   :A newA :b newb :c newC :dim tmp-dim :state-dim state-dim
-                  :q q :r r :delay d :init-xk init-xk)
+                  :q q :r r :delay d :init-xk init-xk :initialize-queue-p iqp)
       (when (null xk*)
         (setq xk* (make-matrix new-state-dim dim))
         (setf (matrix-row xk* 0) (subseq init-xk 0 dim))
@@ -1368,10 +1375,11 @@
           ((:B _B) (make-matrix 3 1 (list (list (* (/ 1.0 6.0) dt dt dt))
                                           (list (* 0.5 dt dt))
                                           (list dt))))
-          ((:C _C) (make-matrix 1 3 (list (list 1.0 0.0 (- (/ _zc (elt *g-vec* 2))))))))
+          ((:C _C) (make-matrix 1 3 (list (list 1.0 0.0 (- (/ _zc (elt *g-vec* 2)))))))
+          ((:initialize-queue-p iqp)))
     (send-super :init dt :q q :r r :delay d
                 :init-xk init-xk :dim 2
-                :A _A :B _B :C _C :state-dim 3)
+                :A _A :B _B :C _C :state-dim 3 :initialize-queue-p iqp)
     (setq cog-z _zc)
     self)
   ;; getter methods
@@ -1420,7 +1428,7 @@
 
 (defmethod extended-preview-control
   (:init
-    (dt zc &key (q 1.0) (r 1.0e-6) ((:delay d) 1.6) (init-xk (float-vector 0 0 0)))
+    (dt zc &key (q 1.0) (r 1.0e-6) ((:delay d) 1.6) (init-xk (float-vector 0 0 0)) ((:initialize-queue-p iqp)))
     (setq orgA (make-matrix 3 3 (list (list 1 dt (* 0.5 dt dt))
                                     (list 0 1 dt)
                                     (list 0 0 1)))
@@ -1452,7 +1460,7 @@
                   dt zc
                   :A newA :b newb
                   :c (make-matrix 1 4 (list (list 1.0 0.0 0.0 0.0)))
-                  :q q :r r :delay d :init-xk init-xk))
+                  :q q :r r :delay d :init-xk init-xk :initialize-queue-p iqp))
     (when (null xk*)
       (setq xk* (make-matrix 4 dim))
       (setf (matrix-row xk* 0) (subseq init-xk 0 dim)))
