@@ -1065,7 +1065,7 @@
              (send self :angle-vector (cadr (memq :angle-vector av)))
              (send self :move-coords (cadr (memq :root-coords av)) (car (send self :links)))))
      (update-robot-state (car avs))
-     (let ((df (instance preview-control-cogxy-trajectory-generator
+     (let ((df (instance preview-control-cart-table-cog-trajectory-generator
                          :init dt (elt (send self :centroid) 2) :delay delay :initialize-queue-p t
                          :preview-controller-class preview-controller-class))
            (r))
@@ -1418,16 +1418,16 @@
 ;;; COG (xy) trajectory generator using preview-control convert reference ZMP from reference COG
 ;;;  (refer to "Biped Walking Pattern Generation by using Preview Control of Zero-Moment Point", ICRA 2003, p.1620-1626, Shuuji KAJITA, Fumio KANEHIRO, Kenji KANEKO, Kiyoshi FUJIWARA, Kensuke HARADA, Kazuhito YOKOI and Hirohisa HIRUKAWA
 ;;;            "Humanoid Robot (in Japanese)", Ohmsha, 2005, Shuji Kajita, ISBN 4-274-20058-2)
-;;; A,B,C -> Table-cart system
+;;; A,B,C -> cart-table system
 ;;; xk -> 3 x 2 matrix (3 = COG pos, vel, acc, 2 = x, y)
 ;;; uk -> 1 x 2 matrix (COG jark of x and y)
 ;;  yk -> zmp
 ;;; unit system -> [mm], [s]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defclass preview-control-cogxy-trajectory-generator
+(defclass preview-control-cart-table-cog-trajectory-generator
   :super propertied-object
   :slots (pc cog-z zmp-z))
-(defmethod preview-control-cogxy-trajectory-generator
+(defmethod preview-control-cart-table-cog-trajectory-generator
   (:init
     (dt _zc
      &key (q 1) (r 1e-6)
@@ -1652,7 +1652,7 @@
     (send self :append-step-height-list 0.0)
     (pop footstep-node-list)
     ;; currently, not error system
-    (setq apreview-controller (instance preview-control-cogxy-trajectory-generator :init
+    (setq apreview-controller (instance preview-control-cart-table-cog-trajectory-generator :init
                                        dt (- (elt cog 2) (elt (car refzmp-cur-list) 2))
                                        :delay delay
                                        :q q :r r

@@ -198,7 +198,7 @@
         (q 1) (r 1e-6))
   "Example for preview controller in walking ZMP input."
   (let* ((dt 0.010) (max-tm 10.0)
-         (pc (instance preview-control-cogxy-trajectory-generator :init dt 800 :q q :r r :preview-controller-class preview-controller-class))
+         (pc (instance preview-control-cart-table-cog-trajectory-generator :init dt 800 :q q :r r :preview-controller-class preview-controller-class))
          (tm-list (mapcar #'(lambda (x) (* x dt))
                           (let ((i 0)) (mapcar #'(lambda (x) (incf i)) (make-list (round (/ max-tm dt)))))))
          (ref-zmp-list
@@ -251,7 +251,7 @@
                             ((< tm 6) (midpoint (/ (- tm 2) 4.0) #f(-20 20 0) #f(20 -20 0)))
                             (t #f(20 -20 0))))
                   tm-list))
-         (pc (instance preview-control-cogxy-trajectory-generator :init dt 800 :q q :r r :preview-controller-class preview-controller-class :init-xk (car ref-zmp-list)))
+         (pc (instance preview-control-cart-table-cog-trajectory-generator :init dt 800 :q q :r r :preview-controller-class preview-controller-class :init-xk (car ref-zmp-list)))
          zmp-list cog-list ref-zmp-list2
          ret)
     (mapcar
@@ -304,7 +304,7 @@
                        (float-vector 100 100 0) ;; neutoral zmp
                        ))
                   tm-list))
-         (pc (instance preview-control-cogxy-trajectory-generator :init dt 800 :q q :r r :preview-controller-class preview-controller-class :init-xk (car ref-zmp-list)))
+         (pc (instance preview-control-cart-table-cog-trajectory-generator :init dt 800 :q q :r r :preview-controller-class preview-controller-class :init-xk (car ref-zmp-list)))
          zmp-list cog-list ref-zmp-list2
          ret)
     (mapcar
@@ -340,7 +340,7 @@
         (q 1) (r 1e-6))
   "Example for preview controller in long walking ZMP input."
   (let* ((dt 0.010) (max-tm 20.0)
-         (pc (instance preview-control-cogxy-trajectory-generator :init dt 800 :q q :r r :preview-controller-class preview-controller-class))
+         (pc (instance preview-control-cart-table-cog-trajectory-generator :init dt 800 :q q :r r :preview-controller-class preview-controller-class))
          (tm-list (mapcar #'(lambda (x) (* x dt))
                           (let ((i 0)) (mapcar #'(lambda (x) (incf i)) (make-list (round (/ max-tm dt)))))))
          (tmp-zmp (float-vector 0 0 0))
