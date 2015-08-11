@@ -46,6 +46,7 @@
    self)
   (:A (&optional m) (if m (setq A m) A))
   (:H (&optional m) (if m (setq H m) H))
+  (:P () P_k)
   (:Q (&optional m) (if m (setq Q m) Q))
   (:R (&optional m) (if m (setq R m) R))
   (:x (&optional v) (if v (setq x_k v) x_k))
