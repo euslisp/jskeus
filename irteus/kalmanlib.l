@@ -28,7 +28,7 @@
 
 (defclass kalman-filter
   :super propertied-object
-  :slots (A H I Q R x_k z_k P_k x_k-1 P_k-1 K S))
+  :slots (A H I Q R x_k z_k P_k x_k-1 P_k-1 K S vlst))
 
 (defmethod kalman-filter
   (:init 
@@ -71,9 +71,24 @@
    (setq P_k (m* (m- I (m* K H)) P_k))
    t)
   (:proc
-   (z)
+   (z &key (adaptive nil) (m 15)) ;; use m times observed data in adaptive kalman filter
    (send self :predict)
    (send self :correct z)
+   (if adaptive
+       (cond
+        ((< (length vlst) m)
+         (setq vlst (append vlst (list (v- z (transform H x_k)))))
+         )
+        (t
+         (pop vlst)
+         (setq vlst (append vlst (list (v- z (transform H x_k)))))
+         (let ((cov-matrix (scale-matrix 0 R)))
+           (dolist (v vlst nil)
+             (setq cov-matrix (m+ cov-matrix (m* (transpose (matrix v)) (matrix v)))))
+           (setq cov-matrix (scale-matrix (/ 1.0 m) cov-matrix))
+           ;; (ros::ros-debug "cov-mat:~A" cov-matrix)
+           (setq R (m+ cov-matrix (m* H (m* P_k (transpose H)))))
+           ))))
    (transform H x_k)
    )
   (:error
