@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.10 (2015-08-18)
+-------------------
 * [irteus/test/time.l] add test for time add/subtruct (https://github.com/euslisp/EusLisp/pull/128)
 * [irteus/kalmanlib.l] add adaptive flag
 * [irteus/kalmanlib.l] add show P_k method
