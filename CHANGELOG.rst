@@ -2,6 +2,76 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [irteus/test/time.l] add test for time add/subtruct (https://github.com/euslisp/EusLisp/pull/128)
+* [irteus/kalmanlib.l] add adaptive flag
+* [irteus/kalmanlib.l] add show P_k method
+* [irteus/test/string.l] add test for url encoding
+* .update-doc.sh:  skip contents, commit png/jpg files
+* [irteus/demo/*.l] Use ;; at the begenning of print message to escape documentation from demo function usage.
+* [irteus/demo/closed-loop.l, special-joints.l, walk-motion.l] Add print message for demo functions.
+* [jskeus/irteus/test/character.l] add test for character
+* [irteus/test/number.l] add test for eus number
+* [irteus/irtmodel.l] Make pqpmodel in :init-ending
+* [irteus/irtmodel.l] Add check collision argument to :inverse-kinematics and nil by default according to https://github.com/euslisp/jskeus/issues/95
+* (irtpointcloud) fix removing global variables https://github.com/euslisp/jskeus/pull/223#issuecomment-120209460
+
+* irteus/irtdyna (preview controller)
+
+  * [irteus/irtdyna.l] Fix documentation string to avoid eus documentation tex error
+  * [demo/walk-motion.l, irtdyna.l] Rename preview controller cog generator class
+  * [demo/walk-motion.l, test/irteus-demo.l] Update preview control example (long walk, impulsive force, liear zmp transition).
+  * [irteus/irtdyna.l] Add documentation and use extended-preview-controller for COG generator by default.
+  * [irteus/demo/walk-motion.l, irteus/irtdyna.l] Add :pass-preview-controller to add reference list
+  * [irteus/irtdyna.l] Return cart zmp
+  * [demo/walk-motion.l, irtdyna.l, test/irteus-demo.l] Update class names. Rename old preview-control => preview-control-cogxy-trajectory-generator.
+  * [irteus/demo/walk-motion.l, irteus/irtdyna.l] Use preview controller classes and remove extended-preview-control
+  * [irteus/irtdyna.l] Use preview-controller-base queue value directly and remove preview-dynamics-filter class
+  * [irteus/irtdyna.l] Fix indent
+  * [irteus/irtdyna.l] remove duplicated codes
+  * [irteus/irtdyna.l] Move queue handling and initialization and finalization check to preview-controller-base
+  * [irteus/irtdyna.l] Add queue data to preview-controller-base class
+  * [irteus/irtdyna.l] Update state getter methods
+  * [irteus/irtdyna.l] Enable to select queue initalization
+  * [irteus/irtdyna.l] Add extended-preview-control-base class
+  * [irteus/irtdyna.l] Update preview-controller-base updating and add methods for getter.
+  * [demo/walk-motion.l] Update quad sample. Especially in the :go-backward-over nil case, target cog was infeasible
+  * [irteus/demo/sample-robot-model.l] Inrease joint range for shoulder pitch and crotch pitch according to existent real robot joint ranges.
+  * [irteus/irtmodel.l, irteus/irtrobot.l] Do not use lambda function for additional-jacobi and additional-vel by default.
+  * [irteus/demo/walk-motion.l, irteus/test/irteus-demo.l] Add test for both preview-control and extended-preview-control
+  * [irteus/irtdyna.l] Add base class for preview controller which
+    does not include cog and zmp
+
+* irteus/irtgl.l (glvertices)
+
+  * add write-wrl-from-glvertices function
+  * fix glbody, same name of slot veriable and class
+  * add :convert-to-world method to glvertices
+
+* irteus/irtmodel.l
+
+  * [irteus/irtmodel.l] Use dump-command as :fail-only by default.
+  * [irteus/irtmodel.l] Set success flag in one line
+  * [test/test-irt-motion.l] Add unittest for dump-command
+  * [irteus/irtmodel.l] Introduce dump-command as mode according to discussion in https://github.com/euslisp/jskeus/commit/8f9e79e4f24b86cc66fdf3d4bec1a71b878b099e#commitcomment-12334678
+
+* irteus/irtmodel.l closed-loop
+
+  * [irteus/irtmodel.l, irteus/demo/special-joints.l] Add method to calculate velocity for interlocking joint constraint. Use it in sample program.
+  * [irteus/irtrobot.l] Remove unused arguments.
+  * [irteus/irtrobot.l] Reduce too match mass properties calculation.
+  * [demo/closed-loop.l, demo/special-joints.l] Fix print usage style to match demo.l style.
+  * [irteus/demo/demo.l, irteus/test/irteus-demo.l] Add closed-loop sample and special-joint sample to demo.l and unittest.
+  * [irteus/demo/special-joints.l] Add special joints examples. Currently, interlocking joint are defined.
+  * [irteus/irtmodel.l] Add interlocking joint methods.
+  * [irteus/irtrobot.l] Fix additional-vel to argument
+  * add argument cog-null-space. set cog jacobian to additional-jacobi in :fullbody-inverse-kinematics
+  * add arguments additional-jacobi and additional-vel to cascaded-link :inverse-kinematics
+  * [irteus/test/test-irt-motion.l] Add test program for check-collision
+
+* Contributors: Yuki Furuta, Kamada Hitoshi, Kei Okada, Ryohei Ueda, Shunichi Nozawa, Yohei Kakiuchi, Masaki Murooka
+
 1.0.9 (2015-07-09)
 ------------------
 * irtpointcloud.l: impliment :append methods on pointcloud
