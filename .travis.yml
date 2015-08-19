@@ -9,6 +9,7 @@ notifications:
       - euslisp@jsk.t.u-tokyo.ac.jp
     on_success: always #[always|never|change] # default: change
     on_failure: always #[always|never|change] # default: always
+  slack: jsk-robotics:Av7tc8wj3IWkLYvlTzHE7x2g
 env:
   - secure: "u0lUaQ+BR5IH2bJNmGPZ8Yp5/iroJiHNkADN6lvMMqS9FQc8kcEe74UgsTjMdteQXRsDTtJVmwB7UFB83bwwcKoVYwrGAdOfBkWM702hTgmEIqKTkBkaVyUjkzR/VrnVCHCLhQMysAuHQyPrEPjLlvmKiJJ/OYfRg2QCd74ef1I="
 before_install: # Use this to prepare the system to install prerequisites or dependencies
