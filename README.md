@@ -1,5 +1,7 @@
 ## [JSK EusLisp repository](http://jskeus.sourceforge.net) [![Build Status](https://travis-ci.org/euslisp/jskeus.png?branch=master)](https://travis-ci.org/euslisp/jskeus)
 
+[![Join the chat at https://gitter.im/euslisp/jskeus](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/euslisp/jskeus?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 This repository containts software devleoped and used by [JSK](http://www.jsk.t.u-tokyo.ac.jp )at The University of Tokyo.
 
