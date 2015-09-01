@@ -822,8 +822,17 @@
    support-polygons)
   (:support-polygon
    (name)
-   "Return support polygon with given name."
-   (find name (send self :support-polygons) :test #'equal :key #'(lambda (x) (send x :name))))
+   "Return support polygon.
+    If name is list, return convex hull of all polygons.
+    Otherwise, return polygon with given name"
+   (if (consp name)
+       (instance polygon :init :vertices (quickhull
+                                          (apply
+                                           #'append
+                                           (mapcar #'(lambda (nm)
+                                                       (send (send self :support-polygon nm) :vertices))
+                                                   name))))
+     (find name (send self :support-polygons) :test #'equal :key #'(lambda (x) (send x :name)))))
   (:make-support-polygons
    ()
    (setq support-polygons
