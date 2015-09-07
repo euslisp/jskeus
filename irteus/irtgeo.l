@@ -40,6 +40,11 @@
 		 :rot (user::midrot p (send c1 :worldrot) (send c2 :worldrot)))
     ))
 
+(defmethod line
+  (:worldcoords ()
+    "Return a coordinates on the midpoint of the end points"
+    (make-coords :pos (midpoint 0.5 nvert pvert))))
+
 (defmethod coordinates
   (:axis (axis)
 	 (send self :rotate-vector
