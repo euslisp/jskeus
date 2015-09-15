@@ -939,6 +939,35 @@
      (setq links (append links (list l0 l1 l2)))
      (setq joint-list (append joint-list (list j0 j1 j2)))
      ))
+  (:calc-static-balance-point
+   (&key (target-points
+          (mapcar #'(lambda (tmp-arm)
+                      (send (send self tmp-arm :end-coords) :worldpos))
+                  '(:rarm :larm)))
+         (force-list (make-list (length target-points) :initial-element (float-vector 0 0 0)))
+         (moment-list (make-list (length target-points) :initial-element (float-vector 0 0 0)))
+         (static-balance-point-height (elt (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos)) 2))
+         (update-mass-properties t))
+   "Calculate static balance point which is equivalent to static extended ZMP.
+    target-points are end-effector points on which force-list and moment-list apply.
+    force-list [N] and moment-list [Nm] are list of force and moment at target-points.
+    static-balance-point-height is height of static balance point [mm]."
+   (let* ((sbp (float-vector 0 0 static-balance-point-height))
+          (mg (* 1e-6 (send self :weight nil) (elt *g-vec* 2))))
+     (dotimes (idx 2)
+       (let ((denom mg)
+             (nume (* mg (elt (send self :centroid update-mass-properties) idx))))
+         (mapcar #'(lambda (f m tp)
+                     (setq nume
+                           (+ nume
+                              (- (* (- (elt tp 2) static-balance-point-height) (elt f idx))
+                                 (* (elt tp idx) (elt f 2)))
+                              (case idx (0 (- (elt m 1))) (1 (elt m 0))))
+                           denom (- denom (elt f 2))))
+                 force-list moment-list target-points)
+         (setf (elt sbp idx) (/ nume denom))
+         ))
+     sbp))
   )
 (in-package "GEOMETRY")
 

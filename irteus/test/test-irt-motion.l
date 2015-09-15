@@ -726,6 +726,35 @@
       )
     ))
 
+;; test for static balance point
+(defun fullbody-ik-with-forces (robot &key (debug-view :no-message))
+  (send robot :newcoords (make-coords))
+  (send robot :reset-pose)
+  (send robot :fix-leg-to-coords (make-coords))
+  (send robot :legs :move-end-pos (float-vector 0 0 50))
+  (send robot :fix-leg-to-coords (make-coords))
+  (objects (list robot))
+  (let* ((centroid-thre 10)
+         (result
+          (send robot :fullbody-inverse-kinematics
+                (list (send robot :rleg :end-coords :copy-worldcoords)
+                      (send robot :lleg :end-coords :copy-worldcoords)
+                      (make-coords :pos #f(150 -300 600))
+                      (make-coords :pos #f(150 300 600)))
+                :move-target (mapcar #'(lambda (x)
+                                         (send robot x :end-coords))
+                                     (list :rleg :lleg :rarm :larm))
+                :link-list (mapcar #'(lambda (x)
+                                       (send robot :link-list (send robot x :end-coords :parent)))
+                                   (list :rleg :lleg :rarm :larm))
+                :centroid-thre centroid-thre
+                :centroid-offset-func #'(lambda () (send robot :calc-static-balance-point :force-list (list #f(10 20 0) #f(25 20 0))))
+                :debug-view debug-view)))
+    (and result
+         (> centroid-thre (distance (apply #'midpoint 0.5 (send robot :legs :end-coords :worldpos))
+                                    (send robot :calc-static-balance-point :force-list (list #f(10 20 0) #f(25 20 0))))))
+    ))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; unit tests
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -794,6 +823,10 @@
 (deftest test-self-collision-check-IK-test
   (assert
    (test-self-collision-check-IK)))
+
+(deftest test-fullbody-ik-with-forces-samplerobot
+  (assert
+   (fullbody-ik-with-forces *sample-robot*)))
 
 (run-all-tests)
 (exit 0)
