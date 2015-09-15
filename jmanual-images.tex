@@ -3124,7 +3124,7 @@ $\displaystyle _{G} =  \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath 
 \begin{emtabbing}
 {\bf :calc-zmp-from-forces-moments} 
 \it forces moments \&key \= (wrt :world) \` [method]\\
-\> (limbs '(:rleg :lleg)) \\
+\> (limbs (if (send self :force-sensors) (remove nil (mapcar \#'(lambda (fs) (find-if \#'(lambda (l) (equal fs (car (send self l :force-sensors)))) '(:rleg :lleg))) (send self :force-sensors))) '(:rleg :lleg))) \\
 \> (force-sensors (mapcar \#'(lambda (l) (send self :force-sensor l)) limbs)) \\
 \> (cop-coords (mapcar \#'(lambda (l) (send self l :end-coords)) limbs)) \\
 \> (fz-thre 0.001) \\
@@ -3170,7 +3170,7 @@ $\displaystyle _{G} =  \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath 
 \> (default-step-time 1.0) \\
 \> (solve-angle-vector-args) \\
 \> (debug-view nil) \\
-\> ((:all-limbs al) '(:rleg :lleg)) \\
+\> ((:all-limbs al) (if (send self :force-sensors) (remove nil (mapcar \#'(lambda (fs) (find-if \#'(lambda (l) (equal fs (car (send self l :force-sensors)))) '(:rleg :lleg))) (send self :force-sensors))) '(:rleg :lleg))) \\
 \> ((:default-zmp-offsets dzo) (mapcan \#'(lambda (x) (list x (float-vector 0 0 0))) al)) \\
 \> (init-pose-function \#'(lambda nil (send self :move-centroid-on-foot :both '(:rleg :lleg)))) \\
 \> (start-with-double-support t) \\

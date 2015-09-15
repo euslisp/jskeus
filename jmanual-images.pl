@@ -1760,7 +1760,7 @@ $cached_env_img{$key} = q|<IMG
 
 $key = q/{emtabbing}{{bf{:go-pos-params-textgreaterfootstep-list}{it{xxyyth&key=((:footstlate(cadr(assoclegleg-translate-pos)))))(sendcc:nameleg)cc))){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
- WIDTH="1029" HEIGHT="245" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="1826" HEIGHT="245" ALIGN="BOTTOM" BORDER="0"
  SRC="|."$dir".q|jmanual-img300.png"
  ALT="\begin{emtabbing}
 {\bf :go-pos-params-\textgreater footstep-list}
