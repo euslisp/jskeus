@@ -522,7 +522,12 @@
     &key (wrt :world)
          ;; :wrt is :local => calc local zmp for robot's root-link coords
          ;; :wrt is :world => calc world zmp for robot
-         (limbs '(:rleg :lleg))
+         (limbs
+          (if (send self :force-sensors)
+              (remove nil (mapcar #'(lambda (fs)
+                                      (find-if #'(lambda (l) (equal fs (car (send self l :force-sensors)))) '(:rleg :lleg)))
+                                  (send self :force-sensors)))
+            '(:rleg :lleg)))
          (force-sensors (mapcar #'(lambda (l) (send self :force-sensor l)) limbs))
          (cop-coords (mapcar #'(lambda (l) (send self l :end-coords)) limbs))
          (fz-thre 1e-3) ;; [N]
@@ -621,7 +626,12 @@
    (footstep-list
     &key (default-step-height 50) (dt 0.1) (default-step-time 1.0)
          (solve-angle-vector-args) (debug-view nil)
-         ((:all-limbs al) '(:rleg :lleg))
+         ((:all-limbs al)
+          (if (send self :force-sensors)
+              (remove nil (mapcar #'(lambda (fs)
+                                      (find-if #'(lambda (l) (equal fs (car (send self l :force-sensors)))) '(:rleg :lleg)))
+                                  (send self :force-sensors)))
+            '(:rleg :lleg)))
          ((:default-zmp-offsets dzo)
           (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) ;; [mm]
          (init-pose-function #'(lambda () (send self :move-centroid-on-foot :both '(:rleg :lleg))))
