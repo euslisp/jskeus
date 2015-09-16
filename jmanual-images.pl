@@ -80,6 +80,20 @@ $cached_env_img{$key} = q|<IMG
  ALT="$\displaystyle _{G} = \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath {...
 ...oldmath {$M$}}_{\dot{\mbox{\boldmath {$\theta$}}}}^{\prime} \end{array} \right]$">|; 
 
+$key = q/{emtabbing}{{bf{make-camera-from-param}{it{&key=pwidth`[function]>pheight>fx>fy>cx>cy>(tx0)>(ty0)>parent-coords>name>create-viewer{rm{{emtabbing};AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="552" HEIGHT="130" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img304.png"
+ ALT="\begin{emtabbing}
+{\bf make-camera-from-param}
+\it\&amp;key \= pwidth \\\\lq  [function]...
+...ty 0) \\\\
+\&gt; parent-coords \\\\
+\&gt; name \\\\
+\&gt; create-viewer
+\rm
+\end{emtabbing}">|; 
+
 $key = q/displaystyle_{K},;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="87" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
@@ -231,6 +245,15 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img204.png"
  ALT="$ _{n_{ca}}C_2$">|; 
 
+$key = q/{figure}center{epsfile{file=figslashpanelitem.ps,height=5cm}center{{{{figure};FSF=1.6;AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="553" HEIGHT="92" BORDER="0"
+ SRC="|."$dir".q|jmanual-img95.png"
+ ALT="\begin{figure}\begin{center}
+\epsfile{file=fig/panelitem.ps,height=5cm}
+\end{center}
+\end{figure}">|; 
+
 $key = q/{emtabbing}{{bf{:convert-to-faces}{it{&restargs&key=(gl::wrt:local)`[method]>&allow-other-keys{rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="552" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
@@ -241,15 +264,6 @@ $cached_env_img{$key} = q|<IMG
 \&gt; \&amp;allow-other-keys
 \rm
 \end{emtabbing}">|; 
-
-$key = q/{figure}center{epsfile{file=figslashpanelitem.ps,height=5cm}center{{{{figure};FSF=1.6;AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="553" HEIGHT="92" BORDER="0"
- SRC="|."$dir".q|jmanual-img95.png"
- ALT="\begin{figure}\begin{center}
-\epsfile{file=fig/panelitem.ps,height=5cm}
-\end{center}
-\end{figure}">|; 
 
 $key = q/S_i;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
@@ -361,21 +375,6 @@ $cached_env_img{$key} = q|<IMG
 ... 1.0)) \\\\
 \&gt; :view-right \&gt; nil \\\\
 \&gt; \&amp;allow-other-keys
-\rm
-\end{emtabbing}">|; 
-
-$key = q/{emtabbing}{{bf{make-camera-from-param}{it{&key=pwidth`[function]>pheight>fx>fy>cx>cy>(tx0)>(ty0)>parent-coords>name{rm{{emtabbing};AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="552" HEIGHT="130" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img304.png"
- ALT="\begin{emtabbing}
-{\bf make-camera-from-param}
-\it\&amp;key \= pwidth \\\\lq  [function]...
-...\
-\&gt; (tx 0) \\\\
-\&gt; (ty 0) \\\\
-\&gt; parent-coords \\\\
-\&gt; name
 \rm
 \end{emtabbing}">|; 
 
@@ -2376,7 +2375,7 @@ $cached_env_img{$key} = q|<IMG
 
 $key = q/{emtabbing}{{bf{:init}{it{&restargs&key=((:namen)scene)`[method]>((:objectso)){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
- WIDTH="553" HEIGHT="185" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="553" HEIGHT="204" ALIGN="BOTTOM" BORDER="0"
  SRC="|."$dir".q|jmanual-img305.png"
  ALT="\begin{emtabbing}
 {\bf :init}
