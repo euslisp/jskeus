@@ -183,7 +183,7 @@
    "Get current view to a image object. It returns color-image24 object."
    (let ()
      (send self :makecurrent)
-     (glReadBuffer GL_BACK)
+     (glReadBuffer GL_FRONT)
      (glPixelStorei GL_PACK_ALIGNMENT 1)
      (glReadPixels x y width height GL_RGB GL_UNSIGNED_BYTE imgbuf)
      #-:x86_64
