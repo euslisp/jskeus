@@ -430,6 +430,7 @@
           (additional-weight-list)
           (joint-args nil)
           (cog-null-space t)
+          (min-loop 2) ;; 2 is minimum loop count
      &allow-other-keys)
     "fullbody inverse kinematics for legged robot.
      necessary args : target-coords, move-target, and link-list must include legs' (or leg's) parameters
@@ -442,6 +443,7 @@
             :move-target move-target :link-list link-list-with-robot-6dof
             :cog-gain cog-gain :centroid-thre centroid-thre :target-centroid-pos target-centroid-pos
             :cog-translation-axis cog-translation-axis :centroid-offset-func centroid-offset-func :cog-null-space cog-null-space
+            :min-loop min-loop
             :additional-weight-list
             (append
              additional-weight-list
