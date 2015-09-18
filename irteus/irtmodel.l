@@ -2317,8 +2317,13 @@
                (and (memq dump-command '(:fail-only :fail-only-with-debug-log)) (not success)))
        (setq command-directory
 	     (format nil "/tmp/irtmodel-ik-~A" (unix::getpid))
-	     command-id
-	     (let ((lt (unix::localtime))) (substitute #\0 #\  (format nil "~A-~04d-~02d-~02d-~02d-~02d-~02d" (send (class self) :name) (+ 1900 (elt lt 5)) (+ 1 (elt lt 4)) (elt lt 3) (elt lt 2) (elt lt 1) (elt lt 0))))
+	     command-id ;; command-id including [robot name], [localtime], and [usec time]
+             (let ((lt (unix::localtime)) (gtd (cadr (unix::gettimeofday))))
+               (substitute #\0 #\  (format nil "~A-~04d-~02d-~02d-~02d-~02d-~02d-~A-~A-~A"
+                                           (send (class self) :name) ;; name
+                                           (+ 1900 (elt lt 5)) (+ 1 (elt lt 4)) (elt lt 3) (elt lt 2) (elt lt 1) (elt lt 0) ;; localtime
+                                           (subseq (format nil "~0,6d" gtd) 0 2) (subseq (format nil "~0,6d" gtd) 2 4) (subseq (format nil "~0,6d" gtd) 4) ;; usec
+                                           )))
              command-filename (format nil "~A/~A-~A.l" command-directory command-id (if success "success" "failure")))
        (unix::mkdir command-directory)
        (with-open-file
