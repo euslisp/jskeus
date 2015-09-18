@@ -2545,6 +2545,7 @@
          (move-joints-hook) (additional-weight-list)
          ;; closed loop params
          (constrained-joint-list) (constrained-joint-angle-list)
+         (min-loop 2) ;; 2 is minimum loop count
     &allow-other-keys)
    "Solve inverse-kinematics for closed loop forward kinematics.
     Move move-target to target-coords with link-list.
@@ -2571,6 +2572,7 @@
           :additional-weight-list
           (append additional-weight-list
                   (mapcar #'(lambda (jnt) (list (send jnt :child-link) 0.0)) constrained-joint-list))
+          :min-loop min-loop
           args)
    )
   (:calc-jacobian-for-interlocking-joints
