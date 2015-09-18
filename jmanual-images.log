@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2015.9.18)  18 SEP 2015 14:34
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2015.9.18)  18 SEP 2015 15:19
 entering extended mode
  %&-line parsing enabled.
 **./jmanual-images.tex
@@ -69,7 +69,7 @@ File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
 ) (/usr/share/texmf-texlive/tex/latex/base/makeidx.sty
 Package: makeidx 2000/03/29 v1.0m Standard LaTeX package
-) (/tmp/tmp.hTfHDZiksq/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
+) (/tmp/tmp.tGdDRzo896/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
 hdr/fancyheadings.sty
 Package: fancyheadings 2008/02/04 1.99 Dummy package to call fancyhdr
 
@@ -2158,7 +2158,7 @@ Overfull \hbox (163.06923pt too wide) detected at line 3007
 [] [] []
  []
 
-l2hSize :emtabbing52900:106.84526pt::0.0pt::534.5354pt.
+l2hSize :emtabbing52900:118.84526pt::0.0pt::534.5354pt.
 [288
 
 
@@ -2168,7 +2168,7 @@ l2hSize :emtabbing52951:46.84526pt::0.0pt::485.3483pt.
 
 
 ]
-Overfull \hbox (147.58998pt too wide) detected at line 3034
+Overfull \hbox (147.58998pt too wide) detected at line 3035
 [] [] []
  []
 
@@ -2182,7 +2182,7 @@ l2hSize :emtabbing55717:70.84526pt::0.0pt::929.40454pt.
 
 
 ]
-Overfull \hbox (11.62842pt too wide) detected at line 3059
+Overfull \hbox (11.62842pt too wide) detected at line 3060
 [] [] []
  []
 
@@ -2196,7 +2196,7 @@ l2hSize :emtabbing55759:130.84526pt::0.0pt::369.94196pt.
 
 
 ]
-Overfull \hbox (115.36815pt too wide) detected at line 3092
+Overfull \hbox (115.36815pt too wide) detected at line 3093
 [] [] []
  []
 
@@ -2205,16 +2205,16 @@ l2hSize :emtabbing55770:46.84526pt::0.0pt::349.0pt.
 
 
 ]
-Overfull \hbox (31.49773pt too wide) detected at line 3103
+Overfull \hbox (31.49773pt too wide) detected at line 3104
 [] [] []
  []
 
-l2hSize :emtabbing55781:190.84526pt::0.0pt::639.47891pt.
+l2hSize :emtabbing55781:202.84526pt::0.0pt::639.47891pt.
 [295
 
 
 ]
-Overfull \hbox (5.34398pt too wide) detected at line 3126
+Overfull \hbox (5.34398pt too wide) detected at line 3128
 [] [] []
  []
 
@@ -2228,7 +2228,7 @@ l2hSize :emtabbing55823:46.84526pt::0.0pt::349.0pt.
 
 
 ]
-Overfull \hbox (254.36858pt too wide) detected at line 3152
+Overfull \hbox (254.36858pt too wide) detected at line 3154
 [] [] []
  []
 
@@ -2237,7 +2237,7 @@ l2hSize :emtabbing55834:106.84526pt::0.0pt::1281.0745pt.
 
 
 ]
-Overfull \hbox (60.9908pt too wide) detected at line 3168
+Overfull \hbox (60.9908pt too wide) detected at line 3170
 [] [] []
  []
 
@@ -2246,16 +2246,16 @@ l2hSize :emtabbing55845:178.84526pt::0.0pt::1148.90198pt.
 
 
 ]
-LaTeX Font Info:    Try loading font information for OML+cmr on input line 3189
+LaTeX Font Info:    Try loading font information for OML+cmr on input line 3191
 .
 (/usr/share/texmf-texlive/tex/latex/base/omlcmr.fd
 File: omlcmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OML/cmr/bx/n' in size <10> not available
-(Font)              Font shape `OML/cmm/b/it' tried instead on input line 3189.
+(Font)              Font shape `OML/cmm/b/it' tried instead on input line 3191.
 
 
-Overfull \hbox (168.52046pt too wide) detected at line 3190
+Overfull \hbox (168.52046pt too wide) detected at line 3192
 [] [] []
  []
 
@@ -2264,7 +2264,7 @@ l2hSize :emtabbing55866:94.84526pt::0.0pt::1011.09976pt.
 
 
 ]
-Overfull \hbox (341.7638pt too wide) detected at line 3205
+Overfull \hbox (341.7638pt too wide) detected at line 3207
 [] [] []
  []
 
@@ -2359,14 +2359,14 @@ l2hSize :emtabbing66337:46.84526pt::0.0pt::349.0pt.
 
 ]
 LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <10> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 3478.
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 3480.
 
 l2hSize :emtabbing67520:58.84526pt::0.0pt::349.0pt.
 [319
 
 
 ]
-Overfull \hbox (10.30089pt too wide) detected at line 3488
+Overfull \hbox (10.30089pt too wide) detected at line 3490
 [] [] []
  []
 
@@ -2384,4 +2384,4 @@ Here is how much of TeX's memory you used:
  28 hyphenation exceptions out of 8191
  28i,17n,45p,400b,412s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on jmanual-images.dvi (321 pages, 104928 bytes).
+Output written on jmanual-images.dvi (321 pages, 104988 bytes).
