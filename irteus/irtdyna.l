@@ -452,9 +452,13 @@
 		   :link-list link-list
 		   :translation-axis translation-axis args)
 	    args)
-     (send self :calc-vel-for-cog cog-gain translation-axis target-centroid-pos
-           :centroid-offset-func centroid-offset-func
-           :update-mass-properties nil)
+     (let ((cvel
+            (send self :calc-vel-for-cog cog-gain translation-axis target-centroid-pos
+                  :centroid-offset-func centroid-offset-func
+                  :update-mass-properties nil)))
+       (when (send self :get :ik-target-error)
+         (push cvel (cdr (assoc :centroid (send self :get :ik-target-error)))))
+       cvel)
      )
     )
   (:calc-vel-for-cog

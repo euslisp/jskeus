@@ -2052,6 +2052,8 @@
                    (* 1000.0 (norm vel-p)) (elt thre i) (norm vel-r) (elt rthre i)))
            (dotimes (j (length vel-p)) (setf (elt tmp-dim j) (* dif-pos-ratio (elt vel-p j))))
            (dotimes (j (length vel-r)) (setf (elt tmp-dim (+ j (length vel-p))) (* dif-rot-ratio (elt vel-r j))))
+           (when (send self :get :ik-target-error)
+             (push (list vel-p vel-r) (cdr (assoc (read-from-string (format nil ":target-~d" i)) (send self :get :ik-target-error)))))
            ))
        (dotimes (i (length tmp-dims))
          (dotimes (j (length (elt tmp-dims i)))
@@ -2072,7 +2074,10 @@
                           (send self :calc-vel-for-cog tmp-cog-gain cog-translation-axis target-centroid-pos
                                 :centroid-offset-func centroid-offset-func
                                 :update-mass-properties nil))
-                         additional-vel))))
+                         additional-vel))
+           (when (send self :get :ik-target-error)
+             (push (car additional-vel) (cdr (assoc :centroid (send self :get :ik-target-error)))))
+           ))
        ;; append additional-jacobi and additional-vel
        (let (add-vel-list (row0) add-vel add-jacobi)
          (when additional-jacobi
@@ -2092,6 +2097,9 @@
              (when (and debug-view (not (memq :no-message debug-view)))
                (format-array add-jacobi (format nil "add-J~a    :" i-add-jacobi))
                (format-array add-vel (format nil "add-v~a    :" i-add-jacobi)))
+             (when (send self :get :ik-target-error)
+               (if (and (not cog-null-space) target-centroid-pos (/= i-add-jacobi 0)) ;; First additional-vel is for COG, so neglect
+                   (push (car additional-vel) (cdr (assoc (read-from-string (format nil ":additional-~d" (- i-add-jacobi 1))) (send self :get :ik-target-error))))))
              )))
 
        ;; check loop end
@@ -2152,10 +2160,13 @@
                   (additional-jacobi) (additional-vel)
 		  &allow-other-keys)
    "Move move-target to target-coords.
-    dump-command should be t, nil, or :fail-only.
-      t          : dump log both in success and fail.
-      :fail-only : dump log only in fail.
-      nil        : do not dump log."
+    dump-command should be t, nil, :always, :fail-only, :always-with-debug-log, or :fail-only-with-debug-log.
+    Log are success/fail log and ik debug information log.
+      t or :always           : dump log both in success and fail (for success/fail log).
+      :always-with-debug-log : dump log both in success and fail (for success/fail log and ik debug information log).
+      :fail-only             : dump log only in fail (for success/fail log).
+      :always-with-debug-log : dump log only in fail (for success/fail log and ik debug information log).
+      nil                    : do not dump log."
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
    (let* ((loop 0)
@@ -2235,6 +2246,14 @@
                                       (reduce #'+ (mapcar #'(lambda (aj) (array-dimension (if (functionp aj) (funcall aj link-list) aj) 0)) tmp-additional-jacobi)))
                                    :union-link-list union-link-list args) args)))
      (send self :reset-joint-angle-limit-weight-old union-link-list) ;; reset weight
+     (when (memq dump-command '(:always-with-debug-log :fail-only-with-debug-log))
+       ;; If ik debug information log is enabled, initialize empty list for ik target errors.
+       (send self :put :ik-target-error
+             (append
+              (let ((tmp-count -1)) (mapcar #'(lambda (x) (list (read-from-string (format nil ":target-~d" (incf tmp-count))))) (make-list (length target-coords)))) ;; For target-coords error
+              (if target-centroid-pos (list (list :centroid))) ;; For taget-centroid-pos error
+              (let ((tmp-count -1)) (mapcar #'(lambda (x) (list (read-from-string (format nil ":additional-~d" (incf tmp-count))))) (make-list (length additional-vel)))) ;; For additional-vel error
+              )))
      
      ;; inverse kinematics loop
      (while (< (incf loop) stop)
@@ -2294,12 +2313,17 @@
      (if check-collision (setq collision-status (send self :self-collision-check)))
      (setq success (and (or success (not revert-if-fail)) (not collision-status)))
      ;; Dump log
-     (when (or (eq dump-command t)
-               (and (eq dump-command :fail-only) (not success)))
+     (when (or (memq dump-command '(:always :always-with-debug-log t))
+               (and (memq dump-command '(:fail-only :fail-only-with-debug-log)) (not success)))
        (setq command-directory
 	     (format nil "/tmp/irtmodel-ik-~A" (unix::getpid))
-	     command-id
-	     (let ((lt (unix::localtime))) (substitute #\0 #\  (format nil "~A-~04d-~02d-~02d-~02d-~02d-~02d" (send (class self) :name) (+ 1900 (elt lt 5)) (+ 1 (elt lt 4)) (elt lt 3) (elt lt 2) (elt lt 1) (elt lt 0))))
+	     command-id ;; command-id including [robot name], [localtime], and [usec time]
+             (let ((lt (unix::localtime)) (gtd (cadr (unix::gettimeofday))))
+               (substitute #\0 #\  (format nil "~A-~04d-~02d-~02d-~02d-~02d-~02d-~A-~A-~A"
+                                           (send (class self) :name) ;; name
+                                           (+ 1900 (elt lt 5)) (+ 1 (elt lt 4)) (elt lt 3) (elt lt 2) (elt lt 1) (elt lt 0) ;; localtime
+                                           (subseq (format nil "~0,6d" gtd) 0 2) (subseq (format nil "~0,6d" gtd) 2 4) (subseq (format nil "~0,6d" gtd) 4) ;; usec
+                                           )))
              command-filename (format nil "~A/~A-~A.l" command-directory command-id (if success "success" "failure")))
        (unix::mkdir command-directory)
        (with-open-file
@@ -2307,7 +2331,19 @@
         (format f "~A" initial-log-str)
         (dump-structure f initial-target-coords)
         (dump-structure f initial-av)
-        ))
+        )
+       (if (memq dump-command '(:fail-only-with-debug-log :always-with-debug-log)) ;; For ik debug information log
+           (with-open-file
+            (f (format nil "~A/~A-~A-debug-log.l" command-directory command-id (if success "success" "failure")) :direction :output)
+            (format f "(setq *ik-loop* ~A~%" loop)
+            (format f "      *ik-target-error* '~A~%" (mapcar #'(lambda (x) (append (list (car x)) (reverse (cdr x)))) (send self :get :ik-target-error)))
+            (format f "      *ik-target-error-thre* '~A)~%"
+                    (append
+                     (let ((tmp-count -1)) (mapcar #'(lambda (tr rtr) (list (read-from-string (format nil ":target-~d" (incf tmp-count))) (list (* 1e-3 tr) rtr))) thre rthre)) ;; For target-coords threshold (thre[m], rthre[rad])
+                     (if target-centroid-pos (list (list :centroid (* 1e-3 centroid-thre)))))) ;; For target-centroid-pos threshold [m]
+            (remprop self :ik-target-error)
+            ))
+       )
      ;; check solved or not
      (if success
          (send self :angle-vector)
