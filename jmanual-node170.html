@@ -1670,12 +1670,16 @@ If min-loop is nil, do not consider loop counting for IK convergence.
 <DT> 
 <DD>Move move-target to target-coords.
 <BR>
-dump-command should be t, nil, or :fail-only.
+dump-command should be t, nil, :always, :fail-only, :always-with-debug-log, or :fail-only-with-debug-log.
 <BR>
-t          : dump log both in success and fail.
-<BR>      :fail-only : dump log only in fail.
+Log are success/fail log and ik debug information log.
 <BR>
-nil        : do not dump log.
+t or :always           : dump log both in success and fail (for success/fail log).
+<BR>      :always-with-debug-log : dump log both in success and fail (for success/fail log and ik debug information log).
+<BR>      :fail-only             : dump log only in fail (for success/fail log).
+<BR>      :always-with-debug-log : dump log only in fail (for success/fail log and ik debug information log).
+<BR>
+nil                    : do not dump log.
 </DD>
 </DL>
 <BR>
@@ -3682,7 +3686,7 @@ static-balance-point-height is height of static balance point [mm].
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-09-16
+2015-09-18
 </ADDRESS>
 </BODY>
 </HTML>
