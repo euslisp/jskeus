@@ -826,6 +826,41 @@
                             (setq dx (+ dx ddx) dy (+ dy ddy) dth (+ dth ddth)))))
        (push (funcall gen-go-pos-step-node-func mc leg leg-translate-pos) ret)
        (reverse ret))))
+  (:go-pos-quadruped-params->footstep-list
+   (xx yy th ;; [mm] [mm] [deg]
+       &key (type :crawl))
+   "Calculate foot step list for quadruped walking from goal x position [mm], goal y position [mm], and goal yaw orientation [deg]."
+   (let ((biped-fsl (send self :go-pos-params->footstep-list xx yy th :forward-offset-length 100 :rotate-rad 3))
+         quadruped-fsl)
+     ;; calculate foot step list for quad walk
+     (dolist (fs biped-fsl)
+       (let* ((fs-leg-name (send fs :name))
+              (offset (send (send self fs-leg-name :end-coords :copy-worldcoords) :transformation fs :world))
+              (target-arm-name))
+         (case type
+               (:crawl
+                (dolist (l (list fs-leg-name (case fs-leg-name (:lleg :larm) (:rleg :rarm))))
+                  (push (list (make-coords :coords (send (send self l :end-coords :copy-worldcoords) :transform offset :world) :name l))
+                        quadruped-fsl)))
+               (:trot
+                (push (mapcar #'(lambda (l)
+                                  (make-coords :coords (send (send self l :end-coords :copy-worldcoords) :transform offset :world) :name l))
+                              (list fs-leg-name (setq target-arm-name (case fs-leg-name (:lleg :rarm) (:rleg :larm)))))
+                      quadruped-fsl))
+               (:pace
+                (push (mapcar #'(lambda (l)
+                                  (make-coords :coords (send (send self l :end-coords :copy-worldcoords) :transform offset :world) :name l))
+                              (list fs-leg-name (case fs-leg-name (:lleg :larm) (:rleg :rarm))))
+                      quadruped-fsl))
+               (:gallop
+                (push (mapcar #'(lambda (l)
+                                  (make-coords :coords (send (send self l :end-coords :copy-worldcoords) :transform offset :world) :name l))
+                              (list (case fs-leg-name (:rleg :rleg) (:lleg :rarm))
+                                    (case fs-leg-name (:rleg :lleg) (:lleg :larm))))
+                      quadruped-fsl))
+               )))
+     (reverse quadruped-fsl)))
+
   ;; Support polygon methods
   (:support-polygons
    ()
