@@ -145,33 +145,14 @@
 (defun trot-walk-motion-for-sample-robot
   (&key (go-backward-over t))
   (quad-walk-motion-for-sample-robot
-   #'(lambda ()
-       (list (list (make-coords :coords (send *robot* :rleg :end-coords :copy-worldcoords) :name :rleg)
-                   (make-coords :coords (send *robot* :larm :end-coords :copy-worldcoords) :name :larm))
-             (list (make-coords :coords (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world) :name :lleg)
-                   (make-coords :coords (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world) :name :rarm))
-             (list (make-coords :coords (send (send *robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 100 0 0) :world) :name :rleg)
-                   (make-coords :coords (send (send *robot* :larm :end-coords :copy-worldcoords) :translate (float-vector 100 0 0) :world) :name :larm))
-             (list (make-coords :coords (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 150 50 0) :world) :name :lleg)
-                   (make-coords :coords (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 150 50 0) :world) :name :rarm))
-             (list (make-coords :coords (send (send *robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world) :name :rleg)
-                   (make-coords :coords (send (send *robot* :larm :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world) :name :larm))
-             (list (make-coords :coords (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world) :name :lleg)
-                   (make-coords :coords (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 200 100 0) :world) :name :rarm))
-             ))
+   #'(lambda () (send *robot* :go-pos-quadruped-params->footstep-list 200 100 0 :type :trot))
    :go-backward-over go-backward-over))
 (warn "(trot-walk-motion-for-sample-robot) ;; for walking motion~%")
 
 (defun crawl-walk-motion-for-sample-robot
   (&key (go-backward-over t))
   (quad-walk-motion-for-sample-robot
-   #'(lambda ()
-       (list (list (make-coords :coords (send *robot* :lleg :end-coords :copy-worldcoords) :name :lleg))
-             (list (make-coords :coords (send (send *robot* :larm :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world) :name :larm))
-             (list (make-coords :coords (send (send *robot* :rarm :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world) :name :rarm))
-             (list (make-coords :coords (send (send *robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world) :name :rleg))
-             (list (make-coords :coords (send (send *robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 50 0 0) :world) :name :lleg))
-             ))
+   #'(lambda () (send *robot* :go-pos-quadruped-params->footstep-list 50 0 0 :type :crawl))
    :go-backward-over go-backward-over))
 (warn "(crawl-walk-motion-for-sample-robot) ;; for walking motion~%")
 
