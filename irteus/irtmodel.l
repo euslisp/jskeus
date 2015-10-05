@@ -2239,6 +2239,7 @@
                                    :additional-jacobi-dimension
                                    (+ (if (and (not cog-null-space) target-centroid-pos)
                                           (case cog-translation-axis
+                                                (t 3)
                                                 ((:x :y :z :xx :yy :zz) 2)
                                                 ((:xy :yx :yz :zy :zx :xz) 1)
                                                 (nil 0))
