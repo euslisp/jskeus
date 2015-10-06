@@ -540,18 +540,6 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img116.png"
  ALT="$\displaystyle \mbox{\boldmath {$r$}}$">|; 
 
-$key = q/{emtabbing}{{bf{:torque-vector}{it{&key=(force-list)`[method]>(moment-list)>(tar)>(calc-torque-buffer-args(sendself:calc-torque-buffer-args)){rm{{emtabbing};AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="1524" HEIGHT="111" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img293.png"
- ALT="\begin{emtabbing}
-{\bf :torque-vector}
-\it\&amp;key \= (force-list) \\\\lq  [method]\\\\
-...
-...lc-torque-buffer-args (send self :calc-torque-buffer-args))
-\rm
-\end{emtabbing}">|; 
-
 $key = q/{emtabbing}{{bf{:filter}{it{&restargs&key=create`[method]>&allow-other-keys{rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="552" HEIGHT="207" ALIGN="BOTTOM" BORDER="0"
@@ -2230,6 +2218,18 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img231.png"
  ALT="$ l$">|; 
 
+$key = q/{emtabbing}{{bf{:torque-vector}{it{&key=(force-list)`[method]>(moment-list)>(tar-coords))):distribute-total-wrench-to-torque-method-default)){rm{{emtabbing};AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="1524" HEIGHT="111" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img293.png"
+ ALT="\begin{emtabbing}
+{\bf :torque-vector}
+\it\&amp;key \= (force-list) \\\\lq  [method]\\\\
+...
+...ords))) :distribute-total-wrench-to-torque-method-default))
+\rm
+\end{emtabbing}">|; 
+
 $key = q/^T]^T;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="38" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
@@ -2539,7 +2539,7 @@ $cached_env_img{$key} = q|<IMG
 
 $key = q/{emtabbing}{{bf{:calc-force-from-joint-torque}{it{limball-torque&key=(move-target(sendselflimb:end-coords))`[method]>(use-torso){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
- WIDTH="587" HEIGHT="169" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="1455" HEIGHT="188" ALIGN="BOTTOM" BORDER="0"
  SRC="|."$dir".q|jmanual-img294.png"
  ALT="\begin{emtabbing}
 {\bf :calc-force-from-joint-torque}
