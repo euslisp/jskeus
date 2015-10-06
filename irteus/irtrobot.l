@@ -375,25 +375,36 @@
          (dt 0.005)
          (av (send self :angle-vector))
          (root-coords (send (car (send self :links)) :copy-worldcoords))
-         (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
+         (calc-torque-buffer-args (send self :calc-torque-buffer-args))
+         (distribute-total-wrench-to-torque-method (if (and (not (every #'null (send self :legs))) ;; For legged robots
+                                                            (not (and force-list moment-list target-coords))) ;; If no force-list, moment-list, target-coords are specified
+                                                       :distribute-total-wrench-to-torque-method-default)))
    "Returns torque vector"
-   (unless (every #'null (send self :legs)) ;; for legged robot, set default external force and moment at the end-effectors
-     (unless target-coords
-       (dolist (limb '(:rleg :lleg))
-         (if (send self limb)
-             (push (send self limb :end-coords) target-coords))))
-     (unless (or force-list moment-list) ;; force [N], moment [Nm]
-       ;; set default force & moment by solving mimimum internal forces
-       (let* ((ret-fm (send self :calc-contact-wrenches-from-total-wrench (send-all target-coords :worldpos))))
-         (setq force-list (car ret-fm) moment-list (cadr ret-fm))
-         )))
-   (send self :calc-torque
-              :debug-view debug-view
-              :calc-statics-p calc-statics-p
-              :av av :root-coords root-coords :dt dt
-              :force-list force-list :moment-list moment-list :target-coords target-coords
-              :calc-torque-buffer-args calc-torque-buffer-args)
-   )
+   (let ((ret-tq
+          (send self :calc-torque
+                :debug-view debug-view
+                :calc-statics-p calc-statics-p
+                :av av :root-coords root-coords :dt dt
+                :force-list force-list :moment-list moment-list :target-coords target-coords
+                :calc-torque-buffer-args calc-torque-buffer-args)))
+     (when (find-method self distribute-total-wrench-to-torque-method)
+       (let ((ext-wrench-tq (send self distribute-total-wrench-to-torque-method)))
+         (dotimes (i (length ret-tq))
+           (setf (elt ret-tq i) (- (elt ret-tq i) (elt ext-wrench-tq i)))
+           (send (elt joint-list i) :joint-torque (elt ret-tq i)))))
+     ret-tq
+     ))
+  (:distribute-total-wrench-to-torque-method-default
+   ()
+   ;; set default force & moment by solving mimimum internal forces
+   (let ((target-coords))
+     (dolist (limb '(:rleg :lleg))
+       (if (send self limb)
+           (push (send self limb :end-coords) target-coords)))
+     (let* ((ret-fm (send self :calc-contact-wrenches-from-total-wrench (send-all target-coords :worldpos)
+                          :total-wrench (concatenate float-vector (send (car (send self :links)) :force) (send (car (send self :links)) :moment)))))
+       (send self :calc-torque-from-ext-wrenches :force-list (car ret-fm) :moment-list (cadr ret-fm) :target-coords target-coords)
+       )))
   (:calc-force-from-joint-torque
    (limb all-torque &key (move-target (send self limb :end-coords)) (use-torso))
    "Calculates end-effector force and moment from joint torques."
