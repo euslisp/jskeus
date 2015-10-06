@@ -376,7 +376,9 @@
          (av (send self :angle-vector))
          (root-coords (send (car (send self :links)) :copy-worldcoords))
          (calc-torque-buffer-args (send self :calc-torque-buffer-args))
-         (distribute-total-wrench-to-torque-method (if (not (every #'null (send self :legs))) :distribute-total-wrench-to-torque-method-default)))  ;; for legged robot, set default external force and moment at the end-effectors
+         (distribute-total-wrench-to-torque-method (if (and (not (every #'null (send self :legs))) ;; For legged robots
+                                                            (not (and force-list moment-list target-coords))) ;; If no force-list, moment-list, target-coords are specified
+                                                       :distribute-total-wrench-to-torque-method-default)))
    "Returns torque vector"
    (let ((ret-tq
           (send self :calc-torque
