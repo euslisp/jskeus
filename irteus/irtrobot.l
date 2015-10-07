@@ -821,7 +821,7 @@
                (val val-max)
                (1+ (round (floor (- (/ (abs val) val-max) 1e-5))))))
        (do-push-steps (max (calc-max-count xx xx-max)
-                           (calc-max-count yy yy-max)
+                           (- (* (calc-max-count yy yy-max) 2) 1)
                            (calc-max-count th th-max))
                       #'(lambda ()
                           (let ((ddx (if (> xx-max (abs (- dx xx))) (- xx dx) (* xx-max x-sign)))
