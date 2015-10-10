@@ -801,7 +801,8 @@
           (leg (if (eps= (float yy) 0.0)
                    (if (> th 0.0) :lleg :rleg)
                  (if (> yy 0.0) :lleg :rleg)))
-          (mc (apply #'midcoords 0.5 (send self :legs :end-coords :copy-worldcoords)))
+          (orig-mc (apply #'midcoords 0.5 (send self :legs :end-coords :copy-worldcoords)))
+          (mc (send orig-mc :copy-worldcoords))
           ;;(mc (make-coords))
           (leg-translate-pos
            (mapcar #'(lambda (l)
@@ -832,8 +833,8 @@
                                 (ddth (cond
                                        ((> th-max (abs (- dth th))) (- th dth))
                                        (t (* th-max th-sign)))))
-                            (send mc :translate (float-vector ddx ddy 0.0))
-                            (send mc :rotate (deg2rad ddth) :z)
+                            (send mc :translate (float-vector ddx ddy 0.0) orig-mc)
+                            (send mc :rotate (deg2rad ddth) :z :local)
                             (setq dx (+ dx ddx) dy (+ dy ddy) dth (+ dth ddth)))))
        (push (funcall gen-go-pos-step-node-func mc leg leg-translate-pos) ret)
        (reverse ret))))
