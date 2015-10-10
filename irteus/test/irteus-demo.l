@@ -38,6 +38,21 @@
    (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
                              (walk-motion-for-sample-robot))))))
 
+(deftest test-footstep-generator
+  (unless (boundp '*robot*) (setq *robot* (instance sample-robot :init)))
+  (send *robot* :reset-pose)
+  (send *robot* :fix-leg-to-coords (make-coords))
+  (let ((start-mc (send *robot* :foot-midcoords))
+        goal-mc trans
+        (x 0) (y 200) (th 180))
+    (send *robot* :calc-walk-pattern-from-footstep-list
+          (send *robot* :go-pos-params->footstep-list x y th))
+    (setq goal-mc (send *robot* :foot-midcoords))
+    (setq trans (send start-mc :transformation goal-mc :local))
+    (assert
+     (and (eps= 0.0 (norm (v- (float-vector x y 0.0) (send trans :pos))))
+          (eps= 0.0 (- th (rad2deg (elt (car (send trans :rpy-angle)) 0))))))))
+
 (deftest test-trot-walk-motion-for-sample-robot-go-backward-over
   (assert
    (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
