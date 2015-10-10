@@ -769,7 +769,7 @@
                  (list :default-half-offset (float-vector 0 (* 0.5 dol) 0)
                        :forward-offset-length (* fol 0.5 ratio)
                        :outside-offset-length (* ool 0.5 ratio)
-                       :rotate-rad (* frr 0.5 ratio)))
+                       :rotate-rad (deg2rad (* frr 0.5 ratio))))
            )))
      ))
   (:footstep-parameter
