@@ -440,7 +440,7 @@
           (centroid-thre 5.0) ;; cog convergence threshould [mm]
           (additional-weight-list)
           (joint-args nil)
-          (cog-null-space t)
+          (cog-null-space nil)
           (min-loop 2) ;; 2 is minimum loop count
      &allow-other-keys)
     "fullbody inverse kinematics for legged robot.
