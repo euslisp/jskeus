@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2015.10.11)  11 OCT 2015 12:32
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2015.10.15)  15 OCT 2015 06:17
 entering extended mode
  %&-line parsing enabled.
 **./jmanual-images.tex
@@ -69,7 +69,7 @@ File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
 ) (/usr/share/texmf-texlive/tex/latex/base/makeidx.sty
 Package: makeidx 2000/03/29 v1.0m Standard LaTeX package
-) (/tmp/tmp.9BuMaYoLD3/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
+) (/tmp/tmp.k93MN3gGKY/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
 hdr/fancyheadings.sty
 Package: fancyheadings 2008/02/04 1.99 Dummy package to call fancyhdr
 
@@ -2384,4 +2384,4 @@ Here is how much of TeX's memory you used:
  28 hyphenation exceptions out of 8191
  28i,17n,45p,400b,412s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on jmanual-images.dvi (321 pages, 105212 bytes).
+Output written on jmanual-images.dvi (321 pages, 105216 bytes).

@@ -271,19 +271,6 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img218.png"
  ALT="$ S_i$">|; 
 
-$key = q/{emtabbing}{{bf{:fullbody-inverse-kinematics}{it{target-coords&restargs&key=(movoint-argsnil)>(cog-null-spacet)>(min-loop2)>&allow-other-keys{rm{{emtabbing};AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="736" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img295.png"
- ALT="\begin{emtabbing}
-{\bf :fullbody-inverse-kinematics}
-\it target-coords \&amp;rest a...
-...null-space t) \\\\
-\&gt; (min-loop 2) \\\\
-\&gt; \&amp;allow-other-keys
-\rm
-\end{emtabbing}">|; 
-
 $key = q/{emtabbing}{{bf{:init}{it{&restargs&key=((:axisax):z)`[method]>((:max-joint-velocitymjv)5)>((:max-joint-torquemjt)100)>&allow-other-keys{rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="646" HEIGHT="188" ALIGN="BOTTOM" BORDER="0"
@@ -1042,17 +1029,17 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img158.png"
  ALT="$ _j$">|; 
 
-$key = q/Sigma_j;MSF=1.6;AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="553" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
- SRC="|."$dir".q|jmanual-img98.png"
- ALT="$ \Sigma_j$">|; 
-
 $key = q/L;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="30" HEIGHT="30" ALIGN="BOTTOM" BORDER="0"
  SRC="|."$dir".q|jmanual-img206.png"
  ALT="$ L$">|; 
+
+$key = q/Sigma_j;MSF=1.6;AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="553" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="|."$dir".q|jmanual-img98.png"
+ ALT="$ \Sigma_j$">|; 
 
 $key = q/theta;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
@@ -1080,6 +1067,19 @@ $cached_env_img{$key} = q|<IMG
 \epsfile{file=fig/beam.ps,height=10cm}
 \end{center}
 \end{figure}">|; 
+
+$key = q/{emtabbing}{{bf{:fullbody-inverse-kinematics}{it{target-coords&restargs&key=(movnt-argsnil)>(cog-null-spacenil)>(min-loop2)>&allow-other-keys{rm{{emtabbing};AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="736" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img295.png"
+ ALT="\begin{emtabbing}
+{\bf :fullbody-inverse-kinematics}
+\it target-coords \&amp;rest a...
+...ll-space nil) \\\\
+\&gt; (min-loop 2) \\\\
+\&gt; \&amp;allow-other-keys
+\rm
+\end{emtabbing}">|; 
 
 $key = q/which=1;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
