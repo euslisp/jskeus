@@ -29,15 +29,33 @@
     (assert t "ok"))
   )
 
+(deftest test5
+  (assert-eq (+ 1 1) 2)
+  (assert-neq (+ 1 3) 2)
+  (assert-equal '(:a :b :c) '(:a :b :c))
+  (assert-equal "hoge" (copy-seq "hoge"))
+  (assert-nequal '(:a :b :c) '(:a :b :c :d))
+)
+
+(deftest test6 ;; this test should fail at each evaluation
+  (assert-eq (+ 1 3) 2) ;; should fail
+  (assert-neq (+ 1 1) 2) ;; should fail
+  (assert-eq '(:a :b :c) '(:a :b :c)) ;; should fail
+  (assert-eq "hoge" (copy-seq "hoge")) ;; should fail
+  (assert-equal '(:a :b :c) '(:a :b :c :d)) ;; should fail
+  (assert-nequal '(:a :b :c) '(:a :b :c)) ;; should fail
+  (setq ((car (*unit-test* . result)) . failures) nil)
+)
+
 (run-all-tests)
 
 (setq ret -1)
 (format t "functions = ~A~%" (length (send *unit-test* :functions)))
 (send *unit-test* :result)
-(if (and (= (length (send *unit-test* :functions)) 4)
-         (= (apply #'+ (send-all (send *unit-test* :result) :num-tests)) 4)
-         (= (apply #'+ (send-all (send *unit-test* :result) :num-failures)) 1)
-         (= (apply #'+ (send-all (send *unit-test* :result) :num-successes)) 3))
+(if (and (= (length (send *unit-test* :functions)) 6)
+         (= (apply #'+ (send-all (send *unit-test* :result) :num-tests)) 6)
+         (= (apply #'+ (send-all (send *unit-test* :result) :num-failures)) 2)
+         (= (apply #'+ (send-all (send *unit-test* :result) :num-successes)) 4))
     (setq ret 0))
 (exit ret)
 
