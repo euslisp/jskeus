@@ -44,7 +44,29 @@
     ;; matrix-determinant
     (assert (eps= (manipulability m1) 1.0) "manipulability")
 
-    ;; FIX ME : how can I test random ?
+    ;; random
+    (assert (v= #i(123456 789012) *random-state*) "initial *random-state*")
+    (progn
+      (assert (= 0 (random 10)) "random 10 (1)")
+      (assert (= 3 (random 10)) "random 10 (2)")
+      (assert (= 7 (random 10)) "random 10 (3)")
+      (assert (= 2 (random 10)) "random 10 (4)")
+      (assert (= 7 (random 10)) "random 10 (5)"))
+
+    (setq *random-state* #i(123456 789012))
+    (progn
+      (assert (eps= 0.593532 (random 10.0) 0.01) "random 10.0 (1)")
+      (assert (eps= 3.59535 (random 10.0) 0.01) "random 10.0 (2)")
+      (assert (eps= 7.68644 (random 10.0) 0.01) "random 10.0 (3)")
+      (assert (eps= 2.44015 (random 10.0) 0.01) "random 10.0 (4)")
+      (assert (eps= 7.26136 (random 10.0) 0.01) "random 10.0 (5)"))
+
+    (setq *random-state* #i(123456 789012))
+    (assert (v= (make-random-state) #i(123456 789012)) "(make-random-state)")
+    (assert (v= (make-random-state nil) #i(123456 789012)) "(make-random-state nil)")
+    (assert (v= (make-random-state #i(11111 22222)) #i(11111 22222)) "(make-random-state #i(11111 22222))")
+    (assert (not (v= (make-random-state t) #i(123456 789012))) "(make-random-state t)")
+    (assert (not (= 0 (random 10 (make-random-state t)))) "(random 10 (make-random-state t))")
 
     ;; eigen decompose
     ;; http://en.wikipedia.org/wiki/Eigendecomposition_of_a_matrix#Example
