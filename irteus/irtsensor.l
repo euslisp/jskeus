@@ -106,6 +106,18 @@
                       ))
      (send self :assoc vwing)
      self))
+  (:create-viewer ()
+   (unless (boundp '*irtviewer*) (make-irtviewer))
+   (let ((cv
+          (view
+           :x pwidth :y pheight
+           :viewing (send self :viewing)
+           :viewsurface
+           (instance gl::glviewsurface :create
+                     :glcon ((send *irtviewer* :viewer :viewsurface) . gl::glcon)
+                     :title (format nil "~A_view" (send self :name)) :width pwidth :height pheight)
+           :title (format nil "~A_view" (send self :name)))))
+     (setq img-viewer cv)))
   (:width () "Returns width of the camera in pixel." pwidth)
   (:height () "Returns height of the camera in pixel." pheight)
   (:viewing (&rest args) (forward-message-to vwing args))
@@ -191,7 +203,9 @@
      (send vwer :viewsurface :color pcolor)
      (gl::draw-glbody vwer self)
      (if flush (send vwer :viewsurface :flush))))
-  (:draw-objects (objs) (send self :draw-objects-raw img-viewer objs))
+  (:draw-objects (objs)
+   (unless img-viewer (send self :create-viewer))
+   (send self :draw-objects-raw img-viewer objs))
   (:draw-objects-raw
    (vwr objs)
    (let* (pcurrent pcolor (draw-things (x::draw-things objs))
@@ -337,19 +351,7 @@
     (send c :translate (float-vector (- tx) (- ty) 0))
     (send (c . vwing) :translate (float-vector tx ty 0))
     (if parent-coords (send parent-coords :assoc c))
-    (when create-viewer
-      (unless (boundp '*irtviewer*) (make-irtviewer))
-      (let ((cv
-             (view
-              :x pwidth :y pheight
-              :viewing (send c :viewing)
-              :viewsurface
-              (instance gl::glviewsurface :create
-                        :glcon ((send *irtviewer* :viewer :viewsurface) . gl::glcon)
-                        :title (format nil "~A_view" name) :width pwidth :height pheight)
-              :title (format nil "~A_view" name))))
-        (setq (c . img-viewer) cv)
-        ))
+    (if create-viewer (send c :create-viewer))
     c))
 
 (in-package "GEOMETRY")
