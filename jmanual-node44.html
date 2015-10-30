@@ -79,7 +79,7 @@ Common Lispでパッケージシステムが生まれた。
 symbolをexportあるいはimportするとき、あらゆるパッケージ内の
 全てのsymbolが独自の
 print-nameを持つ必要があるため、symbol名の重複を発見することができる。
-<A NAME="8403"></A><B>s</B>hadowは、パッケージからsymbolを仮想的に削除することにより、
+<A NAME="8454"></A><B>s</B>hadowは、パッケージからsymbolを仮想的に削除することにより、
 存在するsymbolと同じ名前のsymbolを作成することができる。
 
 <P>
@@ -127,7 +127,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 <P>
 
  <BR>
-<BR> <A NAME="8405"></A>
+<BR> <A NAME="8456"></A>
 <B>*lisp-package*</B> [定数]
 
 <DL COMPACT>
@@ -138,7 +138,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 <BR>
 <BR>
 
-<A NAME="8415"></A>
+<A NAME="8466"></A>
 <B>*user-package*</B> [定数]
 
 <DL COMPACT>
@@ -149,7 +149,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 <BR>
 <BR>
 
-<A NAME="8425"></A>
+<A NAME="8476"></A>
 <B>*unix-package*</B> [定数]
 
 <DL COMPACT>
@@ -160,7 +160,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 <BR>
 <BR>
 
-<A NAME="8435"></A>
+<A NAME="8486"></A>
 <B>*system-package*</B> [定数]
 
 <DL COMPACT>
@@ -171,7 +171,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 <BR>
 <BR>
 
-<A NAME="8445"></A>
+<A NAME="8496"></A>
 <B>*keyword-package*</B> [定数]
 
 <DL COMPACT>
@@ -184,7 +184,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8455"></A>
+<A NAME="8506"></A>
 <B>find-symbol</B> <EM>string &amp;optional (package *package*) </EM>[関数]
 
 <DL COMPACT>
@@ -200,7 +200,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8467"></A>
+<A NAME="8518"></A>
 <B>make-symbol</B> <EM>string </EM>[関数]
 
 <DL COMPACT>
@@ -214,7 +214,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8478"></A>
+<A NAME="8529"></A>
 <B>intern</B> <EM>string &amp;optional (package *package*) (klass symbol) </EM>[関数]
 
 <DL COMPACT>
@@ -231,7 +231,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8491"></A>
+<A NAME="8542"></A>
 <B>list-all-packages</B> [関数]
 
 <DL COMPACT>
@@ -245,7 +245,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8501"></A>
+<A NAME="8552"></A>
 <B>find-package</B> <EM>name </EM>[関数]
 
 <DL COMPACT>
@@ -257,7 +257,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 <BR>
 <BR>
 
-<A NAME="8512"></A>
+<A NAME="8563"></A>
 <B>make-package</B> <EM>name &amp;key :nicknames (:use '(lisp)) </EM>[関数]
 
 <DL COMPACT>
@@ -273,7 +273,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8524"></A>
+<A NAME="8575"></A>
 <B>in-package</B> <EM>pkg &amp;key :nicknames (:uses '(lisp)) </EM>[関数]
 
 <DL COMPACT>
@@ -288,7 +288,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8536"></A>
+<A NAME="8587"></A>
 <B>package-name</B> <EM>pkg </EM>[関数]
 
 <DL COMPACT>
@@ -302,7 +302,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8547"></A>
+<A NAME="8598"></A>
 <B>package-nicknames</B> <EM>pkg </EM>[関数]
 
 <DL COMPACT>
@@ -316,7 +316,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8558"></A>
+<A NAME="8609"></A>
 <B>rename-package</B> <EM>pkg new-name &amp;optional new-nicknames </EM>[関数]
 
 <DL COMPACT>
@@ -332,7 +332,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8571"></A>
+<A NAME="8622"></A>
 <B>package-use-list</B> <EM>pkg </EM>[関数]
 
 <DL COMPACT>
@@ -346,7 +346,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8582"></A>
+<A NAME="8633"></A>
 <B>packagep</B> <EM>pkg </EM>[関数]
 
 <DL COMPACT>
@@ -360,7 +360,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8593"></A>
+<A NAME="8644"></A>
 <B>use-package</B> <EM>pkg &amp;optional (curpkg *package*) </EM>[関数]
 
 <DL COMPACT>
@@ -376,7 +376,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8607"></A>
+<A NAME="8658"></A>
 <B>unuse-package</B> <EM>pkg &amp;optional (curpkg *package*) </EM>[関数]
 
 <DL COMPACT>
@@ -390,7 +390,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8619"></A>
+<A NAME="8670"></A>
 <B>shadow</B> <EM>sym &amp;optional(pkg *package*) </EM>[関数]
 
 <DL COMPACT>
@@ -405,7 +405,7 @@ top-levelプロンプトは、現在のパッケージを示すために<TT>mypk
 
 <P>
 
-<A NAME="8631"></A>
+<A NAME="8682"></A>
 <B>export</B> <EM>sym &amp;optional (pkg *package*) </EM>[関数]
 
 <DL COMPACT>
@@ -435,7 +435,7 @@ symbol名と<EM>sym</EM>が重複していないかどうかを検査する。
 
 <P>
 
-<A NAME="8655"></A>
+<A NAME="8706"></A>
 <B>unexport</B> <EM>sym &amp;optional pkg </EM>[関数]
 
 <DL COMPACT>
@@ -450,7 +450,7 @@ symbol名と<EM>sym</EM>が重複していないかどうかを検査する。
 
 <P>
 
-<A NAME="8667"></A>
+<A NAME="8718"></A>
 <B>import</B> <EM>sym &amp;optional (pkg *package*) </EM>[関数]
 
 <DL COMPACT>
@@ -468,7 +468,7 @@ symbol名と<EM>sym</EM>が重複していないかどうかを検査する。
 
 <P>
 
-<A NAME="8681"></A>
+<A NAME="8732"></A>
 <B>do-symbols</B> <EM>(var pkg) &amp;rest forms </EM>[マクロ]
 
 <DL COMPACT>
@@ -483,7 +483,7 @@ symbol名と<EM>sym</EM>が重複していないかどうかを検査する。
 
 <P>
 
-<A NAME="8693"></A>
+<A NAME="8744"></A>
 <B>do-external-symbols</B> <EM>(var pkg) &amp;rest forms </EM>[マクロ]
 
 <DL COMPACT>
@@ -498,7 +498,7 @@ symbol名と<EM>sym</EM>が重複していないかどうかを検査する。
 
 <P>
 
-<A NAME="8705"></A>
+<A NAME="8756"></A>
 <B>do-all-symbols</B> <EM>(var [result]) &amp;rest forms </EM>[マクロ]
 
 <DL COMPACT>
@@ -547,7 +547,7 @@ symbol名と<EM>sym</EM>が重複していないかどうかを検査する。
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-10-15
+2015-10-30
 </ADDRESS>
 </BODY>
 </HTML>
