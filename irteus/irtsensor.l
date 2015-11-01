@@ -113,9 +113,10 @@
                               (float-vector  0  0  1  0)
                               (float-vector  0  0  0  1))))
      self))
-  (:create-viewer ()
+  (:create-viewer (&optional cv)
    (unless (boundp '*irtviewer*) (make-irtviewer))
-   (let ((cv
+   (unless cv
+     (setq cv
           (view
            :x pwidth :y pheight
            :viewing (send self :viewing)
@@ -124,7 +125,7 @@
                      :glcon ((send *irtviewer* :viewer :viewsurface) . gl::glcon)
                      :title (format nil "~A_view" (send self :name)) :width pwidth :height pheight)
            :title (format nil "~A_view" (send self :name)))))
-     (setq img-viewer cv)))
+   (setq img-viewer cv))
   (:width () "Returns width of the camera in pixel." pwidth)
   (:height () "Returns height of the camera in pixel." pheight)
   (:viewing (&rest args) (forward-message-to vwing args))
