@@ -68,6 +68,39 @@
         ))
     ))
 
+(deftest test-camera-ray-screen-point-1
+  (let (cam obj scp ray odp)
+    (setq cam
+          (make-camera-from-param :pwidth 640 :pheight 360
+                                  :fx 400 :fy 300
+                                  :cx 300 :cy 150 :name "camtest"
+                                  :create-viewer nil))
+    ;; move camera
+    (send cam :translate #f(100 100 100) :world)
+    (send cam :rotate 1.25 :x :world)
+    (send cam :rotate 0.25 :y :world)
+    (send cam :rotate 0.75 :z :world)
+
+    (setq obj (make-cube 10 10 10 :pos #f(100 100 200)))
+
+    ;;(objects (list cam obj))
+    (format t ";; camera location ~A~%" (send cam :worldpos))
+    (format t ";; object location ~A~%" obj)
+    (setq scp (send cam :screen-point (send obj :worldpos)))
+    (format t ";; screen point ~A~%" scp)
+    (setq ray (send cam :ray (elt scp 0) (elt scp 1)))
+    (format t ";; ray to the point ~A~%" ray)
+    ;; object position relative to camera
+    (setq obp (send cam :inverse-transform-vector (send obj :worldpos)))
+    (format t ";; object location wrt camera ~A~%" obp)
+    ;; object postition using ray
+    (setq obr (v+ (send cam :worldpos) (scale (norm obp) ray)))
+    (format t ";; object location from :ray ~A~%" obr)
+
+
+    (assert (eps-v= obr (send obj :worldpos)) "check :ray and :screen-point")
+    ))
+
 
 (run-all-tests)
 (exit)
