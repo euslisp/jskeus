@@ -85,7 +85,7 @@
           &key
           ((:width pw) 320) ((:height ph) 240)
           (view-up #f(0 1 0))
-          (viewdistance 5.0)
+          (viewdistance 100.0)
           (hither 100.0)
           (yon 10000.0)
           &allow-other-keys)
@@ -104,12 +104,12 @@
                       :screen 1.0
                       args
                       ))
-     (send vwing :screen (/ (* viewdistance pw 0.5) 1) (/ (* viewdistance ph 0.5) 1))
+     (send vwing :screen (/ (* viewdistance pw 0.5) viewdistance) (/ (* viewdistance ph 0.5) viewdistance))
      (send self :assoc vwing)
      (send self :newprojection
            (make-matrix 4 4
-                        (list (float-vector  1  0 (/ pw 2) 0) ;; f = 1, t  =0
-                              (float-vector  0  1 (/ ph 2) 0) ;;
+                        (list (float-vector  viewdistance 0  (/ pw 2) 0) ;; f = 1, t  =0
+                              (float-vector  0  viewdistance (/ ph 2) 0) ;;
                               (float-vector  0  0  1  0)
                               (float-vector  0  0  0  1))))
      self))
