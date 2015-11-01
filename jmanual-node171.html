@@ -289,6 +289,17 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <A NAME="56921"></A>
+<B>:create-viewer</B> <EM>&amp;optional cv  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Create camera viewer, or set viewer
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56931"></A>
 <B>:width</B> [メソッド]
 
 <DL COMPACT>
@@ -299,7 +310,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56931"></A>
+<A NAME="56941"></A>
 <B>:height</B> [メソッド]
 
 <DL COMPACT>
@@ -310,7 +321,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56941"></A>
+<A NAME="56951"></A>
 <B>:fovy</B> [メソッド]
 
 <DL COMPACT>
@@ -321,7 +332,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56951"></A>
+<A NAME="56961"></A>
 <B>:cx</B> [メソッド]
 
 <DL COMPACT>
@@ -332,7 +343,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56961"></A>
+<A NAME="56971"></A>
 <B>:cy</B> [メソッド]
 
 <DL COMPACT>
@@ -343,7 +354,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56971"></A>
+<A NAME="56981"></A>
 <B>:fx</B> [メソッド]
 
 <DL COMPACT>
@@ -354,7 +365,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56981"></A>
+<A NAME="56991"></A>
 <B>:fy</B> [メソッド]
 
 <DL COMPACT>
@@ -365,7 +376,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="56991"></A>
+<A NAME="57001"></A>
 <B>:screen-point</B> <EM>pos  </EM>[メソッド]
 
 <DL COMPACT>
@@ -376,7 +387,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="57001"></A>
+<A NAME="57011"></A>
 <B>:3d-point</B> <EM>x y d  </EM>[メソッド]
 
 <DL COMPACT>
@@ -387,7 +398,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="57011"></A>
+<A NAME="57021"></A>
 <B>:ray</B> <EM>x y  </EM>[メソッド]
 
 <DL COMPACT>
@@ -398,22 +409,62 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57021"></A>
-<B>:create-viewer</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
+<A NAME="57031"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="130" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img304.png"
+ ALT="\begin{emtabbing}
+{\bf :draw-on}
+\it\&amp;rest args \&amp;key \= ((:viewer vwer) \texta...
+...textasteriskcentered ) \\lq  [method]\\
+\&gt; \&amp;allow-other-keys
+\rm
+\end{emtabbing}">
+<BR>
 
 <DL COMPACT>
 <DT> 
-<DD>  
+<DD>Draw camera raw in irtviewer, ex (send cam :draw-on :flush t)
 </DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
+</DL>
 <BR>
 <BR>
 
+<A NAME="57042"></A>
+<B>:draw-objects</B> <EM>objs  </EM>[メソッド]
 
-<A NAME="57032"></A>
+<DL COMPACT>
+<DT> 
+<DD> Draw objects in camera view
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57052"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img305.png"
+ ALT="\begin{emtabbing}
+{\bf :get-image}
+\it\&amp;key \= (with-points) \\lq  [method]\\
+\&gt; (with-colors)
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>Get image objects you need to call :draw-objects before calling this function
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="57063"></A>
 <B>:viewing</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -427,7 +478,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="57043"></A>
+<A NAME="57074"></A>
 <B>:image-viewer</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -441,21 +492,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="57054"></A>
-<B>:draw-on</B> <EM>&amp;rest args &amp;key ((:viewer vwer) viewer) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57065"></A>
+<A NAME="57085"></A>
 <B>:draw-sensor</B> <EM>vwer &amp;key flush (width 1) (color (float-vector 1 1 1))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -469,21 +506,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="57076"></A>
-<B>:draw-objects</B> <EM>objs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57087"></A>
+<A NAME="57096"></A>
 <B>:draw-objects-raw</B> <EM>vwr objs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -497,21 +520,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="57098"></A>
-<B>:get-image</B> <EM>&amp;key (with-points) (with-colors)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="57109"></A>
+<A NAME="57107"></A>
 <B>:get-image-raw</B> <EM>vwr &amp;key (points) (colors)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -529,11 +538,11 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 
-<A NAME="57120"></A>
+<A NAME="57118"></A>
 <BR>
 <IMG
- WIDTH="552" HEIGHT="130" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img304.png"
+ WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img306.png"
  ALT="\begin{emtabbing}
 {\bf make-camera-from-param}
 \it\&amp;key \= pwidth \\lq  [function]...

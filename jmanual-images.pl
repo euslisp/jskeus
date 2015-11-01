@@ -5,7 +5,7 @@
 $key = q/{emtabbing}{{bf{:mirror-axis}{it{&key=(gl::createt)`[method]>(gl::invert-facest)>(gl::axis:y){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="553" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img317.png"
+ SRC="|."$dir".q|jmanual-img319.png"
  ALT="\begin{emtabbing}
 {\bf :mirror-axis}
 \it\&amp;key \= (gl::create t) \\\\lq  [method]\\\\
@@ -40,7 +40,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{:init}{it{&restargs&key=(order(list:z:x:y))`[method]>((:bvh-offset-rotationbvh-rotation)(unit-matrix3))>&allow-other-keys{rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="738" HEIGHT="169" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img309.png"
+ SRC="|."$dir".q|jmanual-img311.png"
  ALT="\begin{emtabbing}
 {\bf :init}
 \it\&amp;rest args \&amp;key \= (order (list :z :x :y)) \...
@@ -82,8 +82,8 @@ $cached_env_img{$key} = q|<IMG
 
 $key = q/{emtabbing}{{bf{make-camera-from-param}{it{&key=pwidth`[function]>pheight>fx>fy>cx>cy>(tx0)>(ty0)>parent-coords>name>create-viewer{rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
- WIDTH="552" HEIGHT="130" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img304.png"
+ WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img306.png"
  ALT="\begin{emtabbing}
 {\bf make-camera-from-param}
 \it\&amp;key \= pwidth \\\\lq  [function]...
@@ -91,6 +91,17 @@ $cached_env_img{$key} = q|<IMG
 \&gt; parent-coords \\\\
 \&gt; name \\\\
 \&gt; create-viewer
+\rm
+\end{emtabbing}">|; 
+
+$key = q/{emtabbing}{{bf{:get-image}{it{&key=(with-points)`[method]>(with-colors){rm{{emtabbing};AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img305.png"
+ ALT="\begin{emtabbing}
+{\bf :get-image}
+\it\&amp;key \= (with-points) \\\\lq  [method]\\\\
+\&gt; (with-colors)
 \rm
 \end{emtabbing}">|; 
 
@@ -187,7 +198,7 @@ $">|;
 $key = q/{emtabbing}{{bf{:init}{it{dt_zc&key=(q1)`[method]>(r1.000000e-06)>((:delayd)1.6)-piqp))>(preview-controller-classextended-preview-controller){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="553" HEIGHT="188" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img308.png"
+ SRC="|."$dir".q|jmanual-img310.png"
  ALT="\begin{emtabbing}
 {\bf :init}
 \it dt \_zc \&amp;key \= (q 1) \\\\lq  [method]\\\\
@@ -257,7 +268,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{:convert-to-faces}{it{&restargs&key=(gl::wrt:local)`[method]>&allow-other-keys{rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="552" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img318.png"
+ SRC="|."$dir".q|jmanual-img320.png"
  ALT="\begin{emtabbing}
 {\bf :convert-to-faces}
 \it\&amp;rest args \&amp;key \= (gl::wrt :local) \\\\lq  [method]\\\\
@@ -390,7 +401,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{:init}{it{dt&key=(q)`[method]>(r)>((:delayd))>((:dimtmp-dim))>(i))>(state-dim(array-dimension_a0))>((:initialize-queue-piqp)){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img306.png"
+ SRC="|."$dir".q|jmanual-img308.png"
  ALT="\begin{emtabbing}
 {\bf :init}
 \it dt \&amp;key \= (q) \\\\lq  [method]\\\\
@@ -530,7 +541,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{:filter}{it{&restargs&key=create`[method]>&allow-other-keys{rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="552" HEIGHT="207" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img313.png"
+ SRC="|."$dir".q|jmanual-img315.png"
  ALT="\begin{emtabbing}
 {\bf :filter}
 \it\&amp;rest args \&amp;key \= create \\\\lq  [method]\\\\
@@ -607,19 +618,6 @@ $cached_env_img{$key} = q|<IMG
 \rm
 \end{emtabbing}">|; 
 
-$key = q/{emtabbing}{{bf{:init}{it{b&restargs&key=((:widthpw)320)`[method]>((:heightph)24viewdistance5.0)>(hither100.0)>(yon10000.0)>&allow-other-keys{rm{{emtabbing};AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="552" HEIGHT="32" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img303.png"
- ALT="\begin{emtabbing}
-{\bf :init}
-\it b \&amp;rest args \&amp;key \= ((:width pw) 320) \\\\lq  [...
-...ither 100.0) \\\\
-\&gt; (yon 10000.0) \\\\
-\&gt; \&amp;allow-other-keys
-\rm
-\end{emtabbing}">|; 
-
 $key = q/displaystyle^{-1}(;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="11" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
@@ -629,7 +627,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{connect-server-until-success}{it{hostport&key=(max-port(+port20))`[function]>(return-with-portnil){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="553" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img320.png"
+ SRC="|."$dir".q|jmanual-img322.png"
  ALT="\begin{emtabbing}
 {\bf connect-server-until-success}
 \it host port \&amp;key \= (max-port (+ port 20)) \\\\lq  [function]\\\\
@@ -766,7 +764,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{:init}{it{&restargs&key=tree`[method]>coords>((:scalescl)){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="552" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img310.png"
+ SRC="|."$dir".q|jmanual-img312.png"
  ALT="\begin{emtabbing}
 {\bf :init}
 \it\&amp;rest args \&amp;key \= tree \\\\lq  [method]\\\\
@@ -906,7 +904,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{:filter-with-indices}{it{idx-lst&key=(create)`[method]>(negative){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="553" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img314.png"
+ SRC="|."$dir".q|jmanual-img316.png"
  ALT="\begin{emtabbing}
 {\bf :filter-with-indices}
 \it idx-lst \&amp;key \= (create) \\\\lq  [method]\\\\
@@ -947,7 +945,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{:init}{it{dt&key=(q)`[method]>(r)>((:delayd))>((:dimtmp-dim))>(i(state-dim(array-dimension_orga0))>((:initialize-queue-piqp)){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="553" HEIGHT="188" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img307.png"
+ SRC="|."$dir".q|jmanual-img309.png"
  ALT="\begin{emtabbing}
 {\bf :init}
 \it dt \&amp;key \= (q) \\\\lq  [method]\\\\
@@ -1099,6 +1097,18 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img259.png"
  ALT="$\displaystyle \mbox{\boldmath {$M$}}$">|; 
 
+$key = q/{emtabbing}{{bf{:draw-on}{it{&restargs&key=((:viewervwer)textasteriskcenteredviewertextasteriskcentered)`[method]>&allow-other-keys{rm{{emtabbing};AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="552" HEIGHT="130" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img304.png"
+ ALT="\begin{emtabbing}
+{\bf :draw-on}
+\it\&amp;rest args \&amp;key \= ((:viewer vwer) \texta...
+...textasteriskcentered ) \\\\lq  [method]\\\\
+\&gt; \&amp;allow-other-keys
+\rm
+\end{emtabbing}">|; 
+
 $key = q/displaystyle(;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="15" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -1114,7 +1124,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{find-extreams}{it{datum&key=(key#'identity)`[function]>(identity#'=)>(bigger#'textgreater){rm{{emtabbing};MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img319.png"
+ SRC="|."$dir".q|jmanual-img321.png"
  ALT="\begin{emtabbing}
 {\bf find-extreams}
 \it datum \&amp;key \= (key \char93 'identity...
@@ -1785,7 +1795,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{load-mcd}{it{fname&key=(scale)`[function]>(coords)>(bvh-robot-model-classbvh-robot-model){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="553" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img311.png"
+ SRC="|."$dir".q|jmanual-img313.png"
  ALT="\begin{emtabbing}
 {\bf load-mcd}
 \it fname \&amp;key \= (scale) \\\\lq  [function]\\\\
@@ -1896,7 +1906,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{:step}{it{step&key=(fixsize)`[method]>(create){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="552" HEIGHT="149" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img316.png"
+ SRC="|."$dir".q|jmanual-img318.png"
  ALT="\begin{emtabbing}
 {\bf :step}
 \it step \&amp;key \= (fixsize) \\\\lq  [method]\\\\
@@ -2028,7 +2038,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{:filtered-indices}{it{&key=key`[method]>ckey>nkey>pckey>pnkey>pcnkey>negative>&allow-other-keys{rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img315.png"
+ SRC="|."$dir".q|jmanual-img317.png"
  ALT="\begin{emtabbing}
 {\bf :filtered-indices}
 \it\&amp;key \= key \\\\lq  [method]\\\\
@@ -2301,7 +2311,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{:init}{it{&restargs&key=((:pointsmat))`[method]>((:colorscary))>010))>(point-size2.0)>(fill)>(arrow-width2.0)>(arrow-size0.0){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="553" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img312.png"
+ SRC="|."$dir".q|jmanual-img314.png"
  ALT="\begin{emtabbing}
 {\bf :init}
 \it\&amp;rest args \&amp;key \= ((:points mat)) \\\\lq  [metho...
@@ -2377,7 +2387,7 @@ $cached_env_img{$key} = q|<IMG
 $key = q/{emtabbing}{{bf{:init}{it{&restargs&key=((:namen)scene)`[method]>((:objectso)){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="553" HEIGHT="204" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img305.png"
+ SRC="|."$dir".q|jmanual-img307.png"
  ALT="\begin{emtabbing}
 {\bf :init}
 \it\&amp;rest args \&amp;key \= ((:name n) scene) \\\\lq  [method]\\\\
@@ -2409,6 +2419,19 @@ $cached_env_img{$key} = q|<IMG
  WIDTH="25" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="|."$dir".q|jmanual-img176.png"
  ALT="$\displaystyle H($">|; 
+
+$key = q/{emtabbing}{{bf{:init}{it{b&restargs&key=((:widthpw)320)`[method]>((:heightph)24ewdistance100.0)>(hither100.0)>(yon10000.0)>&allow-other-keys{rm{{emtabbing};AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="552" HEIGHT="32" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img303.png"
+ ALT="\begin{emtabbing}
+{\bf :init}
+\it b \&amp;rest args \&amp;key \= ((:width pw) 320) \\\\lq  [...
+...ither 100.0) \\\\
+\&gt; (yon 10000.0) \\\\
+\&gt; \&amp;allow-other-keys
+\rm
+\end{emtabbing}">|; 
 
 $key = q/displaystylemin_{dot{mbox{boldmath{theta}}}}left(dot{mbox{boldmath{r}}}-mbox{bol{boldmath{J}}(mbox{boldmath{theta}})dot{mbox{boldmath{theta}}}right);MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
