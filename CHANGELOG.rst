@@ -2,6 +2,78 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
+* Misc updates
+
+  * README.md : re-organize documents, put all export information to the end of the page
+  * README.md: update to 14.04
+  * Added Gitter badge
+  * add slack notification
+
+* irtsensor.l : update get-image
+
+  * irtsensor.l: add method documents
+  * [irtsensor.l] fix #294 for correct fx/fy
+  * [test/robot-model-usage.l] add test for sample-get-camera-image, disabled for now
+  * [demo/sample-camera-model.l] add sample-get-camera-image-1 and sample-get-camera-image-2
+  * irtsensor.l: support (&optinal cv) for create-viewer
+  * [irtsensor.l] overwrite default perspective view using :newprojection
+  * [test/robot-model-usage.l] add test for :ray and :screen-point of camera class of samplerobot
+  * add test for :ray and :screen-point of camera class
+  * fix image position from models
+  * add :create-viewer method to camera-model
+  * add sample for getting image and pointcloud from camera sensor
+  * [irtsensor] fix get image and pointcloud from camera model
+
+* add test for random and make-random-state
+
+  * [irteus/test/mathtest.l] add test for random / make-random-state
+
+* irtrobot : update fullbody ik
+
+  * [irteus/irtrobot.l] Use cog-null-space as nil in  :fullbody-inverse-kinematics by default.
+  * [irtrobot.l] Add comments and check force, moment, target-coords checking
+  * [irteus/irtrobot.l] Calculate ext-wrench torque from total-wrench
+  * [irteus/irtmodel.l] Fix cog translation axis t
+  * [irteus/irtmodel.l, irtrobot.l] Reduce default min-loop for :fullbody-inveser-kinematics and :inverse-kinematics-for-closed-loop-forward-kinematics
+  * [irtmodel.l] Add usec to ik log file name to prevent conflict of file names called within one second.
+  * [test/test-irt-motion.l] Add test for new ik success/fail file and debug log file
+  * [irtdyna.l, irtmodel.l] Add ik debug information log including max loop count and target error transition.
+
+* irtrobot : update footstep
+
+  * [irteus/irtrobot.l] fix unit system of footstep-parameter
+  * [irteus/irtrobot.l] fix a step-count-method for y-axis in go-pos-params->footstep-list
+  * [irteus/demo] use go-pos-quadruped-params->footstep-list fucntion in order to get foot step list in quadruped walking motion
+  * [irteus] add a foot step generator function for quadruped walking
+  * [irteus/irtrobot.l, irteus/test/test-irt-motion.l] Add static balance point method and test for it.
+  * [irteus/irtrobot.l] Align default limbs based on order of force-sensors
+
+* irtrobot : support-polygon
+
+  * [irteus/irtrobot.l, irteus/demo/crank-motion.l] Modify  support-polygon method to support convex hull of given name and    add example to crank-motion (#263)
+
+* irtgl.l :
+
+  * add :make-pqpmodel method to glvertices
+
+* irtgeo.l :
+
+  * Add :worldcoords method to line to objects in irtviewer
+
+* euspng.c :
+
+  * Do not print debug message when writing a png file
+
+* irtmath.l :
+
+  * [irteus/test/matrix.l] Add test codes for concatenate-matrix functions which check arguments and concatenation results
+  * [irteus/irtmath.l] Add concatenate matrix functions moved from euslib/jsk/jsk.l.
+
+* Contributors: Eisoku Kuroiwa, Yuki Furuta, Kei Okada, Ryo KOYAMA, Ryohei Ueda, Shunichi Nozawa, The Gitter Badger, Yohei Kakiuchi
+
 1.0.10 (2015-08-18)
 -------------------
 * [irteus/test/time.l] add test for time add/subtruct (https://github.com/euslisp/EusLisp/pull/128)
