@@ -1,41 +1,32 @@
 ## [JSK EusLisp repository](http://jskeus.sourceforge.net) [![Build Status](https://travis-ci.org/euslisp/jskeus.png?branch=master)](https://travis-ci.org/euslisp/jskeus)
 
 
-This repository containts software devleoped and used by [JSK](http://www.jsk.t.u-tokyo.ac.jp )at The University of Tokyo.
+This repository containts software devleoped and used by [JSK](http://www.jsk.t.u-tokyo.ac.jp) at The University of Tokyo.
 
 ## 1. Getting started
 
-### 1.1 Install binary (Ubuntu 12.04)
+### 1.1 Install binary (RECOMMENDED: Ubuntu 14.04)
 
 #### 1.1.1 Setup ROS repository
 ```
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
 wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-echo "source /opt/ros/hydro/setup.bash" >> ~/.bashrc
+echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
 sudo apt-get update
 ```
 #### 1.1.2 Install Euslisp
 ```
-sudo apt-get install ros-hydro-euslisp
+sudo apt-get install ros-indigo-euslisp
 ```
 
-### 1.2 Install from source code
+### 1.2 Install from source code  (EXPERTS ONLY)
 #### 1.2.1 Installing dependent libraries
 
 for Ubuntu users
 ```
-$ sudo apt-get install git gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi msttcorefonts
+$ sudo apt-get install git gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi gsfonts-x11 texlive-fonts-extra xfonts-100dpi-transcoded xfonts-75dpi-transcoded msttcorefonts
 ```
 
-for Ubuntu 11.04 or later, install more fonts.
-```
-$ sudo apt-get install gsfonts-x11 texlive-fonts-extra xfonts-100dpi-transcoded xfonts-75dpi-transcoded
-```
-
-for Mac OSX users using MacPorts
-```
-$ sudo port install jpeg libpng mesa xorg-libX11 wget
-```
 for Mac OSX users using Homebrew
 ```
 $ brew install jpeg libpng mesalib-glw wget
@@ -109,7 +100,7 @@ $ irteusgl models/irt-all-objects.l "(make-all-objects)"
 
 ## 3 Getting started for ROS and PR2 users
 
-### 3.1 Install binaries (Ubuntu 12.04)
+### 3.1 Install binaries (RECOMMENDED: Ubuntu 14.04)
 
 #### 3.1.1 Setup ROS repository
 
@@ -117,20 +108,20 @@ You can skip this procdeure if you already setup ROS system
 ```
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
 wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-echo "source /opt/ros/hydro/setup.bash" >> ~/.bashrc
+echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
 sudo apt-get update
 ```
 #### 3.1.2 Install pr2/euslisp programs
 
 ```
-sudo apt-get install ros-hydro-pr2eus
+sudo apt-get install ros-indigo-pr2eus
 ```
 
-### 3.2 Install from source
+### 3.2 Install from source (EXPERTS ONLY)
 
 #### 3.2.1  Install ROS and jsk-ros-pkg repository
 
-See http://wiki.ros.org/hydro/Installation/Source for more detail
+See http://wiki.ros.org/indigo/Installation/Source for more detail
 
 ```
 $ sudo apt-get install python-rosdep python-rosinstall-generator python-wstool python-rosinstall build-essential
