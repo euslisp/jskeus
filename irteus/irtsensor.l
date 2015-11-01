@@ -114,6 +114,7 @@
                               (float-vector  0  0  0  1))))
      self))
   (:create-viewer (&optional cv)
+   "Create camera viewer, or set viewer"
    (unless (boundp '*irtviewer*) (make-irtviewer))
    (unless cv
      (setq cv
@@ -180,6 +181,7 @@
                               viewdistance)))))
   (:draw-on
    (&rest args &key ((:viewer vwer) user::*viewer*) &allow-other-keys)
+   "Draw camera raw in irtviewer, ex (send cam :draw-on :flush t)"
    (send* self :draw-sensor vwer args))
   (:draw-sensor
    (vwer &key flush (width 1) (color (float-vector 1 1 1)))
@@ -212,6 +214,7 @@
      (gl::draw-glbody vwer self)
      (if flush (send vwer :viewsurface :flush))))
   (:draw-objects (objs)
+   "Draw objects in camera view"
    (unless img-viewer (send self :create-viewer))
    (send self :draw-objects-raw img-viewer objs))
   (:draw-objects-raw
@@ -282,6 +285,7 @@
      ))
   (:get-image
    (&key (with-points) (with-colors))
+   "Get image objects you need to call :draw-objects before calling this function"
    (let (points colors img pc)
      (if with-points
          (setq points (make-matrix (* pwidth pheight) 3)))
