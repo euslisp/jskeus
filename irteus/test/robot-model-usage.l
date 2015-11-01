@@ -125,6 +125,47 @@
     (assert (eps-v= obr (send obj :worldpos)) "check :ray and :screen-point")
     ))
 
+(deftest test-camera-image-1 ()
+  (let (img w h (num 0))
+#|
+    (load "irteus/demo/sample-camera-model.l")
+    (sample-get-camera-image-1)
+;    (do-until-key
+;     (send (*cam* . img-viewer) :viewsurface :flush)
+;     (send *cam* :draw-objects (list *obj*))
+;     (x::window-main-one)
+;    )
+    (setq img (send *cam* :get-image))
+    (setq w (send *cam* :width)
+          h (send *cam* :height))
+    (dotimes (x w)
+      (dotimes (y h)
+        (if (> (send img :pixel x y) 100)
+            (format t "~x " (send img :pixel x y)))
+        (if (> (send img :pixel x y) 100)
+            (incf num))))
+    (format t ";; number of non black pixels ~A~%" num)
+    ;;(assert (not (eq num 0)) "get-image retuns black image")
+|#
+    ))
+
+(deftest test-camera-image-2 ()
+  (let (img w h (num 0))
+#|
+    (load "irteus/demo/sample-camera-model.l")
+    (sample-get-camera-image-2)
+    (setq img (send *camera-model* :get-image))
+    (setq w (send *camera-model* :width)
+          h (send *camera-model* :height))
+    (dotimes (x w)
+      (dotimes (y h)
+        (if (> (send img :pixel x y) 100)
+            (incf num))))
+    (format t ";; number of non black pixels ~A~%" num)
+    ;;(assert (not (eq num 0)) "get-image retuns black image")
+|#
+    ))
+
 
 (run-all-tests)
 (exit)
