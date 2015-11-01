@@ -19,56 +19,6 @@ sudo apt-get update
 sudo apt-get install ros-indigo-euslisp
 ```
 
-### 1.2 Install from source code  (EXPERTS ONLY)
-#### 1.2.1 Installing dependent libraries
-
-for Ubuntu users
-```
-$ sudo apt-get install git gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi gsfonts-x11 texlive-fonts-extra xfonts-100dpi-transcoded xfonts-75dpi-transcoded msttcorefonts
-```
-
-for Mac OSX users using Homebrew
-```
-$ brew install jpeg libpng mesalib-glw wget
-```
-
-'''NOTE:'''
-EusLisp needs X11 Library, but Mac OSX mountain lion no longer support it. So you need to install substitution [XQuartz](http://xquartz.macosforge.org/landing/).
-
-Also for Mac OSX lion (or older) users it's better to install the latest XQuartz for the safety.
-
-(If XQuartz is older than 2.7.3, the installation of EusLisp will fail. You should install the latest XQuartz.)
-
-
-for Raspberry Pi users using debian(Raspbian "wheezy")
-```
-$ sudo apt-get install git gcc g++ libjpeg62-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi
-## additional install for using OpenGL on raspberry pi
-$ sudo apt-get install libgl1-mesa-dri xserver-xorg-video-vesa xutils
-```
-for Cygwin(now working with 32bit only)
-```
-Packages listed below should be intalled using setup.exe.
-
-git, gcc-core, gcc-g++, make
-libjpeg-devel, libpng-devel
-libGL-devel, libGLU-devel, libglut-devel, libX11-devel, libXext-devel
-xorg-server
-X-start-menu-icons (for startxwin.exe)
-mesa-demo (for glxinfo)
-bitmap fonts (all bitmap font packages -75dpi, -100dpi, -misc )
-```
-
-
-#### 1.2.2 Downloading and building EusLisp
-```
-$ git clone http://github.com/euslisp/jskeus jskeus
-$ cd jskeus
-$ make
-you will see instructions to add EUSDIR, ARCHDIR, PATH, LD_LIBRARY_PATH environment variable in your bashrc to invoke euslisp program
-$ echo "source ~/bashrc.eus" >> ~/.bashrc
-```
-
 ## 2 Playing with Demo programs
 
 ### 2.1 Motion generation
@@ -115,24 +65,6 @@ sudo apt-get update
 
 ```
 sudo apt-get install ros-indigo-pr2eus
-```
-
-### 3.2 Install from source (EXPERTS ONLY)
-
-#### 3.2.1  Install ROS and jsk-ros-pkg repository
-
-See http://wiki.ros.org/indigo/Installation/Source for more detail
-
-```
-$ sudo apt-get install python-rosdep python-rosinstall-generator python-wstool python-rosinstall build-essential
-$ mkdir -p ~/ros_catkin_ws/src
-$ cd ~/ros_catkin_ws/src
-$ wstool init src https://raw.githubusercontent.com/jsk-ros-pkg/jsk_pr2eus/master/.rosinstall
-$ wget https://raw.githubusercontent.com/jsk-ros-pkg/jsk_travis/master/rosdep-install.sh
-$ sh ./rosdep-install.sh
-$ cd ..
-$ catkin_make
-$ source devel/setup.bash
 ```
 
 ### 3.3 Running demo programs
@@ -182,6 +114,72 @@ See online [manual](http://euslisp.github.io/jskeus/)
 
 PDF files are also available from [here](https://github.com/euslisp/jskeus/raw/master/doc/jmanual.pdf)
 
-### 3.6 Acknowledgment
+### 3.6 Install euslisp from source code  (EXPERTS ONLY)
+
+#### 3.6.1 Installing dependent libraries
+
+for Ubuntu users
+```
+$ sudo apt-get install git gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi gsfonts-x11 texlive-fonts-extra xfonts-100dpi-transcoded xfonts-75dpi-transcoded msttcorefonts
+```
+
+for Mac OSX users using Homebrew
+```
+$ brew install jpeg libpng mesalib-glw wget
+```
+
+'''NOTE:'''
+EusLisp needs X11 Library, but Mac OSX mountain lion no longer support it. So you need to install substitution [XQuartz](http://xquartz.macosforge.org/landing/).
+
+Also for Mac OSX lion (or older) users it's better to install the latest XQuartz for the safety.
+
+(If XQuartz is older than 2.7.3, the installation of EusLisp will fail. You should install the latest XQuartz.)
+
+
+for Raspberry Pi users using debian(Raspbian "wheezy")
+```
+$ sudo apt-get install git gcc g++ libjpeg62-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi
+## additional install for using OpenGL on raspberry pi
+$ sudo apt-get install libgl1-mesa-dri xserver-xorg-video-vesa xutils
+```
+for Cygwin(now working with 32bit only)
+```
+Packages listed below should be intalled using setup.exe.
+
+git, gcc-core, gcc-g++, make
+libjpeg-devel, libpng-devel
+libGL-devel, libGLU-devel, libglut-devel, libX11-devel, libXext-devel
+xorg-server
+X-start-menu-icons (for startxwin.exe)
+mesa-demo (for glxinfo)
+bitmap fonts (all bitmap font packages -75dpi, -100dpi, -misc )
+```
+
+#### 3.6.2 Downloading and building EusLisp
+```
+$ git clone http://github.com/euslisp/jskeus jskeus
+$ cd jskeus
+$ make
+you will see instructions to add EUSDIR, ARCHDIR, PATH, LD_LIBRARY_PATH environment variable in your bashrc to invoke euslisp program
+$ echo "source ~/bashrc.eus" >> ~/.bashrc
+```
+
+#### 3.6.3  Install ROS and jsk-ros-pkg repository
+
+See http://wiki.ros.org/indigo/Installation/Source for more detail
+
+```
+$ sudo apt-get install python-rosdep python-rosinstall-generator python-wstool python-rosinstall build-essential
+$ mkdir -p ~/ros_catkin_ws/src
+$ cd ~/ros_catkin_ws/src
+$ wstool init src https://raw.githubusercontent.com/jsk-ros-pkg/jsk_pr2eus/master/.rosinstall
+$ wget https://raw.githubusercontent.com/jsk-ros-pkg/jsk_travis/master/rosdep-install.sh
+$ sh ./rosdep-install.sh
+$ cd ..
+$ catkin_make
+$ source devel/setup.bash
+```
+
+### 3.7 Acknowledgment
 
 The software in this repository is based on [EusLisp language](http://euslisp.sourceforge.net).
