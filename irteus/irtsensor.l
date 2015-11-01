@@ -220,21 +220,37 @@
        (gl::glviewport (- (/ (- pheight pwidth) 2)) 0 pheight pheight))
      (gl::glMatrixMode gl::GL_PROJECTION)
      (gl::glLoadIdentity)
-     ;; the following should get aspect ration from viewport
-     (gl::gluPerspectivefv (float-vector (rad2deg (send self :fovy))
-                                         1.0
-                                         (send self :viewing :hither)
-                                         (send self :viewing :yon)))
-     (setq viewpoint
-           (v+ (send self :worldpos) ;; for right camera
-               (send self :viewing :rotate-vector
-                     (scale 1000.0 (float-vector (/ (- (/ (1- pwidth)  2.0) cx) f)
-                                                 (/ (- (/ (1- pheight) 2.0) cy) f)
-                                                 0)))))
+     (let ((fv (instantiate float-vector 16)))
+       ;; projection matrix on OpenGL
+       ;; f 0  A 0
+       ;; 0 f  B 0
+       ;; 0 0  C D
+       ;; 0 0 -1 0
+       (setf (elt fv 0) (/ 1.0 (tan (/ (send self :fovy) 2.0)))) ;; f
+       (setf (elt fv 5) (elt fv 0)) ;; f
+       (setf (elt fv 8)
+             (/ (* 2 (- (/ (1- pwidth) 2.0) cx))
+                (if (> pwidth pheight) pwidth pheight))) ;; A
+       (setf (elt fv 9)
+             (/ (* -2 (- (/ (1- pheight) 2.0) cy))
+                (if (> pwidth pheight) pwidth pheight))) ;; B
+       (setf (elt fv 10)
+             (/ (+ (send self :viewing :yon)
+                   (send self :viewing :hither))
+                (- (send self :viewing :hither)
+                   (send self :viewing :yon)))) ;; C
+       (setf (elt fv 14)
+             (/ (* 2 (send self :viewing :yon)
+                   (send self :viewing :hither))
+                (- (send self :viewing :hither)
+                   (send self :viewing :yon)))) ;; D
+       (setf (elt fv 11) -1)
+       (gl::glMultMatrixd fv))
+
+     (setq viewpoint (send self :worldpos))
      ;; glview define view-directoin to oppsite direction
      (setq viewtarget
-           (v- viewpoint (send self :viewing :view-direction) ))
-     (pprint (list viewpoint viewtarget (v- (send self :viewing :view-up))))
+           (v- viewpoint (send self :viewing :view-direction)))
      (gl::gluLookAtfv (concatenate vector viewpoint viewtarget
                                    (v- (send self :viewing :view-up))))
      (gl::glMatrixMode gl::GL_MODELVIEW)
