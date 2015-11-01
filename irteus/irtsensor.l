@@ -104,7 +104,14 @@
                       :screen 1.0
                       args
                       ))
+     (send vwing :screen (/ (* viewdistance pw 0.5) 1) (/ (* viewdistance ph 0.5) 1))
      (send self :assoc vwing)
+     (send self :newprojection
+           (make-matrix 4 4
+                        (list (float-vector  1  0 (/ pw 2) 0) ;; f = 1, t  =0
+                              (float-vector  0  1 (/ ph 2) 0) ;;
+                              (float-vector  0  0  1  0)
+                              (float-vector  0  0  0  1))))
      self))
   (:create-viewer ()
    (unless (boundp '*irtviewer*) (make-irtviewer))
