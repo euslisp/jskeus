@@ -66,7 +66,7 @@
     (assert (v= (make-random-state nil) #i(123456 789012)) "(make-random-state nil)")
     (assert (v= (make-random-state #i(11111 22222)) #i(11111 22222)) "(make-random-state #i(11111 22222))")
     (assert (not (v= (make-random-state t) #i(123456 789012))) "(make-random-state t)")
-    (assert (not (= 0 (random 10 (make-random-state t)))) "(random 10 (make-random-state t))")
+    (assert (= 0 (random 10 (make-random-state #i(123456 789012)))) "(random 10 (make-random-state #i(123456 789012)))")
 
     ;; eigen decompose
     ;; http://en.wikipedia.org/wiki/Eigendecomposition_of_a_matrix#Example
