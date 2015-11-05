@@ -1454,7 +1454,7 @@ M_{r} \bm{E}_3 & - M_{r} \hat{\bm{p}}_{B\to G}\\
      ;;
      (setq b (body+ (make-cube 10 10 20 :pos #f(0 0 10)) (make-cube 300 300 2)))
      (send b :set-color :white)
-     (setq l1 (instance bodyset-link :init (make-cascoords) :bodies (list b) :name 'l2))
+     (setq l1 (instance bodyset-link :init (make-cascoords) :bodies (list b) :name 'l1))
      (send l1 :assoc l2)
      ;;
      (setq j1 (instance rotational-joint :init :name 'j1
