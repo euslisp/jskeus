@@ -101,7 +101,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
      ;;
      (setq b (body+ (make-cube 10 10 20 :pos #f(0 0 10)) (make-cube 300 300 2)))
      (send b :set-color :white)
-     (setq l1 (instance bodyset-link :init (make-cascoords) :bodies (list b) :name 'l2))
+     (setq l1 (instance bodyset-link :init (make-cascoords) :bodies (list b) :name 'l1))
      (send l1 :assoc l2)
      ;;
      (setq j1 (instance rotational-joint :init :name 'j1
@@ -313,7 +313,7 @@ rotation-axis t)
 <BR><HR>
 <ADDRESS>
 
-2015-11-02
+2015-11-17
 </ADDRESS>
 </BODY>
 </HTML>
