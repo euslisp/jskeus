@@ -297,9 +297,12 @@
         (glEnable GL_CULL_FACE)
         (glCullFace GL_FRONT)
 
-        (mapc #'(lambda (aface)
-                  (draw-face aface nil nil))
-              (send abody :faces))
+        (dolist (aface (send abody :faces))
+          (glBegin GL_POLYGON)
+          (glNormal3fv (transform (transpose (send abody :worldrot)) (send aface :normal)))
+          (dolist (e (send aface :edges))
+            (glVertex3fv (send abody :inverse-transform-vector (send e :pvertex aface))))
+          (glEnd))
 
         (glDisable GL_CULL_FACE)
         (glDisable GL_POLYGON_OFFSET_FILL)
