@@ -286,13 +286,15 @@
   (:select-drawmode
    (mode)
    (when (not (eq mode drawmode))
-     (dolist (obj draw-things)
-       (setf (get obj :GL-DISPLAYLIST-ID) nil)
-       (case mode
-         (user::hid
-          (setf (get obj :gl-hiddenline) (list (cons nil t))))
-         (t
-          (setf (get obj :gl-hiddenline) nil)))))
+     (let ((glcon ((send self :viewer :viewsurface) . gl::glcon)))
+       (dolist (obj draw-things)
+         (gl::delete-displaylist-id (get obj :GL-DISPLAYLIST-ID))
+         (setf (get obj :GL-DISPLAYLIST-ID) nil)
+         (case mode
+           (user::hid
+            (setf (get obj :gl-hiddenline) (list (cons glcon t))))
+           (t
+            (setf (get obj :gl-hiddenline) nil))))))
    (setq drawmode mode)
    drawmode)
   (:flush () (if viewer (send viewer :viewsurface :glflush)))
