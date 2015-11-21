@@ -214,7 +214,7 @@
      (gl::draw-glbody vwer self)
      (if flush (send vwer :viewsurface :flush))))
   (:draw-objects (objs)
-   "Draw objects in camera view"
+   "Draw objects in camera viewer, expected type of objs is list of objects"
    (unless img-viewer (send self :create-viewer))
    (send self :draw-objects-raw img-viewer objs))
   (:draw-objects-raw
@@ -355,6 +355,22 @@
            (incf vptr 1)
            )))
      img
+     ))
+  (:select-drawmode (mode objs)
+   "Change drawmode for drawing with :draw-objects methods. mode is symbol of mode, 'hid is symbol for hidden line mode, the other symbols indicate default mode. objs is the same objects using :draw-objects."
+   (let ((glcon ((send img-viewer :viewsurface) . gl::glcon)))
+     (dolist (obj (x::draw-things objs))
+       (let ((hid (get obj :gl-hiddenline)))
+         (gl::delete-displaylist-id (get obj :GL-DISPLAYLIST-ID))
+         (setf (get obj :GL-DISPLAYLIST-ID) nil)
+         (case mode
+          (user::hid
+           (unless (assq glcon hid)
+             (setf (get obj :gl-hiddenline)
+                   (append hid (list (cons glcon t))))))
+          (t
+           (setf (get obj :gl-hiddenline) nil))
+          )))
      ))
   )
 
