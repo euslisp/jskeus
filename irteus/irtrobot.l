@@ -839,9 +839,21 @@
        (reverse ret))))
   (:go-pos-quadruped-params->footstep-list
    (xx yy th ;; [mm] [mm] [deg]
-       &key (type :crawl))
+       &key
+       (type :crawl)
+       ((:footstep-parameter prm) (send self :footstep-parameter))
+       ((:default-half-offset defp) (cadr (memq :default-half-offset prm)))
+       ((:forward-offset-length xx-max) (cadr (memq :forward-offset-length prm)))
+       ((:outside-offset-length yy-max) (cadr (memq :outside-offset-length prm)))
+       ((:rotate-rad th-max) (abs (rad2deg (cadr (memq :rotate-rad prm)))))
+       )
    "Calculate foot step list for quadruped walking from goal x position [mm], goal y position [mm], and goal yaw orientation [deg]."
-   (let ((biped-fsl (send self :go-pos-params->footstep-list xx yy th :forward-offset-length 100 :rotate-rad 3))
+   (let ((biped-fsl (send self :go-pos-params->footstep-list xx yy th
+                          :footstep-parameter prm
+                          :default-half-offset defp
+                          :forward-offset-length xx-max
+                          :outside-offset-length yy-max
+                          :rotate-rad th-max))
          quadruped-fsl)
      ;; calculate foot step list for quad walk
      (dolist (fs biped-fsl)
@@ -870,7 +882,42 @@
                                     (case fs-leg-name (:rleg :lleg) (:lleg :larm))))
                       quadruped-fsl))
                )))
-     (reverse quadruped-fsl)))
+     (if (eq type :crawl)
+         (let ((ret (reverse (subseq quadruped-fsl 0 (- (length quadruped-fsl) 1)))))
+           (cond ((= (length ret) 3) ret)
+                 ((= (mod (- (length ret) 1) 4) 0)
+                  (let ((ret-new (list (car (last quadruped-fsl)))))
+                    (dotimes (i (/ (- (length ret) 1) 4))
+                      (let ((cycle (subseq ret (+ (* 4 i) 1) (+ (* 4 (+ i 1)) 1))))
+                        (setq cycle
+                              (mapcar #'(lambda (n)
+                                          (find-if #'(lambda (x) (eq n (send (car x) :name))) cycle))
+                                      (cond ((and (>= xx 0) (>= yy 0)) (list :lleg :rarm :rleg :larm))
+                                            ((and (>= xx 0) (< yy 0)) (list :rleg :larm :lleg :rarm))
+                                            ((and (< xx 0) (>= yy 0)) (list :rarm :lleg :rleg :larm))
+                                            ((and (< xx 0) (< yy 0)) (list :larm :rleg :lleg :rarm)))))
+                        (setq ret-new (append ret-new cycle))))
+                    ret-new)
+                  )
+                 ((= (mod (- (length ret) 1) 4) 2)
+                  (let ((ret-new (list (car (last quadruped-fsl)))))
+                    (setq ret-new (list (car (last quadruped-fsl))))
+                    (dotimes (i (/ (- (length ret) 1) 4))
+                      (let ((cycle (subseq ret (+ (* 4 i) 1) (+ (* 4 (+ i 1)) 1))))
+                        (mapcar #'(lambda (x) (print (send (car x) :name))) cycle)
+                        (setq cycle
+                              (mapcar #'(lambda (n)
+                                          (find-if #'(lambda (x) (eq n (send (car x) :name))) cycle))
+                                      (cond ((and (>= xx 0) (>= yy 0)) (list :lleg :rarm :rleg :larm))
+                                            ((and (>= xx 0) (< yy 0)) (list :rleg :larm :lleg :rarm))
+                                            ((and (< xx 0) (>= yy 0)) (list :rarm :lleg :rleg :larm))
+                                            ((and (< xx 0) (< yy 0)) (list :larm :rleg :lleg :rarm)))))
+                        (setq ret-new (append ret-new cycle))))
+                    (setq ret-new (append ret-new (subseq ret (- (length ret) 2) (length ret))))
+                    ret-new))
+                 (t nil))
+           )
+       (reverse quadruped-fsl))))
 
   ;; Support polygon methods
   (:support-polygons
