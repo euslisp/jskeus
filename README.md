@@ -21,6 +21,11 @@ sudo apt-get update
 sudo apt-get install ros-indigo-euslisp
 ```
 
+### 1.2 Install via Homebrew (OSX)
+```
+brew install homebrew/x11/jskeus
+```
+
 ## 2 Playing with Demo programs
 
 ### 2.1 Motion generation
