@@ -1027,17 +1027,17 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img158.png"
  ALT="$ _j$">|; 
 
-$key = q/L;MSF=1.6;AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="30" HEIGHT="30" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img206.png"
- ALT="$ L$">|; 
-
 $key = q/Sigma_j;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="553" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
  SRC="|."$dir".q|jmanual-img98.png"
  ALT="$ \Sigma_j$">|; 
+
+$key = q/L;MSF=1.6;AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="30" HEIGHT="30" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img206.png"
+ ALT="$ L$">|; 
 
 $key = q/theta;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
@@ -2074,6 +2074,12 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img213.png"
  ALT="$ ^T,...,$">|; 
 
+$key = q/displaystyle);MSF=1.6;AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="|."$dir".q|jmanual-img121.png"
+ ALT="$\displaystyle )$">|; 
+
 $key = q/{emtabbing}{{bf{:init}{it{&key=(name(intern(formatniljoint~A(system:addressself)-table))>((:joint-min-max-targetmm-target))>&allow-other-keys{rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="175" HEIGHT="52" ALIGN="BOTTOM" BORDER="0"
@@ -2085,12 +2091,6 @@ $cached_env_img{$key} = q|<IMG
 \&gt; \&amp;allow-other-keys
 \rm
 \end{emtabbing}">|; 
-
-$key = q/displaystyle);MSF=1.6;AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="|."$dir".q|jmanual-img121.png"
- ALT="$\displaystyle )$">|; 
 
 $key = q/{emtabbing}{{bf{render}{it{&key=:bodies:faces(:viewer*viewer*)`[関数]>(:lights*light-sources*)>(colormap*render-colormap*)(y1.0){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
