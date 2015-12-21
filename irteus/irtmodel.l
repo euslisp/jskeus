@@ -2104,7 +2104,9 @@
 
        ;; check loop end
        (if success
-           :ik-succeed
+           (progn
+             (send self :put :ik-draw-on-params nil)
+             :ik-succeed)
          (progn
            (when (and debug-view (not (memq :no-clear debug-view)) *viewer*)
              (send *viewer* :viewsurface :clear))
@@ -2128,9 +2130,9 @@
                  (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0))))
              (dolist (p (send self :get :ik-draw-on-params))
                (send* (car p) :draw-on :flush nil (cdr p)))
-             (send self :put :ik-draw-on-params nil)
              (if (not (memq :no-flush debug-view)) (send *viewer* :viewsurface :flush))
              )
+           (send self :put :ik-draw-on-params nil)
            :ik-continues)
          )
        ))
