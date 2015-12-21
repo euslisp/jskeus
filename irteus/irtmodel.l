@@ -2104,7 +2104,9 @@
 
        ;; check loop end
        (if success
-           :ik-succeed
+           (progn
+             (send self :put :ik-draw-on-params nil) ;; Clear :ik-draw-on-params
+             :ik-succeed)
          (progn
            (when (and debug-view (not (memq :no-clear debug-view)) *viewer*)
              (send *viewer* :viewsurface :clear))
@@ -2117,6 +2119,12 @@
                           :jacobi jacobi :debug-view debug-view
                           ;; buffer for calculation
                           method-args)
+           ;; Visualizaion for :inverse-kinematics-loop. In :inverse-kinematics-loop,
+           ;;   1. Calculate of current value and target value
+           ;;   2. Solve inverse kinematics, update robot state, and update robot's viewer state
+           ;;   3. Add current value and target value viewer draw-on information.
+           ;;   4. Call (send *viewer* :viewsurface :flush) and everything are displayed.
+           ;;   For 3, we need to store information of 1 through :draw-collision-debug-view or :ik-draw-on-params
            (when (and debug-view  *viewer*)
              (send *viewer* :draw-objects :clear nil :flush nil)
              ;;
@@ -2128,9 +2136,9 @@
                  (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0))))
              (dolist (p (send self :get :ik-draw-on-params))
                (send* (car p) :draw-on :flush nil (cdr p)))
-             (send self :put :ik-draw-on-params nil)
              (if (not (memq :no-flush debug-view)) (send *viewer* :viewsurface :flush))
              )
+           (send self :put :ik-draw-on-params nil) ;; Clear :ik-draw-on-params
            :ik-continues)
          )
        ))

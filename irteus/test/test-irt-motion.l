@@ -881,5 +881,10 @@
   (assert
    (fullbody-ik-with-forces *sample-robot*)))
 
+(deftest test-fullbody-ik-draw-param-check-samplerobot
+  (dotimes (i 5) (send *sample-robot* :move-centroid-on-foot :both '(:rleg :lleg)))
+  (assert
+   (not (> (length (send *sample-robot* :get :ik-draw-on-params)) 0))))
+
 (run-all-tests)
 (exit 0)
