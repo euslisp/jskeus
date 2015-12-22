@@ -3305,12 +3305,14 @@ $\displaystyle _{G} =  \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath 
 \it dt \&key \= (q) \` [method]\\
 \> (r) \\
 \> ((:delay d)) \\
-\> ((:dim tmp-dim)) \\
-\> (init-xk (float-vector 0 0 0)) \\
 \> ((:a \_a)) \\
 \> ((:b \_b)) \\
 \> ((:c \_c)) \\
 \> (state-dim (array-dimension \_a 0)) \\
+\> ((:output-dim odim) (array-dimension \_c 0)) \\
+\> ((:input-dim idim) (array-dimension \_b 1)) \\
+\> (init-xk (instantiate float-vector (array-dimension \_a 0))) \\
+\> (init-uk (make-matrix (array-dimension \_b 1) 1)) \\
 \> ((:initialize-queue-p iqp)) 
 \rm
 \end{emtabbing}%
@@ -3324,13 +3326,14 @@ $\displaystyle _{G} =  \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath 
 \it dt \&key \= (q) \` [method]\\
 \> (r) \\
 \> ((:delay d)) \\
-\> ((:dim tmp-dim)) \\
-\> (init-xk (float-vector 0 0 0)) \\
 \> ((:a \_orga)) \\
 \> ((:b \_orgb)) \\
 \> ((:c \_orgc)) \\
+\> (init-xk (instantiate float-vector (array-dimension \_orga 0))) \\
+\> (init-uk (make-matrix (array-dimension \_orgb 1) 1)) \\
 \> (state-dim (array-dimension \_orga 0)) \\
-\> ((:initialize-queue-p iqp)) 
+\> ((:initialize-queue-p iqp)) \\
+\> (q-mat) 
 \rm
 \end{emtabbing}%
 \lthtmlfigureZ

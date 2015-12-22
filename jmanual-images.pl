@@ -197,7 +197,7 @@ $">|;
 
 $key = q/{emtabbing}{{bf{:init}{it{dt_zc&key=(q1)`[method]>(r1.000000e-06)>((:delayd)1.6)-piqp))>(preview-controller-classextended-preview-controller){rm{{emtabbing};AAT/;
 $cached_env_img{$key} = q|<IMG
- WIDTH="553" HEIGHT="188" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="553" HEIGHT="207" ALIGN="BOTTOM" BORDER="0"
  SRC="|."$dir".q|jmanual-img310.png"
  ALT="\begin{emtabbing}
 {\bf :init}
@@ -397,20 +397,6 @@ $cached_env_img{$key} = q|<IMG
 \epsfile{file=fig/pointer.ps}
 \end{center}
 \end{figure}">|; 
-
-$key = q/{emtabbing}{{bf{:init}{it{dt&key=(q)`[method]>(r)>((:delayd))>((:dimtmp-dim))>(i))>(state-dim(array-dimension_a0))>((:initialize-queue-piqp)){rm{{emtabbing};AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img308.png"
- ALT="\begin{emtabbing}
-{\bf :init}
-\it dt \&amp;key \= (q) \\\\lq  [method]\\\\
-\&gt; (r) \\\\
-\&gt; ...
-...(array-dimension \_a 0)) \\\\
-\&gt; ((:initialize-queue-p iqp))
-\rm
-\end{emtabbing}">|; 
 
 $key = q/displaystylem_{new}=sum_{j=1}^{K}m_{j};MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
@@ -942,20 +928,6 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img163.png"
  ALT="$ W$">|; 
 
-$key = q/{emtabbing}{{bf{:init}{it{dt&key=(q)`[method]>(r)>((:delayd))>((:dimtmp-dim))>(i(state-dim(array-dimension_orga0))>((:initialize-queue-piqp)){rm{{emtabbing};AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="553" HEIGHT="188" ALIGN="BOTTOM" BORDER="0"
- SRC="|."$dir".q|jmanual-img309.png"
- ALT="\begin{emtabbing}
-{\bf :init}
-\it dt \&amp;key \= (q) \\\\lq  [method]\\\\
-\&gt; (r) \\\\
-\&gt; ...
-...ray-dimension \_orga 0)) \\\\
-\&gt; ((:initialize-queue-p iqp))
-\rm
-\end{emtabbing}">|; 
-
 $key = q/m;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="47" HEIGHT="30" ALIGN="BOTTOM" BORDER="0"
@@ -1027,17 +999,17 @@ $cached_env_img{$key} = q|<IMG
  SRC="|."$dir".q|jmanual-img158.png"
  ALT="$ _j$">|; 
 
-$key = q/Sigma_j;MSF=1.6;AAT/;
-$cached_env_img{$key} = q|<IMG
- WIDTH="553" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
- SRC="|."$dir".q|jmanual-img98.png"
- ALT="$ \Sigma_j$">|; 
-
 $key = q/L;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="30" HEIGHT="30" ALIGN="BOTTOM" BORDER="0"
  SRC="|."$dir".q|jmanual-img206.png"
  ALT="$ L$">|; 
+
+$key = q/Sigma_j;MSF=1.6;AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="553" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="|."$dir".q|jmanual-img98.png"
+ ALT="$ \Sigma_j$">|; 
 
 $key = q/theta;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
@@ -1933,6 +1905,21 @@ $cached_env_img{$key} = q|<IMG
 \rm
 \end{emtabbing}">|; 
 
+$key = q/{emtabbing}{{bf{:init}{it{dt&key=(q)`[method]>(r)>((:delayd))>((:a_orga))>((:b_oim(array-dimension_orga0))>((:initialize-queue-piqp))>(q-mat){rm{{emtabbing};AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="553" HEIGHT="226" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img309.png"
+ ALT="\begin{emtabbing}
+{\bf :init}
+\it dt \&amp;key \= (q) \\\\lq  [method]\\\\
+\&gt; (r) \\\\
+\&gt; ...
+..._orga 0)) \\\\
+\&gt; ((:initialize-queue-p iqp)) \\\\
+\&gt; (q-mat)
+\rm
+\end{emtabbing}">|; 
+
 $key = q/displaystyledot{mbox{boldmath{r}}}=mbox{boldmath{J}}(mbox{boldmath{theta}})dot{mbox{boldmath{theta}}};MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG
  WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
@@ -2109,6 +2096,20 @@ $cached_env_img{$key} = q|<IMG
  WIDTH="440" HEIGHT="271" ALIGN="MIDDLE" BORDER="0"
  SRC="|."$dir".q|jmanual-img74.png"
  ALT="$ (x, y)$">|; 
+
+$key = q/{emtabbing}{{bf{:init}{it{dt&key=(q)`[method]>(r)>((:delayd))>((:a_a))>((:b_b))>make-matrix(array-dimension_b1)1))>((:initialize-queue-piqp)){rm{{emtabbing};AAT/;
+$cached_env_img{$key} = q|<IMG
+ WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="|."$dir".q|jmanual-img308.png"
+ ALT="\begin{emtabbing}
+{\bf :init}
+\it dt \&amp;key \= (q) \\\\lq  [method]\\\\
+\&gt; (r) \\\\
+\&gt; ...
+...ray-dimension \_b 1) 1)) \\\\
+\&gt; ((:initialize-queue-p iqp))
+\rm
+\end{emtabbing}">|; 
 
 $key = q/[;MSF=1.6;AAT/;
 $cached_env_img{$key} = q|<IMG

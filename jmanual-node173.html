@@ -114,7 +114,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <A NAME="57865"></A>
 <BIG CLASS="XLARGE"><B>preview-controller </B></BIG> [クラス]  <PRE><TT>
   :super   <B>riccati-equation</B> 
-<BR>  :slots 		 xk uk delay f1-n y1-n dim queue-index initialize-queue-p additional-data-queue finishedp initialized-p 
+<BR>  :slots 		 xk uk delay f1-n y1-n queue-index initialize-queue-p additional-data-queue finishedp initialized-p output-dim input-dim 
 </TT></PRE>
 <BR>
 <BR>
@@ -137,7 +137,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 \it dt \&amp;key \= (q) \\lq  [method]\\
 \&gt; (r) \\
 \&gt; ...
-...(array-dimension \_a 0)) \\
+...ray-dimension \_b 1) 1)) \\
 \&gt; ((:initialize-queue-p iqp))
 \rm
 \end{emtabbing}">
@@ -327,15 +327,16 @@ First value of additional-data-queue.
 <A NAME="58024"></A>
 <BR>
 <IMG
- WIDTH="553" HEIGHT="188" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="553" HEIGHT="226" ALIGN="BOTTOM" BORDER="0"
  SRC="jmanual-img309.png"
  ALT="\begin{emtabbing}
 {\bf :init}
 \it dt \&amp;key \= (q) \\lq  [method]\\
 \&gt; (r) \\
 \&gt; ...
-...ray-dimension \_orga 0)) \\
-\&gt; ((:initialize-queue-p iqp))
+..._orga 0)) \\
+\&gt; ((:initialize-queue-p iqp)) \\
+\&gt; (q-mat)
 \rm
 \end{emtabbing}">
 <BR>
@@ -423,7 +424,7 @@ First value of additional-data-queue.
 <A NAME="58079"></A>
 <BIG CLASS="XLARGE"><B>preview-control-cart-table-cog-trajectory-generator </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
-<BR>  :slots 		 pc cog-z zmp-z 
+<BR>  :slots 		 pcs cog-z zmp-z 
 </TT></PRE>
 <BR>
 <BR>
@@ -439,7 +440,7 @@ First value of additional-data-queue.
 <A NAME="58096"></A>
 <BR>
 <IMG
- WIDTH="553" HEIGHT="188" ALIGN="BOTTOM" BORDER="0"
+ WIDTH="553" HEIGHT="207" ALIGN="BOTTOM" BORDER="0"
  SRC="jmanual-img310.png"
  ALT="\begin{emtabbing}
 {\bf :init}
@@ -936,7 +937,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-12-21
+2015-12-22
 </ADDRESS>
 </BODY>
 </HTML>

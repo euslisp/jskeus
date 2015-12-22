@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2015.12.21)  21 DEC 2015 05:02
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2015.12.22)  22 DEC 2015 14:39
 entering extended mode
  %&-line parsing enabled.
 **./jmanual-images.tex
@@ -69,7 +69,7 @@ File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
 ) (/usr/share/texmf-texlive/tex/latex/base/makeidx.sty
 Package: makeidx 2000/03/29 v1.0m Standard LaTeX package
-) (/tmp/tmp.NTXGyg4cQX/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
+) (/tmp/tmp.mOXya9UvQe/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
 hdr/fancyheadings.sty
 Package: fancyheadings 2008/02/04 1.99 Dummy package to call fancyhdr
 
@@ -2303,12 +2303,12 @@ l2hSize :emtabbing57496:46.84526pt::0.0pt::349.0pt.
 
 
 ]
-l2hSize :emtabbing57883:142.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing57883:166.84526pt::0.0pt::349.0pt.
 [308
 
 
 ]
-l2hSize :emtabbing58025:142.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing58025:154.84526pt::0.0pt::349.0pt.
 [309
 
 
@@ -2369,14 +2369,14 @@ l2hSize :emtabbing66487:46.84526pt::0.0pt::349.0pt.
 
 ]
 LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <10> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 3503.
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 3506.
 
 l2hSize :emtabbing67689:58.84526pt::0.0pt::349.0pt.
 [321
 
 
 ]
-Overfull \hbox (10.30089pt too wide) detected at line 3513
+Overfull \hbox (10.30089pt too wide) detected at line 3516
 [] [] []
  []
 
@@ -2394,4 +2394,4 @@ Here is how much of TeX's memory you used:
  28 hyphenation exceptions out of 8191
  28i,17n,45p,400b,412s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on jmanual-images.dvi (323 pages, 105832 bytes).
+Output written on jmanual-images.dvi (323 pages, 106220 bytes).
