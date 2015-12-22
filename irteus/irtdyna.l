@@ -1172,8 +1172,8 @@
       (do ((loop 0 (1+ loop)))
 	  ((>= loop 10000))
 	(let* ((tmp-PA (m* P A)))
-          (setq R+btPb-1 (/ 1.0 (+ R (aref (m* bt (m* P b)) 0 0)))
-                K (scale-matrix R+btPb-1 (m* bt tmp-PA)))
+          (setq R+btPb-1 (inverse-matrix (m+ (scale-matrix R (unit-matrix (array-dimension b 1))) (m* bt (m* P b))))
+                K (m* R+btPb-1 (m* bt tmp-PA)))
           (let ((prevP (m- (m+ (m* At tmp-pa)
                                (m* ct (scale-matrix Q c)))
                            (m* (m* (m* At P) b) K))))
@@ -1201,18 +1201,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass preview-controller
   :super riccati-equation
-  :slots (xk uk delay f1-n y1-n dim queue-index initialize-queue-p additional-data-queue finishedp initialized-p))
+  :slots (xk uk delay f1-n y1-n queue-index initialize-queue-p additional-data-queue finishedp initialized-p output-dim input-dim))
 (defmethod preview-controller
   (:init
     (dt
      &key (q) (r)
           ((:delay d))
-          ((:dim tmp-dim))
-          (init-xk (float-vector 0 0 0))
           ((:A _A))
           ((:B _B))
           ((:C _C))
           (state-dim (array-dimension _A 0))
+          ((:output-dim odim) (array-dimension _C 0))
+          ((:input-dim idim) (array-dimension _B 1))
+          (init-xk (instantiate float-vector (array-dimension _A 0)))
+          (init-uk (make-matrix (array-dimension _B 1) 1))
           ((:initialize-queue-p iqp)))
     "Initialize preview-controller.
      Q is weighting of output error and R is weighting of input.
@@ -1221,27 +1223,31 @@
      init-xk is initial state value.
      A, B, C are state eq matrices.
      If initialize-queue-p is t, fill all queue by the first input at the begenning, otherwise, do not fill queue at the first."
-    (setq delay (round (/ d dt)) dim tmp-dim initialize-queue-p iqp)
+    (setq delay (round (/ d dt)) initialize-queue-p iqp output-dim odim input-dim idim)
     (send-super :init _A _B _C q r)
     (setq queue-index 0)
     (when (null xk)
-      (setq xk (make-matrix state-dim dim))
-      (setf (matrix-row xk 0) (subseq init-xk 0 dim)))
+      (setq xk (make-matrix state-dim 1))
+      (dotimes (i state-dim)
+        (setf (aref xk i 0) (elt init-xk i))))
+    (setq uk init-uk)
     (send self :solve)
     (send self :calc-f)
     self)
   (:calc-f () ;; calculate preview gain for k+1, ... k+N.
-    (setq f1-n (make-matrix 1 (1+ delay))) ;; (matrix-row f1-n 0) is dummy to being mutiplied by p1-n
+    (setq f1-n (make-matrix input-dim (* output-dim (1+ delay)))) ;; (matrix-row f1-n 0) is dummy to being mutiplied by p1-n
     (let* ((gsi (unit-matrix (array-dimension c 1)))
 	   (bt (transpose b))
 	   (ct (transpose c)))
       (dotimes (i delay)
 	(let* ((qt (scale-matrix Q ct))
-	       (fa (scale-matrix R+btPb-1 (m* bt (m* gsi qt)))))
+	       (fa (m* R+btPb-1 (m* bt (m* gsi qt)))))
           (setq gsi (m* A-bKt gsi))
-          (setf (aref f1-n 0 (1+ i)) (aref fa 0 0))
+          (dotimes (ii input-dim)
+            (dotimes (jj output-dim)
+              (setf (aref f1-n ii (+ (* output-dim (1+ i)) jj)) (aref fa ii jj))))
           ))))
-  (:calc-u () (m- (m* f1-n y1-n) (m* K xk)))
+  (:calc-u () (setq uk (m- (m* f1-n y1-n) (m* K xk))))
   (:calc-xk () ;; update xk+1
     (setq xk (m+ (m* A xk) (m* b (send self :calc-u)))))
   ;;
@@ -1257,16 +1263,18 @@
             (incf queue-index)
             (setq initialized-p (>= queue-index (1+ delay))))
           (when (null y1-n)
-            (setq y1-n (make-matrix (1+ delay) dim))
+            (setq y1-n (make-matrix (* output-dim (1+ delay)) 1))
             (setq additional-data-queue (make-list (1+ delay)))
             (if initialize-queue-p
                 (dotimes (i (1+ delay))
-                  (setf (matrix-row y1-n i) (subseq p 0 dim))
+                  (dotimes (j output-dim)
+                    (setf (aref y1-n (+ (* output-dim i) j) 0) (elt p j)))
                   (setf (elt additional-data-queue i) add-data)))
             )
           (unless initialize-queue-p
             (when (< queue-index (1+ delay))
-              (setf (matrix-row y1-n queue-index) (subseq p 0 dim))
+              (dotimes (j output-dim)
+                (setf (aref y1-n (+ (* output-dim queue-index) j) 0) (elt p j)))
               (setf (elt additional-data-queue queue-index) add-data)
               (return-from :update-xk nil))))
       (progn
@@ -1275,9 +1283,11 @@
         (if (<= queue-index 0) (setq finishedp t))))
     ;; update y1-n
     (dotimes (i delay)
-      (setf (matrix-row y1-n i) (matrix-row y1-n (1+ i)))
+      (dotimes (j output-dim)
+        (setf (aref y1-n (+ (* output-dim i) j) 0) (aref y1-n (+ (* output-dim (1+ i)) j) 0)))
       (setf (elt additional-data-queue i) (elt additional-data-queue (1+ i))))
-    (setf (matrix-row y1-n delay) (subseq p 0 dim))
+    (dotimes (j output-dim)
+      (setf (aref y1-n (+ (* output-dim delay) j) 0) (elt p j)))
     (setf (elt additional-data-queue delay) add-data)
     ;;
     (send self :calc-xk)
@@ -1295,20 +1305,21 @@
    ()
    "Last value of reference output queue vector (y_k+N_ref).
     Last value is latest future value."
-   (matrix-row y1-n delay)) ;; tail of queue
+   (subseq y1-n (* output-dim delay) (+ output-dim (* output-dim delay)))) ;; tail of queue
   (:current-reference-output-vector
    ()
    "First value of reference output queue vector (y_k_ref).
     First value is oldest future value and it can be used as current reference value."
-   (matrix-row y1-n 0)) ;; head of queue
+   (subseq y1-n 0 output-dim)) ;; head of queue
   (:current-state-vector
    ()
    "Current state value (xk)."
-   (matrix-row xk 0))
+   (matrix-column xk 0)
+   )
   (:current-output-vector
    ()
    "Current output value (yk)."
-   (m* c xk))
+   (matrix-column (m* c xk) 0))
   (:current-additional-data
    ()
    "Current additional data value.
@@ -1346,11 +1357,13 @@
 (defmethod extended-preview-controller
   (:init
     (dt
-     &key (q) (r) ((:delay d)) ((:dim tmp-dim))
-          (init-xk (float-vector 0 0 0))
+     &key (q) (r) ((:delay d))
           ((:A _orgA)) ((:B _orgB)) ((:C _orgC))
+          (init-xk (instantiate float-vector (array-dimension _orgA 0)))
+          (init-uk (make-matrix (array-dimension _orgB 1) 1))
           (state-dim (array-dimension _orgA 0))
-          ((:initialize-queue-p iqp)))
+          ((:initialize-queue-p iqp))
+          (q-mat))
     "Initialize preview-controller in extended system (error system).
      Q is weighting of output error and R is weighting of input.
      dt is sampling time [s].
@@ -1359,62 +1372,78 @@
      A, B, C are state eq matrices for original system and slot variables A,B,C are used for error system matrices.
      If initialize-queue-p is t, fill all queue by the first input at the begenning, otherwise, do not fill queue at the first."
     (setq orgA _orgA orgB _orgB orgC _orgC)
-    (let* ((output-dim (array-dimension orgC 0))
-           (org-state-dim (array-dimension orgA 0))
+    (setq output-dim (array-dimension orgC 0))
+    (setq input-dim (array-dimension orgB 1))
+    (let* ((org-state-dim (array-dimension orgA 0))
            (new-state-dim (+ output-dim org-state-dim))
            (tmpcA (m* orgc orgA))
            (newA (make-matrix new-state-dim new-state-dim))
            (tmpcb (m* orgc orgB))
            (newb (make-matrix new-state-dim (array-dimension orgB 1)))
            (newC (make-matrix output-dim new-state-dim)))
-      (setf (aref newA 0 0) 1.0)
+      (dotimes (i output-dim)
+        (setf (aref newA i i) 1.0))
       (dotimes (i output-dim)
         (dotimes (j org-state-dim)
           (setf (aref newA i (+ output-dim j)) (aref tmpcA i j))))
       (dotimes (i org-state-dim)
         (dotimes (j org-state-dim)
-          (setf (aref newA (+ 1 i) (+ 1 j)) (aref orgA i j))))
-      (setf (aref newb 0 0) (aref tmpcb 0 0))
-      (dotimes (i org-state-dim)
-        (setf (aref newb (+ output-dim i) 0) (aref orgb i 0)))
+          (setf (aref newA (+ output-dim i) (+ output-dim j)) (aref orgA i j))))
       (dotimes (i output-dim)
-        (setf (aref newC i i) 1.0))
+        (dotimes (j input-dim)
+          (setf (aref newb i j) (aref tmpcb i j))))
+      (dotimes (i org-state-dim)
+        (dotimes (j input-dim)
+          (setf (aref newb (+ output-dim i) j) (aref orgb i j))))
+      (if q-mat
+          (dotimes (i output-dim)
+            (setf (aref newC i i) (aref q-mat i i)))
+        (dotimes (i output-dim)
+          (setf (aref newC i i) 1.0)))
       (send-super :init
                   dt
-                  :A newA :b newb :c newC :dim tmp-dim :state-dim state-dim
-                  :q q :r r :delay d :init-xk init-xk :initialize-queue-p iqp)
+                  :A newA :b newb :c newC :state-dim state-dim
+                  :q q :r r :delay d :init-xk init-xk :init-uk init-uk :initialize-queue-p iqp :output-dim output-dim :input-dim input-dim)
       (when (null xk*)
-        (setq xk* (make-matrix new-state-dim dim))
-        (setf (matrix-row xk* 0) (subseq init-xk 0 dim))
+        (setq xk* (make-matrix new-state-dim 1))
+        (let ((init-y (m* orgC xk)))
+          (dotimes (i output-dim)
+            (setf (aref xk* i 0) (aref init-y i 0))))
         )
       self))
   ;;
   (:calc-f ()
-    (setq f1-n (make-matrix 1 (1+ delay)))
+    (setq f1-n (make-matrix input-dim (* output-dim (1+ delay))))
     (let* ((gsi (unit-matrix (array-dimension c 1)))
 	   (bt (transpose b))
 	   (ct (transpose c))
-	   (R+btPb-1bt (scale-matrix R+btPb-1 bt))
+	   (R+btPb-1bt (m* R+btPb-1 bt))
 	   (qt (scale-matrix Q ct)))
       (dotimes (i delay)
 	(let* ((qt (if (= i (1- delay)) (m* P qt) qt))
-               (fa (scale-matrix R+btPb-1 (m* bt (m* gsi qt)))))
+               (fa (m* R+btPb-1 (m* bt (m* gsi qt)))))
           (setq gsi (m* A-bKt gsi))
-	  (setf (aref f1-n 0 (1+ i)) (aref fa 0 0))
+          (dotimes (ii input-dim)
+            (dotimes (jj output-dim)
+              (setf (aref f1-n ii (+ (* output-dim (1+ i)) jj)) (aref fa ii jj))))
           ))))
-  (:calc-u () (m- (m* f1-n y1-n) (m* K xk*)))
+  (:calc-u
+   ()
+   (let ((uk* (m- (m* f1-n y1-n) (m* K xk*))))
+     (setq uk (m+ uk* uK))
+     uk*))
   (:calc-xk ()
     (setq xk* (m+ (m* A xk*) (m* b (send self :calc-u))))
     (dotimes (i (array-dimension orgA 0))
-      (setf (matrix-row xk i)
-            (v+ (matrix-row xk i)
-                (matrix-row xk* (1+ i)))))
+      (setf (aref xk i 0)
+            (+ (aref xk i 0)
+               (aref xk* (+ output-dim i) 0))))
     )
   (:current-output-vector
    ()
    "Current additional data value.
     First value of additional-data-queue."
-   (matrix-row xk* 0)
+   (subseq (matrix-column xk* 0) 0 output-dim)
    )
   )
 
@@ -1430,7 +1459,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass preview-control-cart-table-cog-trajectory-generator
   :super propertied-object
-  :slots (pc cog-z zmp-z))
+  :slots (pcs cog-z zmp-z))
 (defmethod preview-control-cart-table-cog-trajectory-generator
   (:init
     (dt _zc
@@ -1450,50 +1479,53 @@
      dt -> sampling time[s], _zc is height of COG [mm].
      preview-controller-class is preview controller class (extended-preview-controller by default).
      For other arguments, please see preview-controller and extended-preview-controller :init documentation."
-    (setq pc (instance preview-controller-class
-                       :init dt :q q :r r :delay d
-                       :init-xk init-xk :dim 2
-                       :A _A :B _B :C _C :state-dim 3 :initialize-queue-p iqp))
+    (setq pcs
+          (list (instance preview-controller-class
+                          :init dt :q q :r r :delay d
+                          :init-xk (float-vector (elt init-xk 0) 0 0)
+                          :A _A :B _B :C _C :state-dim 3 :initialize-queue-p iqp)
+                (instance preview-controller-class
+                          :init dt :q q :r r :delay d
+                          :init-xk (float-vector (elt init-xk 1) 0 0)
+                          :A _A :B _B :C _C :state-dim 3 :initialize-queue-p iqp)))
     (setq cog-z _zc)
     self)
   ;; getter methods
   (:refcog
    ()
    "Reference COG [mm]."
-   (let ((cv (send pc :current-state-vector)))
-     (float-vector (elt cv 0) (elt cv 1) cog-z)))
+   (float-vector (elt (send (car pcs) :current-state-vector) 0) (elt (send (cadr pcs) :current-state-vector) 0) cog-z))
   (:cart-zmp ()
    "Cart-table system ZMP[mm] as an output variable."
-    (let ((p (send pc :current-output-vector)))
-      (float-vector (aref p 0 0)
-                    (aref p 0 1)
-                    zmp-z)))
+   (float-vector (elt (send (car pcs) :current-output-vector) 0)
+                 (elt (send (cadr pcs) :current-output-vector) 0)
+                 zmp-z))
   (:last-refzmp ()
    "Reference zmp at the last of queue."
-    (let ((p (send pc :last-reference-output-vector)))
-      (float-vector (elt p 0)
-                    (elt p 1)
-                    zmp-z)))
+   (float-vector (elt (send (car pcs) :last-reference-output-vector) 0)
+                 (elt (send (cadr pcs) :last-reference-output-vector) 0)
+                 zmp-z))
   (:current-refzmp ()
    "Current reference zmp at the first of queue."
-    (let ((p (send pc :current-reference-output-vector))) ;; head of refzmp queue
-      (float-vector (elt p 0)
-                    (elt p 1)
-                    zmp-z)))
+   (float-vector (elt (send (car pcs) :current-reference-output-vector) 0)
+                 (elt (send (cadr pcs) :current-reference-output-vector) 0)
+                 zmp-z))
   ;;
   (:update-xk
    (p &optional (add-data))
    "Update xk and returns zmp and cog values.
     For arguments, please see preview-controller and extended-preview-controller :update-xk."
     (if p (setq zmp-z (elt p 2)))
-    (let ((ret (send pc :update-xk p add-data)))
+    (let ((ret (list (send (car pcs) :update-xk (subseq p 0 1) add-data)
+                     (send (cadr pcs) :update-xk (subseq p 1 2) add-data))))
+      (setq ret (and (car ret) (cadr ret)))
       (if ret
           (list
            (send self :current-refzmp)
            (send self :refcog)
            (send self :cart-zmp)))))
-  (:finishedp () "Finished or not." (send pc :finishedp))
-  (:current-additional-data () "Current additional data value." (send pc :current-additional-data))
+  (:finishedp () "Finished or not." (and (send (car pcs) :finishedp) (send (cadr pcs) :finishedp)))
+  (:current-additional-data () "Current additional data value." (send (car pcs) :current-additional-data))
   (:pass-preview-controller
    (reference-output-vector-list)
    "Get preview controller results from reference-output-vector-list and returns list."
@@ -1508,9 +1540,11 @@
      ))
   (:cog-z () "COG Z [mm]." cog-z)
   (:update-cog-z (zc)
-    (setf (aref (pc . c) 0 2) (- (/ zc (elt *g-vec* 2))))
-    (send pc :solve)
-    (send pc :calc-f))
+   (mapcar #'(lambda (pc)
+               (setf (aref (pc . c) 0 2) (- (/ zc (elt *g-vec* 2))))
+               (send pc :solve)
+               (send pc :calc-f))
+           pcs))
   )
 
 ;;
