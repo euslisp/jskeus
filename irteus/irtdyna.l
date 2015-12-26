@@ -1049,10 +1049,16 @@
   ;; method to calculate fullbody mass properties
   (:weight ;; total weight
    (&optional (update-mass-properties t))
+   "Calculate total robot weight [g].
+    If update-mass-properties argument is t, propagate total mass prop calculation for all links and returns total robot weight.
+    Otherwise, do not calculate total weight, just returns pre-computed total robot weight."
    (if update-mass-properties (send self :update-mass-properties))
    (send (car (send self :links)) :get :m-til))
   (:centroid ;; total centroid
    (&optional (update-mass-properties t))
+   "Calculate total robot centroid (Center Of Gravity, COG) [mm].
+    If update-mass-properties argument is t, propagate total mass prop calculation for all links and returns total robot centroid.
+    Otherwise, do not calculate total mass prop, just returns pre-computed total robot centroid."
    (if update-mass-properties (send self :update-mass-properties))
    (send (car (send self :links)) :get :c-til))
 
