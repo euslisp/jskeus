@@ -886,5 +886,36 @@
   (assert
    (not (> (length (send *sample-robot* :get :ik-draw-on-params)) 0))))
 
+;; Test calling calc-walk-pattern-from-footstep-list N times
+;;   This test is for bug reported in https://github.com/euslisp/jskeus/issues/286.
+(deftest test-samplerobot-walk-pattern-Ntimes
+  (let ((av-list) (cog0) (cog1) (cog2))
+    ;; case 0 : side step with initialize and with :init-pose-function
+    (send *sample-robot* :reset-pose)
+    (send *sample-robot* :fix-leg-to-coords (make-coords))
+    (setq av-list (send *sample-robot* :calc-walk-pattern-from-footstep-list
+                        (list (make-coords :coords (send *sample-robot* :rleg :end-coords :copy-worldcoords) :name :rleg)
+                              (make-coords :coords (send (send *sample-robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 0 100 0)) :name :lleg)
+                              (make-coords :coords (send (send *sample-robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 0 100 0)) :name :rleg))))
+    (setq cog0 (cadr (memq :cog (car av-list))))
+    ;; case 1 : side step with initialize but without :init-pose-function
+    (send *sample-robot* :reset-pose)
+    (send *sample-robot* :fix-leg-to-coords (make-coords))
+    (setq av-list (send *sample-robot* :calc-walk-pattern-from-footstep-list
+                        (list (make-coords :coords (send *sample-robot* :rleg :end-coords :copy-worldcoords) :name :rleg)
+                              (make-coords :coords (send (send *sample-robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 0 100 0)) :name :lleg)
+                              (make-coords :coords (send (send *sample-robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 0 100 0)) :name :rleg))
+                        :init-pose-function #'(lambda ())))
+    (setq cog1 (cadr (memq :cog (car av-list))))
+    ;; case 2 : side step without initialize and with :init-pose-function
+    (setq av-list (send *sample-robot* :calc-walk-pattern-from-footstep-list
+                        (list (make-coords :coords (send *sample-robot* :rleg :end-coords :copy-worldcoords) :name :rleg)
+                              (make-coords :coords (send (send *sample-robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 0 100 0)) :name :lleg)
+                              (make-coords :coords (send (send *sample-robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 0 100 0)) :name :rleg))))
+    (setq cog2 (cadr (memq :cog (car av-list))))
+    (assert (eps= (elt cog0 1) (elt cog1 1) 0.5))
+    (assert (eps= (elt cog0 1) (- (elt cog2 1) 100) 0.5))
+    ))
+
 (run-all-tests)
 (exit 0)
