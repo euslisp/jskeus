@@ -64,7 +64,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   
  <BR>
 <BR> <BR> 
-<A NAME="57478"></A>
+<A NAME="57502"></A>
 <BIG CLASS="XLARGE"><B>scene-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>cascaded-coords</B> 
 <BR>  :slots 		 name objs 
@@ -80,7 +80,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="57495"></A>
+<A NAME="57519"></A>
 <BR>
 <IMG
  WIDTH="553" HEIGHT="204" ALIGN="BOTTOM" BORDER="0"
@@ -101,7 +101,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="57506"></A>
+<A NAME="57530"></A>
 <B>:objects</B> [メソッド]
 
 <DL COMPACT>
@@ -112,7 +112,51 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="57516"></A>
+<A NAME="57540"></A>
+<B>:add-objects</B> <EM>objects  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Add objects to scene with identifiable names. Returns all objects.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57550"></A>
+<B>:add-object</B> <EM>obj  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Add object to scene with identifiable name. Returns all objects.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57560"></A>
+<B>:remove-objects</B> <EM>objs-or-names  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Remove objects or objects with given names from scene. Returns removed objects.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57570"></A>
+<B>:remove-object</B> <EM>obj-or-name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Remove object or object with given name from scene. Returns removed object.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57580"></A>
 <B>:find-object</B> <EM>name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -123,7 +167,51 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="57526"></A>
+<A NAME="57590"></A>
+<B>:add-spots</B> <EM>spots  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Add spots to scene with identifiable names. All spots will be :assoc with this scene. Returns T if added spots successfly, otherwise returns NIL.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57600"></A>
+<B>:add-spot</B> <EM>spot  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Add spot to scene with identifiable name. The spot will be :assoc with this scene. Returns T if spot is added successfly, otherwise returns NIL.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57610"></A>
+<B>:remove-spots</B> <EM>spots  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Remove spots from this scene. All spots will be :dissoc with this scene. Returns removed spots.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57620"></A>
+<B>:remove-spot</B> <EM>spot  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Remove spot from scene. the spot will be :dissoc with this scene. Returns removed spot.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57630"></A>
 <B>:spots</B> <EM>&amp;optional name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -134,7 +222,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="57536"></A>
+<A NAME="57640"></A>
 <B>:object</B> <EM>name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -145,7 +233,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="57546"></A>
+<A NAME="57650"></A>
 <B>:spot</B> <EM>name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -157,7 +245,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57556"></A>
+<A NAME="57660"></A>
 <B>:bodies</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -174,10 +262,39 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </SMALL>
 
 <P>
-              <BR><HR>
+              
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html3050"
+  HREF="jmanual-node173.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3044"
+  HREF="jmanual-node145.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3038"
+  HREF="jmanual-node171.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3046"
+  HREF="jmanual-node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html3048"
+  HREF="jmanual-node187.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html3051"
+  HREF="jmanual-node173.html">動力学計算・歩行動作生成</A>
+<B> Up:</B> <A NAME="tex2html3045"
+  HREF="jmanual-node145.html">ロボットモデリング</A>
+<B> Previous:</B> <A NAME="tex2html3039"
+  HREF="jmanual-node171.html">センサモデル</A>
+ &nbsp; <B>  <A NAME="tex2html3047"
+  HREF="jmanual-node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3049"
+  HREF="jmanual-node187.html">Index</A></B> </DIV>
+<!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-12-22
+2015-12-26
 </ADDRESS>
 </BODY>
 </HTML>
