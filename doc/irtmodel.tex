@@ -410,6 +410,61 @@ $ (send r :angle-vector (float-vector 30))
 \end{verbatim}
 }
 
+\subsubsection{EusLispにおける順運動学計算}
+
+順運動学計算を行うには，cascaded-corods, bodyset, bodyset-link 各クラ
+スに定義された :worldcoords メソッドを用いる．
+:worldcoords メソッドは，ルートリンクが見つかる（親リンクがなくなる）
+か， スロット変数 changed が nil であるリンク
+（一度順運動学計算を行ったことがある）が見つかるまで
+さかのぼって親リンクの :worldcoords メソッドを呼び出すことで
+順運動学計算を行う．
+その際，スロット変数 changed を nil で上書く．
+したがって，二度目の :worldcoords メソッドの呼び出しでは，一度計算され
+たリンクの順運動学計算は行われず，即座にリンクの位置姿勢情報を取り出す
+ことができる．
+
+また，bodyset-link クラスの :worldcoords メソッドは, level 引数を取る
+ことができ，それが :coords である場合には，リンクのもつ bodies スロット変数
+の順運動学計算は行われない．
+bodies にリンクの頂点を構成する faceset が含まれている場合には，これら
+についての順運動学計算を省略することで大幅な高速化が期待できるだろう．
+なお， level 引数の初期値には，リンクのもつ analysis-level スロット変数
+が用いられるため，常に bodies の順運動学計算を行わない場合は，
+analysis-level を :coords にすればよい．
+
+{\baselineskip=10pt
+\begin{verbatim}
+(defmethod bodyset-link
+  (:worldcoords
+   (&optional (level analysis-level))
+   (case
+    level
+    (:coords (send-message self cascaded-coords :worldcoords))
+    (t       (send-super :worldcoords)))
+   ))
+
+(defmethod bodyset
+  (:worldcoords
+   ()
+   (when changed
+     (send-super :worldcoords)
+     (dolist (b bodies) (send b :worldcoords)))
+   worldcoords))
+
+(defmethod cascaded-coords
+ (:worldcoords  ()      ;calculate rot and pos in the world
+   (when changed
+      (if parent
+          (transform-coords (send parent :worldcoords) self
+worldcoords)
+          (send worldcoords :replace-coords self))
+      (send self :update)
+      (setf changed nil))
+   worldcoords))
+\end{verbatim}
+}
+
 \subsection{ロボットの動作生成}
 
 %% \subsubsection{座標系の表現}
