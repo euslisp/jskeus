@@ -658,7 +658,7 @@
      (funcall init-pose-function)
      ;; initial move centroid on foot
      (send gg :initialize-gait-parameter
-           footstep-list default-step-time (send (car (send self :links)) :get :c-til)
+           footstep-list default-step-time (send self :centroid)
            :default-step-height default-step-height :default-double-support-ratio 0.2
            :default-zmp-offsets dzo :all-limbs al
            :thre ik-thre :rthre ik-rthre
