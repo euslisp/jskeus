@@ -431,7 +431,9 @@ bodies にリンクの頂点を構成する faceset が含まれている場合�
 についての順運動学計算を省略することで大幅な高速化が期待できるだろう．
 なお， level 引数の初期値には，リンクのもつ analysis-level スロット変数
 が用いられるため，常に bodies の順運動学計算を行わない場合は，
-analysis-level を :coords にすればよい．
+リンクのインスタンス l について
+\verb|(send l :set-val :analysis-level :coords)|
+とすればよい．
 
 {\baselineskip=10pt
 \begin{verbatim}
