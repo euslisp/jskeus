@@ -1001,10 +1001,10 @@
     force-list [N] and moment-list [Nm] are list of force and moment at target-points.
     static-balance-point-height is height of static balance point [mm]."
    (let* ((sbp (float-vector 0 0 static-balance-point-height))
-          (mg (* 1e-6 (send self :weight nil) (elt *g-vec* 2))))
+          (mg (* 1e-6 (send self :weight update-mass-properties) (elt *g-vec* 2))))
      (dotimes (idx 2)
        (let ((denom mg)
-             (nume (* mg (elt (send self :centroid update-mass-properties) idx))))
+             (nume (* mg (elt (send self :centroid nil) idx))))
          (mapcar #'(lambda (f m tp)
                      (setq nume
                            (+ nume
