@@ -917,5 +917,14 @@
     (assert (eps= (elt cog0 1) (- (elt cog2 1) 100) 0.5))
     ))
 
+(deftest test-samplerobot-static-balance-point
+  (let* ((tmp-robot (instance sample-robot :init))
+         (sbp1 (send tmp-robot :calc-static-balance-point))
+         (sbp2 (send tmp-robot :calc-static-balance-point)))
+    (assert (every #'null (mapcar #'(lambda (x) (and (> x 0) (< x 0))) (concatenate cons sbp1))) "Check nan of sbp1")
+    (assert (every #'null (mapcar #'(lambda (x) (and (> x 0) (< x 0))) (concatenate cons sbp2))) "Check nan of sbp2")
+    (assert (eps-v= sbp1 sbp2) "Check equality of sbp1 and sbp2")
+    ))
+
 (run-all-tests)
 (exit 0)
