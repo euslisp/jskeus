@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>干渉計算</TITLE>
+<TITLE>ロボットビューワ</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="干渉計算">
+<META NAME="description" CONTENT="ロボットビューワ">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,8 +19,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="jmanual.css">
 
-<LINK REL="next" HREF="jmanual-node178.html">
-<LINK REL="previous" HREF="jmanual-node174.html">
+<LINK REL="next" HREF="jmanual-node176.html">
+<LINK REL="previous" HREF="jmanual-node145.html">
 <LINK REL="up" HREF="jmanual-node144.html">
 <LINK REL="next" HREF="jmanual-node176.html">
 </HEAD>
@@ -28,72 +28,527 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html3090"
+<A NAME="tex2html3093"
   HREF="jmanual-node176.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3084"
+<A NAME="tex2html3087"
   HREF="jmanual-node144.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3078"
+<A NAME="tex2html3081"
   HREF="jmanual-node174.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3086"
+<A NAME="tex2html3089"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3088"
-  HREF="jmanual-node187.html">
+<A NAME="tex2html3091"
+  HREF="jmanual-node188.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3091"
-  HREF="jmanual-node176.html">irteusからPQPの呼び出し</A>
-<B> Up:</B> <A NAME="tex2html3085"
+<B> Next:</B> <A NAME="tex2html3094"
+  HREF="jmanual-node176.html">干渉計算</A>
+<B> Up:</B> <A NAME="tex2html3088"
   HREF="jmanual-node144.html">irteus 拡張</A>
-<B> Previous:</B> <A NAME="tex2html3079"
-  HREF="jmanual-node174.html">ロボットビューワ</A>
- &nbsp; <B>  <A NAME="tex2html3087"
+<B> Previous:</B> <A NAME="tex2html3082"
+  HREF="jmanual-node174.html">動力学計算・歩行動作生成</A>
+ &nbsp; <B>  <A NAME="tex2html3090"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3089"
-  HREF="jmanual-node187.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3092"
+  HREF="jmanual-node188.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION05030000000000000000">
-干渉計算</A>
+<H1><A NAME="SECTION05020000000000000000">
+ロボットビューワ</A>
 </H1>
+ 
+ <BR>
+<BR> <BR> 
+<A NAME="59218"></A>
+<BIG CLASS="XLARGE"><B>x::irtviewer </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>x:panel</B> 
+<BR>  :slots 		 x::viewer x::objects x::draw-things x::previous-cursor-pos x::left-right-angle x::up-down-angle x::viewpoint x::viewtarget x::drawmode x::draw-origin x::draw-floor 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="59235"></A>
+<B>:create</B> <EM>&amp;rest args &amp;key (x::title IRT viewer) (x::view-name (gensym title)) (x::hither 200.0) (x::yon 50000.0) (x::width 500) (x::height 500) ((:draw-origin do) 150) ((:draw-floor x::df) nil) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59246"></A>
+<B>:viewer</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59257"></A>
+<B>:redraw</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59268"></A>
+<B>:expose</B> <EM>x:event  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59279"></A>
+<B>:resize</B> <EM>x::newwidth x::newheight  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59290"></A>
+<B>:configurenotify</B> <EM>x:event  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59301"></A>
+<B>:viewtarget</B> <EM>&amp;optional x::p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59312"></A>
+<B>:viewpoint</B> <EM>&amp;optional x::p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59323"></A>
+<B>:look1</B> <EM>&amp;optional (x::vt x::viewtarget) (x::lra x::left-right-angle) (x::uda x::up-down-angle)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59334"></A>
+<B>:look-all</B> <EM>&amp;optional x::bbox  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59345"></A>
+<B>:move-viewing-around-viewtarget</B> <EM>x:event x::x x::y x::dx x::dy x::vwr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59356"></A>
+<B>:set-cursor-pos-event</B> <EM>x:event  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59367"></A>
+<B>:move-coords-event</B> <EM>x:event  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59378"></A>
+<B>:draw-event</B> <EM>x:event  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59389"></A>
+<B>:draw-objects</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59400"></A>
+<B>:objects</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59411"></A>
+<B>:select-drawmode</B> <EM>x::mode  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59422"></A>
+<B>:flush</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59433"></A>
+<B>:change-background</B> <EM>x::col  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
 
 <P>
-干渉計算には２組の幾何モデルが交差するかを判定する物である．
-irteusではノースカロライナ大学のLin氏らのグループにより開発されたPQPを
-他言語インターフェースを介して利用できるようにしてある．
-(他の干渉計算ソフトウェアパッケージについてはhttp://gamma.cs.unc.edu/research/collision/に詳しい．)
-PQPは
-(1)２つのモデルが交差するかを判定する衝突検出，
-(2)２つのモデル間の最初距離を算出する距離計算，
-(3)２つのモデルがある距離以下であるかを判定する近接検証，
-等の３つ機能を提供する．
+	<BR> 
+<A NAME="59445"></A>
+<BIG CLASS="XLARGE"><B>viewer-dummy </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>propertied-object</B> 
+<BR>  :slots 		 nil 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="59462"></A>
+<B>:nomethod</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
 
 <P>
-PQPソフトウェアパッケージの使い方はirteus/PQP/README.txtに
-書いてあり，irteus/PQP/src/PQP.hを読むことで理解できるようになって
-いる．
+	<BR> 
+<A NAME="59474"></A>
+<BIG CLASS="XLARGE"><B>irtviewer-dummy </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>propertied-object</B> 
+<BR>  :slots 		 objects draw-things 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="59491"></A>
+<B>:objects</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="59502"></A>
+<B>:nomethod</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
-<UL CLASS="ChildLinks">
-<LI><A NAME="tex2html3092"
-  HREF="jmanual-node176.html">irteusからPQPの呼び出し</A>
-<LI><A NAME="tex2html3093"
-  HREF="jmanual-node177.html">ロボット動作と干渉計算</A>
-</UL>
-<!--End of Table of Child-Links-->
-<BR><HR>
+<A NAME="59513"></A>
+<B>make-irtviewer</B> <EM>&amp;rest args  </EM>[関数]
+
+<DL COMPACT>
+<DT> 
+<DD> Create irtviewer
+<BR>  :view-name title
+<BR>  :hither    near cropping plane
+<BR>  :yon       far cropping plane
+<BR>  :width     width of the window
+<BR>  :height    height of the window
+<BR>  :draw-origin size of origin arrow, use nil to disable it
+<BR>  :draw-floor  use t to view floor
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="59523"></A>
+<B>x::make-lr-ud-coords</B> <EM>x::lra x::uda  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="59534"></A>
+<B>x::draw-things</B> <EM>x::objs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="59545"></A>
+<B>objects</B> <EM>&amp;optional (objs t) vw  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="59556"></A>
+<B>make-irtviewer-dummy</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+             
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html3093"
+  HREF="jmanual-node176.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3087"
+  HREF="jmanual-node144.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3081"
+  HREF="jmanual-node174.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3089"
+  HREF="jmanual-node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html3091"
+  HREF="jmanual-node188.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html3094"
+  HREF="jmanual-node176.html">干渉計算</A>
+<B> Up:</B> <A NAME="tex2html3088"
+  HREF="jmanual-node144.html">irteus 拡張</A>
+<B> Previous:</B> <A NAME="tex2html3082"
+  HREF="jmanual-node174.html">動力学計算・歩行動作生成</A>
+ &nbsp; <B>  <A NAME="tex2html3090"
+  HREF="jmanual-node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3092"
+  HREF="jmanual-node188.html">Index</A></B> </DIV>
+<!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-12-26
+2016-01-07
 </ADDRESS>
 </BODY>
 </HTML>

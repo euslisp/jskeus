@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>動力学計算・歩行動作生成</TITLE>
+<TITLE>環境モデル</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="動力学計算・歩行動作生成">
+<META NAME="description" CONTENT="環境モデル">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,6 +19,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="jmanual.css">
 
+<LINK REL="next" HREF="jmanual-node174.html">
 <LINK REL="previous" HREF="jmanual-node172.html">
 <LINK REL="up" HREF="jmanual-node145.html">
 <LINK REL="next" HREF="jmanual-node174.html">
@@ -27,94 +28,46 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html3062"
+<A NAME="tex2html3067"
   HREF="jmanual-node174.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3056"
+<A NAME="tex2html3061"
   HREF="jmanual-node145.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3052"
+<A NAME="tex2html3055"
   HREF="jmanual-node172.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3058"
+<A NAME="tex2html3063"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3060"
-  HREF="jmanual-node187.html">
+<A NAME="tex2html3065"
+  HREF="jmanual-node188.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3063"
-  HREF="jmanual-node174.html">ロボットビューワ</A>
-<B> Up:</B> <A NAME="tex2html3057"
+<B> Next:</B> <A NAME="tex2html3068"
+  HREF="jmanual-node174.html">動力学計算・歩行動作生成</A>
+<B> Up:</B> <A NAME="tex2html3062"
   HREF="jmanual-node145.html">ロボットモデリング</A>
-<B> Previous:</B> <A NAME="tex2html3053"
-  HREF="jmanual-node172.html">環境モデル</A>
- &nbsp; <B>  <A NAME="tex2html3059"
+<B> Previous:</B> <A NAME="tex2html3056"
+  HREF="jmanual-node172.html">センサモデル</A>
+ &nbsp; <B>  <A NAME="tex2html3064"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3061"
-  HREF="jmanual-node187.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3066"
+  HREF="jmanual-node188.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION05017000000000000000">
-動力学計算・歩行動作生成</A>
+<H2><A NAME="SECTION05016000000000000000">
+環境モデル</A>
 </H2>
   
  <BR>
 <BR> <BR> 
-<A NAME="57993"></A>
-<BIG CLASS="XLARGE"><B>riccati-equation </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>propertied-object</B> 
-<BR>  :slots 		 a b c p q r k a-bkt r+btpb-1 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58010"></A>
-<B>:init</B> <EM>aa bb cc qq rr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58021"></A>
-<B>:solve</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="58033"></A>
-<BIG CLASS="XLARGE"><B>preview-controller </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>riccati-equation</B> 
-<BR>  :slots 		 xk uk delay f1-n y1-n queue-index initialize-queue-p additional-data-queue finishedp initialized-p output-dim input-dim 
+<A NAME="57514"></A>
+<BIG CLASS="XLARGE"><B>scene-model </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>cascaded-coords</B> 
+<BR>  :slots 		 name objs 
 </TT></PRE>
 <BR>
 <BR>
@@ -127,171 +80,173 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="58050"></A>
+<A NAME="57531"></A>
 <BR>
 <IMG
- WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img308.png"
+ WIDTH="553" HEIGHT="204" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img307.png"
  ALT="\begin{emtabbing}
 {\bf :init}
-\it dt \&amp;key \= (q) \\lq  [method]\\
-\&gt; (r) \\
-\&gt; ...
-...ray-dimension \_b 1) 1)) \\
-\&gt; ((:initialize-queue-p iqp))
+\it\&amp;rest args \&amp;key \= ((:name n) scene) \\lq  [method]\\
+\&gt; ((:objects o))
 \rm
 \end{emtabbing}">
 <BR>
 
 <DL COMPACT>
 <DT> 
-<DD>Initialize preview-controller.
-<BR>
-Q is weighting of output error and R is weighting of input.
-<BR>
-dt is sampling time [s].
-<BR>
-delay is preview time [s].
-<BR>
-init-xk is initial state value.
-<BR>
-A, B, C are state eq matrices.
-<BR>
-If initialize-queue-p is t, fill all queue by the first input at the begenning, otherwise, do not fill queue at the first.
+<DD>Create scene model
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="58061"></A>
-<B>:update-xk</B> <EM>p &amp;optional (add-data)  </EM>[メソッド]
+<A NAME="57542"></A>
+<B>:objects</B> [メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> Update xk by inputting reference output.
-<BR>
-Return value : nil (initializing) =&gt;return values (middle) =&gt;nil (finished)
-<BR>
-If p is nil, automatically the last value in queue is used as input and preview controller starts finishing.
+<DD> Returns objects in the scene.
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="58071"></A>
-<B>:finishedp</B> [メソッド]
+<A NAME="57552"></A>
+<B>:add-objects</B> <EM>objects  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> Finished or not.
+<DD> Add objects to scene with identifiable names. Returns all objects.
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="58081"></A>
-<B>:last-reference-output-vector</B> [メソッド]
+<A NAME="57562"></A>
+<B>:add-object</B> <EM>obj  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> Last value of reference output queue vector (y_k+N_ref).
-<BR>
-Last value is latest future value.
+<DD> Add object to scene with identifiable name. Returns all objects.
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="58091"></A>
-<B>:current-reference-output-vector</B> [メソッド]
+<A NAME="57572"></A>
+<B>:remove-objects</B> <EM>objs-or-names  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> First value of reference output queue vector (y_k_ref).
-<BR>
-First value is oldest future value and it can be used as current reference value.
+<DD> Remove objects or objects with given names from scene. Returns removed objects.
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="58101"></A>
-<B>:current-state-vector</B> [メソッド]
+<A NAME="57582"></A>
+<B>:remove-object</B> <EM>obj-or-name  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> Current state value (xk).
+<DD> Remove object or object with given name from scene. Returns removed object.
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="58111"></A>
-<B>:current-output-vector</B> [メソッド]
+<A NAME="57592"></A>
+<B>:find-object</B> <EM>name  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> Current output value (yk).
+<DD> Returns objects with given name.
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="58121"></A>
-<B>:current-additional-data</B> [メソッド]
+<A NAME="57602"></A>
+<B>:add-spots</B> <EM>spots  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> Current additional data value.
-<BR>
-First value of additional-data-queue.
+<DD> Add spots to scene with identifiable names. All spots will be :assoc with this scene. Returns T if added spots successfly, otherwise returns NIL.
 </DD>
 </DL>
 <BR>
 <BR>
 
-<A NAME="58131"></A>
-<B>:pass-preview-controller</B> <EM>reference-output-vector-list  </EM>[メソッド]
+<A NAME="57612"></A>
+<B>:add-spot</B> <EM>spot  </EM>[メソッド]
 
 <DL COMPACT>
 <DT> 
-<DD> Get preview controller results from reference-output-vector-list and returns list.
+<DD> Add spot to scene with identifiable name. The spot will be :assoc with this scene. Returns T if spot is added successfly, otherwise returns NIL.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57622"></A>
+<B>:remove-spots</B> <EM>spots  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Remove spots from this scene. All spots will be :dissoc with this scene. Returns removed spots.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57632"></A>
+<B>:remove-spot</B> <EM>spot  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Remove spot from scene. the spot will be :dissoc with this scene. Returns removed spot.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57642"></A>
+<B>:spots</B> <EM>&amp;optional name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns spots in the scene. If name is given returns spot of given name.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57652"></A>
+<B>:object</B> <EM>name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns object of given name.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57662"></A>
+<B>:spot</B> <EM>name  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns scene of given name.
 </DD>
 </DL>
 <BR>
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58141"></A>
-<B>:calc-f</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58152"></A>
-<B>:calc-u</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58163"></A>
-<B>:calc-xk</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="57672"></A>
+<B>:bodies</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -307,637 +262,39 @@ First value of additional-data-queue.
 </SMALL>
 
 <P>
-	<BR> 
-<A NAME="58175"></A>
-<BIG CLASS="XLARGE"><B>extended-preview-controller </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>preview-controller</B> 
-<BR>  :slots 		 orga orgb orgc xk
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="58192"></A>
-<BR>
-<IMG
- WIDTH="553" HEIGHT="226" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img309.png"
- ALT="\begin{emtabbing}
-{\bf :init}
-\it dt \&amp;key \= (q) \\lq  [method]\\
-\&gt; (r) \\
-\&gt; ...
-..._orga 0)) \\
-\&gt; ((:initialize-queue-p iqp)) \\
-\&gt; (q-mat)
-\rm
-\end{emtabbing}">
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>Initialize preview-controller in extended system (error system).
-<BR>
-Q is weighting of output error and R is weighting of input.
-<BR>
-dt is sampling time [s].
-<BR>
-delay is preview time [s].
-<BR>
-init-xk is initial state value.
-<BR>
-A, B, C are state eq matrices for original system and slot variables A,B,C are used for error system matrices.
-<BR>
-If initialize-queue-p is t, fill all queue by the first input at the begenning, otherwise, do not fill queue at the first.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="58203"></A>
-<B>:current-output-vector</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Current additional data value.
-<BR>
-First value of additional-data-queue.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58213"></A>
-<B>:calc-f</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58224"></A>
-<B>:calc-u</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58235"></A>
-<B>:calc-xk</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="58247"></A>
-<BIG CLASS="XLARGE"><B>preview-control-cart-table-cog-trajectory-generator </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>propertied-object</B> 
-<BR>  :slots 		 pcs cog-z zmp-z 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="58264"></A>
-<BR>
-<IMG
- WIDTH="553" HEIGHT="207" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img310.png"
- ALT="\begin{emtabbing}
-{\bf :init}
-\it dt \_zc \&amp;key \= (q 1) \\lq  [method]\\
-\&gt; (r 1...
-...
-\&gt; (preview-controller-class extended-preview-controller)
-\rm
-\end{emtabbing}">
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>COG (xy) trajectory generator using preview-control convert reference ZMP from reference COG.
-<BR>
-dt -&gt;sampling time[s], _zc is height of COG [mm].
-<BR>
-preview-controller-class is preview controller class (extended-preview-controller by default).
-<BR>
-For other arguments, please see preview-controller and extended-preview-controller :init documentation.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="58275"></A>
-<B>:refcog</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Reference COG [mm].
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="58285"></A>
-<B>:cart-zmp</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Cart-table system ZMP[mm] as an output variable.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="58295"></A>
-<B>:last-refzmp</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Reference zmp at the last of queue.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="58305"></A>
-<B>:current-refzmp</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Current reference zmp at the first of queue.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="58315"></A>
-<B>:update-xk</B> <EM>p &amp;optional (add-data)  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Update xk and returns zmp and cog values.
-<BR>
-For arguments, please see preview-controller and extended-preview-controller :update-xk.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="58325"></A>
-<B>:finishedp</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Finished or not.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="58335"></A>
-<B>:current-additional-data</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Current additional data value.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="58345"></A>
-<B>:pass-preview-controller</B> <EM>reference-output-vector-list  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Get preview controller results from reference-output-vector-list and returns list.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="58355"></A>
-<B>:cog-z</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> COG Z [mm].
-</DD>
-</DL>
-<BR>
-<BR>
-
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58365"></A>
-<B>:update-cog-z</B> <EM>zc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="58377"></A>
-<BIG CLASS="XLARGE"><B>gait-generator </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>propertied-object</B> 
-<BR>  :slots 		 robot dt footstep-node-list support-leg-list support-leg-coords-list swing-leg-dst-coords-list swing-leg-src-coords refzmp-cur-list refzmp-next refzmp-prev step-height-list one-step-len index-count default-step-height default-double-support-ratio default-zmp-offsets finalize-p apreview-controller all-limbs end-with-double-support ik-thre ik-rthre 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58394"></A>
-<B>:init</B> <EM>rb _dt  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58405"></A>
-<B>:get-footstep-limbs</B> <EM>fs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58416"></A>
-<B>:get-counter-footstep-limbs</B> <EM>fs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58427"></A>
-<B>:get-limbs-zmp-list</B> <EM>limb-coords limb-names  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58438"></A>
-<B>:get-limbs-zmp</B> <EM>limb-coords limb-names  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58449"></A>
-<B>:get-swing-limbs</B> <EM>limbs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58460"></A>
-<B>:initialize-gait-parameter</B> <EM>fsl time cog &amp;key ((:default-step-height dsh) 50) ((:default-double-support-ratio ddsr) 0.2) (delay 1.6) ((:all-limbs al) '(:rleg :lleg)) ((:default-zmp-offsets dzo) (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) (q 1.0) (r 1.000000e-06) (thre 1) (rthre (deg2rad 1)) (start-with-double-support t) ((:end-with-double-support ewds) t)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58471"></A>
-<B>:finalize-gait-parameter</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58482"></A>
-<B>:make-gait-parameter</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58493"></A>
-<B>:calc-current-swing-leg-coords</B> <EM>ratio src dst &amp;key (type :shuffling) (step-height default-step-height)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58504"></A>
-<B>:calc-ratio-from-double-support-ratio</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58515"></A>
-<B>:calc-current-refzmp</B> <EM>prev cur next  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58526"></A>
-<B>:calc-one-tick-gait-parameter</B> <EM>type  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58537"></A>
-<B>:proc-one-tick</B> <EM>&amp;key (type :shuffling) (solve-angle-vector :solve-av-by-move-centroid-on-foot) (solve-angle-vector-args) (debug nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58548"></A>
-<B>:update-current-gait-parameter</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58559"></A>
-<B>:solve-angle-vector</B> <EM>support-leg support-leg-coords swing-leg-coords cog &amp;key (solve-angle-vector :solve-av-by-move-centroid-on-foot) (solve-angle-vector-args)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58570"></A>
-<B>:solve-av-by-move-centroid-on-foot</B> <EM>support-leg support-leg-coords swing-leg-coords cog robot &amp;rest args &amp;key (cog-gain 3.5) (stop 100) (additional-nspace-list) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58581"></A>
-<B>:cycloid-midpoint</B> <EM>ratio start goal height &amp;key (top-ratio 0.5)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="58592"></A>
-<B>:cycloid-midcoords</B> <EM>ratio start goal height &amp;key (top-ratio 0.5)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58603"></A>
-<B>calc-inertia-matrix-rotational</B> <EM>mat row column paxis m-til c-til i-til axis-for-angular child-link world-default-coords translation-axis rotation-axis tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58614"></A>
-<B>calc-inertia-matrix-linear</B> <EM>mat row column paxis m-til c-til i-til axis-for-angular child-link world-default-coords translation-axis rotation-axis tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-             
-<P>
-
+              
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html3062"
+<A NAME="tex2html3067"
   HREF="jmanual-node174.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3056"
+<A NAME="tex2html3061"
   HREF="jmanual-node145.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3052"
+<A NAME="tex2html3055"
   HREF="jmanual-node172.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3058"
+<A NAME="tex2html3063"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3060"
-  HREF="jmanual-node187.html">
+<A NAME="tex2html3065"
+  HREF="jmanual-node188.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3063"
-  HREF="jmanual-node174.html">ロボットビューワ</A>
-<B> Up:</B> <A NAME="tex2html3057"
+<B> Next:</B> <A NAME="tex2html3068"
+  HREF="jmanual-node174.html">動力学計算・歩行動作生成</A>
+<B> Up:</B> <A NAME="tex2html3062"
   HREF="jmanual-node145.html">ロボットモデリング</A>
-<B> Previous:</B> <A NAME="tex2html3053"
-  HREF="jmanual-node172.html">環境モデル</A>
- &nbsp; <B>  <A NAME="tex2html3059"
+<B> Previous:</B> <A NAME="tex2html3056"
+  HREF="jmanual-node172.html">センサモデル</A>
+ &nbsp; <B>  <A NAME="tex2html3064"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3061"
-  HREF="jmanual-node187.html">Index</A></B> </DIV>
+ &nbsp; <B>  <A NAME="tex2html3066"
+  HREF="jmanual-node188.html">Index</A></B> </DIV>
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-12-26
+2016-01-07
 </ADDRESS>
 </BODY>
 </HTML>

@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>リンク間重複があるヤコビアン計算と関節角度計算</TITLE>
+<TITLE>非ブロック対角ヤコビアンによる全身協調動作生成</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="リンク間重複があるヤコビアン計算と関節角度計算">
+<META NAME="description" CONTENT="非ブロック対角ヤコビアンによる全身協調動作生成">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -21,250 +21,101 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="jmanual-node161.html">
 <LINK REL="previous" HREF="jmanual-node159.html">
-<LINK REL="up" HREF="jmanual-node152.html">
+<LINK REL="up" HREF="jmanual-node153.html">
 <LINK REL="next" HREF="jmanual-node161.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html2883"
+<A NAME="tex2html2886"
   HREF="jmanual-node161.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html2877"
-  HREF="jmanual-node152.html">
+<A NAME="tex2html2880"
+  HREF="jmanual-node153.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html2871"
+<A NAME="tex2html2874"
   HREF="jmanual-node159.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html2879"
+<A NAME="tex2html2882"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html2881"
-  HREF="jmanual-node187.html">
+<A NAME="tex2html2884"
+  HREF="jmanual-node188.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html2884"
-  HREF="jmanual-node161.html">ベースリンク仮想ジョイントを用いた全身逆運動学法</A>
-<B> Up:</B> <A NAME="tex2html2878"
-  HREF="jmanual-node152.html">ロボットの動作生成</A>
-<B> Previous:</B> <A NAME="tex2html2872"
-  HREF="jmanual-node159.html">非ブロック対角ヤコビアンによる全身協調動作生成</A>
- &nbsp; <B>  <A NAME="tex2html2880"
+<B> Next:</B> <A NAME="tex2html2887"
+  HREF="jmanual-node161.html">リンク間重複があるヤコビアン計算と関節角度計算</A>
+<B> Up:</B> <A NAME="tex2html2881"
+  HREF="jmanual-node153.html">ロボットの動作生成</A>
+<B> Previous:</B> <A NAME="tex2html2875"
+  HREF="jmanual-node159.html">衝突回避計算例</A>
+ &nbsp; <B>  <A NAME="tex2html2883"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html2882"
-  HREF="jmanual-node187.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2885"
+  HREF="jmanual-node188.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H3><A NAME="SECTION05012800000000000000">
-リンク間重複があるヤコビアン計算と関節角度計算</A>
+<H3><A NAME="SECTION05012700000000000000">
+非ブロック対角ヤコビアンによる全身協調動作生成</A>
 </H3>
-微分運動学方程式を求める際の条件を以下に示す.
+ヒューマノイドは枝分かれのある複雑な構造を持ち,
+複数のマニピュレータで協調して動作を行う必要がある
+(Fig.<A HREF="#fig:duplicate-link"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;)．
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig:duplicate-link"></A><A NAME="48347"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
+Duplicate Link Sequence</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+<IMG
+  WIDTH="528" HEIGHT="500" ALIGN="BOTTOM" BORDER="0"
+ SRC="./normal.jpg"
+ ALT="Image normal">
+    <IMG
+  WIDTH="528" HEIGHT="500" ALIGN="BOTTOM" BORDER="0"
+ SRC="./linklist.jpg"
+ ALT="Image linklist">
+    
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+複数マニピュレータの動作例として,
 
 <UL>
-<LI>マニピュレータの本数　<SPAN CLASS="MATH"><B><IMG
- WIDTH="30" HEIGHT="30" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img206.png"
- ALT="$ L$"></B></SPAN>本
+<LI>リンク間に重複がない場合
+<BR>それぞれのマニピュレータについて
+Equation&nbsp;<A HREF="jmanual-node154.html#eq:inverse-kinematics"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;式を用いて関節角速度を求める.
+もしくは,複数の式を連立した方程式(ヤコビアンはブロック対角行列となる)
+を用いて関節角速度を求めても良い.
 </LI>
-<LI>全関節数　<SPAN CLASS="MATH"><B><IMG
- WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img207.png"
- ALT="$ N$"></B></SPAN>個
-</LI>
-<LI>マニピュレータの先端速度・角速度ベクトル　
-<!-- MATH
- $[\mbox{\boldmath {$\xi$}}_0^T,...,\mbox{\boldmath {$\xi$}}_{L-1}^T]^T$
- -->
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="19" HEIGHT="14" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img208.png"
- ALT="$ [$"><SPAN CLASS="MATH"><B><IMG
- WIDTH="9" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img209.png"
- ALT="$ \xi$"></B></SPAN><IMG
- WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img210.png"
- ALT="$ _0^T,...,$"><SPAN CLASS="MATH"><B><IMG
- WIDTH="9" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img209.png"
- ALT="$ \xi$"></B></SPAN><IMG
- WIDTH="39" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img211.png"
- ALT="$ _{L-1}^T]^T$"></B></SPAN>
-</LI>
-<LI>各関節角速度ベクトル　
-<!-- MATH
- $[\mbox{\boldmath {$\dot{\theta}_0$}}^T,...,\mbox{\boldmath {$\dot{\theta}_{L-1}$}}^T]^T$
- -->
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="19" HEIGHT="14" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img208.png"
- ALT="$ [$"><!-- MATH
- $\dot{\theta}_0$
- -->
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="45" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img212.png"
- ALT="$ \dot{\theta}_0$"></B></SPAN><IMG
- WIDTH="19" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img213.png"
- ALT="$ ^T,...,$"><!-- MATH
- $\dot{\theta}_{L-1}$
- -->
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="39" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img214.png"
- ALT="$ \dot{\theta}_{L-1}$"></B></SPAN><IMG
- WIDTH="38" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img215.png"
- ALT="$ ^T]^T$"></B></SPAN>
-</LI>
-<LI>関節の添字和集合　<!-- MATH
- $S = \{0,\hdots,N-1\}$
- -->
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="29" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img216.png"
- ALT="$ S = \{0,\hdots,N-1\}$"></B></SPAN>
-<BR>ただし,マニピュレータ<SPAN CLASS="MATH"><B><IMG
- WIDTH="138" HEIGHT="32" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img217.png"
- ALT="$ i$"></B></SPAN>の添字集合<SPAN CLASS="MATH"><B><IMG
- WIDTH="10" HEIGHT="17" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img218.png"
- ALT="$ S_i$"></B></SPAN>を用いて<SPAN CLASS="MATH"><B><IMG
- WIDTH="20" HEIGHT="30" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img219.png"
- ALT="$ S$"></B></SPAN>は
-<!-- MATH
- $S = S_0 \cup \hdots \cup S_{L-1}$
- -->
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="15" HEIGHT="15" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img220.png"
- ALT="$ S = S_0 \cup \hdots \cup S_{L-1}$"></B></SPAN>と表せる.
-</LI>
-<LI><SPAN CLASS="MATH"><B><IMG
- WIDTH="20" HEIGHT="30" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img219.png"
- ALT="$ S$"></B></SPAN>に基づく関節速度ベクトル　<!-- MATH
- $[\dot{\theta}_0, ..., \dot{\theta}_{N-1}]^T$
- -->
-<SPAN CLASS="MATH"><B><IMG
- WIDTH="143" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img221.png"
- ALT="$ [\dot{\theta}_0, ..., \dot{\theta}_{N-1}]^T$"></B></SPAN>
+<LI>リンク間に重複がある場合
+<BR>リンク間に重複がある場合は,
+リンク間の重複を考慮したヤコビアンを考える必要がある.
+例えば,双腕動作を行う場合,左腕のマニピュレータのリンク系列と
+右腕のマニピュレータのリンク系列とで,体幹部リンク系列が重複し,
+その部位は左右で協調して関節角速度を求める必要がある.
 </LI>
 </UL>
-とする.
-
-<P>
-運動学関係式はEquation&nbsp;<A HREF="#eq:multi-manipulator-jacobi-eq"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;のようになる.
-
-<P>
-<BR>
-<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="eq:multi-manipulator-jacobi-eq"></A><!-- MATH
- \begin{eqnarray}
-\left[
-\begin{array}{c}
-\mbox{\boldmath {$\xi$}}_0 \\
-\vdots\\
-\mbox{\boldmath {$\xi$}}_{L-1}
-\end{array}
-\right]
-=
-\left[
-\begin{array}{ccc}
-\mbox{\boldmath {$J$}}_{0,0}   &        \hdots & \mbox{\boldmath {$J$}}_{0, N-1}\\
-\vdots         &  \mbox{\boldmath {$J$}}_{i,j} & \vdots\\
-\mbox{\boldmath {$J$}}_{L-1,0} &        \hdots & \mbox{\boldmath {$J$}}_{L-1, N-1}
-\end{array}
-\right]
-\left[
-\begin{array}{c}
-\dot{\theta}_0\\
-\vdots\\
-\dot{\theta}_{N-1}
-\end{array}
-\right]
-\end{eqnarray}
- -->
-<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
-<TR VALIGN="MIDDLE"><TD NOWRAP WIDTH="50%" ALIGN="RIGHT"><IMG
- WIDTH="95" HEIGHT="38" BORDER="0"
- SRC="jmanual-img222.png"
- ALT="\begin{displaymath}\left[
-\begin{array}{c}
-\mbox{\boldmath {$\xi$}}_0 \\
-\vdots...
-...ot{\theta}_0\\
-\vdots\\
-\dot{\theta}_{N-1}
-\end{array}\right]\end{displaymath}"></TD>
-<TD>&nbsp;</TD>
-<TD>&nbsp;</TD>
-<TD CLASS="eqno" WIDTH=10 ALIGN="RIGHT">
-(<SPAN CLASS="arabic">28</SPAN>)</TD></TR>
-</TABLE></DIV>
-<BR CLEAR="ALL">
-
-<P>
-小行列<!-- MATH
- $\mbox{\boldmath {$J$}}_{i,j}$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="20" HEIGHT="38" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img128.png"
- ALT="$ J$"></B></SPAN><IMG
- WIDTH="465" HEIGHT="87" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img223.png"
- ALT="$ _{i,j}$"></B></SPAN>は以下のように求まる.
-
-<P>
-<BR>
-<IMG
- WIDTH="22" HEIGHT="31" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img224.png"
- ALT="\begin{numcases}
-{\mbox{\boldmath {$J$}}_{i,j}=}
-\mbox{\boldmath {$J$}}_j
-&amp; if ...
-...nt $\in$\ $i$-th link array\\
-\mbox{\boldmath {$0$}} &amp; otherwise
-\end{numcases}">
-<BR>
-ここで，<!-- MATH
- $\mbox{\boldmath {$J$}}_j$
- -->
-<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
- WIDTH="20" HEIGHT="38" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img128.png"
- ALT="$ J$"></B></SPAN><IMG
- WIDTH="12" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
- SRC="jmanual-img158.png"
- ALT="$ _j$"></B></SPAN>はEquation&nbsp;<A HREF="jmanual-node154.html#eq:basic-jacobian-column-vector"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;のもの．
-
-<P>
-Equation&nbsp;<A HREF="#eq:multi-manipulator-jacobi-eq"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>&nbsp;を単一のマニピュレータの
-逆運動学解法と同様にSR-Inverseを用いて関節角速度を
-求めることができる.
-
-<P>
-ここでの非ブロック対角ヤコビアンの計算法は,
-アーム・多指ハンドの動作生成
-<A NAME="tex2html37"
-  HREF="jmanual-footnode.html#foot48404"><SUP><SPAN CLASS="arabic">14</SPAN></SUP></A>に
-おいて登場する運動学関係式から求まるヤコビアンを
-導出することが可能である.
+次節ではリンク間に重複がある場合の
+非ブロック対角なヤコビアンの計算法
+および
+それを用いた関節角速度計算法を述べる
+(前者の重複がない場合も以下の計算方法により後者の一部として計算可能で
+ある).
 
 <P>
 <BR><HR>
 <ADDRESS>
 
-2015-12-26
+2016-01-07
 </ADDRESS>
 </BODY>
 </HTML>

@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>グラフ表現</TITLE>
+<TITLE>ポイントクラウドデータ</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="グラフ表現">
+<META NAME="description" CONTENT="ポイントクラウドデータ">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -28,46 +28,46 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html3174"
+<A NAME="tex2html3177"
   HREF="jmanual-node182.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3168"
+<A NAME="tex2html3171"
   HREF="jmanual-node144.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3162"
+<A NAME="tex2html3165"
   HREF="jmanual-node180.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3170"
+<A NAME="tex2html3173"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3172"
-  HREF="jmanual-node187.html">
+<A NAME="tex2html3175"
+  HREF="jmanual-node188.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3175"
-  HREF="jmanual-node182.html">irteus拡張</A>
-<B> Up:</B> <A NAME="tex2html3169"
+<B> Next:</B> <A NAME="tex2html3178"
+  HREF="jmanual-node182.html">グラフ表現</A>
+<B> Up:</B> <A NAME="tex2html3172"
   HREF="jmanual-node144.html">irteus 拡張</A>
-<B> Previous:</B> <A NAME="tex2html3163"
-  HREF="jmanual-node180.html">ポイントクラウドデータ</A>
- &nbsp; <B>  <A NAME="tex2html3171"
+<B> Previous:</B> <A NAME="tex2html3166"
+  HREF="jmanual-node180.html">Colladaデータ</A>
+ &nbsp; <B>  <A NAME="tex2html3174"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3173"
-  HREF="jmanual-node187.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3176"
+  HREF="jmanual-node188.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION05070000000000000000">
-グラフ表現</A>
+<H1><A NAME="SECTION05060000000000000000">
+ポイントクラウドデータ</A>
 </H1>
  
  <BR>
 <BR> <BR> 
-<A NAME="64423"></A>
-<BIG CLASS="XLARGE"><B>node </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>propertied-object</B> 
-<BR>  :slots 		 arc-list 
+<A NAME="63241"></A>
+<BIG CLASS="XLARGE"><B>pointcloud </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>cascaded-coords</B> 
+<BR>  :slots 		 parray carray narray curvature pcolor psize awidth asize box height width view-coords drawnormalmode transparent tcarray 
 </TT></PRE>
 <BR>
 <BR>
@@ -79,9 +79,287 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </DL>
 <BR>
 <BR>
+
+<A NAME="63258"></A>
+<BR>
+<IMG
+ WIDTH="553" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img314.png"
+ ALT="\begin{emtabbing}
+{\bf :init}
+\it\&amp;rest args \&amp;key \= ((:points mat)) \\lq  [metho...
+...
+\&gt; (fill) \\
+\&gt; (arrow-width 2.0) \\
+\&gt; (arrow-size 0.0)
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>Create point cloud object
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63269"></A>
+<B>:size-change</B> <EM>&amp;optional wd ht  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> change width and height, this method does not change points data
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63279"></A>
+<B>:points</B> <EM>&amp;optional pts wd ht  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> replace points, pts should be list of points or n<SPAN CLASS="MATH"><B><IMG
+ WIDTH="160" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img57.png"
+ ALT="$ \times$"></B></SPAN> matrix
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63289"></A>
+<B>:colors</B> <EM>&amp;optional cls  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> replace colors, cls should be list of points or n<SPAN CLASS="MATH"><B><IMG
+ WIDTH="160" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img57.png"
+ ALT="$ \times$"></B></SPAN> matrix
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63299"></A>
+<B>:normals</B> <EM>&amp;optional nmls  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> replace normals by, nmls should be list of points or n<SPAN CLASS="MATH"><B><IMG
+ WIDTH="160" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img57.png"
+ ALT="$ \times$"></B></SPAN>3 matrix
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63309"></A>
+<B>:point-list</B> <EM>&amp;optional (remove-nan)  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> return list of points
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63319"></A>
+<B>:color-list</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> return list of colors
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63329"></A>
+<B>:normal-list</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> return list of normals
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63339"></A>
+<B>:centroid</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> retrun centroid of this point cloud
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63349"></A>
+<B>:append</B> <EM>point-list &amp;key (create t)  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> append point cloud list to this point cloud. 
+<BR>
+<BR>
+if :create is true, return appended point cloud and original point cloud does not change.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63359"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="207" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img315.png"
+ ALT="\begin{emtabbing}
+{\bf :filter}
+\it\&amp;rest args \&amp;key \= create \\lq  [method]\\
+\&gt; \&amp;allow-other-keys
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>this method can take the same keywords with :filter-with-indices method.
+<BR>
+<BR>
+if :create is true, return filtered point cloud and original point cloud does not change.
+<BR></DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63370"></A>
+<BR>
+<IMG
+ WIDTH="553" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img316.png"
+ ALT="\begin{emtabbing}
+{\bf :filter-with-indices}
+\it idx-lst \&amp;key \= (create) \\lq  [method]\\
+\&gt; (negative)
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>filter point cloud with list of index (points which are indicated by indices will remain).
+<BR>
+<BR>
+if :create is true, return filtered point cloud and original point cloud does not change.
+<BR>
+<BR>
+if :negative is true, points which are indicated by indices will be removed.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63381"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img317.png"
+ ALT="\begin{emtabbing}
+{\bf :filtered-indices}
+\it\&amp;key \= key \\lq  [method]\\
+\&gt; cke...
+...key \\
+\&gt; pcnkey \\
+\&gt; negative \\
+\&gt; \&amp;allow-other-keys
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>create list of index where filter function retrun true.
+<BR>
+<BR>
+key, ckey, nkey are filter function for points, colors, normals. They are expected to take one argument and return t or nil.
+<BR>
+<BR>
+pckey, pnkey are filter function for points and colors, points and normals. They are expected to take two arguments and return t or nil.
+<BR>
+<BR>
+pcnkey is filter function for points, colors and normals. It is expected to take three arguments and return t or nil.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63392"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="149" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img318.png"
+ ALT="\begin{emtabbing}
+{\bf :step}
+\it step \&amp;key \= (fixsize) \\lq  [method]\\
+\&gt; (create)
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>downsample points with step
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63403"></A>
+<B>:copy-from</B> <EM>pc  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> update object by pc
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63413"></A>
+<B>:transform-points</B> <EM>coords &amp;key (create)  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> transform points and normals with coords.
+<BR>
+<BR>
+if :create is true, return transformed point cloud and original point cloud does not change.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="63423"></A>
+<B>:convert-to-world</B> <EM>&amp;key (create)  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> transform points and normals with self coords. points data should be the same as displayed
+</DD>
+</DL>
+<BR>
+<BR>
+
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="64440"></A>
-<B>:init</B> <EM>n  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="63433"></A>
+<B>:reset-box</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -94,8 +372,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="64451"></A>
-<B>:arc-list</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="63444"></A>
+<B>:box</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -108,8 +386,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="64462"></A>
-<B>:successors</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="63455"></A>
+<B>:vertices</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -122,8 +400,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="64473"></A>
-<B>:add-arc</B> <EM>a  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="63466"></A>
+<B>:size</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -136,8 +414,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="64484"></A>
-<B>:remove-arc</B> <EM>a  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="63477"></A>
+<B>:width</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -150,8 +428,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="64495"></A>
-<B>:remove-all-arcs</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="63488"></A>
+<B>:height</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -164,8 +442,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="64506"></A>
-<B>:unlink</B> <EM>n  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="63499"></A>
+<B>:view-coords</B> <EM>&amp;optional vc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -178,8 +456,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="64517"></A>
-<B>:add-neighbor</B> <EM>n &amp;optional a  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="63510"></A>
+<B>:curvatures</B> <EM>&amp;optional curv  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -192,8 +470,246 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="64528"></A>
-<B>:neighbors</B> <EM>&amp;optional args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="63521"></A>
+<B>:curvature-list</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63532"></A>
+<B>:set-color</B> <EM>col &amp;optional (_transparent)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63543"></A>
+<B>:point-color</B> <EM>&amp;optional pc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63554"></A>
+<B>:point-size</B> <EM>&amp;optional ps  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63565"></A>
+<B>:axis-length</B> <EM>&amp;optional al  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63576"></A>
+<B>:axis-width</B> <EM>&amp;optional aw  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63587"></A>
+<B>:clear-color</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63598"></A>
+<B>:clear-normal</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63609"></A>
+<B>:nfilter</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63620"></A>
+<B>:viewangle-inlier</B> <EM>&amp;key (min-z 0.0) (hangle 44.0) (vangle 35.0)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63631"></A>
+<B>:image-position-inlier</B> <EM>&amp;key (ipkey) (height 144) (width 176) (cy (/ (float (- height 1)) 2)) (cx (/ (float (- width 1)) 2)) negative  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63642"></A>
+<B>:image-circle-filter</B> <EM>dist &amp;key (height 144) (width 176) (cy (/ (float (- height 1)) 2)) (cx (/ (float (- width 1)) 2)) create negative  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63653"></A>
+<B>:step-inlier</B> <EM>step offx offy  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63664"></A>
+<B>:generate-color-histogram-hs</B> <EM>&amp;key (h-step 9) (s-step 7) (hlimits (cons 360.0 0.0)) (vlimits (cons 1.0 0.15)) (slimits (cons 1.0 0.25)) (rotate-hue) (color-scale 255.0) (sizelimits 1)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63675"></A>
+<B>:set-offset</B> <EM>cds &amp;key (create)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63686"></A>
+<B>:drawnormalmode</B> <EM>&amp;optional mode  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63697"></A>
+<B>:transparent</B> <EM>&amp;optional trs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="63708"></A>
+<B>:draw</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -209,25 +725,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </SMALL>
 
 <P>
-	<BR> 
-<A NAME="64540"></A>
-<BIG CLASS="XLARGE"><B>arc </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>propertied-object</B> 
-<BR>  :slots 		 from to 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="64557"></A>
-<B>:init</B> <EM>from_ to_  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="63719"></A>
+<B>make-random-pointcloud</B> <EM>&amp;key (num 1000) (with-color) (with-normal) (scale 100.0)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
 
@@ -239,1279 +739,41 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-
-<A NAME="64568"></A>
-<B>:from</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64579"></A>
-<B>:to</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64590"></A>
-<B>:prin1</B> <EM>&amp;optional (strm t) &amp;rest msgs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="64602"></A>
-<BIG CLASS="XLARGE"><B>directed-graph </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>propertied-object</B> 
-<BR>  :slots 		 nodes 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="64619"></A>
-<B>:init</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64630"></A>
-<B>:successors</B> <EM>node &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64641"></A>
-<B>:node</B> <EM>name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64652"></A>
-<B>:nodes</B> <EM>&amp;optional arg  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64663"></A>
-<B>:add-node</B> <EM>n  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64674"></A>
-<B>:remove-node</B> <EM>n  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64685"></A>
-<B>:clear-nodes</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64696"></A>
-<B>:add-arc-from-to</B> <EM>from to  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64707"></A>
-<B>:remove-arc</B> <EM>arc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64718"></A>
-<B>:adjacency-matrix</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64729"></A>
-<B>:adjacency-list</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64740"></A>
-<B>:write-to-dot</B> <EM>fname &amp;optional result-path (title output)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64751"></A>
-<B>:write-to-pdf</B> <EM>fname &amp;optional result-path (title (string-right-trim .pdf fname))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="64763"></A>
-<BIG CLASS="XLARGE"><B>costed-arc </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>arc</B> 
-<BR>  :slots 		 cost 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="64780"></A>
-<B>:init</B> <EM>from to c  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64791"></A>
-<B>:cost</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="64803"></A>
-<BIG CLASS="XLARGE"><B>costed-graph </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>directed-graph</B> 
-<BR>  :slots 		 nil 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="64820"></A>
-<B>:add-arc</B> <EM>from to cost &amp;key (both nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64831"></A>
-<B>:add-arc-from-to</B> <EM>from to cost &amp;key (both nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64842"></A>
-<B>:path-cost</B> <EM>from arc to  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="64854"></A>
-<BIG CLASS="XLARGE"><B>graph </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>costed-graph</B> 
-<BR>  :slots 		 start-state goal-state 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="64871"></A>
-<B>:goal-test</B> <EM>gs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64882"></A>
-<B>:path-cost</B> <EM>from arc to  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64893"></A>
-<B>:start-state</B> <EM>&amp;optional arg  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64904"></A>
-<B>:goal-state</B> <EM>&amp;optional arg  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64915"></A>
-<B>:add-arc</B> <EM>from to &amp;key (both nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64926"></A>
-<B>:add-arc-from-to</B> <EM>from to &amp;key (both nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="64938"></A>
-<BIG CLASS="XLARGE"><B>arced-node </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>node</B> 
-<BR>  :slots 		 nil 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="64955"></A>
-<B>:init</B> <EM>&amp;key name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64966"></A>
-<B>:find-action</B> <EM>n  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="64977"></A>
-<B>:neighbor-action-alist</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="64989"></A>
-<BIG CLASS="XLARGE"><B>solver-node </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>propertied-object</B> 
-<BR>  :slots 		 state cost parent action memorized-path 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65006"></A>
-<B>:init</B> <EM>st &amp;key ((:cost c) 0) ((:parent p) nil) ((:action a) nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65017"></A>
-<B>:path</B> <EM>&amp;optional (prev nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65028"></A>
-<B>:expand</B> <EM>prblm &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65039"></A>
-<B>:state</B> <EM>&amp;optional arg  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65050"></A>
-<B>:cost</B> <EM>&amp;optional arg  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65061"></A>
-<B>:parent</B> <EM>&amp;optional arg  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65072"></A>
-<B>:action</B> <EM>&amp;optional arg  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="65084"></A>
-<BIG CLASS="XLARGE"><B>solver </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>propertied-object</B> 
-<BR>  :slots 		 nil 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65101"></A>
-<B>:init</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65112"></A>
-<B>:solve</B> <EM>prblm  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65123"></A>
-<B>:solve-by-name</B> <EM>prblm s g &amp;key (verbose nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="65135"></A>
-<BIG CLASS="XLARGE"><B>graph-search-solver </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>solver</B> 
-<BR>  :slots 		 open-list close-list 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65152"></A>
-<B>:solve-init</B> <EM>prblm  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65163"></A>
-<B>:find-node-in-close-list</B> <EM>n  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65174"></A>
-<B>:solve</B> <EM>prblm &amp;key (verbose nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65185"></A>
-<B>:add-to-open-list</B> <EM>obj/list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65196"></A>
-<B>:null-open-list?</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65207"></A>
-<B>:clear-open-list</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65218"></A>
-<B>:add-list-to-open-list</B> <EM>lst  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65229"></A>
-<B>:add-object-to-open-list</B> <EM>lst  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65240"></A>
-<B>:pop-from-open-list</B> <EM>&amp;key (debug)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65251"></A>
-<B>:open-list</B> <EM>&amp;optional arg  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65262"></A>
-<B>:close-list</B> <EM>&amp;optional arg  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="65274"></A>
-<BIG CLASS="XLARGE"><B>breadth-first-graph-search-solver </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>graph-search-solver</B> 
-<BR>  :slots 		 nil 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65291"></A>
-<B>:init</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65302"></A>
-<B>:clear-open-list</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65313"></A>
-<B>:add-list-to-open-list</B> <EM>lst  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65324"></A>
-<B>:add-object-to-open-list</B> <EM>obj  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65335"></A>
-<B>:pop-from-open-list</B> <EM>&amp;key (debug)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="65347"></A>
-<BIG CLASS="XLARGE"><B>depth-first-graph-search-solver </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>graph-search-solver</B> 
-<BR>  :slots 		 nil 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65364"></A>
-<B>:init</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65375"></A>
-<B>:clear-open-list</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65386"></A>
-<B>:add-list-to-open-list</B> <EM>lst  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65397"></A>
-<B>:add-object-to-open-list</B> <EM>obj  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65408"></A>
-<B>:pop-from-open-list</B> <EM>&amp;key (debug)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="65420"></A>
-<BIG CLASS="XLARGE"><B>best-first-graph-search-solver </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>graph-search-solver</B> 
-<BR>  :slots 		 aproblem 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65437"></A>
-<B>:init</B> <EM>p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65448"></A>
-<B>:clear-open-list</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65459"></A>
-<B>:add-list-to-open-list</B> <EM>lst  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65470"></A>
-<B>:add-object-to-open-list</B> <EM>obj  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65481"></A>
-<B>:pop-from-open-list</B> <EM>&amp;key (debug nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65492"></A>
-<B>:fn</B> <EM>n p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-<BR>
-</SMALL>
-
-<P>
-	<BR> 
-<A NAME="65504"></A>
-<BIG CLASS="XLARGE"><B>a-graph-search-solver </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>best-first-graph-search-solver</B> 
-<BR>  :slots 		 nil 
-</TT></PRE>
-<BR>
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>
-</DD>
-</DL>
-<BR>
-<BR>
-<SMALL CLASS="FOOTNOTESIZE">
-<A NAME="65521"></A>
-<B>:init</B> <EM>p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65532"></A>
-<B>:fn</B> <EM>n p &amp;key (debug nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65543"></A>
-<B>:gn</B> <EM>n p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
-<A NAME="65554"></A>
-<B>:hn</B> <EM>n p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
 <BR>
-
-<BR>
 </SMALL>
-
-<P>
              
-<P>
-
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html3174"
+<A NAME="tex2html3177"
   HREF="jmanual-node182.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3168"
+<A NAME="tex2html3171"
   HREF="jmanual-node144.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3162"
+<A NAME="tex2html3165"
   HREF="jmanual-node180.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3170"
+<A NAME="tex2html3173"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3172"
-  HREF="jmanual-node187.html">
+<A NAME="tex2html3175"
+  HREF="jmanual-node188.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3175"
-  HREF="jmanual-node182.html">irteus拡張</A>
-<B> Up:</B> <A NAME="tex2html3169"
+<B> Next:</B> <A NAME="tex2html3178"
+  HREF="jmanual-node182.html">グラフ表現</A>
+<B> Up:</B> <A NAME="tex2html3172"
   HREF="jmanual-node144.html">irteus 拡張</A>
-<B> Previous:</B> <A NAME="tex2html3163"
-  HREF="jmanual-node180.html">ポイントクラウドデータ</A>
- &nbsp; <B>  <A NAME="tex2html3171"
+<B> Previous:</B> <A NAME="tex2html3166"
+  HREF="jmanual-node180.html">Colladaデータ</A>
+ &nbsp; <B>  <A NAME="tex2html3174"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3173"
-  HREF="jmanual-node187.html">Index</A></B> </DIV>
+ &nbsp; <B>  <A NAME="tex2html3176"
+  HREF="jmanual-node188.html">Index</A></B> </DIV>
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-12-26
+2016-01-07
 </ADDRESS>
 </BODY>
 </HTML>

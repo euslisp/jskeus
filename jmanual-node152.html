@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>ロボットの動作生成</TITLE>
+<TITLE>EusLispにおける順運動学計算</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="ロボットの動作生成">
+<META NAME="description" CONTENT="EusLispにおける順運動学計算">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,87 +19,109 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="jmanual.css">
 
-<LINK REL="next" HREF="jmanual-node166.html">
-<LINK REL="previous" HREF="jmanual-node146.html">
-<LINK REL="up" HREF="jmanual-node145.html">
+<LINK REL="previous" HREF="jmanual-node151.html">
+<LINK REL="up" HREF="jmanual-node146.html">
 <LINK REL="next" HREF="jmanual-node153.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html2758"
+<A NAME="tex2html2761"
   HREF="jmanual-node153.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html2752"
-  HREF="jmanual-node145.html">
+<A NAME="tex2html2755"
+  HREF="jmanual-node146.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html2746"
+<A NAME="tex2html2751"
   HREF="jmanual-node151.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html2754"
+<A NAME="tex2html2757"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html2756"
-  HREF="jmanual-node187.html">
+<A NAME="tex2html2759"
+  HREF="jmanual-node188.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html2759"
-  HREF="jmanual-node153.html">逆運動学</A>
-<B> Up:</B> <A NAME="tex2html2753"
-  HREF="jmanual-node145.html">ロボットモデリング</A>
-<B> Previous:</B> <A NAME="tex2html2747"
+<B> Next:</B> <A NAME="tex2html2762"
+  HREF="jmanual-node153.html">ロボットの動作生成</A>
+<B> Up:</B> <A NAME="tex2html2756"
+  HREF="jmanual-node146.html">ロボットのデータ構造とモデリング</A>
+<B> Previous:</B> <A NAME="tex2html2752"
   HREF="jmanual-node151.html">cascaded-linkを用いたロボット（多リンク系）のモデリング</A>
- &nbsp; <B>  <A NAME="tex2html2755"
+ &nbsp; <B>  <A NAME="tex2html2758"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html2757"
-  HREF="jmanual-node187.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2760"
+  HREF="jmanual-node188.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION05012000000000000000">
-ロボットの動作生成</A>
-</H2>
+<H3><A NAME="SECTION05011600000000000000">
+EusLispにおける順運動学計算</A>
+</H3>
+
+<P>
+順運動学計算を行うには，cascaded-corods, bodyset, bodyset-link 各クラ
+スに定義された :worldcoords メソッドを用いる．
+:worldcoords メソッドは，ルートリンクが見つかる（親リンクがなくなる）
+か， スロット変数 changed が nil であるリンク
+（一度順運動学計算を行ったことがある）が見つかるまで
+さかのぼって親リンクの :worldcoords メソッドを呼び出すことで
+順運動学計算を行う．
+その際，スロット変数 changed を nil で上書く．
+したがって，二度目の :worldcoords メソッドの呼び出しでは，一度計算され
+たリンクの順運動学計算は行われず，即座にリンクの位置姿勢情報を取り出す
+ことができる．
+
+<P>
+また，bodyset-link クラスの :worldcoords メソッドは, level 引数を取る
+ことができ，それが :coords である場合には，リンクのもつ bodies スロット変数
+の順運動学計算は行われない．
+bodies にリンクの頂点を構成する faceset が含まれている場合には，これら
+についての順運動学計算を省略することで大幅な高速化が期待できるだろう．
+なお， level 引数の初期値には，リンクのもつ analysis-level スロット変数
+が用いられるため，常に bodies の順運動学計算を行わない場合は，
+リンクのインスタンス l について
+<code>(send l :analysis-level :coords)</code>
+とすればよい．
+
+<P>
+<PRE>
+(defmethod bodyset-link
+  (:worldcoords
+   (&amp;optional (level analysis-level))
+   (case
+    level
+    (:coords (send-message self cascaded-coords :worldcoords))
+    (t       (send-super :worldcoords)))
+   ))
+
+(defmethod bodyset
+  (:worldcoords
+   ()
+   (when changed
+     (send-super :worldcoords)
+     (dolist (b bodies) (send b :worldcoords)))
+   worldcoords))
+
+(defmethod cascaded-coords
+ (:worldcoords  ()      ;calculate rot and pos in the world
+   (when changed
+      (if parent
+          (transform-coords (send parent :worldcoords) self
+worldcoords)
+          (send worldcoords :replace-coords self))
+      (send self :update)
+      (setf changed nil))
+   worldcoords))
+</PRE>
 
 <P>
 <BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
-
-<UL CLASS="ChildLinks">
-<LI><A NAME="tex2html2760"
-  HREF="jmanual-node153.html">逆運動学</A>
-<LI><A NAME="tex2html2761"
-  HREF="jmanual-node154.html">基礎ヤコビ行列</A>
-<LI><A NAME="tex2html2762"
-  HREF="jmanual-node155.html">関節角度限界回避を含む逆運動学</A>
-<LI><A NAME="tex2html2763"
-  HREF="jmanual-node156.html">衝突回避を含む逆運動学</A>
-<LI><A NAME="tex2html2764"
-  HREF="jmanual-node157.html">衝突回避のための関節角速度計算法</A>
-<LI><A NAME="tex2html2765"
-  HREF="jmanual-node158.html">衝突回避計算例</A>
-<LI><A NAME="tex2html2766"
-  HREF="jmanual-node159.html">非ブロック対角ヤコビアンによる全身協調動作生成</A>
-<LI><A NAME="tex2html2767"
-  HREF="jmanual-node160.html">リンク間重複があるヤコビアン計算と関節角度計算</A>
-<LI><A NAME="tex2html2768"
-  HREF="jmanual-node161.html">ベースリンク仮想ジョイントを用いた全身逆運動学法</A>
-<LI><A NAME="tex2html2769"
-  HREF="jmanual-node162.html">ベースリンク仮想ジョイントヤコビアン</A>
-<LI><A NAME="tex2html2770"
-  HREF="jmanual-node163.html">マスプロパティ計算</A>
-<LI><A NAME="tex2html2771"
-  HREF="jmanual-node164.html">運動量・角運動量ヤコビアン</A>
-<LI><A NAME="tex2html2772"
-  HREF="jmanual-node165.html">重心ヤコビアン</A>
-</UL>
-<!--End of Table of Child-Links-->
-<BR><HR>
 <ADDRESS>
 
-2015-12-26
+2016-01-07
 </ADDRESS>
 </BODY>
 </HTML>

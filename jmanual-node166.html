@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>ロボットの動作生成プログラミング</TITLE>
+<TITLE>重心ヤコビアン</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="ロボットの動作生成プログラミング">
+<META NAME="description" CONTENT="重心ヤコビアン">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -19,67 +19,108 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="jmanual.css">
 
-<LINK REL="next" HREF="jmanual-node170.html">
-<LINK REL="previous" HREF="jmanual-node152.html">
-<LINK REL="up" HREF="jmanual-node145.html">
+<LINK REL="previous" HREF="jmanual-node165.html">
+<LINK REL="up" HREF="jmanual-node153.html">
 <LINK REL="next" HREF="jmanual-node167.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html2965"
+<A NAME="tex2html2968"
   HREF="jmanual-node167.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html2959"
-  HREF="jmanual-node145.html">
+<A NAME="tex2html2962"
+  HREF="jmanual-node153.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html2953"
+<A NAME="tex2html2958"
   HREF="jmanual-node165.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html2961"
+<A NAME="tex2html2964"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html2963"
-  HREF="jmanual-node187.html">
+<A NAME="tex2html2966"
+  HREF="jmanual-node188.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html2966"
-  HREF="jmanual-node167.html">三軸関節ロボットを使ったヤコビアン，逆運動学の例</A>
-<B> Up:</B> <A NAME="tex2html2960"
-  HREF="jmanual-node145.html">ロボットモデリング</A>
-<B> Previous:</B> <A NAME="tex2html2954"
-  HREF="jmanual-node165.html">重心ヤコビアン</A>
- &nbsp; <B>  <A NAME="tex2html2962"
+<B> Next:</B> <A NAME="tex2html2969"
+  HREF="jmanual-node167.html">ロボットの動作生成プログラミング</A>
+<B> Up:</B> <A NAME="tex2html2963"
+  HREF="jmanual-node153.html">ロボットの動作生成</A>
+<B> Previous:</B> <A NAME="tex2html2959"
+  HREF="jmanual-node165.html">運動量・角運動量ヤコビアン</A>
+ &nbsp; <B>  <A NAME="tex2html2965"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html2964"
-  HREF="jmanual-node187.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html2967"
+  HREF="jmanual-node188.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION05013000000000000000">
-ロボットの動作生成プログラミング</A>
-</H2>
+<H3><A NAME="SECTION050121300000000000000">
+重心ヤコビアン</A>
+</H3>
+重心ヤコビアンは
+重心速度と関節角速度の間のヤコビアンである．
+本論文ではベースリンク仮想ジョイントを用いるため，
+ベースリンクに6自由度関節がついたと考え
+ベースリンク速度角速度・関節角速度の
+重心速度に対するヤコビアンを重心ヤコビアンとして用いる．
+具体的には，
+ベースリンク成分<!-- MATH
+ $\mbox{\boldmath {$M$}}_{B}$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="406" HEIGHT="39" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img271.png"
+ ALT="$ M$"></B></SPAN><IMG
+ WIDTH="22" HEIGHT="14" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img272.png"
+ ALT="$ _{B}$"></B></SPAN>と
+使用関節について抜き出した成分<!-- MATH
+ $\mbox{\boldmath {$M$}}_{\dot{\mbox{\boldmath {$\theta$}}}}^{\prime}$
+ -->
+<SPAN CLASS="MATH"><B><SPAN CLASS="MATH"><B><IMG
+ WIDTH="406" HEIGHT="39" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img271.png"
+ ALT="$ M$"></B></SPAN><IMG
+ WIDTH="15" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img273.png"
+ ALT="$ _{\dot{\mbox{\boldmath {$\theta$}}}}^{\prime}$"></B></SPAN>
+による運動量ヤコビアンを
+全質量で割ることで重心ヤコビアンを計算する．
+<P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><!-- MATH
+ \begin{equation}
+\mbox{\boldmath {$J$}}_{G} =
+\frac{1}{M_{r}}
+\left[
+\begin{array}{cc}
+\mbox{\boldmath {$M$}}_{B} & \mbox{\boldmath {$M$}}_{\dot{\mbox{\boldmath {$\theta$}}}}^{\prime}
+\end{array}
+\right]
+\end{equation}
+ -->
+<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
+ WIDTH="60" HEIGHT="52" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img126.png"
+ ALT="$\displaystyle \mbox{\boldmath {$J$}}$"><IMG
+ WIDTH="15" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="jmanual-img274.png"
+ ALT="$\displaystyle _{G} = \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath {...
+...oldmath {$M$}}_{\dot{\mbox{\boldmath {$\theta$}}}}^{\prime} \end{array} \right]$"></SPAN></TD>
+<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
+(<SPAN CLASS="arabic">39</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
 
 <P>
 <BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
-
-<UL CLASS="ChildLinks">
-<LI><A NAME="tex2html2967"
-  HREF="jmanual-node167.html">三軸関節ロボットを使ったヤコビアン，逆運動学の例</A>
-<LI><A NAME="tex2html2968"
-  HREF="jmanual-node168.html">irteusのサンプルプログラムにおける例</A>
-<LI><A NAME="tex2html2969"
-  HREF="jmanual-node169.html">実際のロボットモデル</A>
-</UL>
-<!--End of Table of Child-Links-->
-<BR><HR>
 <ADDRESS>
 
-2015-12-26
+2016-01-07
 </ADDRESS>
 </BODY>
 </HTML>

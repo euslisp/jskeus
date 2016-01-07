@@ -7,9 +7,9 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>環境モデル</TITLE>
+<TITLE>センサモデル</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<META NAME="description" CONTENT="環境モデル">
+<META NAME="description" CONTENT="センサモデル">
 <META NAME="keywords" CONTENT="jmanual">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -28,46 +28,46 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html3050"
+<A NAME="tex2html3053"
   HREF="jmanual-node173.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3044"
+<A NAME="tex2html3047"
   HREF="jmanual-node145.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3038"
+<A NAME="tex2html3041"
   HREF="jmanual-node171.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3046"
+<A NAME="tex2html3049"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3048"
-  HREF="jmanual-node187.html">
+<A NAME="tex2html3051"
+  HREF="jmanual-node188.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3051"
-  HREF="jmanual-node173.html">動力学計算・歩行動作生成</A>
-<B> Up:</B> <A NAME="tex2html3045"
+<B> Next:</B> <A NAME="tex2html3054"
+  HREF="jmanual-node173.html">環境モデル</A>
+<B> Up:</B> <A NAME="tex2html3048"
   HREF="jmanual-node145.html">ロボットモデリング</A>
-<B> Previous:</B> <A NAME="tex2html3039"
-  HREF="jmanual-node171.html">センサモデル</A>
- &nbsp; <B>  <A NAME="tex2html3047"
+<B> Previous:</B> <A NAME="tex2html3042"
+  HREF="jmanual-node171.html">ロボットモデル</A>
+ &nbsp; <B>  <A NAME="tex2html3050"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3049"
-  HREF="jmanual-node187.html">Index</A></B> 
+ &nbsp; <B>  <A NAME="tex2html3052"
+  HREF="jmanual-node188.html">Index</A></B> 
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION05016000000000000000">
-環境モデル</A>
+<H2><A NAME="SECTION05015000000000000000">
+センサモデル</A>
 </H2>
   
  <BR>
 <BR> <BR> 
-<A NAME="57502"></A>
-<BIG CLASS="XLARGE"><B>scene-model </B></BIG> [クラス]  <PRE><TT>
-  :super   <B>cascaded-coords</B> 
-<BR>  :slots 		 name objs 
+<A NAME="56775"></A>
+<BIG CLASS="XLARGE"><B>sensor-model </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>body</B> 
+<BR>  :slots 		 data profile 
 </TT></PRE>
 <BR>
 <BR>
@@ -79,174 +79,79 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </DL>
 <BR>
 <BR>
-
-<A NAME="57519"></A>
-<BR>
-<IMG
- WIDTH="553" HEIGHT="204" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img307.png"
- ALT="\begin{emtabbing}
-{\bf :init}
-\it\&amp;rest args \&amp;key \= ((:name n) scene) \\lq  [method]\\
-\&gt; ((:objects o))
-\rm
-\end{emtabbing}">
-<BR>
-
-<DL COMPACT>
-<DT> 
-<DD>Create scene model
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="57530"></A>
-<B>:objects</B> [メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns objects in the scene.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="57540"></A>
-<B>:add-objects</B> <EM>objects  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Add objects to scene with identifiable names. Returns all objects.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="57550"></A>
-<B>:add-object</B> <EM>obj  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Add object to scene with identifiable name. Returns all objects.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="57560"></A>
-<B>:remove-objects</B> <EM>objs-or-names  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Remove objects or objects with given names from scene. Returns removed objects.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="57570"></A>
-<B>:remove-object</B> <EM>obj-or-name  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Remove object or object with given name from scene. Returns removed object.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="57580"></A>
-<B>:find-object</B> <EM>name  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns objects with given name.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="57590"></A>
-<B>:add-spots</B> <EM>spots  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Add spots to scene with identifiable names. All spots will be :assoc with this scene. Returns T if added spots successfly, otherwise returns NIL.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="57600"></A>
-<B>:add-spot</B> <EM>spot  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Add spot to scene with identifiable name. The spot will be :assoc with this scene. Returns T if spot is added successfly, otherwise returns NIL.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="57610"></A>
-<B>:remove-spots</B> <EM>spots  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Remove spots from this scene. All spots will be :dissoc with this scene. Returns removed spots.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="57620"></A>
-<B>:remove-spot</B> <EM>spot  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Remove spot from scene. the spot will be :dissoc with this scene. Returns removed spot.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="57630"></A>
-<B>:spots</B> <EM>&amp;optional name  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns spots in the scene. If name is given returns spot of given name.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="57640"></A>
-<B>:object</B> <EM>name  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns object of given name.
-</DD>
-</DL>
-<BR>
-<BR>
-
-<A NAME="57650"></A>
-<B>:spot</B> <EM>name  </EM>[メソッド]
-
-<DL COMPACT>
-<DT> 
-<DD> Returns scene of given name.
-</DD>
-</DL>
-<BR>
-<BR>
-
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="57660"></A>
-<B>:bodies</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<A NAME="56792"></A>
+<B>:profile</B> <EM>&amp;optional p  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="56803"></A>
+<B>:signal</B> <EM>rawinfo  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="56814"></A>
+<B>:simulate</B> <EM>model  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="56825"></A>
+<B>:read</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="56836"></A>
+<B>:draw-sensor</B> <EM>v  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="56847"></A>
+<B>:init</B> <EM>shape &amp;key name &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -262,39 +167,445 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </SMALL>
 
 <P>
+	<BR> 
+<A NAME="56859"></A>
+<BIG CLASS="XLARGE"><B>bumper-model </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>sensor-model</B> 
+<BR>  :slots 		 bumper-threshold 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56876"></A>
+<BR>
+<IMG
+ WIDTH="1096" HEIGHT="92" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img302.png"
+ ALT="\begin{emtabbing}
+{\bf :init}
+\it b \&amp;rest args \&amp;key \= ((:bumper-threshold bt) 20) \\lq  [method]\\
+\&gt; name
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>Create bumper model, b is the shape of an object and bt is the threshold in distance[mm].
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56887"></A>
+<B>:simulate</B> <EM>objs  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Simulate bumper, with given objects, return 1 if the sensor detects an object and 0 if not.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="56897"></A>
+<B>:draw</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="56908"></A>
+<B>:draw-sensor</B> <EM>vwer  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+	<BR> 
+<A NAME="56920"></A>
+<BIG CLASS="XLARGE"><B>camera-model </B></BIG> [クラス]  <PRE><TT>
+  :super   <B>sensor-model</B> 
+<BR>  :slots 		 (vwing :forward (:projection :newprojection :view :viewpoint :view-direction :viewdistance :yon :hither)) img-viewer pwidth pheight 
+</TT></PRE>
+<BR>
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56937"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="32" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img303.png"
+ ALT="\begin{emtabbing}
+{\bf :init}
+\it b \&amp;rest args \&amp;key \= ((:width pw) 320) \\lq  [...
+...ither 100.0) \\
+\&gt; (yon 10000.0) \\
+\&gt; \&amp;allow-other-keys
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>Create camera model. b is the shape of an object
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56948"></A>
+<B>:create-viewer</B> <EM>&amp;optional cv  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Create camera viewer, or set viewer
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56958"></A>
+<B>:width</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns width of the camera in pixel.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56968"></A>
+<B>:height</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns height of the camera in pixel.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56978"></A>
+<B>:fovy</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns field of view in degree
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56988"></A>
+<B>:cx</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns center x.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="56998"></A>
+<B>:cy</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns center y.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57008"></A>
+<B>:fx</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns focal length of x.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57018"></A>
+<B>:fy</B> [メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns focal length of y.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57028"></A>
+<B>:screen-point</B> <EM>pos  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns point in screen corresponds to the given pos.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57038"></A>
+<B>:3d-point</B> <EM>x y d  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns 3d position
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57048"></A>
+<B>:ray</B> <EM>x y  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Returns ray vector of given x and y.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57058"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="130" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img304.png"
+ ALT="\begin{emtabbing}
+{\bf :draw-on}
+\it\&amp;rest args \&amp;key \= ((:viewer vwer) \texta...
+...textasteriskcentered ) \\lq  [method]\\
+\&gt; \&amp;allow-other-keys
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>Draw camera raw in irtviewer, ex (send cam :draw-on :flush t)
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57069"></A>
+<B>:draw-objects</B> <EM>objs  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Draw objects in camera viewer, expected type of objs is list of objects
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57079"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img305.png"
+ ALT="\begin{emtabbing}
+{\bf :get-image}
+\it\&amp;key \= (with-points) \\lq  [method]\\
+\&gt; (with-colors)
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>Get image objects you need to call :draw-objects before calling this function
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="57090"></A>
+<B>:select-drawmode</B> <EM>mode objs  </EM>[メソッド]
+
+<DL COMPACT>
+<DT> 
+<DD> Change drawmode for drawing with :draw-objects methods. mode is symbol of mode, 'hid is symbol for hidden line mode, the other symbols indicate default mode. objs is the same objects using :draw-objects.
+</DD>
+</DL>
+<BR>
+<BR>
+
+<SMALL CLASS="FOOTNOTESIZE">
+<A NAME="57100"></A>
+<B>:viewing</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="57111"></A>
+<B>:image-viewer</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="57122"></A>
+<B>:draw-sensor</B> <EM>vwer &amp;key flush (width 1) (color (float-vector 1 1 1))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="57133"></A>
+<B>:draw-objects-raw</B> <EM>vwr objs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+
+<A NAME="57144"></A>
+<B>:get-image-raw</B> <EM>vwr &amp;key (points) (colors)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+
+</SMALL>
+
+<DL COMPACT>
+<DT> 
+<DD>  
+</DD>
+</DL><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+
+<BR>
+</SMALL>
+
+<P>
+
+<A NAME="57155"></A>
+<BR>
+<IMG
+ WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img306.png"
+ ALT="\begin{emtabbing}
+{\bf make-camera-from-param}
+\it\&amp;key \= pwidth \\lq  [function]...
+...ty 0) \\
+\&gt; parent-coords \\
+\&gt; name \\
+\&gt; create-viewer
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>Create camera object from given parameters.
+</DD>
+</DL>
+<BR>
+<BR>
+
               
 <DIV CLASS="navigation"><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html3050"
+<A NAME="tex2html3053"
   HREF="jmanual-node173.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html3044"
+<A NAME="tex2html3047"
   HREF="jmanual-node145.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html3038"
+<A NAME="tex2html3041"
   HREF="jmanual-node171.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html3046"
+<A NAME="tex2html3049"
   HREF="jmanual-node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
-<A NAME="tex2html3048"
-  HREF="jmanual-node187.html">
+<A NAME="tex2html3051"
+  HREF="jmanual-node188.html">
 <IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
 <BR>
-<B> Next:</B> <A NAME="tex2html3051"
-  HREF="jmanual-node173.html">動力学計算・歩行動作生成</A>
-<B> Up:</B> <A NAME="tex2html3045"
+<B> Next:</B> <A NAME="tex2html3054"
+  HREF="jmanual-node173.html">環境モデル</A>
+<B> Up:</B> <A NAME="tex2html3048"
   HREF="jmanual-node145.html">ロボットモデリング</A>
-<B> Previous:</B> <A NAME="tex2html3039"
-  HREF="jmanual-node171.html">センサモデル</A>
- &nbsp; <B>  <A NAME="tex2html3047"
+<B> Previous:</B> <A NAME="tex2html3042"
+  HREF="jmanual-node171.html">ロボットモデル</A>
+ &nbsp; <B>  <A NAME="tex2html3050"
   HREF="jmanual-node1.html">Contents</A></B> 
- &nbsp; <B>  <A NAME="tex2html3049"
-  HREF="jmanual-node187.html">Index</A></B> </DIV>
+ &nbsp; <B>  <A NAME="tex2html3052"
+  HREF="jmanual-node188.html">Index</A></B> </DIV>
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2015-12-26
+2016-01-07
 </ADDRESS>
 </BODY>
 </HTML>
