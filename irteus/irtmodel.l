@@ -1089,12 +1089,12 @@
 	      &allow-other-keys)
    "Calculate jacobian matrix from link-list and move-target. Unit system is [m] or [rad], not [mm] or [deg]."
    "Joint order for this jacobian matrix follows link-list order. Joint torque[Nm] order is also the same.
-    ;; Ex1. One-Arm
-    ;; (setq *rarm-link-list* (send *robot* :link-list (send *robot* :rarm :end-coords :parent)))
-    ;; (send-all *rarm-link-list* :joint)
-    ;; Ex2. Two-Arm
-    ;; (setq *arms-link-list* (mapcar #'(lambda (l) (send *robot* :link-list (send *robot* l :end-coords :parent))) '(:rarm :larm)))
-    ;; (send-all (send *robot* :calc-union-link-list *arms-link-list*) :joint)
+    Ex1. One-Arm
+    (setq *rarm-link-list* (send *robot* :link-list (send *robot* :rarm :end-coords :parent)))
+    (send-all *rarm-link-list* :joint)
+    Ex2. Two-Arm
+    (setq *arms-link-list* (mapcar #'(lambda (l) (send *robot* :link-list (send *robot* l :end-coords :parent))) '(:rarm :larm)))
+    (send-all (send *robot* :calc-union-link-list *arms-link-list*) :joint)
    "
    (let* (len ul row
 	  child-reverse union-link-list
