@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2016.1.8)  8 JAN 2016 09:56
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2016.1.19)  19 JAN 2016 12:53
 entering extended mode
  %&-line parsing enabled.
 **./jmanual-images.tex
@@ -69,7 +69,7 @@ File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
 ) (/usr/share/texmf-texlive/tex/latex/base/makeidx.sty
 Package: makeidx 2000/03/29 v1.0m Standard LaTeX package
-) (/tmp/tmp.Jk6N0lmrkh/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
+) (/tmp/tmp.kgeGbaeV28/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
 hdr/fancyheadings.sty
 Package: fancyheadings 2008/02/04 1.99 Dummy package to call fancyhdr
 
@@ -2387,7 +2387,7 @@ l2hSize :emtabbing67890:46.84526pt::0.0pt::349.0pt.
 ] (./jmanual-images.aux) ) 
 Here is how much of TeX's memory you used:
  2081 strings out of 495062
- 25257 string characters out of 1182645
+ 25257 string characters out of 1182644
  85597 words of memory out of 3000000
  5211 multiletter control sequences out of 15000+50000
  8908 words of font info for 34 fonts, out of 3000000 for 9000
