@@ -427,26 +427,31 @@
     self)
   (:joint-angle
     (&optional v &key relative &allow-other-keys)
-    "return joint-angle if v is not set, if v is given, set joint angle. v is joint-angle vector by axis-angle representation, i.e (scale rotation-angle-from-default-coords[deg] axis-unit-vector)"
-    ;; v is anguler velocity [deg]
+    "return joint-angle if v is not set, if v is given, set joint angle.
+     v is joint-angle vector [deg] by axis-angle representation, i.e (scale rotation-angle-from-default-coords[deg] axis-unit-vector)"
     (when v
-      ;; if relative nil
-      ;; v is equivalent to orthogonal orientation matrix calculated from (send (send world-default-coords :transformation child-link) :worldrot)
-      (unless relative (setq joint-angle v))
-      (let* ((drot (matrix-exponent (map float-vector #'deg2rad joint-angle))))
-	(if relative
-	    ;; if relative t
-	    ;; v is calculated from difference-rotation or jacobian
-	    (let ((vec (map float-vector #'deg2rad v)))
-	      (unless (eps= (norm vec) 0.0 1e-20)
-		(m* (rotation-matrix (norm vec) (normalize-vector vec)) drot drot))))
-	;; min max check
-	(let* ((dr (map float-vector #'rad2deg (matrix-log drot))))
-	  (setq joint-angle (vmin (vmax dr min-angle) max-angle)))
-	;; update child-link
-	(send child-link :replace-coords default-coords)
-	(send child-link :transform
-	      (make-coords :rot (matrix-exponent (map float-vector #'deg2rad joint-angle))))))
+      ;; Update joint-angle
+      (cond
+       (relative
+        ;; if relative t
+        ;; v is axis-angle difference vector calculated from difference-rotation or jacobian
+        (let ((vec (map float-vector #'deg2rad v)))
+          (unless (eps= (norm vec) 0.0 1e-20)
+            ;; If vec is large, update joint-angle
+            (let ((drot (matrix-exponent (map float-vector #'deg2rad joint-angle))))
+              (m* (rotation-matrix (norm vec) (normalize-vector vec)) drot drot)
+              (setq joint-angle (map float-vector #'rad2deg (matrix-log drot))))
+            )))
+       (t
+        ;; if relative nil
+        ;; v is axis-angle equivalent to orthogonal orientation matrix calculated from (send (send world-default-coords :transformation child-link) :worldrot)
+        (setq joint-angle v)))
+      ;; min max check
+      (setq joint-angle (vmin (vmax joint-angle min-angle) max-angle))
+      ;; update child-link
+      (send child-link :replace-coords default-coords)
+      (send child-link :transform
+            (make-coords :rot (matrix-exponent (map float-vector #'deg2rad joint-angle)))))
     joint-angle)
   (:joint-angle-rpy ;; v and return-value -> [deg] and (float-vector yaw roll pitch)
     (&optional v &key relative)
@@ -569,29 +574,38 @@
     (&optional v &key relative &allow-other-keys) ;; v [mm] [deg]
     "Return joint-angle if v is not set, if v is given, set joint angle vector, which is 6D vector of 3D translation[mm] and 3D rotation[deg], i.e. (find-if #'(lambda (x) (eq (send (car x) :name) 'sphere-joint)) (documentation :joint-angle))"
     (when v
-      (let (dp drot)
-	;; translation
-	(setq dp (if relative
-		     (v+ (subseq joint-angle 0 3) (subseq v 0 3))
-		   (subseq v 0 3)))
-	(setq dp (vmin (vmax dp (subseq min-angle 0 3)) (subseq max-angle 0 3)))
-	;; rotation
-	(unless relative (dotimes (i 3) (setf (elt joint-angle (+ i 3)) (elt v (+ i 3)))))
-	(setq drot (matrix-exponent (map float-vector #'deg2rad (subseq joint-angle 3 6))))
-	(if relative
-	    (let ((vec (map float-vector #'deg2rad (subseq v 3 6))))
-	      (unless (eps= (norm vec) 0.0 1e-20)
-		(m* (rotation-matrix (norm vec) (normalize-vector vec)) drot drot))))
-	;; min max check
-	(let* ((dr (map float-vector #'rad2deg (matrix-log drot))))
-	  (setq dr (vmin (vmax dr (subseq min-angle 3 6)) (subseq max-angle 3 6)))
-	  (dotimes (i 3)
-	    (setf (elt joint-angle i) (elt dp i))
-	    (setf (elt joint-angle (+ i 3)) (elt dr i)))
-	  ;; update child-link
-	  (send child-link :replace-coords default-coords)
-	  (send child-link :transform
-		(make-coords :rot (matrix-exponent (map float-vector #'deg2rad dr)) :pos dp)))))
+      (let (joint-angle-pos joint-angle-rot)
+        ;; Update joint-angle
+        ;;   translation
+        (setq joint-angle-pos (if relative
+                                  (v+ (subseq joint-angle 0 3) (subseq v 0 3))
+                                (subseq v 0 3)))
+        ;;   rotation
+        (cond
+         (relative
+          ;; if relative t
+          ;; rotation part of v is axis-angle difference vector calculated from difference-rotation or jacobian
+          (let ((vec (map float-vector #'deg2rad (subseq v 3 6))))
+            (if (eps= (norm vec) 0.0 1e-20)
+                (setq joint-angle-rot (subseq joint-angle 3 6))
+              (let ((drot (matrix-exponent (map float-vector #'deg2rad (subseq joint-angle 3 6)))))
+                (m* (rotation-matrix (norm vec) (normalize-vector vec)) drot drot)
+                (setq joint-angle-rot (map float-vector #'rad2deg (matrix-log drot))))
+              )))
+         (t
+          ;; if relative nil
+          ;; rotation part of v is axis-angle equivalent to orthogonal orientation matrix calculated from (send (send world-default-coords :transfor
+          (setq joint-angle-rot (subseq v 3 6))
+          ))
+        (dotimes (i 3)
+          (setf (elt joint-angle i) (elt joint-angle-pos i))
+          (setf (elt joint-angle (+ i 3)) (elt joint-angle-rot i)))
+        ;; min max check
+        (setq joint-angle (vmin (vmax joint-angle min-angle) max-angle))
+        ;; update child-link
+        (send child-link :replace-coords default-coords)
+        (send child-link :transform
+              (make-coords :rot (matrix-exponent (map float-vector #'deg2rad joint-angle-rot)) :pos joint-angle-pos))))
     joint-angle)
   (:joint-angle-rpy ;; v and return-value -> [deg] and (float-vector yaw roll pitch)
     (&optional v &key relative)
