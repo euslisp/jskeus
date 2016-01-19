@@ -337,6 +337,32 @@
        ))
     (list max-dif-pos max-dif-rot)))
 
+(defun test-zero-orientation-of-joint-class-common
+  (joint-class)
+  "Check zero setting for orientation of 6dof-joint and sphere-joint.
+   If zero vector is set as :joint-angle :relative t, worldrot should not change."
+  ;; Initialize
+  (setq *robot* (instance sample-multidof-joint-robot :init :joint-class joint-class
+                          :child-init-coords (make-coords :pos #f(100 200 300) :rpy (list (deg2rad 10) (deg2rad 20) (deg2rad 30)))))
+  (unless (or (null x::*display*) (= x::*display* 0))
+    (objects (list *robot*)))
+  (if (= (length (send *robot* :angle-vector)) 3)
+      (send *robot* :angle-vector #f(15.1 -25.2 35.3))
+    (send *robot* :angle-vector #f(20.0 -30.0 40.0 15.1 -25.2 35.3)))
+  (let ((rot1) (rot2))
+    ;; Rot before :joint-angle :relative t setting
+    (setq rot1 (copy-object (send (send (car (send *robot* :joint-list)) :child-link) :worldrot)))
+    (send (car (send *robot* :joint-list)) :joint-angle (if (= (length (send *robot* :angle-vector)) 3)
+                                                            (float-vector 0 0 0)
+                                                          (float-vector 0 0 0 0 0 0))
+          :relative t)
+    ;; Rot after :joint-angle :relative t setting
+    (setq rot2 (copy-object (send (send (car (send *robot* :joint-list)) :child-link) :worldrot)))
+    ;;(print (array-entity (m- rot1 rot2)))
+    ;; rot1 and rot2 should be same, otherwise it is numerical error.
+    (eps= (norm (array-entity (m- rot1 rot2))) 0.0 1e-20)
+    ))
+
 ;; test :cog-convergence-check
 (defun test-cog-convergence-check-common
   (robot)
@@ -840,6 +866,12 @@
      (and
       (> 0.05 (elt ret 0))
       (> (deg2rad 1e-2) (elt ret 1))))))
+
+(deftest test-zero-orientation-of-joint-class
+  (assert
+   (test-zero-orientation-of-joint-class-common sphere-joint))
+  (assert
+   (test-zero-orientation-of-joint-class-common 6dof-joint)))
 
 (deftest test-load-ik-fail-log-rarm-ik-for-sample-robot
   (assert (test-load-ik-fail-log-rarm-ik-common *sample-robot*)))
