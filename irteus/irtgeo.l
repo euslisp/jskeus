@@ -27,7 +27,7 @@
 (in-package "GEOMETRY")
 
 (export '(body-to-faces body-to-triangles midcoords orient-coords-to-axis bodyset *g-vec*
-                        make-sphere make-ring x-of-cube y-of-cube z-of-cube
+                        make-sphere make-ring make-fan-cylinder x-of-cube y-of-cube z-of-cube
                         height-of-cylinder radius-of-cylinder radius-of-sphere
 			matrix-to-euler-angle))
 
@@ -544,6 +544,29 @@
                           0 (* pipe-radius (sin (* i dtheta))))
             v-list))
     (apply #'make-torus v-list :segments segments args)))
+
+(defun make-fan-cylinder (radius height
+                                 &rest args
+                                 &key (segments 12)
+                                      (angle 2pi)
+                                      (mid-angle (/ angle 2.0)))
+  "make a cylinder whose base face is a fan. the angle of fan
+   is defined by :angle keyword. and, the csg of the returned body is
+   (:cylinder radius height segments angle)"
+  (let ((base-vertices
+         (mapcar #'(lambda (i)
+                     (let ((th (- (* i (/ angle segments)) mid-angle)))
+                       (float-vector (* radius (cos th))
+                                     (* radius (sin th))
+                                     0)))
+                 (let ((idx -1)) (mapcar #'(lambda (x) (incf idx)) (make-list (+ segments 1)))) ;; This is same as "range" function.
+                 )))
+    (make-prism
+     (if (eps= angle 2pi)
+         (cdr (reverse base-vertices))
+       (cons (float-vector 0 0 0) (reverse base-vertices)))
+     height
+     :primitive (list :cylinder radius height segments angle))))
 
 ;;
 ;; accessor to primitive bodies
