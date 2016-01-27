@@ -120,5 +120,10 @@
   (assert
    (test-sample-legged-robot-with-interlocking-joints)))
 
+(deftest test-test-virtual-joint-for-rotation-axis-all
+  (makunbound '*robot*)
+  (assert
+   (test-virtual-joint-for-rotation-axis-all)))
+
 (run-all-tests)
 (exit)
