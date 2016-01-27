@@ -2510,7 +2510,7 @@ If users want to use interlocking joints, please overwrite this method.
                
  <BR>
 <BR> <BR> 
-<A NAME="55016"></A>
+<A NAME="55019"></A>
 <BIG CLASS="XLARGE"><B>bodyset </B></BIG> [クラス]  <PRE><TT>
   :super   <B>cascaded-coords</B> 
 <BR>  :slots 		 (geometry::bodies :type cons) 
@@ -2526,7 +2526,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55033"></A>
+<A NAME="55036"></A>
 <BR>
 <IMG
  WIDTH="770" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
@@ -2550,7 +2550,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="55044"></A>
+<A NAME="55047"></A>
 <B>:bodies</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2564,7 +2564,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="55055"></A>
+<A NAME="55058"></A>
 <B>:faces</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2578,7 +2578,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="55066"></A>
+<A NAME="55069"></A>
 <B>:worldcoords</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2592,7 +2592,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="55077"></A>
+<A NAME="55080"></A>
 <B>:draw-on</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2610,7 +2610,7 @@ If users want to use interlocking joints, please overwrite this method.
 
 <P>
 
-<A NAME="55088"></A>
+<A NAME="55091"></A>
 <B>midcoords</B> <EM>geometry::p geometry::c1 geometry::c2  </EM>[関数]
 
 <DL COMPACT>
@@ -2621,7 +2621,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55098"></A>
+<A NAME="55101"></A>
 <B>orient-coords-to-axis</B> <EM>geometry::target-coords geometry::v &amp;optional (geometry::axis :z)  </EM>[関数]
 
 <DL COMPACT>
@@ -2633,7 +2633,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55108"></A>
+<A NAME="55111"></A>
 <B>geometry::face-to-triangle-aux</B> <EM>geometry::f  </EM>[関数]
 
 <DL COMPACT>
@@ -2644,7 +2644,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55118"></A>
+<A NAME="55121"></A>
 <B>geometry::face-to-triangle</B> <EM>geometry::f  </EM>[関数]
 
 <DL COMPACT>
@@ -2655,7 +2655,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55128"></A>
+<A NAME="55131"></A>
 <B>geometry::face-to-tessel-triangle</B> <EM>geometry::f geometry::num  </EM>[関数]
 
 <DL COMPACT>
@@ -2666,7 +2666,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55138"></A>
+<A NAME="55141"></A>
 <B>body-to-faces</B> <EM>geometry::abody  </EM>[関数]
 
 <DL COMPACT>
@@ -2677,7 +2677,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55148"></A>
+<A NAME="55151"></A>
 <B>make-sphere</B> <EM>geometry::r &amp;rest args  </EM>[関数]
 
 <DL COMPACT>
@@ -2688,7 +2688,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55158"></A>
+<A NAME="55161"></A>
 <B>make-ring</B> <EM>geometry::ring-radius geometry::pipe-radius &amp;rest args &amp;key (geometry::segments 16)  </EM>[関数]
 
 <DL COMPACT>
@@ -2699,7 +2699,33 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55168"></A>
+<A NAME="55171"></A>
+<BR>
+<IMG
+ WIDTH="787" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img291.png"
+ ALT="\begin{emtabbing}
+{\bf make-fan-cylinder}
+\it geometry::radius geometry::height...
+...
+\&gt; (angle 2pi) \\
+\&gt; (geometry::mid-angle (/ angle 2.0))
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>make a cylinder whose base face is a fan. the angle of fan
+<BR>
+is defined by :angle keyword. and, the csg of the returned body is
+<BR>   (:cylinder radius height segments angle)
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="55182"></A>
 <B>x-of-cube</B> <EM>geometry::cub  </EM>[関数]
 
 <DL COMPACT>
@@ -2710,7 +2736,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55178"></A>
+<A NAME="55192"></A>
 <B>y-of-cube</B> <EM>geometry::cub  </EM>[関数]
 
 <DL COMPACT>
@@ -2721,7 +2747,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55188"></A>
+<A NAME="55202"></A>
 <B>z-of-cube</B> <EM>geometry::cub  </EM>[関数]
 
 <DL COMPACT>
@@ -2732,7 +2758,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55198"></A>
+<A NAME="55212"></A>
 <B>height-of-cylinder</B> <EM>geometry::cyl  </EM>[関数]
 
 <DL COMPACT>
@@ -2743,7 +2769,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55208"></A>
+<A NAME="55222"></A>
 <B>radius-of-cylinder</B> <EM>geometry::cyl  </EM>[関数]
 
 <DL COMPACT>
@@ -2754,7 +2780,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55218"></A>
+<A NAME="55232"></A>
 <B>radius-of-sphere</B> <EM>geometry::sp  </EM>[関数]
 
 <DL COMPACT>
@@ -2765,7 +2791,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55228"></A>
+<A NAME="55242"></A>
 <B>geometry::make-faceset-from-vertices</B> <EM>geometry::vs  </EM>[関数]
 
 <DL COMPACT>
@@ -2776,7 +2802,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55238"></A>
+<A NAME="55252"></A>
 <B>matrix-to-euler-angle</B> <EM>geometry::m geometry::axis-order  </EM>[関数]
 
 <DL COMPACT>
@@ -2787,7 +2813,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55248"></A>
+<A NAME="55262"></A>
 <B>geometry::quaternion-from-two-vectors</B> <EM>geometry::a geometry::b  </EM>[関数]
 
 <DL COMPACT>
@@ -2799,7 +2825,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="55258"></A>
+<A NAME="55272"></A>
 <B>transform-coords</B> <EM>geometry::c1 geometry::c2 &amp;optional (geometry::c3 (let ((geometry::dim (send geometry::c1 :dimension))) (instance coordinates :newcoords (unit-matrix geometry::dim) (instantiate float-vector geometry::dim))))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2815,7 +2841,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="55269"></A>
+<A NAME="55283"></A>
 <B>geometry::face-to-triangle-rest-polygon</B> <EM>geometry::f geometry::num geometry::edgs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2831,7 +2857,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="55280"></A>
+<A NAME="55294"></A>
 <B>geometry::face-to-triangle-make-simple</B> <EM>geometry::f  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2847,7 +2873,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="55291"></A>
+<A NAME="55305"></A>
 <B>body-to-triangles</B> <EM>geometry::abody &amp;optional (geometry::limit 50)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2863,7 +2889,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="55302"></A>
+<A NAME="55316"></A>
 <B>geometry::triangle-to-triangle</B> <EM>geometry::aface &amp;optional (geometry::limit 50)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -2881,7 +2907,7 @@ If users want to use interlocking joints, please overwrite this method.
                
  <BR>
 <BR> <BR> 
-<A NAME="55710"></A>
+<A NAME="55732"></A>
 <BIG CLASS="XLARGE"><B>robot-model </B></BIG> [クラス]  <PRE><TT>
   :super   <B>cascaded-link</B> 
 <BR>  :slots 		 larm-end-coords rarm-end-coords lleg-end-coords rleg-end-coords head-end-coords torso-end-coords larm-root-link rarm-root-link lleg-root-link rleg-root-link head-root-link torso-root-link larm-collision-avoidance-links rarm-collision-avoidance-links larm rarm lleg rleg torso head force-sensors imu-sensors cameras support-polygons 
@@ -2897,7 +2923,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55727"></A>
+<A NAME="55749"></A>
 <B>:camera</B> <EM>sensor-name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2908,7 +2934,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55737"></A>
+<A NAME="55759"></A>
 <B>:force-sensor</B> <EM>sensor-name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2919,7 +2945,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55747"></A>
+<A NAME="55769"></A>
 <B>:imu-sensor</B> <EM>sensor-name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2930,7 +2956,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55757"></A>
+<A NAME="55779"></A>
 <B>:force-sensors</B> [メソッド]
 
 <DL COMPACT>
@@ -2941,7 +2967,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55767"></A>
+<A NAME="55789"></A>
 <B>:imu-sensors</B> [メソッド]
 
 <DL COMPACT>
@@ -2952,7 +2978,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55777"></A>
+<A NAME="55799"></A>
 <B>:cameras</B> [メソッド]
 
 <DL COMPACT>
@@ -2963,7 +2989,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55787"></A>
+<A NAME="55809"></A>
 <B>:look-at-hand</B> <EM>l/r  </EM>[メソッド]
 
 <DL COMPACT>
@@ -2974,11 +3000,11 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="55797"></A>
+<A NAME="55819"></A>
 <BR>
 <IMG
- WIDTH="787" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img291.png"
+ WIDTH="755" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img292.png"
  ALT="\begin{emtabbing}
 {\bf :inverse-kinematics}
 \it target-coords \&amp;rest args \&amp;key...
@@ -3000,11 +3026,11 @@ link-list is set by default based on move-target -&gt;root link link-list
 <BR>
 <BR>
 
-<A NAME="55808"></A>
+<A NAME="55830"></A>
 <BR>
 <IMG
  WIDTH="1477" HEIGHT="73" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img292.png"
+ SRC="jmanual-img293.png"
  ALT="\begin{emtabbing}
 {\bf :inverse-kinematics-loop}
 \it dif-pos dif-rot \&amp;rest arg...
@@ -3026,7 +3052,7 @@ link-list is set by default based on move-target -&gt;root link link-list
 <BR>
 <BR>
 
-<A NAME="55819"></A>
+<A NAME="55841"></A>
 <B>:look-at-target</B> <EM>look-at-target &amp;key (target-coords)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -3037,7 +3063,7 @@ link-list is set by default based on move-target -&gt;root link link-list
 <BR>
 <BR>
 
-<A NAME="55829"></A>
+<A NAME="55851"></A>
 <B>:init-pose</B> [メソッド]
 
 <DL COMPACT>
@@ -3048,11 +3074,11 @@ link-list is set by default based on move-target -&gt;root link link-list
 <BR>
 <BR>
 
-<A NAME="55839"></A>
+<A NAME="55861"></A>
 <BR>
 <IMG
  WIDTH="1524" HEIGHT="111" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img293.png"
+ SRC="jmanual-img294.png"
  ALT="\begin{emtabbing}
 {\bf :torque-vector}
 \it\&amp;key \= (force-list) \\lq  [method]\\
@@ -3070,11 +3096,11 @@ link-list is set by default based on move-target -&gt;root link link-list
 <BR>
 <BR>
 
-<A NAME="55850"></A>
+<A NAME="55872"></A>
 <BR>
 <IMG
  WIDTH="1455" HEIGHT="188" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img294.png"
+ SRC="jmanual-img295.png"
  ALT="\begin{emtabbing}
 {\bf :calc-force-from-joint-torque}
 \it limb all-torque \&amp;key...
@@ -3092,11 +3118,11 @@ link-list is set by default based on move-target -&gt;root link link-list
 <BR>
 <BR>
 
-<A NAME="55861"></A>
+<A NAME="55883"></A>
 <BR>
 <IMG
  WIDTH="736" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img295.png"
+ SRC="jmanual-img296.png"
  ALT="\begin{emtabbing}
 {\bf :fullbody-inverse-kinematics}
 \it target-coords \&amp;rest a...
@@ -3119,7 +3145,7 @@ ex. (send robot:fullbody-inverse-kinematics (list rarm-tc rleg-tc lleg-tc) :move
 <BR>
 <BR>
 
-<A NAME="55872"></A>
+<A NAME="55894"></A>
 <B>:print-vector-for-robot-limb</B> <EM>vec  </EM>[メソッド]
 
 <DL COMPACT>
@@ -3140,11 +3166,11 @@ torso-j0 ... torso-jN
 <BR>
 <BR>
 
-<A NAME="55882"></A>
+<A NAME="55904"></A>
 <BR>
 <IMG
  WIDTH="1016" HEIGHT="283" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img296.png"
+ SRC="jmanual-img297.png"
  ALT="\begin{emtabbing}
 {\bf :calc-zmp-from-forces-moments}
 \it forces moments \&amp;key ...
@@ -3165,7 +3191,7 @@ Otherwise, zmp cannot be defined and returns nil.
 <BR>
 <BR>
 
-<A NAME="55893"></A>
+<A NAME="55915"></A>
 <B>:foot-midcoords</B> <EM>&amp;optional (mid 0.5)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -3178,11 +3204,11 @@ In the following codes, leged robot is assumed.
 <BR>
 <BR>
 
-<A NAME="55903"></A>
+<A NAME="55925"></A>
 <BR>
 <IMG
  WIDTH="2394" HEIGHT="111" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img297.png"
+ SRC="jmanual-img298.png"
  ALT="\begin{emtabbing}
 {\bf :fix-leg-to-coords}
 \it fix-coords \&amp;optional (l/r :both) \&amp;key \= (mid 0.5) \\lq  [method]\\
@@ -3201,11 +3227,11 @@ In the following codes, leged robot is assumed.
 <BR>
 <BR>
 
-<A NAME="55914"></A>
+<A NAME="55936"></A>
 <BR>
 <IMG
  WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img298.png"
+ SRC="jmanual-img299.png"
  ALT="\begin{emtabbing}
 {\bf :move-centroid-on-foot}
 \it leg fix-limbs \&amp;rest args \&amp;...
@@ -3227,11 +3253,11 @@ fix-limbs : limb names which are fixed in this IK.
 <BR>
 <BR>
 
-<A NAME="55925"></A>
+<A NAME="55947"></A>
 <BR>
 <IMG
  WIDTH="2036" HEIGHT="130" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img299.png"
+ SRC="jmanual-img300.png"
  ALT="\begin{emtabbing}
 {\bf :calc-walk-pattern-from-footstep-list}
 \it footstep-list...
@@ -3250,7 +3276,7 @@ fix-limbs : limb names which are fixed in this IK.
 <BR>
 <BR>
 
-<A NAME="55936"></A>
+<A NAME="55958"></A>
 <B>:gen-footstep-parameter</B> <EM>&amp;key (ratio 1.0)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -3261,11 +3287,11 @@ fix-limbs : limb names which are fixed in this IK.
 <BR>
 <BR>
 
-<A NAME="55946"></A>
+<A NAME="55968"></A>
 <BR>
 <IMG
  WIDTH="1826" HEIGHT="245" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img300.png"
+ SRC="jmanual-img301.png"
  ALT="\begin{emtabbing}
 {\bf :go-pos-params-\textgreater footstep-list}
 \it xx yy th ...
@@ -3282,7 +3308,7 @@ fix-limbs : limb names which are fixed in this IK.
 <BR>
 <BR>
 
-<A NAME="55957"></A>
+<A NAME="55979"></A>
 <B>:go-pos-quadruped-params-&gt;footstep-list</B> <EM>xx yy th &amp;key (type :crawl)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -3293,7 +3319,7 @@ fix-limbs : limb names which are fixed in this IK.
 <BR>
 <BR>
 
-<A NAME="55967"></A>
+<A NAME="55989"></A>
 <B>:support-polygons</B> [メソッド]
 
 <DL COMPACT>
@@ -3304,7 +3330,7 @@ fix-limbs : limb names which are fixed in this IK.
 <BR>
 <BR>
 
-<A NAME="55977"></A>
+<A NAME="55999"></A>
 <B>:support-polygon</B> <EM>name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -3319,7 +3345,7 @@ Otherwise, return polygon with given name
 <BR>
 <BR>
 
-<A NAME="55987"></A>
+<A NAME="56009"></A>
 <B>:make-default-linear-link-joint-between-attach-coords</B> <EM>attach-coords-0 attach-coords-1 end-coords-name linear-joint-name  </EM>[メソッド]
 
 <DL COMPACT>
@@ -3340,11 +3366,11 @@ linear-joint-name is the name of linear actuator.
 <BR>
 <BR>
 
-<A NAME="55997"></A>
+<A NAME="56019"></A>
 <BR>
 <IMG
  WIDTH="1607" HEIGHT="111" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img301.png"
+ SRC="jmanual-img302.png"
  ALT="\begin{emtabbing}
 {\bf :calc-static-balance-point}
 \it\&amp;key \= (target-points (...
@@ -3369,7 +3395,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56008"></A>
+<A NAME="56030"></A>
 <B>:init-ending</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3383,7 +3409,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56019"></A>
+<A NAME="56041"></A>
 <B>:limb</B> <EM>limb method &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3397,7 +3423,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56030"></A>
+<A NAME="56052"></A>
 <B>:inverse-kinematics-loop-for-look-at</B> <EM>limb &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3411,7 +3437,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56041"></A>
+<A NAME="56063"></A>
 <B>:gripper</B> <EM>limb &amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3425,7 +3451,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56052"></A>
+<A NAME="56074"></A>
 <B>:get-sensor-method</B> <EM>sensor-type sensor-name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3439,7 +3465,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56063"></A>
+<A NAME="56085"></A>
 <B>:get-sensors-method-by-limb</B> <EM>sensors-type limb  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3453,7 +3479,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56074"></A>
+<A NAME="56096"></A>
 <B>:larm</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3467,7 +3493,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56085"></A>
+<A NAME="56107"></A>
 <B>:rarm</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3481,7 +3507,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56096"></A>
+<A NAME="56118"></A>
 <B>:lleg</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3495,7 +3521,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56107"></A>
+<A NAME="56129"></A>
 <B>:rleg</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3509,7 +3535,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56118"></A>
+<A NAME="56140"></A>
 <B>:head</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3523,7 +3549,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56129"></A>
+<A NAME="56151"></A>
 <B>:torso</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3537,7 +3563,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56140"></A>
+<A NAME="56162"></A>
 <B>:arms</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3551,7 +3577,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56151"></A>
+<A NAME="56173"></A>
 <B>:legs</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3565,7 +3591,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56162"></A>
+<A NAME="56184"></A>
 <B>:distribute-total-wrench-to-torque-method-default</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3579,7 +3605,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56173"></A>
+<A NAME="56195"></A>
 <B>:joint-angle-limit-nspace-for-6dof</B> <EM>&amp;key (avoid-nspace-gain 0.01) (limbs '(:rleg :lleg))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3593,7 +3619,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56184"></A>
+<A NAME="56206"></A>
 <B>:joint-order</B> <EM>limb &amp;optional jname-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3607,7 +3633,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56195"></A>
+<A NAME="56217"></A>
 <B>:draw-gg-debug-view</B> <EM>end-coords-list contact-state rz cog pz czmp dt  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3621,7 +3647,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56206"></A>
+<A NAME="56228"></A>
 <B>:footstep-parameter</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3635,7 +3661,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56217"></A>
+<A NAME="56239"></A>
 <B>:make-support-polygons</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3649,7 +3675,7 @@ static-balance-point-height is height of static balance point [mm].
 <BR>
 
 
-<A NAME="56228"></A>
+<A NAME="56250"></A>
 <B>:make-sole-polygon</B> <EM>name  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -3667,7 +3693,7 @@ static-balance-point-height is height of static balance point [mm].
 
 <P>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="56239"></A>
+<A NAME="56261"></A>
 <B>make-default-robot-link</B> <EM>len radius axis name &amp;optional extbody  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -3714,7 +3740,7 @@ static-balance-point-height is height of static balance point [mm].
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2016-01-19
+2016-01-27
 </ADDRESS>
 </BODY>
 </HTML>

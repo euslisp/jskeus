@@ -63,7 +63,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   
  <BR>
 <BR> <BR> 
-<A NAME="58005"></A>
+<A NAME="58027"></A>
 <BIG CLASS="XLARGE"><B>riccati-equation </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
 <BR>  :slots 		 a b c p q r k a-bkt r+btpb-1 
@@ -79,7 +79,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58022"></A>
+<A NAME="58044"></A>
 <B>:init</B> <EM>aa bb cc qq rr  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -93,7 +93,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 
 
-<A NAME="58033"></A>
+<A NAME="58055"></A>
 <B>:solve</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -111,7 +111,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 	<BR> 
-<A NAME="58045"></A>
+<A NAME="58067"></A>
 <BIG CLASS="XLARGE"><B>preview-controller </B></BIG> [クラス]  <PRE><TT>
   :super   <B>riccati-equation</B> 
 <BR>  :slots 		 xk uk delay f1-n y1-n queue-index initialize-queue-p additional-data-queue finishedp initialized-p output-dim input-dim 
@@ -127,11 +127,11 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
 
-<A NAME="58062"></A>
+<A NAME="58084"></A>
 <BR>
 <IMG
  WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img308.png"
+ SRC="jmanual-img309.png"
  ALT="\begin{emtabbing}
 {\bf :init}
 \it dt \&amp;key \= (q) \\lq  [method]\\
@@ -163,7 +163,7 @@ If initialize-queue-p is t, fill all queue by the first input at the begenning, 
 <BR>
 <BR>
 
-<A NAME="58073"></A>
+<A NAME="58095"></A>
 <B>:update-xk</B> <EM>p &amp;optional (add-data)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -178,7 +178,7 @@ If p is nil, automatically the last value in queue is used as input and preview 
 <BR>
 <BR>
 
-<A NAME="58083"></A>
+<A NAME="58105"></A>
 <B>:finishedp</B> [メソッド]
 
 <DL COMPACT>
@@ -189,7 +189,7 @@ If p is nil, automatically the last value in queue is used as input and preview 
 <BR>
 <BR>
 
-<A NAME="58093"></A>
+<A NAME="58115"></A>
 <B>:last-reference-output-vector</B> [メソッド]
 
 <DL COMPACT>
@@ -202,7 +202,7 @@ Last value is latest future value.
 <BR>
 <BR>
 
-<A NAME="58103"></A>
+<A NAME="58125"></A>
 <B>:current-reference-output-vector</B> [メソッド]
 
 <DL COMPACT>
@@ -215,7 +215,7 @@ First value is oldest future value and it can be used as current reference value
 <BR>
 <BR>
 
-<A NAME="58113"></A>
+<A NAME="58135"></A>
 <B>:current-state-vector</B> [メソッド]
 
 <DL COMPACT>
@@ -226,7 +226,7 @@ First value is oldest future value and it can be used as current reference value
 <BR>
 <BR>
 
-<A NAME="58123"></A>
+<A NAME="58145"></A>
 <B>:current-output-vector</B> [メソッド]
 
 <DL COMPACT>
@@ -237,7 +237,7 @@ First value is oldest future value and it can be used as current reference value
 <BR>
 <BR>
 
-<A NAME="58133"></A>
+<A NAME="58155"></A>
 <B>:current-additional-data</B> [メソッド]
 
 <DL COMPACT>
@@ -250,7 +250,7 @@ First value of additional-data-queue.
 <BR>
 <BR>
 
-<A NAME="58143"></A>
+<A NAME="58165"></A>
 <B>:pass-preview-controller</B> <EM>reference-output-vector-list  </EM>[メソッド]
 
 <DL COMPACT>
@@ -262,7 +262,7 @@ First value of additional-data-queue.
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58153"></A>
+<A NAME="58175"></A>
 <B>:calc-f</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -276,7 +276,7 @@ First value of additional-data-queue.
 <BR>
 
 
-<A NAME="58164"></A>
+<A NAME="58186"></A>
 <B>:calc-u</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -290,7 +290,7 @@ First value of additional-data-queue.
 <BR>
 
 
-<A NAME="58175"></A>
+<A NAME="58197"></A>
 <B>:calc-xk</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -308,7 +308,7 @@ First value of additional-data-queue.
 
 <P>
 	<BR> 
-<A NAME="58187"></A>
+<A NAME="58209"></A>
 <BIG CLASS="XLARGE"><B>extended-preview-controller </B></BIG> [クラス]  <PRE><TT>
   :super   <B>preview-controller</B> 
 <BR>  :slots 		 orga orgb orgc xk
@@ -324,11 +324,11 @@ First value of additional-data-queue.
 <BR>
 <BR>
 
-<A NAME="58204"></A>
+<A NAME="58226"></A>
 <BR>
 <IMG
  WIDTH="553" HEIGHT="226" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img309.png"
+ SRC="jmanual-img310.png"
  ALT="\begin{emtabbing}
 {\bf :init}
 \it dt \&amp;key \= (q) \\lq  [method]\\
@@ -361,7 +361,7 @@ If initialize-queue-p is t, fill all queue by the first input at the begenning, 
 <BR>
 <BR>
 
-<A NAME="58215"></A>
+<A NAME="58237"></A>
 <B>:current-output-vector</B> [メソッド]
 
 <DL COMPACT>
@@ -375,7 +375,7 @@ First value of additional-data-queue.
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58225"></A>
+<A NAME="58247"></A>
 <B>:calc-f</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -389,7 +389,7 @@ First value of additional-data-queue.
 <BR>
 
 
-<A NAME="58236"></A>
+<A NAME="58258"></A>
 <B>:calc-u</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -403,7 +403,7 @@ First value of additional-data-queue.
 <BR>
 
 
-<A NAME="58247"></A>
+<A NAME="58269"></A>
 <B>:calc-xk</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -421,7 +421,7 @@ First value of additional-data-queue.
 
 <P>
 	<BR> 
-<A NAME="58259"></A>
+<A NAME="58281"></A>
 <BIG CLASS="XLARGE"><B>preview-control-cart-table-cog-trajectory-generator </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
 <BR>  :slots 		 pcs cog-z zmp-z 
@@ -437,11 +437,11 @@ First value of additional-data-queue.
 <BR>
 <BR>
 
-<A NAME="58276"></A>
+<A NAME="58298"></A>
 <BR>
 <IMG
  WIDTH="553" HEIGHT="207" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img310.png"
+ SRC="jmanual-img311.png"
  ALT="\begin{emtabbing}
 {\bf :init}
 \it dt \_zc \&amp;key \= (q 1) \\lq  [method]\\
@@ -466,7 +466,7 @@ For other arguments, please see preview-controller and extended-preview-controll
 <BR>
 <BR>
 
-<A NAME="58287"></A>
+<A NAME="58309"></A>
 <B>:refcog</B> [メソッド]
 
 <DL COMPACT>
@@ -477,7 +477,7 @@ For other arguments, please see preview-controller and extended-preview-controll
 <BR>
 <BR>
 
-<A NAME="58297"></A>
+<A NAME="58319"></A>
 <B>:cart-zmp</B> [メソッド]
 
 <DL COMPACT>
@@ -488,7 +488,7 @@ For other arguments, please see preview-controller and extended-preview-controll
 <BR>
 <BR>
 
-<A NAME="58307"></A>
+<A NAME="58329"></A>
 <B>:last-refzmp</B> [メソッド]
 
 <DL COMPACT>
@@ -499,7 +499,7 @@ For other arguments, please see preview-controller and extended-preview-controll
 <BR>
 <BR>
 
-<A NAME="58317"></A>
+<A NAME="58339"></A>
 <B>:current-refzmp</B> [メソッド]
 
 <DL COMPACT>
@@ -510,7 +510,7 @@ For other arguments, please see preview-controller and extended-preview-controll
 <BR>
 <BR>
 
-<A NAME="58327"></A>
+<A NAME="58349"></A>
 <B>:update-xk</B> <EM>p &amp;optional (add-data)  </EM>[メソッド]
 
 <DL COMPACT>
@@ -523,7 +523,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 <BR>
 
-<A NAME="58337"></A>
+<A NAME="58359"></A>
 <B>:finishedp</B> [メソッド]
 
 <DL COMPACT>
@@ -534,7 +534,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 <BR>
 
-<A NAME="58347"></A>
+<A NAME="58369"></A>
 <B>:current-additional-data</B> [メソッド]
 
 <DL COMPACT>
@@ -545,7 +545,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 <BR>
 
-<A NAME="58357"></A>
+<A NAME="58379"></A>
 <B>:pass-preview-controller</B> <EM>reference-output-vector-list  </EM>[メソッド]
 
 <DL COMPACT>
@@ -556,7 +556,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 <BR>
 
-<A NAME="58367"></A>
+<A NAME="58389"></A>
 <B>:cog-z</B> [メソッド]
 
 <DL COMPACT>
@@ -568,7 +568,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58377"></A>
+<A NAME="58399"></A>
 <B>:update-cog-z</B> <EM>zc  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -586,7 +586,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 
 <P>
 	<BR> 
-<A NAME="58389"></A>
+<A NAME="58411"></A>
 <BIG CLASS="XLARGE"><B>gait-generator </B></BIG> [クラス]  <PRE><TT>
   :super   <B>propertied-object</B> 
 <BR>  :slots 		 robot dt footstep-node-list support-leg-list support-leg-coords-list swing-leg-dst-coords-list swing-leg-src-coords refzmp-cur-list refzmp-next refzmp-prev step-height-list one-step-len index-count default-step-height default-double-support-ratio default-zmp-offsets finalize-p apreview-controller all-limbs end-with-double-support ik-thre ik-rthre 
@@ -602,7 +602,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 <BR>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58406"></A>
+<A NAME="58428"></A>
 <B>:init</B> <EM>rb _dt  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -616,7 +616,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58417"></A>
+<A NAME="58439"></A>
 <B>:get-footstep-limbs</B> <EM>fs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -630,7 +630,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58428"></A>
+<A NAME="58450"></A>
 <B>:get-counter-footstep-limbs</B> <EM>fs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -644,7 +644,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58439"></A>
+<A NAME="58461"></A>
 <B>:get-limbs-zmp-list</B> <EM>limb-coords limb-names  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -658,7 +658,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58450"></A>
+<A NAME="58472"></A>
 <B>:get-limbs-zmp</B> <EM>limb-coords limb-names  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -672,7 +672,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58461"></A>
+<A NAME="58483"></A>
 <B>:get-swing-limbs</B> <EM>limbs  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -686,7 +686,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58472"></A>
+<A NAME="58494"></A>
 <B>:initialize-gait-parameter</B> <EM>fsl time cog &amp;key ((:default-step-height dsh) 50) ((:default-double-support-ratio ddsr) 0.2) (delay 1.6) ((:all-limbs al) '(:rleg :lleg)) ((:default-zmp-offsets dzo) (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) (q 1.0) (r 1.000000e-06) (thre 1) (rthre (deg2rad 1)) (start-with-double-support t) ((:end-with-double-support ewds) t)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -700,7 +700,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58483"></A>
+<A NAME="58505"></A>
 <B>:finalize-gait-parameter</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -714,7 +714,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58494"></A>
+<A NAME="58516"></A>
 <B>:make-gait-parameter</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -728,7 +728,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58505"></A>
+<A NAME="58527"></A>
 <B>:calc-current-swing-leg-coords</B> <EM>ratio src dst &amp;key (type :shuffling) (step-height default-step-height)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -742,7 +742,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58516"></A>
+<A NAME="58538"></A>
 <B>:calc-ratio-from-double-support-ratio</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -756,7 +756,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58527"></A>
+<A NAME="58549"></A>
 <B>:calc-current-refzmp</B> <EM>prev cur next  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -770,7 +770,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58538"></A>
+<A NAME="58560"></A>
 <B>:calc-one-tick-gait-parameter</B> <EM>type  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -784,7 +784,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58549"></A>
+<A NAME="58571"></A>
 <B>:proc-one-tick</B> <EM>&amp;key (type :shuffling) (solve-angle-vector :solve-av-by-move-centroid-on-foot) (solve-angle-vector-args) (debug nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -798,7 +798,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58560"></A>
+<A NAME="58582"></A>
 <B>:update-current-gait-parameter</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -812,7 +812,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58571"></A>
+<A NAME="58593"></A>
 <B>:solve-angle-vector</B> <EM>support-leg support-leg-coords swing-leg-coords cog &amp;key (solve-angle-vector :solve-av-by-move-centroid-on-foot) (solve-angle-vector-args)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -826,7 +826,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58582"></A>
+<A NAME="58604"></A>
 <B>:solve-av-by-move-centroid-on-foot</B> <EM>support-leg support-leg-coords swing-leg-coords cog robot &amp;rest args &amp;key (cog-gain 3.5) (stop 100) (additional-nspace-list) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -840,7 +840,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58593"></A>
+<A NAME="58615"></A>
 <B>:cycloid-midpoint</B> <EM>ratio start goal height &amp;key (top-ratio 0.5)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -854,7 +854,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 
 
-<A NAME="58604"></A>
+<A NAME="58626"></A>
 <B>:cycloid-midcoords</B> <EM>ratio start goal height &amp;key (top-ratio 0.5)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -872,7 +872,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 
 <P>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58615"></A>
+<A NAME="58637"></A>
 <B>calc-inertia-matrix-rotational</B> <EM>mat row column paxis m-til c-til i-til axis-for-angular child-link world-default-coords translation-axis rotation-axis tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -888,7 +888,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <BR>
 </SMALL>
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="58626"></A>
+<A NAME="58648"></A>
 <B>calc-inertia-matrix-linear</B> <EM>mat row column paxis m-til c-til i-til axis-for-angular child-link world-default-coords translation-axis rotation-axis tmp-v0 tmp-v1 tmp-v2 tmp-va tmp-vb tmp-vc tmp-vd tmp-m  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[関数] 
 
 </SMALL>
@@ -937,7 +937,7 @@ For arguments, please see preview-controller and extended-preview-controller :up
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2016-01-19
+2016-01-27
 </ADDRESS>
 </BODY>
 </HTML>
