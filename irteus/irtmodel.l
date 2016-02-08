@@ -1322,6 +1322,12 @@
 	       (setf (elt col-list i) np)))
            (scale 0.001 (normalize-vector (v- (elt np 1) (elt np 2) (elt np 3)) (elt np 3)) (elt np 3))
 	   ))) ;; dotimes
+     ;; Element of "col-list" (variable "np") is list of:
+     ;;   distance-between-pair1<->pair2
+     ;;   nearest-point-on-pair1
+     ;;   nearest-point-on-pair2
+     ;;   direction-vector-from-p2->p1
+     ;;   index-of-this-pair-within-collision-avoidance-link-pair
      (sort col-list #'<= #'(lambda (p) (car p)))
      (send self :put :collision-distance col-list)
      t))
