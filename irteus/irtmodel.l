@@ -1291,10 +1291,10 @@
    (&rest args
 	  &key union-link-list (warnp t)
           ((:collision-avoidance-link-pair pair-list))
+          ((:collision-distance-limit distance-limit) 10) ;; [mm]
 	  &allow-other-keys)
    (let* ((pair-len (length pair-list))
 	  (col-list (send self :get :collision-distance))
-	  (distance-limit 10)
 	  (sc 0.0) np pair)
      (when (or (null union-link-list) (= pair-len 0))
        (return-from :collision-avoidance-calc-distance nil))
