@@ -1291,11 +1291,11 @@
    (&rest args
 	  &key union-link-list (warnp t)
           ((:collision-avoidance-link-pair pair-list))
+          ((:collision-distance-limit distance-limit) 10) ;; [mm]
 	  &allow-other-keys)
    (let* ((pair-len (length pair-list))
 	  (col-list (send self :get :collision-distance))
-	  (distance-limit 10)
-	  (sc 0.0) np pair)
+          np pair)
      (when (or (null union-link-list) (= pair-len 0))
        (return-from :collision-avoidance-calc-distance nil))
      (if (or (null col-list) (/= (length col-list) pair-len))
@@ -1322,6 +1322,12 @@
 	       (setf (elt col-list i) np)))
            (scale 0.001 (normalize-vector (v- (elt np 1) (elt np 2) (elt np 3)) (elt np 3)) (elt np 3))
 	   ))) ;; dotimes
+     ;; Element of "col-list" (variable "np") is list of:
+     ;;   distance-between-pair1<->pair2
+     ;;   nearest-point-on-pair1
+     ;;   nearest-point-on-pair2
+     ;;   direction-vector-from-p2->p1
+     ;;   index-of-this-pair-within-collision-avoidance-link-pair
      (sort col-list #'<= #'(lambda (p) (car p)))
      (send self :put :collision-distance col-list)
      t))
@@ -1396,7 +1402,6 @@
             &allow-other-keys)
    (send* self :collision-avoidance-calc-distance args)
    (let ((pair-len (length pair-list)) (n 0)
-         (min-distance (car (elt (send self :get :collision-distance) 0)))
          (dav-col (instantiate float-vector fik-len)))
      (send self :put :collision-pair-list pair-list)
      (if (atom (car link-list)) (setq link-list (list link-list)))
