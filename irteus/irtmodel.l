@@ -2558,20 +2558,28 @@
 	     (push p cpairs)))
 	 ))
      cpairs))
-  ;; calc grasp matrix
-  ;;  -> grasp matrix is defined as
-  ;;   | E_3    0   E_3    0   ... |
-  ;;   | p1_hat E_3 p2_hat E_3 ... |
   (:calc-grasp-matrix
-   (contact-points &optional (ret (make-matrix 6 (* 6 (length contact-points))))) ;; contact-points [mm]
-   (let ((contact-matrices (mapcar #'(lambda (x) (outer-product-matrix (scale 1e-3 x))) contact-points)))
+   (contact-points
+    &key (ret (make-matrix 6 (* 6 (length contact-points))))
+         (contact-rots (mapcar #'(lambda (r) (unit-matrix 3)) contact-points)))
+   "Calc grasp matrix.
+      Grasp matrix is defined as
+       | E_3 0   E_3 0   ... |
+       | p1x E_3 p2x E_3 ... |
+    Arguments:
+      contact-points is list of contact points[mm].
+      contact-rots is list of contact coords rotation[rad].
+      If contact-rots is specified, grasp matrix as follow:
+       | R1    0  R2    0  ... |
+       | p1xR1 R1 p2xR2 R2 ... |"
+   (let* ((contact-matrices (mapcar #'(lambda (p r) (m* (outer-product-matrix (scale 1e-3 p)) r)) contact-points contact-rots)))
      (dotimes (c (length contact-points))
        (dotimes (i 3)
-	 (setf (aref ret i (+ (* c 6) i)) 1.0)
-	 (setf (aref ret (+ 3 i) (+ (* c 6) 3 i)) 1.0)
-	 (dotimes (j 3)
-	   (setf (aref ret (+ 3 i) (+ (* c 6) j)) (aref (elt contact-matrices c) i j))
-	   )))
+         (dotimes (j 3)
+           (setf (aref ret i (+ (* c 6) j)) (aref (elt contact-rots c) i j))
+           (setf (aref ret (+ 3 i) (+ (* c 6) 3 j)) (aref (elt contact-rots c) i j))
+           (setf (aref ret (+ 3 i) (+ (* c 6) j)) (aref (elt contact-matrices c) i j))
+           )))
      ret))
   ;; closed loop kinematics method
   (:inverse-kinematics-for-closed-loop-forward-kinematics

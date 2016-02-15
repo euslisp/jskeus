@@ -958,5 +958,44 @@
     (assert (eps-v= sbp1 sbp2) "Check equality of sbp1 and sbp2")
     ))
 
+(deftest test-calc-grasp-matrix
+  (let* ((size (1+ (random 10)))
+         (contact-points (mapcar #'(lambda (x) (random-vector)) (make-list size)))
+         (contact-rots (mapcar #'(lambda (x) (rpy-matrix (deg2rad (- (random 180.0) 90.0)) (deg2rad (- (random 180.0) 90.0)) (deg2rad (- (random 180.0) 90.0))))
+                               (make-list size)))
+         (world-force-list (mapcar #'(lambda (x) (random-vector)) (make-list size)))
+         (world-moment-list (mapcar #'(lambda (x) (random-vector)) (make-list size)))
+         (local-force-list (mapcar #'(lambda (f r) (transform (transpose r) f)) world-force-list contact-rots))
+         (local-moment-list (mapcar #'(lambda (n r) (transform (transpose r) n)) world-moment-list contact-rots)))
+    (warn ";; test-grasp-matrix size = ~A~%" size)
+    (let ((ret1
+           ;; Direct calculation
+           (concatenate float-vector
+                        (reduce #'v+ world-force-list :initial-value (float-vector 0 0 0))
+                        (v+
+                         (reduce #'v+ (mapcar #'(lambda (p f) (v* (scale 1e-3 p) f)) contact-points world-force-list)
+                                 :initial-value (float-vector 0 0 0))
+                         (reduce #'v+ world-moment-list :initial-value (float-vector 0 0 0)))))
+          (ret2
+           ;; World grasp matrix
+           (transform
+            (send *sample-robot* :calc-grasp-matrix contact-points)
+            (apply
+             #'concatenate
+             float-vector
+             (flatten
+              (mapcar #'(lambda (f m) (list f m)) world-force-list world-moment-list)))))
+          (ret3
+           ;; Local grasp matrix
+           (transform
+            (send *sample-robot* :calc-grasp-matrix contact-points :contact-rots contact-rots)
+            (apply
+             #'concatenate
+             float-vector
+             (flatten
+              (mapcar #'(lambda (f m) (list f m)) local-force-list local-moment-list))))))
+      (and (eps-v= ret1 ret2) (eps-v= ret1 ret3))
+      )))
+
 (run-all-tests)
 (exit 0)
