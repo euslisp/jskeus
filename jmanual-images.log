@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2016.2.14)  14 FEB 2016 05:59
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2016.2.15)  15 FEB 2016 12:30
 entering extended mode
  %&-line parsing enabled.
 **./jmanual-images.tex
@@ -69,7 +69,7 @@ File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
 ) (/usr/share/texmf-texlive/tex/latex/base/makeidx.sty
 Package: makeidx 2000/03/29 v1.0m Standard LaTeX package
-) (/tmp/tmp.SwA7HWbFwk/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
+) (/tmp/tmp.IRAV0shedb/mytabbing.sty) (/usr/share/texmf-texlive/tex/latex/fancy
 hdr/fancyheadings.sty
 Package: fancyheadings 2008/02/04 1.99 Dummy package to call fancyhdr
 
@@ -2154,243 +2154,252 @@ l2hSize :emtabbing52964:298.84526pt::0.0pt::724.7059pt.
 
 
 ]
-Overfull \hbox (163.06923pt too wide) detected at line 3008
+Overfull \hbox (98.48483pt too wide) detected at line 3008
 [] [] []
  []
 
-l2hSize :emtabbing52975:118.84526pt::0.0pt::534.5354pt.
+l2hSize :emtabbing52975:46.84526pt::0.0pt::492.29523pt.
 [288
 
 
 ]
-l2hSize :emtabbing53026:46.84526pt::0.0pt::485.3483pt.
+Overfull \hbox (163.06923pt too wide) detected at line 3019
+[] [] []
+ []
+
+l2hSize :emtabbing52986:118.84526pt::0.0pt::534.5354pt.
 [289
 
 
 ]
-Overfull \hbox (147.58998pt too wide) detected at line 3036
-[] [] []
- []
-
-l2hSize :emtabbing55037:58.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing53037:46.84526pt::0.0pt::485.3483pt.
 [290
 
 
 ]
-Overfull \hbox (121.22765pt too wide) detected at line 3048
+Overfull \hbox (147.58998pt too wide) detected at line 3047
 [] [] []
  []
 
-l2hSize :emtabbing55172:58.84526pt::0.0pt::475.09393pt.
+l2hSize :emtabbing55037:58.84526pt::0.0pt::349.0pt.
 [291
 
 
 ]
-l2hSize :emtabbing55820:70.84526pt::0.0pt::929.40454pt.
+Overfull \hbox (121.22765pt too wide) detected at line 3059
+[] [] []
+ []
+
+l2hSize :emtabbing55172:58.84526pt::0.0pt::475.09393pt.
 [292
 
 
 ]
-Overfull \hbox (11.62842pt too wide) detected at line 3073
-[] [] []
- []
-
-l2hSize :emtabbing55831:94.84526pt::0.0pt::958.85724pt.
+l2hSize :emtabbing55820:70.84526pt::0.0pt::929.40454pt.
 [293
 
 
 ]
-l2hSize :emtabbing55862:142.84526pt::0.0pt::915.6769pt.
+Overfull \hbox (11.62842pt too wide) detected at line 3084
+[] [] []
+ []
+
+l2hSize :emtabbing55831:94.84526pt::0.0pt::958.85724pt.
 [294
 
 
 ]
-Overfull \hbox (115.36815pt too wide) detected at line 3107
-[] [] []
- []
-
-l2hSize :emtabbing55873:46.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing55862:142.84526pt::0.0pt::915.6769pt.
 [295
 
 
 ]
-Overfull \hbox (31.49773pt too wide) detected at line 3118
+Overfull \hbox (115.36815pt too wide) detected at line 3118
 [] [] []
  []
 
-l2hSize :emtabbing55884:202.84526pt::0.0pt::639.47891pt.
+l2hSize :emtabbing55873:46.84526pt::0.0pt::349.0pt.
 [296
 
 
 ]
-Overfull \hbox (5.34398pt too wide) detected at line 3142
+Overfull \hbox (31.49773pt too wide) detected at line 3129
 [] [] []
  []
 
-l2hSize :emtabbing55905:94.84526pt::0.0pt::1506.12279pt.
+l2hSize :emtabbing55884:202.84526pt::0.0pt::639.47891pt.
 [297
 
 
 ]
-l2hSize :emtabbing55926:46.84526pt::0.0pt::349.0pt.
+Overfull \hbox (5.34398pt too wide) detected at line 3153
+[] [] []
+ []
+
+l2hSize :emtabbing55905:94.84526pt::0.0pt::1506.12279pt.
 [298
 
 
 ]
-Overfull \hbox (254.36858pt too wide) detected at line 3168
-[] [] []
- []
-
-l2hSize :emtabbing55937:106.84526pt::0.0pt::1281.0745pt.
+l2hSize :emtabbing55926:46.84526pt::0.0pt::349.0pt.
 [299
 
 
 ]
-Overfull \hbox (60.9908pt too wide) detected at line 3184
+Overfull \hbox (254.36858pt too wide) detected at line 3179
 [] [] []
  []
 
-l2hSize :emtabbing55948:178.84526pt::0.0pt::1148.90198pt.
+l2hSize :emtabbing55937:106.84526pt::0.0pt::1281.0745pt.
 [300
 
 
 ]
-LaTeX Font Info:    Try loading font information for OML+cmr on input line 3205
+Overfull \hbox (60.9908pt too wide) detected at line 3195
+[] [] []
+ []
+
+l2hSize :emtabbing55948:178.84526pt::0.0pt::1148.90198pt.
+[301
+
+
+]
+LaTeX Font Info:    Try loading font information for OML+cmr on input line 3216
 .
 (/usr/share/texmf-texlive/tex/latex/base/omlcmr.fd
 File: omlcmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OML/cmr/bx/n' in size <10> not available
-(Font)              Font shape `OML/cmm/b/it' tried instead on input line 3205.
+(Font)              Font shape `OML/cmm/b/it' tried instead on input line 3216.
 
 
-Overfull \hbox (168.52046pt too wide) detected at line 3206
+Overfull \hbox (168.52046pt too wide) detected at line 3217
 [] [] []
  []
 
 l2hSize :emtabbing55969:94.84526pt::0.0pt::1011.09976pt.
-[301
-
-
-]
-Overfull \hbox (341.7638pt too wide) detected at line 3221
-[] [] []
- []
-
-l2hSize :emtabbing56020:82.84526pt::0.0pt::580.72523pt.
 [302
 
 
 ]
-l2hSize :emtabbing56899:46.84526pt::0.0pt::349.0pt.
+Overfull \hbox (341.7638pt too wide) detected at line 3232
+[] [] []
+ []
+
+l2hSize :emtabbing56020:82.84526pt::0.0pt::580.72523pt.
 [303
 
 
 ]
-l2hSize :emtabbing56960:106.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing56899:46.84526pt::0.0pt::349.0pt.
 [304
 
 
 ]
-l2hSize :emtabbing57081:46.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing56960:106.84526pt::0.0pt::349.0pt.
 [305
 
 
 ]
-l2hSize :emtabbing57102:46.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing57081:46.84526pt::0.0pt::349.0pt.
 [306
 
 
 ]
-l2hSize :emtabbing57178:154.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing57102:46.84526pt::0.0pt::349.0pt.
 [307
 
 
 ]
-l2hSize :emtabbing57554:46.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing57178:154.84526pt::0.0pt::349.0pt.
 [308
 
 
 ]
-l2hSize :emtabbing58085:166.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing57554:46.84526pt::0.0pt::349.0pt.
 [309
 
 
 ]
-l2hSize :emtabbing58227:154.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing58085:166.84526pt::0.0pt::349.0pt.
 [310
 
 
 ]
-l2hSize :emtabbing58299:130.84526pt::0.0pt::465.26807pt.
+l2hSize :emtabbing58227:154.84526pt::0.0pt::349.0pt.
 [311
 
 
 ]
-l2hSize :emtabbing60230:58.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing58299:130.84526pt::0.0pt::465.26807pt.
 [312
 
 
 ]
-l2hSize :emtabbing60398:58.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing60230:58.84526pt::0.0pt::349.0pt.
 [313
 
 
 ]
-l2hSize :emtabbing60721:58.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing60398:58.84526pt::0.0pt::349.0pt.
 [314
 
 
 ]
-l2hSize :emtabbing63281:154.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing60721:58.84526pt::0.0pt::349.0pt.
 [315
 
 
 ]
-l2hSize :emtabbing63382:46.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing63281:154.84526pt::0.0pt::349.0pt.
 [316
 
 
 ]
-l2hSize :emtabbing63393:46.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing63382:46.84526pt::0.0pt::349.0pt.
 [317
 
 
 ]
-l2hSize :emtabbing63404:118.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing63393:46.84526pt::0.0pt::349.0pt.
 [318
 
 
 ]
-l2hSize :emtabbing63415:46.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing63404:118.84526pt::0.0pt::349.0pt.
 [319
 
 
 ]
-l2hSize :emtabbing66678:58.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing63415:46.84526pt::0.0pt::349.0pt.
 [320
 
 
 ]
-l2hSize :emtabbing66689:46.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing66678:58.84526pt::0.0pt::349.0pt.
 [321
 
 
 ]
-LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <10> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 3519.
-
-l2hSize :emtabbing67891:58.84526pt::0.0pt::349.0pt.
+l2hSize :emtabbing66689:46.84526pt::0.0pt::349.0pt.
 [322
 
 
 ]
-Overfull \hbox (10.30089pt too wide) detected at line 3529
+LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <10> not available
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 3530.
+
+l2hSize :emtabbing67891:58.84526pt::0.0pt::349.0pt.
+[323
+
+
+]
+Overfull \hbox (10.30089pt too wide) detected at line 3540
 [] [] []
  []
 
 l2hSize :emtabbing67912:46.84526pt::0.0pt::349.0pt.
-[323
+[324
 
 
 ] (./jmanual-images.aux) ) 
@@ -2403,4 +2412,4 @@ Here is how much of TeX's memory you used:
  28 hyphenation exceptions out of 8191
  28i,17n,45p,400b,412s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on jmanual-images.dvi (324 pages, 106632 bytes).
+Output written on jmanual-images.dvi (325 pages, 107060 bytes).

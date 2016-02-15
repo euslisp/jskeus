@@ -1693,6 +1693,41 @@ nil                    : do not dump log.
  WIDTH="1151" HEIGHT="436" ALIGN="BOTTOM" BORDER="0"
  SRC="jmanual-img288.png"
  ALT="\begin{emtabbing}
+{\bf :calc-grasp-matrix}
+\it contact-points \&amp;key \= (ret (ma...
+...pcar \char93 '(lambda (r) (unit-matrix 3)) contact-points))
+\rm
+\end{emtabbing}">
+<BR>
+
+<DL COMPACT>
+<DT> 
+<DD>Calc grasp matrix.
+<BR>
+Grasp matrix is defined as
+<BR>       | E_3 0   E_3 0   ... |
+<BR>       | p1x E_3 p2x E_3 ... |
+<BR>
+Arguments:
+<BR>
+contact-points is list of contact points[mm].
+<BR>
+contact-rots is list of contact coords rotation[rad].
+<BR>
+If contact-rots is specified, grasp matrix as follow:
+<BR>       | R1    0  R2    0  ... |
+<BR>       | p1xR1 R1 p2xR2 R2 ... |
+</DD>
+</DL>
+<BR>
+<BR>
+
+<A NAME="52985"></A>
+<BR>
+<IMG
+ WIDTH="781" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
+ SRC="jmanual-img289.png"
+ ALT="\begin{emtabbing}
 {\bf :inverse-kinematics-for-closed-loop-forward-kinematics}
 ...
 ...t-angle-list) \\
@@ -1718,7 +1753,7 @@ constrained-joint-angle-list is list of joint-angle for constrained-joint-list.
 <BR>
 <BR>
 
-<A NAME="52985"></A>
+<A NAME="52996"></A>
 <B>:calc-jacobian-for-interlocking-joints</B> <EM>link-list &amp;key (interlocking-joint-pairs (send self :interlocking-joint-pairs))  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1731,7 +1766,7 @@ dtheta_0 = dtheta_1 =&gt;[... 0 1 0 ... 0 -1 0 .... ][...dtheta_0...dtheta_1...]
 <BR>
 <BR>
 
-<A NAME="52995"></A>
+<A NAME="53006"></A>
 <B>:calc-vel-for-interlocking-joints</B> <EM>link-list &amp;key (interlocking-joint-pairs (send self :interlocking-joint-pairs))  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1742,7 +1777,7 @@ dtheta_0 = dtheta_1 =&gt;[... 0 1 0 ... 0 -1 0 .... ][...dtheta_0...dtheta_1...]
 <BR>
 <BR>
 
-<A NAME="53005"></A>
+<A NAME="53016"></A>
 <B>:set-midpoint-for-interlocking-joints</B> <EM>&amp;key (interlocking-joint-pairs (send self :interlocking-joint-pairs))  </EM>[メソッド]
 
 <DL COMPACT>
@@ -1753,7 +1788,7 @@ dtheta_0 = dtheta_1 =&gt;[... 0 1 0 ... 0 -1 0 .... ][...dtheta_0...dtheta_1...]
 <BR>
 <BR>
 
-<A NAME="53015"></A>
+<A NAME="53026"></A>
 <B>:interlocking-joint-pairs</B> [メソッド]
 
 <DL COMPACT>
@@ -1768,11 +1803,11 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <BR>
 
-<A NAME="53025"></A>
+<A NAME="53036"></A>
 <BR>
 <IMG
  WIDTH="849" HEIGHT="149" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img289.png"
+ SRC="jmanual-img290.png"
  ALT="\begin{emtabbing}
 {\bf :check-interlocking-joint-angle-validity}
 \it\&amp;key \= (a...
@@ -1790,7 +1825,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 <SMALL CLASS="FOOTNOTESIZE">
-<A NAME="53036"></A>
+<A NAME="53047"></A>
 <B>:update-descendants</B> <EM>&amp;rest args  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1804,7 +1839,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53047"></A>
+<A NAME="53058"></A>
 <B>:find-link-route</B> <EM>to &amp;optional from  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1818,7 +1853,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53058"></A>
+<A NAME="53069"></A>
 <B>:make-joint-min-max-table</B> <EM>l0 l1 joint0 joint1 &amp;key (fat 0) (fat2 nil) (debug nil) (margin 0.0) (overwrite-collision-model nil)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1832,7 +1867,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53069"></A>
+<A NAME="53080"></A>
 <B>:make-min-max-table-using-collision-check</B> <EM>l0 l1 joint0 joint1 joint-range0 joint-range1 min-joint0 min-joint1 fat fat2 debug margin  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1846,7 +1881,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53080"></A>
+<A NAME="53091"></A>
 <B>:plot-joint-min-max-table-common</B> <EM>joint0 joint1  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1860,7 +1895,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53091"></A>
+<A NAME="53102"></A>
 <B>:calc-target-axis-dimension</B> <EM>rotation-axis translation-axis  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1874,7 +1909,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53102"></A>
+<A NAME="53113"></A>
 <B>:calc-union-link-list</B> <EM>link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1888,7 +1923,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53113"></A>
+<A NAME="53124"></A>
 <B>:calc-target-joint-dimension</B> <EM>link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1902,7 +1937,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53124"></A>
+<A NAME="53135"></A>
 <B>:calc-inverse-jacobian</B> <EM>jacobi &amp;rest args &amp;key ((:manipulability-limit ml) 0.1) ((:manipulability-gain mg) 0.001) weight debug-view ret wmat tmat umat umat2 mat-tmp mat-tmp-rc tmp-mrr tmp-mrr2 &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1916,7 +1951,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53135"></A>
+<A NAME="53146"></A>
 <B>:calc-gradh-from-link-list</B> <EM>link-list &amp;optional (res (instantiate float-vector (length link-list)))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1930,7 +1965,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53146"></A>
+<A NAME="53157"></A>
 <B>:calc-joint-angle-speed</B> <EM>union-vel &amp;rest args &amp;key angle-speed (angle-speed-blending 0.5) jacobi jacobi# null-space i-j#j debug-view weight wmat tmp-len tmp-len2 fik-len &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1944,7 +1979,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53157"></A>
+<A NAME="53168"></A>
 <B>:calc-joint-angle-speed-gain</B> <EM>union-link-list dav periodic-time  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1958,7 +1993,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53168"></A>
+<A NAME="53179"></A>
 <B>:collision-avoidance-links</B> <EM>&amp;optional l  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1972,7 +2007,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53179"></A>
+<A NAME="53190"></A>
 <B>:collision-avoidance-link-pair-from-link-list</B> <EM>link-lists &amp;key obstacles ((:collision-avoidance-links collision-links) collision-avoidance-links) debug  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -1986,7 +2021,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53190"></A>
+<A NAME="53201"></A>
 <B>:collision-avoidance-calc-distance</B> <EM>&amp;rest args &amp;key union-link-list (warnp t) ((:collision-avoidance-link-pair pair-list)) ((:collision-distance-limit distance-limit) 10) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2000,7 +2035,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53201"></A>
+<A NAME="53212"></A>
 <B>:collision-avoidance-args</B> <EM>pair link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2014,7 +2049,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53212"></A>
+<A NAME="53223"></A>
 <B>:collision-avoidance</B> <EM>&amp;rest args &amp;key avoid-collision-distance avoid-collision-joint-gain avoid-collision-null-gain ((:collision-avoidance-link-pair pair-list)) (union-link-list) (link-list) (weight) (fik-len (send self :calc-target-joint-dimension union-link-list)) debug-view &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2028,7 +2063,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53223"></A>
+<A NAME="53234"></A>
 <B>:move-joints</B> <EM>union-vel &amp;rest args &amp;key union-link-list (periodic-time 0.05) (joint-args) (debug-view nil) (move-joints-hook) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2042,7 +2077,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53234"></A>
+<A NAME="53245"></A>
 <B>:find-joint-angle-limit-weight-old-from-union-link-list</B> <EM>union-link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2056,7 +2091,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53245"></A>
+<A NAME="53256"></A>
 <B>:reset-joint-angle-limit-weight-old</B> <EM>union-link-list  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2070,7 +2105,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53256"></A>
+<A NAME="53267"></A>
 <B>:calc-weight-from-joint-limit</B> <EM>avoid-weight-gain fik-len link-list union-link-list debug-view weight tmp-weight tmp-len  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2084,7 +2119,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53267"></A>
+<A NAME="53278"></A>
 <B>:calc-inverse-kinematics-weight-from-link-list</B> <EM>link-list &amp;key (avoid-weight-gain 1.0) (union-link-list (send self :calc-union-link-list link-list)) (fik-len (send self :calc-target-joint-dimension union-link-list)) (weight (fill (instantiate float-vector fik-len) 1)) (additional-weight-list) (debug-view) (tmp-weight (instantiate float-vector fik-len)) (tmp-len (instantiate float-vector fik-len))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2098,7 +2133,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53278"></A>
+<A NAME="53289"></A>
 <B>:calc-nspace-from-joint-limit</B> <EM>avoid-nspace-gain union-link-list weight debug-view tmp-nspace  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2112,7 +2147,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53289"></A>
+<A NAME="53300"></A>
 <B>:calc-inverse-kinematics-nspace-from-link-list</B> <EM>link-list &amp;key (avoid-nspace-gain 0.01) (union-link-list (send self :calc-union-link-list link-list)) (fik-len (send self :calc-target-joint-dimension union-link-list)) (null-space) (debug-view) (additional-nspace-list) (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil) (weight (fill (instantiate float-vector fik-len) 1.0)) (update-mass-properties t) (tmp-nspace (instantiate float-vector fik-len))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2126,7 +2161,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53300"></A>
+<A NAME="53311"></A>
 <B>:move-joints-avoidance</B> <EM>union-vel &amp;rest args &amp;key union-link-list link-list (fik-len (send self :calc-target-joint-dimension union-link-list)) (weight (fill (instantiate float-vector fik-len) 1)) (null-space) (avoid-nspace-gain 0.01) (avoid-weight-gain 1.0) (avoid-collision-distance 200) (avoid-collision-null-gain 1.0) (avoid-collision-joint-gain 1.0) ((:collision-avoidance-link-pair pair-list) (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args)))) (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil) (additional-weight-list) (additional-nspace-list) (tmp-len (instantiate float-vector fik-len)) (tmp-len2 (instantiate float-vector fik-len)) (tmp-weight (instantiate float-vector fik-len)) (tmp-nspace (instantiate float-vector fik-len)) (tmp-mcc (make-matrix fik-len fik-len)) (tmp-mcc2 (make-matrix fik-len fik-len)) (debug-view) (jacobi) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2140,7 +2175,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53311"></A>
+<A NAME="53322"></A>
 <B>:inverse-kinematics-args</B> <EM>&amp;rest args &amp;key union-link-list rotation-axis translation-axis additional-jacobi-dimension &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2154,7 +2189,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53322"></A>
+<A NAME="53333"></A>
 <B>:draw-collision-debug-view</B> </SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2168,7 +2203,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53333"></A>
+<A NAME="53344"></A>
 <B>:ik-convergence-check</B> <EM>success dif-pos dif-rot rotation-axis translation-axis thre rthre centroid-thre target-centroid-pos centroid-offset-func cog-translation-axis &amp;key (update-mass-properties t)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2182,7 +2217,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53344"></A>
+<A NAME="53355"></A>
 <B>:calc-vel-from-pos</B> <EM>dif-pos translation-axis &amp;rest args &amp;key (p-limit 100.0) (tmp-v0 (instantiate float-vector 0)) (tmp-v1 (instantiate float-vector 1)) (tmp-v2 (instantiate float-vector 2)) (tmp-v3 (instantiate float-vector 3)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2196,7 +2231,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53355"></A>
+<A NAME="53366"></A>
 <B>:calc-vel-from-rot</B> <EM>dif-rot rotation-axis &amp;rest args &amp;key (r-limit 0.5) (tmp-v0 (instantiate float-vector 0)) (tmp-v1 (instantiate float-vector 1)) (tmp-v2 (instantiate float-vector 2)) (tmp-v3 (instantiate float-vector 3)) &amp;allow-other-keys  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2210,7 +2245,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53366"></A>
+<A NAME="53377"></A>
 <B>:collision-check-pairs</B> <EM>&amp;key ((:links ls) (cons (car links) (all-child-links (car links))))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
@@ -2224,22 +2259,8 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 
 
-<A NAME="53377"></A>
-<B>:self-collision-check</B> <EM>&amp;key (mode :all) (pairs (send self :collision-check-pairs)) (collision-func 'pqp-collision-check)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
-
-</SMALL>
-
-<DL COMPACT>
-<DT> 
-<DD>  
-</DD>
-</DL><SMALL CLASS="FOOTNOTESIZE">
-<BR>
-<BR>
-
-
 <A NAME="53388"></A>
-<B>:calc-grasp-matrix</B> <EM>contact-points &amp;optional (ret (make-matrix 6 (6 (length contact-points))))  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
+<B>:self-collision-check</B> <EM>&amp;key (mode :all) (pairs (send self :collision-check-pairs)) (collision-func 'pqp-collision-check)  </EM></SMALL><SMALL CLASS="FOOTNOTESIZE">[メソッド] 
 
 </SMALL>
 
@@ -2530,7 +2551,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <IMG
  WIDTH="770" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img290.png"
+ SRC="jmanual-img291.png"
  ALT="\begin{emtabbing}
 {\bf :init}
 \it coords \&amp;rest args \&amp;key \= (name (intern (fo...
@@ -2703,7 +2724,7 @@ If users want to use interlocking joints, please overwrite this method.
 <BR>
 <IMG
  WIDTH="787" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img291.png"
+ SRC="jmanual-img292.png"
  ALT="\begin{emtabbing}
 {\bf make-fan-cylinder}
 \it geometry::radius geometry::height...
@@ -3004,7 +3025,7 @@ is defined by :angle keyword. and, the csg of the returned body is
 <BR>
 <IMG
  WIDTH="755" HEIGHT="54" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img292.png"
+ SRC="jmanual-img293.png"
  ALT="\begin{emtabbing}
 {\bf :inverse-kinematics}
 \it target-coords \&amp;rest args \&amp;key...
@@ -3030,7 +3051,7 @@ link-list is set by default based on move-target -&gt;root link link-list
 <BR>
 <IMG
  WIDTH="1477" HEIGHT="73" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img293.png"
+ SRC="jmanual-img294.png"
  ALT="\begin{emtabbing}
 {\bf :inverse-kinematics-loop}
 \it dif-pos dif-rot \&amp;rest arg...
@@ -3078,7 +3099,7 @@ link-list is set by default based on move-target -&gt;root link link-list
 <BR>
 <IMG
  WIDTH="1524" HEIGHT="111" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img294.png"
+ SRC="jmanual-img295.png"
  ALT="\begin{emtabbing}
 {\bf :torque-vector}
 \it\&amp;key \= (force-list) \\lq  [method]\\
@@ -3100,7 +3121,7 @@ link-list is set by default based on move-target -&gt;root link link-list
 <BR>
 <IMG
  WIDTH="1455" HEIGHT="188" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img295.png"
+ SRC="jmanual-img296.png"
  ALT="\begin{emtabbing}
 {\bf :calc-force-from-joint-torque}
 \it limb all-torque \&amp;key...
@@ -3122,7 +3143,7 @@ link-list is set by default based on move-target -&gt;root link link-list
 <BR>
 <IMG
  WIDTH="736" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img296.png"
+ SRC="jmanual-img297.png"
  ALT="\begin{emtabbing}
 {\bf :fullbody-inverse-kinematics}
 \it target-coords \&amp;rest a...
@@ -3170,7 +3191,7 @@ torso-j0 ... torso-jN
 <BR>
 <IMG
  WIDTH="1016" HEIGHT="283" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img297.png"
+ SRC="jmanual-img298.png"
  ALT="\begin{emtabbing}
 {\bf :calc-zmp-from-forces-moments}
 \it forces moments \&amp;key ...
@@ -3208,7 +3229,7 @@ In the following codes, leged robot is assumed.
 <BR>
 <IMG
  WIDTH="2394" HEIGHT="111" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img298.png"
+ SRC="jmanual-img299.png"
  ALT="\begin{emtabbing}
 {\bf :fix-leg-to-coords}
 \it fix-coords \&amp;optional (l/r :both) \&amp;key \= (mid 0.5) \\lq  [method]\\
@@ -3231,7 +3252,7 @@ In the following codes, leged robot is assumed.
 <BR>
 <IMG
  WIDTH="552" HEIGHT="35" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img299.png"
+ SRC="jmanual-img300.png"
  ALT="\begin{emtabbing}
 {\bf :move-centroid-on-foot}
 \it leg fix-limbs \&amp;rest args \&amp;...
@@ -3257,7 +3278,7 @@ fix-limbs : limb names which are fixed in this IK.
 <BR>
 <IMG
  WIDTH="2036" HEIGHT="130" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img300.png"
+ SRC="jmanual-img301.png"
  ALT="\begin{emtabbing}
 {\bf :calc-walk-pattern-from-footstep-list}
 \it footstep-list...
@@ -3291,7 +3312,7 @@ fix-limbs : limb names which are fixed in this IK.
 <BR>
 <IMG
  WIDTH="1826" HEIGHT="245" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img301.png"
+ SRC="jmanual-img302.png"
  ALT="\begin{emtabbing}
 {\bf :go-pos-params-\textgreater footstep-list}
 \it xx yy th ...
@@ -3370,7 +3391,7 @@ linear-joint-name is the name of linear actuator.
 <BR>
 <IMG
  WIDTH="1607" HEIGHT="111" ALIGN="BOTTOM" BORDER="0"
- SRC="jmanual-img302.png"
+ SRC="jmanual-img303.png"
  ALT="\begin{emtabbing}
 {\bf :calc-static-balance-point}
 \it\&amp;key \= (target-points (...
@@ -3740,7 +3761,7 @@ static-balance-point-height is height of static balance point [mm].
 <!--End of Navigation Panel-->
 <ADDRESS>
 
-2016-02-14
+2016-02-15
 </ADDRESS>
 </BODY>
 </HTML>

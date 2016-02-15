@@ -3004,6 +3004,17 @@ $\displaystyle _{G} =  \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath 
 {\newpage\clearpage
 \lthtmlfigureA{emtabbing52975}%
 \begin{emtabbing}
+{\bf :calc-grasp-matrix} 
+\it contact-points \&key \= (ret (make-matrix 6 (\textasteriskcentered  6 (length contact-points)))) \` [method]\\
+\> (contact-rots (mapcar \#'(lambda (r) (unit-matrix 3)) contact-points)) 
+\rm
+\end{emtabbing}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{emtabbing52986}%
+\begin{emtabbing}
 {\bf :inverse-kinematics-for-closed-loop-forward-kinematics} 
 \it target-coords \&rest args \&key \= (move-target) \` [method]\\
 \> (link-list) \\
@@ -3019,7 +3030,7 @@ $\displaystyle _{G} =  \frac{1}{M_{r}} \left[ \begin{array}{cc} \mbox{\boldmath 
 \lthtmlcheckvsize\clearpage}
 
 {\newpage\clearpage
-\lthtmlfigureA{emtabbing53026}%
+\lthtmlfigureA{emtabbing53037}%
 \begin{emtabbing}
 {\bf :check-interlocking-joint-angle-validity} 
 \it\&key \= (angle-thre 0.001) \` [method]\\
