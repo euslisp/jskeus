@@ -97,18 +97,31 @@
                                                      head-end-coords torso-end-coords))))
      )
    )
+  ;; End-coords accessor
+  (:rarm-end-coords () rarm-end-coords)
+  (:larm-end-coords () larm-end-coords)
+  (:rleg-end-coords () rleg-end-coords)
+  (:lleg-end-coords () lleg-end-coords)
+  (:head-end-coords () head-end-coords)
+  (:torso-end-coords () torso-end-coords)
+  ;; Root-link accessor
+  (:rarm-root-link () rarm-root-link)
+  (:larm-root-link () larm-root-link)
+  (:rleg-root-link () rleg-root-link)
+  (:lleg-root-link () lleg-root-link)
+  (:head-root-link () head-root-link)
+  (:torso-root-link () torso-root-link)
   (:limb
    (limb method &rest args)
    (let (ret)
      (case method
        (:end-coords 
 	(user::forward-message-to 
-	 (cdr (assoc (intern (format nil "~A-END-COORDS" (string-upcase limb)))
-		     (send self :slots)))
+         (send self (read-from-string (format nil "~A-END-COORDS" limb)))
 	 args))
        (:root-link
 	(user::forward-message-to 
-	 (cdr (assoc (intern (format nil "~A-ROOT-LINK" (string-upcase limb))) (send self :slots)))
+         (send self (read-from-string (format nil "~A-ROOT-LINK" limb)))
 	 args))
        (:angle-vector
 	(if args
