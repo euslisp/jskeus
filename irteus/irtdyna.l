@@ -872,15 +872,18 @@
            :joint-acceleration-vector jav)
      ))
   (:calc-torque-from-ext-wrenches
-   (&key (force-list) (moment-list) (target-coords))
+   (&key (force-list) (moment-list) (target-coords) ((:jacobi tmp-jacobi)))
    (let* ((link-list (mapcar #'(lambda (tc) (send self :link-list (send tc :parent))) target-coords))
           (jacobi
-           (send self :calc-jacobian-from-link-list
-                 link-list
-                 :move-target target-coords
-                 :transform-coords (mapcar #'(lambda (x) (make-coords)) target-coords)
-                 :rotation-axis (make-list (length target-coords) :initial-element t)
-                 :translation-axis (make-list (length target-coords) :initial-element t)))
+           (if tmp-jacobi
+               tmp-jacobi
+             (send self :calc-jacobian-from-link-list
+                   link-list
+                   :move-target target-coords
+                   :transform-coords (mapcar #'(lambda (x) (make-coords)) target-coords)
+                   :rotation-axis (make-list (length target-coords) :initial-element t)
+                   :translation-axis (make-list (length target-coords) :initial-element t))
+             ))
           (wrenches
            (mapcar #'(lambda (f m) (concatenate float-vector f m)) force-list moment-list))
           (tq (transform (transpose jacobi)
