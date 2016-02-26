@@ -2063,7 +2063,7 @@
 		   rotation-axis translation-axis thre rthre
 		   centroid-thre target-centroid-pos centroid-offset-func cog-translation-axis
                    :update-mass-properties nil))
-       (if (and additional-check success)
+       (if additional-check
            (setq success (and success (funcall additional-check))))
 
        ;; calculation of move-coords velocities from vel-p and vel-r
