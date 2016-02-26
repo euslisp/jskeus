@@ -1112,10 +1112,11 @@
    "
    (let* (len ul row
 	  child-reverse union-link-list
-	  j)
+	  j jdim)
      (unless fik (setq fik (make-matrix dim fik-len)))
 ;;
      (setq union-link-list (send self :calc-union-link-list link-list))
+     (setq jdim (send self :calc-target-joint-dimension union-link-list))
      (if (atom (car link-list)) (setq link-list (list link-list)))
      (if (atom move-target) (setq move-target (list move-target)))
      (if (atom transform-coords) (setq transform-coords (list transform-coords)))
@@ -1124,7 +1125,7 @@
 ;;
      (do ((col col-offset (+ col (send j :joint-dof)))
 	  (i 0 (1+ i)))
-         ((>= col (+ col-offset (send self :calc-target-joint-dimension union-link-list))))
+         ((>= col (+ col-offset jdim)))
        (setq ul (elt union-link-list i) row 0)
        (dotimes (m (length link-list))
          (let ((link-list (elt link-list m))
