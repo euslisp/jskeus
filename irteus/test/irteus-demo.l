@@ -125,5 +125,9 @@
   (assert
    (test-virtual-joint-for-rotation-axis-all)))
 
+(deftest test-look-at-ik
+  (assert
+   (look-at-ik-all)))
+
 (run-all-tests)
 (exit)

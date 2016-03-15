@@ -14,6 +14,7 @@
 (load "closed-loop.l")
 (load "special-joints.l")
 (load "virtual-joints.l")
+(load "look-at-ik.l")
 
 (unless (boundp '*irtviewer*) (make-irtviewer))
 #+:jsk
