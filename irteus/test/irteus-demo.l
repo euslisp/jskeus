@@ -48,6 +48,11 @@
    (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
                              (trot-walk-motion-for-sample-robot :go-backward-over nil))))))
 
+(deftest test-trot-walk-motion-for-sample-robot-with-sphere-hand
+  (assert
+   (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
+                             (trot-walk-motion-for-sample-robot :go-backward-over nil :rotation-axis (list t t nil nil)))))))
+
 (deftest test-crawl-walk-motion-for-sample-robot-go-backward-over
   (assert
    (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
