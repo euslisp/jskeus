@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.12 (2016-03-20)
+-------------------
 
 * Walking for Quadruped Robot (https://github.com/euslisp/jskeus/issues/353)
 
