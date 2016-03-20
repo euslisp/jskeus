@@ -73,7 +73,7 @@ EusLispのリーダとプリンタは、どのようなオブジェクトも再�
 <P>
 
  <BR>
-<BR> <A NAME="19179"></A>
+<BR> <A NAME="19185"></A>
 <B>dump-object</B> <EM>file &amp;rest objects </EM>[関数]
 
 <DL COMPACT>
@@ -84,7 +84,7 @@ EusLispのリーダとプリンタは、どのようなオブジェクトも再�
 <BR>
 <BR>
 
-<A NAME="19190"></A>
+<A NAME="19196"></A>
 <B>dump-structure</B> <EM>file &amp;rest objects </EM>[関数]
 
 <DL COMPACT>
@@ -98,7 +98,7 @@ EusLispのリーダとプリンタは、どのようなオブジェクトも再�
 
 <P>
 
-<A NAME="19202"></A>
+<A NAME="19208"></A>
 <B>dump-loadable-structure</B> <EM>file &amp;rest symbols </EM>[関数]
 
 <DL COMPACT>
@@ -112,10 +112,34 @@ EusLispのリーダとプリンタは、どのようなオブジェクトも再�
 <BR>
 
              <P>
+<PRE>
+(setq a (make-cube 1 2 3))
+
+;; sample for dump-object
+(dump-object "a-cube.l" a)
+(with-open-file
+  (f "a-cube.l" :direction :input)
+  (setq a (read f)))
+(print a)
+
+;; sample for dump-structure
+(dump-structure "a-cube.l" a)
+(with-open-file
+  (f "a-cube.l" :direction :input)
+  (setq a (read f)))
+(print a)
+
+;; sample for dump-loadable-structure
+(dump-loadable-structure "a-cube.l" a)
+(load "a-cube.l")
+(print a)
+</PRE>
+
+<P>
 <BR><HR>
 <ADDRESS>
 
-2016-03-15
+2016-03-20
 </ADDRESS>
 </BODY>
 </HTML>
