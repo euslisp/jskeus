@@ -105,5 +105,18 @@
     (setq f2 (make-array (list 2 2) :element-type :float))
     ))
 
+(deftest nan-inf-read
+  (let (v1 v2)
+    (setq v1 (float-vector (/ 1.0 0.0) (/ -1.0 0.0) (/ 0.0 0.0)))
+    (format *error-output* "v1 = ~A~%" v1)
+    (dump-structure "/tmp/test-v-dump-structure.l" v1)
+    (with-open-file (f "/tmp/test-v-dump-structure.l" :direction :input)
+     (setq v2 (read f)))
+    (format *error-output* "v2 = ~A~%" v2)
+    (assert (eq (elt v1 0) (elt v2 0)))
+    (assert (eq (elt v1 1) (elt v2 1)))
+    (assert (eq (elt v1 2) (elt v2 2)))
+    t))
+
 (run-all-tests)
 (exit)
