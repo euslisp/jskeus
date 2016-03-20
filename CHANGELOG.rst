@@ -2,6 +2,101 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
+* Walking for Quadruped Robot (https://github.com/euslisp/jskeus/issues/353)
+
+  * [irteus/demo/walk-motion.l, irteus/test/irteus-demo.l] add a calc-walk-pattern-from-footstep-list test for rotation-axis option
+  * [irteus/irtdyna.l] match the order of target-coords and link-list and rotation-axis, translation-axis, thre, rthre and so on
+
+* Fullbody Look at (https://github.com/euslisp/jskeus/issues/351)
+
+  * [jskeus/irteus/demo,test] add test for look-at ik.
+  * [jskeus/irteus/demo] add look-at-ik.l
+
+* Speed up access to end-coords (https://github.com/euslisp/jskeus/pull/342)
+
+  * [irteus/irtrobot.l] Fasten access for end-coords and root-link by not using assoc searching
+
+* Update :calc-grasp-matrix (https://github.com/euslisp/jskeus/pull/341)
+
+  * [irteus/test/test-irt-motion.l] Add test code for calc-grasp-matrix
+  * [irteus/irtmodel.l] Update :calc-grasp-matrix. Add documentation string and support rotation matrices.
+
+* Add example for irtscene (https://github.com/euslisp/jskeus/pull/340)
+
+  * [irteus/demo/scene.l] add sample code for irtscene
+
+* update Collision codes  (https://github.com/euslisp/jskeus/pull/339)
+
+  * [irteus/irtmodel.l] Enable to change distance-limit for collision-checking
+  * [irteus/irtmodel.l] Add comment for what is included in col-list.
+
+* add sample program for virtual joint  (https://github.com/euslisp/jskeus/pull/338)
+
+  * [demo/demo.l,virtual-joints.l,test/irteus-demo.l] Add example for virtual joint and include it in unittest for irt demos.
+
+* add make-fan-cylinder function (https://github.com/euslisp/jskeus/pull/337)
+
+  * [irteus/irtgeo.l] Add make-fan-cylinder function from euslib/jsk/jskgeo.l
+
+* Fix rotation nchange bug of sphere/6dof-joint (https://github.com/euslisp/jskeus/pull/336)
+
+  * [irteus/irtmodel.l] Fix rotation change bug of sphere-joint and 6dof-joint zero orientation setting, tested in the previous commit (test/test-irt-motion.l).
+  * [irteus/test/test-irt-motion.l] Add test for zero setting for orientation of 6dof-joint and sphere-joint. If zero vector is set as :joint-angle :relative t, worldrot should not change.
+
+* :calc-static-balance-point returns nan for the 1st time (https://github.com/euslisp/jskeus/issues/330)
+
+  * [irteus/irtrobot.l] Fix bug of omission of update-mass-properties.
+  * [irteus/test/test-irt-motion.l] Add test code to check the bug reported in https://github.com/euslisp/jskeus/issues/330#issuecomment-169544613
+
+* Fix coginit bug of calc-walk-pattern-from-footste-list (https://github.com/euslisp/jskeus/issues/286)
+
+  * [irteus/irtrobot.l] Use :centroid method. This is :update-mass-properties and getting :c-til. So, we can update total COG information on initializing of calc-walk-pattern-from-footstep-list.
+  * [irteus/test/test-irt-motion.l] Add test code for calc-walk-pattern-from-footstep-list. (https://github.com/euslisp/jskeus/issues/327)
+
+* Support output/input dimension more than 1 for Preview Control (https://github.com/euslisp/jskeus/issues/324)
+
+  * [irteus/irtdyna.l] Support output dimension > 1 and input dimension > 1 for Preview Control classes
+
+* OSX support (https://github.com/euslisp/jskeus/issues/315)
+
+  * Add installing description via homebrew
+  * Test HEAD version euslisp which is installed via Homebrew
+
+* Fixed code for displaying objects with hidden-line mode. (https://github.com/euslisp/jskeus/issues/308, https://github.com/euslisp/jskeus/issues/309)
+
+  * [irteus/demo/sample-camera-model.l] add sample for using hidden line mode with camera-model
+  * [irteus/irtsensor.l] add :select-drawmode method to camera-model
+  * [irteus/irtscene.l] add :(add|remove)-(object(s)|spot(s)) methods
+  * [irteus/irtgl.l] fix drawing hidden-line
+  * [irteus/irtviewer.l] fix :select-drawmode method in irtviewer
+
+* Enable to clear :ik-draw-on-params (https://github.com/euslisp/jskeus/issues/323)
+
+  * [irtmodel.l] Add explanations for inverse-kinematics visualization.
+  * [test/test-irt-motion.l] Add test for :ik-draw-on-params clear check
+  * [irteus/irtmodel.l] Clear :ik-draw-on-params at the end of :inverese-kinematics-loop (by garaemon)
+
+* write fk section in doc (https://github.com/euslisp/jskeus/issues/325)
+  * [doc/irtmodel.tex] add fk section in doc
+  * [doc/irtmodel.tex] add sample code for updating :analysis-level in manual
+
+* irtmodel, disdyna : misc updates
+
+  * [irteus/irtmodel.l] Check additional-check function if exists regardless of success flag. (https://github.com/euslisp/jskeus/pull/345)
+  * [irteus/irtdyna.l] Enable to set jacobi from outside of :calc-torque-from-ext-wrenches (https://github.com/euslisp/jskeus/pull/344)
+  * [irteus/irtmodel.l] Remove unnecessary calculation of target joint dimension (https://github.com/euslisp/jskeus/pull/343)
+  * [irteus/irtmodel.l] Remove unused local variables (https://github.com/euslisp/jskeus/pull/339)
+  * [jskeus/irtmodel.l] Add comment about joint order for :calc-jacobian-from-link-list (https://github.com/euslisp/jskeus/pull/335)
+  * [irteus/irtdyna.l] Add mass properties calculation doc. (https://github.com/euslisp/jskeus/issues/328)
+  * [doc/irtmodel.tex] Fix typo in doc/irtmodel.tex (https://github.com/euslisp/jskeus/issues/300)
+  * [irteus/demo/sample-camera-model.l] fix (sample-get-camera-image-2) https://github.com/euslisp/jskeus/issues/268
+  * [irteus/test/mathtest.l] fix random with random state (https://github.com/euslisp/jskeus/issues/298)
+
+* Contributors: Yuki Furuta, Kei Okada, Kentaro Wada, Kohei Kimura, Masaki Murooka, Shunichi Nozawa, Yohei Kakiuchi, Eisoku Kuroiwa,  Shinaro Noda
+
 1.0.11 (2015-11-02)
 -------------------
 
