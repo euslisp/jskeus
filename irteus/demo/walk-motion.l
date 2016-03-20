@@ -81,7 +81,7 @@
 (warn "(walk-motion-single-support-for-sample-robot) ;; for walking motion~%")
 
 (defun quad-walk-motion-for-sample-robot
-  (gen-footstep-func &key (go-backward-over t))
+  (gen-footstep-func &key (go-backward-over t) (rotation-axis (list t t t t)))
   (unless (boundp '*robot*)
     (setq *robot* (instance sample-robot :init)))
   ;; initial quad pose
@@ -106,6 +106,7 @@
          (list :min (float-vector -1e10 -1e10 -1e10 -180 -180 -180)
                :max (float-vector  1e10  1e10  1e10  180  180  180)
                :joint-args '(:absolute-p t)
+               :rotation-axis rotation-axis
                :additional-nspace-list
                (list
                 (list (car (send *robot* :links))
@@ -143,10 +144,11 @@
       )))
 
 (defun trot-walk-motion-for-sample-robot
-  (&key (go-backward-over t))
+  (&key (go-backward-over t) (rotation-axis (list t t nil nil)))
   (quad-walk-motion-for-sample-robot
    #'(lambda () (send *robot* :go-pos-quadruped-params->footstep-list 200 100 0 :type :trot))
-   :go-backward-over go-backward-over))
+   :go-backward-over go-backward-over
+   :rotation-axis rotation-axis))
 (warn "(trot-walk-motion-for-sample-robot) ;; for walking motion~%")
 
 (defun crawl-walk-motion-for-sample-robot

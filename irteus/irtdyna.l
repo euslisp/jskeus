@@ -1908,17 +1908,17 @@
   (:solve-av-by-move-centroid-on-foot
    (support-leg support-leg-coords swing-leg-coords cog robot
    &rest args &key (cog-gain 3.5) (stop 100) (additional-nspace-list) &allow-other-keys)
-   (let ((legs
-          (append (send self :get-counter-footstep-limbs support-leg)
-                  support-leg))
-         (fix-coords (append swing-leg-coords support-leg-coords)))
+   (let* ((legs (append (send self :get-counter-footstep-limbs support-leg)
+                        support-leg))
+          (leg-order (mapcar #'(lambda (l) (position l legs)) all-limbs))
+          (fix-coords (append swing-leg-coords support-leg-coords)))
      (unless (memq :thre args)
-       (append args (list :thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) ik-thre (* 5 ik-thre))) legs))))
+       (append args (list :thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) ik-thre (* 5 ik-thre))) all-limbs))))
      (unless (memq :rthre args)
-       (append args (list :rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) ik-rthre (* 5 ik-rthre)))) legs))))
+       (append args (list :rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) ik-rthre (* 5 ik-rthre)))) all-limbs))))
      (send* robot :move-centroid-on-foot
-            :both legs :target-centroid-pos cog
-            :fix-limbs-target-coords fix-coords
+            :both all-limbs :target-centroid-pos cog
+            :fix-limbs-target-coords (mapcar #'(lambda (idx) (elt fix-coords idx)) leg-order)
             :cog-gain cog-gain :stop stop
             :additional-nspace-list
             (append
