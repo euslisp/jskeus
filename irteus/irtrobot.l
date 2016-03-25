@@ -852,9 +852,19 @@
        (reverse ret))))
   (:go-pos-quadruped-params->footstep-list
    (xx yy th ;; [mm] [mm] [deg]
-       &key (type :crawl))
+       &key (type :crawl)
+       ((:footstep-parameter prm) (send self :footstep-parameter))
+       ((:default-half-offset defp) (cadr (memq :default-half-offset prm)))
+       ((:forward-offset-length xx-max) 100)
+       ((:outside-offset-length yy-max) (cadr (memq :outside-offset-length prm)))
+       ((:rotate-rad th-max) 3))
    "Calculate foot step list for quadruped walking from goal x position [mm], goal y position [mm], and goal yaw orientation [deg]."
-   (let ((biped-fsl (send self :go-pos-params->footstep-list xx yy th :forward-offset-length 100 :rotate-rad 3))
+   (let ((biped-fsl (send self :go-pos-params->footstep-list xx yy th
+                          :footstep-parameter prm
+                          :default-half-offset defp
+                          :forward-offset-length xx-max
+                          :outside-offset-length yy-max
+                          :rotate-rad th-max))
          quadruped-fsl)
      ;; calculate foot step list for quad walk
      (dolist (fs biped-fsl)
