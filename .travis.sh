@@ -23,7 +23,7 @@ function travis_time_end {
 }
 
 travis_time_start setup.apt-get_update
-sudo apt-get update -qq
+sudo apt-get update
 travis_time_end
 
 travis_time_start setup.apt-get_install
