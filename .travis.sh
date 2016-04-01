@@ -27,7 +27,7 @@ sudo apt-get update
 travis_time_end
 
 travis_time_start setup.apt-get_install
-sudo apt-get install -qq -y subversion gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi texlive-latex-base ptex-bin latex2html nkf poppler-utils # msttcorefonts could not install on 14.04 travis
+sudo apt-get install -qq -y git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi texlive-latex-base ptex-bin latex2html nkf poppler-utils # msttcorefonts could not install on 14.04 travis
 travis_time_end
 
 travis_time_start install # Use this to install any prerequisites or dependencies necessary to run your build
