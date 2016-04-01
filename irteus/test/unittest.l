@@ -32,12 +32,17 @@
 (run-all-tests)
 
 (setq ret -1)
-(format t "functions = ~A~%" (length (send *unit-test* :functions)))
+(format t "functions = ~A, num-tests =~A, num-failures = ~A, num-successes = ~A~%"
+        (length (send *unit-test* :functions))
+        (apply #'+ (send-all (send *unit-test* :result) :num-tests))
+        (apply #'+ (send-all (send *unit-test* :result) :num-failures))
+        (apply #'+ (send-all (send *unit-test* :result) :num-successes)))
 (send *unit-test* :result)
 (if (and (= (length (send *unit-test* :functions)) 4)
          (= (apply #'+ (send-all (send *unit-test* :result) :num-tests)) 4)
          (= (apply #'+ (send-all (send *unit-test* :result) :num-failures)) 1)
          (= (apply #'+ (send-all (send *unit-test* :result) :num-successes)) 3))
     (setq ret 0))
+(format t "return code = ~A~%" ret)
 (exit ret)
 
