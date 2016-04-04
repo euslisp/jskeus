@@ -27,7 +27,7 @@ script: # All commands must exit with code 0 on success. Anything else is consid
   - cd jskeus
   - make
   - source bashrc.eus
-  - find irteus/test -iname "*.l" | grep -v unittest.l | xargs -n1 irteusgl
+  - find irteus/test -iname "*.l" | xargs -n1 irteusgl
   # Test Homebrew formula
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install homebrew/x11/jskeus --HEAD; fi
