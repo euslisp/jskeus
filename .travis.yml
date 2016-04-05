@@ -1,8 +1,8 @@
 # Travis Continuous Integration Configuration File
-language:
-  - cpp
-compiler:
-  - gcc
+sudo: required
+dist: trusty
+language: generic
+cache: apt
 notifications:
   email:
     recipients:
@@ -11,53 +11,25 @@ notifications:
     on_failure: always #[always|never|change] # default: always
   slack: jsk-robotics:Av7tc8wj3IWkLYvlTzHE7x2g
 env:
-  - secure: "u0lUaQ+BR5IH2bJNmGPZ8Yp5/iroJiHNkADN6lvMMqS9FQc8kcEe74UgsTjMdteQXRsDTtJVmwB7UFB83bwwcKoVYwrGAdOfBkWM702hTgmEIqKTkBkaVyUjkzR/VrnVCHCLhQMysAuHQyPrEPjLlvmKiJJ/OYfRg2QCd74ef1I="
+  secure: "u0lUaQ+BR5IH2bJNmGPZ8Yp5/iroJiHNkADN6lvMMqS9FQc8kcEe74UgsTjMdteQXRsDTtJVmwB7UFB83bwwcKoVYwrGAdOfBkWM702hTgmEIqKTkBkaVyUjkzR/VrnVCHCLhQMysAuHQyPrEPjLlvmKiJJ/OYfRg2QCd74ef1I="
+  matrix:
+    - DISTRO=trusty
+    - DISTRO=xenial
+
 before_install: # Use this to prepare the system to install prerequisites or dependencies
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   # Define some config vars
   - export CI_SOURCE_PATH=$(pwd)
   - export REPOSITORY_NAME=${PWD##*/}
   - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq -y subversion gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi msttcorefonts texlive-latex-base ptex-bin latex2html nkf poppler-utils
-install: # Use this to install any prerequisites or dependencies necessary to run your build
-  - cd ${HOME}
-  - ln -s $CI_SOURCE_PATH jskeus
-script: # All commands must exit with code 0 on success. Anything else is considered failure.
-  - cd jskeus
-  - make
-  - source bashrc.eus
-  - find irteus/test -iname "*.l" | xargs -n1 irteusgl
+  - docker run --rm -i -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t ubuntu:$DISTRO sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"
   # Test Homebrew formula
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install homebrew/x11/jskeus --HEAD; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew test jskeus; fi
 after_success:
-  - export GIT_COMMITTER_NAME=$GIT_NAME
-  - export GIT_COMMITTER_EMAIL=$GIT_EMAIL
-  - export GIT_AUTHOR_NAME=$GIT_NAME
-  - export GIT_AUTHOR_EMAIL=$GIT_EMAIL
   - (cd doc/; pdftotext jmanual.pdf; mv jmanual.txt jmanual.txt.old; make; pdftotext jmanual.pdf)
   - (cd doc/; make html)
-  - cd doc
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then diff jmanual.txt jmanual.txt.old || (git add -f *.pdf *.dvi; git commit -m "add documents for $TRAVIS_COMMIT"); fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git checkout master;      fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git merge HEAD@{1};       fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git push --quiet https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git master; fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then cd ~/;    fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git clone --branch gh-pages https://github.com/$TRAVIS_REPO_SLUG doc;     fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then cd doc;   fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git reset --hard bb420562a8d224491784081ed51536d0e9aaf072
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then cp -r ~/jskeus/doc/html/* ./;     fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git add -f .;                     fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git commit -m "Build documents from $TRAVIS_COMMIT" . ;   fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git push -f --quiet https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git gh-pages; fi
-# upload to euslisp-docs
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git clone https://k-okada:$GH_TOKEN@github.com/jsk-ros-pkg/euslisp-docs.git /tmp/euslisp-docs; fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then cd /tmp/euslisp-docs; git remote rm origin; git remote add origin https://k-okada:$GH_TOKEN@github.com/jsk-ros-pkg/euslisp-docs.git; fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then cd ${CI_SOURCE_PATH}/doc; git clean -xfd; sed -i 's@rm -fr@#rm -fr@g' Makefile; sed -i 's@\euslisptrue@\euslispfalse@g' jmanual.tex; awk 'BEGIN{flg=1}; {if (/^\\ifeuslisp/) {flg=0}; if(flg>0)print; if (/^\\fi/) {flg=1} };' jmanual.tex > jmanual.tex.tmp; mv jmanual.tex.tmp jmanual.tex ; rm -fr html; make TMPDIR=/tmp; cp /tmp/*.tex ./; cp ../eus/doc/jlatex/*.sty .; ${CI_SOURCE_PATH}/.upload-doc.sh; fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then mkdir -p /tmp/euslisp-docs/docs/jskeus; cd /tmp/euslisp-docs/docs; cp /tmp/html/*.{jpg,png,md} jskeus/; fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git add jskeus/*.{md,jpg,png}; git commit -m "Update jskeus form https://github.com/$TRAVIS_REPO_SLUG/tree/$TRAVIS_COMMIT"; git push -fq origin master; fi
 after_failure:
   - echo "failure"
 
