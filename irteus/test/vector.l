@@ -115,7 +115,8 @@
     (format *error-output* "v2 = ~A~%" v2)
     (assert (eq (elt v1 0) (elt v2 0)))
     (assert (eq (elt v1 1) (elt v2 1)))
-    (assert (eq (elt v1 2) (elt v2 2)))
+    (assert (not (= (elt v1 2) (elt v1 2)))) ;; this is only the way to compare NaN
+    (assert (not (= (elt v2 2) (elt v2 2))))
     t))
 
 (run-all-tests)
