@@ -1819,9 +1819,11 @@
                refzmp-prev (car refzmp-cur-list) refzmp-next)
          (let ((swing-leg-proj-coords
                 (mapcar #'(lambda (sw-sc sw-dc)
-                            (midcoords
-                             (send self :calc-ratio-from-double-support-ratio)
-                             sw-sc sw-dc))
+                            ;; Use sigmoid to obtain smooth trajectory
+                            (let ((ratio (/ (- one-step-len index-count) (float one-step-len))))
+                              (midcoords
+                               (/ 1 (+ 1 (exp (* -15.0 (- ratio 0.5)))))
+                               sw-sc sw-dc)))
                         swing-leg-src-coords (car swing-leg-dst-coords-list)))
                (limbs
                 (append (send self :get-counter-footstep-limbs (car support-leg-list))
