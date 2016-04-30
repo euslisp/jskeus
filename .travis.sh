@@ -23,10 +23,8 @@ function travis_time_end {
 }
 
 travis_time_start setup.apt-get_update
-apt-get update
+if [ "$(which sudo)" == "" ]; then apt-get update && apt-get install -y sudo; else sudo apt-get update; fi
 travis_time_end
-
-if [ ! -e /usr/bin/sudo ] ; then apt-get install -y sudo; fi
 
 travis_time_start setup.apt-get_install
 sudo apt-get install -qq -y git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi  # msttcorefonts could not install on 14.04 travis
