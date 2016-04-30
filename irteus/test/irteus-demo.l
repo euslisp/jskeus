@@ -38,6 +38,16 @@
    (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
                              (walk-motion-for-sample-robot))))))
 
+(deftest test-walk-motion-single-support-for-sample-robot
+  (assert
+   (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
+                             (walk-motion-single-support-for-sample-robot))))))
+
+(deftest test-walk-motion-stair-climb-for-sample-robot
+  (assert
+   (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
+                             (walk-motion-stair-climb-for-sample-robot))))))
+
 (deftest test-trot-walk-motion-for-sample-robot-go-backward-over
   (assert
    (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
