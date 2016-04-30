@@ -28,6 +28,9 @@ ifeq ($(OS),Linux)
  ifneq (, $(findstring armv,$(MACHINE)))
   export ARCHDIR=LinuxARM
   export MAKEFILE=Makefile.LinuxARM
+ else ifneq (, $(findstring aarch,$(MACHINE)))
+  export ARCHDIR=LinuxARM
+  export MAKEFILE=Makefile.LinuxARM
  else
   export ARCHDIR=Linux
   export MAKEFILE=Makefile.Linux.thread
