@@ -63,10 +63,6 @@ script:
   - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then COUNT=10; while [ $COUNT -gt 0 -a ! -e $CI_SOURCE_PATH/eus ] ; do echo $COUNT; sleep 1; GIT_SSL_NO_VERIFY=true git clone --depth 10 http://github.com/euslisp/EusLisp $CI_SOURCE_PATH/eus; COUNT=`expr $COUNT - 1`; done; fi # running git clone within arm VM is very slow
   - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then mv $CI_SOURCE_PATH/irteus/test/*.l /tmp; mv /tmp/irt*.l $CI_SOURCE_PATH/irteus/test/; fi # arm VM is very slow so we do not have time to run all tests
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then docker run --rm -i -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"; fi
-  # Test Homebrew formula
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install homebrew/x11/jskeus --HEAD; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew test jskeus; fi
 after_success:
   - (cd doc/; pdftotext jmanual.pdf; mv jmanual.txt jmanual.txt.old; make; pdftotext jmanual.pdf)
   - (cd doc/; make html)
