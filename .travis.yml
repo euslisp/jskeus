@@ -1,8 +1,4 @@
 # Travis Continuous Integration Configuration File
-sudo: required
-dist: trusty
-language: generic
-cache: apt
 notifications:
   email:
     recipients:
@@ -10,19 +6,63 @@ notifications:
     on_success: always #[always|never|change] # default: change
     on_failure: always #[always|never|change] # default: always
   slack: jsk-robotics:Av7tc8wj3IWkLYvlTzHE7x2g
-env:
-  secure: "u0lUaQ+BR5IH2bJNmGPZ8Yp5/iroJiHNkADN6lvMMqS9FQc8kcEe74UgsTjMdteQXRsDTtJVmwB7UFB83bwwcKoVYwrGAdOfBkWM702hTgmEIqKTkBkaVyUjkzR/VrnVCHCLhQMysAuHQyPrEPjLlvmKiJJ/OYfRg2QCd74ef1I="
-  matrix:
-    - DISTRO=trusty
-    - DISTRO=xenial
-
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=ubuntu:trusty
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=ubuntu:xenial
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=osrf/ubuntu_armhf:trusty
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=osrf/ubuntu_armhf:xenial
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=osrf/ubuntu_arm64:trusty
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=osrf/ubuntu_arm64:xenial
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=debian:jessie
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=osrf/debian_arm64:jessie
+    - os: osx
+  allow_failures:
+    - os: osx
 before_install: # Use this to prepare the system to install prerequisites or dependencies
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+install:
   # Define some config vars
   - export CI_SOURCE_PATH=$(pwd)
   - export REPOSITORY_NAME=${PWD##*/}
+  - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then sudo apt-get install -y -qq qemu-user-static git; fi
+script:
   - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
-  - docker run --rm -i -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t ubuntu:$DISTRO sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"
+  - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then COUNT=10; while [ $COUNT -gt 0 -a ! -e $CI_SOURCE_PATH/eus ] ; do echo $COUNT; sleep 1; GIT_SSL_NO_VERIFY=true git clone --depth 10 http://github.com/euslisp/EusLisp $CI_SOURCE_PATH/eus; COUNT=`expr $COUNT - 1`; done; fi # running git clone within arm VM is very slow
+  - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then mv $CI_SOURCE_PATH/irteus/test/*.l /tmp; mv /tmp/irt*.l $CI_SOURCE_PATH/irteus/test/; fi # arm VM is very slow so we do not have time to run all tests
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then docker run --rm -i -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"; fi
   # Test Homebrew formula
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install homebrew/x11/jskeus --HEAD; fi

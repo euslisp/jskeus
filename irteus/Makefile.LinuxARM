@@ -44,7 +44,7 @@ FFTW=-L/usr/local/lib -lfftw -lrfftw
 
 SVNVERSION=\"$(shell git rev-parse --short HEAD)\"
 
-MACHINE=armv6
+MACHINE=$(shell uname -m | sed 's/\(armv[0-9]\).*/\1/')
 THREAD= -DTHREADED -DPTHREAD
 
 CFLAGS=-O2 -D$(MACHINE) -D$(ARCH) -DARM -D_REENTRANT -DGCC -I$(EUSDIR)/include $(THREAD) -DSVNVERSION=$(SVNVERSION) -fPIC
