@@ -75,7 +75,7 @@ eus:
 eus-installed: eus
 	cd eus/lisp && ln -sf $(MAKEFILE) Makefile && make eus0 eus1 eus2 eusg eusx eusgl eus
 
-irteus-installed:
+irteus-installed: eus-installed
 	cd irteus; make
 
 clean:
