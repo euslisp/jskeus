@@ -73,10 +73,10 @@ eus:
 	COUNT=10; while [ $$COUNT -gt 0 -a ! -e eus ] ; do echo $$COUNT; sleep 1; GIT_SSL_NO_VERIFY=true git clone --depth 10 $(GIT_EUSURL) eus; COUNT=`expr $$COUNT - 1`; done; #	
 
 eus-installed: eus
-	cd eus/lisp && ln -sf $(MAKEFILE) Makefile && make eus0 eus1 eus2 eusg eusx eusgl eus
+	cd eus/lisp && ln -sf $(MAKEFILE) Makefile && $(MAKE) eus0 eus1 eus2 eusg eusx eusgl eus
 
 irteus-installed: eus-installed
-	cd irteus; make
+	cd irteus; $(MAKE)
 
 clean:
 	-rm -f bashrc.eus manual.pdf jmanual.pdf
