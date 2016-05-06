@@ -1595,6 +1595,9 @@
           end-with-double-support
           ik-thre ;; position thre for ik
           ik-rthre ;; rotaiotn thre fo rik
+          swing-leg-proj-ratio-interpolation-acc
+          swing-leg-proj-ratio-interpolation-vel
+          swing-leg-proj-ratio-interpolation-pos
           )
   )
 
@@ -1683,6 +1686,9 @@
           all-limbs al
           ik-thre thre ik-rthre rthre
           end-with-double-support ewds)
+    (setq swing-leg-proj-ratio-interpolation-pos 0
+          swing-leg-proj-ratio-interpolation-vel 0
+          swing-leg-proj-ratio-interpolation-acc 0)
     (let ((current-swing-limbs
            (send self :get-footstep-limbs (car footstep-node-list))))
       (send self :append-support-leg-list
@@ -1817,13 +1823,23 @@
                  swing-leg-src-coords (car swing-leg-dst-coords-list))
          (send self :calc-current-refzmp
                refzmp-prev (car refzmp-cur-list) refzmp-next)
-         (let ((swing-leg-proj-coords
-                (mapcar #'(lambda (sw-sc sw-dc)
-                            ;; Use sigmoid to obtain smooth trajectory
-                            (let ((ratio (/ (- one-step-len index-count) (float one-step-len))))
-                              (midcoords
-                               (/ 1 (+ 1 (exp (* -15.0 (- ratio 0.5)))))
-                               sw-sc sw-dc)))
+         (let* ((swing-leg-proj-ratio
+                 (progn
+                   (if (= index-count one-step-len)
+                       (setq swing-leg-proj-ratio-interpolation-pos 0
+                             swing-leg-proj-ratio-interpolation-vel 0
+                             swing-leg-proj-ratio-interpolation-acc 0))
+                   (let* ((tmp-remain-time (* index-count dt)) (tmp-goal 1.0)
+                          (jerk (+ (+ (* (/ -9.0 tmp-remain-time) swing-leg-proj-ratio-interpolation-acc)
+                                      (* (/ -36.0 (expt tmp-remain-time 2)) swing-leg-proj-ratio-interpolation-vel))
+                                   (* (/ 60.0 (expt tmp-remain-time 3)) (- tmp-goal swing-leg-proj-ratio-interpolation-pos)))))
+                     (setq swing-leg-proj-ratio-interpolation-acc (+ swing-leg-proj-ratio-interpolation-acc (* dt jerk))
+                           swing-leg-proj-ratio-interpolation-vel (+ swing-leg-proj-ratio-interpolation-vel (* dt swing-leg-proj-ratio-interpolation-acc))
+                           swing-leg-proj-ratio-interpolation-pos (+ swing-leg-proj-ratio-interpolation-pos (* dt swing-leg-proj-ratio-interpolation-vel)))
+                     swing-leg-proj-ratio-interpolation-pos)))
+                (swing-leg-proj-coords
+                 (mapcar #'(lambda (sw-sc sw-dc)
+                             (midcoords swing-leg-proj-ratio sw-sc sw-dc))
                         swing-leg-src-coords (car swing-leg-dst-coords-list)))
                (limbs
                 (append (send self :get-counter-footstep-limbs (car support-leg-list))
