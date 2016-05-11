@@ -186,7 +186,7 @@
       )))
 
 (defun trot-walk-motion-for-sample-robot
-  (&key (go-backward-over t) (rotation-axis (list t t nil nil)))
+  (&key (go-backward-over t) (rotation-axis (list t t t t)))
   (quad-walk-motion-for-sample-robot
    #'(lambda () (send *robot* :go-pos-quadruped-params->footstep-list 200 100 0 :type :trot))
    :go-backward-over go-backward-over
