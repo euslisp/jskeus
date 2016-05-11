@@ -895,29 +895,33 @@
      (dotimes (i (length ul))
        (setf (elt ret-tq (position (send (elt ul i) :joint) joint-list)) (elt tq i)))
      ret-tq))
-  ;; calculate Zero Moment Point based on Inverse Dynamics
-  ;;   necessary arguments -> av and root-coords
   (:calc-zmp
     (&optional (av (send self :angle-vector))
                (root-coords (send (car (send self :links)) :copy-worldcoords))
-     &key (pZMPz 0.0) ;; ZMP height [mm]
-          (dt 0.005) ;; dt [s]
+     &key (pZMPz 0.0)
+          (dt 0.005)
           (update t) (debug-view)
           (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
-    (unless update (return-from :calc-zmp (send self :get :zmp)))
+    "Calculate Zero Moment Point based on Inverse Dynamics.
+     After solving Inverse Dynamics, ZMP is calculated from total root-link force and moment.
+     necessary arguments -> av and root-coords.
+     If update is t, call inverse dynamics, otherwise, just return zmp from total root-link force and moment.
+     dt [s] is time step used only when update is t.
+     pZMPz is ZMP height [mm].
+     After this method, (send robot :get :zmp) is ZMP and (send robot :get :zmp-moment) is moment around ZMP."
+    (when update
+      ;; under no external forces and moments
+      (all-child-links
+       (car (send self :links))
+       #'(lambda (l)
+           (send l :ext-force (float-vector 0 0 0))
+           (send l :ext-moment (float-vector 0 0 0))))
 
-    ;; under no external forces and moments
-    (all-child-links
-     (car (send self :links))
-     #'(lambda (l)
-	      (send l :ext-force (float-vector 0 0 0))
-	      (send l :ext-moment (float-vector 0 0 0))))
-
-    (send self :calc-torque
-          :dt dt :av av :root-coords root-coords
-          :debug-view debug-view
-          :calc-statics-p nil
-          :calc-torque-buffer-args calc-torque-buffer-args)
+      (send self :calc-torque
+            :dt dt :av av :root-coords root-coords
+            :debug-view debug-view
+            :calc-statics-p nil
+            :calc-torque-buffer-args calc-torque-buffer-args))
 
     ;; calculate ZMP from force and moment of root-link
     (let* ((f0 (send (car (send self :links)) :force)) ;; [N]
