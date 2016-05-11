@@ -895,29 +895,33 @@
      (dotimes (i (length ul))
        (setf (elt ret-tq (position (send (elt ul i) :joint) joint-list)) (elt tq i)))
      ret-tq))
-  ;; calculate Zero Moment Point based on Inverse Dynamics
-  ;;   necessary arguments -> av and root-coords
   (:calc-zmp
     (&optional (av (send self :angle-vector))
                (root-coords (send (car (send self :links)) :copy-worldcoords))
-     &key (pZMPz 0.0) ;; ZMP height [mm]
-          (dt 0.005) ;; dt [s]
+     &key (pZMPz 0.0)
+          (dt 0.005)
           (update t) (debug-view)
           (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
-    (unless update (return-from :calc-zmp (send self :get :zmp)))
+    "Calculate Zero Moment Point based on Inverse Dynamics.
+     After solving Inverse Dynamics, ZMP is calculated from total root-link force and moment.
+     necessary arguments -> av and root-coords.
+     If update is t, call inverse dynamics, otherwise, just return zmp from total root-link force and moment.
+     dt [s] is time step used only when update is t.
+     pZMPz is ZMP height [mm].
+     After this method, (send robot :get :zmp) is ZMP and (send robot :get :zmp-moment) is moment around ZMP."
+    (when update
+      ;; under no external forces and moments
+      (all-child-links
+       (car (send self :links))
+       #'(lambda (l)
+           (send l :ext-force (float-vector 0 0 0))
+           (send l :ext-moment (float-vector 0 0 0))))
 
-    ;; under no external forces and moments
-    (all-child-links
-     (car (send self :links))
-     #'(lambda (l)
-	      (send l :ext-force (float-vector 0 0 0))
-	      (send l :ext-moment (float-vector 0 0 0))))
-
-    (send self :calc-torque
-          :dt dt :av av :root-coords root-coords
-          :debug-view debug-view
-          :calc-statics-p nil
-          :calc-torque-buffer-args calc-torque-buffer-args)
+      (send self :calc-torque
+            :dt dt :av av :root-coords root-coords
+            :debug-view debug-view
+            :calc-statics-p nil
+            :calc-torque-buffer-args calc-torque-buffer-args))
 
     ;; calculate ZMP from force and moment of root-link
     (let* ((f0 (send (car (send self :links)) :force)) ;; [N]
@@ -1595,9 +1599,14 @@
           end-with-double-support
           ik-thre ;; position thre for ik
           ik-rthre ;; rotaiotn thre fo rik
+          ;; Smooth interpolation for swing-leg-proj-ratio
           swing-leg-proj-ratio-interpolation-acc
           swing-leg-proj-ratio-interpolation-vel
           swing-leg-proj-ratio-interpolation-pos
+          ;; Smooth interpolation for swing-rot-ratio
+          swing-rot-ratio-interpolation-acc
+          swing-rot-ratio-interpolation-vel
+          swing-rot-ratio-interpolation-pos
           )
   )
 
@@ -1688,7 +1697,10 @@
           end-with-double-support ewds)
     (setq swing-leg-proj-ratio-interpolation-pos 0
           swing-leg-proj-ratio-interpolation-vel 0
-          swing-leg-proj-ratio-interpolation-acc 0)
+          swing-leg-proj-ratio-interpolation-acc 0
+          swing-rot-ratio-interpolation-pos 0
+          swing-rot-ratio-interpolation-vel 0
+          swing-rot-ratio-interpolation-acc 0)
     (let ((current-swing-limbs
            (send self :get-footstep-limbs (car footstep-node-list))))
       (send self :append-support-leg-list
@@ -1776,14 +1788,25 @@
             (send self :get-limbs-zmp (car (last support-leg-coords-list)) (car (last support-leg-list))))
       (send self :append-step-height-list default-step-height)
       t))
+  (:calc-hoffarbib-pos-vel-acc
+   (tmp-remain-time tmp-goal old-acc old-vel old-pos)
+   (let* ((jerk (+ (+ (* (/ -9.0 tmp-remain-time) old-acc)
+                      (* (/ -36.0 (expt tmp-remain-time 2)) old-vel))
+                   (* (/ 60.0 (expt tmp-remain-time 3)) (- tmp-goal old-pos))))
+          (new-acc (+ old-acc (* dt jerk)))
+          (new-vel (+ old-vel (* dt new-acc)))
+          (new-pos (+ old-pos (* dt new-vel))))
+     (list new-acc new-vel new-pos)
+     ))
   ;; calculate swing leg coords
   (:calc-current-swing-leg-coords
     (ratio src dst &key (type :shuffling) (step-height default-step-height))
+    ;; Calculate swing leg coords
     (case type
       (:shuffling
         (midcoords ratio src dst))
       (:cycloid
-        (send self :cycloid-midcoords ratio src dst step-height))
+        (send self :cycloid-midcoords ratio src dst step-height :rot-ratio swing-rot-ratio-interpolation-pos))
       )
     )
   (:calc-ratio-from-double-support-ratio
@@ -1813,6 +1836,23 @@
      ))
   (:calc-one-tick-gait-parameter
    (type)
+   ;; Calculate swing leg rot ratio
+   (let ((default-half-double-support-count (truncate (* 0.5 default-double-support-ratio one-step-len))))
+     (cond
+      ((> index-count (- one-step-len default-half-double-support-count)) ;; initial double support period
+       (setq swing-rot-ratio-interpolation-pos 0
+             swing-rot-ratio-interpolation-vel 0
+             swing-rot-ratio-interpolation-acc 0))
+      ((< index-count default-half-double-support-count) ;; final double support period
+       (setq swing-rot-ratio-interpolation-pos 1.0
+             swing-rot-ratio-interpolation-vel 0
+             swing-rot-ratio-interpolation-acc 0))
+      (t ;; swing period
+       (multiple-value-setq
+        (swing-rot-ratio-interpolation-acc swing-rot-ratio-interpolation-vel swing-rot-ratio-interpolation-pos)
+        (send self :calc-hoffarbib-pos-vel-acc
+              (* (1+ (- index-count default-half-double-support-count)) dt) 1.0 swing-rot-ratio-interpolation-acc swing-rot-ratio-interpolation-vel swing-rot-ratio-interpolation-pos))
+       )))
    (list (car support-leg-list)
          (car support-leg-coords-list)
          (mapcar #'(lambda (sw-sc sw-dc)
@@ -1829,14 +1869,11 @@
                        (setq swing-leg-proj-ratio-interpolation-pos 0
                              swing-leg-proj-ratio-interpolation-vel 0
                              swing-leg-proj-ratio-interpolation-acc 0))
-                   (let* ((tmp-remain-time (* index-count dt)) (tmp-goal 1.0)
-                          (jerk (+ (+ (* (/ -9.0 tmp-remain-time) swing-leg-proj-ratio-interpolation-acc)
-                                      (* (/ -36.0 (expt tmp-remain-time 2)) swing-leg-proj-ratio-interpolation-vel))
-                                   (* (/ 60.0 (expt tmp-remain-time 3)) (- tmp-goal swing-leg-proj-ratio-interpolation-pos)))))
-                     (setq swing-leg-proj-ratio-interpolation-acc (+ swing-leg-proj-ratio-interpolation-acc (* dt jerk))
-                           swing-leg-proj-ratio-interpolation-vel (+ swing-leg-proj-ratio-interpolation-vel (* dt swing-leg-proj-ratio-interpolation-acc))
-                           swing-leg-proj-ratio-interpolation-pos (+ swing-leg-proj-ratio-interpolation-pos (* dt swing-leg-proj-ratio-interpolation-vel)))
-                     swing-leg-proj-ratio-interpolation-pos)))
+                   (multiple-value-setq
+                    (swing-leg-proj-ratio-interpolation-acc swing-leg-proj-ratio-interpolation-vel swing-leg-proj-ratio-interpolation-pos)
+                    (send self :calc-hoffarbib-pos-vel-acc
+                          (* index-count dt) 1.0 swing-leg-proj-ratio-interpolation-acc swing-leg-proj-ratio-interpolation-vel swing-leg-proj-ratio-interpolation-pos))
+                   swing-leg-proj-ratio-interpolation-pos))
                 (swing-leg-proj-coords
                  (mapcar #'(lambda (sw-sc sw-dc)
                              (midcoords swing-leg-proj-ratio sw-sc sw-dc))
@@ -1992,11 +2029,11 @@
   ;;   goal   -> goal pos
   ;;   height -> max height of step
   (:cycloid-midcoords
-   (ratio start goal height &key (top-ratio 0.5))
+   (ratio start goal height &key (top-ratio 0.5) (rot-ratio ratio))
    (let ((cp (send self :cycloid-midpoint ratio (send start :worldpos) (send goal :worldpos)
                    height :top-ratio top-ratio)))
      (make-coords :pos cp
-                  :rot (send (midcoords ratio start goal) :worldrot))))
+                  :rot (send (midcoords rot-ratio start goal) :worldrot))))
   )
 
 (in-package "GEOMETRY")
