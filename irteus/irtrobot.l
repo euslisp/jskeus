@@ -705,6 +705,7 @@
                 :czmp czmp :zmp (elt ret 5) :cog (elt ret 6)
                 :time tm
                 :pz (elt ret 7)
+                :all-limbs al
                 :contact-state contact-state
                 :end-coords-list end-coords-list
                 )
