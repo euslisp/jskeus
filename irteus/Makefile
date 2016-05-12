@@ -61,6 +61,7 @@ IRTEUSOBJS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUS_OSFX))
 IRTEUSDLLS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUS_LSFX))
 IRTEUS_C=$(addsuffix .c,$(IRTEUS))
 IRTEUS_H=$(addsuffix .h,$(IRTEUS))
+IRTEUS_L=$(patsubst pgsql.l,$(EUSDIR)/lib/llib/pgsql.l,$(addsuffix .l,$(IRTEUS)))
 
 IRTEUSG_OSFX=$(addsuffix .$(OSFX),$(IRTEUSG))
 IRTEUSG_LSFX=$(addsuffix .$(LSFX),$(IRTEUSG))
@@ -68,6 +69,7 @@ IRTEUSGOBJS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSG_OSFX))
 IRTEUSGDLLS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSG_LSFX))
 IRTEUSG_C=$(addsuffix .c,$(IRTEUSG))
 IRTEUSG_H=$(addsuffix .h,$(IRTEUSG))
+IRTEUSG_L=$(addsuffix .l,$(IRTEUSG))
 
 IRTEUSX_OSFX=$(addsuffix .$(OSFX),$(IRTEUSX))
 IRTEUSX_LSFX=$(addsuffix .$(LSFX),$(IRTEUSX))
@@ -75,6 +77,7 @@ IRTEUSXOBJS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSX_OSFX))
 IRTEUSXDLLS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSX_LSFX))
 IRTEUSX_C=$(addsuffix .c,$(IRTEUSX))
 IRTEUSX_H=$(addsuffix .h,$(IRTEUSX))
+IRTEUSX_L=$(addsuffix .l,$(IRTEUSX))
 
 IRTEUSIMG_OSFX=$(addsuffix .$(OSFX),$(IRTEUSIMG))
 IRTEUSIMG_LSFX=$(addsuffix .$(LSFX),$(IRTEUSIMG))
@@ -82,6 +85,7 @@ IRTEUSIMGOBJS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSIMG_OSFX))
 IRTEUSIMGDLLS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSIMG_LSFX))
 IRTEUSIMG_C=$(addsuffix .c,$(IRTEUSIMG))
 IRTEUSIMG_H=$(addsuffix .h,$(IRTEUSIMG))
+IRTEUSIMG_L=$(patsubst eusjpeg.l,$(EUSDIR)/lisp/image/jpeg/eusjpeg.l,$(addsuffix .l,$(IRTEUSIMG)))
 
 IRTEUSGL_OSFX=$(addsuffix .$(OSFX),$(IRTEUSGL))
 IRTEUSGL_LSFX=$(addsuffix .$(LSFX),$(IRTEUSGL))
@@ -89,6 +93,7 @@ IRTEUSGLOBJS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSGL_OSFX))
 IRTEUSGLDLLS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUSGL_LSFX))
 IRTEUSGL_C=$(addsuffix .c,$(IRTEUSGL))
 IRTEUSGL_H=$(addsuffix .h,$(IRTEUSGL))
+IRTEUSGL_L=$(addsuffix .l,$(IRTEUSGL))
 
 IRTCOBJECTS=$(INSTALLOBJDIR)/irtc.$(OSFX) $(INSTALLOBJDIR)/irtgeoc.$(OSFX)
 IRTGCOBJECTS=$(INSTALLOBJDIR)/CPQP.$(OSFX) $(INSTALLOBJDIR)/euspqp.$(OSFX)
@@ -115,27 +120,27 @@ $(LIBIRTEUSGL): $(IRTEUSGLOBJS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSGL) $(IRTEUSGLOBJS) $(IMPLIB)
 
 $(IRTEUSOBJS): $(OBJDIR)/compile_irt.log
-$(OBJDIR)/compile_irt.log:
+$(OBJDIR)/compile_irt.log: $(IRTEUS_L)
 	$(BINDIR)/eus2$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irt.l > $(OBJDIR)/compile_irt.log
 	-rm -f $(IRTEUS_C) $(IRTEUS_H)
 
 $(IRTEUSGOBJS): $(OBJDIR)/compile_irtg.log
-$(OBJDIR)/compile_irtg.log:
+$(OBJDIR)/compile_irtg.log: $(IRTEUSG_L)
 	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l > $(OBJDIR)/compile_irtg.log
 	-rm -f $(IRTEUSG_C) $(IRTEUSG_H)
 
 $(IRTEUSXOBJS): $(OBJDIR)/compile_irtx.log
-$(OBJDIR)/compile_irtx.log:
+$(OBJDIR)/compile_irtx.log: $(IRTEUSX_L)
 	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtx.l > $(OBJDIR)/compile_irtx.log
 	-rm -f $(IRTEUSX_C) $(IRTEUSX_H)
 
 $(IRTEUSIMGOBJS): $(OBJDIR)/compile_irtimg.log
-$(OBJDIR)/compile_irtimg.log:
+$(OBJDIR)/compile_irtimg.log: $(IRTEUSIMG_L)
 	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtimg.l > $(OBJDIR)/compile_irtimg.log
 	-rm -f $(IRTEUSIMG_C) $(IRTEUSIMG_H)
 
 $(IRTEUSGLOBJS): $(OBJDIR)/compile_irtgl.log
-$(OBJDIR)/compile_irtgl.log:
+$(OBJDIR)/compile_irtgl.log: $(IRTEUSGL_L)
 	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtgl.l > $(OBJDIR)/compile_irtgl.log
 	-rm -f $(IRTEUSGL_C) $(IRTEUSGL_H)
 
