@@ -755,7 +755,9 @@
          (root-spacial-acceleration (float-vector 0 0 0))
          (root-angular-acceleration (float-vector 0 0 0))
          (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
-   (let ((torque-vector (instantiate float-vector (length joint-list))))
+   (let ((torque-vector (instantiate float-vector (length joint-list)))
+         (analysis-level-org (mapcar #'(lambda (l) (send l :analysis-level)) (send self :links))))
+     (send-all (send self :links) :analysis-level :coords)
      (all-child-links
       (car (send self :links))
       #'(lambda (l)
@@ -789,6 +791,7 @@
           (send l :ext-moment (float-vector 0 0 0))))
      (dotimes (i (length torque-vector))
        (setf (elt torque-vector i) (send (elt joint-list i) :joint-torque)))
+     (mapcar #'(lambda (l org) (send l :analysis-level org)) (send self :links) analysis-level-org)
      torque-vector))
   (:calc-root-coords-vel-acc-from-pos
    (dt root-coords)
