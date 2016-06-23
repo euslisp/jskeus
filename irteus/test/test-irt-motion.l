@@ -997,5 +997,16 @@
       (and (eps-v= ret1 ret2) (eps-v= ret1 ret3))
       )))
 
+(deftest test-torque-with-root-joint
+  (let* ((torque-without-root-joint (send *sample-robot* :calc-torque :calc-statics-p t))
+         (torque-with-root-joint
+          (with-append-root-joint
+           (link-list-with-robot-6dof *sample-robot* (list (cdr (send *sample-robot* :links)))
+                                      :joint-class 6dof-joint)
+           (send *sample-robot* :calc-torque :calc-statics-p t)
+           )))
+    (assert (eps-v= torque-without-root-joint torque-with-root-joint))
+    ))
+
 (run-all-tests)
 (exit 0)

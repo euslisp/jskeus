@@ -581,7 +581,7 @@
 	 ;; buffers for calculation
 	 (tmp-va (float-vector 0 0 0)))
    (if debug-view (format t ";; forward-all-kinematics link = ~A~%" (send self :name)))
-   (when parent-link
+   (when (and parent-link (derivedp (send self :parent) bodyset-link)) ;; exclude if root-link
      (let* ((paxis (case (joint . axis)
 		     (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1))
 		     (:xx #f(1 0 0)) (:yy #f(0 1 0)) (:zz #f(0 0 1))
@@ -658,7 +658,7 @@
      (setq force (v+ force (send child :force) force)
 	   moment (v+ moment (send child :moment) moment)))
 
-   (when (and joint parent-link)
+   (when (and joint parent-link (derivedp (send self :parent) bodyset-link)) ;; exclude if root-link
      (send joint :joint-torque
 	   (+ (v. (send self :get :spacial-velocity-jacobian) force)
 	      (v. (send self :get :angular-velocity-jacobian) moment))))
