@@ -40,6 +40,12 @@
     ;; eps> num1 num2 tolerance -> num1 > num2+torelance
     (assert (null (eps>  0  -0.2 0.3)) "(eps> 0 -0.2 0.3)")
     (assert (eps>  0  -0.2 0.1) "(eps> 0 0.2 0.1)")
+    ;; eps<>
+    (assert (eps<> 0 0.2 0.1) "(eps<> 0 0.2 0.1)")
+    (assert (null (eps<> 0 0.2 0.3)) "(eps<> 0 0.2 0.3)")
+    ;; eps==
+    (assert (eps= 0 0.2 0.3) "(eps= 0 0.2 0.3)")
+    (assert (null (eps= 0 0.2 0.1)) "(eps= 0 0.2 0.1)")
 
     (assert (outer-product-matrix #f(1 2 3)) #2f((0.0 -3.0 2.0) (3.0 0.0 -1.0) (-2.0 1.0 0.0)) "outer product matrix")
 
