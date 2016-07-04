@@ -17,6 +17,30 @@
     (assert (eps= (atan2 0 1)    0) "atan2 1 0")
     (assert (eps= (atan2 1 1) (/ pi 4)) "atan2 1 1")
 
+    ;;
+    (assert (null (<= 0 (+ -0.2 0.1))) "(<= 0 (+ -0.2 0.1))")
+    (assert (<= 0 (+ -0.2 0.3)) "(<= 0 (+ -0.2 0.3))")
+    (assert (null (<  0 (+ -0.2 0.1))) "(< 0 (+ -0.2 0.1))")
+    (assert (<  0 (+ -0.2 0.3)) "(< 0 (+ -0.2 0.3))")
+    (assert (null (>= 0  (- 0.2 0.1))) "(>= 0 (- 0.2 0.1))")
+    (assert (>= 0  (- 0.2 0.3)) "(>= 0 (- 0.2 0.3))")
+    (assert (null (>  0  (- 0.2 0.1))) "(> 0 (- 0.2 0.1))")
+    (assert (>  0  (- 0.2 0.3)) "(> 0 (- 0.2 0.3))")
+
+    ;; see section 14 of jmanual.pdf
+    ;; eps<= num1 num2 tolerance -> num1 < num2+torelance
+    (assert (null (eps<= 0 -0.2 0.1)) "(eps<= 0 -0.2 0.1)")
+    (assert (eps<= 0 -0.2 0.3) "(eps<= 0 -0.2 0.3)")
+    ;; eps< num1 num2 tolerance -> num1 < num2-torelance
+    (assert (null (eps<  0 0.2 0.3)) "(eps< 0 0.2 0.3)")
+    (assert (eps<  0 0.2 0.1) "(eps< 0 0.2 0.1)")
+    ;; eps>= num1 num2 tolerance -> num1 > num2-torelance
+    (assert (null (eps>= 0  0.2 0.1)) "(eps>= 0 0.2 0.1)")
+    (assert (eps>= 0  0.2 0.3) "(eps>= 0 0.2 0.3)")
+    ;; eps> num1 num2 tolerance -> num1 > num2+torelance
+    (assert (null (eps>  0  -0.2 0.3)) "(eps> 0 -0.2 0.3)")
+    (assert (eps>  0  -0.2 0.1) "(eps> 0 0.2 0.1)")
+
     (assert (outer-product-matrix #f(1 2 3)) #2f((0.0 -3.0 2.0) (3.0 0.0 -1.0) (-2.0 1.0 0.0)) "outer product matrix")
 
     ;; quaternion
