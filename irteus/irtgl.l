@@ -194,13 +194,18 @@
    (&key (x 0) (y 0)
 	 (width x::width)
 	 (height x::height)
+	 (offscreen)
 	 ((:imagebuf imgbuf) (make-string (* width height 3)))
          (depthbuf))
    "Get current view to a image object. It returns color-image24 object."
    (let ((img (instance image::color-image24 :init width height imgbuf)))
-     (send self :makecurrent)
-     (glReadBuffer GL_FRONT)
-     (glPixelStorei GL_PACK_ALIGNMENT 1)
+     (cond
+       (offscreen
+        (glReadBuffer GL_COLOR_ATTACHMENT0))
+       (t
+        (send self :makecurrent)
+        (glReadBuffer GL_FRONT)
+        (glPixelStorei GL_PACK_ALIGNMENT 1)))
      (glReadPixels x y width height GL_RGB GL_UNSIGNED_BYTE imgbuf)
      #-:x86_64
      (if depthbuf (glReadPixels x y width height GL_DEPTH_COMPONENT GL_FLOAT depthbuf))
