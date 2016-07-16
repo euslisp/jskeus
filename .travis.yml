@@ -1,11 +1,11 @@
 # Travis Continuous Integration Configuration File
-notifications:
-  email:
-    recipients:
-      - euslisp@jsk.t.u-tokyo.ac.jp
-    on_success: always #[always|never|change] # default: change
-    on_failure: always #[always|never|change] # default: always
-  slack: jsk-robotics:Av7tc8wj3IWkLYvlTzHE7x2g
+# notifications:
+#   email:
+#     recipients:
+#       - euslisp@jsk.t.u-tokyo.ac.jp
+#     on_success: always #[always|never|change] # default: change
+#     on_failure: always #[always|never|change] # default: always
+#   slack: jsk-robotics:Av7tc8wj3IWkLYvlTzHE7x2g
 matrix:
   include:
     - os: linux
