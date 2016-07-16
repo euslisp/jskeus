@@ -62,6 +62,8 @@ setup_make() {
     find irteus/test -iname "*.l" | xargs -n1 irteusgl
     travis_time_end
 }
+
+install_gnu_tools
 if [ "$TRAVIS_PULL_REQUEST" = "false" -a "$TRAVIS_BRANCH" = "master" ]; then
     setup_brew_test
 else

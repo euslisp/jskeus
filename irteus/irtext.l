@@ -55,7 +55,7 @@
   (load-library
    (format nil "~A~A/lib/libirteusgl"
 	   *eusdir* (unix:getenv "ARCHDIR"))
-   '("irtglrgb" "irtgl" "irtviewer"))
+   '("irtglrgb" "irtgl" "irtglc" "irtviewer"))
   )
 
 (unless (member (pathname-name *program-name*)

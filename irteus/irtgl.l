@@ -99,6 +99,22 @@
           (error "could not find viewers for ~A" alist))))) ;; t
    ))
 
+(defun transpose-image-rows (img &optional ret)
+  (let* ((h (send img :height))
+         (step (* (send img :width) (send img :components)))
+         (src (send img :entity)))
+    (cond
+      (ret
+       (unless (and (eq (send img :height) (send ret :height))
+                    (eq (send img :width) (send ret :width))
+                    (eq (send img :components) (send ret :components)))
+         (error "invalid return image format"))
+       (ctranspose-image-rows h step src (send ret :entity))
+       ret)
+      (t
+       (ctranspose-image-rows h step src)
+       img))))
+
 (unless (assoc :color-org (send glviewsurface :methods))
   (rplaca (assoc :color (send glviewsurface :methods)) :color-org))
 (defmethod glviewsurface
@@ -178,13 +194,18 @@
    (&key (x 0) (y 0)
 	 (width x::width)
 	 (height x::height)
+	 (offscreen)
 	 ((:imagebuf imgbuf) (make-string (* width height 3)))
          (depthbuf))
    "Get current view to a image object. It returns color-image24 object."
-   (let ()
-     (send self :makecurrent)
-     (glReadBuffer GL_FRONT)
-     (glPixelStorei GL_PACK_ALIGNMENT 1)
+   (let ((img (instance image::color-image24 :init width height imgbuf)))
+     (cond
+       (offscreen
+        (glReadBuffer GL_COLOR_ATTACHMENT0))
+       (t
+        (send self :makecurrent)
+        (glReadBuffer GL_FRONT)
+        (glPixelStorei GL_PACK_ALIGNMENT 1)))
      (glReadPixels x y width height GL_RGB GL_UNSIGNED_BYTE imgbuf)
      #-:x86_64
      (if depthbuf (glReadPixels x y width height GL_DEPTH_COMPONENT GL_FLOAT depthbuf))
@@ -194,14 +215,8 @@
 	 (glReadPixels x y width height GL_DEPTH_COMPONENT GL_FLOAT fv)
 	 (user::float-bytestring2dvector fv depthbuf)))
      ;; transpose
-     (let ((b (make-string (* width height 3))))
-       (dotimes (x width)
-	 (dotimes (y height)
-	   (dotimes (z 3)
-	     (setf (elt b (+ (* (- height y 1) width 3) (* x 3) z))
-		   (elt imgbuf (+ (* y width 3) (* x 3) z))))))
-       (instance image::color-image24 :init width height b))
-     ))
+     (transpose-image-rows img)
+     img))
   )
 
 (defun draw-globjects (vwr draw-things &key (clear t) (flush t) (draw-origin 150) (draw-floor nil))
