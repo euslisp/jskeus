@@ -31,7 +31,7 @@
   (send *obj* :set-color #f(0 0 1))
   (send *cam* :draw-objects (list *obj*))
   (setq *img* (send *cam* :image-viewer :viewsurface :getglimage :offscreen t))
-  (assert (> (send (send *img* :blue) :average-pixel) 0.0)
+  (assert (> (send (send *img* :monochromize) :average-pixel) 0.0)
           "offscreen rendering"))
 
 (run-all-tests)
