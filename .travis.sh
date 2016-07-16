@@ -29,17 +29,23 @@ if [ "$(which sudo)" == "" ]; then apt-get $APT_OPTS update && apt-get $APT_OPTS
 travis_time_end
 
 travis_time_start setup.apt-get_install
-sudo -E apt-get $APT_OPTS install git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi xvfb xorg xserver-xorg-video-dummy mesa-utils # msttcorefonts could not install on 14.04 travis
+if [[ "`uname -m`" == *"arm"* ]]; then
+  sudo -E apt-get $APT_OPTS install git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi
+else
+  sudo -E apt-get $APT_OPTS install git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi xvfb xorg xserver-xorg-video-dummy mesa-utils # msttcorefonts could not install on 14.04 travis
+fi
 # sudo apt-get install -qq -y texlive-latex-base ptex-bin latex2html nkf poppler-utils || echo "ok" # 16.04 does ont have ptex bin
 travis_time_end
 
 travis_time_start install # Use this to install any prerequisites or dependencies necessary to run your build
 cd ${HOME}
 ln -s $CI_SOURCE_PATH jskeus
-sudo Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile /tmp/xorg.log -config $CI_SOURCE_PATH/.travis.xorg.conf :0 &
-sleep 1
-export DISPLAY=:0
-glxinfo | grep GLX
+if [[ "`uname -m`" != *"arm"* ]]; then
+  sudo Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile /tmp/xorg.log -config $CI_SOURCE_PATH/.travis.xorg.conf :0 &
+  sleep 1
+  export DISPLAY=:0
+  glxinfo | grep GLX
+fi
 travis_time_end
 
 travis_time_start script.make # All commands must exit with code 0 on success. Anything else is considered failure.
