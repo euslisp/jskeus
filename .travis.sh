@@ -23,11 +23,13 @@ function travis_time_end {
 }
 
 travis_time_start setup.apt-get_update
-if [ "$(which sudo)" == "" ]; then apt-get update && apt-get install -y sudo; else sudo apt-get update; fi
+export DEBIAN_FRONTEND=noninteractive
+export APT_OPTS='-y -qq' # -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew"'
+if [ "$(which sudo)" == "" ]; then apt-get update && apt-get $APT_OPTS install sudo; else sudo apt-get update; fi
 travis_time_end
 
 travis_time_start setup.apt-get_install
-sudo apt-get install -qq -y git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi xvfb xorg xserver-xorg-video-dummy mesa-utils # msttcorefonts could not install on 14.04 travis
+sudo apt-get $APT_OPTS install git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi xvfb xorg xserver-xorg-video-dummy mesa-utils # msttcorefonts could not install on 14.04 travis
 # sudo apt-get install -qq -y texlive-latex-base ptex-bin latex2html nkf poppler-utils || echo "ok" # 16.04 does ont have ptex bin
 travis_time_end
 
