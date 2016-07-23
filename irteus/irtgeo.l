@@ -280,7 +280,7 @@
 ;; orient-coords-to-axis
 ;;   orient "axis" in "target-coords" to the direction specified by "v" destructively.
 ;;   "v" must be non-zero vector.
-(defun orient-coords-to-axis (target-coords v &optional (axis :z))
+(defun orient-coords-to-axis (target-coords v &optional (axis :z) (eps *epsilon*))
   "orient 'axis' in 'target-coords' to the direction specified by 'v' destructively.
    'v' must be non-zero vector."
   (let* ((nv (normalize-vector v))
@@ -295,14 +295,14 @@
     ;; check rot-angle-cos
     (cond
      ;; if th = 0[deg] -> no need to rotate target-coords
-     ((eps= rot-angle-cos 1.0)
+     ((eps= rot-angle-cos 1.0 eps)
       (return-from orient-coords-to-axis target-coords))
      ;; if th = 180[deg] -> previous rot-axis = 0 vector and rot-axis is ambiguous. overwrite rot-axis by the axis orthogonal to ax
-     ((eps= rot-angle-cos -1.0)
+     ((eps= rot-angle-cos -1.0 eps)
       (block :calc-for-th-180
         (dolist (rot-axis2 (list #f(1 0 0) #f(0 1 0)))
           (let ((rot-angle-cos2 (v. ax rot-axis2)))
-            (unless (eps= (abs rot-angle-cos2) 1.0)
+            (unless (eps= (abs rot-angle-cos2) 1.0 eps)
               (setq rot-axis (v- rot-axis2 (scale rot-angle-cos2 ax))) ;; use only vertical component of rot-axis2 by removing parallel component of rot-axis2
               (return-from :calc-for-th-180 nil))
             ))))
