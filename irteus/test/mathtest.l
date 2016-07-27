@@ -3,15 +3,12 @@
 (init-unit-test)
 
 (defun eps-matrix= (m1 m2 &optional (eps *epsilon*))
-  (print (list m1 m2))
    (eps= (distance (array-entity m1) (array-entity m2)) 0.0 eps))
 
 (deftest mathtest
   (let (m1 m2 m3 m4 m5 m6 m7 r u s v val vec)
     ;;
-    (print (inverse-matrix #2f((2 5)(1 3))))
     (assert (eps-matrix= (inverse-matrix #2f((2 5)(1 3))) #2f((3 -5) (-1 2))) "invere matrix")
-#|
     (assert (eps-matrix= (diagonal #f(1 2)) #2f((1 0) (0 2))) "check diagonal")
 
     (assert (eps-matrix= (minor-matrix #2f((1 2 3)(4 5 6)(7 8 9)) 2 3) #2f((1.0 2.0) (4.0 5.0))) "minor matrix")
@@ -19,6 +16,36 @@
     (assert (eps= (atan2 1 0) pi/2) "atan2 0 1")
     (assert (eps= (atan2 0 1)    0) "atan2 1 0")
     (assert (eps= (atan2 1 1) (/ pi 4)) "atan2 1 1")
+
+    ;;
+    (assert (null (<= 0 (+ -0.2 0.1))) "(<= 0 (+ -0.2 0.1))")
+    (assert (<= 0 (+ -0.2 0.3)) "(<= 0 (+ -0.2 0.3))")
+    (assert (null (<  0 (+ -0.2 0.1))) "(< 0 (+ -0.2 0.1))")
+    (assert (<  0 (+ -0.2 0.3)) "(< 0 (+ -0.2 0.3))")
+    (assert (null (>= 0  (- 0.2 0.1))) "(>= 0 (- 0.2 0.1))")
+    (assert (>= 0  (- 0.2 0.3)) "(>= 0 (- 0.2 0.3))")
+    (assert (null (>  0  (- 0.2 0.1))) "(> 0 (- 0.2 0.1))")
+    (assert (>  0  (- 0.2 0.3)) "(> 0 (- 0.2 0.3))")
+
+    ;; see section 14 of jmanual.pdf
+    ;; eps<= num1 num2 tolerance -> num1 < num2+torelance
+    (assert (null (eps<= 0 -0.2 0.1)) "(eps<= 0 -0.2 0.1)")
+    (assert (eps<= 0 -0.2 0.3) "(eps<= 0 -0.2 0.3)")
+    ;; eps< num1 num2 tolerance -> num1 < num2-torelance
+    (assert (null (eps<  0 0.2 0.3)) "(eps< 0 0.2 0.3)")
+    (assert (eps<  0 0.2 0.1) "(eps< 0 0.2 0.1)")
+    ;; eps>= num1 num2 tolerance -> num1 > num2-torelance
+    (assert (null (eps>= 0  0.2 0.1)) "(eps>= 0 0.2 0.1)")
+    (assert (eps>= 0  0.2 0.3) "(eps>= 0 0.2 0.3)")
+    ;; eps> num1 num2 tolerance -> num1 > num2+torelance
+    (assert (null (eps>  0  -0.2 0.3)) "(eps> 0 -0.2 0.3)")
+    (assert (eps>  0  -0.2 0.1) "(eps> 0 0.2 0.1)")
+    ;; eps<>
+    (assert (eps<> 0 0.2 0.1) "(eps<> 0 0.2 0.1)")
+    (assert (null (eps<> 0 0.2 0.3)) "(eps<> 0 0.2 0.3)")
+    ;; eps==
+    (assert (eps= 0 0.2 0.3) "(eps= 0 0.2 0.3)")
+    (assert (null (eps= 0 0.2 0.1)) "(eps= 0 0.2 0.1)")
 
     (assert (outer-product-matrix #f(1 2 3)) #2f((0.0 -3.0 2.0) (3.0 0.0 -1.0) (-2.0 1.0 0.0)) "outer product matrix")
 
@@ -115,7 +142,6 @@
     (setq m6 #2f((2 0 1)(0 2 0)(1 0 2))) 
     (setq val (car (ql-decompose m6)) vec (cadr (ql-decompose m6)))
     (assert (eps-matrix= (m* m6 vec) (m* vec (diagonal val))) "ql-decompose")
-|#
     ))
 
 (run-all-tests)
