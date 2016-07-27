@@ -216,7 +216,7 @@
           (position :type float-vector)   ;; current data point
           (time :type float)          ;; time [sec] from start
           (segmnet-num :type integer) ;; number of total segment
-          (segment-time :type float)  ;; time[sec] with in each sgment
+          (segment-time :type float)  ;; time[sec] with in each segment
           (segment :type integer)     ;; index of segment which is currently processing
           (interpolatingp :type symbol)
           ))
@@ -224,6 +224,7 @@
 (defmethod interpolator
   (:init
    ()
+   "Abstract class of interpolator"
    (setq time 0.0)
    (setq segment-time 0.0)
    (setq segment 0)
@@ -237,6 +238,9 @@
     ((:position-list pl) (send self :position-list)) ;; list of control point
     ((:time-list tl) (send self :time-list))   ;; list of time from start for each control point, time in fisrt contrall point is zero, so length of this list is length of control point minus 1
     &allow-other-keys)
+   "Initialize interpolator
+   position-list: list of control point
+   time-list: list of time from start for each control point, time in fisrt contrall point is zero, so length of this list is length of control point minus 1"
    (setq position-list pl)
    (setq time-list tl)
    (if (/= (length position-list) (1+ (length time-list)))
@@ -249,20 +253,21 @@
    (setq interpolatingp nil))
 
   ;; accessor to slots
-  (:position-list () position-list)
-  (:position () position)
-  (:time-list () time-list)
-  (:time () time)
-  (:segment-time () segment-time)
-  (:segment () segment)
-  (:segment-num () segment-num)
-  (:interpolatingp () interpolatingp)
+  (:position-list () "returns position list" position-list)
+  (:position () "returns current position" position)
+  (:time-list () "returns time list" time-list)
+  (:time () "returns current time" time)
+  (:segment-time () "returns time[sec] with in each segment" segment-time)
+  (:segment () "returns index of segment which is currently processing" segment)
+  (:segment-num () "returns number of total segment" segment-num)
+  (:interpolatingp () "returns if it is currently processing" interpolatingp)
 
   ;; operation
-  (:start-interpolation () (setq interpolatingp t))
-  (:stop-interpolation () (setq interpolatingp nil))
+  (:start-interpolation () "start interpolation" (setq interpolatingp t))
+  (:stop-interpolation () "stop interpolation" (setq interpolatingp nil))
   (:pass-time
    (dt)
+   "process interpolation for dt[sec]"
    (when interpolatingp
      (setq position (send self :interpolation))
      (incf time dt)
@@ -280,6 +285,7 @@
   ;;
   (:interpolation
    ()
+   "Linear interpolator"
    (let* ((v1 (nth segment position-list))
 	  (v2 (nth (1+ segment) position-list))
 	  (t1+t2 (- (nth segment time-list) (if (> segment 0) (nth (1- segment) time-list) 0))) ;; total time of segment
@@ -302,16 +308,20 @@
   :super interpolator
   :slots (velocity acceleration velocity-list acceleration-list))
 (defmethod minjerk-interpolator
-  (:velocity () velocity)
-  (:velocity-list () velocity-list)
-  (:acceleration () acceleration)
-  (:acceleration-list () acceleration-list)
+  (:velocity () "returns current velocity" velocity)
+  (:velocity-list () "returns velocity list" velocity-list)
+  (:acceleration () "returns current acceleration" acceleration)
+  (:acceleration-list () "returns acceleration list" acceleration-list)
   (:reset
    (&rest args
     &key
     ((:velocity-list vl) (send self :velocity-list))
     ((:acceleration-list al) (send self :acceleration-list))
     &allow-other-keys)
+   "minjerk interopolator
+    position-list : list of control point
+    velocity-list : list of velocity in each control point
+    acceleration-list : list of acceleration in each control point"
    (send-super* :reset args)
    (setq velocity-list (if vl vl (make-list (1+ segment-num) :initial-element (instantiate float-vector (length (car position-list))))))
    (setq acceleration-list (if al al (make-list (1+ segment-num) :initial-element (instantiate float-vector (length (car position-list))))))
@@ -319,6 +329,14 @@
 
   (:interpolation
    ()
+   "Minjerk interpolator, a.k.a Hoff & Arbib
+
+    Example code is:
+(setq l (instance minjerk-interpolator :init))
+(send l :reset :position-list (list #f(1 2 3) #f(3 4 5) #f(1 2 3)) :time-list (list 0.1 0.18))
+(send l :start-interpolation)
+(while (send l :interpolatingp) (send l :pass-time 0.02) (print (send l :position)))
+"
    (let* ((xi (nth segment position-list))
           (xf (nth (1+ segment) position-list))
           (vi (nth segment velocity-list))
