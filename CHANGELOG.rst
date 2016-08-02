@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.13 (2016-08-02)
+-------------------
 * add linear/minjerk-interpolator https://github.com/euslisp/jskeus/pull/391
   * add linear/minjerk-interpolator
   * add irteus/test/interpolator.l
