@@ -2,6 +2,89 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add linear/minjerk-interpolator https://github.com/euslisp/jskeus/pull/391
+  * add linear/minjerk-interpolator
+  * add irteus/test/interpolator.l
+  * add doc for interpolators
+
+* mathtest.l : fix wrongly comment out-ed at https://github.com/euslisp/jskeus/pull/364 (https://github.com/euslisp/jskeus/pull/390 )
+
+* add test for eps>, eps<, eps>=, eps<= https://github.com/euslisp/jskeus/pull/385 (#385)
+  * mathtest.l : fix wrongly comment out-ed at https://github.com/euslisp/jskeus/pull/364
+  * mathtest.l : add test for eps<, eps>, eps<=, eps>=, see section 14 of the manual.pdf
+  * mathtest.l : add test for eps= and eps<>
+
+* Enable to set eps for orient-coords-to-axis https://github.com/euslisp/jskeus/pull/392
+  * [irteus/irtgeo.l] Enable to set eps for orient-coords-to-axis (*epsilon* is used for acos and this is too big in terms of angle error).
+
+* implement function for transpose image (https://github.com/euslisp/jskeus/pull/388 )
+  * [irteus/irtglc.c,irtues/irtext.l,Makefile] add irtglc.c / implement function for transpose image (https://github.com/euslisp/jskeus/pull/388 )
+  * [irteus/irtgl.l] add interface for transpose image function in irtglc.c; replace lisp code for transpose image with C code.
+  * [irteus/test/rendering.l] add test for transpose
+  * [irteus/test/pr2.png] add test image
+
+* irtdyna.l : add condition whther parent is root-link or not in irtdyna.l, and add test for calculate torque when using with-append-root-joint in irteus/test/test-irt-motion.l https://github.com/euslisp/jskeus/pull/382
+* irtdyna.l: set analysis level :coords in :calc-torque-from-vel-acc (irtdyna.l) https://github.com/euslisp/jskeus/pull/383
+
+* [irteus/irtrobot.l] Add all-limbs as robot limb information to motion result from calc-walk-pattern (https://github.com/euslisp/jskeus/pull/379 )
+
+* Calculate smooth swing foot rotation for walking motion (https://github.com/euslisp/jskeus/pull/378 )
+  * [irtdyna.l] Enable to calculate ZMP from total force/moment when update is t in :calc-zmp
+  * [demo/walk-motion.l] Reduce execution time for small robot walking sample by reducing footstep number
+  * [demo/walk-motion.l] Fix default rotation-axis to use all t by default.
+  * [irtdyna.l] Calculate smooth swing foot rotation for walking motion.
+
+* Fix calculation of swing-leg-proj-coords to be smooth trajectory. (https://github.com/euslisp/jskeus/pull/371 )
+  * [irteus/irtdyna.l] Add hoffarbib calculation for swing-leg-proj-coords calculation to smooth trajectory. Previous sigmoig sometimes return discontinuous trajectory.
+
+* Update for stair walk https://github.com/euslisp/jskeus/pull/366
+  * [demo/walk-motion.l,test/irteus-demo.l] Add sample for stair climb. Add test for stair-climb and single-support walking.
+  * [irtdyna.l] Use sigmoid to smooth z (cog, root, ...) trajectory.
+
+* [irteus/irtdyna.l] Add getting method for robot total inertia-tensor. Add and update documentation strings for mass prop calculation. https://github.com/euslisp/jskeus/pull/363
+
+* add armv8(jessie) returns aarch64 (https://github.com/euslisp/jskeus/pull/364)
+  * add arm8(jessie) returns aarch64
+  * docker 16.04 does not have sudo installed
+  * .travis.yml: add testing on ARM arach for both ubuntu/debian, debian for amd64, osx
+  * .travis.sh: do not install tex
+  * .travis.yml : allow_failure for osx
+
+* Support parallel Compile
+  * compile\_*.log depends on .l files (https://github.com/euslisp/jskeus/pull/375 )
+  * irteus/Makefile: support parallel compile (https://github.com/euslisp/jskeus/pull/373)
+  * Makefile: use $(MAKE) instaed of make
+  * Makefile: irteus-installed depends on eus-installed
+
+* OSX support
+  * test/transparent.l: fix for osx, ru_maxrss retuns huge value on osx, so we check if the growth rate of vmrss (https://github.com/euslisp/jskeus/pull/377)
+  * [.travis.yml] add .travis-osx.sh for building on OSX (https://github.com/euslisp/jskeus/pull/302 )
+  * Test installing jskeus by Homebrew via Push to master (https://github.com/euslisp/jskeus/pull/370 )
+
+* update travis.yml to use 16.04 (https://github.com/euslisp/jskeus/pull/357) 
+  * .travis.sh: docker 16.04 does not have sudo nor ptex-bin
+  * .travis.yml : test on both 14.04 and 16.04
+  * .travis.sh add make for docker
+  * .travis.yml: use docker to run travis.sh
+  * .travis.sh: verbose apt-get update
+  * [.travis.sh, travis.yml] split build file into .travis.sh
+  * enable unittest.l cehcking #359
+  * update travis.yml to use 14.04
+  * [.travis.sh] Add apt-get update before apt-get execution https://github.com/euslisp/jskeus/pull/367
+
+* README.md: make is not installed on plain debian/ubuntu, need to apt-get intall make (https://github.com/euslisp/jskeus/pull/365 )
+
+* Update Testing
+  * [irteus/test/vector.l] fix compare NaN  (https://github.com/euslisp/jskeus/pull/361) 
+  * test/vector.l: test for nan/info read https://github.com/euslisp/EusLisp/pull/162 (https://github.com/euslisp/EusLisp/pull/354 )
+  * Enable unittest.l checking. (https://github.com/euslisp/EusLisp/pull/359 )
+  * [irteus/test/unittest.l, .travis.yml] Enable unittest.l checking. Remove removing of failure (https://github.com/jsk-ros-pkg/jsk_roseus/pull/21#issuecomment-205101195) and add neglection of exitting.
+  * [irteus/test/unittest.l] Add more print message to debug unittest.l. (https://github.com/euslisp/EusLisp/pull/358)
+
+* Contributors: Furushchev, Kei Okada, Kentaro Wada, Ryo Terasawa, Shunichi Nozawa
+
 1.0.12 (2016-03-20)
 -------------------
 
