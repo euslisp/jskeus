@@ -120,29 +120,29 @@ $(LIBIRTEUSIMG): $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOB
 $(LIBIRTEUSGL): $(IRTEUSGLOBJS) $(IRTGLCOBJECTS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSGL) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS) $(IMPLIB)
 
-$(IRTEUSOBJS): $(OBJDIR)/compile_irt.log
-$(OBJDIR)/compile_irt.log: $(IRTEUS_L)
-	$(BINDIR)/eus2$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irt.l > $(OBJDIR)/compile_irt.log
+$(IRTEUSOBJS): $(INSTALLOBJDIR)/compile_irt.log
+$(INSTALLOBJDIR)/compile_irt.log: $(IRTEUS_L)
+	$(BINDIR)/eus2$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irt.l > $(INSTALLOBJDIR)/compile_irt.log
 	-rm -f $(IRTEUS_C) $(IRTEUS_H)
 
-$(IRTEUSGOBJS): $(OBJDIR)/compile_irtg.log
-$(OBJDIR)/compile_irtg.log: $(IRTEUSG_L)
-	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l > $(OBJDIR)/compile_irtg.log
+$(IRTEUSGOBJS): $(INSTALLOBJDIR)/compile_irtg.log
+$(INSTALLOBJDIR)/compile_irtg.log: $(IRTEUSG_L)
+	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l > $(INSTALLOBJDIR)/compile_irtg.log
 	-rm -f $(IRTEUSG_C) $(IRTEUSG_H)
 
-$(IRTEUSXOBJS): $(OBJDIR)/compile_irtx.log
-$(OBJDIR)/compile_irtx.log: $(IRTEUSX_L)
-	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtx.l > $(OBJDIR)/compile_irtx.log
+$(IRTEUSXOBJS): $(INSTALLOBJDIR)/compile_irtx.log
+$(INSTALLOBJDIR)/compile_irtx.log: $(IRTEUSX_L)
+	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtx.l > $(INSTALLOBJDIR)/compile_irtx.log
 	-rm -f $(IRTEUSX_C) $(IRTEUSX_H)
 
-$(IRTEUSIMGOBJS): $(OBJDIR)/compile_irtimg.log
-$(OBJDIR)/compile_irtimg.log: $(IRTEUSIMG_L)
-	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtimg.l > $(OBJDIR)/compile_irtimg.log
+$(IRTEUSIMGOBJS): $(INSTALLOBJDIR)/compile_irtimg.log
+$(INSTALLOBJDIR)/compile_irtimg.log: $(IRTEUSIMG_L)
+	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtimg.l > $(INSTALLOBJDIR)/compile_irtimg.log
 	-rm -f $(IRTEUSIMG_C) $(IRTEUSIMG_H)
 
-$(IRTEUSGLOBJS): $(OBJDIR)/compile_irtgl.log
-$(OBJDIR)/compile_irtgl.log: $(IRTEUSGL_L)
-	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtgl.l > $(OBJDIR)/compile_irtgl.log
+$(IRTEUSGLOBJS): $(INSTALLOBJDIR)/compile_irtgl.log
+$(INSTALLOBJDIR)/compile_irtgl.log: $(IRTEUSGL_L)
+	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtgl.l > $(INSTALLOBJDIR)/compile_irtgl.log
 	-rm -f $(IRTEUSGL_C) $(IRTEUSGL_H)
 
 PQP/$(ARCHDIR)/libPQP-static.a:
@@ -174,6 +174,7 @@ clean:
 	-rm -f $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(LIBNR) $(NROBJECTS)
 	-rm -f *~ *.stackdump
 	-rm -f $(EUSDIR)/irteus
+	-rm -f $(INSTALLOBJDIR)/compile_*.log
 	chmod a-x Makefile* *.l *.c
 	(cd PQP;make clean)
 	(cd $(EUSDIR)/lisp/image/jpeg/; make clean)
