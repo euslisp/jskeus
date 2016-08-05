@@ -50,6 +50,7 @@
   (:Q (&optional m) (if m (setq Q m) Q))
   (:R (&optional m) (if m (setq R m) R))
   (:x (&optional v) (if v (setq x_k v) x_k))
+  (:P (&optional m) (if m (setq P_k m) P_k))
   (:predict 
    () 
    (setq x_k-1 x_k)
@@ -61,6 +62,8 @@
    (z) ; measurement
    (setq z_k z)
    ;; S = HPH^ + R
+   (setq diff (matrix (v- z_k (transform H x_k))))
+   (setq R (m* (transpose diff) diff))
    (setq S (m+ (m* H (m* P_k (transpose H))) R))
    ;; K = P H^ S-1
    (setq K (m* (m* P_k (transpose H)) (inverse-matrix S)))
@@ -137,9 +140,9 @@
 
     (cond 
      ((or (eq arg 0) (eq arg 2))
-      (setq k (instance kalman-filter :init :state-dim 2)))
+      (setq k (instance kalman-filter :init :state-dim 2 :q-variance 2)))
      (t
-      (setq k (instance kalman-filter :init :state-dim 4 :r-variance 0.001))
+      (setq k (instance kalman-filter :init :state-dim 4 :q-variance 0.01))
       (send k :A #2f((1 0 1 0)(0 1 0 1)(0 0 1 0)(0 0 0 1)))))
 
     (with-open-file 
