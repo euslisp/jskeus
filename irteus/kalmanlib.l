@@ -28,12 +28,13 @@
 
 (defclass kalman-filter
   :super propertied-object
-  :slots (A H I Q R x_k z_k P_k x_k-1 P_k-1 K S vlst))
+  :slots (A B H I Q R x_k u_k z_k P_k x_k-1 u_k-1 P_k-1 K S vlst))
 
 (defmethod kalman-filter
   (:init 
    (&key (state-dim 2) (measure-dim 2) (q-variance 1e-5) (r-variance 0.01))
    (setq A (unit-matrix state-dim)) ;;(make-matrix state-dim state-dim))
+   (setq B (unit-matrix state-dim))
    (setq H (make-matrix measure-dim state-dim))
    (setq I (unit-matrix state-dim))
    (dotimes (i (car (array-dimensions (make-matrix measure-dim state-dim))))
@@ -41,20 +42,24 @@
    (setq Q (scale-matrix q-variance (unit-matrix state-dim)))
    (setq R (scale-matrix r-variance (unit-matrix measure-dim)))
    (setq z_k (make-array measure-dim :element-type :float))
+   (setq u_k (make-array state-dim :element-type :float))
    (setq x_k (transform (transpose H) z_k))
    (setq P_k (unit-matrix state-dim))
    self)
   (:A (&optional m) (if m (setq A m) A))
+  (:B (&optional m) (if m (setq B m) B))
   (:H (&optional m) (if m (setq H m) H))
   (:P () P_k)
   (:Q (&optional m) (if m (setq Q m) Q))
   (:R (&optional m) (if m (setq R m) R))
   (:x (&optional v) (if v (setq x_k v) x_k))
+  (:u (&optional v) (if v (setq u_k v) u_k))
   (:predict 
    () 
    (setq x_k-1 x_k)
+   (setq u_k-1 u_k)
    (setq P_k-1 P_k)
-   (setq x_k (transform A x_k-1))
+   (setq x_k (v+ (transform A x_k-1) (transform B u_k-1)))
    (setq P_k (m+ (m* A (m* P_k-1 (transpose A))) Q))
    x_k)
   (:correct 
