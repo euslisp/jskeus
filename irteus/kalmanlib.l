@@ -37,7 +37,7 @@
    (setq B (unit-matrix state-dim))
    (setq H (make-matrix measure-dim state-dim))
    (setq I (unit-matrix state-dim))
-   (dotimes (i (car (array-dimensions (make-matrix measure-dim state-dim))))
+   (dotimes (i (apply #'min (array-dimensions (make-matrix measure-dim state-dim))))
      (setf (aref H i i) 1))
    (setq Q (scale-matrix q-variance (unit-matrix state-dim)))
    (setq R (scale-matrix r-variance (unit-matrix measure-dim)))
