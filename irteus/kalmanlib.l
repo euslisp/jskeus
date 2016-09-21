@@ -104,7 +104,7 @@
 
 (defun kalman-demo 
   nil
-  (dotimes (i 4)
+  (dotimes (i 5)
     (kalman-demo-impl i)
     (unix:sleep 1))
   (format t ";; exiting...~%")
@@ -124,8 +124,10 @@
        (format t ";; data -> line, kalman -> Position-Velocity model~%"))
       (2
        (format t ";; data -> sin,  kalman -> Position model~%"))
+      (3
+       (format t ";; data -> sin,  kalman -> Position-Velocity model~%"))
       (t
-       (format t ";; data -> sin,  kalman -> Position-Velocity model~%")))
+       (format t ";; data -> a*x^2+c,  kalman -> Position-Velocity model~%")))
   
     (setq x1o '(float-vector))
     (setq y1o '(float-vector))
@@ -134,8 +136,10 @@
       (cond
        ((< arg 2)
 	(push (+ -0.37727 (random-gauss 0 0.1)) y1o))
-       (t
+       ((< arg 4)
 	(push (+ -0.37727 (random-gauss 0 0.05) (* 0.2 (sin (/ i 5.0)))) y1o))
+       (t
+        (push (+ -0.37727 (random-gauss 0 0.05) (* i i 5e-5)) y1o))
        ))
     (setq x1o (eval (reverse x1o)))
     (setq y1o (eval (reverse y1o)))
@@ -146,13 +150,14 @@
      (t
       (setq k (instance kalman-filter :init :state-dim 4 :r-variance 0.001))
       (send k :A #2f((1 0 1 0)(0 1 0 1)(0 0 1 0)(0 0 0 1)))))
+    (when (eq arg 4) (send k :u #f(0 0 0 1e-4)))
 
     (with-open-file 
-     (f "data.dat" :direction :output)
+     (f (format nil "data_~a.dat" arg) :direction :output)
      (dotimes (i (length y1o))
        (format f "~A ~A~%" (elt x1o i) (elt y1o i))))
     (with-open-file 
-     (f "kalman.dat" :direction :output)
+     (f (format nil "kalman_~a.dat" arg) :direction :output)
      (dotimes (i (length y1o))
        (setq z (float-vector (elt x1o i) (elt y1o i)))
        (setq z^ (send k :proc z))
@@ -165,11 +170,11 @@
      (f fname :direction :output :permission #o744)
      (format f "#!/usr/bin/env gnuplot~%")
      (format f "~%")
-     (format f "plot [0:100][-0.6:0] 'data.dat' title \"data\" with linespoints~%")
+     (format f "plot [0:100][-0.6:0] 'data_~a.dat' title \"data\" with linespoints~%" arg)
      (format f "set y2tics~%")
      (format f "set y2range [0:0.01]~%")
-     (format f "replot 'kalman.dat' title \"kalman\" with linespoints~%")
-     (format f "replot 'kalman.dat' using 3 axes x1y2 title \"error\" with linespoints~%")
+     (format f "replot 'kalman_~a.dat' title \"kalman\" with linespoints~%" arg)
+     (format f "replot 'kalman_~a.dat' using 3 axes x1y2 title \"error\" with linespoints~%" arg)
      (format f "replot -0.37727~%")
      (format f "pause -1~%")
      )
