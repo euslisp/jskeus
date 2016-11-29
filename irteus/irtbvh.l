@@ -550,11 +550,38 @@
    self) ;; init
   ) ;defmethod cmu-bvh-robot-model
 
-(defun load-mcd (fname &key (scale) (coords) (bvh-robot-model-class bvh-robot-model))
+(defun load-mcd (fname &key (scale) (coords) (bvh-robot-model-class bvh-robot-model) &allow-other-keys)
   "load motion capture data"
   (let ((bvh-robot-model bvh-robot-model-class))
     (instance motion-capture-data :init fname :coords coords :scale scale)
     ))
+
+(defun rikiya-bvh2eus (fname &rest args)
+  "read rikiya bvh file and anmiate robot model in the viewer
+(rikiya-bvh2eus \"A01.bvh\")
+"
+  (apply #'bvh2eus fname :scale 10.0 :bvh-robot-model-class rikiya-bvh-robot-model args))
+
+(defun cmu-bvh2eus (fname &rest args)
+  "read cmu bvh file and anmiate robot model in the viewer
+
+CMU motion capture database
+ (https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion)
+
+(cmu-bvh2eus \"01_01.bvh\" :scale 100.0)
+"
+  (apply #'bvh2eus fname :scale 100.0 :bvh-robot-model-class cmu-bvh-robot-model args))
+
+(defun tum-bvh2eus (fname &rest args)
+  "read tum file and anmiate robot model in the viewer
+
+The TUM Kitchen Data Set
+ (http://ias.cs.tum.edu/download/kitchen-activity-data)
+
+(tum-bvh2eus \"Take 005.bvh\" :scale 10.0)
+"
+  (apply #'bvh2eus fname :scale 10.0 :bvh-robot-model-class tum-bvh-robot-model args))
+
 
 (in-package "GEOMETRY")
 
