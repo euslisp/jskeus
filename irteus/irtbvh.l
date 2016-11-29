@@ -464,6 +464,43 @@ Other Sites are:
    (send self :init-root-link)
    ;;;
    self) ;; init
+  (:larm-collar (&rest args)   (forward-message-to (elt larm 0) args))
+  (:larm-shoulder (&rest args) (forward-message-to (elt larm 1) args))
+  (:larm-elbow (&rest args)    (forward-message-to (elt larm 2) args))
+  (:larm-wrist (&rest args)    (forward-message-to (elt larm 3) args))
+  (:rarm-collar (&rest args)   (forward-message-to (elt rarm 0) args))
+  (:rarm-shoulder (&rest args) (forward-message-to (elt rarm 1) args))
+  (:rarm-elbow (&rest args)    (forward-message-to (elt rarm 2) args))
+  (:rarm-wrist (&rest args)    (forward-message-to (elt rarm 3) args))
+  (:lleg-crotch (&rest args)   (forward-message-to (elt lleg 0) args))
+  (:lleg-knee (&rest args)     (forward-message-to (elt lleg 1) args))
+  (:lleg-ankle (&rest args)    (forward-message-to (elt lleg 2) args))
+  (:rleg-crotch (&rest args)   (forward-message-to (elt rleg 0) args))
+  (:rleg-knee (&rest args)     (forward-message-to (elt rleg 1) args))
+  (:rleg-ankle (&rest args)    (forward-message-to (elt rleg 2) args))
+  (:torso-chest (&rest args)   (forward-message-to (elt torso 0) args))
+  (:head-neck (&rest args)     (forward-message-to (elt head 0) args))
+  (:copy-joint-to
+   (robot limb joint &optional (sign 1))
+   (send robot limb (intern (format nil "~A-R" (symbol-name joint)) "KEYWORD") :joint-angle
+         (* sign (elt (send self limb joint :joint :joint-angle) 2)))
+   (send robot limb (intern (format nil "~A-P" (symbol-name joint)) "KEYWORD") :joint-angle
+         (elt (send self limb joint :joint :joint-angle) 0))
+   (send robot limb (intern (format nil "~A-Y" (symbol-name joint)) "KEYWORD") :joint-angle
+         (* sign (elt (send self limb joint :joint :joint-angle) 1))))
+  (:copy-state-to
+   (robot)
+   (let (sign)
+     (dolist (arm '(:larm :rarm))
+       (dolist (joint '(:collar :shoulder :elbow :wrist))
+         (send self :copy-joint-to robot arm joint (case arm (:rarm -1) (t 1)))))
+     (dolist (leg '(:lleg :rleg))
+       (dolist (joint '(:crotch :knee :ankle))
+         (send self :copy-joint-to robot leg joint (case leg (:rleg -1) (t 1)))))
+     (send self :copy-joint-to robot :torso :chest)
+     (send self :copy-joint-to robot :head :neck -1)
+     (send robot :newcoords (send self :transformation (car links) :world))
+     )) ;; copy-state-to
   ) ;defmethod rikiya-bvh-robot-model
 
 (defclass tum-bvh-robot-model
