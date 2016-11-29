@@ -362,6 +362,10 @@
        (while t
 	 (send self :frame frame)
 	 (send (get *viewer* :pickviewer) :look-all)
+         (dolist (obj (objects))
+           (if (and (not (derivedp obj bvh-robot-model))
+                    (derivedp obj robot-model))
+               (send (send self :model) :copy-state-to obj)))
 	 (incf frame step)
 	 (if (>= frame (send self :frame-length)) (throw :animate nil))
 	 (if (select-stream (list *standard-input*) 1.0e-8) (throw :animate nil))
@@ -371,7 +375,7 @@
   ;;
   ) ; motion-capture-data
 
-(defun bvh2eus (fname &rest args)
+(defun bvh2eus (fname &rest args &key ((:objects obj) nil) &allow-other-keys)
   "read bvh file and anmiate robot model in the viewer
 
 for Supported bvh data, such as
@@ -397,8 +401,9 @@ Other Sites are:
 (bvh2eus \"poses.bvh\")
  "
   (let (b)
+    (unless (listp obj) (setq obj (list obj)))
     (setq b (apply #'load-mcd fname args))
-    (objects (list (send b :model)))
+    (objects (append (list (send b :model)) obj))
     (send b :animate)
     b))
 
