@@ -372,28 +372,35 @@
   ) ; motion-capture-data
 
 (defun bvh2eus (fname &rest args)
-  "read bvh file and anmiate robot model in the viewer"
+  "read bvh file and anmiate robot model in the viewer
+
+for Supported bvh data, such as
+
+- CMU motion capture database
+   (https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion)
+
+- The TUM Kitchen Data Set
+   (http://ias.cs.tum.edu/download/kitchen-activity-data)
+
+Use
+
+(tum-bvh2eus \"Take 005.bvh\")   ;; tum
+(rikiya-bvh2eus \"A01.bvh\")     ;; rikiya
+(cmu-bvh2eus \"01_01.bvh\")      ;; cmu
+
+
+Other Sites are:
+ (http://www.mocapdata.com/page.cgi?p=free_motions)
+ (http://www.motekentertainment.com/)
+ (http://www.mocapclub.com/Pages/Library.htm)
+
+(bvh2eus \"poses.bvh\")
+ "
   (let (b)
     (setq b (apply #'load-mcd fname args))
     (objects (list (send b :model)))
     (send b :animate)
     b))
-
-;; CMU motion capture database
-;; https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion
-;;
-;; The TUM Kitchen Data Set
-;; http://ias.cs.tum.edu/download/kitchen-activity-data
-;;
-;; Other Sites
-;; http://www.mocapdata.com/page.cgi?p=free_motions
-;; http://www.motekentertainment.com/
-;; http://www.mocapclub.com/Pages/Library.htm
-
-;;(bvh2eus "Take 005.bvh" :scale 10.0)
-;;(bvh2eus "A01.bvh" :scale 10.0)
-;;(bvh2eus "01_01.bvh" :scale 100.0)
-;;(bvh2eus "poses.bvh")
 
 (defmethod bvh-robot-model
   (:init-end-coords ()
