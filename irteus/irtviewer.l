@@ -300,6 +300,7 @@
   (:flush () (if viewer (send viewer :viewsurface :glflush)))
   (:change-background (col)
    (let ((vs (send self :viewer :viewsurface)))
+     (send vs :makecurrent)
      (setq (vs . x::bg-color) col)
      (gl::glClearColorfv col)))
   )
