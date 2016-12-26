@@ -223,7 +223,7 @@
          (setq target-orient (matrix-column (send target-coords :worldrot) 2)
                move-orient (matrix-column (send move-target :worldrot) 2))
          (setq jid 0)
-         (dolist (j (send self :head :joint-list))
+         (dolist (j (send-all link-list :joint))
            (setq axis-orient (send j :parent-link :rotate-vector (case (j . axis) (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1)) (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1)) (t (j . axis)))))
            ;; direciton of non continuous area
            (setq axis-orient2 (send j :parent-link :rotate-vector #f(-1 0 0)))
