@@ -812,6 +812,7 @@
     (send robot :legs :move-end-pos (float-vector 0 0 50))
     (send robot :fix-leg-to-coords (make-coords))
     ;(send robot :head :neck-y :joint-angle 180)
+    (send robot :update-descendants) ;; update all bodies
     (objects (list robot))
     (setq result
           (send robot :fullbody-inverse-kinematics
@@ -947,7 +948,7 @@
   (assert
    (not (> (length (send *sample-robot* :get :ik-draw-on-params)) 0))))
 
-(deftest test-fullbody-ik-kwith-look-at
+(deftest test-fullbody-ik-with-look-at
   (let (robot l1 l2 l3 j1 j2 j3)
     ;; normal test
     (setq robot (instance sample-robot :init))
@@ -978,8 +979,8 @@
     (send robot :head :neck-y :max-angle   45)
     (send robot :head :neck-p :min-angle -135)
     (send robot :head :neck-p :max-angle -175)
-    ;;(assert ;; intentinally do no check result
-     (fullbody-ik-with-look-at robot);)
+    (assert
+     (fullbody-ik-with-look-at robot :debug-view nil))
     ))
 
 
