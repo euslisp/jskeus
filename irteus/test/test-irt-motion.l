@@ -978,8 +978,8 @@
     (send robot :head :neck-y :max-angle   45)
     (send robot :head :neck-p :min-angle -135)
     (send robot :head :neck-p :max-angle -175)
-    (assert
-     (fullbody-ik-with-look-at robot))
+    ;;(assert ;; intentinally do no check result
+     (fullbody-ik-with-look-at robot);)
     ))
 
 
