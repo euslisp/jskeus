@@ -41,7 +41,7 @@ PQPLIB=-L$(PQPLIBDIR) -lPQP-static
 MODULES.L=irt_modules.l
 EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 
-IRTEUS=irtmath irtutil irtgraph pgsql
+IRTEUS=irtmath irtutil irtgraph pgsql time
 IRTEUSG=irtgeo pqp irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud
 IRTEUSX=irtx
 IRTEUSIMG=irtimage eusjpeg png
@@ -61,7 +61,9 @@ IRTEUSOBJS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUS_OSFX))
 IRTEUSDLLS=$(addprefix $(INSTALLOBJDIR)/,$(IRTEUS_LSFX))
 IRTEUS_C=$(addsuffix .c,$(IRTEUS))
 IRTEUS_H=$(addsuffix .h,$(IRTEUS))
-IRTEUS_L=$(patsubst pgsql.l,$(EUSDIR)/lib/llib/pgsql.l,$(addsuffix .l,$(IRTEUS)))
+IRTEUS_L=$(addsuffix .l,$(IRTEUS))
+IRTEUS_L:=$(subst pgsql.l,$(EUSDIR)/lib/llib/pgsql.l,$(IRTEUS_L))
+IRTEUS_L:=$(subst time.l,$(EUSDIR)/lib/llib/time.l,$(IRTEUS_L))
 
 IRTEUSG_OSFX=$(addsuffix .$(OSFX),$(IRTEUSG))
 IRTEUSG_LSFX=$(addsuffix .$(LSFX),$(IRTEUSG))
@@ -179,6 +181,7 @@ clean:
 	(cd PQP;make clean)
 	(cd $(EUSDIR)/lisp/image/jpeg/; make clean)
 	-rm -f $(EUSDIR)/lib/llib/pgsql.c $(EUSDIR)/lib/llib/pgsql.h
+	-rm -f $(EUSDIR)/lib/llib/time.c $(EUSDIR)/lib/llib/time.h
 
 $(INSTALLOBJDIR)/irtmath.$(OSFX): irtmath.l
 $(INSTALLOBJDIR)/irtutil.$(OSFX): irtutil.l
@@ -200,6 +203,7 @@ $(INSTALLOBJDIR)/irtimage.$(OSFX): irtimage.l
 $(INSTALLOBJDIR)/pqp.$(OSFX): pqp.l
 $(INSTALLOBJDIR)/png.$(OSFX): png.l
 $(INSTALLOBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l
+$(INSTALLOBJDIR)/time.$(OSFX): $(EUSDIR)/lib/llib/time.l
 $(INSTALLOBJDIR)/eusjpeg.$(OSFX): $(EUSDIR)/lisp/image/jpeg/eusjpeg.l
 
 $(INSTALLOBJDIR)/irtc.$(OSFX): irtc.c $(filter-out $(INSTALLOBJDIR)/irtc.$(OSFX),$(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS))
