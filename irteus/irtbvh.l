@@ -362,6 +362,10 @@
        (while t
 	 (send self :frame frame)
 	 (send (get *viewer* :pickviewer) :look-all)
+         (dolist (obj (objects))
+           (if (and (not (derivedp obj bvh-robot-model))
+                    (derivedp obj robot-model))
+               (send (send self :model) :copy-state-to obj)))
 	 (incf frame step)
 	 (if (>= frame (send self :frame-length)) (throw :animate nil))
 	 (if (select-stream (list *standard-input*) 1.0e-8) (throw :animate nil))
@@ -371,29 +375,37 @@
   ;;
   ) ; motion-capture-data
 
-(defun bvh2eus (fname &rest args)
-  "read bvh file and anmiate robot model in the viewer"
+(defun bvh2eus (fname &rest args &key ((:objects obj) nil) &allow-other-keys)
+  "read bvh file and anmiate robot model in the viewer
+
+for Supported bvh data, such as
+
+- CMU motion capture database
+   (https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion)
+
+- The TUM Kitchen Data Set
+   (http://ias.cs.tum.edu/download/kitchen-activity-data)
+
+Use
+
+(tum-bvh2eus \"Take 005.bvh\")   ;; tum
+(rikiya-bvh2eus \"A01.bvh\")     ;; rikiya
+(cmu-bvh2eus \"01_01.bvh\")      ;; cmu
+
+
+Other Sites are:
+ (http://www.mocapdata.com/page.cgi?p=free_motions)
+ (http://www.motekentertainment.com/)
+ (http://www.mocapclub.com/Pages/Library.htm)
+
+(bvh2eus \"poses.bvh\")
+ "
   (let (b)
+    (unless (listp obj) (setq obj (list obj)))
     (setq b (apply #'load-mcd fname args))
-    (objects (list (send b :model)))
+    (objects (append (list (send b :model)) obj))
     (send b :animate)
     b))
-
-;; CMU motion capture database
-;; https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion
-;;
-;; The TUM Kitchen Data Set
-;; http://ias.cs.tum.edu/download/kitchen-activity-data
-;;
-;; Other Sites
-;; http://www.mocapdata.com/page.cgi?p=free_motions
-;; http://www.motekentertainment.com/
-;; http://www.mocapclub.com/Pages/Library.htm
-
-;;(bvh2eus "Take 005.bvh" :scale 10.0)
-;;(bvh2eus "A01.bvh" :scale 10.0)
-;;(bvh2eus "01_01.bvh" :scale 100.0)
-;;(bvh2eus "poses.bvh")
 
 (defmethod bvh-robot-model
   (:init-end-coords ()
@@ -457,6 +469,46 @@
    (send self :init-root-link)
    ;;;
    self) ;; init
+  (:larm-collar (&rest args)   (forward-message-to (elt larm 0) args))
+  (:larm-shoulder (&rest args) (forward-message-to (elt larm 1) args))
+  (:larm-elbow (&rest args)    (forward-message-to (elt larm 2) args))
+  (:larm-wrist (&rest args)    (forward-message-to (elt larm 3) args))
+  (:rarm-collar (&rest args)   (forward-message-to (elt rarm 0) args))
+  (:rarm-shoulder (&rest args) (forward-message-to (elt rarm 1) args))
+  (:rarm-elbow (&rest args)    (forward-message-to (elt rarm 2) args))
+  (:rarm-wrist (&rest args)    (forward-message-to (elt rarm 3) args))
+  (:lleg-crotch (&rest args)   (forward-message-to (elt lleg 0) args))
+  (:lleg-knee (&rest args)     (forward-message-to (elt lleg 1) args))
+  (:lleg-ankle (&rest args)    (forward-message-to (elt lleg 2) args))
+  (:rleg-crotch (&rest args)   (forward-message-to (elt rleg 0) args))
+  (:rleg-knee (&rest args)     (forward-message-to (elt rleg 1) args))
+  (:rleg-ankle (&rest args)    (forward-message-to (elt rleg 2) args))
+  (:torso-chest (&rest args)   (forward-message-to (elt torso 0) args))
+  (:head-neck (&rest args)     (forward-message-to (elt head 0) args))
+  (:copy-joint-to
+   (robot limb joint &optional (sign 1))
+   (if (find-method robot (intern (format nil "~A-~A-R" (symbol-name limb) (symbol-name joint)) "KEYWORD"))
+       (send robot limb (intern (format nil "~A-R" (symbol-name joint)) "KEYWORD") :joint-angle
+             (* sign (elt (send self limb joint :joint :joint-angle) 2))))
+   (if (find-method robot (intern (format nil "~A-~A-P" (symbol-name limb) (symbol-name joint)) "KEYWORD"))
+       (send robot limb (intern (format nil "~A-P" (symbol-name joint)) "KEYWORD") :joint-angle
+             (elt (send self limb joint :joint :joint-angle) 0)))
+   (if (find-method robot (intern (format nil "~A-~A-Y" (symbol-name limb) (symbol-name joint)) "KEYWORD"))
+       (send robot limb (intern (format nil "~A-Y" (symbol-name joint)) "KEYWORD") :joint-angle
+             (* sign (elt (send self limb joint :joint :joint-angle) 1)))))
+  (:copy-state-to
+   (robot)
+   (let (sign)
+     (dolist (arm '(:larm :rarm))
+       (dolist (joint '(:collar :shoulder :elbow :wrist))
+         (send self :copy-joint-to robot arm joint (case arm (:rarm -1) (t 1)))))
+     (dolist (leg '(:lleg :rleg))
+       (dolist (joint '(:crotch :knee :ankle))
+         (send self :copy-joint-to robot leg joint (case leg (:rleg -1) (t 1)))))
+     (send self :copy-joint-to robot :torso :chest)
+     (send self :copy-joint-to robot :head :neck -1)
+     (send robot :newcoords (send self :transformation (car links) :world))
+     )) ;; copy-state-to
   ) ;defmethod rikiya-bvh-robot-model
 
 (defclass tum-bvh-robot-model
@@ -550,11 +602,38 @@
    self) ;; init
   ) ;defmethod cmu-bvh-robot-model
 
-(defun load-mcd (fname &key (scale) (coords) (bvh-robot-model-class bvh-robot-model))
+(defun load-mcd (fname &key (scale) (coords) (bvh-robot-model-class bvh-robot-model) &allow-other-keys)
   "load motion capture data"
   (let ((bvh-robot-model bvh-robot-model-class))
     (instance motion-capture-data :init fname :coords coords :scale scale)
     ))
+
+(defun rikiya-bvh2eus (fname &rest args)
+  "read rikiya bvh file and anmiate robot model in the viewer
+(rikiya-bvh2eus \"A01.bvh\")
+"
+  (apply #'bvh2eus fname :scale 10.0 :bvh-robot-model-class rikiya-bvh-robot-model args))
+
+(defun cmu-bvh2eus (fname &rest args)
+  "read cmu bvh file and anmiate robot model in the viewer
+
+CMU motion capture database
+ (https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion)
+
+(cmu-bvh2eus \"01_01.bvh\" :scale 100.0)
+"
+  (apply #'bvh2eus fname :scale 100.0 :bvh-robot-model-class cmu-bvh-robot-model args))
+
+(defun tum-bvh2eus (fname &rest args)
+  "read tum file and anmiate robot model in the viewer
+
+The TUM Kitchen Data Set
+ (http://ias.cs.tum.edu/download/kitchen-activity-data)
+
+(tum-bvh2eus \"Take 005.bvh\" :scale 10.0)
+"
+  (apply #'bvh2eus fname :scale 10.0 :bvh-robot-model-class tum-bvh-robot-model args))
+
 
 (in-package "GEOMETRY")
 
