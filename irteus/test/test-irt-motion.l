@@ -801,6 +801,36 @@
       )
     ))
 
+;; test for fullbody look at
+(defun fullbody-ik-with-look-at (robot &key (debug-view :no-message))
+  (let (result av)
+    ;; (send robot :reset-pose) ;; fixed robot has more joint on neck
+    (setq av (send robot :angle-vector))
+    (replace av #f(0.0 0.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0))
+    (send robot :angle-vector av)
+    ;;
+    (send robot :legs :move-end-pos (float-vector 0 0 50))
+    (send robot :fix-leg-to-coords (make-coords))
+    ;(send robot :head :neck-y :joint-angle 180)
+    (send robot :update-descendants) ;; update all bodies
+    (objects (list robot))
+    (setq result
+          (send robot :fullbody-inverse-kinematics
+                (list (make-coords :pos #f(0 -300 600))
+                      (make-coords :pos #f(0 300 600))
+                      (send robot :rleg :end-coords :copy-worldcoords)
+                      (send robot :lleg :end-coords :copy-worldcoords))
+                :move-target (mapcar #'(lambda (x)
+                                         (send robot x :end-coords))
+                                     (list :rarm :larm :rleg :lleg))
+                :link-list (mapcar #'(lambda (x)
+                                       (send robot :link-list (send robot x :end-coords :parent)))
+                                   (list :rarm :larm :rleg :lleg))
+                :rotation-axis (list nil nil t t)
+                :look-at-target t
+                :debug-view debug-view))
+    result))
+
 ;; test for static balance point
 (defun fullbody-ik-with-forces (robot &key (debug-view :no-message))
   (send robot :newcoords (make-coords))
@@ -917,6 +947,42 @@
   (dotimes (i 5) (send *sample-robot* :move-centroid-on-foot :both '(:rleg :lleg)))
   (assert
    (not (> (length (send *sample-robot* :get :ik-draw-on-params)) 0))))
+
+(deftest test-fullbody-ik-with-look-at
+  (let (robot l1 l2 l3 j1 j2 j3)
+    ;; normal test
+    (setq robot (instance sample-robot :init))
+    (assert
+     (fullbody-ik-with-look-at robot))
+    ;; change robot
+    ;; extend head link head :end-coords is assoced to not the leaf of the link treee
+    (setq l1 (instance bodyset-link :init (make-cascoords) :bodies (list (make-cube 3 10 10))))
+    (setq l2 (instance bodyset-link :init (make-cascoords) :bodies (list (make-cube 3 10 10))))
+    (setq l3 (instance bodyset-link :init (make-cascoords) :bodies (list (make-cube 3 80 10))))
+    (send l1 :locate (send (send robot :head :end-coords) :transform-vector #f(-20 0 -5)) :world)
+    (send l2 :locate (send l1 :transform-vector #f(5 0 0)) :world)
+    (send l3 :locate (send l2 :transform-vector #f(5 0 0)) :world)
+    (send l1 :assoc l2)
+    (send l2 :assoc l3)
+    (send (send robot :head :end-coords :parent) :assoc l1)
+    (setq (robot . links) (append (robot . links) (list l1 l2 l3)))
+    (setq (robot . head) (append (robot . head) (list l1 l2 l3)))
+    (setq j1 (instance rotational-joint :init :name :j1 :parent-link (send robot :head :end-coords :parent) :child-link l1 :axis :z :min -100 :max 100))
+    (setq j2 (instance rotational-joint :init :name :j2 :parent-link l1 :child-link l2 :axis :x :min -100 :max 100))
+    (setq j3 (instance rotational-joint :init :name :j3 :parent-link l2 :child-link l3 :axis :y :min -100 :max 100))
+    (setq (robot . joint-list) (append (robot . joint-list) (list j1 j2 j3)))
+    (send robot :init-ending)
+    (send (send robot :head :end-coords :parent) :dissoc (send robot :head :end-coords))
+    ;;(send l2 :assoc (send robot :head :end-coords))
+    (send (send robot :head :root-link) :assoc (send robot :head :end-coords))
+    (send robot :head :neck-y :min-angle  -45)
+    (send robot :head :neck-y :max-angle   45)
+    (send robot :head :neck-p :min-angle -135)
+    (send robot :head :neck-p :max-angle -175)
+    (assert
+     (fullbody-ik-with-look-at robot :debug-view nil))
+    ))
+
 
 ;; Test calling calc-walk-pattern-from-footstep-list N times
 ;;   This test is for bug reported in https://github.com/euslisp/jskeus/issues/286.
