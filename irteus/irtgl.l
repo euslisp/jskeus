@@ -485,6 +485,7 @@
   (:draw-on
    (&key ((:viewer vwer) *viewer*)
          flush (width 1) (color #f(1 1 1)))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color))
 	 (v (float-vector 0 0 0)))
@@ -501,6 +502,7 @@
   (:draw-on
    (&key ((:viewer vwer) *viewer*)
          flush (width 1) (color #f(1 1 1)))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color))
 	 (v (float-vector 0 0 0)))
@@ -530,6 +532,7 @@
   (:draw-on
    (&key ((:viewer vwer) *viewer*)
          flush (width 1) (color #f(1 1 1)))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color)))
      (send vwer :viewsurface :line-width width)
@@ -587,6 +590,7 @@
    (&key ((:viewer vwer) user::*viewer*)
 	 flush (width (get self :width)) (color (get self :color))
 	 (size (get self :size)))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color))
 	 (v (float-vector 0 0 0)) v2)
@@ -621,6 +625,7 @@
   (:draw-on
    (&key ((:viewer vwer) *viewer*)
          flush (width 1) (color #f(1 1 1)) (size 50))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color))
 	 (v (float-vector 0 0 0)))
