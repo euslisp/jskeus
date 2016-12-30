@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.14 (2016-12-30)
+-------------------
 * update bvh2eus (`#400 <https://github.com/EusLisp/jskeus/issues/400>`_)
   * fix documentation of bvh2eus
   * support :objects keyword for bvh2eus
