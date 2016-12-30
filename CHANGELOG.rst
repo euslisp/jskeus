@@ -2,6 +2,26 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* update bvh2eus (`#400 <https://github.com/EusLisp/jskeus/issues/400>`_)
+  * fix documentation of bvh2eus
+  * support :objects keyword for bvh2eus
+  * check if the robot has correspond joint
+  * add copy-state-to to rikiya-bvh-model
+  * add {rikiya/cmu/tmu}-bvh2eus
+* add :makecurrent in :draw-on, this will fix https://github.com/euslisp/jskeus/issues/401 (`#402 <https://github.com/EusLisp/jskeus/issues/402>`_ )
+* irtrobot.l: :inverse-kinematics-loop-for-look-at : use joint-list from joint of link-liste (`#408 <https://github.com/EusLisp/jskeus/issues/408>`_ )
+* load lib/llib/time.l from .so object. Fix https://github.com/euslisp/jskeus/issues/292 (`#409 <https://github.com/EusLisp/jskeus/issues/409>`_ )
+* irtviewer.l: Add :makecurrent in :change-background. Fix https://github.com/euslisp/jskeus/issues/404 (`#406 <https://github.com/EusLisp/jskeus/issues/406>`_ )
+* Update kalmanlib (`#396 <https://github.com/EusLisp/jskeus/issues/396>`_)
+  * [irteus/kalmanlib.l] add kalmanlib sample of accelerated motion
+  * [irteus/kalmanlib.l] allow larger dimension of H than A in kalman filter model
+  * [irteus/kalmanlib.l] add controller term in model
+* add circle.yaml : run make doc in circleci (`#395 <https://github.com/EusLisp/jskeus/issues/395>`_)
+* add test/queue.l for https://github.com/euslisp/EusLisp/pull/185 (`#394 <https://github.com/EusLisp/jskeus/issues/394>`_ )
+* Contributors: Ryo Koyama, Kei Okada, Shun Hasegawa
+
 1.0.13 (2016-08-02)
 -------------------
 * add linear/minjerk-interpolator https://github.com/euslisp/jskeus/pull/391
