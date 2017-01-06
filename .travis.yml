@@ -64,7 +64,11 @@ script:
   - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then mv $CI_SOURCE_PATH/irteus/test/*.l /tmp; mv /tmp/irt*.l $CI_SOURCE_PATH/irteus/test/; fi # arm VM is very slow so we do not have time to run all tests
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then docker run --rm -i -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"; fi
   # Test installing head version jskeus via Homebrew formula
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then source $CI_SOURCE_PATH/.travis-osx.sh; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" -a "$TRAVIS_PULL_REQUEST" = "false" -a "$TRAVIS_BRANCH" = "master" ]; then
+      brew update;
+      brew install homebrew/x11/jskeus --HEAD;
+      brew test jskeus;
+    fi
 after_success:
   - (cd doc/; pdftotext jmanual.pdf; mv jmanual.txt jmanual.txt.old; make; pdftotext jmanual.pdf)
   - (cd doc/; make html)
