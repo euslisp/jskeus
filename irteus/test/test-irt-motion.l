@@ -885,6 +885,8 @@
     :robot-class sarmclass :wheel-class omniwheel-joint
     :use-wholebody t)))
 
+;; https://github.com/euslisp/EusLisp/issues/232
+#-:arm
 (deftest test-orientation-of-joint-class
   (assert
    (let ((ret (test-orientation-of-joint-class-common sphere-joint)))
