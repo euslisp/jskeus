@@ -23,7 +23,7 @@ sudo apt-get install ros-indigo-euslisp
 
 ### 1.2 Install via Homebrew (OSX)
 ```
-brew install homebrew/x11/jskeus
+brew install euslisp/jskeus/jskeus
 ```
 
 ## 2 Playing with Demo programs
