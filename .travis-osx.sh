@@ -33,7 +33,7 @@ setup_brew_test() {
     travis_time_end
 
     travis_time_start brew.install
-    brew install homebrew/x11/jskeus --HEAD
+    brew install euslisp/jskeus/jskeus --HEAD
     travis_time_end
 
     travis_time_start brew.test
