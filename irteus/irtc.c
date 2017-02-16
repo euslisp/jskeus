@@ -840,6 +840,175 @@ pointer argv[];
   while(pc-->0) vpop();
   return (cons(ctx,rr,cons(ctx,ri,NIL)));};
 
+///
+static pointer VMEAN(ctx, n, argv)
+/* make mean of vector, vmean #f(1 2 3) -> 2.0 */
+/* (vmean X) => (/ (+ x_0 x_1 ... x_n) (length x)), where X := [x_0, ..., x_n] */
+register context *ctx;
+int n;
+register pointer *argv;
+{
+  int i,fn;
+  double sum=0;
+  pointer pcur;
+  numunion nu;
+  ckarg(1);
+  if (isvector(argv[0])) {
+    fn = vecsize(argv[0]);
+    if (isfltvector(argv[0])) {
+      for (i = 0; i < fn; i++){ sum += argv[0]->c.fvec.fv[i];}
+    }
+    else if (isintvector(argv[0])) {
+      for (i = 0; i < fn; i++){ sum += argv[0]->c.ivec.iv[i];}
+    }
+    else if (isptrvector(argv[0])) {
+      for (i = 0; i < fn; i++){
+        if ( isint(argv[0]->c.vec.v[i]) ) {
+          sum += intval(argv[0]->c.vec.v[i]);
+        }
+        else if ( isflt(argv[0]->c.vec.v[i]) ) {
+          sum += fltval(argv[0]->c.vec.v[i]);
+        }
+        else error(E_NONUMBER);
+      }
+    }
+    else error(E_NONUMBER);
+  }
+  else if (islist(argv[0])) {
+    fn = 0;
+    pcur = argv[0];
+    do {
+      if ( isint(ccar(pcur)) ) {
+        sum += intval(ccar(pcur));
+      }
+      else if ( isflt(ccar(pcur)) ) {
+        sum += fltval(ccar(pcur));
+      }
+      else error(E_NONUMBER);
+      fn++;
+      pcur = ccdr(pcur);
+    } while ( iscons(pcur) );
+  }
+  else error(E_NOVECTOR);
+
+  sum = (eusfloat_t)(sum/fn);
+  return(makeflt(sum));
+}
+
+static pointer VARIANCE(ctx, n, argv)
+/* make variance of vector, variance #f(1 2 3) -> 0.6 */
+/* (variance X) => (vmean Z), where Z := [x_i^2 - mu_x^2], */
+/* where X := [x_0, ..., x_n], mu_x := (vmean X) */
+register context *ctx;
+int n;
+register pointer *argv;
+{
+  int i,fn;
+  double res=0;
+  double ave=0;
+  numunion nu;
+  pointer pcur;
+  ckarg(1);
+  ave = fltval(VMEAN(ctx,n,argv));
+
+  if (isvector(argv[0])) {
+    fn = vecsize(argv[0]);
+    if (isfltvector(argv[0])) {
+      for (i = 0; i < fn; i++){ res += pow( (argv[0]->c.fvec.fv[i] - ave), 2);}
+    }
+    else if (isintvector(argv[0])) {
+      for (i = 0; i < fn; i++){ res += pow( (argv[0]->c.ivec.iv[i] - ave), 2);}
+    }
+    else if (isptrvector(argv[0])) {
+      for (i = 0; i < fn; i++){
+        if ( isint(argv[0]->c.vec.v[i]) ) {
+          res += pow( (intval(argv[0]->c.vec.v[i]) - ave), 2);
+        }
+        else if ( isflt(argv[0]->c.vec.v[i]) ) {
+          res += pow( (fltval(argv[0]->c.vec.v[i]) - ave), 2);
+        }
+        else error(E_NONUMBER);
+      }
+    }
+    else error(E_NONUMBER);
+  }
+  else if (islist(argv[0])) {
+    fn = 0;
+    pcur = argv[0];
+    do {
+      if ( isint(ccar(pcur)) ) {
+        res += pow( (intval(ccar(pcur)) - ave), 2);
+      }
+      else if ( isflt(ccar(pcur)) ) {
+        res += pow( (fltval(ccar(pcur)) - ave), 2);
+      }
+      else error(E_NONUMBER);
+      fn++;
+      pcur = ccdr(pcur);
+    } while ( iscons(pcur) );
+  }
+  else error(E_NOVECTOR);
+
+  res = (eusfloat_t)(res/fn);
+  return(makeflt(res));
+}
+
+static pointer COVARIANCE(ctx, n, argv)
+/* make co-variance of vector, covariance #f(1 2 3) #(0 2 4) -> 1.3 */
+/* (covariance X Y) => (vmean Z) */
+/* where Z := [(x_i - mu_x) * (y_i - mu_y)], i=0, ... ,n */
+/* X := [x_0, ... ,x_n], Y := [y_0, ... ,y_n], mu_x := (vmean X), m_y := (vmean Y) */
+register context *ctx;
+int n;
+register pointer *argv;
+{
+  int i,fn;
+  double res=0;
+  double ave0=0, ave1=0;
+  numunion nu;
+  int isf, isi, isl;
+  ckarg(2);
+  if (!((isf=isfltvector(argv[0])) && isfltvector(argv[1])) &&
+      !((isi=isintvector(argv[0])) && isintvector(argv[1])) &&
+      !((isl=islist(argv[0])) && islist(argv[1])))
+    error(E_TYPEMISMATCH);
+  if (isf || isi) {
+#define ckvsize(a,b) ((a->c.vec.size==b->c.vec.size)?vecsize(a):(int)error(E_VECINDEX))
+    fn=ckvsize(argv[0], argv[1]);
+  }else{ // isl
+    if (!((fn = intval(LENGTH(ctx,1,&(argv[0])))) == intval(LENGTH(ctx,1,&(argv[1]))))) error(E_SEQINDEX);
+  }
+
+  ave0 = fltval(VMEAN(ctx,1,&(argv[0])));
+  ave1 = fltval(VMEAN(ctx,1,&(argv[1])));
+
+  if (isf) {
+    eusfloat_t *a, *b;
+    a=argv[0]->c.fvec.fv; b=argv[1]->c.fvec.fv;
+    for(i=0; i<fn; i++)
+      res+=((a[i]-ave0) * (b[i]-ave1));
+    res/=(fn-1);
+  }else if (isi) {
+    eusinteger_t *a, *b;
+    a=argv[0]->c.ivec.iv; b=argv[1]->c.ivec.iv;
+    for(i=0; i<fn; i++)
+      res+=((a[i]-ave0) * (b[i]-ave1));
+    res/=(fn-1);
+  }else if (isl) {
+    pointer a,b;
+    a=argv[0]; b=argv[1];
+    while (islist (a)){
+      res+=((ckfltval(ccar(a))-ave0) * (ckfltval(ccar(b))-ave1));
+      a=ccdr(a);
+      b=ccdr(b);
+    }
+    res/=(fn-1);
+  }else{
+    error(E_NOSEQ);
+  }
+  return(makeflt(res));
+}
+
 pointer ___irtc(ctx,n,argv, env)
 register context *ctx;
 int n;
@@ -858,6 +1027,9 @@ pointer env;
   defun(ctx,"PSEUDO-INVERSE2",mod,PSEUDO_INVERSE2);
   defun(ctx,"QL-DECOMPOSE",mod,QL_DECOMPOSE);
   defun(ctx,"QR-DECOMPOSE",mod,QR_DECOMPOSE);
+  defun(ctx,"VMEAN",mod,VMEAN);
+  defun(ctx,"VARIANCE",mod,VARIANCE);
+  defun(ctx,"COVARIANCE",mod,COVARIANCE);
 
   /* irteus-version */
   extern pointer QVERSION;
