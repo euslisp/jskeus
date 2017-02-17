@@ -227,7 +227,7 @@
      ret))
   (:set-color
    (col &optional (_transparent))
-   (if col (send self :point-color))
+   (if col (send self :point-color col))
    (if _transparent (send self :transparent _transparent)))
   (:point-color (&optional pc) (if pc (setq pcolor pc)) pcolor)
   (:point-size (&optional ps) (if ps (setq psize ps)) psize)
