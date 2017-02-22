@@ -30,11 +30,16 @@
 
 (defmethod scene-model
   (:init
-   (&rest args &key ((:name n) "scene") ((:objects o)))
+   (&rest args &key ((:name n) "scene") ((:objects o)) ((:remove-wall w)) &allow-other-keys)
    "Create scene model"
    (send-super* :init args)
    (setq name :name)
    (setq objs o)
+   (if w (delete-if
+          #'(lambda (x)
+              (and (stringp (send x :name))
+                   (substringp "wall" (send x :name)))) o)
+        objs)
    (dolist (obj objs)
      (send self :assoc obj)
      (when (eq (class obj) cascaded-coords)
