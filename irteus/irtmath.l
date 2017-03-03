@@ -583,6 +583,7 @@
 ;; vector functions
 ;;
 (defun vector-variance (vector-list)
+  "returns vector, each element represents variance of elements in the same index of vector within vector-list"
   (let*  ((len (length vector-list))
           (m (make-matrix len (length (car vector-list)) vector-list))
           (ret (instantiate float-vector (length (car vector-list)))))
@@ -591,7 +592,7 @@
     ret))
 
 (defun covariance-matrix (vector-list)
-  "make covariance matrix of given input vector-list(vs)"
+  "make covariance matrix of given input vector-list"
   (let (m n)
     (setq n (length vector-list))
     (setq m (make-matrix n n))
