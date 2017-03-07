@@ -2,6 +2,18 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add vector-variance and covariance-matrix (`#418 <https://github.com/euslisp/jskeus/issues/418>`_)
+  * add documentation to vector-variance and covariance-matrix
+  * add vector-variance and covariance-matrix
+* [irteus.irtscene.l] add :remove-wall for scene-model (`#417 <https://github.com/euslisp/jskeus/issues/417>`_)
+* [irteus/irtpointcloud.l] fix bug of :set-color. (`#416 <https://github.com/euslisp/jskeus/issues/416>`_)
+* Adapt to moved formulae: homebrew/homebrew-x11 -> euslisp/homebrew-jskeus
+  Fix `#412 <https://github.com/euslisp/jskeus/issues/412>`_
+* irtgl.l/irtpointcloud.l: add :aarch64 (`#410 <https://github.com/euslisp/jskeus/issues/410>`_)
+* Contributors: Kei Okada, Kentaro Wada, Masaki Murooka, Yohei Kakiuchi, Yuki Furuta
+
 1.0.14 (2016-12-30)
 -------------------
 * update bvh2eus (`#400 <https://github.com/EusLisp/jskeus/issues/400>`_)
