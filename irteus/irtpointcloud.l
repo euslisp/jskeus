@@ -625,17 +625,17 @@
 
        (gl::glEnableClientState gl::GL_VERTEX_ARRAY)
        (if tmp-color (gl::glEnableClientState gl::GL_COLOR_ARRAY))
-       #-:x86_64
+       #-(or :x86_64 :aarch64)
        (if tmp-color
            (gl::glColorPointer (if transparent 4 3)
                                gl::GL_FLOAT 0 (array-entity (if transparent tcarray tmp-color))))
-       #+:x86_64
+       #+(or :x86_64 :aarch64)
        (if tmp-color
            (gl::glColorPointer (if transparent 4 3)
                                gl::GL_DOUBLE 0 (array-entity (if transparent tcarray tmp-color))))
-       #-:x86_64
+       #-(or :x86_64 :aarch64)
        (gl::glVertexPointer 3 gl::GL_FLOAT 0 (array-entity parray))
-       #+:x86_64
+       #+(or :x86_64 :aarch64)
        (gl::glVertexPointer 3 gl::GL_DOUBLE 0 (array-entity parray))
        (gl::glDrawArrays gl::GL_POINTS 0 (array-dimension parray 0))
        (gl::glDisableClientState gl::GL_VERTEX_ARRAY)

@@ -202,9 +202,9 @@
      (glReadBuffer GL_FRONT)
      (glPixelStorei GL_PACK_ALIGNMENT 1)
      (glReadPixels x y width height GL_RGB GL_UNSIGNED_BYTE imgbuf)
-     #-:x86_64
+     #-(or :x86_64 :aarch64)
      (if depthbuf (glReadPixels x y width height GL_DEPTH_COMPONENT GL_FLOAT depthbuf))
-     #+:x86_64
+     #+(or :x86_64 :aarch64)
      (when depthbuf
        (let ((fv (user::dvector2float-bytestring depthbuf)))
 	 (glReadPixels x y width height GL_DEPTH_COMPONENT GL_FLOAT fv)
@@ -1110,24 +1110,24 @@ if flat option is true, use-flat-shader"
            (unless (and teximg texcoords) (setq texcoords nil))
            ;;
            (glEnableClientState GL_VERTEX_ARRAY)
-#+:x86_64
+#+(or :x86_64 :aarch64)
            (glVertexPointer 3 GL_DOUBLE 0 (array-entity vertices))
-#-:x86_64
+#-(or :x86_64 :aarch64)
            (glVertexPointer 3 GL_FLOAT 0 (array-entity vertices))
            ;;
            (when normals
              (glEnableClientState GL_NORMAL_ARRAY)
-#+:x86_64
+#+(or :x86_64 :aarch64)
              (glNormalPointer GL_DOUBLE 0 (array-entity normals))
-#-:x86_64
+#-(or :x86_64 :aarch64)
              (glNormalPointer GL_FLOAT 0 (array-entity normals))
              )
            ;;
            (when texcoords
              (glEnableClientState GL_TEXTURE_COORD_ARRAY)
-#+:x86_64
+#+(or :x86_64 :aarch64)
              (glTexCoordPointer 2 GL_DOUBLE 0 texcoords)
-#-:x86_64
+#-(or :x86_64 :aarch64)
              (glTexCoordPointer 2 GL_FLOAT 0 texcoords)
              )
 
@@ -1141,10 +1141,10 @@ if flat option is true, use-flat-shader"
              (when tp
                (cond
                 (indices
-#+:x86_64
+#+(or :x86_64 :aarch64)
                  (glDrawElements tp (length indices) GL_UNSIGNED_INT
                                  (user::lvector2integer-bytestring indices))
-#-:x86_64
+#-(or :x86_64 :aarch64)
                  (glDrawElements tp (length indices) GL_UNSIGNED_INT indices)
                  )
                 (t
