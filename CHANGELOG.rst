@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.0 (2017-03-07)
+------------------
 * Add vector-variance and covariance-matrix (`#418 <https://github.com/euslisp/jskeus/issues/418>`_)
   * add documentation to vector-variance and covariance-matrix
   * add vector-variance and covariance-matrix
