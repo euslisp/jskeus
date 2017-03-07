@@ -187,61 +187,128 @@
 (defmethod directed-graph
   ;; :write-to-dot method is supposed to be meaningful
   ;; in only static graph.
-  (:write-to-dot (fname &optional result-path (title "output"))
+  (:write-to-dot-stream (strm &optional result-path (title "output"))
     (let ((node-alist          ; ((node . symbol) (node . symbol) ...)
            (mapcar #'(lambda (n)
                        (cons n (string (gensym))))
-                   nodes)))
+                   nodes))
+          (draw-both-arc (send self :get :draw-both-arc))
+          (draw-arc-label (send self :get :draw-arc-label))
+          (draw-result-only (not (send self :get :draw-merged-result)))
+          )
       (labels ((graphviz-node-name
                 (n)
                 (cdr (assoc n node-alist))))
-      (with-open-file (f fname :direction :output)
-        (format f "digraph ~A {~%" title)
+        (format strm "digraph ~A {~%" title)
         (dolist (target-node nodes)
-          (format f "   ")
-          ;; hoge = "hoge";
-          (format f "~A [label = \"~s\"];~%"
+          (format strm "   ")
+          (format strm "~A [label = \"~A\"];~%"
                   (graphviz-node-name target-node)
                   (send target-node :name))
           )
         ;; first of all, write result-path
-        (let ((drawed-arc nil))
+        (let ((result-tbl (make-hash-table :test #'equal))
+              (draw-tbl (make-hash-table :test #'equal))
+              )
+          ;; write result-path
           (let (anode)
             (while (and (setq anode (pop result-path)) result-path)
-              (format f "   ")
-              (format f "~A -> ~A [color = red];~%"
-                      (graphviz-node-name (send anode :state))
-                      (graphviz-node-name (send (car result-path) :state)))))
+              (setf (gethash (cons (send anode :state)
+                                   (send (car result-path) :state))
+                             result-tbl)
+                    (list "color = red"))
+              ))
+          ;; write arcs
           (dolist (target-node nodes)
             (let ((neighbors
-                   (mapcar #'cdr (send self :successors target-node))))
+                   (send self :successors target-node)
+                   ))
               (dolist (neighbor neighbors)
-                (when (not (or (find (cons target-node neighbor) drawed-arc
-                                     :test #'equal)
-                               (find (cons neighbor target-node) drawed-arc
-                                     :test #'equal)))
-                    (if (member target-node
-                              (mapcar #'cdr (send self :successors neighbor)))
-                      (progn
-                        (format f "   ")
-                        (format f "~A -> ~A [dir = both];~%"
-                                (graphviz-node-name target-node)
-                                (graphviz-node-name neighbor)))
-                    (progn
-                      (format f "   ")
-                      (format f "~A -> ~A;~%"
-                              (graphviz-node-name target-node)
-                              (graphviz-node-name neighbor))))
-                  (push (cons target-node neighbor) drawed-arc)))))
-          (format f "}~%")
-          t)))))
+                (let ((narc (car neighbor))
+                      (nnode (cdr neighbor))
+                      (draw-arc t) result
+                      options)
+                  ;; Is  there in result path ?
+                  (when (and (not draw-result-only)
+                             (gethash (cons target-node nnode) result-tbl))
+                    (setq result t)
+                    (push "color = red" options))
+                  (when draw-arc-label
+                    (push (format nil "label = \"~A\"" (send narc :name)) options))
+                  ;; checked drawed for both direction
+                  (unless draw-both-arc
+                    (cond
+                     ((gethash (cons target-node nnode) draw-tbl)
+                      (setq draw-arc nil)
+                      )
+                     ((gethash (cons nnode target-node) draw-tbl)
+                      (setq draw-arc nil)
+                      )
+                     ((member target-node
+                              (mapcar #'cdr (send self :successors nnode)))
+                      (push "dir = both" options)
+                      )
+                     ))
+                  (unless options (setq options :no-option))
+                  (when draw-arc
+                    (setf (gethash (cons target-node nnode) draw-tbl)
+                          options))
+                  ))
+              ))
+          (flet ((print-arcs (tbl)
+                  (maphash
+                   #'(lambda (key options)
+                       (format strm "   ")
+                       (format strm "~A -> ~A"
+                               (graphviz-node-name (car key))
+                               (graphviz-node-name (cdr key)))
+                       (if (eq options :no-option)
+                           (format strm ";~%")
+                         (progn
+                           (format strm "[")
+                           (dolist (opt options)
+                             (unless (eq opt (car options))
+                               (format strm ", "))
+                             (format strm "~A" opt))
+                           (format strm "];~%"))))
+                   tbl)))
+            (when draw-result-only (print-arcs result-tbl)) ;; draw-resut
+            (print-arcs draw-tbl)
+            )
+          (format strm "}~%")
+          t))))
+  (:write-to-dot
+   (fname &optional result-path (title "output"))
+   (with-open-file
+    (f fname :direction :output)
+    (send self :write-to-dot-stream f result-path title))
+   t)
+  (:write-to-dot-convert
+   (fname &optional result-path title (type "pdf"))
+    (let ((dot-fname
+           (format nil "~A.dot" fname)))
+      (send self :write-to-dot dot-fname result-path title)
+      (unix:system (format nil "dot ~A -T~A -o ~A"
+                           dot-fname type (format nil "~A.~A" fname type)))
+      t))
   (:write-to-pdf (fname &optional result-path
                         (title (string-right-trim ".pdf" fname)))
-    (let ((dot-fname
-           (format nil "~A.dot" (string-right-trim ".pdf" fname))))
-      (send self :write-to-dot dot-fname result-path title)
-      (unix:system (format nil "dot ~A -Tpdf -o ~A" dot-fname fname))
-      t))
+   (send self :write-to-dot-convert fname result-path title))
+  (:draw-both-arc
+   (&optional (bothq :both))
+   (unless (eq bothq :both)
+     (send self :put :draw-both-arc bothq))
+   (send self :get :draw-both-arc))
+  (:draw-arc-label
+   (&optional (writeq :write))
+   (unless (eq writeq :write)
+     (send self :put :draw-arc-label writeq))
+   (send self :get :draw-arc-label))
+  (:draw-merged-result
+   (&optional (mergeq :merge))
+   (unless (eq mergeq :merge)
+     (send self :put :draw-merged-result mergeq))
+   (send self :get :draw-merged-result))
   )
 
 ;;=======================================
