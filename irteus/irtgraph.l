@@ -187,7 +187,13 @@
 (defmethod directed-graph
   ;; :write-to-dot method is supposed to be meaningful
   ;; in only static graph.
-  (:write-to-dot-stream (strm &optional result-path (title "output"))
+  (:write-to-dot-stream (&optional (strm *standard-output*) result-path (title "output"))
+   "write graph structure to stream as dot(graphviz) style
+Args:
+  strm: stream class for output
+  result-path: list of solver-node, it's result of (send solver :solve graph)
+  title: title of graph
+"
     (let ((node-alist          ; ((node . symbol) (node . symbol) ...)
            (mapcar #'(lambda (n)
                        (cons n (string (gensym))))
@@ -228,7 +234,7 @@
                       (nnode (cdr neighbor))
                       (draw-arc t) result
                       options)
-                  ;; Is  there in result path ?
+                  ;; Is there in result path ?
                   (when (and (not draw-result-only)
                              (gethash (cons target-node nnode) result-tbl))
                     (setq result t)
@@ -277,35 +283,68 @@
             )
           (format strm "}~%")
           t))))
-  (:write-to-dot
-   (fname &optional result-path (title "output"))
+  (:write-to-dot (fname &optional result-path (title "output"))
+   "write graph structure to dot(graphviz) file
+Args:
+  fname: filename for output
+  result-path: list of solver-node, it's result of (send solver :solve graph)
+  title: title of graph
+"
    (with-open-file
     (f fname :direction :output)
     (send self :write-to-dot-stream f result-path title))
    t)
-  (:write-to-dot-convert
-   (fname &optional result-path title (type "pdf"))
+  (:write-to-file (basename &optional result-path title (type "pdf"))
+   "write graph structure to various type of file
+Args:
+  basename: basename for output (output filename is 'basename.type')
+  result-path: list of solver-node, it's result of (send solver :solve graph)
+  title: title of graph
+  type: type of output
+"
     (let ((dot-fname
-           (format nil "~A.dot" fname)))
+           (format nil "~A.dot" basename)))
       (send self :write-to-dot dot-fname result-path title)
       (unix:system (format nil "dot ~A -T~A -o ~A"
-                           dot-fname type (format nil "~A.~A" fname type)))
+                           dot-fname type (format nil "~A.~A" basename type)))
       t))
   (:write-to-pdf (fname &optional result-path
                         (title (string-right-trim ".pdf" fname)))
-   (send self :write-to-dot-convert fname result-path title))
-  (:draw-both-arc
-   (&optional (bothq :both))
+   "write graph structure to pdf
+Args:
+  fname: filename for output
+  result-path: list of solver-node, it's result of (send solver :solve graph)
+  title: title of graph
+"
+   (when (substringp ".pdf" fname)
+     (let ((str (string-right-trim "pdf" fname)))
+       (when (= (elt str (1- (length str))) #\.)
+         ;; fname finished with '.pdf', remove it
+         (setq fname (subseq str 0 (1- (length str))))
+         )))
+   (send self :write-to-file fname result-path title))
+  (:original-draw-mode ()
+   "change draw-mode to original mode"
+   (send self :draw-both-arc nil)
+   (send self :draw-arc-label nil)
+   (send self :draw-merged-result nil))
+  (:current-draw-mode ()
+   "change draw-mode to latest mode"
+   (send self :draw-both-arc t)
+   (send self :draw-arc-label t)
+   (send self :draw-merged-result t))
+  (:draw-both-arc (&optional (bothq :both))
+   "change draw-mode, if true is set, draw bidirectional arc as two arcs"
    (unless (eq bothq :both)
      (send self :put :draw-both-arc bothq))
    (send self :get :draw-both-arc))
-  (:draw-arc-label
-   (&optional (writeq :write))
+  (:draw-arc-label (&optional (writeq :write))
+   "change draw-mode, if true is set, draw label(name) of arcs"
    (unless (eq writeq :write)
      (send self :put :draw-arc-label writeq))
    (send self :get :draw-arc-label))
-  (:draw-merged-result
-   (&optional (mergeq :merge))
+  (:draw-merged-result (&optional (mergeq :merge))
+   "change draw-mode, if true is set, draw result arc as red. if not, draw red arc independently"
    (unless (eq mergeq :merge)
      (send self :put :draw-merged-result mergeq))
    (send self :get :draw-merged-result))
