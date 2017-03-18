@@ -1073,7 +1073,7 @@
    (send (car (send self :links)) :get :c-til))
   (:inertia-tensor ;; total inertia tensor
    (&optional (update-mass-properties t))
-   "Calculate total robot inertia tensor [g mm^2] around total robot centroid in euslisp world coordinates.
+   "Calculate total robot inertia tensor [g $mm^2$] around total robot centroid in euslisp world coordinates.
     If update-mass-properties argument is t, propagate total mass prop calculation for all links and returns total robot inertia tensor.
     Otherwise, do not calculate total mass prop, just returns pre-computed total robot inertia tensor."
    (if update-mass-properties (send self :update-mass-properties))
