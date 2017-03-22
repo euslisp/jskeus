@@ -906,6 +906,8 @@
           (update t) (debug-view)
           (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
     "Calculate Zero Moment Point based on Inverse Dynamics.
+     The output is expressed by the world coordinates, 
+     and depends on historical robot states of the past 3 steps. Step is incremented when this method is called.
      After solving Inverse Dynamics, ZMP is calculated from total root-link force and moment.
      necessary arguments -> av and root-coords.
      If update is t, call inverse dynamics, otherwise, just return zmp from total root-link force and moment.

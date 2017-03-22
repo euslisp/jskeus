@@ -1011,6 +1011,7 @@
          (static-balance-point-height (elt (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos)) 2))
          (update-mass-properties t))
    "Calculate static balance point which is equivalent to static extended ZMP.
+    The output is expressed by the world coordinates.
     target-points are end-effector points on which force-list and moment-list apply.
     force-list [N] and moment-list [Nm] are list of force and moment at target-points.
     static-balance-point-height is height of static balance point [mm]."
