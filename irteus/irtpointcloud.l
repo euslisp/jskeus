@@ -715,6 +715,72 @@
                         :points pts :colors col :normals nom))
     ret))
 
+(defun object->pointcloud (obj
+                           &key (with-normal) (with-color) (step 5.0) (eps 1.0))
+
+  "Make pointcloud from eus object surface by sampling method"
+  (labels ((face-center-coords (aface)
+             (let* ((z (send aface :normal))
+                    (x (if (< (abs (- 1 (abs (v. z #f(1 0 0))))) 0.0001)
+                           #f(0 1 0) #f(1 0 0)))
+                    (y (normalize-vector (v* z x))))
+               (setq x (v* y z))
+               (make-coords :rot (transpose (matrix x y z))
+                            :pos (cadr (send aface :centroid)))))
+           (make-coords-on-face (aface
+                                 &optional (step 5.0) (eps 1.0)
+                                           (color (float-vector 1 1 1)))
+             (let (c vv b p0 p1 xx yy p pp)
+               (setq c (face-center-coords aface))
+               ;; project to place
+               (setq vv (mapcar #'(lambda (v) (send c :inverse-transform-vector v))
+                                (send aface :vertices)))
+               ;; make bounding rectangle
+               (setq b (make-bounding-box vv))
+               (setq p0 (send b :minpoint))
+               (setq p1 (send b :maxpoint))
+               (setq xx nil yy nil)
+               (do ((x step (+ x step)))
+                   ((eps> x (elt p1 0) eps))
+                 (push x xx))
+               (do ((x 0 (- x step)))
+                   ((eps< x (elt p0 0) eps))
+                 (push x xx))
+               (do ((y step (+ y step)))
+                   ((eps> y (elt p1 1) eps))
+                 (push y yy))
+               (do ((y 0 (- y step)))
+                   ((eps< y (elt p0 1) eps))
+                 (push y yy))
+               (dolist (y yy)
+                 (dolist (x xx)
+                   (setq p (send c :transform-vector (float-vector x y 0)))
+                   (when (eq :inside (send aface :insidep p))
+                     (push
+                      (progn
+                        (setq p (send (send c :copy-worldcoords) :translate (float-vector x y 0)))
+                        (setf (get p :face-color) color)
+                        p)
+                      pp))))
+               pp))
+           (make-coords-on-object (obj &optional (step 5.0) (eps 1.0))
+             (flatten
+              (mapcan #'(lambda (fs)
+                          (mapcan #'(lambda (f)
+                                      (if (> (send f :area) (* step step))
+                                          (make-coords-on-face f step eps (get fs :face-color))))
+                                  (send fs :faces)))
+                      (if (memq :bodies (send obj :methods))
+                          (send obj :bodies) (list obj))))))
+    (let ((cs (make-coords-on-object obj step eps)))
+      (instance pointcloud :init :points (send-all cs :worldpos)
+                                 :normals (if with-normal
+                                              (send-all (send-all cs :copy-worldcoords) :z-axis))
+                                 :colors (if with-color
+                                             (mapcar #'(lambda (v)
+                                                         (get v :face-color)) cs))))
+    )) ;; object->pointcloud
+
 (in-package "GEOMETRY")
 
 (provide :irtpointcloud "$Id: $")
