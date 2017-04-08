@@ -102,84 +102,99 @@
      (* (sqrt (matrix-determinant S)) (exp (* 0.5 (v. (transform z (inverse-matrix S)) z))))))
   )
 
-(defun kalman-demo 
-  nil
-  (dotimes (i 5)
-    (kalman-demo-impl i)
-    (unix:sleep 1))
-  (format t ";; exiting...~%")
-  (exit 1))
-
-(defun kalman-demo-impl
-  (&optional arg)
-  (let (x1o y1o k z z^ fname)
-
-    (unless arg
-      (format t ";; usage kalman-demo-impl {0,1,2,3}~%")
-      (setq arg 0))
-    (case arg
-      (0 
+(defun kalman-demo (&optional demo-type)
+  "Function to execute demo using kalman-filter and visualize the results.
+   Args:
+    demo-type (optional, keyword): :line-pos :line-pos-vel :sin-pos :sin-pos-vel :adaptive :non-linear
+  "
+  (let ((demo-types (list :line-pos :line-pos-vel :sin-pos :sin-pos-vel :adaptive :non-linear))
+        (suffix (string-downcase demo-type))
+        x y z kf)
+    ;; x = sequential linear values
+    ;; y = observable values at each timepoint x
+    ;; z = estimated values from y
+    (unless demo-type
+    (format t ";; kalman-demo~%;; args: ~A~%" (append demo-types (list :all)))
+    (return-from kalman-demo nil))
+    (case demo-type
+      (:all
+       (dolist (typ demo-types)
+         (kalman-demo typ)
+         (unix:sleep 1))
+       (return-from kalman-demo t))
+      (:line-pos
        (format t ";; data -> line, kalman -> Position model~%"))
-      (1
+      (:line-pos-vel
        (format t ";; data -> line, kalman -> Position-Velocity model~%"))
-      (2
+      (:sin-pos
        (format t ";; data -> sin,  kalman -> Position model~%"))
-      (3
+      (:sin-pos-vel
        (format t ";; data -> sin,  kalman -> Position-Velocity model~%"))
+      (:adaptive
+       (format t ";; data -> sin, kalman -> Adaptive Position-Velocity model~%"))
+      (:non-linear
+       (format t ";; data -> a*x^2+c,  kalman -> Position-Velocity model~%"))
       (t
-       (format t ";; data -> a*x^2+c,  kalman -> Position-Velocity model~%")))
-  
-    (setq x1o '(float-vector))
-    (setq y1o '(float-vector))
-    (dotimes (i 100)
-      (push i x1o)
-      (cond
-       ((< arg 2)
-	(push (+ -0.37727 (random-gauss 0 0.1)) y1o))
-       ((< arg 4)
-	(push (+ -0.37727 (random-gauss 0 0.05) (* 0.2 (sin (/ i 5.0)))) y1o))
-       (t
-        (push (+ -0.37727 (random-gauss 0 0.05) (* i i 5e-5)) y1o))
-       ))
-    (setq x1o (eval (reverse x1o)))
-    (setq y1o (eval (reverse y1o)))
+       (format t ";; kalman-demo~%;; args: ~A~%" (append demo-types (list :all)))
+       (return-from kalman-demo nil)))
 
-    (cond 
-     ((or (eq arg 0) (eq arg 2))
-      (setq k (instance kalman-filter :init :state-dim 2)))
+    ;; make dataset
+    (setq x (make-sequence float-vector 100))
+    (setq y (make-sequence float-vector 100))
+    (dotimes (i (length x))
+      (setf (elt x i) i)
+      (setf (elt y i)
+            (case demo-type
+              ((:line-pos :line-pos-vel)
+               (+ -0.37727 (random-gauss 0 0.1)))
+              ((:sin-pos :sin-pos-vel :adaptive)
+               (+ -0.37727 (random-gauss 0 0.05) (* 0.2 (sin (/ i 5.0)))))
+              (:non-linear
+               (+ -0.37727 (random-gauss 0 0.05) (* i i 5e-5)))
+              (t (error "invalid demo-type")))))
+
+    ;; initialize kalman filter
+    (case demo-type
+      ((:line-pos :sin-pos)
+       (setq kf (instance kalman-filter :init :state-dim 2)))
      (t
-      (setq k (instance kalman-filter :init :state-dim 4 :r-variance 0.001))
-      (send k :A #2f((1 0 1 0)(0 1 0 1)(0 0 1 0)(0 0 0 1)))))
-    (when (eq arg 4) (send k :u #f(0 0 0 1e-4)))
+      (setq kf (instance kalman-filter :init :state-dim 4 :r-variance 0.001))
+      (send kf :A #2f((1 0 1 0)(0 1 0 1)(0 0 1 0)(0 0 0 1)))))
+    (when (eq demo-type :non-linear)
+      (send kf :u #f(0 0 0 1e-4)))
 
-    (with-open-file 
-     (f (format nil "data_~a.dat" arg) :direction :output)
-     (dotimes (i (length y1o))
-       (format f "~A ~A~%" (elt x1o i) (elt y1o i))))
-    (with-open-file 
-     (f (format nil "kalman_~a.dat" arg) :direction :output)
-     (dotimes (i (length y1o))
-       (setq z (float-vector (elt x1o i) (elt y1o i)))
-       (setq z^ (send k :proc z))
-       (format f "~A ~A ~A~%" (elt z^ 0) (elt z^ 1) (send k :error))
-       ))
-
-    (setq fname (format nil "kalmanlib_demo_~d.sh" arg))
-    (format t ";; Writing gnuplot script to ~s~%" fname)
+    ;; write groundtruth data
     (with-open-file
-     (f fname :direction :output :permission #o744)
-     (format f "#!/usr/bin/env gnuplot~%")
-     (format f "~%")
-     (format f "plot [0:100][-0.6:0] 'data_~a.dat' title \"data\" with linespoints~%" arg)
-     (format f "set y2tics~%")
-     (format f "set y2range [0:0.01]~%")
-     (format f "replot 'kalman_~a.dat' title \"kalman\" with linespoints~%" arg)
-     (format f "replot 'kalman_~a.dat' using 3 axes x1y2 title \"error\" with linespoints~%" arg)
-     (format f "replot -0.37727~%")
-     (format f "pause -1~%")
-     )
-    ))
+        (f (format nil "data_~a.dat" suffix) :direction :output)
+      (dotimes (i (length x))
+        (format f "~A ~A~%" (elt x i) (elt y i))))
 
+    ;; write estimated data
+    (with-open-file
+        (f (format nil "kalman_result_~a.dat" suffix) :direction :output)
+      (dotimes (i (length x))
+        (case demo-type
+          (:adaptive
+           (setq z (send kf :proc (float-vector (elt x i) (elt y i)) :adaptive t)))
+          (t
+           (setq z (send kf :proc (float-vector (elt x i) (elt y i))))))
+        (format f "~A ~A ~A ~A~%" (elt x i) (elt z 1) (send kf :error) (aref (send kf :P) 1 1))))
 
-
-
+    ;; write graph data
+    (let ((fname (format nil "visualize_~A.sh" suffix)))
+      (format t ";; Writing gnuplot script to ~s~%" fname)
+      (with-open-file
+          (f fname :direction :output :permission #o744)
+        (format f "#!/usr/bin/env gnuplot~%")
+        (format f "~%")
+        (format f "set title \"~A\"~%" suffix)
+        (format f "plot [0:100][-0.6:0] 'data_~a.dat' title \"observed\" with linespoints~%" suffix)
+        (format f "set y2tics~%")
+        (format f "set y2range [0:0.01]~%")
+        (format f "replot 'kalman_result_~a.dat' title \"estimated\" with linespoints~%" suffix)
+        (format f "replot 'kalman_result_~a.dat' using 3 axes x1y2 title \"error\" with linespoints~%" suffix)
+        (format f "replot 'kalman_result_~a.dat' using 4 axes x1y2 title 'P covariance' with linespoints~%" suffix)
+        (format f "replot -0.37727 title \"baseline\"~%")
+        (format f "pause -1~%"))
+      (piped-fork (concatenate string (unix:getwd) "/" fname))
+    t))
