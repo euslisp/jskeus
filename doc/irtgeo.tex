@@ -1,0 +1,141 @@
+\section{幾何学関数と座標系}
+
+ \subsection{数学関数}
+ \input{irtmath-func}
+
+ \subsection{幾何学関数}
+  \input{irtgeo-func}
+
+ \subsection{coordinates classと変換行列の関係}
+
+\noindent
+変換行列Tを$4\times4$行列として以下のように表す．
+\[
+T = \begin{pmatrix}
+\mathbf{R}_T & \mathbf{p}_T \\
+\mathbf{0} & 1
+\end{pmatrix}
+\]
+$\mathbf{R}_T$は$3\times3$行列，$\mathbf{p}_T$は$3\times1$行列(eus内部処理
+では要素数3のfloat-vector)であって，
+EusLispにおけるcoordinatesクラスは
+$\mathbf{R}$は$3\times3$ の回転行列と
+3 次元位置ベクトルの組で表現されており，
+スロットrotとposは，
+それぞれ，$\mathbf{R}_T$，$\mathbf{p}_T$に対応する．
+
+\vspace{1ex}
+\noindent {\gt 回転行列と３次元位置の取り出し}
+
+coordinates classのメソッドを用いて以下のように$\mathbf{R}$と$\mathbf{p}$を取り出せる．
+
+\noindent
+(send T :rot) returns $\mathbf{R}_T$
+
+\noindent
+(send T :pos) returns $\mathbf{p}_T$
+
+\vspace{1ex}
+\noindent {\gt ベクトルを変換するメソッド}
+
+以下，$\mathbf{v}$は3次元位置ベクトルである．
+
+\noindent
+(send T :rotate-vector $\mathbf{v}$) returns $\mathbf{R}_T \mathbf{v}$
+
+\noindent
+(send T :inverse-rotate-vector $\mathbf{v}$) returns $\mathbf{v}^T \mathbf{R}_T$
+
+\noindent
+(send T :transform-vector $\mathbf{v}$)
+returns $\mathbf{R}_T\mathbf{v} + \mathbf{p}_T$
+
+ローカル座標系Tで表されたベクトルをワールド座標系で表されたベクトルに変換する
+
+\noindent
+(send T :inverse-transform-vector $\mathbf{v}$)
+returns  $\mathbf{R}_T^{-1}\left( \mathbf{v} - \mathbf{p}_T \right)$
+
+ワールド座標系で表されたベクトルをローカル座標系Tで表されたベクトルに変換する
+
+\vspace{1ex}
+\noindent {\gt 座標系を返すメソッド (座標系を変更しない)}
+
+\noindent
+(send T :inverse-transformation)
+
+逆行列を返す．\[
+T^{-1} = \begin{pmatrix}
+ \mathbf{R}_T^{-1} & -\mathbf{R}_T^{-1}\mathbf{p}_T \\
+ \mathbf{0} & 1
+\end{pmatrix}
+\]
+
+\noindent
+(send T :transformation A (\&optional (wrt :local)))
+
+wrt == :local のとき，$T^{-1}A$ を返す
+
+wrt == :world のとき，$AT^{-1}$ を返す
+
+wrt == W (coordinates class) のとき，$W^{-1}AT^{-1}W$ を返す
+
+
+\vspace{1ex}
+\noindent {\gt 座標系を変更するメソッド}
+
+\noindent
+(send T :newcoords $\mathbf{R}$ $\mathbf{p}$)
+
+$\mathbf{R}_T \leftarrow \mathbf{R}$
+
+$\mathbf{p}_T \leftarrow \mathbf{p}$
+
+\noindent
+(send T :move-to A (\&optional (wrt :local)))
+
+wrt == :local のとき，$T \leftarrow TA$
+
+wrt == :world のとき，$T \leftarrow A$
+
+wrt == W (coordinates class) のとき，$T \leftarrow WA$
+
+\noindent
+(send T :translate $\mathbf{v}$ (\&optional (wrt :local)))
+
+wrt == :local のとき，
+$\mathbf{p}_{T} \leftarrow \mathbf{R}_{T}\mathbf{p}_{T} + \mathbf{v}$
+
+wrt == :world のとき，
+$\mathbf{p}_{T} \leftarrow \mathbf{p}_{T} + \mathbf{v}$
+
+wrt == W (coordinates class) のとき，
+$\mathbf{p}_{T} \leftarrow \mathbf{R}_{W} \mathbf{v} + \mathbf{p}_{T}$
+
+\noindent
+(send T :locate $\mathbf{v}$ (\&optional (wrt :local)))
+
+wrt == :local のとき，
+$\mathbf{p}_{T} \leftarrow \mathbf{R}_{T} \mathbf{v} + \mathbf{p}_{T}$
+
+wrt == :world のとき，
+$\mathbf{p}_{T} \leftarrow \mathbf{v}$
+
+wrt == W (coordinates class) のとき，
+$\mathbf{p}_{T} \leftarrow W\mathbf{v}$
+
+\noindent
+(send T :transform A (\&optional (wrt :local)))
+
+wrt == :local のとき， $T \leftarrow TA$
+
+wrt == :world のとき， $T \leftarrow AT$
+
+wrt == W (coordinates class) のとき，$T \leftarrow$ $\left( WAW \right)^{-1} T$
+
+%\noindent
+%(send T :rotate \theta axis (\&optional wrt))
+%:local :world W
+%% (rotation-matrix theta axis) wrl
+%\noindent
+%(send T :orient \theta axis (\&optional wrt))
