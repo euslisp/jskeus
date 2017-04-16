@@ -569,6 +569,54 @@
             (return-from make-robot-model-from-name (instance* klass :init args)))))
       nil)))
 
+(defun hex-to-colormaterial (hex)
+  "Convert a hex code like #xFF0000 into colormaterial"
+  (let ((r (ash (logand hex #xff0000) -16))
+        (g (ash (logand hex #x00ff00) -8))
+        (b (ash (logand hex #x0000ff) -0)))
+    (instance colormaterial
+              :create :diffuse (float-vector (/ r 255.0)
+                                             (/ g 255.0)
+                                             (/ b 255.0)))))
+
+(defun color-category10 (i)
+  "Choose good color from 10 colors"
+  (hex-to-colormaterial (case (mod i 10)
+                              (0 #x1f77b4)
+                              (1 #xff7f0e)
+                              (2 #x2ca02c)
+                              (3 #xd62728)
+                              (4 #x9467bd)
+                              (5 #x8c564b)
+                              (6 #xe377c2)
+                              (7 #x7f7f7f)
+                              (8 #xbcbd22)
+                              (9 #x17becf))))
+
+(defun color-category20 (i)
+  "Choose good color from 20 colors"
+  (hex-to-colormaterial (case (mod i 20)
+                              (0 #x1f77b4)
+                              (1 #xaec7e8)
+                              (2 #xff7f0e)
+                              (3 #xffbb78)
+                              (4 #x2ca02c)
+                              (5 #x98df8a)
+                              (6 #xd62728)
+                              (7 #xff9896)
+                              (8 #x9467bd)
+                              (9 #xc5b0d5)
+                              (10 #x8c564b)
+                              (11 #xc49c94)
+                              (12 #xe377c2)
+                              (13 #xf7b6d2)
+                              (14 #x7f7f7f)
+                              (15 #xc7c7c7)
+                              (16 #xbcbd22)
+                              (17 #xdbdb8d)
+                              (18 #x17becf)
+                              (19 #x9edae5))))
+
 
 (provide :irtutil "$Id$")
 
