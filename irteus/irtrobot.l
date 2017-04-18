@@ -95,6 +95,7 @@
                                                (list larm-end-coords rarm-end-coords
                                                      lleg-end-coords rleg-end-coords
                                                      head-end-coords torso-end-coords))))
+     (send self :define-min-max-table)
      )
    )
   ;; End-coords accessor
@@ -1031,6 +1032,12 @@
          (setf (elt sbp idx) (/ nume denom))
          ))
      sbp))
+  (:define-min-max-table
+   ()
+   "Define min max table.
+    This method is called in :init-ending in this class and do nothing by default.
+    If you want to define min/max table for your robots, please define :define-min-max-table method in your robots' classes."
+   )
   )
 (in-package "GEOMETRY")
 
