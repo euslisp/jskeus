@@ -123,7 +123,15 @@ PDF files are also available from [here](https://github.com/euslisp/jskeus/raw/m
 
 ### 3.6 Install euslisp from source code  (EXPERTS ONLY)
 
-#### 3.6.1 Installing dependent libraries
+#### 3.6.1 Installing on macOS >= 10.9 (Mavericks)
+
+If you're [Homebrew](http://brew.sh/), just run below:
+
+```bash
+brew install homebrew/x11/jskeus
+```
+
+#### 3.6.2 Installing dependent libraries
 
 for Ubuntu users
 ```
@@ -162,7 +170,7 @@ mesa-demo (for glxinfo)
 bitmap fonts (all bitmap font packages -75dpi, -100dpi, -misc )
 ```
 
-#### 3.6.2 Downloading and building EusLisp
+#### 3.6.3 Downloading and building EusLisp
 ```
 $ git clone http://github.com/euslisp/jskeus jskeus
 $ cd jskeus
@@ -171,7 +179,7 @@ you will see instructions to add EUSDIR, ARCHDIR, PATH, LD_LIBRARY_PATH environm
 $ echo "source ~/bashrc.eus" >> ~/.bashrc
 ```
 
-#### 3.6.3  Install ROS and jsk-ros-pkg repository
+#### 3.6.4  Install ROS and jsk-ros-pkg repository
 
 See http://wiki.ros.org/indigo/Installation/Source for more detail
 
