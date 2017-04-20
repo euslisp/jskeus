@@ -10,58 +10,41 @@ execute_process(COMMAND grep version ${PROJECT_SOURCE_DIR}/package.xml
                 COMMAND sed -e s/[^0-9.]//g
                 OUTPUT_VARIABLE jskeus_VERSION
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
-# build irteus on install command
-set(INSTALLDIR \${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/euslisp/jskeus/eus/)
-add_custom_command(OUTPUT ${INSTALLDIR}
-  COMMAND cmake -E make_directory ${INSTALLDIR}/lib
-  COMMAND cmake -E make_directory ${INSTALLDIR}/${ARCHDIR}/bin
-  COMMAND cmake -E make_directory ${INSTALLDIR}/${ARCHDIR}/obj
-  COMMAND cmake -E make_directory ${INSTALLDIR}/${ARCHDIR}/lib)
-add_custom_target(compile_jskeus
-  DEPENDS ${INSTALLDIR}
-  COMMAND export EUSDIR=${EUSDIR} DISPLAY="" lt_cv_sys_lib_dlsearch_path_spec=${lt_cv_sys_lib_dlsearch_path_spec} && \$\(MAKE\) -j1 -l1 -C ${PROJECT_SOURCE_DIR}/irteus -f Makefile ARCHDIR=${ARCHDIR} EUSDIR=${EUSDIR} IRTEUSDIR=${INSTALLDIR} 'SVNVERSION=\\"${jskeus_VERSION}\\"' VERBOSE=1)
+message(STATUS "euslisp_VERSION : ${euslisp_VERSION}")
+message(STATUS "jskeus_VERSION  : ${jskeus_VERSION}")
 
-install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" --target compile_jskeus RESULT_VARIABLE result_variable OUTPUT_VARIABLE output_variable)
-if(NOT \${result_variable} EQUAL 0)
-  message(FATAL_ERROR \"\${output_variable}\")
-endif()")
+# build irteus
+# if EUSDIR is write protected use share as target directory
+execute_process(COMMAND test -w ${EUSDIR} RESULT_VARIABLE eusdir_WRITABLE)
+if(${eusdir_WRITABLE} EQUAL 0)
+  message(STATUS "eusdir_WRITABLE : TRUE")
+  set(INSTALLDIR ${EUSDIR}) # install to EUSDIR
+else()
+  message(STATUS "eusdir_WRITABLE : FALSE")
+  set(INSTALLDIR $ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/share/euslisp) # install to prefix/eusdir
+  message(STATUS "INSTALLDIR ${INSTALLDIR}")
+  execute_process(
+    COMMAND cmake -E make_directory ${INSTALLDIR}
+    COMMAND cmake -E copy_directory ${EUSDIR}/lib ${INSTALLDIR}/lib
+    COMMAND cmake -E copy_directory ${EUSDIR}/${ARCHDIR} ${INSTALLDIR}/${ARCHDIR})
+endif()
+add_custom_target(compile_jskeus ALL
+  COMMAND export EUSDIR=${EUSDIR} DISPLAY="" lt_cv_sys_lib_dlsearch_path_spec=${lt_cv_sys_lib_dlsearch_path_spec} && \$\(MAKE\) -j1 -l1 -C ${PROJECT_SOURCE_DIR}/irteus -f Makefile ARCHDIR=${ARCHDIR} EUSDIR=${EUSDIR} IRTEUSDIR=${INSTALLDIR} 'SVNVERSION=\\"${jskeus_VERSION}\\"' VERBOSE=1
+  COMMAND cmake -E remove -f ${INSTALLDIR}/irteus
+  COMMAND cmake -E create_symlink ${PROJECT_SOURCE_DIR}/irteus ${INSTALLDIR}/irteus
+)
 
-install(DIRECTORY doc
-   DESTINATION share/jskeus/
-   USE_SOURCE_PERMISSIONS)
-install(DIRECTORY irteus
-   DESTINATION share/euslisp/jskeus/
-   USE_SOURCE_PERMISSIONS)
-install(FILES package.xml DESTINATION share/jskeus/)
-
-add_custom_target(test) # dummy target for catkin test
-
+# catkin
 find_package(catkin)
 catkin_package()
-string(REGEX MATCH "catkin" need_catkin "$ENV{_}")
-get_filename_component(install_dir_name ${CMAKE_INSTALL_PREFIX} NAME)
-if(need_catkin AND NOT install_dir_name MATCHES "install") # check if  install_prefix end with /install, we can  remove this section of we remove all rosrun euslisp ... usage
-  install(CODE "
-## this is tricky force write catkin marker file
-set(_catkin_marker_file \"\${CMAKE_INSTALL_PREFIX}/.catkin\")
-# check if the develspace marker file exists yet
-if(EXISTS \${_catkin_marker_file})
-  file(READ \${_catkin_marker_file} _existing_sourcespaces)
-  if(_existing_sourcespaces STREQUAL \"\")
-    # write this sourcespace to the marker file
-    file(WRITE \${_catkin_marker_file} \"${CMAKE_INSTALL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}\")
-  else()
-    # append to existing list of sourcespaces if it's not in the list
-    list(FIND _existing_sourcespaces \"${CMAKE_INSTALL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}\" _existing_sourcespace_index)
-    if(_existing_sourcespace_index EQUAL -1)
-      file(APPEND \${_catkin_marker_file} \";${CMAKE_INSTALL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}\")
-    endif()
-  endif()
-else()
-  # create a new develspace marker file
-  # NOTE: extra care must be taken when running multiple catkin jobs in parallel 
-  #       so that this does not overwrite the result of a similar call in another package
-  file(WRITE \${_catkin_marker_file} \"${CMAKE_INSTALL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}\")
+if(${eusdir_WRITABLE} EQUAL 0) # EUSDIR IS WRITABLE
+else()                         # EUSDIR IS NOT WRITABLE
+  catkin_add_env_hooks(99.jskeus SHELLS sh DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/env-hooks)
 endif()
-")
-endif()
+
+# install
+install(DIRECTORY doc irteus
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  USE_SOURCE_PERMISSIONS)
+install(CODE "execute_process(COMMAND cmake -E remove -f ${INSTALLDIR}/irteus)")
+install(CODE "execute_process(COMMAND cmake -E create_symlink \${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/irteus ${INSTALLDIR}/irteus)")
