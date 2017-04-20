@@ -13,15 +13,20 @@ execute_process(COMMAND grep version ${PROJECT_SOURCE_DIR}/package.xml
 message(STATUS "euslisp_VERSION : ${euslisp_VERSION}")
 message(STATUS "jskeus_VERSION  : ${jskeus_VERSION}")
 
-# build irteus
 # if EUSDIR is write protected use share as target directory
 execute_process(COMMAND test -w ${EUSDIR} RESULT_VARIABLE eusdir_WRITABLE)
+
+# catkin
+find_package(catkin)
+catkin_package()
+
+# build irteus
 if(${eusdir_WRITABLE} EQUAL 0)
   message(STATUS "eusdir_WRITABLE : TRUE")
   set(INSTALLDIR ${EUSDIR}) # install to EUSDIR
 else()
   message(STATUS "eusdir_WRITABLE : FALSE")
-  set(INSTALLDIR $ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/share/euslisp) # install to prefix/eusdir
+  set(INSTALLDIR $ENV{DESTDIR}${CATKIN_DEVEL_PREFIX}/share/euslisp) # install to prefix/eusdir
   message(STATUS "INSTALLDIR ${INSTALLDIR}")
   execute_process(
     COMMAND cmake -E make_directory ${INSTALLDIR}
@@ -34,17 +39,29 @@ add_custom_target(compile_jskeus ALL
   COMMAND cmake -E create_symlink ${PROJECT_SOURCE_DIR}/irteus ${INSTALLDIR}/irteus
 )
 
-# catkin
-find_package(catkin)
-catkin_package()
+# catkin envs
 if(${eusdir_WRITABLE} EQUAL 0) # EUSDIR IS WRITABLE
 else()                         # EUSDIR IS NOT WRITABLE
-  catkin_add_env_hooks(99.jskeus SHELLS sh DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/env-hooks)
+  catkin_add_env_hooks(99.jskeus SHELLS sh DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/env-hooks SKIP_INSTALL)
 endif()
 
 # install
 install(DIRECTORY doc irteus
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS)
+install(FILES ${INSTALLDIR}/lib/irtext.l DESTINATION share/euslisp/lib)
+# install ont included in euslisp
+install(CODE "
+foreach(dir bin lib obj)
+  execute_process(COMMAND cmake -E make_directory \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/share/euslisp/${ARCHDIR}/\${dir})
+  file(GLOB programs RELATIVE ${INSTALLDIR}/${ARCHDIR}/\${dir} ${INSTALLDIR}/${ARCHDIR}/\${dir}/*)
+  foreach(program \${programs})
+   if(NOT EXISTS ${EUSDIR}/${ARCHDIR}/\${dir}/\${program})
+     message(STATUS \"install ${ARCHDIR}/\${dir}/\${program}\")
+     execute_process(COMMAND cmake -E copy \${program} \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/share/euslisp/${ARCHDIR}/\${dir} WORKING_DIRECTORY ${INSTALLDIR}/${ARCHDIR})
+    endif()
+  endforeach()
+endforeach()
+")
 install(CODE "execute_process(COMMAND cmake -E remove -f ${INSTALLDIR}/irteus)")
 install(CODE "execute_process(COMMAND cmake -E create_symlink \${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/irteus ${INSTALLDIR}/irteus)")
