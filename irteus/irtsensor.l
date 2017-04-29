@@ -75,7 +75,7 @@
 (defclass camera-model
   :super sensor-model
   :slots ((vwing :forward
-                   (:projection :newprojection
+                   (:projection :newprojection :screen
                     :view :viewpoint :view-direction :viewdistance
                     :yon :hither))
           img-viewer pwidth pheight))
@@ -192,7 +192,8 @@
           (vp (send self :viewpoint))
           (r (/ hither viewdistance))
           (rr (/ yon viewdistance))
-          (screenx 1.0) (screeny 1.0))
+          (screen (send self :screen))
+          (screenx (car screen)) (screeny (cadr screen)))
      (send vwer :viewsurface :line-width width)
      (send vwer :viewsurface :color color)
      (gl::glDisable gl::GL_DEPTH_TEST)
