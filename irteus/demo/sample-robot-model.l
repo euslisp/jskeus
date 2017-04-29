@@ -140,6 +140,7 @@
            (mapcar #'(lambda (pos name)
                        (let ((sen (instance camera-model :init (make-cylinder 10 20) :name name)))
                          (send sen :rotate pi/2 :y)
+                         (send sen :rotate -pi/2 :z)
                          (send sen :locate (v+ pos (send (car (send (send self :head :neck-p :child-link) :bodies)) :centroid)) :world)
                          (send (send self :head :neck-p :child-link) :assoc sen)
                          sen))
