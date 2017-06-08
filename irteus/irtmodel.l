@@ -2224,7 +2224,7 @@
      (send-all union-link-list :analysis-level :coords)
      ;; argument check
      (when (or (null link-list) (null move-target))
-       (warn ";; ERROR: :link-list or :move-target required~%")
+       (warn ";; ERROR: both :link-list and :move-target required~%")
        (return-from :inverse-kinematics t))
      (if (and (null translation-axis) (null rotation-axis))
          (return-from :inverse-kinematics t))
