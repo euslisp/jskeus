@@ -27,11 +27,13 @@
 (export '(forward-message-to forward-message-to-all))
 
 (defun forward-message-to (to args)
+  "forward _args_ message to _to_ object"
   (if to
       (if args (send* to args) to)
     (if *debug* (warn ";; (forward-message-to ~A ~A) ~%" to args))))
 
 (defun forward-message-to-all (to args)
+  "forward _args_ message to all _to_ object"
   (if to
       (if args (apply #'send-all to args) to)
     (if *debug* (warn ";; (forward-message-to-all ~A ~A) ~%" to args))))
@@ -51,6 +53,7 @@
      ))
 
 (defmacro do-until-key (&rest forms)
+  "iterate forms until any key input"
   `(do-until-key-with-check t ,@forms))
 
 (defmacro do-until-key-with-timer
@@ -479,6 +482,11 @@
 ;;                1.00024
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmacro bench (&rest args)
+  "calculating execution time using mtimer, bench returns the value of args where the arbitrary lisp form
+(bench (unix:sleep 1))
+;; time -> 1.0001[s]
+t
+"
   (let ((tm (gensym))
         (str (gensym)))
     `(let ((,tm (instance mtimer :init))
@@ -491,6 +499,10 @@
          (format t ";; ~A -> ~A[s]~%" ,str (send ,tm :stop))))))
 
 (defmacro bench2 (&rest args)
+  "calculating execution time using mtimer, bench2 returns the execution time of args where the arbitrary lisp form
+(bench2 (unix:sleep 1))
+1.00024
+"
   (let ((tm (gensym)))
     `(let ((,tm (instance mtimer :init)))
        (send ,tm :start)
@@ -531,6 +543,12 @@
 ;;  (#\r (format t "retry~%") t)
 ;;  )
 (defmacro read-char-case (str &rest clauses)
+"read one charactor with lower caes
+(read-char-case \"y or n or r: \"
+ (#\y (format t \"yes~%\") t)
+ (#\n (format t \"no~%\") t)
+ (#\r (format t \"retry~%\") t))
+"
   (let ((ch (gensym))
         (missed-return (gensym))
         (flag (gensym)))
@@ -550,6 +568,7 @@
 
 ;; piped fork returning result as list
 (defun piped-fork-returns-list (cmd &optional args)
+  "piped fork returning result as list"
   (let ((strm (apply #'piped-fork cmd args)))
     (unwind-protect
         (let ((ret) (buf))
