@@ -91,6 +91,9 @@
    (spots)
    "Add spots to scene with identifiable names. All spots will be :assoc with this scene. Returns T if added spots successfly, otherwise returns NIL."
    (dolist (spot spots)
+     (unless (and (stringp (send spot :name)) (not (null-string-p (send spot :name))))
+       (error "spot name must not be empty!: ~A" (send spot :name))
+       (return-from :add-spots nil))
      (unless (eq (class spot) cascaded-coords)
        (error "class of spot ~A must be cascaded-coords" (send (class spot) :name))
        (return-from :add-spots nil))
