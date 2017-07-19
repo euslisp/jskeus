@@ -38,9 +38,9 @@
 (defmethod joint
   (:init (&key (name (intern (format nil "joint~A" (sys::address self)) "KEYWORD"))
                ((:child-link clink)) ((:parent-link plink))
-	       (min -90) (max 90)
-	       ((:max-joint-velocity mjv))
-               ((:max-joint-torque mjt))
+	       (min -90) (max 90) ;; use deg/mm unit
+	       ((:max-joint-velocity mjv)) ;; use SI(m/s,rad/s) unit
+               ((:max-joint-torque mjt)) ;; use SI(N,Nm) unit
 	       ((:joint-min-max-table mm-table))
                ((:joint-min-max-target mm-target))
 	       &allow-other-keys)
@@ -76,15 +76,31 @@
    "Returns child link of this joint. if any arguments is set, it is passed to the child-link."
    (user::forward-message-to child-link args))
   (:calc-dav-gain (dav i periodic-time) (warn "subclass's respoinsibility (send ~s :calc-dav-gain)~%" self))
-  (:joint-dof () (warn "subclass's respoinsibility (send ~s :joint-dof)~%" self))
-  (:speed-to-angle (&rest args) (warn "subclass's respoinsibility (send ~s :speed-to-angle)~%" self))
-  (:angle-to-speed (&rest args) (warn "subclass's respoinsibility (send ~s :angle-to-speed)~%" self))
+  (:joint-dof ()
+   "Returns Degree of Freedom of this joint."
+   (warn "subclass's respoinsibility (send ~s :joint-dof)~%" self))
+  (:speed-to-angle (&rest args)
+   "Returns values in deg/mm unit of input value in SI(rad/m) unit."
+   (warn "subclass's respoinsibility (send ~s :speed-to-angle)~%" self))
+  (:angle-to-speed (&rest args)
+   "Returns values in SI(rad/m) unit of input value in deg/mm unit."
+   (warn "subclass's respoinsibility (send ~s :angle-to-speed)~%" self))
   (:calc-jacobian (&rest args) (warn "subclass's respoinsibility (send ~s :calc-jacobian)~%" self))
-  (:joint-velocity (&optional jv) (if jv (setq joint-velocity jv) joint-velocity))
-  (:joint-acceleration (&optional ja) (if ja (setq joint-acceleration ja) joint-acceleration))
-  (:joint-torque (&optional jt) (if jt (setq joint-torque jt) joint-torque))
-  (:max-joint-velocity (&optional mjv) (if mjv (setq max-joint-velocity mjv) max-joint-velocity))
-  (:max-joint-torque (&optional mjt) (if mjt (setq max-joint-torque mjt) max-joint-torque))
+  (:joint-velocity (&optional jv)
+   "If jv is set, it updates joint-velocity of this instance. :joint-velocity returns velocity of this joint in SI(m/s, rad/s) unit."
+   (if jv (setq joint-velocity jv) joint-velocity))
+  (:joint-acceleration (&optional ja)
+   "If ja is set, it updates joint-acceleration of this instance. :joint-acceleration returns acceleration of this joint in SI(m/s^2, rad/s^2) unit."
+   (if ja (setq joint-acceleration ja) joint-acceleration))
+  (:joint-torque (&optional jt)
+   "If jt is set, it updates joint-torque of this instance. :joint-torque returns torque of this joint in SI(N, Nm) unit."
+   (if jt (setq joint-torque jt) joint-torque))
+  (:max-joint-velocity (&optional mjv)
+   "If mjv is set, it updates min-joint-velocity of this instance. :min-joint-velocity returns velocity of this joint in SI(m/s, rad/s)  unit."
+   (if mjv (setq max-joint-velocity mjv) max-joint-velocity))
+  (:max-joint-torque (&optional mjt)
+   "If mjt is set, it updates min-joint-torque of this instance. :min-joint-torque returns velocity of this joint in SI(N, Nm) unit."
+   (if mjt (setq max-joint-torque mjt) max-joint-torque))
   (:joint-min-max-table (&optional mm-table) (if mm-table (setq joint-min-max-table mm-table) joint-min-max-table))
   (:joint-min-max-target (&optional mm-target) (if mm-target (setq joint-min-max-target mm-target) joint-min-max-target))
   (:joint-min-max-table-angle-interpolate
@@ -219,8 +235,8 @@
      joint-angle))
   (:joint-dof () "Returns DOF of rotational joint, 1." 1)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-scalar self dav i periodic-time))
-  (:speed-to-angle (v) (rad2deg v))
-  (:angle-to-speed (v) (deg2rad v))
+  (:speed-to-angle (v) "Returns degree of given input in radian" (rad2deg v))
+  (:angle-to-speed (v) "Returns radian of given input in degree" (deg2rad v))
   (:calc-jacobian (&rest args) (apply #'calc-jacobian-rotational args))
   )
 
@@ -271,8 +287,8 @@
      joint-angle))
   (:joint-dof () "Returns DOF of linear joint, 1." 1)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-scalar self dav i periodic-time))
-  (:speed-to-angle (v) (* 1000 v))
-  (:angle-to-speed (v) (* 0.001 v))
+  (:speed-to-angle (v) "Returns [mm] of given input in [m]" (* 1000 v))
+  (:angle-to-speed (v) "Returns [m] of given input in [mm]" (* 0.001 v))
   (:calc-jacobian (&rest args) (apply #'calc-jacobian-linear args))
   )
 
@@ -315,10 +331,10 @@
      joint-angle))
   (:joint-dof () "Returns DOF of linear joint, 2." 2)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
-  (:speed-to-angle (dv)
+  (:speed-to-angle (dv) "Returns [mm/deg] of given input in SI unit [m/rad]"
                    (float-vector (* 1000 (elt dv 0))
                                  (rad2deg (elt dv 1))))
-  (:angle-to-speed (dv)
+  (:angle-to-speed (dv) "Returns SI unit [m/rad] of given input in [mm/deg]"
                    (float-vector (* 0.001 (elt dv 0))
                                  (deg2rad (elt dv 1))))
   (:calc-jacobian
@@ -373,11 +389,11 @@
    joint-angle)
   (:joint-dof () "Returns DOF of linear joint, 3." 3)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
-  (:speed-to-angle (dv)
+  (:speed-to-angle (dv) "Returns [mm/deg] of given input in SI unit [m/rad]"
                    (float-vector (* 1000 (elt dv 0))
                                  (* 1000 (elt dv 1))
                                  (rad2deg (elt dv 2))))
-  (:angle-to-speed (dv)
+  (:angle-to-speed (dv) "Returns SI unit [m/rad] of given input in [mm/deg]"
                    (float-vector (* 0.001 (elt dv 0))
                                  (* 0.001 (elt dv 1))
                                  (deg2rad (elt dv 2))))
@@ -466,11 +482,11 @@
     (map float-vector #'rad2deg (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad joint-angle))))))
   (:joint-dof () "Returns DOF of linear joint, 3." 3)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
-  (:speed-to-angle (dv)
+  (:speed-to-angle (dv) "Returns degree of given input in radian"
                    (float-vector (rad2deg (elt dv 0))
                                  (rad2deg (elt dv 1))
                                  (rad2deg (elt dv 2))))
-  (:angle-to-speed (dv)
+  (:angle-to-speed (dv) "Returns radian of given input in degree"
                    (float-vector (deg2rad (elt dv 0))
                                  (deg2rad (elt dv 1))
                                  (deg2rad (elt dv 2))))
@@ -624,14 +640,14 @@
 		 (map float-vector #'rad2deg (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad (subseq joint-angle 3 6))))))))
   (:joint-dof () "Returns DOF of linear joint, 6." 6)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
-  (:speed-to-angle (dv)
+  (:speed-to-angle (dv) "Returns [mm/deg] of given input in SI unit [m/rad]"
                    (float-vector (* 1000 (elt dv 0))
                                  (* 1000 (elt dv 1))
                                  (* 1000 (elt dv 2))
                                  (rad2deg (elt dv 3))
                                  (rad2deg (elt dv 4))
                                  (rad2deg (elt dv 5))))
-  (:angle-to-speed (dv)
+  (:angle-to-speed (dv) "Returns SI unit [m/rad] of given input in [mm/deg]"
                    (float-vector (* 0.001 (elt dv 0))
                                  (* 0.001 (elt dv 1))
                                  (* 0.001 (elt dv 2))
