@@ -213,7 +213,7 @@
 (defun eus2stl (fname _faceset &key (scale 0.001))
   (send _faceset :worldpos)
   (with-open-file (f fname :direction :output)
-    (let ((faces (send _faceset :faces)))
+    (let ((faces (send (body-to-faces _faceset) :faces)))
       (write-stl-header f (length faces))
       (dolist (_face faces)
         (write-stl-face f _face :scale scale))))
