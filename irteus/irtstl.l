@@ -213,7 +213,21 @@
 (defun eus2stl (fname _faceset &key (scale 0.001))
   (send _faceset :worldpos)
   (with-open-file (f fname :direction :output)
-    (let ((faces (send (body-to-faces _faceset) :faces)))
+    (let ((faces))
+      (cond ((find-method _faceset :bodies)
+             (setq faces
+                   (mapcan #'(lambda (x)
+                               ;(print (list x (boundp 'gl::glbody) (classp gl::glbody) (derivedp x gl::glbody)))
+                               (cond ((find-method x :glvertices)
+                                      (send (body-to-faces (send x :glvertices)) :faces))
+                                     ((cdr (assoc 'user::glvertices (send x :slots)))
+                                      (send (cdr (assoc 'user::glvertices (send x :slots))) :faces))
+                                     (t
+                                      (send (body-to-faces x) :faces))
+                               ))
+                               (send _faceset :bodies))))
+            (t
+             (setq faces (send (body-to-faces _faceset) :faces))))
       (write-stl-header f (length faces))
       (dolist (_face faces)
         (write-stl-face f _face :scale scale))))
