@@ -459,7 +459,7 @@
     "fullbody inverse kinematics for legged robot.
      necessary args : target-coords, move-target, and link-list must include legs' (or leg's) parameters
                       ex. (send *robot* :fullbody-inverse-kinematics (list rarm-tc rleg-tc lleg-tc) :move-target (list rarm-mt rleg-mt lleg-mt) :link-list (list rarm-ll rleg-ll lleg-ll))"
-    (with-append-root-joint ;; inverse-kinematics with base-link
+    (with-append-root-joint ;; inverse-kinematics with root-link
      (link-list-with-robot-6dof self link-list
                                 :joint-class 6dof-joint
                                 :joint-args (append (list :min min :max max) joint-args))
