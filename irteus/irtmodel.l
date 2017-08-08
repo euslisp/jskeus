@@ -3010,14 +3010,39 @@
       )))
 
 (defmacro with-append-root-joint (params &rest bodies)
+  ;; Return value:
+  ;;   list of link-list
+  ;; Arguments:
+  ;;   params := (output-link-list robot input-link-list :joint-class joint-class :joint-args joint-args)
+  ;;     output-link-list, robot, input-link-list : Necessary parameters
+  ;;     joint-class, joint-args : Additional parameter, which can be omitted
+  ;;     If joint-class is omitted, 6dof-joint is used as root-joint.
+  ;;     If joint-args is omitted, nil.
+  ;;   bodies : any S-expressions.
+  ;; Supported types of input-link-list:
+  ;;   1. link-list
+  ;;        input-link-list : (list link0 link1 ...)
+  ;;        =>
+  ;;        output-link-list : (list root-link link0 link1 ...)
+  ;;   2. list of link-list (without "nil")
+  ;;        input-link-list : (list (list link00 link01 ...) (list link10 link11 ...) ...)
+  ;;        =>
+  ;;        output-link-list : (list (list root-link link00 link01 ...) (list root-link link10 link11 ...) ...)
+  ;;   3. list of link-list including "nil", where "nil" derived from move-target at the root-link
+  ;;        input-link-list : (list nil (list link00 link01 ...) ...)
+  ;;        =>
+  ;;        output-link-list : (list (list root-link) (list root-link link00 link01 ...) ...)
+  ;; More info:
+  ;;   Please see irtrobot.l's :fullbody-inverse-kinematics for usage and arguments.
+  ;;   Please see test/test-irt-motion.l for testing and types of input-link-list.
   (with-gensyms
    (robot link-list vlink rlink joint-args)
    `(progn
       (let ((,robot ,(cadr params))
             (,link-list
-             (if (atom (car ,(caddr  params)))
-                 (list ,(caddr  params))
-               ,(caddr  params)))
+             (if (every #'listp ,(caddr  params)) ;; Check all is list or not. Note that both (list link-list-0 link-list-1) and (list link-list-0 nil) is "t" at this check.
+                 ,(caddr  params)
+               (list ,(caddr  params))))
             (,joint-args ,(cadr (member :joint-args params))))
         (let ((,vlink (instance bodyset-link :init (make-cascoords)
                                 :bodies (list (make-cube 150 10 400))

@@ -1074,5 +1074,52 @@
     (assert (eps-v= torque-without-root-joint torque-with-root-joint))
     ))
 
+;; Test for with-append-root-joint
+(deftest test-with-append-root-joint
+  (let* ((mt (send *sample-robot* :rarm :end-coords))
+         (ll (send *sample-robot* :link-list (send mt :parent))))
+    (with-append-root-joint
+     (link-list-with-robot-6dof *sample-robot* ll :joint-class 6dof-joint)
+     (assert
+      (equal
+       (append (list (car (send *sample-robot* :links))) ll)
+       (car link-list-with-robot-6dof))
+      "Test single link-list without root-link")))
+  (let* ((mt (list (send *sample-robot* :rarm :end-coords) (send *sample-robot* :lleg :end-coords)))
+         (ll (mapcar #'(lambda (tmt) (send *sample-robot* :link-list (send tmt :parent))) mt)))
+    (with-append-root-joint
+     (link-list-with-robot-6dof *sample-robot* ll :joint-class 6dof-joint)
+     (assert
+      (equal
+       (mapcar #'(lambda (l) (append (list (car (send *sample-robot* :links))) l)) ll)
+       link-list-with-robot-6dof)
+      "Test multiple link-list without root-link")))
+  (let* ((root-move-target
+          (make-cascoords :coords (send (car (send *sample-robot* :links)) :copy-worldcoords)
+                          :parent (car (send *sample-robot* :links))))
+         (mt (list root-move-target (send *sample-robot* :larm :end-coords) (send *sample-robot* :rleg :end-coords)))
+         (ll (mapcar #'(lambda (c) (send *sample-robot* :link-list (send c :parent))) mt)))
+    (with-append-root-joint
+     (link-list-with-robot-6dof *sample-robot* ll :joint-class 6dof-joint)
+     (let ((ret
+            (equal
+             (mapcar #'(lambda (l) (append (list (car (send *sample-robot* :links))) l)) ll)
+             link-list-with-robot-6dof)))
+       (send (send root-move-target :parent) :dissoc root-move-target)
+       (assert ret "Test multiple link-list with root-link"))))
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :newcoords (make-coords))
+  (let* ((root-move-target
+          (make-cascoords :coords (send (car (send *sample-robot* :links)) :copy-worldcoords)
+                          :parent (car (send *sample-robot* :links))))
+         (mt (list root-move-target (send *sample-robot* :lleg :end-coords) (send *sample-robot* :rleg :end-coords)))
+         (ll (mapcar #'(lambda (c) (send *sample-robot* :link-list (send c :parent))) mt)))
+    (let ((ret (send *sample-robot* :fullbody-inverse-kinematics
+                     (send-all mt :copy-worldcoords)
+                     :translation-axis (list :xy t t) ;; root-link XY positions are used for COG jacobian
+                     :move-target mt :link-list ll)))
+      (send (send root-move-target :parent) :dissoc root-move-target)
+      (assert ret "Test multiple link-list with root-link and IK"))))
+
 (run-all-tests)
 (exit 0)
