@@ -110,6 +110,8 @@
      (< (reduce #'(lambda (x y) (max x y)) ret-list2) (+ 90 *epsilon*)))
     ))
 
+;; https://github.com/euslisp/EusLisp/issues/232
+#-:arm
 (deftest test-linear-interpolator ()
   (let ((res (test-interpolators linear-interpolator)))
     (assert res)))

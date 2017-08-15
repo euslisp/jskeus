@@ -21,6 +21,8 @@
                        distance (- (v. normal (car vertices))))))
 (in-package "USER")
 
+;; https://github.com/euslisp/EusLisp/issues/232
+#-:arm
 (deftest test-body+
   (let (bottom-frame
         b

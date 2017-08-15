@@ -4,6 +4,9 @@
 
 (init-unit-test)
 
+#+:arm
+(setq i-max 100)
+#-:arm
 (setq i-max 100000)
 
 (deftest test-makecoords-rpy

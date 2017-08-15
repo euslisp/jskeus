@@ -4,21 +4,21 @@
 (require :unittest "lib/llib/unittest.l")
 
 (init-unit-test)
-(defmacro check-bignum (op num1 num2 ans)
-  `(let (num3)
-     (format *error-output* "check (~a #x~x #x~x) -> " (quote ,op) ,num1 ,num2)
-     (setq num3 (funcall ,op ,num1 ,num2))
+(defun check-bignum (op num1 num2 ans &optional (f #'equal))
+  (let (num3)
+     (format *error-output* "check (~a #x~x #x~x) -> " op num1 num2)
+     (setq num3 (funcall op num1 num2))
      (if (numberp num3)
 	 (format *error-output* "#x~x,  " num3)
        (format *error-output* "~a,  " num3))
-     (if (equal num3 ,ans)
+     (if (funcall f num3 ans)
          (format *error-output* "passed~%")
        (progn
-         (warn "failed!! : answer(~x)~%" ,ans)
-         (print (list 'ans (class ,ans)
-                      'num3 (class num3)))
+         (warn "failed!! : answer(~x)~%" ans)
+         (print (list ans (class ans)
+                      num3 (class num3)))
          ))
-     (assert (equal num3 ,ans))))
+     (assert (funcall f num3 ans))))
 
 (deftest test-bignum
   (dotimes (i 10)
@@ -86,17 +86,32 @@
     (check-bignum #'equal #x2000000000000000 #x2000000000000001 nil)
 
     ;; bignum devide float / float devide bignum
-    (check-bignum #'/ 10000000000000000000 1.0e+19 1.0)
-    (check-bignum #'/ -10000000000000000000 1.0e+19 -1.0)
-    (check-bignum #'/ 1.0e+19 10000000000000000000 1.0)
-    (check-bignum #'/ 1.0e+19 -10000000000000000000 -1.0)
+    (cond ((= lisp::sizeof-* 4) ;; 32 bit
+	   (check-bignum #'/ 10000000000000000000 1.0e+19 1.0)
+	   (check-bignum #'/ -10000000000000000000 1.0e+19 -1.0)
+	   (check-bignum #'/ 1.0e+19 10000000000000000000 1.0 #'eps=)
+	   (check-bignum #'/ 1.0e+19 -10000000000000000000 -1.0 #'eps=)
+	   )
+	  (t ;; 64 bit
+	   (check-bignum #'/ 10000000000000000000 1.0e+19 1.0)
+	   (check-bignum #'/ -10000000000000000000 1.0e+19 -1.0)
+	   (check-bignum #'/ 1.0e+19 10000000000000000000 1.0)
+	   (check-bignum #'/ 1.0e+19 -10000000000000000000 -1.0)
+	   ))
 
     ;; bignum multiple float / float multiple bignum
-    (check-bignum #'* 10000000000000000000 1.0e-19 1.0)
-    (check-bignum #'* -10000000000000000000 1.0e-19 -1.0)
-    (check-bignum #'* 1.0e-19 10000000000000000000 1.0)
-    (check-bignum #'* 1.0e-19 -10000000000000000000 -1.0)
-
+    (cond ((= lisp::sizeof-* 4) ;; 32 bit
+;	   (check-bignum #'* 10000000000000000000 1.0e-19 1.0 #'eps=)
+;	   (check-bignum #'* -10000000000000000000 1.0e-19 -1.0 #'eps=)
+;	   (check-bignum #'* 1.0e-19 10000000000000000000 1.0 #'eps=)
+;	   (check-bignum #'* 1.0e-19 -10000000000000000000 -1.0 #'eps=)
+	   )
+	  (t ;; 64 bit
+	   (check-bignum #'* 10000000000000000000 1.0e-19 1.0)
+	   (check-bignum #'* -10000000000000000000 1.0e-19 -1.0)
+	   (check-bignum #'* 1.0e-19 10000000000000000000 1.0)
+	   (check-bignum #'* 1.0e-19 -10000000000000000000 -1.0)
+	   ))
     ;;
     (check-bignum #'equal (elt #i(536870912) 0) #x20000000 t)
     (check-bignum #'equal (elt (integer-vector 536870912) 0) #x20000000 t)

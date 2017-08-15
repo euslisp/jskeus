@@ -43,6 +43,9 @@
 
 ;;;
 
+#+:arm
+(setq i-max 200)
+#-:arm
 (setq i-max 200000)
 
 (deftest test-copy-object-integer
