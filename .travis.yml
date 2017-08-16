@@ -48,6 +48,11 @@ matrix:
       sudo: required
       cache: apt
       env: DOCKER_IMAGE=osrf/debian_arm64:jessie
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: BUILD_DOC=true
     - os: osx
   allow_failures:
     - os: osx
@@ -62,12 +67,16 @@ script:
   - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
   - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then COUNT=10; while [ $COUNT -gt 0 -a ! -e $CI_SOURCE_PATH/eus ] ; do echo $COUNT; sleep 1; GIT_SSL_NO_VERIFY=true git clone --depth 10 http://github.com/euslisp/EusLisp $CI_SOURCE_PATH/eus; COUNT=`expr $COUNT - 1`; done; fi # running git clone within arm VM is very slow
   - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then mv $CI_SOURCE_PATH/irteus/test/*.l /tmp; mv /tmp/irt*.l $CI_SOURCE_PATH/irteus/test/; fi # arm VM is very slow so we do not have time to run all tests
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then docker run --rm -i -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" -a "$BUILD_DOC" != "true" ]; then docker run --rm -i -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"; fi
   # Test installing head version jskeus via Homebrew formula
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then source $CI_SOURCE_PATH/.travis-osx.sh; fi
-after_success:
-  - (cd doc/; pdftotext jmanual.pdf; mv jmanual.txt jmanual.txt.old; make; pdftotext jmanual.pdf)
-  - (cd doc/; make html)
+  # Test doc generation
+  - if [ "$BUILD_DOC" == "true" ]; then git log --oneline | head -10; fi
+  - if [ "$BUILD_DOC" == "true" ]; then sudo apt-get install -y -qq git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi; fi
+  - if [ "$BUILD_DOC" == "true" ]; then make; fi
+  - if [ "$BUILD_DOC" == "true" ]; then sudo apt-get install -y -qq texlive-binaries texlive-lang-cjk poppler-utils nkf latex2html; fi
+  - if [ "$BUILD_DOC" == "true" ]; then (source bashrc.eus; cd doc/; make pdf); fi
+  - if [ "$BUILD_DOC" == "true" ]; then (source bashrc.eus; cd doc/; make html); fi
 after_failure:
   - echo "failure"
 
