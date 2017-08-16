@@ -90,7 +90,7 @@
    "If jv is set, it updates joint-velocity of this instance. :joint-velocity returns velocity of this joint in SI(m/s, rad/s) unit."
    (if jv (setq joint-velocity jv) joint-velocity))
   (:joint-acceleration (&optional ja)
-   "If ja is set, it updates joint-acceleration of this instance. :joint-acceleration returns acceleration of this joint in SI(m/$s^2$, rad/$s^2$) unit."
+   "If ja is set, it updates joint-acceleration of this instance. :joint-acceleration returns acceleration of this joint in SI(m/s^2, rad/s^2) unit."
    (if ja (setq joint-acceleration ja) joint-acceleration))
   (:joint-torque (&optional jt)
    "If jt is set, it updates joint-torque of this instance. :joint-torque returns torque of this joint in SI(N, Nm) unit."
