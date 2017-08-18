@@ -56,6 +56,9 @@
 
 (defun pqp-collision-check (model1 model2
 				       &optional (flag PQP_FIRST_CONTACT) &key (fat 0) (fat2 nil))
+  "Check collision between model1 and model2 using PQP.
+   If return value is 0, no collision.
+   Otherwise (return value is 1), collision."
   (let ((m1 (get model1 :pqpmodel))
 	(m2 (get model2 :pqpmodel))
 	(r1 (send model1 :worldrot))
@@ -70,6 +73,9 @@
 
 (defun pqp-collision-distance (model1 model2
 				      &key (fat 0) (fat2 nil) (qsize 2))
+  "Calculate collision distance between model1 and model2 using PQP.
+   Return value is (list [distance] [nearest point on model1] [nearest point on model2]).
+   If collision occurs, [distance] is 0 and nearest points are insignificant values."
   (let ((m1 (get model1 :pqpmodel))
 	(m2 (get model2 :pqpmodel))
 	(r1 (send model1 :worldrot))
