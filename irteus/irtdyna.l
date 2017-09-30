@@ -1159,6 +1159,7 @@
                         (send (send self :centroid) :draw-on :flush nil :size 300 :color #f(1 0 0))
                         (send (cadr (car ret)) :draw-on :flush nil :size 400)
                         (send zmp :draw-on :flush t :size 300 :color #f(1 0 0))
+                        (x::window-main-one)
                         (unix:usleep 10000)
                         (setq tm (+ tm dt))
                         (list :time tm :output-zmp zmp :input-zmp (cadr (car ret))
