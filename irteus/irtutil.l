@@ -218,7 +218,7 @@
           ;;
           (position :type float-vector)   ;; current data point
           (time :type float)          ;; time [sec] from start
-          (segmnet-num :type integer) ;; number of total segment
+          (segment-num :type integer) ;; number of total segment
           (segment-time :type float)  ;; time[sec] with in each segment
           (segment :type integer)     ;; index of segment which is currently processing
           (interpolatingp :type symbol)
