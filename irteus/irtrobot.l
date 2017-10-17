@@ -691,14 +691,15 @@
              (end-coords-list (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) (gg . all-limbs)))
              (contact-state (elt ret 8))
              )
-         (if debug-view
+         (when debug-view
              (send self :draw-gg-debug-view
                    end-coords-list
                    contact-state
                    (elt ret 5) ;; rz
                    (elt ret 6) ;; cog
                    (elt ret 7) ;; pz
-                   czmp dt))
+                   czmp dt)
+             (x::window-main-one))
          (push
           (list :angle-vector (car ret)
                 :root-coords (cadr ret)

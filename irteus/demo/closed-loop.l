@@ -182,6 +182,7 @@
       (push (send *robot* :get-cylinder-length) cylinder-length-list)
       (push ja link-angle-list)
       (unix:usleep 100000)
+      (x::window-main-one)
       )
 
     (format t ";; Test forward calculation (cylinder length => link joint angle).~%")
@@ -228,6 +229,7 @@
       (push (list (send *robot* :get-cylinder-length :right) (send *robot* :get-cylinder-length :left)) cylinder-length-list)
       (push (list j0 j1) link-angle-list)
       (unix:usleep 100000)
+      (x::window-main-one)
       ))
 
     (format t ";; Test forward calculation (cylinder length => link joint angle).~%")
