@@ -1273,12 +1273,13 @@
         (setq valid-link-list
 	      (if (= (length link-list) 1)
 		  link-list
-		(subseq
-		 link-list
-		 (let ((i 1))
-		   (while (eps= (distance (send (elt link-list 0) :worldpos)
-					  (send (elt link-list i) :worldpos)) 0.0)
-		     (incf i)) i))))
+                (let ((i 1))
+                  (while (and (<= i (- (length link-list) 1))
+                              (eps= (distance (send (elt link-list 0) :worldpos)
+                                              (send (elt link-list i) :worldpos)) 0.0))
+                    (incf i))
+                  (if (<= i (- (length link-list) 1))
+                      (subseq link-list i)))))
         (setq index-links
               (mapcar #'(lambda (l) (position l valid-link-list)) collision-links))
         (when (and debug (not (memq :no-message debug)))
