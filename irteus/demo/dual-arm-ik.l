@@ -94,6 +94,7 @@
      (send b0 :orient (* 0.2 (sin (/ i 10.0))) :x :world)
      (send b0 :locate (float-vector 250 (* 250 (sin (/ (incf i) 10.0))) 0) :world)
      (send *irtviewer* :draw-objects)
+     (x::window-main-one)
      (incf i)
      )
     ))

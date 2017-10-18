@@ -2182,6 +2182,7 @@
              (dolist (p (send self :get :ik-draw-on-params))
                (send* (car p) :draw-on :flush nil (cdr p)))
              (if (not (memq :no-flush debug-view)) (send *viewer* :viewsurface :flush))
+             (x::window-main-one)
              )
            (send self :put :ik-draw-on-params nil) ;; Clear :ik-draw-on-params
            :ik-continues)
