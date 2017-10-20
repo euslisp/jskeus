@@ -1274,14 +1274,12 @@
         ;; originally introduced in https://github.com/euslisp/jskeus/commit/b0e3b482f8469241b2bfd9e9c607c19542b4d234
         ;; heuristics to skip adjacent links with same axis
         (setq valid-link-list
-	      (if (= (length link-list) 1)
-		  link-list
-		(subseq
-		 link-list
-                 (do ((i 0 (1+ i)))
-                     ((not (and (< i (1- (length link-list)))
-                                (eps= (distance (send (elt link-list 0) :worldpos)
-                                                (send (elt link-list 1) :worldpos)) 0.0))) i)))))
+              (subseq  ;; returns link-list when it's length is 1
+               link-list
+               (do ((i 1 (1+ i)))
+                   ((not (and (< i (1- (length link-list)))
+                              (eps= (distance (send (elt link-list 0) :worldpos)
+                                              (send (elt link-list 1) :worldpos)) 0.0))) i))))
         (setq index-links
               (mapcar #'(lambda (l) (position l valid-link-list)) collision-links))
         (when (and debug (not (memq :no-message debug)))
