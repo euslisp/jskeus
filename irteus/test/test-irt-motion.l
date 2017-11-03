@@ -1011,8 +1011,8 @@
                               (make-coords :coords (send (send *sample-robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 0 100 0)) :name :lleg)
                               (make-coords :coords (send (send *sample-robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 0 100 0)) :name :rleg))))
     (setq cog2 (cadr (memq :cog (car av-list))))
-    (assert (eps= (elt cog0 1) (elt cog1 1) 0.5) (format nil "cog: ~A ~A" cog0 cog1))
-    (assert (eps= (elt cog0 1) (- (elt cog2 1) 100) 0.5) (format nil "cog: ~A ~A" cog0 cog2))
+    (assert (eps= (elt cog0 1) (elt cog1 1) 1.5) (format nil "cog: ~A ~A" cog0 cog1))
+    (assert (eps= (elt cog0 1) (- (elt cog2 1) 100) 1.5) (format nil "cog: ~A ~A" cog0 cog2))
     ))
 
 (deftest test-samplerobot-static-balance-point
