@@ -160,8 +160,11 @@
 		 (send coords :rotate (deg2rad angle) axis wrt) args)))
        (:move-end-pos
 	(let ((coords (send self limb :end-coords :copy-worldcoords))
-	      (pos (pop args)) (wrt (pop args)))
-	  (unless wrt (setq wrt :local))
+	      (pos (pop args)) wrt)
+      (setq wrt
+            (if (or (find (car args) (list :world :local :parent))
+                    (coordinates-p (car args)))
+                (pop args) :local))
 	  (send* self limb :move-end (send coords :translate pos wrt) args)))
        (:look-at
         (if (send self :head :links) (send* self :inverse-kinematics-loop-for-look-at limb args)))
