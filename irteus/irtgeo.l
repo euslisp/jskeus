@@ -228,7 +228,8 @@
 				    :inverse-transformation) cc cc)
 	    (send self :newcoords cc))))
   (:move-coords
-   (target at) ;; fix "at" coords on "self" to "target"
+   (target at)
+   "fix 'at' coords on 'self' to 'target'"
    (send self :transform (send at :transformation target) at)
    (send self :worldcoords)
    )
