@@ -817,8 +817,8 @@
                  (setq tmp-joint-angle (elt vec i) tmp-target-joint-angle (elt vec ii))
                  (setq tmp-joint-min-angle (send j :joint-min-max-table-min-angle tmp-target-joint-angle)
                        tmp-joint-max-angle (send j :joint-min-max-table-max-angle tmp-target-joint-angle))
-                 (setq tmp-target-joint-min-angle (send j :joint-min-max-table-min-angle tmp-joint-angle)
-                       tmp-target-joint-max-angle (send j :joint-min-max-table-max-angle tmp-joint-angle))
+                 (setq tmp-target-joint-min-angle (send jj :joint-min-max-table-min-angle tmp-joint-angle)
+                       tmp-target-joint-max-angle (send jj :joint-min-max-table-max-angle tmp-joint-angle))
                  (cond ((<= tmp-joint-min-angle tmp-joint-angle tmp-joint-max-angle) ;; ok
                         ;; force change joint-angle to avoid problem
                         (setq (j . joint-angle) tmp-joint-angle
@@ -829,8 +829,8 @@
                             ((> i 1))
                           (setq tmp-joint-min-angle (send j :joint-min-max-table-min-angle tmp-target-joint-angle)
                                 tmp-joint-max-angle (send j :joint-min-max-table-max-angle tmp-target-joint-angle))
-                          (setq tmp-target-joint-min-angle (send j :joint-min-max-table-min-angle tmp-joint-angle)
-                                tmp-target-joint-max-angle (send j :joint-min-max-table-max-angle tmp-joint-angle))
+                          (setq tmp-target-joint-min-angle (send jj :joint-min-max-table-min-angle tmp-joint-angle)
+                                tmp-target-joint-max-angle (send jj :joint-min-max-table-max-angle tmp-joint-angle))
 
                           (if (< tmp-joint-angle tmp-joint-min-angle)
                               (incf tmp-joint-angle (* (- tmp-joint-min-angle tmp-joint-angle) i)))
