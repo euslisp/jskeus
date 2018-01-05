@@ -107,9 +107,14 @@
     ;; j1-hash
     (mapcar #'(lambda (self-joint target-joint j-min-max-table)
                 (do ((i (round (send target-joint :min-angle)) (+ i 1))) ((> i (round (send target-joint :max-angle))))
-                    (setf (aref j-min-max-table 0 (round (- i (send self-joint :min-angle)))) i)
-                    (setf (aref j-min-max-table 1 (round (- i (send self-joint :min-angle)))) (- (abs i) (send self-joint :max-angle)))
-                    (setf (aref j-min-max-table 2 (round (- i (send self-joint :min-angle)))) (- (send self-joint :max-angle) (abs i))))
+                    (setf (aref j-min-max-table 0 (round (- i (send target-joint :min-angle)))) i)
+                    (setf (aref j-min-max-table 1 (round (- i (send target-joint :min-angle))))
+                          (- (+ (min (* (/ (send self-joint :max-angle) (send target-joint :max-angle)) i)
+                                     (* -1 (/ (send self-joint :max-angle) (send target-joint :max-angle)) i))
+                                (send self-joint :max-angle))))
+                    (setf (aref j-min-max-table 2 (round (- i (send target-joint :min-angle))))
+                          (- (aref j-min-max-table 1 (round (- i (send target-joint :min-angle))))))
+                    )
                 (send self-joint :joint-min-max-table j-min-max-table)
                 (send self-joint :joint-min-max-target target-joint))
             (list j1 j2)
@@ -169,10 +174,22 @@
                (send min-max-table-view :color #x0000ff))
               (t ;; out of limit
                (if min-max-table-view (format t ";; out of limit ~A -> ~A~%" (float-vector x y) (send *robot* :angle-vector)))
-               (setq ret
-                     (and ret
-                          (< (- (- (abs (send j2 :joint-angle)) (abs j1-org-max-angle)) *epsilon*) (send j1 :joint-angle) (+ (- (abs j1-org-max-angle) (abs (send j2 :joint-angle))) *epsilon*))
-                            (< (- (- (abs (send j1 :joint-angle)) (abs j2-org-max-angle)) *epsilon*) (send j2 :joint-angle) (+ (- (abs j2-org-max-angle) (abs (send j1 :joint-angle))) *epsilon*))))
+               (let* ((j1-max-angle
+                       (+ (min (* (/ j1-org-max-angle j2-org-max-angle) (send j2 :joint-angle))
+                               (* -1 (/ j1-org-max-angle j2-org-max-angle) (send j2 :joint-angle)))
+                          j1-org-max-angle))
+                      (j1-min-angle
+                       (- j1-max-angle))
+                      (j2-max-angle
+                       (+ (min (* (/ j2-org-max-angle j1-org-max-angle) (send j1 :joint-angle))
+                               (* -1 (/ j2-org-max-angle j1-org-max-angle) (send j1 :joint-angle)))
+                          j2-org-max-angle))
+                      (j2-min-angle
+                       (- j2-max-angle)))
+                 (setq ret
+                       (and ret
+                            (< (- j1-min-angle *epsilon*) (send j1 :joint-angle) (+ j1-max-angle *epsilon*))
+                            (< (- j2-min-angle *epsilon*) (send j2 :joint-angle) (+ j2-max-angle *epsilon*)))))
                (when min-max-table-view
                  (send min-max-table-view :color #xff0000)
                  (send min-max-table-view :draw-line
