@@ -170,8 +170,9 @@
           (if min-max-table-view
               (format t ";; Is (~A ~A) safe posture? ~A ~A~%" x y (and (= x (send j1 :joint-angle)) (= y (send j2 :joint-angle))) (<= (abs y) (- 90 (abs x))))))
         ;; check in view
-        (cond ((and (= x (send j1 :joint-angle)) (= y (send j2 :joint-angle)) min-max-table-view) ;; with i nlimit
-               (send min-max-table-view :color #x0000ff))
+        (cond ((and (= x (send j1 :joint-angle)) (= y (send j2 :joint-angle))) ;; with i nlimit
+               (if min-max-table-view
+                   (send min-max-table-view :color #x0000ff)))
               (t ;; out of limit
                (if min-max-table-view (format t ";; out of limit ~A -> ~A~%" (float-vector x y) (send *robot* :angle-vector)))
                (let* ((j1-max-angle
