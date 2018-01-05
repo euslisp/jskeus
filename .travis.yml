@@ -6,50 +6,46 @@ notifications:
     on_success: always #[always|never|change] # default: change
     on_failure: always #[always|never|change] # default: always
   slack: jsk-robotics:Av7tc8wj3IWkLYvlTzHE7x2g
+language: generic
+sudo: required
+cache: apt
+services: docker
 matrix:
+  fast_finish: true
   include:
     - os: linux
-      dist: trusty
       sudo: required
       cache: apt
       env: DOCKER_IMAGE=ubuntu:trusty
     - os: linux
-      dist: trusty
       sudo: required
       cache: apt
       env: DOCKER_IMAGE=ubuntu:xenial
     - os: linux
-      dist: trusty
       sudo: required
       cache: apt
       env: DOCKER_IMAGE=osrf/ubuntu_armhf:trusty
     - os: linux
-      dist: trusty
       sudo: required
       cache: apt
       env: DOCKER_IMAGE=osrf/ubuntu_armhf:xenial
     - os: linux
-      dist: trusty
       sudo: required
       cache: apt
       env: DOCKER_IMAGE=osrf/ubuntu_arm64:trusty
     - os: linux
-      dist: trusty
       sudo: required
       cache: apt
       env: DOCKER_IMAGE=osrf/ubuntu_arm64:xenial
     - os: linux
-      dist: trusty
       sudo: required
       cache: apt
       env: DOCKER_IMAGE=debian:jessie
     - os: linux
-      dist: trusty
       sudo: required
       cache: apt
       env: DOCKER_IMAGE=osrf/debian_arm64:jessie
     - os: linux
-      dist: trusty
       sudo: required
       cache: apt
       env: BUILD_DOC=true
@@ -62,12 +58,23 @@ install:
   # Define some config vars
   - export CI_SOURCE_PATH=$(pwd)
   - export REPOSITORY_NAME=${PWD##*/}
-  - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then sudo apt-get install -y -qq qemu-user-static git; fi
+  - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then
+      sudo apt-get install -y -qq qemu-user-static git;
+    else
+      sudo apt-get -y -qq install mesa-utils x11-xserver-utils xserver-xorg-video-dummy;
+      export DISPLAY=:0;
+      (sudo Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile /tmp/xorg.log -config $CI_SOURCE_PATH/.dummy.xorg.conf $DISPLAY &);
+      sleep 3;
+      glxinfo | grep GLX;
+      export QT_X11_NO_MITSHM=1;
+      xhost +local:root;
+      export DOCKER_X11_OPTIONS='-v /tmp/.X11-unix:/tmp/.X11-unix -e QT_X11_NO_MITSHM -e DISPLAY';
+    fi
 script:
   - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
   - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then COUNT=10; while [ $COUNT -gt 0 -a ! -e $CI_SOURCE_PATH/eus ] ; do echo $COUNT; sleep 1; GIT_SSL_NO_VERIFY=true git clone --depth 10 http://github.com/euslisp/EusLisp $CI_SOURCE_PATH/eus; COUNT=`expr $COUNT - 1`; done; fi # running git clone within arm VM is very slow
   - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then mv $CI_SOURCE_PATH/irteus/test/*.l /tmp; mv /tmp/irt*.l $CI_SOURCE_PATH/irteus/test/; fi # arm VM is very slow so we do not have time to run all tests
-  - if [ "$TRAVIS_OS_NAME" == "linux" -a "$BUILD_DOC" != "true" ]; then docker run --rm -i -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" -a "$BUILD_DOC" != "true" ]; then docker run --rm -i -v $CI_SOURCE_PATH:$CI_SOURCE_PATH $DOCKER_X11_OPTIONS -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"; fi
   # Test installing head version jskeus via Homebrew formula
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then source $CI_SOURCE_PATH/.travis-osx.sh; fi
   # Test doc generation
@@ -78,4 +85,3 @@ script:
   - if [ "$BUILD_DOC" == "true" ]; then (source bashrc.eus; cd doc/; make html); fi
 after_failure:
   - echo "failure"
-
