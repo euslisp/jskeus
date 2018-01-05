@@ -10,7 +10,7 @@
 (defmethod 2dof-robot
   (:init ()
          (send-super :init)
-         (setq l3 (send self :make-link (make-cube 40 40 80) #f(0 0 40) :read 'l3))
+         (setq l3 (send self :make-link (make-cube 40 40 80) #f(0 0 40) :red 'l3))
          (setq end-coords (make-cascoords :pos #f(0 0 80)))
          (send l3 :assoc end-coords)
          (send l3 :locate #f(0 0 10))
