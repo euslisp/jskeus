@@ -189,8 +189,11 @@
                        (- j2-max-angle)))
                  (setq ret
                        (and ret
-                            (< (- j1-min-angle *epsilon*) (send j1 :joint-angle) (+ j1-max-angle *epsilon*))
-                            (< (- j2-min-angle *epsilon*) (send j2 :joint-angle) (+ j2-max-angle *epsilon*)))))
+                            (and (or (< (- j1-min-angle *epsilon*) (send j1 :joint-angle) (+ j1-min-angle *epsilon*))
+                                     (< (- j1-max-angle *epsilon*) (send j1 :joint-angle) (+ j1-max-angle *epsilon*)))
+                                 (or (< (- j2-min-angle *epsilon*) (send j2 :joint-angle) (+ j2-min-angle *epsilon*))
+                                     (< (- j2-max-angle *epsilon*) (send j2 :joint-angle) (+ j2-max-angle *epsilon*))))
+                            )))
                (when min-max-table-view
                  (send min-max-table-view :color #xff0000)
                  (send min-max-table-view :draw-line
