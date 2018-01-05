@@ -23,9 +23,9 @@
                                                (make-cube 300 300 2)) #f(0 0 0) :white 'l1))
          (send l1 :assoc l2)
          (setq j1 (instance rotational-joint :init :parent-link l1 :child-link l2 :axis :z
-                            :min-angle -90 :max-angle 90)
+                            :min -90 :max 90)
                j2 (instance rotational-joint :init :parent-link l2 :child-link l3 :axis :y
-                            :min-angle -90 :max-angle 90))
+                            :min -90 :max 90))
          ;;
          (setq links (list l1 l2 l3) joint-list (list j1 j2))
      (send self :init-ending)
