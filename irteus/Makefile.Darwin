@@ -28,7 +28,7 @@ LD=g++ -dynamiclib -flat_namespace -undefined suppress
 OBJOPT=-o 
 OUTOPT=-o 
 OSFX=o
-LSFX=so
+LSFX=dylib
 LPFX=lib
 ESFX=
 SOFLAGS=-g -falign-functions=8
