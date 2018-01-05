@@ -128,8 +128,8 @@
           ((> x j1-org-max-angle))
         (do ((y j2-org-min-angle (+ y 1)))
             ((> y j2-org-max-angle))
-          (let* ((j1-min-max (cons (aref j1-min-max-table 1 (round (- y (aref j1-min-max-table 0 0)))) (aref j1-min-max-table 2 (round (- y (aref j1-min-max-table 0 0)))))) ;; j1-min-max-table is functoin of j2
-                 (j2-min-max (cons (aref j2-min-max-table 1 (round (- x (aref j2-min-max-table 0 0)))) (aref j2-min-max-table 2 (round (- x (aref j2-min-max-table 0 0))))))
+          (let* ((j1-min-max (cons (aref j1-min-max-table 1 (round (- y j2-org-min-angle))) (aref j1-min-max-table 2 (round (- y j2-org-min-angle))))) ;; j1-min-max-table is functoin of j2
+                 (j2-min-max (cons (aref j2-min-max-table 1 (round (- x j1-org-min-angle))) (aref j2-min-max-table 2 (round (- x j1-org-min-angle)))))
                  (j1-min (car j1-min-max))
                  (j1-max (cdr j1-min-max))
                  (j2-min (car j2-min-max))
