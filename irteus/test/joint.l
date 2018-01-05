@@ -96,8 +96,8 @@
 (deftest test-min-max-table
   (let* ((j1 (send *robot* :j1))
          (j2 (send *robot* :j2))
-         (j1-min-max-table (make-matrix 3 (round (+ 1 (- (send j1 :max-angle) (send j1 :min-angle))))))
-         (j2-min-max-table (make-matrix 3 (round (+ 1 (- (send j2 :max-angle) (send j2 :min-angle))))))
+         (j1-min-max-table (make-matrix 3 (round (+ 1 (- (send j2 :max-angle) (send j2 :min-angle))))))
+         (j2-min-max-table (make-matrix 3 (round (+ 1 (- (send j1 :max-angle) (send j1 :min-angle))))))
          (j1-org-min-angle (send j1 :min-angle)) (j2-org-min-angle (send j2 :min-angle))
          (j1-org-max-angle (send j1 :max-angle)) (j2-org-max-angle (send j2 :max-angle))
          min-max-table-view
