@@ -2291,11 +2291,7 @@
                                    ;; evaluate additional-jacobi function and calculate row dimension of additional-jacobi
                                    :additional-jacobi-dimension
                                    (+ (if (and (not cog-null-space) target-centroid-pos)
-                                          (case cog-translation-axis
-                                                (t 3)
-                                                ((:x :y :z :xx :yy :zz) 2)
-                                                ((:xy :yx :yz :zy :zx :xz) 1)
-                                                (nil 0))
+                                          (send self :calc-target-axis-dimension nil cog-translation-axis)
                                         0)
                                       (reduce #'+ (mapcar #'(lambda (aj) (array-dimension (if (functionp aj) (funcall aj link-list) aj) 0)) tmp-additional-jacobi)))
                                    :union-link-list union-link-list args) args)))
