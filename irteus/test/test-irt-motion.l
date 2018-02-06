@@ -1121,5 +1121,17 @@
       (send (send root-move-target :parent) :dissoc root-move-target)
       (assert ret "Test multiple link-list with root-link and IK"))))
 
+(deftest test-sample-robot-collision-avoidance-link-pair-from-link-list
+  (send *sample-robot* :collision-avoidance-link-pair-from-link-list
+        (send *sample-robot* :link-list
+              (send (send *sample-robot* :rarm :end-coords) :parent)
+              (send (send *sample-robot* :rarm :wrist-y) :child-link)))
+  (send *sample-robot* :collision-avoidance-link-pair-from-link-list
+        (send *sample-robot* :link-list
+              (send (send *sample-robot* :rarm :end-coords) :parent)
+              (send (send *sample-robot* :rarm :elbow-p) :child-link)))
+  (assert t)
+  )
+
 (run-all-tests)
 (exit 0)
