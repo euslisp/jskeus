@@ -1320,12 +1320,8 @@
      ;; pair (part of this limb . part of another limb)
      (dotimes (i pair-len)
        (setq pair (elt pair-list i))
-       (if (not (memq (car pair) union-link-list)) 
-	   (progn
-             (warn ";; ERROR : (car pair) is not included in link-list ~A~%" (send-all pair :name))
-	     (setf (elt col-list i) nil)
-	     )
-	 (progn
+       (if (and warnp (not (memq (car pair) union-link-list)))
+         (warn ";; !!WARNING!! : (car pair) is not included in link-list ~A~%" (send-all pair :name)))
 	   (setq np (nconc (pqp-collision-distance (car pair) (cadr pair) :qsize 2) (list (float-vector 0 0 0) i)))
 	   (if (<= (car np) distance-limit)
 	       (progn
@@ -1338,7 +1334,7 @@
 	     (progn
 	       (setf (elt col-list i) np)))
            (scale 0.001 (normalize-vector (v- (elt np 1) (elt np 2) (elt np 3)) (elt np 3)) (elt np 3))
-	   ))) ;; dotimes
+	   ) ;; dotimes
      ;; Element of "col-list" (variable "np") is list of:
      ;;   distance-between-pair1<->pair2
      ;;   nearest-point-on-pair1
