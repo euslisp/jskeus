@@ -61,6 +61,16 @@
     bottom-frame
     ))
 
+(deftest test-face-distance
+  (let* ((f
+          (instance face :init :vertices
+                    '(#f(100 100 0) #f(-100 100 0) #f(-100 -100 0) #f(100 -100 0))))
+         )
+    (assert (eps= (send f :distance (float-vector 0 0 100)) 100.0))
+    (assert (eps= (send f :distance (float-vector 200 0 0)) 100.0))
+    (assert (eps= (send f :distance (float-vector 200 0 100)) (norm #f(100 100))))
+    ))
+
 (run-all-tests)
 (exit)
 
