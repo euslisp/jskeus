@@ -149,7 +149,7 @@ $ sudo apt-get install git gcc g++ libjpeg62-dev libxext-dev libx11-dev libgl1-m
 ## additional install for using OpenGL on raspberry pi
 $ sudo apt-get install libgl1-mesa-dri xserver-xorg-video-vesa xutils
 ```
-For Cygwin(doesn't work with 32 bit architectures):
+For Cygwin(only works with 32bit systems)
 ```
 Packages listed below should be intalled using setup.exe.
 
