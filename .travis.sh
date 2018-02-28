@@ -43,5 +43,10 @@ travis_time_end
 
 travis_time_start script.test
 source bashrc.eus
-find irteus/test -iname "*.l" | xargs -n1 irteusgl
+# find irteus/test -iname "*.l" | xargs -n1 irteusgl
+for f in `find irteus/test -iname "*.l"`; do
+  irteus "(progn (load \"${f%.*}.so\") (run-all-tests) (exit)) "
+  irteus "(progn (comp:compile-file-if-src-newer \"$f\" \"irteus/test/\") (exit))"
+  irteus "(progn (load \"${f%.*}.so\") (run-all-tests) (exit)) "
+done
 travis_time_end
