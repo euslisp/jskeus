@@ -1121,5 +1121,5 @@
       (send (send root-move-target :parent) :dissoc root-move-target)
       (assert ret "Test multiple link-list with root-link and IK"))))
 
-(run-all-tests)
-(exit 0)
+;;(run-all-tests)
+;;(exit 0)

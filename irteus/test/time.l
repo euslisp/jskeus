@@ -62,5 +62,5 @@
 
 )
 
-(run-all-tests)
-(exit)  ;; end of time.l
+;;(run-all-tests)
+;;(exit)  ;; end of time.l

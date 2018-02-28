@@ -144,5 +144,5 @@
   (assert
    (look-at-ik-all)))
 
-(run-all-tests)
-(exit)
+;;(run-all-tests)
+;;(exit)

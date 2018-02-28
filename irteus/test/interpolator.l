@@ -127,5 +127,5 @@
 (print (length r2))
 |#
 
-(run-all-tests)
-(exit)
+;;(run-all-tests)
+;;(exit)

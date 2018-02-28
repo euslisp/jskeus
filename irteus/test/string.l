@@ -48,5 +48,5 @@
 
 )
 
-(run-all-tests)
-(exit) ;; end of string.l
+;;(run-all-tests)
+;;(exit) ;; end of string.l

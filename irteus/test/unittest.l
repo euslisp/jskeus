@@ -48,5 +48,5 @@
          (= (apply #'+ (send-all (send *unit-test* :result) :num-successes)) 3))
     (setq ret 0))
 (format t "return code = ~A~%" ret)
-(exit ret)
+;;(exit ret)
 

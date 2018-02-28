@@ -16,5 +16,5 @@
   ;; (assert (= (test-read-line 8192) 8192) "read-line with ~A char" 8192) ;; tempolarily comment out
   )
 
-(run-all-tests)
-(exit)
+;;(run-all-tests)
+;;(exit)

@@ -119,6 +119,6 @@
     ))
 
 
-(run-all-tests)
+;;(run-all-tests)
 
-(exit)
+;;(exit)

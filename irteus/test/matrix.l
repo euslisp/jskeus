@@ -165,5 +165,5 @@
                   (apply #'concatenate-matrix-column-naive-impl mats))))
     ))
 
-(run-all-tests)
-(exit)
+;;(run-all-tests)
+;;(exit)

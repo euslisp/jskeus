@@ -289,5 +289,5 @@
 (deftest test-make-joint-min-max-table-margin-5deg
   (assert (test-make-joint-min-max-table-common :margin 5)))
 
-(run-all-tests)
-(exit)
+;;(run-all-tests)
+;;(exit)

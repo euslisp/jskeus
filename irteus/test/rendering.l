@@ -20,6 +20,6 @@
           "image transposed twice must be the same as original image")
 )
 
-(run-all-tests)
-(exit)
+;;(run-all-tests)
+;;(exit)
 

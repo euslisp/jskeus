@@ -55,5 +55,5 @@
     (format *error-output* "~A gc:~A, vmrss:~A -> ~A~%" j (sys::gc) vmrss-orig vmrss)
     (assert (< vmrss (* 2 vmrss-orig)) "make-coords quaternion2matrix")))
 
-(run-all-tests)
-(exit)
+;;(run-all-tests)
+;;(exit)

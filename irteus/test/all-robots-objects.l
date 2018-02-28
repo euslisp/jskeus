@@ -26,5 +26,5 @@
  '("robots" "objects" "scenes")
  '(make-all-robots make-all-objects make-all-scenes))
 
-(run-all-tests)
-(exit)
+;;(run-all-tests)
+;;(exit)

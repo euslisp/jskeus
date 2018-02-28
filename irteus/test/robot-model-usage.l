@@ -167,5 +167,5 @@
     ))
 
 
-(run-all-tests)
-(exit)
+;;(run-all-tests)
+;;(exit)

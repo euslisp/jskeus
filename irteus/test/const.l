@@ -25,5 +25,5 @@
   (assert (not (= num (+ (length ((find-package "TEST3") . intsymvector)) 10))) "check if intsymvector is expanded")
   )
 
-(run-all-tests)
-(exit)
+;;(run-all-tests)
+;;(exit)
