@@ -142,7 +142,15 @@
     (setq m6 #2f((2 0 1)(0 2 0)(1 0 2))) 
     (setq val (car (ql-decompose m6)) vec (cadr (ql-decompose m6)))
     (assert (eps-matrix= (m* m6 vec) (m* vec (diagonal val))) "ql-decompose")
+
+    ;; abs https://github.com/euslisp/EusLisp/issues/274
+    (assert (= (abs (- 1234)) 1234) "abs")
+    (assert (= (abs (- #x30000000)) #x30000000) "abs(#x30000000)")
+    (assert (= (abs (- (+ (expt 2 32) 1234))) (+ (expt 2 32) 1234)) "abs(2^32)")
+    (assert (= (abs (- (+ (expt 2 48) 1234))) (+ (expt 2 48) 1234)) "abs(2^47)")
+    (assert (= (abs (- (+ (expt 2 64) 1234))) (+ (expt 2 64) 1234)) "abs(2^64)")
     ))
 
+    (format *error-output* "~A ~A~%" (+ (expt 2 32) 1234) (abs (+ (expt 2 32) 1234)))
 (run-all-tests)
 (exit)
