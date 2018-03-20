@@ -1,10 +1,10 @@
 (require :unittest "lib/llib/unittest.l")
 
 #-(or :x86_64 :aarch64)
-(setq *temp-eps* 1e-5)
+(setq *temp-eps* 1e-2) ;; 5 significant figure of 1000mm
 
 #+(or :x86_64 :aarch64)
-(setq *temp-eps* 1e-8)
+(setq *temp-eps* 1e-9) ;; 12 significant figure of 1000mm
 
 (init-unit-test)
 
