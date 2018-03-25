@@ -41,8 +41,11 @@
 #ifndef PQP_COMPILE_H
 #define PQP_COMPILE_H
 
-// prevents compiler warnings when PQP_REAL is float
+// Prevents compiler warnings when PQP_REAL is float.
+// This block is disabled on macOS clang >= 9.0.0 (e.g. High Sierra)
+// to avoid undefined exception and redefinition error.
 
+#if !defined(__APPLE__) || __clang_major__ < 9
 #include <math.h>
 #if !( (defined(__GNUC__) && (__GNUC__ >= 7) ) ) // gnu gcc 7 complains with re-definition
 inline float sqrt(float x) { return (float)sqrt((double)x); }
