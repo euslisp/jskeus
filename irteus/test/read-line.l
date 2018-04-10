@@ -16,5 +16,12 @@
   ;; (assert (= (test-read-line 8192) 8192) "read-line with ~A char" 8192) ;; tempolarily comment out
   )
 
+(deftest test-read-gensym
+  (let ((g (gensym))
+        (*print-circle* t))
+    (assert
+     (apply #'eq (read-from-string (format nil "~S" (list g g))))
+     "Unable to read uninterned symbol")))
+
 (run-all-tests)
 (exit)
