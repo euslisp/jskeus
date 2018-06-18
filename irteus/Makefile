@@ -97,7 +97,7 @@ IRTEUSGL_C=$(addsuffix .c,$(IRTEUSGL))
 IRTEUSGL_H=$(addsuffix .h,$(IRTEUSGL))
 IRTEUSGL_L=$(addsuffix .l,$(IRTEUSGL))
 
-IRTCOBJECTS=$(INSTALLOBJDIR)/irtc.$(OSFX) $(INSTALLOBJDIR)/irtgeoc.$(OSFX)
+IRTCOBJECTS=$(INSTALLOBJDIR)/irtc.$(OSFX) $(INSTALLOBJDIR)/irtgeoc.$(OSFX) $(INSTALLOBJDIR)/ckdtree.$(OSFX)
 IRTGCOBJECTS=$(INSTALLOBJDIR)/CPQP.$(OSFX) $(INSTALLOBJDIR)/euspqp.$(OSFX)
 IRTIMGCOBJECTS=$(INSTALLOBJDIR)/euspng.$(OSFX)
 IRTGLCOBJECTS=$(INSTALLOBJDIR)/irtglc.$(OSFX)
@@ -220,6 +220,7 @@ $(INSTALLOBJDIR)/euspng.$(OSFX): euspng.c
 	$(CC) $(CFLAGS) -c euspng.c $(OBJOPT)$(INSTALLOBJDIR)/euspng.$(OSFX)
 $(INSTALLOBJDIR)/nr.$(OSFX): nr.c
 	$(CC) $(CFLAGS) -c nr.c $(OBJOPT)$(INSTALLOBJDIR)/nr.$(OSFX)
-
+$(INSTALLOBJDIR)/ckdtree.$(OSFX): ckdtree.c
+	$(CC) $(CFLAGS) -c ckdtree.c $(OBJOPT)$(INSTALLOBJDIR)/ckdtree.$(OSFX)
 $(INSTALLLIBDIR)/jpegmemcd.$(LSFX): $(EUSDIR)/lisp/image/jpeg/jpegmemcd.c
 	(cd $(EUSDIR)/lisp/image/jpeg/;make ARCH=$(ARCHDIR) LIBDIR=$(INSTALLLIBDIR) OBJDIR=$(INSTALLOBJDIR))
