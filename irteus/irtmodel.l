@@ -2030,7 +2030,7 @@
 	   (send *viewer* :viewsurface :clear))
        (if (atom (car link-list)) (setq link-list (list link-list)))
        (if (atom move-target) (setq move-target (list move-target)))
-       (if (atom target-coords) (setq target-coords (list target-coords)))
+       (if (or (atom target-coords) (functionp target-coords)) (setq target-coords (list target-coords)))
        (if (atom dif-pos) (setq dif-pos (list dif-pos)))
        (if (atom dif-rot) (setq dif-rot (list dif-rot)))
        (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
@@ -2222,6 +2222,7 @@
       nil                    : do not dump log."
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
+   (if (or (atom target-coords) (functionp target-coords)) (setq target-coords (list target-coords)))
    (let* ((loop 0)
           (union-link-list (if (functionp union-link-list) (funcall union-link-list link-list) (send self :calc-union-link-list link-list)))
           (av0 (send-all (remove-duplicates
@@ -2253,9 +2254,7 @@
 	(setq initial-log-str (format nil "~A;; move-target ~A~%" initial-log-str move-target))
 	(setq initial-log-str (format nil "~A;; rotatoin-axis ~A, translation-axis ~A~%" initial-log-str rotation-axis translation-axis))
 	(setq initial-log-str (format nil "~A;; thre ~A, rthre ~A, stop ~A~%" initial-log-str thre rthre stop))
-        (if (atom target-coords)
-            (setq initial-target-coords `(setq c0 ,target-coords))
-          (setq initial-target-coords `(setq c0 ',(mapcar #'(lambda (x) x) target-coords))))
+  (setq initial-target-coords `(setq c0 ',(mapcar #'(lambda (x) x) target-coords)))
         (setq initial-av `(setq av0 ,(send self :angle-vector))))
      ;; atom -> list
      (when debug-view
@@ -2266,7 +2265,6 @@
 	 (push :no-flush debug-view)))
      (if (atom (car link-list)) (setq link-list (list link-list)))
      (if (atom move-target) (setq move-target (list move-target)))
-     (if (atom target-coords) (setq target-coords (list target-coords)))
      (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
      (if (atom translation-axis) (setq translation-axis (list translation-axis)))
      (if (atom thre) (setq thre (list thre)))
