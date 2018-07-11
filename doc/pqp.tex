@@ -90,6 +90,41 @@ PQP\_Model *PQP_MakeModel()
 る以降，(pqpbeginmodel m)でPQPの幾何モデルのインスタンスを作成し，
 (pqpaddtri m v1 v2 v3 id)として面情報を登録している．
 
+\subsubsection{物体形状モデル同士の干渉計算例}
+pqp-collision-checkやpqp-collision-distanceを利用した例を示す．
+{\baselineskip=10pt
+\begin{verbatim}
+;; Make models
+(setq *b0* (make-cube 100 100 100))
+(setq *b1* (make-cube 100 100 100))
+
+;; Case 1 : no collision
+(send *b0* :newcoords (make-coords :pos #f(100 100 -100)
+                                   :rpy (list (deg2rad 10) (deg2rad -20) (deg2rad 30))))
+(objects (list *b0* *b1*))
+(print (pqp-collision-check *b0* *b1*)) ;; Check collision
+(let ((ret (pqp-collision-distance *b0* *b1*))) ;; Check distance and nearest points
+  (print (car ret)) ;; distance
+  (send (cadr ret) :draw-on :flush nil :size 20 :color #f(1 0 0)) ;; nearest point on *b0*
+  (send (caddr ret) :draw-on :flush nil :size 20 :color #f(1 0 0)) ;; nearest point on *b1*
+  (send *irtviewer* :viewer :draw-line (cadr ret) (caddr ret))
+  (send *irtviewer* :viewer :viewsurface :flush))
+
+;; Case 2 : collision
+(send *b0* :newcoords (make-coords :pos #f(50 50 -50)
+                                   :rpy (list (deg2rad 10) (deg2rad -20) (deg2rad 30))))
+(objects (list *b0* *b1*))
+(print (pqp-collision-check *b0* *b1*)) ;; Check collision
+(let ((ret (pqp-collision-distance *b0* *b1*))) ;; Check distance and nearest points
+  (print (car ret)) ;; distance
+  ;; In case of collision, nearest points are insignificant values.
+  (send (cadr ret) :draw-on :flush nil :size 20 :color #f(1 0 0)) ;; nearest point on *b0*
+  (send (caddr ret) :draw-on :flush nil :size 20 :color #f(1 0 0)) ;; nearest point on *b1*
+  (send *irtviewer* :viewer :draw-line (cadr ret) (caddr ret))
+  (send *irtviewer* :viewer :viewsurface :flush))
+\end{verbatim}
+}
+
 \subsection{ロボット動作と干渉計算}
 
 ハンドで物体をつかむ，という動作の静的なシミュレーションを行う場合に

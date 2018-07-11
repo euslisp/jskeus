@@ -99,6 +99,22 @@
           (error "could not find viewers for ~A" alist))))) ;; t
    ))
 
+(defun transpose-image-rows (img &optional ret)
+  (let* ((h (send img :height))
+         (step (* (send img :width) (send img :components)))
+         (src (send img :entity)))
+    (cond
+      (ret
+       (unless (and (eq (send img :height) (send ret :height))
+                    (eq (send img :width) (send ret :width))
+                    (eq (send img :components) (send ret :components)))
+         (error "invalid return image format"))
+       (ctranspose-image-rows h step src (send ret :entity))
+       ret)
+      (t
+       (ctranspose-image-rows h step src)
+       img))))
+
 (unless (assoc :color-org (send glviewsurface :methods))
   (rplaca (assoc :color (send glviewsurface :methods)) :color-org))
 (defmethod glviewsurface
@@ -181,27 +197,21 @@
 	 ((:imagebuf imgbuf) (make-string (* width height 3)))
          (depthbuf))
    "Get current view to a image object. It returns color-image24 object."
-   (let ()
+   (let ((img (instance image::color-image24 :init width height imgbuf)))
      (send self :makecurrent)
-     (glReadBuffer GL_BACK)
+     (glReadBuffer GL_FRONT)
      (glPixelStorei GL_PACK_ALIGNMENT 1)
      (glReadPixels x y width height GL_RGB GL_UNSIGNED_BYTE imgbuf)
-     #-:x86_64
+     #-(or :x86_64 :aarch64)
      (if depthbuf (glReadPixels x y width height GL_DEPTH_COMPONENT GL_FLOAT depthbuf))
-     #+:x86_64
+     #+(or :x86_64 :aarch64)
      (when depthbuf
        (let ((fv (user::dvector2float-bytestring depthbuf)))
 	 (glReadPixels x y width height GL_DEPTH_COMPONENT GL_FLOAT fv)
 	 (user::float-bytestring2dvector fv depthbuf)))
      ;; transpose
-     (let ((b (make-string (* width height 3))))
-       (dotimes (x width)
-	 (dotimes (y height)
-	   (dotimes (z 3)
-	     (setf (elt b (+ (* (- height y 1) width 3) (* x 3) z))
-		   (elt imgbuf (+ (* y width 3) (* x 3) z))))))
-       (instance image::color-image24 :init width height b))
-     ))
+     (transpose-image-rows img)
+     img))
   )
 
 (defun draw-globjects (vwr draw-things &key (clear t) (flush t) (draw-origin 150) (draw-floor nil))
@@ -297,9 +307,12 @@
         (glEnable GL_CULL_FACE)
         (glCullFace GL_FRONT)
 
-        (mapc #'(lambda (aface)
-                  (draw-face aface nil nil))
-              (send abody :faces))
+        (dolist (aface (send abody :faces))
+          (glBegin GL_POLYGON)
+          (glNormal3fv (transform (transpose (send abody :worldrot)) (send aface :normal)))
+          (dolist (e (send aface :edges))
+            (glVertex3fv (send abody :inverse-transform-vector (send e :pvertex aface))))
+          (glEnd))
 
         (glDisable GL_CULL_FACE)
         (glDisable GL_POLYGON_OFFSET_FILL)
@@ -442,10 +455,12 @@
       (cond
        ((null color) nil)
        ((derivedp color colormaterial) (send color :diffuse))
+       ((vectorp color) color)
+       ((listp color) (float-vector (/ (elt color 0) 255.0) (/ (elt color 1) 255.0) (/ (elt color 2) 255.0)))
        ((symbolp color)
 	(setq c (find-if #'(lambda (o) (eq (send o :name) color))
 			 *face-colors*))
-	(when c (send c :diffuse)))
+	(if c (send c :diffuse) (warn "Color name not found ")))
        (t color)))
     (unless v (setq v (float-vector 0.5 0.5 0.5)))
     v))
@@ -470,6 +485,7 @@
   (:draw-on
    (&key ((:viewer vwer) *viewer*)
          flush (width 1) (color #f(1 1 1)))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color))
 	 (v (float-vector 0 0 0)))
@@ -486,6 +502,7 @@
   (:draw-on
    (&key ((:viewer vwer) *viewer*)
          flush (width 1) (color #f(1 1 1)))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color))
 	 (v (float-vector 0 0 0)))
@@ -501,6 +518,7 @@
 (defmethod faceset
   (:set-color
    (color &optional (transparent))
+   "Set color of given color name, color sample and color name are referenced from http://en.wikipedia.org/wiki/X11_color_names"
    (delete-displaylist-id (get self :GL-DISPLAYLIST-ID))
    (setf (get self :GL-DISPLAYLIST-ID) nil)
    (cond
@@ -514,6 +532,7 @@
   (:draw-on
    (&key ((:viewer vwer) *viewer*)
          flush (width 1) (color #f(1 1 1)))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color)))
      (send vwer :viewsurface :line-width width)
@@ -571,6 +590,7 @@
    (&key ((:viewer vwer) user::*viewer*)
 	 flush (width (get self :width)) (color (get self :color))
 	 (size (get self :size)))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color))
 	 (v (float-vector 0 0 0)) v2)
@@ -605,6 +625,7 @@
   (:draw-on
    (&key ((:viewer vwer) *viewer*)
          flush (width 1) (color #f(1 1 1)) (size 50))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color))
 	 (v (float-vector 0 0 0)))
@@ -636,6 +657,7 @@
    self)
   (:filename (&optional nm) (if nm (setq filename nm)) filename)
   (:set-color (color &optional (transparent))
+   "set color as float vector of 3 elements, and transparent as float, all values are betwenn 0 to 1"
    (delete-displaylist-id (get self :GL-DISPLAYLIST-ID))
    (setf (get self :GL-DISPLAYLIST-ID) nil)
    (setf (get self :transparent) transparent)
@@ -644,7 +666,27 @@
      (setf (get self :face-color) nil)))
   ;; (:check-normal ())
   ;; (:update ()) ;; call update when updating coordinates
+  (:get-meshinfo (key &optional (pos -1))
+   (when (< pos 0)
+     (return-from :get-meshinfo (mapcar #'(lambda (info) (cadr (assoc key info))) mesh-list)))
+   (cadr (assoc key (elt mesh-list pos))))
+  (:set-meshinfo (key info &optional (pos -1))
+   (when (< pos 0)
+     (dolist (meshinfo mesh-list)
+       (delete (assoc key meshinfo) meshinfo)
+       (nconc meshinfo (list (list key info))))
+     (return-from :set-meshinfo))
+   (let ((meshinfo (elt mesh-list pos)))
+     (delete (assoc key meshinfo) meshinfo)
+     (nconc meshinfo (list (list key info)))
+     (send self :get-meshinfo key pos)))
+  (:get-material (&optional (pos -1))
+   (send self :get-meshinfo :material pos))
+  (:set-material
+   (mat &optional (pos -1))
+   (send self :set-meshinfo :material mat pos))
   (:actual-vertices ()
+   "return list of vertices(float-vector), it returns all vertices of this object"
    (let (ret)
      (dolist (minfo mesh-list)
        (let ((v (cadr (assoc :vertices minfo))))
@@ -653,45 +695,58 @@
              (push (user::c-matrix-row v i) ret)))))
      ret))
   (:calc-bounding-box ()
+   "calculate and set bounding box of this object"
    (setq bbox (make-bounding-box (send self :actual-vertices) 0.0))
    bbox)
   (:vertices ()
+   "return list of vertices(float-vector), it returns vertices of bounding box of this object"
    (unless bbox
      (send self :calc-bounding-box))
    (send (send bbox :body) :vertices))
   (:reset-offset-from-parent ()
+   "move vertices in this object using self transformation, this method change values of vertices. coordinates's method such as :transform just change view of this object"
    (let ((cds (send self :copy-coords)))
      (send self :set-offset cds)
      (send self :reset-coords))
    self)
   (:expand-vertices ()
+   "expand vertices number as same number of indices, it enable to set individual normal to every vertices"
    (let (new-mesh)
      (dolist (minfo mesh-list)
-       (let (;;(nmat (cadr (assoc :normals minfo)))
-             ;;(tp (cadr (assoc :type minfo)))
-             (idxs (cadr (assoc :indices minfo)))
-             (vmat (cadr (assoc :vertices minfo)))
-             (p (instantiate float-vector 3)))
-         (cond
-          ((> (length idxs) (array-dimension vmat 0)) ;; TODO: redundancy check in indices
-           (let ((nvmat (make-matrix (length idxs) 3))
-                 (nidxs (instantiate integer-vector (length idxs))))
-             (setq minfo (delete (assoc :vertices minfo) minfo))
-             (setq minfo (delete (assoc :indices minfo) minfo))
-             (dotimes (i (length idxs))
-               (setf (elt nidxs i) i)
-               (user::c-matrix-row vmat (elt idxs i) p)
-               (user::c-matrix-row nvmat i p t))
-             (setq minfo (nconc minfo (list (list :vertices nvmat) (list :indices nidxs))))
-             (push minfo new-mesh)
-             ))
-          (t
-           (push minfo new-mesh)))
-         ))
+       (push (send self :expand-vertices-info minfo) new-mesh))
      (setq mesh-list new-mesh)
      ))
-  (:calc-normals (&optional (force nil) (expand t))
-   ;;(if expand (send self :expand-vertices))
+  (:expand-vertices-info (minfo)
+   (let ((idxs (cadr (assoc :indices minfo)))
+         (vmat (cadr (assoc :vertices minfo)))
+         (p (instantiate float-vector 3)))
+     (if (> (length idxs) (array-dimension vmat 0)) ;; TODO: redundancy check in indices
+       (let ((nvmat (make-matrix (length idxs) 3))
+             (nidxs (instantiate integer-vector (length idxs))))
+         (setq minfo (delete (assoc :vertices minfo) minfo))
+         (setq minfo (delete (assoc :indices minfo) minfo))
+         (setq minfo (delete (assoc :normals minfo) minfo))
+         (dotimes (i (length idxs))
+           (setf (elt nidxs i) i)
+           (user::c-matrix-row vmat (elt idxs i) p)
+           (user::c-matrix-row nvmat i p t))
+         (setq minfo (nconc minfo (list (list :vertices nvmat) (list :indices nidxs))))
+         minfo)
+       minfo)))
+  (:use-flat-shader ()
+   "use flat shader mode, use opengl function of glShadeModel(GL_FLAT)"
+   (dolist (minfo mesh-list)
+     (nconc minfo (list (list :flat t)))))
+  (:use-smooth-shader ()
+   "use smooth shader mode, use opengl function of glShadeModel(GL_SMOOTH) {default}"
+   (dolist (minfo mesh-list)
+     (let ((a (assoc :flat minfo)))
+       (if a (delete a minfo)))))
+  (:calc-normals (&optional (force nil) (expand t) (flat t))
+   "normal calculation
+if force option is true, clear current normalset.
+if exapnd option is ture, do :expand-vertices.
+if flat option is true, use-flat-shader"
    (dolist (minfo mesh-list)
      (let ((nmat (cadr (assoc :normals minfo)))
            (tp (cadr (assoc :type minfo)))
@@ -710,6 +765,10 @@
          (nil (setq tp 3) (warn ";; keyword :type not found (processing as :triangles)~%"))
          (t (warn ";; mesh-type not found ~A~%") (return-from :calc-normals)))
        (unless (and nmat (null force))
+         (when expand
+           (send self :expand-vertices-info minfo)
+           (setq idxs (cadr (assoc :indices minfo)))
+           (setq vmat (cadr (assoc :vertices minfo))))
          (if nmat (delete (assoc :normals minfo) minfo))
          (let ((len (array-dimension vmat 0)))
            (setq nmat (make-matrix len 3))
@@ -735,9 +794,48 @@
                (user::c-matrix-row nmat (elt idxs (+ (* tp i) 1)) nn t)
                (user::c-matrix-row nmat (elt idxs (+ (* tp i) 2)) nn t))))
            (nconc minfo (list (list :normals nmat)))
+           (when flat
+             (nconc minfo (list (list :flat t))))
            ))
        )))
+  (:mirror-axis
+   (&key (create t) (invert-faces t) (axis :y))
+   "creating mirror vertices respect to :axis"
+   (case axis
+     (:x (setq axis 0))
+     (:y (setq axis 1))
+     (:z (setq axis 2)))
+   (let ((ret (copy-object mesh-list))
+         (p (instantiate float-vector 3)))
+     (dolist (mesh ret)
+       (let* ((vts (cadr (assoc :vertices mesh)))
+              (len (array-dimension vts 0)))
+         (when len
+           (dotimes (j len)
+             (user::c-matrix-row vts j p)
+             (setf (elt p axis) (- (elt p axis)))
+             (user::c-matrix-row vts j p t))
+           (when invert-faces
+             (let* ((idx (cadr (assoc :indices mesh)))
+                    (idx-len (/ (length idx) 3)) ;; mesh should be triangle
+                    i0 i1 i2)
+               (dotimes (i idx-len)
+                 (setq i0 (elt idx (* i 3))
+                       i1 (elt idx (+ (* i 3) 1))
+                       i2 (elt idx (+ (* i 3) 2)))
+                 (setf (elt idx (* i 3))       i2)
+                 (setf (elt idx (+ (* i 3) 1)) i1)
+                 (setf (elt idx (+ (* i 3) 2)) i0))
+               )))
+         ))
+     (if create
+         (instance glvertices :init ret)
+       (progn
+         (setq mesh-list ret)
+         self))
+     ))
   (:convert-to-faces (&rest args &key (wrt :local) &allow-other-keys) ;; check-normal <-> check-vertices-order, add face-color
+   "create list of faces using vertices of this object"
    (let (ret)
      (dolist (mesh mesh-list)
        (let* ((vlst (cadr (assoc :vertices mesh)))
@@ -785,25 +883,33 @@
                           (:local (nreverse vs))
                           (t )))
                (push
-                (if ns
-                    (instance face :init :vertices vs :normal ns)
-                  (instance face :init :vertices vs))
+                (cond
+                 ;;((and ns check-vertices-order) )
+                 ;;(ns (instance face :init :vertices vs :normal ns))
+                 (t (instance face :init :vertices vs)))
                 lst))))
           ) ;; /cond
          (push (nreverse lst) ret)))
      (nreverse ret)))
-  (:faces () (flatten (send self :convert-to-faces)))
+  (:faces () (flatten (send self :convert-to-faces :wrt :world)))
   (:convert-to-faceset (&rest args)
+   "create faceset using vertices of this object"
    (let ((fs
           (instance faceset :init :faces
                     (flatten (send* self :convert-to-faces args)))))
      (send fs :transform (send self :worldcoords))
      fs))
-  (:set-offset (cds) ;; not checked
+  (:set-offset (cds &key (create))
+   "move vertices in this object using given coordinates, this method change values of vertices. coordinates's method such as :transform just change view of this object"
    (let* ((zero (float-vector 0 0 0))
           (wpos (send cds :worldpos))
-          (wrot (send cds :worldrot)))
-     (dolist (minfo mesh-list)
+          (wrot (send cds :worldrot))
+          ret)
+     (if create
+         (setq ret
+               (instance glvertices :init (copy-object mesh-list)))
+       (setq ret self))
+     (dolist (minfo (ret . mesh-list))
        (let ((vmat (cadr (assoc :vertices minfo)))
              (nmat (cadr (assoc :normals minfo))))
          (user::c-coords-transform-vector
@@ -811,8 +917,15 @@
          (when nmat
            (user::c-coords-transform-vector
             zero wrot nmat nmat))))
-     self))
+     ret))
+  (:convert-to-world (&key (create))
+   "move vertices in this object using self's coordinates. vertices data should be moved as the same as displayed"
+   (let ((ret (send self :set-offset (send self :worldcoords) :create create)))
+     (send ret :reset-coords)
+     (send self :worldcoords)
+     ret))
   (:glvertices (&optional (name) (test #'string=))
+   "create individual glvertices objects from mesh-list. if name is given, search mesh has the same name"
    (let (ret)
      (cond
       (name
@@ -824,7 +937,8 @@
        (setq ret (nreverse ret))
        ))
      ret))
-  (:append-glvertices (glv-lst) ;; not checked
+  (:append-glvertices (glv-lst)
+   "append list of glvertices to this object"
    (if (atom glv-lst) (setq glv-lst (list glv-lst)))
    (let (ret (sw (send self :worldcoords)))
      (dolist (glv glv-lst)
@@ -883,17 +997,25 @@
                (normals (cadr (assoc :normals minfo)))
                (indices (cadr (assoc :indices minfo)))
                (texcoords (cadr (assoc :texcoords minfo)))
+               (flat-shade (cadr (assoc :flat minfo)))
                teximg)
+           (when flat-shade
+             (glEnable GL_FLAT)
+             (glShadeModel GL_FLAT))
            (cond
             (fcol ;; use :face-color
              (glColor3fv fcol)
-             (glMaterialfv GL_BACK  GL_AMBIENT_AND_DIFFUSE
-                           (if stransparent
-                               (concatenate float-vector fcol (float-vector stransparent))
-                             fcol))
-             (glMaterialfv GL_FRONT GL_AMBIENT_AND_DIFFUSE (if stransparent
-                                                               (float-vector 0.8 0.0 0.54 1)
-                                                             (float-vector 0.8 0.0 0.54)))
+             (cond
+              (stransparent
+               (glMaterialfv GL_BACK
+                             GL_AMBIENT_AND_DIFFUSE
+                             (concatenate float-vector fcol (float-vector stransparent)))
+               (glMaterialfv GL_FRONT
+                             GL_AMBIENT_AND_DIFFUSE (float-vector 0 0 0 0)))
+              (t
+               (glMaterialfv GL_BACK  GL_AMBIENT_AND_DIFFUSE fcol)
+               (glMaterialfv GL_FRONT GL_AMBIENT_AND_DIFFUSE (float-vector 0.8 0.0 0.54))
+               ))
              ;;(glMaterialfv GL_FRONT_AND_BACK GL_SPECULAR (float-vector 0.2 0.2 0.2 0.1))
              ;;(glMaterialfv GL_FRONT_AND_BACK GL_EMISSION (float-vector 0.1 0.1 0.1 0.1))
              )
@@ -917,19 +1039,19 @@
                                  col)))
                (when amb
                  (if stransparent
-                     (setf (elt amb 3) (float-vector stransparent)))
+                     (setf (elt amb 3) stransparent))
                  (glMaterialfv GL_BACK GL_AMBIENT amb))
                (when diff
                  (if stransparent
-                     (setf (elt diff 3) (float-vector stransparent)))
+                     (setf (elt diff 3) stransparent))
                  (glMaterialfv GL_BACK GL_DIFFUSE diff))
                (when spec
                  (if stransparent
-                     (setf (elt spec 3) (float-vector stransparent)))
+                     (setf (elt spec 3) stransparent))
                  (glMaterialfv GL_BACK GL_SPECULAR spec))
                (when emi
                  (if stransparent
-                     (setf (elt emi 3) (float-vector stransparent)))
+                     (setf (elt emi 3) stransparent))
                  (glMaterialfv GL_BACK GL_EMISSION emi))
                (cond
                 (shin
@@ -968,6 +1090,9 @@
                    (glTexEnvi GL_TEXTURE_ENV GL_TEXTURE_ENV_MODE GL_MODULATE)
                    (glEnable GL_TEXTURE_2D)
                    ))
+               (when stransparent
+                 (glMaterialfv GL_FRONT
+                               GL_AMBIENT_AND_DIFFUSE (float-vector 0 0 0 0)))
                ))
             (t ;; default color
              ;; Font face was set CW at glview.l (glFrontFace GL_CW)
@@ -985,24 +1110,24 @@
            (unless (and teximg texcoords) (setq texcoords nil))
            ;;
            (glEnableClientState GL_VERTEX_ARRAY)
-#+:x86_64
+#+(or :x86_64 :aarch64)
            (glVertexPointer 3 GL_DOUBLE 0 (array-entity vertices))
-#-:x86_64
+#-(or :x86_64 :aarch64)
            (glVertexPointer 3 GL_FLOAT 0 (array-entity vertices))
            ;;
            (when normals
              (glEnableClientState GL_NORMAL_ARRAY)
-#+:x86_64
+#+(or :x86_64 :aarch64)
              (glNormalPointer GL_DOUBLE 0 (array-entity normals))
-#-:x86_64
+#-(or :x86_64 :aarch64)
              (glNormalPointer GL_FLOAT 0 (array-entity normals))
              )
            ;;
            (when texcoords
              (glEnableClientState GL_TEXTURE_COORD_ARRAY)
-#+:x86_64
+#+(or :x86_64 :aarch64)
              (glTexCoordPointer 2 GL_DOUBLE 0 texcoords)
-#-:x86_64
+#-(or :x86_64 :aarch64)
              (glTexCoordPointer 2 GL_FLOAT 0 texcoords)
              )
 
@@ -1016,10 +1141,10 @@
              (when tp
                (cond
                 (indices
-#+:x86_64
+#+(or :x86_64 :aarch64)
                  (glDrawElements tp (length indices) GL_UNSIGNED_INT
                                  (user::lvector2integer-bytestring indices))
-#-:x86_64
+#-(or :x86_64 :aarch64)
                  (glDrawElements tp (length indices) GL_UNSIGNED_INT indices)
                  )
                 (t
@@ -1031,6 +1156,9 @@
              (glDisableClientState GL_TEXTURE_COORD_ARRAY))
            (when normals (glDisableClientState GL_NORMAL_ARRAY))
            (glDisableClientState GL_VERTEX_ARRAY)
+           (when flat-shade
+             (glEnable GL_SMOOTH)
+             (glShadeModel GL_SMOOTH))
            ))
 
        (when stransparent
@@ -1055,7 +1183,212 @@
    (unless bbox
      (send self :calc-bounding-box))
    bbox)
+  (:make-pqpmodel (&key (fat 0))
+   (let ((m (geo::pqpmakemodel))
+         v1 v2 v3 (id 0))
+     (dolist (mesh mesh-list) ;; check triangle model
+       (let ((tp (cadr (assoc :type mesh))))
+         (unless (eq tp :triangles)
+           (warn ";; not supported mesh type -> ~A" tp)
+           (geo::pqpdeletemodel m)
+           (return-from :make-pqpmodel nil))))
+     (setq v1 (float-vector 0 0 0))
+     (setq v2 (float-vector 0 0 0))
+     (setq v3 (float-vector 0 0 0))
+     (geo::pqpbeginmodel m)
+     (dolist (mesh mesh-list)
+       (let* ((vlst (cadr (assoc :vertices mesh)))
+              (idces (cadr (assoc :indices mesh)))
+              (idlen (* (/ (length idces) 3) 3)))
+         (cond
+           (idces
+            (do ((v 0 (+ v 3)))
+                ((>= v idlen))
+              (user::c-matrix-row vlst (elt idces    v   ) v1)
+              (user::c-matrix-row vlst (elt idces (+ v 1)) v2)
+              (user::c-matrix-row vlst (elt idces (+ v 2)) v3)
+              (when (not (= fat 0))
+                (v+ v1 (scale fat (normalize-vector v1)) v1)
+                (v+ v2 (scale fat (normalize-vector v2)) v2)
+                (v+ v3 (scale fat (normalize-vector v3)) v3))
+              (geo::pqpaddtri m v1 v2 v3 id)
+              (incf id)
+              ))
+           (t
+            (do ((v 0 (+ v 3)))
+                ((>= v (array-dimension vlst 0)))
+              (user::c-matrix-row vlst    v    v1)
+              (user::c-matrix-row vlst (+ v 1) v2)
+              (user::c-matrix-row vlst (+ v 2) v3)
+              (when (not (= fat 0))
+                (v+ v1 (scale fat (normalize-vector v1)) v1)
+                (v+ v2 (scale fat (normalize-vector v2)) v2)
+                (v+ v3 (scale fat (normalize-vector v3)) v3))
+              (geo::pqpaddtri m v1 v2 v3 id)
+              (incf id)
+              )))
+         ))
+     (geo::pqpendmodel m)
+     m
+     ))
   )
+
+;;;
+(defclass glbody
+  :super body
+  :slots (aglvertices)
+  )
+(defmethod glbody
+  (:glvertices (&rest args) (user::forward-message-to aglvertices args))
+  (:draw (vwr)
+   (when aglvertices
+     (send aglvertices :draw vwr)))
+  (:set-color (&rest args)
+   (send-super* :set-color args)
+   (when aglvertices (send* aglvertices :set-color args)))
+  )
+
+;;; glvertices utility
+(defun make-glvertices-from-faceset (fs &key (material))
+  "returns glvertices instance
+fs is geomatry::faceset"
+  (let (mat)
+    (cond
+     (material (setq mat material))
+     ((get fs :face-color)
+      (let ((col (get fs :face-color)))
+        (unless (vectorp col)
+          (setq col (gl::find-color col)))
+        (setq mat
+              (list (list :ambient (float-vector (elt col 0) (elt col 1) (elt col 2)))
+                    (list :diffuse (float-vector (elt col 0) (elt col 1) (elt col 2)))))))
+     (t ;; use default material
+      (setq mat
+            (list (list :ambient (float-vector 0.65 0.65 0.65))
+                  (list :diffuse (float-vector 0.65 0.65 0.65))))))
+    (make-glvertices-from-faces (send fs :faces) :material mat)))
+
+(defun make-glvertices-from-faces (flst &key (material))
+  "returns glvertices instance
+flst is list of geomatry::face"
+  (setq flst (flatten (mapcar #'(lambda (f) (geometry::face-to-triangle-aux f)) flst)))
+  (let ((mat (make-matrix (* 3 (length flst)) 3))
+        (nom (make-matrix (* 3 (length flst)) 3))
+        (idx (instantiate integer-vector (* 3 (length flst))))
+        (cntr 0))
+    (dolist (f flst)
+      (let ((nm (normalize-vector (send f :normal)))
+            (vsl (send f :vertices)))
+        ;;
+        (user::c-matrix-row mat cntr (car vsl) t)
+        (user::c-matrix-row nom cntr nm t)
+        (incf cntr)
+        ;;
+        (user::c-matrix-row mat cntr (cadr vsl) t)
+        (user::c-matrix-row nom cntr nm t)
+        (incf cntr)
+        ;;
+        (user::c-matrix-row mat cntr (caddr vsl) t)
+        (user::c-matrix-row nom cntr nm t)
+        (incf cntr)
+        ))
+    (dotimes (i (length idx)) (setf (elt idx i) i))
+    (let ((msh
+           (list (list :type :triangles)
+                 (list :vertices mat)
+                 (list :normals nom)
+                 (list :indices idx))))
+      (when material
+        (push (list :material material) msh))
+      (instance gl::glvertices :init (list msh)))
+    ))
+
+(defun _dump-wrl-shape (strm mesh &key ((:scale scl) 1.0) (use_ambient nil)
+                             (use_normal nil) (use_texture nil)
+                             &allow-other-keys)
+  (let* ((tp   (cadr (assoc :type      mesh))) ;; type should be :triangle
+         (indx (cadr (assoc :indices   mesh))) ;; should have index
+         (vmat (cadr (assoc :vertices  mesh)))
+         (matl (cadr (assoc :material  mesh)))
+         (tcds (cadr (assoc :texcoords mesh)))
+         (nmat (cadr (assoc :normals mesh)))
+         (len (/ (length (array-entity vmat)) 3)))
+    (format strm "    Shape {~%")
+    (let ((col   (cadr (assoc :color matl)))
+          (amb   (cadr (assoc :ambient matl)))
+          (diff  (cadr (assoc :diffuse matl)))
+          (spec  (cadr (assoc :specular matl)))
+          (emi   (cadr (assoc :emission matl)))
+          (shin  (cadr (assoc :shininess matl)))
+          (trans (cadr (assoc :transparency matl)))
+          (matfile (cadr (assoc :filename matl))))
+      (format strm "      appearance Appearance {
+        material Material {~%")
+      (if diff
+          (format strm "          diffuseColor     ~A ~A ~A~%" (elt diff 0) (elt diff 1) (elt diff 2)))
+      (if (and use_ambient amb)
+          (format strm "          diffuseColor     ~A ~A ~A~%" (elt amb 0) (elt amb 1) (elt amb 2)))
+      (if spec
+          (format strm "          specularColor    ~A ~A ~A~%" (elt spec 0) (elt spec 1) (elt spec 2)))
+      (if emi
+          (format strm "          emissiveColor    ~A ~A ~A~%" (elt emi 0) (elt emi 1) (elt emi 2)))
+      (if shin
+          (format strm "          shininess        ~A~%" shin))
+      (if trans
+          (format strm "          transparency     ~A~%" trans))
+      (format strm "          ambientIntensity 0~%") ;; ??
+      (format strm "        }~%")
+      (format strm "      }~%" )
+      )
+    (format strm "      geometry IndexedFaceSet {
+        ccw    TRUE
+        convex TRUE
+        solid  FALSE
+        creaseAngle 0
+        coord  Coordinate {
+          point [~%")
+    (let ((p (float-vector 0 0 0)))
+      (dotimes (i len)
+        (user::c-matrix-row vmat i p)
+        (format strm "~8,8f ~8,8f ~8,8f,~%" (* scl (elt p 0)) (* scl (elt p 1)) (* scl (elt p 2)))
+        ))
+    (format strm "                ]
+        }~%")
+    (when (and use_normal nmat)
+    ;;;; normal
+    ;;(format strm "        normal Normal { vector [~%")
+    ;; nx ny nz,
+    ;;(format strm "        ] } #normal~%")
+      )
+    (when (and use_texture tcds)
+    ;;;; texcoords
+    ;;(format strm "        texCoord TextureCoordinate { point [~%")
+    ;; t s,
+    ;;(format strm "        ] } #texCoord~%")
+      )
+    (format strm "        coordIndex [~%")
+    (dotimes (i (/ (length indx) 3))
+      (format strm "~D, ~D, ~D, -1,~%"
+              (elt indx    (* i 3))
+              (elt indx (+ (* i 3) 1))
+              (elt indx (+ (* i 3) 2))))
+    (format strm "        ]
+      } #IndexedFaceSet
+    } #Shape~%")
+    ))
+
+(defun write-wrl-from-glvertices (fname glv &rest args)
+  "write .wrl file from instance of glvertices"
+  (let ((mesh-list (glv . gl::mesh-list)))
+    (with-open-file
+     (strm fname :direction :output)
+     (format strm "Transform {~%")
+     (format strm "  children [~%")
+     (dolist (mesh mesh-list)
+       (apply #'_dump-wrl-shape strm mesh args))
+     (format strm "  ] #children~%")
+     (format strm "} #Transform~%")
+     )))
 
 #| ;; sample of glvertices
 (setq ver-lst (list

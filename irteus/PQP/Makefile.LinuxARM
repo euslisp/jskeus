@@ -1,4 +1,4 @@
-CC = c++ -O2
+CC = c++ -O2 -fPIC
 OBJOPT = -o 
 OUTOPT = -o 
 LD = c++

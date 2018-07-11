@@ -11,6 +11,10 @@
 (load "walk-motion.l")
 (load "hanoi-arm.l")
 (load "particle.l")
+(load "closed-loop.l")
+(load "special-joints.l")
+(load "virtual-joints.l")
+(load "look-at-ik.l")
 
 (unless (boundp '*irtviewer*) (make-irtviewer))
 #+:jsk

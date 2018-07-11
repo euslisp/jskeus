@@ -23,12 +23,21 @@
 ;;;
 
 
-(setq *objdir*
-  (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
-  )
+(unless (boundp '*objdir*)
+  (setq *objdir*
+        (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
+  ))
 
 (in-package "IMAGE")
-(comp:compile-file-if-src-newer (format nil "~A/lisp/image/jpeg/eusjpeg.l" *eusdir*) user::*objdir*)
+(if (eq (unix:access (format nil "~A/lisp/image/jpeg/" *eusdir*) unix::O_RDWR) t)
+    (comp:compile-file-if-src-newer (format nil "~A/lisp/image/jpeg/eusjpeg.l" *eusdir*) user::*objdir*)
+  (progn
+    (unix::mkdir (format nil "/tmp/~A" (unix::getpid)))
+    (unix::system (format nil "cp ~A/lisp/image/jpeg/eusjpeg.l /tmp/~A/eusjpeg.l" user::*eusdir* (unix::getpid)))
+    (unix::link (format nil "~A/lisp/image/jpeg/eusjpeg.l" *eusdir*) (format nil "/tmp/~A/eusjpeg.l" (unix::getpid)))
+    (comp:compile-file-if-src-newer (format nil "/tmp/~A/eusjpeg.l" (unix::getpid)) user::*objdir*)
+    (unix::unlink (format nil "/tmp/~A" (unix::getpid)))
+    ))
 (comp:compile-file-if-src-newer (format nil "png.l" *eusdir*) user::*objdir*)
 (comp:compile-file-if-src-newer (format nil "irtimage.l" *eusdir*) user::*objdir*)
 

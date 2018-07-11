@@ -106,6 +106,7 @@
                :dump-command nil)
          ;; draw
          (send *irtviewer* :draw-objects :flush nil)
+         (send (send *robot* :support-polygon '(:rleg :lleg)) :draw-on :flush nil :width 4)
          (mapcar #'(lambda (act ref)
                      (send act :draw-on :flush nil :size 100)
                      (send ref :draw-on :flush nil :color #f(1 0 0)))
@@ -115,8 +116,9 @@
                  (append (list cog-target-pos) target-coords))
          (send *robot* :draw-torque *viewer*)
          (send *irtviewer* :flush)
+         (x::window-main-one)
          ))
       )))
 
 (unless (boundp '*irtviewer*) (make-irtviewer))
-(warn "(crank-motion) for fullbody motion~%")
+(warn "(crank-motion) ;; for fullbody motion~%")

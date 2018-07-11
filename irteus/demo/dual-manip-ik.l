@@ -84,6 +84,6 @@
     ))
 
 (unless (boundp '*irtviewer*) (make-irtviewer))
-(warn "(dual-manip-ik) for dual-armed object manipulation~%")
+(warn "(dual-manip-ik) ;; for dual-armed object manipulation~%")
 
 

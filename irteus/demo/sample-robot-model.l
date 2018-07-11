@@ -64,10 +64,9 @@
      (setq jc0 (instance rotational-joint :init :parent-link aroot-link :child-link (car torso) :name :torso-waist-y :axis :z :min -45 :max 45))
      (setq jc1 (instance rotational-joint :init :parent-link (car torso) :child-link (cadr torso) :name :torso-waist-p :axis :y))
 
-     (setq jh0 (instance rotational-joint :init :parent-link (cadr torso) :child-link (car head) :name :head-neck-y :axis :z))
+     (setq jh0 (instance rotational-joint :init :parent-link (cadr torso) :child-link (car head) :name :head-neck-y :axis :z :min -150 :max 150))
      (setq jh1 (instance rotational-joint :init :parent-link (car head) :child-link (cadr head) :name :head-neck-p :axis :y))
-
-     (setq jal0 (instance rotational-joint :init :parent-link (cadr torso) :child-link (elt larm 0) :name :larm-shoulder-p :axis :y))
+     (setq jal0 (instance rotational-joint :init :parent-link (cadr torso) :child-link (elt larm 0) :name :larm-shoulder-p :axis :y :min -150 :max 150))
      (setq jal1 (instance rotational-joint :init :parent-link (elt larm 0) :child-link (elt larm 1) :name :larm-shoulder-r :axis :x :min -30 :max 180))
      (setq jal2 (instance rotational-joint :init :parent-link (elt larm 1) :child-link (elt larm 2) :name :larm-shoulder-y :axis :z))
      (setq jal3 (instance rotational-joint :init :parent-link (elt larm 2) :child-link (elt larm 3) :name :larm-elbow-p :axis :y :min -180 :max 0))
@@ -75,7 +74,7 @@
      (setq jal5 (instance rotational-joint :init :parent-link (elt larm 4) :child-link (elt larm 5) :name :larm-wrist-r :axis :x))
      (setq jal6 (instance rotational-joint :init :parent-link (elt larm 5) :child-link (elt larm 6) :name :larm-wrist-p :axis :y))
 
-     (setq jar0 (instance rotational-joint :init :parent-link (cadr torso)  :child-link (elt rarm 0) :name :rarm-shoulder-p :axis :y))
+     (setq jar0 (instance rotational-joint :init :parent-link (cadr torso)  :child-link (elt rarm 0) :name :rarm-shoulder-p :axis :y :min -150 :max 150))
      (setq jar1 (instance rotational-joint :init :parent-link (elt rarm 0) :child-link (elt rarm 1) :name :rarm-shoulder-r :axis :-x :min -30 :max 180))
      (setq jar2 (instance rotational-joint :init :parent-link (elt rarm 1) :child-link (elt rarm 2) :name :rarm-shoulder-y :axis :-z))
      (setq jar3 (instance rotational-joint :init :parent-link (elt rarm 2) :child-link (elt rarm 3) :name :rarm-elbow-p :axis :y :min -180 :max 0))
@@ -85,14 +84,14 @@
 
      (setq jll0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt lleg 0) :name :lleg-crotch-y :axis :z))
      (setq jll1 (instance rotational-joint :init :parent-link (elt lleg 0) :child-link (elt lleg 1) :name :lleg-crotch-r :axis :x))
-     (setq jll2 (instance rotational-joint :init :parent-link (elt lleg 1) :child-link (elt lleg 2) :name :lleg-crotch-p :axis :y))
+     (setq jll2 (instance rotational-joint :init :parent-link (elt lleg 1) :child-link (elt lleg 2) :name :lleg-crotch-p :axis :y :min -120 :max 120))
      (setq jll3 (instance rotational-joint :init :parent-link (elt lleg 2) :child-link (elt lleg 3) :name :lleg-knee-p :axis :y :min 0))
      (setq jll4 (instance rotational-joint :init :parent-link (elt lleg 3) :child-link (elt lleg 4) :name :lleg-ankle-p :axis :y))
      (setq jll5 (instance rotational-joint :init :parent-link (elt lleg 4) :child-link (elt lleg 5) :name :lleg-ankle-r :axis :x))
 
      (setq jlr0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt rleg 0) :name :rleg-crotch-y :axis :-z))
      (setq jlr1 (instance rotational-joint :init :parent-link (elt rleg 0) :child-link (elt rleg 1) :name :rleg-crotch-r :axis :-x))
-     (setq jlr2 (instance rotational-joint :init :parent-link (elt rleg 1) :child-link (elt rleg 2) :name :rleg-crotch-p :axis :y))
+     (setq jlr2 (instance rotational-joint :init :parent-link (elt rleg 1) :child-link (elt rleg 2) :name :rleg-crotch-p :axis :y :min -120 :max 120))
      (setq jlr3 (instance rotational-joint :init :parent-link (elt rleg 2) :child-link (elt rleg 3) :name :rleg-knee-p :axis :y :min 0))
      (setq jlr4 (instance rotational-joint :init :parent-link (elt rleg 3) :child-link (elt rleg 4) :name :rleg-ankle-p :axis :y))
      (setq jlr5 (instance rotational-joint :init :parent-link (elt rleg 4) :child-link (elt rleg 5) :name :rleg-ankle-r :axis :-x))
@@ -141,6 +140,7 @@
            (mapcar #'(lambda (pos name)
                        (let ((sen (instance camera-model :init (make-cylinder 10 20) :name name)))
                          (send sen :rotate pi/2 :y)
+                         (send sen :rotate -pi/2 :z)
                          (send sen :locate (v+ pos (send (car (send (send self :head :neck-p :child-link) :bodies)) :centroid)) :world)
                          (send (send self :head :neck-p :child-link) :assoc sen)
                          sen))

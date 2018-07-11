@@ -6,13 +6,21 @@
    (obj &rest args)
    (send self :open-hand)
    (prog1
-       (send* self :solve-ik obj args)
+       (send* self :inverse-kinematics
+              obj
+              :link-list (send self :link-list (send self :end-coords :parent))
+              :move-target (send self :end-coords)
+              args)
      (send self :close-hand obj))
    )
   (:place
    (obj &rest args)
    (prog1
-       (send* self :solve-ik obj args)
+       (send* self :inverse-kinematics
+              obj
+              :link-list (send self :link-list (send self :end-coords :parent))
+              :move-target (send self :end-coords)
+              args)
      (send self :open-hand)))
   )
 
@@ -54,7 +62,10 @@
 
   (send *sarm* :reset-pose)
   (send *irtviewer* :draw-objects)
-  (send *sarm* :solve-ik (make-cascoords :pos #f(500 0 100))
+  (send *sarm* :inverse-kinematics
+        (make-cascoords :pos #f(500 0 100))
+        :link-list (send *sarm* :link-list (send *sarm* :end-coords :parent))
+        :move-target (send *sarm* :end-coords)
         :avoid-collision-null-gain  0.0 ;; 1.0
         :rotation-axis t :debug-view nil  :dump-command nil)
   (send *sarm* :open-hand)
@@ -78,7 +89,7 @@
     ))
 
 (unless (boundp '*irtviewer*) (make-irtviewer))
-(warn "(hanoi-arm) for arm solving hanoi tower~%")
+(warn "(hanoi-arm) ;; for arm solving hanoi tower~%")
 
 
 

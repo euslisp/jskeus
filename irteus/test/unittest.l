@@ -22,22 +22,31 @@
   (warning-message 1 "*** This test  fails intentinally ****~%")
   (dotimes (i 10)
     (assert nil "false")
-    ;; force remove trace from expected errored test
-    (setq ((car (*unit-test* . result)) . failures) nil)
     )
   (dotimes (i 10)
     (assert t "ok"))
   )
 
+;; Prevent from exitting from run-all-tests because we intentinally raise failure of unitteset.
+(setf (symbol-function 'org-exit) (symbol-function 'exit))
+(setf (symbol-function 'exit) #'(lambda (a) (print a)))
+;; Test all cases including intentinal failure.
 (run-all-tests)
+;; Revert exit function
+(setf (symbol-function 'exit) (symbol-function 'org-exit))
 
 (setq ret -1)
-(format t "functions = ~A~%" (length (send *unit-test* :functions)))
+(format t "functions = ~A, num-tests =~A, num-failures = ~A, num-successes = ~A~%"
+        (length (send *unit-test* :functions))
+        (apply #'+ (send-all (send *unit-test* :result) :num-tests))
+        (apply #'+ (send-all (send *unit-test* :result) :num-failures))
+        (apply #'+ (send-all (send *unit-test* :result) :num-successes)))
 (send *unit-test* :result)
 (if (and (= (length (send *unit-test* :functions)) 4)
          (= (apply #'+ (send-all (send *unit-test* :result) :num-tests)) 4)
          (= (apply #'+ (send-all (send *unit-test* :result) :num-failures)) 1)
          (= (apply #'+ (send-all (send *unit-test* :result) :num-successes)) 3))
     (setq ret 0))
+(format t "return code = ~A~%" ret)
 (exit ret)
 

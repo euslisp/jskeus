@@ -85,6 +85,18 @@
     (check-bignum #'equal #x1FFFFFFFFFFFFFFF #x2000000000000000 nil)
     (check-bignum #'equal #x2000000000000000 #x2000000000000001 nil)
 
+    ;; bignum devide float / float devide bignum
+    (check-bignum #'/ 10000000000000000000 1.0e+19 1.0)
+    (check-bignum #'/ -10000000000000000000 1.0e+19 -1.0)
+    (check-bignum #'/ 1.0e+19 10000000000000000000 1.0)
+    (check-bignum #'/ 1.0e+19 -10000000000000000000 -1.0)
+
+    ;; bignum multiple float / float multiple bignum
+    (check-bignum #'* 10000000000000000000 1.0e-19 1.0)
+    (check-bignum #'* -10000000000000000000 1.0e-19 -1.0)
+    (check-bignum #'* 1.0e-19 10000000000000000000 1.0)
+    (check-bignum #'* 1.0e-19 -10000000000000000000 -1.0)
+
     ;;
     (check-bignum #'equal (elt #i(536870912) 0) #x20000000 t)
     (check-bignum #'equal (elt (integer-vector 536870912) 0) #x20000000 t)

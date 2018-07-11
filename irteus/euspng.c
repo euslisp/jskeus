@@ -127,7 +127,6 @@ pointer PNG_WRITE_IMAGE(register context *ctx, int n, register pointer *argv)
   height = ckintval(argv[2]);
   channels  = ckintval(argv[3]);
   image_ptr = argv[4]->c.str.chars;
-  fprintf(stderr, "%d %d %d %x\n", width, height, channels, image_ptr);
   FILE *fp = fopen(file_name, "wb");
   if (!fp) {
     error(E_OPENFILE);
@@ -151,7 +150,6 @@ pointer PNG_WRITE_IMAGE(register context *ctx, int n, register pointer *argv)
                PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
   png_bytep * row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * height);
   int y, byte_per_scanline = png_get_rowbytes(png_ptr, info_ptr);
-  fprintf(stderr, "%d\n", byte_per_scanline);
   for(y=0;y<height;y++){
     row_pointers[y] = &(image_ptr[y*byte_per_scanline]);
   }

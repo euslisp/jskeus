@@ -1,51 +1,81 @@
 # Travis Continuous Integration Configuration File
-language:
-  - cpp
-compiler:
-  - gcc
 notifications:
   email:
     recipients:
       - euslisp@jsk.t.u-tokyo.ac.jp
     on_success: always #[always|never|change] # default: change
     on_failure: always #[always|never|change] # default: always
-env:
-  - secure: "u0lUaQ+BR5IH2bJNmGPZ8Yp5/iroJiHNkADN6lvMMqS9FQc8kcEe74UgsTjMdteQXRsDTtJVmwB7UFB83bwwcKoVYwrGAdOfBkWM702hTgmEIqKTkBkaVyUjkzR/VrnVCHCLhQMysAuHQyPrEPjLlvmKiJJ/OYfRg2QCd74ef1I="
+  slack: jsk-robotics:Av7tc8wj3IWkLYvlTzHE7x2g
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=ubuntu:trusty
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=ubuntu:xenial
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=osrf/ubuntu_armhf:trusty
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=osrf/ubuntu_armhf:xenial
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=osrf/ubuntu_arm64:trusty
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=osrf/ubuntu_arm64:xenial
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=debian:jessie
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=osrf/debian_arm64:jessie
+    - os: linux
+      dist: trusty
+      sudo: required
+      cache: apt
+      env: BUILD_DOC=true
+    - os: osx
+  allow_failures:
+    - os: osx
 before_install: # Use this to prepare the system to install prerequisites or dependencies
+  - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+install:
   # Define some config vars
   - export CI_SOURCE_PATH=$(pwd)
   - export REPOSITORY_NAME=${PWD##*/}
+  - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then sudo apt-get install -y -qq qemu-user-static git; fi
+script:
   - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq -y subversion gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi msttcorefonts texlive-latex-base ptex-bin latex2html nkf poppler-utils
-install: # Use this to install any prerequisites or dependencies necessary to run your build
-  - cd ${HOME}
-  - ln -s $CI_SOURCE_PATH jskeus
-script: # All commands must exit with code 0 on success. Anything else is considered failure.
-  - cd jskeus
-  - make
-  - source bashrc.eus
-  - find irteus/test -iname "*.l" | grep -v unittest.l | xargs -n1 irteusgl
-after_success:
-  - export GIT_COMMITTER_NAME=$GIT_NAME
-  - export GIT_COMMITTER_EMAIL=$GIT_EMAIL
-  - export GIT_AUTHOR_NAME=$GIT_NAME
-  - export GIT_AUTHOR_EMAIL=$GIT_EMAIL
-  - (cd doc/; pdftotext jmanual.pdf; mv jmanual.txt jmanual.txt.old; make; pdftotext jmanual.pdf)
-  - (cd doc/; make html)
-  - cd doc
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then diff jmanual.txt jmanual.txt.old || (git add -f *.pdf *.dvi; git commit -m "add documents for $TRAVIS_COMMIT"); fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git checkout master;      fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git merge HEAD@{1};       fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git push --quiet https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git master; fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then cd ~/;    fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git clone --branch gh-pages https://github.com/$TRAVIS_REPO_SLUG doc;     fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then cd doc;   fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git reset --hard bb420562a8d224491784081ed51536d0e9aaf072
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then cp -r ~/jskeus/doc/html/* ./;     fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git add -f .;                     fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git commit -m "Build documents from $TRAVIS_COMMIT" . ;   fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then git push -f --quiet https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git gh-pages; fi
+  - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then COUNT=10; while [ $COUNT -gt 0 -a ! -e $CI_SOURCE_PATH/eus ] ; do echo $COUNT; sleep 1; GIT_SSL_NO_VERIFY=true git clone --depth 10 http://github.com/euslisp/EusLisp $CI_SOURCE_PATH/eus; COUNT=`expr $COUNT - 1`; done; fi # running git clone within arm VM is very slow
+  - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then mv $CI_SOURCE_PATH/irteus/test/*.l /tmp; mv /tmp/irt*.l $CI_SOURCE_PATH/irteus/test/; fi # arm VM is very slow so we do not have time to run all tests
+  - if [ "$TRAVIS_OS_NAME" == "linux" -a "$BUILD_DOC" != "true" ]; then docker run --rm -i -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"; fi
+  # Test installing head version jskeus via Homebrew formula
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then source $CI_SOURCE_PATH/.travis-osx.sh; fi
+  # Test doc generation
+  - if [ "$BUILD_DOC" == "true" ]; then sudo apt-get install -y -qq git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi; fi
+  - if [ "$BUILD_DOC" == "true" ]; then make; fi
+  - if [ "$BUILD_DOC" == "true" ]; then sudo apt-get install -y -qq texlive-binaries texlive-lang-cjk poppler-utils nkf latex2html; fi
+  - if [ "$BUILD_DOC" == "true" ]; then (source bashrc.eus; cd doc/; make pdf); fi
+  - if [ "$BUILD_DOC" == "true" ]; then (source bashrc.eus; cd doc/; make html); fi
 after_failure:
   - echo "failure"
 

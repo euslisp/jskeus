@@ -51,7 +51,7 @@
   (:draw-objects
     (&rest args)
     (send* (get self :pickviewer) :draw-objects args)))
-
+(defvar gl::*light3*)
 (defclass irtviewer
   :super x::panel
   :slots (viewer
@@ -93,27 +93,42 @@
      (setf (get viewer :pickviewer) self)
      (setq user::*viewer* viewer)
 
-     (setq gl::*light0* 
-       (instance gl::lightsource :create 0
-		 :ambient (float-vector 0.2 0.2 0.2 1.0)
-		 :diffuse (float-vector 0.6 0.6 0.6 1.0)
-		 :specular (float-vector 0.4 0.4 0.4 1.0)
-		 :position (float-vector 1.0 2.0 1.5 0.0)))
-     (setq gl::*light1*
-       (instance gl::lightsource :create 1
-		 :ambient (float-vector 0.1 0.1 0.1 1.0)
-		 :diffuse (float-vector 0.2 0.2 0.2 1.0)
-		 :specular (float-vector 0.4 0.4 0.4 1.0)
-		 :position (float-vector -1.0 -2.0 0.0 0.0)))
-     (setq  gl::*light2*
-       (instance gl::lightsource :create 2
-		 :ambient (float-vector 0.1 0.1 0.1 1.0)
-		 :diffuse (float-vector 0.2 0.2 0.2 1.0)
-		 :specular (float-vector 0.4 0.4 0.4 1.0)
-		 :position (float-vector -1.0 -2.0 -1.0 0.0)))
+     (let ((default-ambient (float-vector 0.1 0.1 0.1 1.0))
+           (default-diffuse (float-vector 1.0 1.0 1.0 1.0))
+           (default-specular (float-vector 0.1 0.1 0.1 1.0))
+           (scale-light0 1.00)
+           (scale-light1 0.70)
+           (scale-light2 0.40)
+           (scale-light3 0.25))
+       (setq gl::*light0* ;; from back
+             (instance gl::lightsource :create 0
+                       :ambient (scale scale-light0 default-ambient)
+                       :diffuse (scale scale-light0 default-diffuse)
+                       :specular (scale scale-light0 default-specular)
+                       :position (float-vector 4000.0 3000.0 0.0 0.0)))
+       (setq gl::*light1* ;; from front-left
+             (instance gl::lightsource :create 1
+                       :ambient (scale scale-light1 default-ambient)
+                       :diffuse (scale scale-light1 default-diffuse)
+                       :specular (scale scale-light1 default-specular)
+                       :position (float-vector -4000.0 -2000.0 -2000.0 0.0)))
+       (setq gl::*light2* ;; from front-left
+             (instance gl::lightsource :create 2
+                       :ambient (scale scale-light2 default-ambient)
+                       :diffuse (scale scale-light2 default-diffuse)
+                       :specular (scale scale-light2 default-specular)
+                       :position (float-vector -2000.0 -2000.0 2500.0 0.0)))
+       (setq gl::*light3*
+             (instance gl::lightsource :create 3
+                       :ambient (scale scale-light3 default-ambient)
+                       :diffuse (scale scale-light3 default-diffuse)
+                       :specular (scale scale-light3 default-specular)
+                       :position (float-vector 0.0 0.0 0.0 1.0)))
+       )
      (send gl::*light0* :opengl)
      (send gl::*light1* :opengl)
      (send gl::*light2* :opengl)
+     (send gl::*light3* :opengl)
      ;;
      (send viewer :viewsurface :set-event-proc
 	   :buttonrelease-left :draw-event self)
@@ -137,6 +152,10 @@
    (send viewer :viewsurface :resize newwidth newheight)
    (send viewer :viewsurface :makecurrent)
    (send viewer :viewsurface :3d-mode)
+   (let ((wh-max (max newwidth newheight)))
+     (send (send viewer :viewport)
+           :resize :width wh-max :height (- wh-max)
+           :xcenter (/ newwidth 2) :ycenter (/ newheight 2)))
    (send self :redraw))
   (:configureNotify
    (event)
@@ -267,18 +286,21 @@
   (:select-drawmode
    (mode)
    (when (not (eq mode drawmode))
-     (dolist (obj draw-things)
-       (setf (get obj :GL-DISPLAYLIST-ID) nil)
-       (case mode
-         (user::hid
-          (setf (get obj :gl-hiddenline) (list (cons nil t))))
-         (t
-          (setf (get obj :gl-hiddenline) nil)))))
+     (let ((glcon ((send self :viewer :viewsurface) . gl::glcon)))
+       (dolist (obj draw-things)
+         (gl::delete-displaylist-id (get obj :GL-DISPLAYLIST-ID))
+         (setf (get obj :GL-DISPLAYLIST-ID) nil)
+         (case mode
+           (user::hid
+            (setf (get obj :gl-hiddenline) (list (cons glcon t))))
+           (t
+            (setf (get obj :gl-hiddenline) nil))))))
    (setq drawmode mode)
    drawmode)
   (:flush () (if viewer (send viewer :viewsurface :glflush)))
   (:change-background (col)
    (let ((vs (send self :viewer :viewsurface)))
+     (send vs :makecurrent)
      (setq (vs . x::bg-color) col)
      (gl::glClearColorfv col)))
   )
@@ -340,7 +362,14 @@
 ;;
 (proclaim '(special *irtviewer*))
 (defun make-irtviewer (&rest args)
-  "Create irtviewer"
+  "Create irtviewer
+  :view-name title
+  :hither    near cropping plane
+  :yon       far cropping plane
+  :width     width of the window
+  :height    height of the window
+  :draw-origin size of origin arrow, use nil to disable it
+  :draw-floor  use t to view floor"
   (cond
    ((or (null x::*display*) (= x::*display* 0))
     (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")

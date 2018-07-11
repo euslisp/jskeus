@@ -82,6 +82,11 @@
     (dotimes (i 360)
       (setq a (rotate-vector a (deg2rad 1) :x)))
     (assert (eps-v= a b) "rotate-vector")
+
+    (assert (eps-v= (vplus (list a b a b)) (scale 2 (v+ a b))) "vplus")
+
+    (assert (eps-v= (vector-mean (list a b b a)) (scale 0.5 (v+ a b))) "vector-mean")
+
     ))
 
 (deftest reader
@@ -99,6 +104,20 @@
     (setq i2 (make-array (list 2 2) :element-type :integer))
     (setq f2 (make-array (list 2 2) :element-type :float))
     ))
+
+(deftest nan-inf-read
+  (let (v1 v2)
+    (setq v1 (float-vector (/ 1.0 0.0) (/ -1.0 0.0) (/ 0.0 0.0))) ;; v1 is inf -inf nan
+    (format *error-output* "v1 = ~A~%" v1)
+    (dump-structure "/tmp/test-v-dump-structure.l" v1)
+    (with-open-file (f "/tmp/test-v-dump-structure.l" :direction :input)
+     (setq v2 (read f)))
+    (format *error-output* "v2 = ~A~%" v2)
+    (assert (eq (elt v1 0) (elt v2 0))) ;; v1[0] (= inf) is v2[0] (= inf)
+    (assert (eq (elt v1 1) (elt v2 1))) ;; v2[1] (= -inf) is v2[1] (= -inf)
+    (assert (not (= (elt v1 2) (elt v1 2)))) ;; check if v1[2] is nan; this is only the way to compare NaN
+    (assert (not (= (elt v2 2) (elt v2 2)))) ;; check if v2[2] is nan;
+    t))
 
 (run-all-tests)
 (exit)

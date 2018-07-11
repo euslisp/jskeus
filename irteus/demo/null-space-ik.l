@@ -64,5 +64,5 @@
 
 ;;
 (unless (boundp '*irtviewer*) (make-irtviewer))
-(warn "(null-space-ik) for humanoid~%")
+(warn "(null-space-ik) ;; for humanoid~%")
 

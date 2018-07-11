@@ -27,7 +27,7 @@
 (in-package "GEOMETRY")
 
 (export '(body-to-faces body-to-triangles midcoords orient-coords-to-axis bodyset *g-vec*
-                        make-sphere make-ring x-of-cube y-of-cube z-of-cube
+                        make-sphere make-ring make-fan-cylinder x-of-cube y-of-cube z-of-cube
                         height-of-cylinder radius-of-cylinder radius-of-sphere
 			matrix-to-euler-angle))
 
@@ -39,6 +39,11 @@
     (make-coords :pos (midpoint p (send c1 :worldpos) (send c2 :worldpos))
 		 :rot (user::midrot p (send c1 :worldrot) (send c2 :worldrot)))
     ))
+
+(defmethod line
+  (:worldcoords ()
+    "Return a coordinates on the midpoint of the end points"
+    (make-coords :pos (midpoint 0.5 nvert pvert))))
 
 (defmethod coordinates
   (:axis (axis)
@@ -223,7 +228,8 @@
 				    :inverse-transformation) cc cc)
 	    (send self :newcoords cc))))
   (:move-coords
-   (target at) ;; fix "at" coords on "self" to "target"
+   (target at)
+   "fix 'at' coords on 'self' to 'target'"
    (send self :transform (send at :transformation target) at)
    (send self :worldcoords)
    )
@@ -275,7 +281,7 @@
 ;; orient-coords-to-axis
 ;;   orient "axis" in "target-coords" to the direction specified by "v" destructively.
 ;;   "v" must be non-zero vector.
-(defun orient-coords-to-axis (target-coords v &optional (axis :z))
+(defun orient-coords-to-axis (target-coords v &optional (axis :z) (eps *epsilon*))
   "orient 'axis' in 'target-coords' to the direction specified by 'v' destructively.
    'v' must be non-zero vector."
   (let* ((nv (normalize-vector v))
@@ -290,14 +296,14 @@
     ;; check rot-angle-cos
     (cond
      ;; if th = 0[deg] -> no need to rotate target-coords
-     ((eps= rot-angle-cos 1.0)
+     ((eps= rot-angle-cos 1.0 eps)
       (return-from orient-coords-to-axis target-coords))
      ;; if th = 180[deg] -> previous rot-axis = 0 vector and rot-axis is ambiguous. overwrite rot-axis by the axis orthogonal to ax
-     ((eps= rot-angle-cos -1.0)
+     ((eps= rot-angle-cos -1.0 eps)
       (block :calc-for-th-180
         (dolist (rot-axis2 (list #f(1 0 0) #f(0 1 0)))
           (let ((rot-angle-cos2 (v. ax rot-axis2)))
-            (unless (eps= (abs rot-angle-cos2) 1.0)
+            (unless (eps= (abs rot-angle-cos2) 1.0 eps)
               (setq rot-axis (v- rot-axis2 (scale rot-angle-cos2 ax))) ;; use only vertical component of rot-axis2 by removing parallel component of rot-axis2
               (return-from :calc-for-th-180 nil))
             ))))
@@ -540,6 +546,29 @@
             v-list))
     (apply #'make-torus v-list :segments segments args)))
 
+(defun make-fan-cylinder (radius height
+                                 &rest args
+                                 &key (segments 12)
+                                      (angle 2pi)
+                                      (mid-angle (/ angle 2.0)))
+  "make a cylinder whose base face is a fan. the angle of fan
+   is defined by :angle keyword. and, the csg of the returned body is
+   (:cylinder radius height segments angle)"
+  (let ((base-vertices
+         (mapcar #'(lambda (i)
+                     (let ((th (- (* i (/ angle segments)) mid-angle)))
+                       (float-vector (* radius (cos th))
+                                     (* radius (sin th))
+                                     0)))
+                 (let ((idx -1)) (mapcar #'(lambda (x) (incf idx)) (make-list (+ segments 1)))) ;; This is same as "range" function.
+                 )))
+    (make-prism
+     (if (eps= angle 2pi)
+         (cdr (reverse base-vertices))
+       (cons (float-vector 0 0 0) (reverse base-vertices)))
+     height
+     :primitive (list :cylinder radius height segments angle))))
+
 ;;
 ;; accessor to primitive bodies
 ;;
@@ -716,6 +745,19 @@
 	    (setq a2 (user::atan2 (- (aref m 2 0)) (aref m 2 2)))))
 	  ))))
     (list a0 a1 a2)))
+
+(defun quaternion-from-two-vectors (a b)
+  "Comupute quaternion which rotate vector a into b."
+  (let* ((v0 (normalize-vector a))
+         (v1 (normalize-vector b))
+         (c (v. v1 v0)))
+    (let* ((axis (v* v0 v1))
+           (s (sqrt (* 2 (+ 1 c))))
+           (invs (/ 1.0 s)))
+      (let ((vec (scale invs axis))
+            (w (* 0.5 s)))
+        (normalize-vector
+	 (float-vector w (elt vec 0) (elt vec 1) (elt vec 2)))))))
 
 (provide :irtgeo "$Id$")
 

@@ -32,7 +32,7 @@ LSFX=so
 LPFX=lib
 ESFX=
 SOFLAGS=-g -falign-functions=8
-IMPLIB=-L$(EUSDIR)/$(ARCHDIR)/lib -leusgeo -lnr
+IMPLIB=-L$(EUSDIR)/$(ARCHDIR)/lib -leusgeo -L$(INSTALLLIBDIR) -lnr
 IMPLIBGL=-L$(EUSDIR)/$(ARCHDIR)/lib -leusgl -L/usr/X11R6/lib -lGLU -lGL -lXext
 IMPLIBIMG=-L/opt/local/lib/jpeg6b/lib -ljpeg -L/opt/local/lib -lpng
 EXPLIB=

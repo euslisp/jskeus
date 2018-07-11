@@ -24,15 +24,29 @@
 
 (in-package "USER")
 
-(setq *objdir*
-  (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
-  )
-
+(unless (boundp '*objdir*)
+  (setq *objdir*
+        (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
+  ))
+(print *objdir*)
 (comp:compile-file-if-src-newer "irtmath.l" *objdir*)
 (comp:compile-file-if-src-newer "irtutil.l" *objdir*)
 (comp:compile-file-if-src-newer "irtgraph.l" *objdir*)
-(comp:compile-file-if-src-newer (format nil "~A/lib/llib/pgsql.l" *eusdir*) *objdir*)
 
+(defun comp::compile-llib-file-if-src-newer (fname)
+  (print (list 'compile fname))
+  (if (eq (unix:access (format nil "~A/lib/llib/" *eusdir*) unix::O_RDWR) t)
+      (comp:compile-file-if-src-newer (format nil "~A/lib/llib/~A" *eusdir* fname) *objdir*)
+    (progn
+      (unix::mkdir (format nil "/tmp/~A" (unix::getpid)))
+      (unix::system (format nil "cp ~A/lib/llib/~A /tmp/~A/~A" *eusdir* fname (unix::getpid) fname))
+      (unix::link (format nil "~A/lib/llib/~A" *eusdir* fname) (format nil "/tmp/~A/pgsql.l" (unix::getpid)))
+      (comp:compile-file-if-src-newer (format nil "/tmp/~A/~A" (unix::getpid) fname) *objdir*)
+      (unix::unlink (format nil "/tmp/~A" (unix::getpid)))
+      ))
+  )
+(comp::compile-llib-file-if-src-newer "time.l")
+(comp::compile-llib-file-if-src-newer "pgsql.l")
 
 (exit 0)
 

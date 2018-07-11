@@ -1,0 +1,32 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  cache_directories:
+    # - "~/docker"
+
+  override:
+    - sudo apt-get update -q -y
+    - sudo apt-get install -qq -y git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi
+    - make
+    - sudo apt-get install -y -qq texlive-binaries texlive-lang-cjk poppler-utils nkf latex2html
+test:
+  override:
+    - cd doc && pdftotext jmanual.pdf && mv jmanual.txt jmanual.txt.old
+    - source bashrc.eus && make doc
+    - source bashrc.eus && cd doc && make html
+    - cd doc && pdftotext jmanual.pdf
+    - cd doc && diff -y --suppress-common-lines -Bbw jmanual.txt.old jmanual.txt; echo "ok"
+
+  post:
+    # copy results
+    - cp doc/*.pdf $CIRCLE_ARTIFACTS
+    - cp -r doc/html $CIRCLE_ARTIFACTS
+
+deployment:
+  release:
+    tag: /[0-9]+(\.[0-9]+)*/
+    commands:
+      - echo "deploy"
+

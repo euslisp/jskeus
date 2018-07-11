@@ -532,6 +532,483 @@ pointer MATMINUS(ctx,n,argv)
   return(result);
 }
 
+void balanc(eusfloat_t **a, int n)
+{
+  eusfloat_t RADIX = 2.0;
+  int last,j,i;
+  eusfloat_t s,r,g,f,c,sqrdx;
+  sqrdx=RADIX*RADIX;
+  last=0;
+  while (last == 0) {
+    last=1;
+    for (i=1;i<=n;i++) { // Calculate row and column norms.
+      r=c=0.0;
+      for (j=1;j<=n;j++)
+	if (j != i) {
+	  c += fabs(a[j][i]);
+	  r += fabs(a[i][j]);
+	}
+      if (c && r) { // If both are nonzero,
+	g=r/RADIX;
+	f=1.0;
+	s=c+r;
+	while (c<g) { // find the integer power of the machine radix that comes closest to balancing the matrix.
+	  f *= RADIX;
+	  c *= sqrdx;
+	}
+	g=r*RADIX;
+	while (c>g) {
+	  f /= RADIX;
+	  c /= sqrdx;
+	}
+	if ((c+r)/f < 0.95*s) {
+	  last=0;
+	  g=1.0/f;
+	  for (j=1;j<=n;j++) a[i][j] *= g; // Apply similarity transformation.
+	  for (j=1;j<=n;j++) a[j][i] *= f;
+	}
+      }
+    }
+  }
+}
+
+#define SWAP(g,h) {y=(g);(g)=(h);(h)=y;}
+void elmhes(eusfloat_t **a, int n)
+{
+  int m,j,i;
+  eusfloat_t y,x;
+  for (m=2;m<n;m++) { // m is called r + 1 in the text.
+    x=0.0;
+    i=m;
+    for (j=m;j<=n;j++) { // Find the pivot.
+      if (fabs(a[j][m-1]) > fabs(x)) {
+	x=a[j][m-1];
+	i=j;
+      }
+    }
+    if (i != m) { // Interchange rows and columns.
+      for (j=m-1;j<=n;j++) SWAP(a[i][j],a[m][j]);
+      for (j=1;j<=n;j++) SWAP(a[j][i],a[j][m]);
+    }
+    if (x) { // Carry out the elimination.
+      for (i=m+1;i<=n;i++) {
+	if ((y=a[i][m-1]) != 0.0) {
+	  y /= x;
+	  a[i][m-1]=y;
+	  for (j=m;j<=n;j++)
+	    a[i][j] -= y*a[m][j];
+	  for (j=1;j<=n;j++)
+	    a[j][m] += y*a[j][i];
+	}
+      }
+    }
+  }
+}
+
+int hqr(eusfloat_t **a, int n, eusfloat_t wr[], eusfloat_t wi[])
+{
+  int nn,m,l,k,j,its,i,mmin;
+  eusfloat_t z,y,x,w,v,u,t,s,r,q,p,anorm;
+  anorm=0.0; // Compute matrix norm for possible use inlocating  single small subdiagonal element. 
+  for (i=1;i<=n;i++)
+    for (j=max(i-1,1);j<=n;j++)
+      anorm += fabs(a[i][j]);
+  nn=n;
+  t=0.0; //Gets changed only by an exceptional shift.
+  while (nn >= 1) { // Begin search for next eigenvalue.
+    its=0;
+    do {
+      for (l=nn;l>=2;l--) { // Begin iteration: look for single small subdiagonal element. 
+	s=fabs(a[l-1][l-1])+fabs(a[l][l]);
+	if (s == 0.0) s=anorm;
+	if ((eusfloat_t)(fabs(a[l][l-1]) + s) == s) {
+	  a[l][l-1]=0.0;
+	  break;
+	}
+      }
+      x=a[nn][nn];
+      if (l == nn) { // One root found.
+	wr[nn]=x+t;
+	wi[nn--]=0.0;
+      } else {
+	y=a[nn-1][nn-1];
+	w=a[nn][nn-1]*a[nn-1][nn];
+	if (l == (nn-1)) { // Two roots found...
+	  p=0.5*(y-x);
+	  q=p*p+w;
+	  z=sqrt(fabs(q));
+	  x += t;
+	  if (q >= 0.0) { // ...a real pair.
+	    z=p+SIGN(z,p);
+	    wr[nn-1]=wr[nn]=x+z;
+	    if (z) wr[nn]=x-w/z;
+	    wi[nn-1]=wi[nn]=0.0;
+	  } else { // ...a complex pair.
+	    wr[nn-1]=wr[nn]=x+p;
+	    wi[nn-1]= -(wi[nn]=z);
+	  }
+	  nn -= 2;
+	} else { // No roots found. Continue iteration.
+	  if (its == 30) {nrerror("Too many iterations in hqr"); return -1;}
+	  if (its == 10 || its == 20) { // Form exceptional shift.
+	    t += x;
+	    for (i=1;i<=nn;i++) a[i][i] -= x;
+	    s=fabs(a[nn][nn-1])+fabs(a[nn-1][nn-2]);
+	    y=x=0.75*s;
+	    w = -0.4375*s*s;
+	  }
+	  ++its;
+	  for (m=(nn-2);m>=l;m--) { // Form shift and then look for 2 consecutive small subdiagonal elements.
+	    z=a[m][m];
+	    r=x-z;
+	    s=y-z;
+	    p=(r*s-w)/a[m+1][m]+a[m][m+1]; // Equation (11.6.23).
+	    q=a[m+1][m+1]-z-r-s;
+	    r=a[m+2][m+1];
+	    s=fabs(p)+fabs(q)+fabs(r); // Scale to prevent overflow or underflow.
+	    p /= s;
+	    q /= s;
+	    r /= s;
+	    if (m == l) break;
+	    u=fabs(a[m][m-1])*(fabs(q)+fabs(r));
+	    v=fabs(p)*(fabs(a[m-1][m-1])+fabs(z)+fabs(a[m+1][m+1]));
+	    if ((eusfloat_t)(u+v) == v) break; // Equation (11.6.26).
+	  }
+	  for (i=m+2;i<=nn;i++) {
+	    a[i][i-2]=0.0;
+	    if (i != (m+2)) a[i][i-3]=0.0;
+	  }
+	  for (k=m;k<=nn-1;k++) {
+	    // Double QR step on rows l to nn and columns m to nn.
+	    if (k != m) {
+	      p=a[k][k-1]; // Begin setup of Householder vector.
+	      q=a[k+1][k-1];
+	      r=0.0;
+	      if (k != (nn-1)) r=a[k+2][k-1];
+	      if ((x=fabs(p)+fabs(q)+fabs(r)) != 0.0) {
+		p /= x; // Scale to prevent overflow or underflow.
+		q /= x;
+		r /= x;
+	      }
+	    }
+	    if ((s=SIGN(sqrt(p*p+q*q+r*r),p)) != 0.0) {
+	      if (k == m) {
+		if (l != m)
+		  a[k][k-1] = -a[k][k-1];
+	      } else
+		a[k][k-1] = -s*x;
+	      p += s; // Equations (11.6.24).
+	      x=p/s;
+	      y=q/s;
+	      z=r/s;
+	      q /= p;
+	      r /= p;
+	      for (j=k;j<=nn;j++) { // Row modification.
+		p=a[k][j]+q*a[k+1][j];
+		if (k != (nn-1)) {
+		  p += r*a[k+2][j];
+		  a[k+2][j] -= p*z;
+		}
+		a[k+1][j] -= p*y;
+		a[k][j] -= p*x;
+	      }
+	      mmin = nn<k+3 ? nn : k+3;
+	      for (i=l;i<=mmin;i++) { // Column modification.
+		p=x*a[i][k]+y*a[i][k+1];
+		if (k != (nn-1)) {
+		  p += z*a[i][k+2];
+		  a[i][k+2] -= p*r;
+		}
+		a[i][k+1] -= p*q;
+		a[i][k] -= p;
+	      }
+	    }
+	  }
+	}
+      }
+    } while (l < nn-1);
+  }
+  return 1;
+}
+
+eusfloat_t pythag(eusfloat_t a, eusfloat_t b)
+{
+  eusfloat_t absa, absb;
+  absa=fabs(a);
+  absb=fabs(b);
+  if (absa > absb) return absa*sqrt(1.0+SQR(absb/absa));
+  else return (absb == 0.0 ? 0.0 : absb*sqrt(1.0+SQR(absa/absb)));
+}
+
+pointer QL_DECOMPOSE(ctx,n,argv)
+register context *ctx;
+int n;
+pointer argv[];
+/* (QL_DECOMPOSE mat) */
+{
+  pointer a,re,rv;
+  eusfloat_t **aa, *d, *e;
+  int c, i, j;
+
+  ckarg(1);
+  a=argv[0];
+  if (!ismatrix(a)) error(E_NOVECTOR);
+  c = colsize(a);
+  if(c != rowsize(a)) error(E_VECSIZE);
+
+  aa = nr_matrix(1,c,1,c);
+  d = nr_vector(1,c);
+  e = nr_vector(1,c);
+  re = makefvector(c);
+  rv = makematrix(ctx,c,c);
+
+  for (i = 0; i < c; i++){
+    for (j = 0; j < c; j++){
+      aa[j+1][i+1]=a->c.ary.entity->c.fvec.fv[j*c+i];
+    }
+  }
+
+  tred2(aa, c, d, e);
+  if ( tqli(d, e, c, aa) < 0 ) {
+    free_nr_matrix(aa,1,c,1,c);
+    free_nr_vector(d,1,c);
+    free_nr_vector(e,1,c);
+    return NIL;
+  }
+
+  for (i = 0; i < c; i++){
+    re->c.fvec.fv[i] = d[i+1];
+  }
+  for (i = 0; i < c; i++){
+    for (j = 0; j < c; j++){
+      rv->c.ary.entity->c.fvec.fv[j*c+i] = aa[j+1][i+1];
+    }
+  }
+
+  free_nr_matrix(aa,1,c,1,c);
+  free_nr_vector(d,1,c);
+  free_nr_vector(e,1,c);
+  return (cons(ctx,re,cons(ctx,rv,NIL)));}
+
+pointer QR_DECOMPOSE(ctx,n,argv)
+register context *ctx;
+int n;
+pointer argv[];
+/* (QR_DECOMPOSE mat) */
+{
+  pointer a,rr,ri, r;
+  eusfloat_t **aa, *wr, *wi;
+  int c, i, j, pc=0;
+
+  ckarg(1);
+  a=argv[0];
+  if (!ismatrix(a)) error(E_NOVECTOR);
+  c = colsize(a);
+  if(c != rowsize(a)) error(E_VECSIZE);
+
+  aa = nr_matrix(1,c,1,c);
+  wr = nr_vector(1,c);
+  wi = nr_vector(1,c);
+  rr = makefvector(c); vpush(rr); pc++;
+  ri = makefvector(c); vpush(ri); pc++;
+
+  for (i = 0; i < c; i++){
+    for (j = 0; j < c; j++){
+      aa[j+1][i+1]=a->c.ary.entity->c.fvec.fv[j*c+i];
+    }
+  }
+
+  balanc(aa, c);
+  elmhes(aa, c);
+  if ( hqr(aa, c, wr, wi) < 0 ) {
+    free_nr_matrix(aa,1,c,1,c);
+    free_nr_vector(wr,1,c);
+    free_nr_vector(wi,1,c);
+    while(pc-->0) vpop();
+    return NIL;
+  }
+
+  for (i = 0; i < c; i++){
+    rr->c.fvec.fv[i] = wr[i+1];
+    ri->c.fvec.fv[i] = wi[i+1];
+  }
+
+  free_nr_matrix(aa,1,c,1,c);
+  free_nr_vector(wr,1,c);
+  free_nr_vector(wi,1,c);
+
+  while(pc-->0) vpop();
+  return (cons(ctx,rr,cons(ctx,ri,NIL)));};
+
+///
+static pointer VMEAN(ctx, n, argv)
+/* make mean of vector, vmean #f(1 2 3) -> 2.0 */
+/* (vmean X) => (/ (+ x_0 x_1 ... x_n) (length x)), where X := [x_0, ..., x_n] */
+register context *ctx;
+int n;
+register pointer *argv;
+{
+  int i,fn;
+  double sum=0;
+  pointer pcur;
+  numunion nu;
+  ckarg(1);
+  if (isvector(argv[0])) {
+    fn = vecsize(argv[0]);
+    if (isfltvector(argv[0])) {
+      for (i = 0; i < fn; i++){ sum += argv[0]->c.fvec.fv[i];}
+    }
+    else if (isintvector(argv[0])) {
+      for (i = 0; i < fn; i++){ sum += argv[0]->c.ivec.iv[i];}
+    }
+    else if (isptrvector(argv[0])) {
+      for (i = 0; i < fn; i++){
+        if ( isint(argv[0]->c.vec.v[i]) ) {
+          sum += intval(argv[0]->c.vec.v[i]);
+        }
+        else if ( isflt(argv[0]->c.vec.v[i]) ) {
+          sum += fltval(argv[0]->c.vec.v[i]);
+        }
+        else error(E_NONUMBER);
+      }
+    }
+    else error(E_NONUMBER);
+  }
+  else if (islist(argv[0])) {
+    fn = 0;
+    pcur = argv[0];
+    do {
+      if ( isint(ccar(pcur)) ) {
+        sum += intval(ccar(pcur));
+      }
+      else if ( isflt(ccar(pcur)) ) {
+        sum += fltval(ccar(pcur));
+      }
+      else error(E_NONUMBER);
+      fn++;
+      pcur = ccdr(pcur);
+    } while ( iscons(pcur) );
+  }
+  else error(E_NOVECTOR);
+
+  sum = (eusfloat_t)(sum/fn);
+  return(makeflt(sum));
+}
+
+static pointer VARIANCE(ctx, n, argv)
+/* make variance of vector, variance #f(1 2 3) -> 0.6 */
+/* (variance X) => (vmean Z), where Z := [x_i^2 - mu_x^2], */
+/* where X := [x_0, ..., x_n], mu_x := (vmean X) */
+register context *ctx;
+int n;
+register pointer *argv;
+{
+  int i,fn;
+  double res=0;
+  double ave=0;
+  numunion nu;
+  pointer pcur;
+  ckarg(1);
+  ave = fltval(VMEAN(ctx,n,argv));
+
+  if (isvector(argv[0])) {
+    fn = vecsize(argv[0]);
+    if (isfltvector(argv[0])) {
+      for (i = 0; i < fn; i++){ res += pow( (argv[0]->c.fvec.fv[i] - ave), 2);}
+    }
+    else if (isintvector(argv[0])) {
+      for (i = 0; i < fn; i++){ res += pow( (argv[0]->c.ivec.iv[i] - ave), 2);}
+    }
+    else if (isptrvector(argv[0])) {
+      for (i = 0; i < fn; i++){
+        if ( isint(argv[0]->c.vec.v[i]) ) {
+          res += pow( (intval(argv[0]->c.vec.v[i]) - ave), 2);
+        }
+        else if ( isflt(argv[0]->c.vec.v[i]) ) {
+          res += pow( (fltval(argv[0]->c.vec.v[i]) - ave), 2);
+        }
+        else error(E_NONUMBER);
+      }
+    }
+    else error(E_NONUMBER);
+  }
+  else if (islist(argv[0])) {
+    fn = 0;
+    pcur = argv[0];
+    do {
+      if ( isint(ccar(pcur)) ) {
+        res += pow( (intval(ccar(pcur)) - ave), 2);
+      }
+      else if ( isflt(ccar(pcur)) ) {
+        res += pow( (fltval(ccar(pcur)) - ave), 2);
+      }
+      else error(E_NONUMBER);
+      fn++;
+      pcur = ccdr(pcur);
+    } while ( iscons(pcur) );
+  }
+  else error(E_NOVECTOR);
+
+  res = (eusfloat_t)(res/fn);
+  return(makeflt(res));
+}
+
+static pointer COVARIANCE(ctx, n, argv)
+/* make co-variance of vector, covariance #f(1 2 3) #(0 2 4) -> 1.3 */
+/* (covariance X Y) => (vmean Z) */
+/* where Z := [(x_i - mu_x) * (y_i - mu_y)], i=0, ... ,n */
+/* X := [x_0, ... ,x_n], Y := [y_0, ... ,y_n], mu_x := (vmean X), m_y := (vmean Y) */
+register context *ctx;
+int n;
+register pointer *argv;
+{
+  int i,fn;
+  double res=0;
+  double ave0=0, ave1=0;
+  numunion nu;
+  int isf, isi, isl;
+  ckarg(2);
+  if (!((isf=isfltvector(argv[0])) && isfltvector(argv[1])) &&
+      !((isi=isintvector(argv[0])) && isintvector(argv[1])) &&
+      !((isl=islist(argv[0])) && islist(argv[1])))
+    error(E_TYPEMISMATCH);
+  if (isf || isi) {
+#define ckvsize(a,b) ((a->c.vec.size==b->c.vec.size)?vecsize(a):(int)error(E_VECINDEX))
+    fn=ckvsize(argv[0], argv[1]);
+  }else{ // isl
+    if (!((fn = intval(LENGTH(ctx,1,&(argv[0])))) == intval(LENGTH(ctx,1,&(argv[1]))))) error(E_SEQINDEX);
+  }
+
+  ave0 = fltval(VMEAN(ctx,1,&(argv[0])));
+  ave1 = fltval(VMEAN(ctx,1,&(argv[1])));
+
+  if (isf) {
+    eusfloat_t *a, *b;
+    a=argv[0]->c.fvec.fv; b=argv[1]->c.fvec.fv;
+    for(i=0; i<fn; i++)
+      res+=((a[i]-ave0) * (b[i]-ave1));
+    res/=(fn-1);
+  }else if (isi) {
+    eusinteger_t *a, *b;
+    a=argv[0]->c.ivec.iv; b=argv[1]->c.ivec.iv;
+    for(i=0; i<fn; i++)
+      res+=((a[i]-ave0) * (b[i]-ave1));
+    res/=(fn-1);
+  }else if (isl) {
+    pointer a,b;
+    a=argv[0]; b=argv[1];
+    while (islist (a)){
+      res+=((ckfltval(ccar(a))-ave0) * (ckfltval(ccar(b))-ave1));
+      a=ccdr(a);
+      b=ccdr(b);
+    }
+    res/=(fn-1);
+  }else{
+    error(E_NOSEQ);
+  }
+  return(makeflt(res));
+}
+
 pointer ___irtc(ctx,n,argv, env)
 register context *ctx;
 int n;
@@ -548,6 +1025,11 @@ pointer env;
   defun(ctx,"LU-DECOMPOSE2",mod,LU_DECOMPOSE2);
   defun(ctx,"MATRIX-DETERMINANT",mod,MATRIX_DETERMINANT);
   defun(ctx,"PSEUDO-INVERSE2",mod,PSEUDO_INVERSE2);
+  defun(ctx,"QL-DECOMPOSE",mod,QL_DECOMPOSE);
+  defun(ctx,"QR-DECOMPOSE",mod,QR_DECOMPOSE);
+  defun(ctx,"VMEAN",mod,VMEAN);
+  defun(ctx,"VARIANCE",mod,VARIANCE);
+  defun(ctx,"COVARIANCE",mod,COVARIANCE);
 
   /* irteus-version */
   extern pointer QVERSION;
