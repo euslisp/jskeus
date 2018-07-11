@@ -43,7 +43,6 @@ setup_brew_test() {
 
 setup_make() {
     travis_time_start brew.install-deps
-    brew tap homebrew/x11
     brew install jpeg libpng mesalib-glw wget poppler
     travis_time_end
 
