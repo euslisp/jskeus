@@ -14,6 +14,15 @@
     (print axis *error-output*)
     (assert (null axis) "small rotatoin-angle")
 
+    (setq angle 0.5 axis #f(1.0 0.0 0.0))
+    (setq rot (make-coords :axis axis :angle angle))
+    (print (send rot :rot) *error-output*)
+    (setq rot-angle (rotation-angle (send rot :rot)))
+    (print (list rot-angle (list angle axis) (norm axis) (v. (cadr rot-angle) axis)) *error-output*)
+    (assert (eps= (car rot-angle) angle) "check angle of rotation-angle")
+    (assert (eps-v= (cadr rot-angle) axis) "check axis rotatoin-angle")
+    (assert (not (c-isnan (norm (cadr rot-angle)))) "check nan is not contained in axis of rotation-angle"))
+
     (setq angle 0.00141 axis #f(-0.684209 0.536652 0.493825))
     (setq rot (make-coords :axis axis :angle angle))
     (print (send rot :rot) *error-output*)

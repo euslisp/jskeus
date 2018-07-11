@@ -143,6 +143,7 @@
                 (send *robot* :set-midpoint-for-interlocking-joints)
                 nil))
       (send *irtviewer* :draw-objects)
+      (x::window-main-one)
       (format t ";; joint angles = ~A => interlocking? ~A~%"
               (mapcar #'(lambda (jl) (send-all jl :joint-angle)) (send *robot* :interlocking-joint-pairs))
               (send *robot* :check-interlocking-joint-angle-validity))

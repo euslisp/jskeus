@@ -90,7 +90,7 @@
    "If jv is set, it updates joint-velocity of this instance. :joint-velocity returns velocity of this joint in SI(m/s, rad/s) unit."
    (if jv (setq joint-velocity jv) joint-velocity))
   (:joint-acceleration (&optional ja)
-   "If ja is set, it updates joint-acceleration of this instance. :joint-acceleration returns acceleration of this joint in SI(m/s^2, rad/s^2) unit."
+   "If ja is set, it updates joint-acceleration of this instance. :joint-acceleration returns acceleration of this joint in SI(m/$s^2$, rad/$s^2$) unit."
    (if ja (setq joint-acceleration ja) joint-acceleration))
   (:joint-torque (&optional jt)
    "If jt is set, it updates joint-torque of this instance. :joint-torque returns torque of this joint in SI(N, Nm) unit."
@@ -817,8 +817,8 @@
                  (setq tmp-joint-angle (elt vec i) tmp-target-joint-angle (elt vec ii))
                  (setq tmp-joint-min-angle (send j :joint-min-max-table-min-angle tmp-target-joint-angle)
                        tmp-joint-max-angle (send j :joint-min-max-table-max-angle tmp-target-joint-angle))
-                 (setq tmp-target-joint-min-angle (send j :joint-min-max-table-min-angle tmp-joint-angle)
-                       tmp-target-joint-max-angle (send j :joint-min-max-table-max-angle tmp-joint-angle))
+                 (setq tmp-target-joint-min-angle (send jj :joint-min-max-table-min-angle tmp-joint-angle)
+                       tmp-target-joint-max-angle (send jj :joint-min-max-table-max-angle tmp-joint-angle))
                  (cond ((<= tmp-joint-min-angle tmp-joint-angle tmp-joint-max-angle) ;; ok
                         ;; force change joint-angle to avoid problem
                         (setq (j . joint-angle) tmp-joint-angle
@@ -829,8 +829,8 @@
                             ((> i 1))
                           (setq tmp-joint-min-angle (send j :joint-min-max-table-min-angle tmp-target-joint-angle)
                                 tmp-joint-max-angle (send j :joint-min-max-table-max-angle tmp-target-joint-angle))
-                          (setq tmp-target-joint-min-angle (send j :joint-min-max-table-min-angle tmp-joint-angle)
-                                tmp-target-joint-max-angle (send j :joint-min-max-table-max-angle tmp-joint-angle))
+                          (setq tmp-target-joint-min-angle (send jj :joint-min-max-table-min-angle tmp-joint-angle)
+                                tmp-target-joint-max-angle (send jj :joint-min-max-table-max-angle tmp-joint-angle))
 
                           (if (< tmp-joint-angle tmp-joint-min-angle)
                               (incf tmp-joint-angle (* (- tmp-joint-min-angle tmp-joint-angle) i)))
@@ -2181,6 +2181,7 @@
              (dolist (p (send self :get :ik-draw-on-params))
                (send* (car p) :draw-on :flush nil (cdr p)))
              (if (not (memq :no-flush debug-view)) (send *viewer* :viewsurface :flush))
+             (x::window-main-one)
              )
            (send self :put :ik-draw-on-params nil) ;; Clear :ik-draw-on-params
            :ik-continues)
@@ -2240,7 +2241,7 @@
      (send-all union-link-list :analysis-level :coords)
      ;; argument check
      (when (or (null link-list) (null move-target))
-       (warn ";; ERROR: :link-list or :move-target required~%")
+       (warn ";; ERROR: both :link-list and :move-target required~%")
        (return-from :inverse-kinematics t))
      (if (and (null translation-axis) (null rotation-axis))
          (return-from :inverse-kinematics t))
@@ -2290,11 +2291,7 @@
                                    ;; evaluate additional-jacobi function and calculate row dimension of additional-jacobi
                                    :additional-jacobi-dimension
                                    (+ (if (and (not cog-null-space) target-centroid-pos)
-                                          (case cog-translation-axis
-                                                (t 3)
-                                                ((:x :y :z :xx :yy :zz) 2)
-                                                ((:xy :yx :yz :zy :zx :xz) 1)
-                                                (nil 0))
+                                          (send self :calc-target-axis-dimension nil cog-translation-axis)
                                         0)
                                       (reduce #'+ (mapcar #'(lambda (aj) (array-dimension (if (functionp aj) (funcall aj link-list) aj) 0)) tmp-additional-jacobi)))
                                    :union-link-list union-link-list args) args)))

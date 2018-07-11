@@ -116,6 +116,7 @@
                  (append (list cog-target-pos) target-coords))
          (send *robot* :draw-torque *viewer*)
          (send *irtviewer* :flush)
+         (x::window-main-one)
          ))
       )))
 

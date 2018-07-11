@@ -19,5 +19,12 @@
   (assert (/= (test-read-line 1000000) 1000000) "read-line with ~A char" 1000000) ;; may print 'line length exceeds MAX_READLINE_LNEGHT(1000000)'
   )
 
+(deftest test-read-gensym
+  (let ((g (gensym))
+        (*print-circle* t))
+    (assert
+     (apply #'eq (read-from-string (format nil "~S" (list g g))))
+     "Unable to read uninterned symbol")))
+
 (run-all-tests)
 (exit)

@@ -125,7 +125,46 @@
            (instance gl::glviewsurface :create
                      :glcon ((send *irtviewer* :viewer :viewsurface) . gl::glcon)
                      :title (format nil "~A_view" (send self :name)) :width pwidth :height pheight)
-           :title (format nil "~A_view" (send self :name)))))
+           :title (format nil "~A_view" (send self :name))))
+     (send cv :viewsurface :makecurrent)
+     (let ((default-ambient (float-vector 0.1 0.1 0.1 1.0))
+           (default-diffuse (float-vector 1.0 1.0 1.0 1.0))
+           (default-specular (float-vector 0.1 0.1 0.1 1.0))
+           (scale-light0 1.00)
+           (scale-light1 0.70)
+           (scale-light2 0.40)
+           (scale-light3 0.25)
+           light0 light1 light2 light3)
+       (setq light0 ;; from back
+             (instance gl::lightsource :create 0
+                       :ambient (scale scale-light0 default-ambient)
+                       :diffuse (scale scale-light0 default-diffuse)
+                       :specular (scale scale-light0 default-specular)
+                       :position (float-vector 4000.0 3000.0 0.0 0.0)))
+       (setq light1 ;; from front-left
+             (instance gl::lightsource :create 1
+                       :ambient (scale scale-light1 default-ambient)
+                       :diffuse (scale scale-light1 default-diffuse)
+                       :specular (scale scale-light1 default-specular)
+                       :position (float-vector -4000.0 -2000.0 -2000.0 0.0)))
+       (setq light2 ;; from front-left
+             (instance gl::lightsource :create 2
+                       :ambient (scale scale-light2 default-ambient)
+                       :diffuse (scale scale-light2 default-diffuse)
+                       :specular (scale scale-light2 default-specular)
+                       :position (float-vector -2000.0 -2000.0 2500.0 0.0)))
+       (setq light3
+             (instance gl::lightsource :create 3
+                       :ambient (scale scale-light3 default-ambient)
+                       :diffuse (scale scale-light3 default-diffuse)
+                       :specular (scale scale-light3 default-specular)
+                       :position (float-vector 0.0 0.0 0.0 1.0)))
+       (send light0 :opengl)
+       (send light1 :opengl)
+       (send light2 :opengl)
+       (send light3 :opengl)
+       )
+     )
    (setq img-viewer cv))
   (:width () "Returns width of the camera in pixel." pwidth)
   (:height () "Returns height of the camera in pixel." pheight)
@@ -271,6 +310,7 @@
      (setq pcolor (send vwr :viewsurface :color))
      (send vwr :viewsurface :color pcolor)
 
+     (gl::glEnable gl::GL_LIGHTING)
      (dolist (abody draw-things)
       ;; draw body
       (cond

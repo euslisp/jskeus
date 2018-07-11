@@ -1121,5 +1121,47 @@
       (send (send root-move-target :parent) :dissoc root-move-target)
       (assert ret "Test multiple link-list with root-link and IK"))))
 
+;; Check :cog-translation-axis dimension bug
+(deftest test-cog-translation-axis-dim
+  (unwind-protect
+      (progn
+        ;; Method overwrite to get method argument for checking
+        (unless (assoc :inverse-kinematics-loop-org (send cascaded-link :methods))
+          (rplaca (assoc :inverse-kinematics-loop (send cascaded-link :methods)) :inverse-kinematics-loop-org))
+        (defmethod cascaded-link
+          (:inverse-kinematics-loop
+           (dif-pos dif-rot &rest args &key ik-args &allow-other-keys)
+           (send self :put :tmp-ik-args ik-args) ;; Store ik-args just for this testing.
+           (send* self :inverse-kinematics-loop-org dif-pos dif-rot :ik-args ik-args args)))
+        ;; Testing
+        (mapcar #'(lambda (caxis caxis-dim)
+                    (assert
+                     (let ((ik-ret)
+                           (ik-target-axis-dim (send *sample-robot* :calc-target-axis-dimension (list t t) (list t t)))) ;; rotation-axis (list t t) and translation-axis (list t t) => dim = 12
+                       ;; Call :fullbody-inverse-kinematics
+                       (send *sample-robot* :reset-pose)
+                       (send *sample-robot* :newcoords (make-coords))
+                       (setq ik-ret
+                             (send *sample-robot* :fullbody-inverse-kinematics
+                                   (list (send *sample-robot* :rleg :end-coords :copy-worldcoords) (send *sample-robot* :lleg :end-coords :copy-worldcoords))
+                                   :move-target (list (send *sample-robot* :rleg :end-coords) (send *sample-robot* :lleg :end-coords))
+                                   :link-list (mapcar #'(lambda (x) (send *sample-robot* :link-list (send x :parent))) (list (send *sample-robot* :rleg :end-coords) (send *sample-robot* :lleg :end-coords)))
+                                   :target-centroid-pos (send *sample-robot* :centroid)
+                                   :cog-translation-axis caxis))
+                       (and ik-ret
+                            (= (cadr (memq :dim (send *sample-robot* :get :tmp-ik-args)))
+                               (+ ik-target-axis-dim caxis-dim)
+                               )))
+                     (format nil ";; Check COG axis dim (:cog-translation-axis = ~A should be dim = ~A)" caxis caxis-dim)))
+                (list t :z :xz nil) ;; :cog-translation-axis
+                (list 3 2 1 0) ;; Desired axis dimension
+                ))
+    ;; Revert method overwrite
+    (defmethod cascaded-link
+      (:inverse-kinematics-loop
+       (dif-pos dif-rot &rest args &key ik-args &allow-other-keys)
+       (send* self :inverse-kinematics-loop-org dif-pos dif-rot :ik-args ik-args args)))
+    ))
+
 (run-all-tests)
 (exit 0)
