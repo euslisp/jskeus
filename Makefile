@@ -1,6 +1,7 @@
 all: eus-installed irteus-installed manuals bashrc.eus
 
-GIT_EUSURL=http://github.com/euslisp/EusLisp
+GIT_EUSURL ?= http://github.com/euslisp/EusLisp
+GIT_EUSBRANCH ?= master
 
 EUSC_PATCH=eus.c_CUSTUM_EUSDIR.patch
 
@@ -70,7 +71,7 @@ export LD_LIBRARY_PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
 	@cat bashrc.eus
 
 eus:
-	COUNT=10; while [ $$COUNT -gt 0 -a ! -e eus ] ; do echo $$COUNT; sleep 1; GIT_SSL_NO_VERIFY=true git clone --depth 10 $(GIT_EUSURL) eus; COUNT=`expr $$COUNT - 1`; done; #	
+	COUNT=10; while [ $$COUNT -gt 0 -a ! -e eus ] ; do echo $$COUNT; sleep 1; GIT_SSL_NO_VERIFY=true git clone --depth 10 $(GIT_EUSURL) -b $(GIT_EUSBRANCH) eus; COUNT=`expr $$COUNT - 1`; done; #
 
 eus-installed: eus
 	cd eus/lisp && ln -sf $(MAKEFILE) Makefile && $(MAKE) eus0 eus1 eus2 eusg eusx eusgl eus
