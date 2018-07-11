@@ -28,10 +28,6 @@ install_gnu_tools() {
 }
 
 setup_brew_test() {
-    travis_time_start brew.update
-    brew update
-    travis_time_end
-
     travis_time_start brew.install
     brew install euslisp/jskeus/jskeus --HEAD
     travis_time_end
