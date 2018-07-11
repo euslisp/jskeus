@@ -278,7 +278,9 @@
      (when (> time (nth segment time-list))
        (setq segment-time (- time (nth segment time-list)))
        (incf segment))
-     (if (>= segment segment-num) (send self :reset))
+     (when (>= segment segment-num)
+       (setq position (car (last position-list)))
+       (send self :reset))
      position))
   )
 

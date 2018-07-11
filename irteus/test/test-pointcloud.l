@@ -1,5 +1,11 @@
 (require :unittest "lib/llib/unittest.l")
 
+#-(or :x86_64 :aarch64)
+(setq *temp-eps* 1e-2) ;; 5 significant figure of 1000mm
+
+#+(or :x86_64 :aarch64)
+(setq *temp-eps* 1e-9) ;; 12 significant figure of 1000mm
+
 (init-unit-test)
 
 (defun points-size-check (make-element-func &key (size 10))
@@ -150,31 +156,31 @@
           )
      (send *base* :assoc *point*)
      (let ((p (send *point* :convert-to-world :create t)))
-       (assert (eps-v= (car (send *point* :point-list)) *origin-p* 1e-8)) ;; original does not move
-       (assert (eps-v= (car (send p :point-list)) *origin-p* 1e-8))
+       (assert (eps-v= (car (send *point* :point-list)) *origin-p* *temp-eps*)) ;; original does not move
+       (assert (eps-v= (car (send p :point-list)) *origin-p* *temp-eps*))
        )
 
      (send *base* :transform *bcoords*)
      (let ((p (send *point* :convert-to-world :create t)))
-       (assert (eps-v= (car (send *point* :point-list)) *origin-p* 1e-8))  ;; original does not move
+       (assert (eps-v= (car (send *point* :point-list)) *origin-p* *temp-eps*))  ;; original does not move
        (assert (eps-v=
                 (car (send p :point-list))
                 (send (send *point* :worldcoords) :transform-vector (car (send *point* :point-list)))
-                1e-8))
+                *temp-eps*))
        )
      (let ((pt (send (send *point* :worldcoords) :transform-vector (car (send *point* :point-list)))))
        (send *point* :convert-to-world :create nil)
        (assert (eps-v=
                 (car (send *point* :point-list))
                 (send (send *point* :worldcoords) :transform-vector (car (send *point* :point-list)))
-                1e-8))
+                *temp-eps*))
        (assert (eps-v=
                 (car (send *point* :point-list)) ;; original moved
                 pt
-                1e-8))
-       (assert (eps-v= (send *point* :worldpos) (float-vector 0 0 0) 1e-8))
+                *temp-eps*))
+       (assert (eps-v= (send *point* :worldpos) (float-vector 0 0 0) *temp-eps*))
        (assert (eps-v= (array-entity (send *point* :worldrot))
-                       (float-vector 1 0 0 0 1 0 0 0 1) 1e-8))
+                       (float-vector 1 0 0 0 1 0 0 0 1) *temp-eps*))
        )
      ))
 
@@ -191,31 +197,31 @@
        (eps-v=
         (send (send *point* :worldcoords) :transform-vector (car (send *point* :point-list)))
         *origin-p*
-        1e-8))
+        *temp-eps*))
       (assert
        (eps-v=
         (send *bcoords* :transform-vector (car (send *point* :point-list)))
         (send (send *point* :worldcoords) :transform-vector (car (send *point* :point-list)))
-        1e-8))
+        *temp-eps*))
 
       (send *point* :move-origin-to *ccoords*)
       (assert
        (eps-v=
         (send (send *point* :worldcoords) :transform-vector (car (send *point* :point-list)))
         *origin-p*
-        1e-8))
+        *temp-eps*))
       (assert
        (eps-v=
         (send *ccoords* :transform-vector (car (send *point* :point-list)))
         (send (send *point* :worldcoords) :transform-vector (car (send *point* :point-list)))
-        1e-8))
+        *temp-eps*))
 
       (send *point* :move-origin-to (make-coords))
       (assert
        (eps-v=
         (send (send *point* :worldcoords) :transform-vector (car (send *point* :point-list)))
         *origin-p*
-        1e-8))
+        *temp-eps*))
 
       (setq *point*
             (instance pointcloud :init :points (list *origin-p*) :point-size 10))
@@ -227,20 +233,20 @@
          (eps-v=
           (send (send *point* :worldcoords) :transform-vector (car (send *point* :point-list)))
           (float-vector 792.732209445 539.4908242525 2397.9448709116)
-          1e-8))
+          *temp-eps*))
 
         (send *point* :move-origin-to *ccoords*)
         (assert
          (eps-v=
           (send (send *point* :worldcoords) :transform-vector (car (send *point* :point-list)))
           (float-vector 792.732209445 539.4908242525 2397.9448709116)
-          1e-8))
+          *temp-eps*))
         (assert
-         (eps-v= (send *point* :worldpos) (send *ccoords* :pos) 1e-8))
+         (eps-v= (send *point* :worldpos) (send *ccoords* :pos) *temp-eps*))
         (assert
          (eps-v=
           (array-entity (send *point* :worldrot))
-          (array-entity (send *ccoords* :rot)) 1e-8))
+          (array-entity (send *ccoords* :rot)) *temp-eps*))
         )
       )
     ))

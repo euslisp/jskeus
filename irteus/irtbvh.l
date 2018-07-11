@@ -24,7 +24,7 @@
 
 (in-package "USER")
 
-(require :irtrobot)
+;(require :irtrobot)
 
 ;;
 ;; bvh joint and link
@@ -498,13 +498,20 @@ Other Sites are:
              (* sign (elt (send self limb joint :joint :joint-angle) 1)))))
   (:copy-state-to
    (robot)
+   ;;(warning-message 2 ";; irteus copy-state-to in irtbvh.l robot:~A~%" robot)
    (let (sign)
      (dolist (arm '(:larm :rarm))
        (dolist (joint '(:collar :shoulder :elbow :wrist))
-         (send self :copy-joint-to robot arm joint (case arm (:rarm -1) (t 1)))))
+	 (if (and (boundp 'euscollada-robot)
+		  (derivedp robot euscollada-robot))
+	     (send self :copy-joint-to robot arm joint)
+	   (send self :copy-joint-to robot arm joint (case arm (:rarm -1) (t 1))))))
      (dolist (leg '(:lleg :rleg))
        (dolist (joint '(:crotch :knee :ankle))
-         (send self :copy-joint-to robot leg joint (case leg (:rleg -1) (t 1)))))
+	 (if (and (boundp 'euscollada-robot)
+		  (derivedp robot euscollada-robot))
+	     (send self :copy-joint-to robot leg joint)
+	   (send self :copy-joint-to robot leg joint (case leg (:rleg -1) (t 1))))))
      (send self :copy-joint-to robot :torso :chest)
      (send self :copy-joint-to robot :head :neck -1)
      (send robot :newcoords (send self :transformation (car links) :world))
@@ -634,6 +641,23 @@ The TUM Kitchen Data Set
 "
   (apply #'bvh2eus fname :scale 10.0 :bvh-robot-model-class tum-bvh-robot-model args))
 
+
+(defun rikiya-file (&key (num 1) (cls 'a))
+  (format nil "~A/bvh/rikiya/rbvh_~A/~A~0,2d.bvh"
+          (unix::getenv "EUSDIR")
+          cls
+          (string-upcase
+           (format nil "~A" cls)) num))
+
+(defun tum-kitchen-file (&key (num 1) (cls 0))
+  (format nil "~A/bvh/tum-kitchen/~A-~A/poses.bvh"
+          (unix::getenv "EUSDIR")
+          cls num))
+
+(defun cmu-mocap-file (&key (num 1) (cls 1))
+  (format nil "~A/bvh/cmu-mocap/~0,2d/~0,2d_~0,2d.bvh"
+          (unix::getenv "EUSDIR")
+          cls cls num))
 
 (in-package "GEOMETRY")
 

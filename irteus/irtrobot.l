@@ -213,7 +213,7 @@
                 (make-coords :pos (car args))
                 (v- (car args) (send move-target :worldpos))))
               target-orient move-orient axis-orient axis-orient2 head-weight head-nspace jid)
-         ;; this code assuming that the robot does not have contenious rotatoin joint for neck-y
+         ;; this code assuming that the robot does not have continuous rotation joint for neck-y
          (setq p-dif-rot dif-rot
                dif-pos (send move-target :difference-position target-coords :translation-axis nil)
                dif-rot (send move-target :difference-rotation target-coords :rotation-axis :z))
