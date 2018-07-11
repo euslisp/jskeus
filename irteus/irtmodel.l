@@ -817,8 +817,8 @@
                  (setq tmp-joint-angle (elt vec i) tmp-target-joint-angle (elt vec ii))
                  (setq tmp-joint-min-angle (send j :joint-min-max-table-min-angle tmp-target-joint-angle)
                        tmp-joint-max-angle (send j :joint-min-max-table-max-angle tmp-target-joint-angle))
-                 (setq tmp-target-joint-min-angle (send j :joint-min-max-table-min-angle tmp-joint-angle)
-                       tmp-target-joint-max-angle (send j :joint-min-max-table-max-angle tmp-joint-angle))
+                 (setq tmp-target-joint-min-angle (send jj :joint-min-max-table-min-angle tmp-joint-angle)
+                       tmp-target-joint-max-angle (send jj :joint-min-max-table-max-angle tmp-joint-angle))
                  (cond ((<= tmp-joint-min-angle tmp-joint-angle tmp-joint-max-angle) ;; ok
                         ;; force change joint-angle to avoid problem
                         (setq (j . joint-angle) tmp-joint-angle
@@ -829,8 +829,8 @@
                             ((> i 1))
                           (setq tmp-joint-min-angle (send j :joint-min-max-table-min-angle tmp-target-joint-angle)
                                 tmp-joint-max-angle (send j :joint-min-max-table-max-angle tmp-target-joint-angle))
-                          (setq tmp-target-joint-min-angle (send j :joint-min-max-table-min-angle tmp-joint-angle)
-                                tmp-target-joint-max-angle (send j :joint-min-max-table-max-angle tmp-joint-angle))
+                          (setq tmp-target-joint-min-angle (send jj :joint-min-max-table-min-angle tmp-joint-angle)
+                                tmp-target-joint-max-angle (send jj :joint-min-max-table-max-angle tmp-joint-angle))
 
                           (if (< tmp-joint-angle tmp-joint-min-angle)
                               (incf tmp-joint-angle (* (- tmp-joint-min-angle tmp-joint-angle) i)))
@@ -2242,7 +2242,7 @@
      (send-all union-link-list :analysis-level :coords)
      ;; argument check
      (when (or (null link-list) (null move-target))
-       (warn ";; ERROR: :link-list or :move-target required~%")
+       (warn ";; ERROR: both :link-list and :move-target required~%")
        (return-from :inverse-kinematics t))
      (if (and (null translation-axis) (null rotation-axis))
          (return-from :inverse-kinematics t))
@@ -2292,11 +2292,7 @@
                                    ;; evaluate additional-jacobi function and calculate row dimension of additional-jacobi
                                    :additional-jacobi-dimension
                                    (+ (if (and (not cog-null-space) target-centroid-pos)
-                                          (case cog-translation-axis
-                                                (t 3)
-                                                ((:x :y :z :xx :yy :zz) 2)
-                                                ((:xy :yx :yz :zy :zx :xz) 1)
-                                                (nil 0))
+                                          (send self :calc-target-axis-dimension nil cog-translation-axis)
                                         0)
                                       (reduce #'+ (mapcar #'(lambda (aj) (array-dimension (if (functionp aj) (funcall aj link-list) aj) 0)) tmp-additional-jacobi)))
                                    :union-link-list union-link-list args) args)))

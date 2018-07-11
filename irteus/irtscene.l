@@ -101,7 +101,7 @@
                 (not (eq (send self :name) (send (send spot :parent) :name))))
        (error "parent of spot ~A must be ~A. please dissoc at first." (send spot :parent) (send self :name))
        (return-from :add-spots nil))
-     (when (send self :spots (send spot :name))
+     (when (send self :spot (send spot :name))
        (error "spot with name ~A already exists." (send spot :name))
        (return-from :add-spots nil)))
    (dolist (s spots) (send self :assoc s))
@@ -127,21 +127,15 @@
    "Remove spot from scene. the spot will be :dissoc with this scene. Returns removed spot."
    (car (send self :remove-spots (list spot))))
   (:spots
-   (&optional name)
-   "Returns spots in the scene. If name is given returns spot of given name."
+   ()
+   "Return all spots in the scene."
    (append
-    (mapcan
-     #'(lambda(x)(if (derivedp x scene-model) (send x :spots name) nil))
-     objs)
-    (mapcan #'(lambda (o)
-		(if (and (eq (class o) cascaded-coords)
-			 (or (null name) (string= name (send o :name))))
-		    (list o)))
-	    objs)))
+    (mapcan #'(lambda(x)(if (derivedp x scene-model) (send x :spots) nil)) objs)
+    (remove-if-not #'(lambda (o) (eq (class o) cascaded-coords)) objs)))
   ;;
   (:object
    (name)
-   "Returns object of given name."
+   "Return an object of given name."
    (let ((r (send self :find-object name)))
      (case (length r)
        (0 (warning-message 1 "could not found object(~A)" name) nil)
@@ -149,8 +143,8 @@
        (t (warning-message 1 "found multiple object ~A for given name(~A)" r name) (car r)))))
   (:spot
    (name)
-   "Returns scene of given name."
-   (let ((r (send self :spots name)))
+   "Return a spot of given name."
+   (let ((r (remove-if-not #'(lambda (s) (string= name (send s :name))) (send self :spots))))
      (case (length r)
        (0 (warning-message 1 "could not found spot(~A)" name) nil)
        (1 (car r))

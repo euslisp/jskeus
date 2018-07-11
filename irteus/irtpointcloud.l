@@ -545,15 +545,30 @@
           (send coords :worldrot)
           mat mat)))
      ret))
-  (:convert-to-world (&key (create))
-   "transform points and normals with self coords. points data should be the same as displayed"
-   (let ((ret
-          (send self :transform-points (send self :worldcoords) :create create)))
-     (send ret :reset-coords)
-     (send self :worldcoords)
-     ret))
   (:set-offset (cds &key (create))
    (send self :transform-points cds :create create))
+  (:convert-to-world (&key (create))
+   "transform points and normals with self coords. converted points data should be at the same position as displayed"
+   (send self :move-origin-to (make-coords) :create create))
+  (:move-origin-to (neworigin &key (create))
+   "origin of point cloud is moved to neworigin. moved points data should be at the same position as displayed"
+   (let ((ret
+          (send self :transform-points
+                (send (send self :copy-worldcoords) :transform
+                      (send neworigin :inverse-transformation) :world)
+                :create create)
+          ))
+     (send ret :reset-coords)
+     (cond
+      ((and parent (not create)) ;; assocced
+       (send self :transform
+             (send (send (send parent :worldcoords) :inverse-transformation)
+                   :transform neworigin))
+       )
+      (t
+       (send ret :transform neworigin)))
+     (send self :worldcoords)
+     ret))
   ;; (:add-normal ())
   (:drawnormalmode (&optional mode)
    (case mode
@@ -580,7 +595,7 @@
    (gl::glDisable gl::GL_LIGHTING)
 
    (gl::glpushmatrix)
-   (gl::glmultmatrixf (array-entity (transpose (send worldcoords :4x4) gl::*temp-matrix*)))
+   (gl::glmultmatrixf (array-entity (transpose (send (send self :worldcoords) :4x4) gl::*temp-matrix*)))
     ;; draw coords
    (when (> asize 0.1)
      (gl::glLineWidth (float awidth))
