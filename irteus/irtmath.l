@@ -178,7 +178,7 @@
     ))
 
 (defun midrot (p r1 r2)
-  "returns mid (or p) rotation matrix of given two matrix r1 and r1"
+  "returns mid (or p) rotation matrix of given two matrix r1 and r2"
   (let (r omega)
     (setq r (m* (transpose r1) r2))
     (setq omega (matrix-log r))
