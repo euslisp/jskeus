@@ -23,10 +23,6 @@ travis_time_end() {
     set -x
 }
 
-install_gnu_tools() {
-    brew install coreutils # for use GNU date command
-}
-
 setup_brew_test() {
     travis_time_start brew.install
     brew install euslisp/jskeus/jskeus --HEAD
@@ -39,7 +35,11 @@ setup_brew_test() {
 
 setup_make() {
     travis_time_start brew.install-deps
-    brew install jpeg libpng mesalib-glw wget poppler
+    brew list jpeg &>/dev/null || brew install jpeg
+    brew list libpng &>/dev/null || brew install libpng
+    brew list mesalib-glw &>/dev/null || brew install mesalib-glw
+    brew list wget &>/dev/null || brew install wget
+    brew list poppler &>/dev/null || brew install poppler
     travis_time_end
 
     travis_time_start install.x11
