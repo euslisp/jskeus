@@ -63,3 +63,5 @@ if [ "$TRAVIS_PULL_REQUEST" = "false" -a "$TRAVIS_BRANCH" = "master" ]; then
 else
     setup_make
 fi
+
+exit 0
