@@ -67,7 +67,7 @@ script:
   - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then mv $CI_SOURCE_PATH/irteus/test/*.l /tmp; mv /tmp/irt*.l $CI_SOURCE_PATH/irteus/test/; fi # arm VM is very slow so we do not have time to run all tests
   - if [ "$TRAVIS_OS_NAME" == "linux" -a "$BUILD_DOC" != "true" ]; then docker run --rm -i -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"; fi
   # Test installing head version jskeus via Homebrew formula
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then echo "oK"; fi; #source $CI_SOURCE_PATH/.travis-osx.sh; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./$CI_SOURCE_PATH/.travis-osx.sh; fi
   # Test doc generation
   - if [ "$BUILD_DOC" == "true" ]; then sudo apt-get install -y -qq git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi; fi
   - if [ "$BUILD_DOC" == "true" ]; then make; fi
