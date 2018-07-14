@@ -113,7 +113,7 @@ defun.h:
 	$(CC) $(CFLAGS) -c test.c $(OBJOPT) test.o || echo "#define defun(a, b, c, d, e) defun(a, b, c, d) // for EusLisp < 9.24" >> defun.h
 	cat defun.h
 
-$(LIBIRTEUS): $(IRTEUSOBJS) $(IRTCOBJECTS)
+$(LIBIRTEUS): $(IRTEUSOBJS) $(IRTCOBJECTS) $(LIBNR)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUS) $(IRTEUSOBJS) \
 		$(IRTCOBJECTS) $(IMPLIB)
 
