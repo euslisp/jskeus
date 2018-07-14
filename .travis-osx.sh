@@ -42,11 +42,11 @@ setup_make() {
     brew list poppler &>/dev/null || brew install poppler
     travis_time_end
 
-    travis_time_start install.x11
-    wget http://xquartz.macosforge.org/downloads/SL/XQuartz-2.7.6.dmg
-    hdiutil attach XQuartz-2.7.6.dmg
-    sudo installer -pkg /Volumes/XQuartz-2.7.6/XQuartz.pkg -target /
-    travis_time_end
+    # travis_time_start install.x11
+    # wget http://xquartz.macosforge.org/downloads/SL/XQuartz-2.7.6.dmg
+    # hdiutil attach XQuartz-2.7.6.dmg
+    # sudo installer -pkg /Volumes/XQuartz-2.7.6/XQuartz.pkg -target /
+    # travis_time_end
 
     travis_time_start script.make
     make -j
