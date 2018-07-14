@@ -50,7 +50,7 @@ setup_make() {
     export LIBGL_ALLOW_SOFTWARE=1
 
     travis_time_start script.make
-    make -j
+    make -j 2
     travis_time_end
 
     travis_time_start script.test
