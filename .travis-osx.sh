@@ -47,6 +47,7 @@ setup_make() {
     # hdiutil attach XQuartz-2.7.6.dmg
     # sudo installer -pkg /Volumes/XQuartz-2.7.6/XQuartz.pkg -target /
     # travis_time_end
+    export LIBGL_ALLOW_SOFTWARE=1
 
     travis_time_start script.make
     make -j
