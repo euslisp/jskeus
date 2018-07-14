@@ -144,6 +144,20 @@
                  (delete-if-not #'evenp (vector 1 2 3 2 1) :end 2)))
   (assert (equal (vector 2 3 2 1)
                  (delete-if-not #'evenp (vector 1 2 3 2 1) :count 1)))
+  (let (v)
+    ;; Added test cases for usage of 'input value reuse' for backward compatibility,
+    ;; but it may be changed since it is not in the specification of Lisp.
+    ;; See https://github.com/euslisp/EusLisp/issues/295 for detail.
+    (setq v (vector 1 2 3 2 1))
+    (delete 2 v)
+    (assert (equal (vector 1 3 1) v))
+    (setq v (vector 1 2 3 2 1))
+    (delete 2 v :start 3)
+    (assert (equal (vector 1 2 3 1) v))
+    (setq v (vector 1 2 3 2 1))
+    (delete 2 v :end 2)
+    (assert (equal (vector 1 3 2 1) v))
+    (setq v (vector 1 2 3 2 1)))
 )
 
 (deftest remove-sequence
