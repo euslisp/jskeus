@@ -1011,8 +1011,8 @@
                               (make-coords :coords (send (send *sample-robot* :lleg :end-coords :copy-worldcoords) :translate (float-vector 0 100 0)) :name :lleg)
                               (make-coords :coords (send (send *sample-robot* :rleg :end-coords :copy-worldcoords) :translate (float-vector 0 100 0)) :name :rleg))))
     (setq cog2 (cadr (memq :cog (car av-list))))
-    (assert (eps= (elt cog0 1) (elt cog1 1) 0.5))
-    (assert (eps= (elt cog0 1) (- (elt cog2 1) 100) 0.5))
+    (assert (eps= (elt cog0 1) (elt cog1 1) 1.5) (format nil "cog: ~A ~A" cog0 cog1))
+    (assert (eps= (elt cog0 1) (- (elt cog2 1) 100) 1.5) (format nil "cog: ~A ~A" cog0 cog2))
     ))
 
 (deftest test-samplerobot-static-balance-point
@@ -1120,6 +1120,19 @@
                      :move-target mt :link-list ll)))
       (send (send root-move-target :parent) :dissoc root-move-target)
       (assert ret "Test multiple link-list with root-link and IK"))))
+
+;; test to check https://github.com/euslisp/jskeus/issues/459 issue
+(deftest test-sample-robot-collision-avoidance-link-pair-from-link-list
+  (send *sample-robot* :collision-avoidance-link-pair-from-link-list
+        (send *sample-robot* :link-list
+              (send (send *sample-robot* :rarm :end-coords) :parent)
+              (send (send *sample-robot* :rarm :wrist-y) :child-link)))
+  (send *sample-robot* :collision-avoidance-link-pair-from-link-list
+        (send *sample-robot* :link-list
+              (send (send *sample-robot* :rarm :end-coords) :parent)
+              (send (send *sample-robot* :rarm :elbow-p) :child-link)))
+  (assert t)
+  )
 
 ;; Check :cog-translation-axis dimension bug
 (deftest test-cog-translation-axis-dim
