@@ -158,6 +158,12 @@
 	(transform-coords (send wrt :worldcoords) self self))
       (t (send self :error ":transform wrt?" wrt)))
    (send self :newcoords rot pos))
+  (:move-coords
+   (target at)
+   "fix 'at' coords on 'self' to 'target'"
+   (send self :transform (send at :transformation target) at)
+   (send self :worldcoords)
+   )
   )
 
 (defmethod cascaded-coords 
@@ -227,12 +233,6 @@
 	    (transform-coords (send (send self :parentcoords)
 				    :inverse-transformation) cc cc)
 	    (send self :newcoords cc))))
-  (:move-coords
-   (target at)
-   "fix 'at' coords on 'self' to 'target'"
-   (send self :transform (send at :transformation target) at)
-   (send self :worldcoords)
-   )
   )
 
 (defun transform-coords (c1 c2 &optional

@@ -1270,15 +1270,16 @@
         (warn "collision-links : ~A~%" (send-all collision-links :name))
         (warn "parnet-links    : ~A~%" (send-all parent-links :name)))
       (dolist (link-list link-lists)
+        ;; https://github.com/euslisp/jskeus/issues/459
+        ;; originally introduced in https://github.com/euslisp/jskeus/commit/b0e3b482f8469241b2bfd9e9c607c19542b4d234
+        ;; heuristics to skip adjacent links with same axis
         (setq valid-link-list
-	      (if (= (length link-list) 1)
-		  link-list
-		(subseq
-		 link-list
-		 (let ((i 1))
-		   (while (eps= (distance (send (elt link-list 0) :worldpos)
-					  (send (elt link-list i) :worldpos)) 0.0)
-		     (incf i)) i))))
+              (subseq  ;; returns link-list when it's length is 1
+               link-list
+               (do ((i 1 (1+ i)))
+                   ((not (and (< i (1- (length link-list)))
+                              (eps= (distance (send (elt link-list 0) :worldpos)
+                                              (send (elt link-list i) :worldpos)) 0.0))) (1- i)))))
         (setq index-links
               (mapcar #'(lambda (l) (position l valid-link-list)) collision-links))
         (when (and debug (not (memq :no-message debug)))

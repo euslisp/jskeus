@@ -61,6 +61,22 @@
     bottom-frame
     ))
 
+(deftest test-vector-angle
+  (assert (and (eps= (vector-angle (float-vector 0 0 1) (float-vector 0 0 1)) 0.0)
+               (not (c-isnan (vector-angle (float-vector 0 0 1) (float-vector 0 0 1))))))
+  (assert (and (eps= (vector-angle (float-vector 0 0 1) (float-vector 0 0 -1)) pi)
+               (not (c-isnan (vector-angle (float-vector 0 0 1) (float-vector 0 0 -1))))))
+  (assert (eps=
+           (vector-angle (float-vector 0 0 1)
+                         (send (make-coords :rpy (list 0 -0.2 0)) :rotate-vector (float-vector 0 0 1)))
+           0.2))
+  (assert (eps=
+           (vector-angle (float-vector 0 0 1)
+                         (send (make-coords :rpy (list 0 -0.2 0)) :rotate-vector (float-vector 0 0 1))
+                         (float-vector 0 1 0))
+           -0.2))
+  )
+
 (deftest test-face-distance
   (let* ((f
           (instance face :init :vertices
