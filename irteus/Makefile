@@ -103,7 +103,14 @@ IRTIMGCOBJECTS=$(INSTALLOBJDIR)/euspng.$(OSFX)
 IRTGLCOBJECTS=$(INSTALLOBJDIR)/irtglc.$(OSFX)
 NROBJECTS=$(INSTALLOBJDIR)/nr.$(OSFX)
 
-all: $(LIBNR) $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSIMG) $(LIBIRTEUSGL) make-link install-irtext.l
+all: defun.h $(LIBNR) $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSIMG) $(LIBIRTEUSGL) make-link install-irtext.l
+
+.PHONY: defun.h
+defun.h:
+	echo '#include "eus.h"\nvoid TEST();\nvoid test(void) {register context *ctx; pointer mod; defun(ctx,"TEST",mod,TEST,NULL);}' > test.c
+	echo "// redefine defun for update defun() API () https://github.com/euslisp/EusLisp/pull/116" > defun.h
+	$(CC) $(CFLAGS) -c test.c $(OBJOPT) test.o || echo "#define defun(a, b, c, d, e) defun(a, b, c, d) // for EusLisp < 9.24" >> defun.h
+	cat defun.h
 
 $(LIBIRTEUS): $(IRTEUSOBJS) $(IRTCOBJECTS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUS) $(IRTEUSOBJS) \
@@ -206,19 +213,19 @@ $(INSTALLOBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l
 $(INSTALLOBJDIR)/time.$(OSFX): $(EUSDIR)/lib/llib/time.l
 $(INSTALLOBJDIR)/eusjpeg.$(OSFX): $(EUSDIR)/lisp/image/jpeg/eusjpeg.l
 
-$(INSTALLOBJDIR)/irtc.$(OSFX): irtc.c $(filter-out $(INSTALLOBJDIR)/irtc.$(OSFX),$(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS))
+$(INSTALLOBJDIR)/irtc.$(OSFX): irtc.c $(filter-out $(INSTALLOBJDIR)/irtc.$(OSFX),$(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS)) defun.h
 	$(CC) $(CFLAGS) -c irtc.c $(OBJOPT)$(INSTALLOBJDIR)/irtc.$(OSFX)
-$(INSTALLOBJDIR)/irtglc.$(OSFX): irtglc.c $(filter-out $(INSTALLOBJDIR)/irtglc.$(OSFX),$(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS))
+$(INSTALLOBJDIR)/irtglc.$(OSFX): irtglc.c $(filter-out $(INSTALLOBJDIR)/irtglc.$(OSFX),$(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS)) defun.h
 	$(CC) $(CFLAGS) -c irtglc.c $(OBJOPT)$(INSTALLOBJDIR)/irtglc.$(OSFX)
-$(INSTALLOBJDIR)/irtgeoc.$(OSFX): irtgeoc.c $(filter-out $(INSTALLOBJDIR)/irtgeoc.$(OSFX), $(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS))
+$(INSTALLOBJDIR)/irtgeoc.$(OSFX): irtgeoc.c $(filter-out $(INSTALLOBJDIR)/irtgeoc.$(OSFX), $(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS)) defun.h
 	$(CC) $(CFLAGS) -c irtgeoc.c $(OBJOPT)$(INSTALLOBJDIR)/irtgeoc.$(OSFX)
-$(INSTALLOBJDIR)/CPQP.$(OSFX): CPQP.C
+$(INSTALLOBJDIR)/CPQP.$(OSFX): CPQP.C defun.h
 	$(CXX) $(CXXFLAGS) -c CPQP.C $(OBJOPT)$(INSTALLOBJDIR)/CPQP.$(OSFX)
-$(INSTALLOBJDIR)/euspqp.$(OSFX): euspqp.c
+$(INSTALLOBJDIR)/euspqp.$(OSFX): euspqp.c defun.h
 	$(CC) $(CFLAGS) -c euspqp.c $(OBJOPT)$(INSTALLOBJDIR)/euspqp.$(OSFX)
-$(INSTALLOBJDIR)/euspng.$(OSFX): euspng.c
+$(INSTALLOBJDIR)/euspng.$(OSFX): euspng.c defun.h
 	$(CC) $(CFLAGS) -c euspng.c $(OBJOPT)$(INSTALLOBJDIR)/euspng.$(OSFX)
-$(INSTALLOBJDIR)/nr.$(OSFX): nr.c
+$(INSTALLOBJDIR)/nr.$(OSFX): nr.c defun.h
 	$(CC) $(CFLAGS) -c nr.c $(OBJOPT)$(INSTALLOBJDIR)/nr.$(OSFX)
 
 $(INSTALLLIBDIR)/jpegmemcd.$(LSFX): $(EUSDIR)/lisp/image/jpeg/jpegmemcd.c

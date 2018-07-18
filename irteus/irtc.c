@@ -1009,6 +1009,7 @@ register pointer *argv;
   return(makeflt(res));
 }
 
+#include "defun.h" // redefine defun for update defun() API
 pointer ___irtc(ctx,n,argv, env)
 register context *ctx;
 int n;
@@ -1016,20 +1017,20 @@ pointer argv[];
 pointer env;
 {
   pointer mod=argv[0];
-  defun(ctx,"ROTM3*",mod,MATTIMES3);
-  defun(ctx,"M+",mod,MATPLUS);
-  defun(ctx,"M-",mod,MATMINUS);
-  defun(ctx,"SV-SOLVE",mod,SV_SOLVE);
-  defun(ctx,"SV-DECOMPOSE",mod,SV_DECOMPOSE);
-  defun(ctx,"LU-SOLVE2",mod,LU_SOLVE2);
-  defun(ctx,"LU-DECOMPOSE2",mod,LU_DECOMPOSE2);
-  defun(ctx,"MATRIX-DETERMINANT",mod,MATRIX_DETERMINANT);
-  defun(ctx,"PSEUDO-INVERSE2",mod,PSEUDO_INVERSE2);
-  defun(ctx,"QL-DECOMPOSE",mod,QL_DECOMPOSE);
-  defun(ctx,"QR-DECOMPOSE",mod,QR_DECOMPOSE);
-  defun(ctx,"VMEAN",mod,VMEAN);
-  defun(ctx,"VARIANCE",mod,VARIANCE);
-  defun(ctx,"COVARIANCE",mod,COVARIANCE);
+  defun(ctx,"ROTM3*",mod,MATTIMES3,NULL);
+  defun(ctx,"M+",mod,MATPLUS,NULL);
+  defun(ctx,"M-",mod,MATMINUS,NULL);
+  defun(ctx,"SV-SOLVE",mod,SV_SOLVE,NULL);
+  defun(ctx,"SV-DECOMPOSE",mod,SV_DECOMPOSE,NULL);
+  defun(ctx,"LU-SOLVE2",mod,LU_SOLVE2,NULL);
+  defun(ctx,"LU-DECOMPOSE2",mod,LU_DECOMPOSE2,NULL);
+  defun(ctx,"MATRIX-DETERMINANT",mod,MATRIX_DETERMINANT,NULL);
+  defun(ctx,"PSEUDO-INVERSE2",mod,PSEUDO_INVERSE2,NULL);
+  defun(ctx,"QL-DECOMPOSE",mod,QL_DECOMPOSE,NULL);
+  defun(ctx,"QR-DECOMPOSE",mod,QR_DECOMPOSE,NULL);
+  defun(ctx,"VMEAN",mod,VMEAN,NULL);
+  defun(ctx,"VARIANCE",mod,VARIANCE,NULL);
+  defun(ctx,"COVARIANCE",mod,COVARIANCE,NULL);
 
   /* irteus-version */
   extern pointer QVERSION;
