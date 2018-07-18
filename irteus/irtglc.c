@@ -69,6 +69,7 @@ pointer CTRANSPOSE_IMAGE_ROWS(ctx,n,argv)
     }
     return(dst);}}
 
+#include "defun.h" // redefine defun for update defun() API
 pointer ___irtglc(ctx,n,argv,env)
      register context *ctx;
      int n;
@@ -76,6 +77,6 @@ pointer ___irtglc(ctx,n,argv,env)
      pointer env;
 {
   pointer mod=argv[0];
-  defun(ctx,"CTRANSPOSE-IMAGE-ROWS",mod,CTRANSPOSE_IMAGE_ROWS);
+  defun(ctx,"CTRANSPOSE-IMAGE-ROWS",mod,CTRANSPOSE_IMAGE_ROWS,NULL);
 }
 
