@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.0 (2018-07-19)
+------------------
 * to use IMPLIB we need run LIBNR first (`#512 <https://github.com/euslisp/jskeus/issues/512>`_, `#513 <https://github.com/euslisp/jskeus/issues/513>`_)
 * update function using defun() for https://github.com/euslisp/EusLisp/pull/116 (`#511 <https://github.com/euslisp/jskeus/issues/511>`_)
 * Fix invalid indexing in collision link pair calculation (`#461 <https://github.com/euslisp/jskeus/issues/461>`_)
