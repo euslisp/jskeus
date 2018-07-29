@@ -470,8 +470,7 @@
   (let (fc dif)
     (when (setq fc (get abody :face-color))
       (unless (vectorp fc)
-	(warn "transparent: body ~A param ~A face-color ~A~%" abody param fc)
-	(setq fc (find-color fc)))
+        (setq fc (find-color fc)))
       (if (= (length fc) 3)
 	  (setq fc
 	    (concatenate float-vector fc #f(0))))
