@@ -460,7 +460,7 @@
        ((symbolp color)
 	(setq c (find-if #'(lambda (o) (eq (send o :name) color))
 			 *face-colors*))
-	(if c (send c :diffuse) (warn "Color name not found ")))
+	(if c (send c :diffuse) (warn ";; Color name not found ~A~%" color)))
        (t color)))
     (unless v (setq v (float-vector 0.5 0.5 0.5)))
     v))
