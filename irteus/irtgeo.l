@@ -284,7 +284,8 @@
 (defun orient-coords-to-axis (target-coords v &optional (axis :z) (eps *epsilon*))
   "orient 'axis' in 'target-coords' to the direction specified by 'v' destructively.
    'v' must be non-zero vector."
-  (let* ((nv (normalize-vector v))
+  (let* ((v (if (equal v #f(0 0 0)) #f(0 0 1) v))
+         (nv (normalize-vector v))
          (ax (send target-coords :rotate-vector ;; axis in the worldcoords
                    (case axis
                      (:x #f(1 0 0)) (:-x #f(-1 0 0))
