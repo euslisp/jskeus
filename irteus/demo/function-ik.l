@@ -1,7 +1,12 @@
-(load "irteus/demo/sample-robot-model.l")
+(load "sample-robot-model.l")
 
 (defun shake-cocktail ()
-  (setq *robot* (instance sample-robot :init))
+  (send *irtviewer* :title "shake-cocktail")
+  (unless (boundp '*robot*)
+    (setq *robot* (instance sample-robot :init)))
+  (send *robot* :reset-pose)
+  (send *robot* :newcoords (make-coords))
+
   (setq *obj* (make-cylinder 20 100))
   (send *obj* :set-color #f(1 1 0))
   (send *robot* :reset-pose)
