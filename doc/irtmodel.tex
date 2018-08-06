@@ -1937,6 +1937,86 @@ concatenate result-type a bは a bを
 \verb|:look-at-target|は移動中に首の向きを常に対象を見つづけるようにす
 るという指令である．
 
+\subsubsection{inverse-kinematicsのtarget-coordsに関数を指定する例}
+
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.49\columnwidth]{fig/dual-arm-ik.jpg}
+    \caption{Example of Dual Arm InverseKinematics}
+    \labfig{dual-arm-ik}
+  \end{center}
+\end{figure}
+
+:inverse-kinematicsの引数target-coordsは\verb|coordinates|クラス以外に
+\verb|coordinates|クラスを返す関数を指定することができる。
+以下に示すプログラムは2つの腕を利用してカクテルをふる動作を行うものである(\reffig{dual-arm-ik})。
+
+{\baselineskip=10pt
+\begin{verbatim}
+(load "irteus/demo/sample-robot-model.l")
+(setq *robot* (instance sample-robot :init))
+(setq *obj* (make-cylinder 20 100))
+(send *obj* :set-color #f(1 1 0))
+(send *robot* :reset-pose)
+(objects (list *robot* *obj*))
+
+(send *robot* :inverse-kinematics
+      (list (make-coords :pos #f(400 0 0)))
+      :move-target
+      (list (send *robot* :larm :end-coords))
+      :link-list
+      (list (send *robot* :link-list
+                  (send (send *robot* :larm :end-coords) :parent)
+                  (car (send *robot* :larm :links))))
+      :translation-axis (list t)
+      :rotation-axis (list nil))
+
+(let* ((cnt 0.0))
+  (do-until-key
+   (incf cnt 0.1)
+   (send *robot* :inverse-kinematics
+         (list (make-coords :pos (float-vector (+ 400 (* 100 (sin cnt))) (* 50 (cos cnt)) 0))
+               #'(lambda ()
+                   (send (send (send *robot* :larm :end-coords) :copy-worldcoords)
+                         :translate #f(0 0 100) :local)))
+         :move-target
+         (list (send *robot* :larm :end-coords)
+               (send *robot* :rarm :end-coords))
+         :link-list
+         (list (send *robot* :link-list
+                     (send (send *robot* :larm :end-coords) :parent)
+                     (car (send *robot* :larm :links)))
+               (send *robot* :link-list
+                     (send (send *robot* :rarm :end-coords) :parent)
+                     (car (send *robot* :rarm :links))))
+         :translation-axis (list :z t)
+         :rotation-axis (list nil :z))
+   (send *obj* :newcoords (send (send *robot* :larm :end-coords) :copy-worldcoords))
+   (send *irtviewer* :draw-objects)))
+\end{verbatim}
+}
+
+{\baselineskip=10pt
+\begin{verbatim}
+         (list (make-coords :pos (float-vector (+ 400 (* 100 (sin cnt))) (* 50 (cos cnt)) 0))
+               #'(lambda ()
+                   (send (send (send *robot* :larm :end-coords) :copy-worldcoords)
+                         :translate #f(0 0 100) :local)))
+\end{verbatim}
+}
+
+の行で実際にtarget-coordsに関数を指定している。
+この例では、まずカクテルを持つ左手の位置を最初に決める。この時に
+\verb|:translation-axis :z|, \verb|:rotation-axis nil|となっているため、
+z方向の移動量と回転方向は左手の逆運動学の計算に考慮されない。
+そして、決まった左手の位置に対して関数が評価されることで
+手先のlocal座標から見てz方向に100の位置に対して右手の位置が決まる。
+この時、右手の拘束条件は\verb|:translation-axis t|, \verb|:rotation-axis :z|となっ
+ているためz方向、つまりカクテルの長さ方向を軸としてその軸に対する回転は許した条
+件で逆運動学を解くことになる。
+このように、拘束条件を踏まえて逆運動学を解きたい場合にはtarget-coordsを関数とし
+て扱うことが必要になる。
+
  \subsection{ロボットモデル}
 
 ロボットの身体はリンクとジョイントから構成されるが、それぞれ
