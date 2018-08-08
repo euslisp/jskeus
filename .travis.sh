@@ -43,5 +43,5 @@ travis_time_end
 
 travis_time_start script.test
 source bashrc.eus
-find irteus/test -iname "*.l" | xargs -n1 irteusgl
+export EXIT_STATUS=0; for test_l in irteus/test/*.l; do irteusgl $test_l; export EXIT_STATUS=`expr $? + $EXIT_STATUS`; done;echo "Exit status : $EXIT_STATUS"; [ $EXIT_STATUS == 0 ] || exit 1
 travis_time_end

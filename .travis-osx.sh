@@ -23,15 +23,7 @@ travis_time_end() {
     set -x
 }
 
-install_gnu_tools() {
-    brew install coreutils # for use GNU date command
-}
-
 setup_brew_test() {
-    travis_time_start brew.update
-    brew update
-    travis_time_end
-
     travis_time_start brew.install
     brew install euslisp/jskeus/jskeus --HEAD
     travis_time_end
@@ -43,23 +35,28 @@ setup_brew_test() {
 
 setup_make() {
     travis_time_start brew.install-deps
-    brew tap homebrew/x11
-    brew install jpeg libpng mesalib-glw wget poppler
+    brew list jpeg &>/dev/null || brew install jpeg
+    brew list libpng &>/dev/null || brew install libpng
+    brew list mesalib-glw &>/dev/null || brew install mesalib-glw
+    brew list wget &>/dev/null || brew install wget
+    brew list poppler &>/dev/null || brew install poppler
     travis_time_end
 
-    travis_time_start install.x11
-    wget http://xquartz.macosforge.org/downloads/SL/XQuartz-2.7.6.dmg
-    hdiutil attach XQuartz-2.7.6.dmg
-    sudo installer -pkg /Volumes/XQuartz-2.7.6/XQuartz.pkg -target /
-    travis_time_end
+    # travis_time_start install.x11
+    # wget http://xquartz.macosforge.org/downloads/SL/XQuartz-2.7.6.dmg
+    # hdiutil attach XQuartz-2.7.6.dmg
+    # sudo installer -pkg /Volumes/XQuartz-2.7.6/XQuartz.pkg -target /
+    # travis_time_end
+    export LIBGL_ALLOW_SOFTWARE=1
 
     travis_time_start script.make
-    make -j
+    make -j 2
     travis_time_end
 
     travis_time_start script.test
     source bashrc.eus
-    find irteus/test -iname "*.l" | xargs -n1 irteusgl
+    export DISPLAY=
+    export EXIT_STATUS=0; for test_l in irteus/test/*.l; do irteusgl $test_l; export EXIT_STATUS=`expr $? + $EXIT_STATUS`; done;echo "Exit status : $EXIT_STATUS"; [ $EXIT_STATUS == 0 ] || exit 1
     travis_time_end
 }
 if [ "$TRAVIS_PULL_REQUEST" = "false" -a "$TRAVIS_BRANCH" = "master" ]; then
@@ -67,3 +64,5 @@ if [ "$TRAVIS_PULL_REQUEST" = "false" -a "$TRAVIS_BRANCH" = "master" ]; then
 else
     setup_make
 fi
+
+exit 0
