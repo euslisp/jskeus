@@ -174,5 +174,6 @@
                   (apply #'concatenate-matrix-column-naive-impl mats))))
     ))
 
-(run-all-tests)
-(exit)
+(eval-when (load eval)
+  (run-all-tests)
+  (exit))
