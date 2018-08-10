@@ -43,5 +43,14 @@ travis_time_end
 
 travis_time_start script.test
 source bashrc.eus
-export EXIT_STATUS=0; for test_l in irteus/test/*.l; do irteusgl $test_l; export EXIT_STATUS=`expr $? + $EXIT_STATUS`; done;echo "Exit status : $EXIT_STATUS"; [ $EXIT_STATUS == 0 ] || exit 1
+export EXIT_STATUS=0;
+echo "Source test"
+for test_l in irteus/test/*.l; do irteusgl $test_l; export EXIT_STATUS=`expr $? + $EXIT_STATUS`; done;
+travis_time_end
+
+travis_time_start compiled.test
+echo "Compiled test"
+for test_l in irteus/test/*.l; do irteusgl "(progn (comp::compile-file-if-src-newer \"$test_l\" \"irteus/test\") (load (namestring (merge-pathnames \".so\" \"$test_l\"))))"; export EXIT_STATUS=`expr $? + $EXIT_STATUS`; done;
+
+echo "Exit status : $EXIT_STATUS"; [ $EXIT_STATUS == 0 ] || exit 1
 travis_time_end
