@@ -59,7 +59,6 @@
                           (pqp-collision-distance l c0))
                       (flatten (link-descendants (send j :child-link))))
               #'<= #'car))
-       (print r)
        (if (evenp (/ i 400))
            (if (> (caar r) 5)
                (send j :joint-angle (elt av k) :relative t))
