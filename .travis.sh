@@ -54,6 +54,16 @@ for test_l in irteus/test/*.l; do
 
     export EXIT_STATUS=`expr $TMP_EXIT_STATUS + $EXIT_STATUS`;
 
+
+    travis_time_start jskeus.compiled.${test_l##*/}.test
+
+    irteusgl "(let ((o (namestring (merge-pathnames \".o\" \"$test_l\"))) (so (namestring (merge-pathnames \".so\" \"$test_l\")))) (compile-file \"$test_l\" :o o) (if (probe-file so) (load so) (exit 1))))"
+    export TMP_EXIT_STATUS=$?
+
+    travis_time_end `expr 32 - $TMP_EXIT_STATUS`
+
+    export EXIT_STATUS=`expr $TMP_EXIT_STATUS + $EXIT_STATUS`;
+
 done;
 echo "Exit status : $EXIT_STATUS";
 
