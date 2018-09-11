@@ -33,12 +33,16 @@
 	    "(send directed-graph :clear-nodes) success")
     ))
 
-
+(defclass costed-node
+  :super node)
+(defmethod costed-node
+  (:cost () 0))
 (deftest test-graph ()
-  (defmethod node
-    (:cost () 0))
+  ;; re-define method within defun is not working with compile
+  ;; (defmethod node
+  ;;   (:cost () 0))
   (let ((gr (instance graph :init)) ar
-	(a (instance node :init 'a)) (b (instance node :init 'b)))
+	(a (instance costed-node :init 'a)) (b (instance costed-node :init 'b)))
     (send gr :add-node a)
     (send gr :add-node b)
     (setq ar (send gr :add-arc-from-to a b))
@@ -119,6 +123,6 @@
     ))
 
 
-(run-all-tests)
-
-(exit)
+(eval-when (load eval)
+  (run-all-tests)
+  (exit))

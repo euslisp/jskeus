@@ -26,5 +26,6 @@
  '("robots" "objects" "scenes")
  '(make-all-robots make-all-objects make-all-scenes))
 
-(run-all-tests)
-(exit)
+(eval-when (load eval)
+  (run-all-tests)
+  (exit))
