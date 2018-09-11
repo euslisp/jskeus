@@ -1176,5 +1176,6 @@
        (send* self :inverse-kinematics-loop-org dif-pos dif-rot :ik-args ik-args args)))
     ))
 
-(run-all-tests)
-(exit 0)
+(eval-when (load eval)
+  (run-all-tests)
+  (exit 0))

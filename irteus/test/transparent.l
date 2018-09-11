@@ -33,5 +33,6 @@
       (assert (< vmrss (* 4 vmrss-orig)) "check memory leak")
       )))
 
-(run-all-tests)
-(exit)
+(eval-when (load eval)
+  (run-all-tests)
+  (exit))

@@ -87,5 +87,6 @@
     (assert (eps-matrix= (m* m6 vec) (m* vec (diagonal val))) "ql-decompose")
     ))
 
-(run-all-tests)
-(exit)
+(eval-when (load eval)
+  (run-all-tests)
+  (exit))

@@ -20,6 +20,7 @@
           "image transposed twice must be the same as original image")
 )
 
-(run-all-tests)
-(exit)
+(eval-when (load eval)
+  (run-all-tests)
+  (exit))
 
