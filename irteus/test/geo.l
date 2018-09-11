@@ -3,6 +3,8 @@
 (init-unit-test)
 
 (in-package "GEO")
+;; redefined to use normalize-vector defined in irteus(?)
+;; this requrie to avoid outer circuit not found in (body+ c1 b d1 c2 d2 c3 d3 c4 d4),
 (defun face-normal-vector (vertices)
   (let* ((v1 (first vertices)) (v2) (vlist (rest vertices))
          (v (float-vector 0 0 0))
@@ -76,16 +78,6 @@
                          (float-vector 0 1 0))
            -0.2))
   )
-
-(deftest test-face-distance
-  (let* ((f
-          (instance face :init :vertices
-                    '(#f(100 100 0) #f(-100 100 0) #f(-100 -100 0) #f(100 -100 0))))
-         )
-    (assert (eps= (send f :distance (float-vector 0 0 100)) 100.0))
-    (assert (eps= (send f :distance (float-vector 200 0 0)) 100.0))
-    (assert (eps= (send f :distance (float-vector 200 0 100)) (norm #f(100 100))))
-    ))
 
 (run-all-tests)
 (exit)

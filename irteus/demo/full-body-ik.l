@@ -2,7 +2,7 @@
 
 (defun full-body-ik
   (&key (target (make-coords :pos (float-vector 0 0 1500)))
-        (use-torso t) (use-leg))
+        (use-torso t) (use-leg) (debug-view :no-flush))
   "full body ik"
     (send *irtviewer* :title "full-body-ik")
     (unless (boundp '*robot*)
@@ -34,7 +34,7 @@
                :move-target (send *robot* :larm :end-coords)
                :rotation-axis nil :translation-axis t
                :manipulability-gain 0.05
-               :debug-view :no-flush
+               :debug-view debug-view
                (if use-leg '(:manipulability-limit 0.5)))
        (send *robot* :head :look-at
              (send *robot* :larm :end-coords :worldpos))
