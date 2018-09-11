@@ -922,6 +922,7 @@
   (assert (every #'identity
                  (mapcar #'(lambda (dc) (test-load-ik-debug-information-log-common dc)) '(t :always :always-with-debug-log nil)))))
 
+(eval-when (eval) ;; redefine method within class is not run for compiled code)
 (deftest test-all-for-arm-robot-static-1
   (assert
    (test-all-for-sample-multidof-arm-robot :static-p t :fix-pos #f(0 0 0))))
@@ -934,6 +935,7 @@
 (deftest test-all-for-sample-robot-static-2
   (assert
    (test-all-for-sample-robot :static-p t :fix-pos #f(100 200 300))))
+)
 
 (deftest test-self-collision-check-IK-test
   (assert
@@ -1135,6 +1137,7 @@
   )
 
 ;; Check :cog-translation-axis dimension bug
+(eval-when (eval) ;; redefine method within class is not run for compiled code)
 (deftest test-cog-translation-axis-dim
   (unwind-protect
       (progn
@@ -1175,6 +1178,7 @@
        (dif-pos dif-rot &rest args &key ik-args &allow-other-keys)
        (send* self :inverse-kinematics-loop-org dif-pos dif-rot :ik-args ik-args args)))
     ))
+)
 
 (eval-when (load eval)
   (run-all-tests)
