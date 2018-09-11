@@ -60,7 +60,7 @@
         (send *robot* :head :neck-p :joint-angle 0)
         (send *robot* :head :neck-y :joint-angle yaw)
         ;;(send *irtviewer* :draw-objects)
-        (setq ret (send *robot* :head :look-at target :debug-view t))
+        (setq ret (send *robot* :head :look-at target :debug-view nil))
         (setq gaze-dir (matrix-column (send *robot* :head :end-coords :worldrot) 2))
         (setq target-dir (normalize-vector (v- target (send *robot* :head :end-coords :worldpos))))
         (format t "ret = ~A, (v. gaze-dir target-dir) = ~A~%" ret (v. gaze-dir target-dir))
