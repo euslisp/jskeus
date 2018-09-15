@@ -2222,7 +2222,7 @@
     debug-view : Set t to show debug message and visualization. Use :no-message to just show the irtview image. Default is nil.
     warnp : Set nil to not display debug message when the IK failed. Default is t.
     revert-if-fail : Set nil to keep the angle posture of ik solve iteration. Default is t, which return to original position when ik fails.
-    rotation-axis : Use nil for position only ik. :x, :y, :z for the constraint around axis with plus direction, :-x :-y :-z for axis with minus direction. :zz :yy :zz for direction free axis. When the target-coords is list, this should be list too. Default is t.
+    rotation-axis : Use nil for position only ik. :x, :y, :z for the constraint around axis with plus direction, :-x :-y :-z for axis with minus direction. :zz :yy :zz for direction free axis. :xm :ym :zm for allowing rotation with respect to mirror direction. When the target-coords is list, this should be list too. Default is t.
     translation-axis : :x :y :z for constraint along the x, y, z axis. :xy :yz :zx for plane. Default is t.
     thre : Threshold for position error to terminate IK iteration. Default is 1[mm]
     rthre : Threshold for rotation error to terminate IK iteration. Default is 1[rad]
