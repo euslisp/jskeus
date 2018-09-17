@@ -2215,18 +2215,18 @@
    "Move move-target to target-coords.
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
-    target-coords : A coordinate of the target, this could be function that returns coordinates, this could be atom or list
-    link-list : List of links to control. When the target-coords is list, this should be list too.
-    move-target : Specify end effecter coordinate. When the target-coords is list, this should be list too.
+    target-coords : The coordinate of the target, or a function that returns coordinates. Use a list of targets to solve the IK relative to multiple end links simultaneously.
+    link-list : List of links to control. When the target-coords is list, this should be a list of lists.
+    move-target : Specify end-effector coordinate. When the target-coords is list, this should be list too.
     stop : Maximum number for IK iteration. Default is 50.
     debug-view : Set t to show debug message and visualization. Use :no-message to just show the irtview image. Default is nil.
     warnp : Set nil to not display debug message when the IK failed. Default is t.
-    revert-if-fail : Set nil to keep the angle posture of ik solve iteration. Default is t, which return to original position when ik fails.
-    rotation-axis : Use nil for position only ik. :x, :y, :z for the constraint around axis with plus direction, :-x :-y :-z for axis with minus direction. :zz :yy :zz for direction free axis. :xm :ym :zm for allowing rotation with respect to mirror direction. When the target-coords is list, this should be list too. Default is t.
+    revert-if-fail : Set nil to keep the angle posture of IK solve iteration. Default is t, which return to original position when IK fails.
+    rotation-axis : Use nil for position only IK. :x, :y, :z for the constraint around axis with plus direction, :-x :-y :-z for axis with minus direction. :zz :yy :zz for direction free axis. :xm :ym :zm for allowing rotation with respect to mirror direction. When the target-coords is list, this should be list too. Default is t.
     translation-axis : :x :y :z for constraint along the x, y, z axis. :xy :yz :zx for plane. Default is t.
-    thre : Threshold for position error to terminate IK iteration. Default is 1[mm]
-    rthre : Threshold for rotation error to terminate IK iteration. Default is 1[rad]
-    check-collision : Set t to return false when self collision occurs at found IK solution. Default is nil. Note that to avoid collision within in IK loop. Use set links to collision-avoidance-links slot of cascaded-link.
+    thre : Threshold for position error to terminate IK iteration. Default is 1 [mm].
+    rthre : Threshold for rotation error to terminate IK iteration. Default is 0.017453 [rad] (1 deg).
+    check-collision : Set t to return false when self collision occurs at found IK solution. Default is nil. To avoid collision within IK loop, use set links to collision-avoidance-links slot of cascaded-link.
     dump-command : should be t, nil, :always, :fail-only, :always-with-debug-log, or :fail-only-with-debug-log.
     Log are success/fail log and ik debug information log.
       t or :always           : dump log both in success and fail (for success/fail log).
