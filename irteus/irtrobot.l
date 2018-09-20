@@ -333,7 +333,10 @@
    "solve inverse kinematics, move move-target to target-coords
     look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords
     link-list is set by default based on move-target -> root link link-list"
-   (if (atom target-coords) (setq target-coords (list target-coords)))
+   (if (or (atom target-coords) (functionp target-coords)) (setq target-coords (list target-coords)))
+   (when (null (every #'(lambda (x) (or (coordinates-p x) (functionp x))) target-coords))
+     (warn ";; error: all target-coords should be Coordinates or functions, but get ~A~%" target-coords)
+     (return-from :inverse-kinematics nil))
    (prog1
        (send-super* :inverse-kinematics target-coords
                     :move-target move-target :link-list link-list args)
@@ -352,7 +355,7 @@
    "move move-target using dif-pos and dif-rot,
     look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords
     link-list is set by default based on move-target -> root link link-list"
-   (if (atom target-coords) (setq target-coords (list target-coords)))
+   (if (or (atom target-coords) (functionp target-coords)) (setq target-coords (list target-coords)))
    (prog1
        (send-super* :inverse-kinematics-loop dif-pos dif-rot
                     :link-list link-list :move-target move-target
