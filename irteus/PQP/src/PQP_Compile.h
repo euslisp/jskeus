@@ -45,7 +45,7 @@
 // This block is disabled on macOS clang >= 9.0.0 (e.g. High Sierra)
 // or GNU GCC >= 7 to avoid undefined exception and redefinition error.
 
-#if ! ( (defined(__APPLE__) && __clang_major__ >= 9) || (defined(__GNUC__) && (__GNUC__ >= 7) ) )
+#if ! ( (defined(__APPLE__) && __clang_major__ >= 9) || (defined(__GNUC__) && (__GNUC__ >= 6) ) )
 #include <math.h>
 inline float sqrt(float x) { return (float)sqrt((double)x); }
 inline float cos(float x) { return (float)cos((double)x); }
