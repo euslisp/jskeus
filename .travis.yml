@@ -69,6 +69,8 @@ matrix:
       cache: apt
       env: BUILD_DOC=true
     - os: osx
+  allow_failures:
+    - env: DOCKER_IMAGE=osrf/debian_arm64:stretch
 before_install: # Use this to prepare the system to install prerequisites or dependencies
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 install:
