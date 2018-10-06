@@ -54,9 +54,12 @@ int svdsolve(eusfloat_t **a, int m, int n, eusfloat_t *b, eusfloat_t *x);
 void svbksb(eusfloat_t **u, eusfloat_t *w, eusfloat_t **v, int m, int n, eusfloat_t *b, eusfloat_t *x);
 int svdcmp(eusfloat_t **a, int m, int n, eusfloat_t *w, eusfloat_t **v);
 
+void tred2(eusfloat_t **a, int n, eusfloat_t d[], eusfloat_t e[]);
+int tqli(eusfloat_t d[], eusfloat_t e[], int n, eusfloat_t **z);
+
 eusfloat_t pythag(eusfloat_t a, eusfloat_t b);
 
-static copymat(dest,src,size)
+static void copymat(dest,src,size)
 pointer dest,src;
 register int size;
 { register int i;

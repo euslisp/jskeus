@@ -28,7 +28,7 @@
 #include "eus.h"
 
 extern pointer ___irtglc();
-static register_irtglc()
+static void register_irtglc()
 { add_module_initializer("___irtglc", ___irtglc);}
 
 #define colsize(p) (intval(p->c.ary.dim[1]))
@@ -49,7 +49,7 @@ pointer CTRANSPOSE_IMAGE_ROWS(ctx,n,argv)
   
   ckarg2(3,4);
   h=ckintval(argv[0]); step=ckintval(argv[1]);
-  if (isstring(argv[2])) src=argv[2]->c.str.chars;
+  if (isstring(argv[2])) src=(char *)argv[2]->c.str.chars;
   else src=(char*)bigintval(argv[2]);
 
   if (n==3) {
@@ -60,14 +60,14 @@ pointer CTRANSPOSE_IMAGE_ROWS(ctx,n,argv)
       memcpy(src + y*step, buf, step);
     }
     free(buf);
-    return(src);
+    return((pointer)src);
   } else {
-    if (isstring(argv[3])) dst=argv[3]->c.str.chars;
+    if (isstring(argv[3])) dst=(char *)argv[3]->c.str.chars;
     else dst=(char*)bigintval(argv[3]);
     for(y = 0; y < h; ++y) {
       memcpy(dst + y*step, src + (h-y-1)*step, step);
     }
-    return(dst);}}
+    return((pointer)dst);}}
 
 #include "defun.h" // redefine defun for update defun() API
 pointer ___irtglc(ctx,n,argv,env)

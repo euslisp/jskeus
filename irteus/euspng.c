@@ -28,7 +28,7 @@
 #include "eus.h"
 
 extern pointer ___euspng();
-static register_euspng()
+static void register_euspng()
 { add_module_initializer("___euspng", ___euspng);}
 
 pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
@@ -36,7 +36,7 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
   char *file_name;
   pointer ret, image_ptr;
   ckarg(1);
-  if (isstring(argv[0])) file_name = argv[0]->c.str.chars;
+  if (isstring(argv[0])) file_name = (char *)(argv[0]->c.str.chars);
   else error(E_NOSTRING);
 
   FILE *fp = fopen(file_name, "rb");
@@ -118,15 +118,16 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
 
 pointer PNG_WRITE_IMAGE(register context *ctx, int n, register pointer *argv)
 {
-  char *file_name, *image_ptr;
+  char *file_name;
+  png_bytep image_ptr;
   int width, height, channels;
   ckarg(5);
-  if (isstring(argv[0])) file_name = argv[0]->c.str.chars;
+  if (isstring(argv[0])) file_name = (char *)(argv[0]->c.str.chars);
   else error(E_NOSTRING);
   width  = ckintval(argv[1]);
   height = ckintval(argv[2]);
   channels  = ckintval(argv[3]);
-  image_ptr = argv[4]->c.str.chars;
+  image_ptr = (png_bytep)(argv[4]->c.str.chars);
   FILE *fp = fopen(file_name, "wb");
   if (!fp) {
     error(E_OPENFILE);
