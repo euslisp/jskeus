@@ -64,6 +64,7 @@
 	  drawmode
           draw-origin
           draw-floor
+          floor-color
           ))
 (defmethod irtviewer
   (:create
@@ -72,14 +73,14 @@
 	  (view-name (gensym "title"))
 	  (hither 200.0) (yon 50000.0)
 	  (width 500) (height 500)
-          ((:draw-origin do) 150) ((:draw-floor df) nil)
+          ((:draw-origin do) 150) ((:draw-floor df) nil) ((:floor-color fc) #f(1 1 1))
 	  &allow-other-keys)
    (let ()
      (setq left-right-angle 60
 	   up-down-angle 20
 	   viewpoint (float-vector 700 400 250)
 	   viewtarget (float-vector 0 0 0)
-           draw-origin do draw-floor df)
+           draw-origin do draw-floor df floor-color fc)
      (send-super* :create :width width :height height :title title
 		  :event-mask '(:configure) args)
      (setq gl::*perspective-far* yon)
@@ -267,7 +268,7 @@
   (:draw-objects
    (&rest args)
    (send viewer :viewsurface :makecurrent)
-   (apply #'gl::draw-globjects viewer draw-things :draw-origin draw-origin :draw-floor draw-floor args))
+   (apply #'gl::draw-globjects viewer draw-things :draw-origin draw-origin :draw-floor draw-floor :floor-color floor-color args))
   (:objects
    (&rest args)
    (when

@@ -214,7 +214,7 @@
      img))
   )
 
-(defun draw-globjects (vwr draw-things &key (clear t) (flush t) (draw-origin 150) (draw-floor nil))
+(defun draw-globjects (vwr draw-things &key (clear t) (flush t) (draw-origin 150) (draw-floor nil) (floor-color #f(1 1 1)))
   (let (pcolor)
     (resetperspective (send vwr :viewing) (send vwr :viewsurface))
     (if clear (send vwr :viewsurface :clear))
@@ -236,7 +236,7 @@
              (s 5000) (-s (- s)))
         (glDisable GL_LIGHTING)
         (glBegin GL_LINES)
-        (glColor3fv #f(1 1 1))
+        (glColor3fv floor-color)
         (do ((y -s (+ y l)))
             ((> y s))
           (do ((x -s (+ x l)))
