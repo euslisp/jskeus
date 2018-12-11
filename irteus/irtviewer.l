@@ -304,6 +304,18 @@
      (send vs :makecurrent)
      (setq (vs . x::bg-color) col)
      (gl::glClearColorfv col)))
+  (:draw-origin
+   (&optional (tmp-draw-origin :null))
+   "get/set draw-origin"
+   (if (not (eq tmp-draw-origin :null)) (setq draw-origin tmp-draw-origin) draw-origin))
+  (:draw-floor
+   (&optional (tmp-draw-floor :null))
+   "get/set draw-floor"
+   (if (not (eq tmp-draw-floor :null)) (setq draw-floor tmp-draw-floor) draw-floor))
+  (:floor-color
+   (&optional (tmp-floor-color :null))
+   "get/set floor-color"
+   (if (not (eq tmp-floor-color :null)) (setq floor-color tmp-floor-color) floor-color))
   )
    
 (defun draw-things (objs)
