@@ -382,7 +382,8 @@
   :width     width of the window
   :height    height of the window
   :draw-origin size of origin arrow, use nil to disable it
-  :draw-floor  use t to view floor"
+  :draw-floor  use t to view floor
+  :floor-color floor color. default is #f(1 1 1), i.e. white."
   (cond
    ((or (null x::*display*) (= x::*display* 0))
     (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")
