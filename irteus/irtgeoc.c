@@ -3,7 +3,7 @@
 #include <math.h>
 
 extern pointer ___irtgeoc();
-static register_irtgeoc()
+static void register_irtgeoc()
 { add_module_initializer("___irtgeoc", ___irtgeoc);}
 
 //

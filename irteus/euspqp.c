@@ -27,7 +27,7 @@
 #include "eus.h"
 
 extern pointer ___euspqp();
-static register_euspqp()
+static void register_euspqp()
 { add_module_initializer("___euspqp", ___euspqp);}
 
 extern eusinteger_t PQP_MakeModel();
@@ -76,7 +76,7 @@ pointer PQPADDTRI(register context *ctx, int n, register pointer *argv)
     eusfloat_t *fv1=argv[1]->c.fvec.fv;
     eusfloat_t *fv2=argv[2]->c.fvec.fv;
     eusfloat_t *fv3=argv[3]->c.fvec.fv;
-    int id = (int)argv[4]>>2;
+    eusinteger_t id = ((eusinteger_t)argv[4])>>2;
     double dv1[3], dv2[3], dv3[3];
     dv1[0] = fv1[0]; dv1[1] = fv1[1]; dv1[2] = fv1[2]; 
     dv2[0] = fv2[0]; dv2[1] = fv2[1]; dv2[2] = fv2[2]; 
@@ -99,7 +99,7 @@ pointer PQPCOLLIDE(register context *ctx, int n, register pointer *argv)
     eusfloat_t *fr2=argv[3]->c.ary.entity->c.fvec.fv;
     eusfloat_t *ft2=argv[4]->c.fvec.fv;
     eusinteger_t m2=intval(argv[5]);
-    int flag=(int)argv[6]>>2;
+    eusinteger_t flag=((eusinteger_t)argv[6])>>2;
     double dr1[3][3], dr2[3][3], dt1[3], dt2[3];
 
     /*printf("addr1=0x%x, addr2=0x%x, flag=%d\n", m1>>2, m2>>2, flag);*/

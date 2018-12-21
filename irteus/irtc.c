@@ -26,7 +26,7 @@
 #include "nr.h"
 #include <math.h>
 extern pointer ___irtc();
-static register_irtc()
+static void register_irtc()
 { add_module_initializer("___irtc", ___irtc);}
 
 #define colsize(p) (intval(p->c.ary.dim[1]))
@@ -838,7 +838,7 @@ pointer argv[];
   free_nr_vector(wi,1,c);
 
   while(pc-->0) vpop();
-  return (cons(ctx,rr,cons(ctx,ri,NIL)));};
+  return (cons(ctx,rr,cons(ctx,ri,NIL)));}
 
 ///
 static pointer VMEAN(ctx, n, argv)
