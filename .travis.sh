@@ -36,7 +36,11 @@ travis_time_end
 
 travis_time_start script.make # All commands must exit with code 0 on success. Anything else is considered failure.
 cd jskeus
-make
+if [[ "$DOCKER_IMAGE" == *"trusty"* || "$DOCKER_IMAGE" == *"jessie"* ]]; then
+    make WFLAGS="-Werror=implicit-int -Werror=implicit-function-declaration -Werror=unused-result"
+else
+    make WFLAGS="-Werror=implicit-int -Werror=implicit-function-declaration -Werror=incompatible-pointer-types -Werror=int-conversion -Werror=unused-result"
+fi
 travis_time_end
 
 source bashrc.eus
