@@ -8,14 +8,19 @@
 (defun face-normal-vector (vertices)
   (let* ((v1 (first vertices)) (v2) (vlist (rest vertices))
          (v (float-vector 0 0 0))
-         (normal (float-vector 0 0 0)))
+         (normal (float-vector 0 0 0))
+	 eps)
+    ;; somehow arm architecture (both 32/64 bit) needs to return #f(0 0 0) for small normalized vectors
+    (if (member :arm *features*)
+	(setq eps 1.0e-10)
+      (setq eps 1.0e-20))
     (while vlist
       (setq v2 (pop vlist))
       (v+ (v* v1 v2 v) normal normal)
       (setq v1 v2))
     (setq v2 (car vertices))
     (v+ (v* v1 v2 v) normal normal)
-    (normalize-vector normal normal)) )
+    (normalize-vector normal normal eps)) )
 
 (defmethod polygon
   (:reset-normal ()
