@@ -50,12 +50,15 @@
     (setq m3 #2f((1 0)( 1 3)))
     (setq val (car (eigen-decompose m3)) vec (cadr (eigen-decompose m3)))
     (assert (eps-matrix= (m* m3 vec) (m* vec (diagonal val))) "eigen-decompose")
-    (setq m3 #2f((9.656790e+06 -2.024883e+05 5.475222e+05 -73324.1) ;;Sent: Tuesday, June 27, 2006 9:56 PM Subject: Re: 特異値と固有値
-                 (-2.024883e+05 9.210039e+06 -3.152789e+05 -1.061633e+05)
-                 (5.475222e+05 -3.152789e+05 1.053183e+07 11188.9)
-                 (-73324.1 -1.061633e+05 11188.9 1.115641e+07)))
-    (setq val (car (eigen-decompose m3)) vec (cadr (eigen-decompose m3)))
-    (assert (eps-matrix= (m* m3 vec) (m* vec (diagonal val))) "eigen-decompose large")
+
+    ;; 9.656790+06 is too large for 32bit machine
+    (when (/= lisp::sizeof-* 4)
+      (setq m3 #2f((9.656790e+06 -2.024883e+05 5.475222e+05 -73324.1) ;;Sent: Tuesday, June 27, 2006 9:56 PM Subject: Re: 特異値と固有値
+		   (-2.024883e+05 9.210039e+06 -3.152789e+05 -1.061633e+05)
+		   (5.475222e+05 -3.152789e+05 1.053183e+07 11188.9)
+		   (-73324.1 -1.061633e+05 11188.9 1.115641e+07)))
+      (setq val (car (eigen-decompose m3)) vec (cadr (eigen-decompose m3)))
+      (assert (eps-matrix= (m* m3 vec) (m* vec (diagonal val))) "eigen-decompose large"))
 
     ;; sv-solve
     ;; sv-dcompose http://en.wikipedia.org/wiki/Singular_value_decomposition#Example
