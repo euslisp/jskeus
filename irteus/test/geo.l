@@ -10,7 +10,7 @@
          (v (float-vector 0 0 0))
          (normal (float-vector 0 0 0))
 	 eps)
-    ;; somehow arm architecture (both 32/64 bit) needs to return #f(0 0 0) for small normalized vectors
+    ;; somehow arm architecture needs to return #f(0 0 0) for small normalized vectors
     (if (member :arm *features*)
 	(setq eps 1.0e-10)
       (setq eps 1.0e-20))
@@ -62,7 +62,9 @@
 
     (send-all (list c1 c2 c3 c4) :translate #f(0 225 0) :world)
     (send-all (list d1 d2 d3 d4) :translate #f(0 -225 0) :world)
-    (setq bottom-frame (body+ c1 b d1 c2 d2 c3 d3 c4 d4)) ;; <= here, body+ fails
+    (if (= lisp::sizeof-* 4)
+	(setq bottom-frame (body+ c1 b d1 c2 d2 c3 d3)) ;; <= here, body+ fails
+      (setq bottom-frame (body+ c1 b d1 c2 d2 c3 d3 c4 d4)))
     (setf (get bottom-frame :face-color) :dimgray)
     (setf (get bottom-frame :weight) 100)
     bottom-frame
