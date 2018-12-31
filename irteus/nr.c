@@ -289,11 +289,11 @@ int svdcmp(double **a, int m, int n, double w[], double **v)
       flag =1;
       for (l=k;l>=1;l--){
 	nm=l-1;
-	if ((double)(fabs(rv1[l])+anorm) == anorm){
+	if ((eusfloat_t)(fabs(rv1[l])+anorm) == (eusfloat_t)anorm){
 	  flag=0;
 	  break;
 	}
-	if ((double)(fabs(w[nm])+anorm)==anorm) break;
+	if ((eusfloat_t)(fabs(w[nm])+anorm)==(eusfloat_t)anorm) break;
       }
       if (flag){
 	c=0.0;
@@ -301,7 +301,7 @@ int svdcmp(double **a, int m, int n, double w[], double **v)
 	for (i=l;i<=k;i++){
 	  f=s*rv1[i];
 	  rv1[i]=c*rv1[i];
-	  if ((double)(fabs(f)+anorm)==anorm) break;
+	  if ((eusfloat_t)(fabs(f)+anorm)==(eusfloat_t)anorm) break;
 	  g=w[i];
 	  h=pythag(f,g);
 	  w[i]=h;
