@@ -695,6 +695,15 @@
              :static-p static-p :dt dt :calc-torque-mode calc-torque-mode))))
 
 ;;  all calc torque test for sample-multidof-arm-robot
+(eval-when (eval)
+  (defun test-all-for-sample-multidof-arm-robot-print (gen-motion-list-func check-results)
+    (format t ";; ~A~%" (cadr gen-motion-list-func))
+    (format t ";;   tq (root fix, without ext wrench)         vs tq (root floating, with ext wrench 1)     -> ~A~%" (car check-results))
+    (format t ";;   wrench (root fix, without ext wrench)     vs wrench (root floating, with ext wrench 1) -> ~A~%" (cadr check-results))
+    (format t ";;   tq (root floating, with ext wrench 1)     vs tq (root floating, with ext wrench 2)     -> ~A~%" (caddr check-results))
+    (format t ";;   wrench (root floating, with ext wrench 1) vs wrench (root floating, with ext wrench 2) -> ~A~%" (cadddr check-results))))
+(eval-when (compile)
+  (defun test-all-for-sample-multidof-arm-robot-print (&rest args) t))
 (defun test-all-for-sample-multidof-arm-robot
   (&key (static-p nil) (max-idx 50) (fix-pos (float-vector 0 0 0)) (fix-rpy (list 0 0 0))
         (dt 0.005)
@@ -740,15 +749,17 @@
                   (every #'identity (mapcar #'(lambda (x y) (every #'(lambda (x) (eps= x 0.0)) (check-diff-with-axis-orders (cadr (memq :torque x)) (cadr (memq :torque y))))) ret-with-ext-wrench-1 ret-with-ext-wrench-2))
                   (every #'identity (mapcar #'(lambda (x y) (every #'(lambda (x) (eps= x 0.0)) (check-diff-wrench (cadr (memq :root-wrench x)) (cadr (memq :root-wrench y))))) ret-with-ext-wrench-1 ret-with-ext-wrench-2))
                   )))
-            (format t ";; ~A~%" (cadr gen-motion-list-func))
-            (format t ";;   tq (root fix, without ext wrench)         vs tq (root floating, with ext wrench 1)     -> ~A~%" (car check-results))
-            (format t ";;   wrench (root fix, without ext wrench)     vs wrench (root floating, with ext wrench 1) -> ~A~%" (cadr check-results))
-            (format t ";;   tq (root floating, with ext wrench 1)     vs tq (root floating, with ext wrench 2)     -> ~A~%" (caddr check-results))
-            (format t ";;   wrench (root floating, with ext wrench 1) vs wrench (root floating, with ext wrench 2) -> ~A~%" (cadddr check-results))
+	    ;; when #'gen-motion-list-func is compiled code, it is not able to print inside of the function
+	    (test-all-for-sample-multidof-arm-robot-print gen-motion-list-func check-results)
             (push (every #'identity check-results) ret)))))
     (every #'identity ret)))
 
 ;;  all calc torque test for sample-robot
+(eval-when (eval)
+  (defun test-all-for-sample-robot-print (check-results)
+    (format t ";;   tq (root floating, with ext wrench 1)     vs tq (root floating, with ext wrench 2)     -> ~A~%" (car check-results))))
+(eval-when (eval compile)
+  (defun test-all-for-sample-robot-print (&rest args) t))
 (defun test-all-for-sample-robot
   (&key (static-p nil) (max-idx 50) (fix-pos (float-vector 0 0 0))
         (dt 0.005))
@@ -774,7 +785,7 @@
              (list
               (every #'identity (mapcar #'(lambda (x y) (every #'(lambda (x) (eps= x 0.0)) (check-diff-with-axis-orders (cadr (memq :torque x)) (cadr (memq :torque y))))) ret-with-ext-wrench-1 ret-with-ext-wrench-2))
               )))
-        (format t ";;   tq (root floating, with ext wrench 1)     vs tq (root floating, with ext wrench 2)     -> ~A~%" (car check-results))
+        (test-all-for-sample-robot-print check-results)
         (every #'identity check-results)
         ))))
 
@@ -922,7 +933,6 @@
   (assert (every #'identity
                  (mapcar #'(lambda (dc) (test-load-ik-debug-information-log-common dc)) '(t :always :always-with-debug-log nil)))))
 
-(eval-when (eval) ;; redefine method within class is not run for compiled code)
 (deftest test-all-for-arm-robot-static-1
   (assert
    (test-all-for-sample-multidof-arm-robot :static-p t :fix-pos #f(0 0 0))))
@@ -935,7 +945,6 @@
 (deftest test-all-for-sample-robot-static-2
   (assert
    (test-all-for-sample-robot :static-p t :fix-pos #f(100 200 300))))
-)
 
 (deftest test-self-collision-check-IK-test
   (assert
