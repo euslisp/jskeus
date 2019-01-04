@@ -336,6 +336,26 @@
 	(warning-message 2 " ... returns ~A, expected to ~A~%" av (if (< i 1)  (float-vector i i) (float-vector 0.98 0.98)))
 	;; NOTE : if i > 1, :angle-vector should return #f(1 1)
 	(assert (eps-v= av (if (< i 1)  (float-vector i i) (float-vector 0.98 0.98)) 0.1) ":angle-vector does not returns expected value")
+        )
+
+    ;; re-define min-max-joint-table https://github.com/euslisp/jskeus/pull/529#issuecomment-451365527
+    (send j1 :joint-min-max-target j2)
+    (send j1 :joint-min-max-table (make-matrix 3 5 (list #f(-2 -1  0  1  2)
+							 #f(-2 -2 -2 -2 -2)
+							 #f( 2  1  0 -1 -2))))
+    (send j2 :joint-min-max-target j1)
+    (send j2 :joint-min-max-table (make-matrix 3 5 (list #f(-2 -1  0  1  2)
+							 #f(-2 -2 -2 -2 -2)
+							 #f( 2  1  0 -1 -2))))
+    (dolist (i '((#f(-2 0) . #f(-2 0))
+		 (#f(-1 0) . #f(-1 0))
+		 (#f( 0 0) . #f( 0 0))
+		 (#f( 1 0) . #f( 0.5 -0.5)) ;;; This should be #f(1 0)??? See https://github.com/euslisp/jskeus/pull/529#issuecomment-451365527
+		 (#f( 2 0) . #f( 1.0 -1.0))))
+      (warning-message 2 "(send r :angle-vector ~A)~%" (car i))
+      (setq av (send r :angle-vector (car i)))
+      (warning-message 2 " ... returns ~A, expected to ~A~%" av (cdr i))
+      (assert (eps-v= av (cdr i)) ":angle-vector does not returns expected value")
       )
     ))
 
