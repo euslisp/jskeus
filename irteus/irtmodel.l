@@ -809,12 +809,12 @@
              ;; currently only 1dof joint is supported
              (when (and (= (send j :joint-dof) 1) (= (send (send j :joint-min-max-target) :joint-dof) 1))
                ;; find index of joint-min-max-target
-               (let* ((ii 0) (jj (elt joint-list ii))
+               (let* ((ii 0) (jj (elt joint-list ii)) (ji 0)
                      tmp-joint-angle tmp-joint-min-angle tmp-joint-max-angle
                      tmp-target-joint-angle tmp-target-joint-min-angle tmp-target-joint-max-angle)
                  (while (not (eq jj (send j :joint-min-max-target)))
-                   (incf ii) (setq jj (elt joint-list ii)))
-                 (setq tmp-joint-angle (elt vec i) tmp-target-joint-angle (elt vec ii))
+                   (incf ii) (incf ji (send jj :joint-dof)) (setq jj (elt joint-list ii)))
+                 (setq tmp-joint-angle (elt vec i) tmp-target-joint-angle (elt vec ji))
                  (setq tmp-joint-min-angle (send j :joint-min-max-table-min-angle tmp-target-joint-angle)
                        tmp-joint-max-angle (send j :joint-min-max-table-max-angle tmp-target-joint-angle))
                  (setq tmp-target-joint-min-angle (send jj :joint-min-max-table-min-angle tmp-joint-angle)
@@ -844,7 +844,7 @@
                         (setq (j . joint-angle) tmp-joint-angle
                               (jj . joint-angle) tmp-target-joint-angle)
                         (setf (elt vec i) tmp-joint-angle)
-                        (setf (elt vec ii) tmp-target-joint-angle)
+                        (setf (elt vec ji) tmp-target-joint-angle)
                         )
                        );; cond
                );; let*
