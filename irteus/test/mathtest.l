@@ -50,12 +50,15 @@
     (setq m3 #2f((1 0)( 1 3)))
     (setq val (car (eigen-decompose m3)) vec (cadr (eigen-decompose m3)))
     (assert (eps-matrix= (m* m3 vec) (m* vec (diagonal val))) "eigen-decompose")
-    (setq m3 #2f((9.656790e+06 -2.024883e+05 5.475222e+05 -73324.1) ;;Sent: Tuesday, June 27, 2006 9:56 PM Subject: Re: 特異値と固有値
-                 (-2.024883e+05 9.210039e+06 -3.152789e+05 -1.061633e+05)
-                 (5.475222e+05 -3.152789e+05 1.053183e+07 11188.9)
-                 (-73324.1 -1.061633e+05 11188.9 1.115641e+07)))
-    (setq val (car (eigen-decompose m3)) vec (cadr (eigen-decompose m3)))
-    (assert (eps-matrix= (m* m3 vec) (m* vec (diagonal val))) "eigen-decompose large")
+
+    ;; 9.656790+06 is too large for 32bit machine
+    (when (/= lisp::sizeof-* 4)
+      (setq m3 #2f((9.656790e+06 -2.024883e+05 5.475222e+05 -73324.1) ;;Sent: Tuesday, June 27, 2006 9:56 PM Subject: Re: 特異値と固有値
+		   (-2.024883e+05 9.210039e+06 -3.152789e+05 -1.061633e+05)
+		   (5.475222e+05 -3.152789e+05 1.053183e+07 11188.9)
+		   (-73324.1 -1.061633e+05 11188.9 1.115641e+07)))
+      (setq val (car (eigen-decompose m3)) vec (cadr (eigen-decompose m3)))
+      (assert (eps-matrix= (m* m3 vec) (m* vec (diagonal val))) "eigen-decompose large"))
 
     ;; sv-solve
     ;; sv-dcompose http://en.wikipedia.org/wiki/Singular_value_decomposition#Example
@@ -85,6 +88,16 @@
     (setq m6 #2f((2 0 1)(0 2 0)(1 0 2))) 
     (setq val (car (ql-decompose m6)) vec (cadr (ql-decompose m6)))
     (assert (eps-matrix= (m* m6 vec) (m* vec (diagonal val))) "ql-decompose")
+
+    ;; pseudo-inverse2
+    (setq m2 #2f((1 1 1 1)(5 7 7 9))) ;; http://help.matheass.eu/en/Pseudoinverse.html
+    (assert (pseudo-inverse2 m2) "psesudo-inverse2 (might be svdcmp failing)")
+    (assert (eps-matrix= (m* m2 (pseudo-inverse2 m2)) (unit-matrix 2)) "psesudo-inverse2")
+
+    ;; this is the case where svdcmp failed to converge
+    (setq m7 #2f((1.0 0.0 0.0 0.0 0.0 0.0) (0.0 1.0 0.0 0.0 0.0 0.0) (0.0 0.0 1.0 0.0 0.0 0.0) (0.0 -0.0647909045219421 -0.1271851658821106 1.0 0.0 0.0) (0.0647909045219421 0.0 0.0192958638072014 0.0 1.0 0.0) (0.1271851658821106 -0.0192958638072014 0.0 0.0 0.0 1.0)))
+    (assert (pseudo-inverse2 m7) "psesudo-inverse2 (might be svdcmp failing)")
+    (assert (eps-matrix= (m* m7 (pseudo-inverse2 m7)) (unit-matrix 6)) "psesudo-inverse2")
     ))
 
 (eval-when (load eval)

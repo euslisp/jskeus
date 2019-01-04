@@ -46,7 +46,7 @@ pointer argv[];
 /* (SV_SOLVE mat vec &optional ret) */
 { 
   pointer a,b,x;
-  eusfloat_t **aa, *bb, *xx;
+  double **aa, *bb, *xx;
   int i, j, s;
 
   ckarg2(2,3);
@@ -93,7 +93,7 @@ pointer argv[];
 /* (SV_DECOMPOSE mat) */
 { 
   pointer a,ru,rv,rw, rr;
-  eusfloat_t **u, **v, *w, y;
+  double **u, **v, *w, y;
   int c, r, i, j, *idx, k, pc=0;;
 
   ckarg(1);
@@ -167,7 +167,7 @@ pointer argv[];
 /* (LU-SOLVE mat perm bvector [result]) */
 { pointer a,p,b,x;
   int i, j, s;
-  eusfloat_t **aa, *cols;
+  double **aa, *cols;
   int *indx;
 
   ckarg2(3,4);
@@ -205,7 +205,7 @@ int n;
 pointer argv[];
 /* (LU-DECOMPOSE mat [result] [tmp-vector]) */
 { pointer a,result,pv;
-  eusfloat_t **aa, d;
+  double **aa, d;
   int i, j, s, stat, *indx;
 
   ckarg2(1,3);
@@ -252,7 +252,7 @@ int n;
 pointer argv[];
 { pointer a,result;
   numunion nu;
-  eusfloat_t **aa, d;
+  double **aa, d;
   int i, j, s, stat, *indx;
 
   ckarg2(1,2);
@@ -290,7 +290,7 @@ int n;
 pointer argv[];
 { pointer a,result;
   numunion nu;
-  eusfloat_t **u, **v, *w, y;
+  double **u, **v, *w, y;
   int c, r, i, j, k, *idx;
 
   ckarg2(1,2);
@@ -360,8 +360,8 @@ pointer argv[];
  *
  */
 
-int matrix2quaternion(eusfloat_t *c, eusfloat_t *q){
-  eusfloat_t q02, q12, q22, q32;
+int matrix2quaternion(double *c, double *q){
+  double q02, q12, q22, q32;
   q02 = (1 + c[0*3+0] + c[1*3+1] + c[2*3+2]) / 4;
   q12 = (1 + c[0*3+0] - c[1*3+1] - c[2*3+2]) / 4;
   q22 = (1 - c[0*3+0] + c[1*3+1] - c[2*3+2]) / 4;
@@ -394,8 +394,8 @@ int matrix2quaternion(eusfloat_t *c, eusfloat_t *q){
   }
 }
 
-int quaternion2matrix(eusfloat_t *q, eusfloat_t *c){
-  eusfloat_t q0 = q[0], q1 = q[1], q2 = q[2], q3 = q[3];
+int quaternion2matrix(double *q, double *c){
+  double q0 = q[0], q1 = q[1], q2 = q[2], q3 = q[3];
   // (+ (* q0 q0) (* q1 q1) (- (* q2 q2)) (- (* q3 q3)))
   c[0*3+0] = q0*q0 + q1*q1 - q2*q2 - q3*q3;
   // (* 2 (- (* q1 q2) (* q0 q3)))
@@ -417,9 +417,9 @@ int quaternion2matrix(eusfloat_t *q, eusfloat_t *c){
 }
 
 
-int quaternion_multiply(eusfloat_t *q1, eusfloat_t *q2, eusfloat_t *q3){
-  eusfloat_t q10 = q1[0], q11 = q1[1], q12 = q1[2], q13 = q1[3];
-  eusfloat_t q20 = q2[0], q21 = q2[1], q22 = q2[2], q23 = q2[3];
+int quaternion_multiply(double *q1, double *q2, double *q3){
+  double q10 = q1[0], q11 = q1[1], q12 = q1[2], q13 = q1[3];
+  double q20 = q2[0], q21 = q2[1], q22 = q2[2], q23 = q2[3];
   // (+ (* q10 q20) (- (* q11 q21)) (- (* q12 q22)) (- (* q13 q23)))
   q3[0] = q10*q20 - q11*q21 - q12*q22 - q13*q23;
   // (+ (* q10 q21)    (* q11 q20)     (* q12 q23)  (- (* q13 q22)))
@@ -438,7 +438,7 @@ pointer MATTIMES3(ctx,n,argv)
   register int i;
   register pointer p,result;
   eusfloat_t *c1,*c2,*c3;
-  eusfloat_t q1[4], q2[4], q3[4], q;
+  double q1[4], q2[4], q3[4], q;
   
   ckarg2(2,3);
   c1 = argv[0]->c.ary.entity->c.fvec.fv;
@@ -447,19 +447,28 @@ pointer MATTIMES3(ctx,n,argv)
   else result = makematrix(ctx,3,3);
   c3 = result->c.ary.entity->c.fvec.fv;
 
+#if (WORD_SIZE == 32)
+  double pc1[9], pc2[9], pc3[9];
+  for(i = 0; i < 9; i++ ) { pc1[i] = c1[i]; pc2[i] = c2[i]; pc3[i] = c3[i]; }
+#else
+  double *pc1=c1, *pc2=c2, *pc3=c3;
+#endif
   /*
      (setf c3 (quaternion2matrix 
 	       (normalize-vector (quaternion*
 				  (matrix2quaternion c1) 
 				  (matrix2quaternion c2)))))
   */
-  matrix2quaternion(c1, q1);
-  matrix2quaternion(c2, q2);
+  matrix2quaternion(pc1, q1);
+  matrix2quaternion(pc2, q2);
   quaternion_multiply(q1, q2, q3);
   //noromalize-vector
   q = sqrt(q3[0]*q3[0]+q3[1]*q3[1]+q3[2]*q3[2]+q3[3]*q3[3]);
   q3[0] /= q; q3[1] /= q; q3[2] /= q; q3[3] /= q;
-  quaternion2matrix(q3, c3);
+  quaternion2matrix(q3, pc3);
+#if (WORD_SIZE == 32)
+  for(i = 0; i < 9; i++ ) { c3[i] = pc3[i]; }
+#endif
 
   return(result);
 }
@@ -532,11 +541,11 @@ pointer MATMINUS(ctx,n,argv)
   return(result);
 }
 
-void balanc(eusfloat_t **a, int n)
+void balanc(double **a, int n)
 {
-  eusfloat_t RADIX = 2.0;
+  double RADIX = 2.0;
   int last,j,i;
-  eusfloat_t s,r,g,f,c,sqrdx;
+  double s,r,g,f,c,sqrdx;
   sqrdx=RADIX*RADIX;
   last=0;
   while (last == 0) {
@@ -573,10 +582,10 @@ void balanc(eusfloat_t **a, int n)
 }
 
 #define SWAP(g,h) {y=(g);(g)=(h);(h)=y;}
-void elmhes(eusfloat_t **a, int n)
+void elmhes(double **a, int n)
 {
   int m,j,i;
-  eusfloat_t y,x;
+  double y,x;
   for (m=2;m<n;m++) { // m is called r + 1 in the text.
     x=0.0;
     i=m;
@@ -605,10 +614,10 @@ void elmhes(eusfloat_t **a, int n)
   }
 }
 
-int hqr(eusfloat_t **a, int n, eusfloat_t wr[], eusfloat_t wi[])
+int hqr(double **a, int n, double wr[], double wi[])
 {
   int nn,m,l,k,j,its,i,mmin;
-  eusfloat_t z,y,x,w,v,u,t,s,r,q,p,anorm;
+  double z,y,x,w,v,u,t,s,r,q,p,anorm;
   anorm=0.0; // Compute matrix norm for possible use inlocating  single small subdiagonal element. 
   for (i=1;i<=n;i++)
     for (j=max(i-1,1);j<=n;j++)
@@ -621,7 +630,7 @@ int hqr(eusfloat_t **a, int n, eusfloat_t wr[], eusfloat_t wi[])
       for (l=nn;l>=2;l--) { // Begin iteration: look for single small subdiagonal element. 
 	s=fabs(a[l-1][l-1])+fabs(a[l][l]);
 	if (s == 0.0) s=anorm;
-	if ((eusfloat_t)(fabs(a[l][l-1]) + s) == s) {
+	if ((double)(fabs(a[l][l-1]) + s) == s) {
 	  a[l][l-1]=0.0;
 	  break;
 	}
@@ -672,7 +681,7 @@ int hqr(eusfloat_t **a, int n, eusfloat_t wr[], eusfloat_t wi[])
 	    if (m == l) break;
 	    u=fabs(a[m][m-1])*(fabs(q)+fabs(r));
 	    v=fabs(p)*(fabs(a[m-1][m-1])+fabs(z)+fabs(a[m+1][m+1]));
-	    if ((eusfloat_t)(u+v) == v) break; // Equation (11.6.26).
+	    if ((double)(u+v) == v) break; // Equation (11.6.26).
 	  }
 	  for (i=m+2;i<=nn;i++) {
 	    a[i][i-2]=0.0;
@@ -731,9 +740,9 @@ int hqr(eusfloat_t **a, int n, eusfloat_t wr[], eusfloat_t wi[])
   return 1;
 }
 
-eusfloat_t pythag(eusfloat_t a, eusfloat_t b)
+double pythag(double a, double b)
 {
-  eusfloat_t absa, absb;
+  double absa, absb;
   absa=fabs(a);
   absb=fabs(b);
   if (absa > absb) return absa*sqrt(1.0+SQR(absb/absa));
@@ -747,7 +756,7 @@ pointer argv[];
 /* (QL_DECOMPOSE mat) */
 {
   pointer a,re,rv;
-  eusfloat_t **aa, *d, *e;
+  double **aa, *d, *e;
   int c, i, j;
 
   ckarg(1);
@@ -797,7 +806,7 @@ pointer argv[];
 /* (QR_DECOMPOSE mat) */
 {
   pointer a,rr,ri, r;
-  eusfloat_t **aa, *wr, *wi;
+  double **aa, *wr, *wi;
   int c, i, j, pc=0;
 
   ckarg(1);
@@ -891,7 +900,7 @@ register pointer *argv;
   }
   else error(E_NOVECTOR);
 
-  sum = (eusfloat_t)(sum/fn);
+  sum = (double)(sum/fn);
   return(makeflt(sum));
 }
 
@@ -949,7 +958,7 @@ register pointer *argv;
   }
   else error(E_NOVECTOR);
 
-  res = (eusfloat_t)(res/fn);
+  res = (double)(res/fn);
   return(makeflt(res));
 }
 

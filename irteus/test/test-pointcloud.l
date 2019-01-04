@@ -229,18 +229,26 @@
         (send base :assoc *point*)
         (send base :transform
               (make-coords :pos (float-vector 400 -800 1200) :rpy (list 0.4 0.3 0.2)))
+	(if (and (derivedp #'move-origin-to-check compiled-code) (not (boundp 'lisp::*print-precision*)))
+	    (warning-message 1 "eps-v= ... (float-vector 792.73...) tests requires https://github.com/euslisp/EusLisp/pull/357~%")
+	  (progn
         (assert
          (eps-v=
           (send (send *point* :worldcoords) :transform-vector (car (send *point* :point-list)))
           (float-vector 792.732209445 539.4908242525 2397.9448709116)
           *temp-eps*))
+	))
 
         (send *point* :move-origin-to *ccoords*)
+	(if (and (derivedp #'move-origin-to-check compiled-code) (not (boundp 'lisp::*print-precision*)))
+	    (warning-message 1 "eps-v= ... (float-vector 792.73...) tests requires https://github.com/euslisp/EusLisp/pull/357~%")
+	  (progn
         (assert
          (eps-v=
           (send (send *point* :worldcoords) :transform-vector (car (send *point* :point-list)))
           (float-vector 792.732209445 539.4908242525 2397.9448709116)
           *temp-eps*))
+	))
         (assert
          (eps-v= (send *point* :worldpos) (send *ccoords* :pos) *temp-eps*))
         (assert

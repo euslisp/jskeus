@@ -26,10 +26,10 @@
 #include "nr.h"
 #include <math.h>
 
-static eusfloat_t sqrarg;
+static double sqrarg;
 #define SQR(a) ((sqrarg=(a)) == 0.0 ? 0.0 : sqrarg*sqrarg)
 
-static eusfloat_t maxarg1, maxarg2;
+static double maxarg1, maxarg2;
 #define FMAX(a,b) (maxarg1=(a),maxarg2=(b),(maxarg1) > (maxarg2) ? (maxarg1) : (maxarg2))
 
 static int iminarg1, iminarg2;
@@ -47,26 +47,26 @@ void nrerror(char error_text[])
   fprintf(stderr,"...now existing to system...\n");
 }
 
-eusfloat_t *nr_vector(int nl, int nh)
+double *nr_vector(int nl, int nh)
 {
-  eusfloat_t *v;
-  v =(eusfloat_t *)malloc((size_t)((nh-nl+1+NR_END)*sizeof(eusfloat_t)));
-  if (!v) {nrerror("allocation failure in nr_vector()"); return (eusfloat_t*)NULL;}
+  double *v;
+  v =(double *)malloc((size_t)((nh-nl+1+NR_END)*sizeof(double)));
+  if (!v) {nrerror("allocation failure in nr_vector()"); return (double*)NULL;}
   return v-nl+NR_END;
 }
 
-eusfloat_t **nr_matrix(int nrl, int nrh, int ncl, int nch)
+double **nr_matrix(int nrl, int nrh, int ncl, int nch)
 {
   int i, nrow=nrh-nrl+1,ncol=nch-ncl+1;
-  eusfloat_t **m;
+  double **m;
   
-  m = (eusfloat_t **)malloc((size_t)((nrow+NR_END)*sizeof(eusfloat_t *)));
-  if (!m) {nrerror("allocation failure 1 in nr_matrix()"); return (eusfloat_t**)NULL;}
+  m = (double **)malloc((size_t)((nrow+NR_END)*sizeof(double *)));
+  if (!m) {nrerror("allocation failure 1 in nr_matrix()"); return (double**)NULL;}
   m += NR_END;
   m -= nrl;
 
-  m[nrl]=(eusfloat_t *)malloc((size_t)((nrow*ncol+NR_END)*sizeof(eusfloat_t)));
-  if (!m[nrl]) {nrerror("allocation failure 2 in nr_matrix()"); return (eusfloat_t**)NULL;}
+  m[nrl]=(double *)malloc((size_t)((nrow*ncol+NR_END)*sizeof(double)));
+  if (!m[nrl]) {nrerror("allocation failure 2 in nr_matrix()"); return (double**)NULL;}
   m[nrl] += NR_END;
   m[nrl] -= ncl;
 
@@ -75,20 +75,20 @@ eusfloat_t **nr_matrix(int nrl, int nrh, int ncl, int nch)
   return m;
 }
 
-void free_nr_vector(eusfloat_t *v, int nl, int nh)
+void free_nr_vector(double *v, int nl, int nh)
 {
   free((FREE_ARG)(v+nl-NR_END));
 }
 
-void free_nr_matrix(eusfloat_t **m, int nrl, int nrh, int ncl, int nch)
+void free_nr_matrix(double **m, int nrl, int nrh, int ncl, int nch)
 {
   free((FREE_ARG)(m[nrl]+ncl-NR_END));
   free((FREE_ARG)(m+nrl-NR_END));
 }
 
-void lubksb(eusfloat_t **a, int n, int *indx, eusfloat_t b[]) {
+void lubksb(double **a, int n, int *indx, double b[]) {
   int i,ii=0,ip,j;
-  eusfloat_t sum;
+  double sum;
 
   for (i=1;i<=n;i++) {
     ip=indx[i];
@@ -106,10 +106,10 @@ void lubksb(eusfloat_t **a, int n, int *indx, eusfloat_t b[]) {
   }
 }
 
-int ludcmp(eusfloat_t **a, int n, int *indx, eusfloat_t *d) {
+int ludcmp(double **a, int n, int *indx, double *d) {
   int i,imax,j,k;
-  eusfloat_t big,dum,sum,temp;
-  eusfloat_t *vv;
+  double big,dum,sum,temp;
+  double *vv;
 
   vv=nr_vector(1,n);
   *d=1.0;
@@ -157,10 +157,10 @@ int ludcmp(eusfloat_t **a, int n, int *indx, eusfloat_t *d) {
   return 0;
 }
 
-int svdsolve(eusfloat_t **a, int m, int n, eusfloat_t *b, eusfloat_t *x)
+int svdsolve(double **a, int m, int n, double *b, double *x)
 {
   int j;
-  eusfloat_t **v, *w, wmax, wmin;
+  double **v, *w, wmax, wmin;
   v = nr_matrix(1,n,1,n);
   w = nr_vector(1,n);
   if ( svdcmp(a,m,n,w,v) < 0 ) {
@@ -178,10 +178,10 @@ int svdsolve(eusfloat_t **a, int m, int n, eusfloat_t *b, eusfloat_t *x)
   return 1;
 }
 
-void svbksb(eusfloat_t **u, eusfloat_t w[], eusfloat_t **v, int m, int n, eusfloat_t b[], eusfloat_t x[])
+void svbksb(double **u, double w[], double **v, int m, int n, double b[], double x[])
 {
   int jj,j,i;
-  eusfloat_t s, *tmp;
+  double s, *tmp;
 
   tmp = nr_vector(1,n);
   for (j=1;j<=n;j++){
@@ -200,11 +200,11 @@ void svbksb(eusfloat_t **u, eusfloat_t w[], eusfloat_t **v, int m, int n, eusflo
   free_nr_vector(tmp,1,n);
 }
 
-int svdcmp(eusfloat_t **a, int m, int n, eusfloat_t w[], eusfloat_t **v)
+int svdcmp(double **a, int m, int n, double w[], double **v)
 {
-  eusfloat_t pythag(eusfloat_t a, eusfloat_t b);
+  double pythag(double a, double b);
   int flag,i,its,j,jj,k,l,nm;
-  eusfloat_t anorm,c,f,g,h,s,scale,x,y,z,*rv1;
+  double anorm,c,f,g,h,s,scale,x,y,z,*rv1;
   
   rv1=nr_vector(1,n);
   g=scale=anorm=0.0;
@@ -289,11 +289,11 @@ int svdcmp(eusfloat_t **a, int m, int n, eusfloat_t w[], eusfloat_t **v)
       flag =1;
       for (l=k;l>=1;l--){
 	nm=l-1;
-	if ((eusfloat_t)(fabs(rv1[l])+anorm) == anorm){
+	if ((eusfloat_t)(fabs(rv1[l])+anorm) == (eusfloat_t)anorm){
 	  flag=0;
 	  break;
 	}
-	if ((eusfloat_t)(fabs(w[nm])+anorm)==anorm) break;
+	if ((eusfloat_t)(fabs(w[nm])+anorm)==(eusfloat_t)anorm) break;
       }
       if (flag){
 	c=0.0;
@@ -301,7 +301,7 @@ int svdcmp(eusfloat_t **a, int m, int n, eusfloat_t w[], eusfloat_t **v)
 	for (i=l;i<=k;i++){
 	  f=s*rv1[i];
 	  rv1[i]=c*rv1[i];
-	  if ((eusfloat_t)(fabs(f)+anorm)==anorm) break;
+	  if ((eusfloat_t)(fabs(f)+anorm)==(eusfloat_t)anorm) break;
 	  g=w[i];
 	  h=pythag(f,g);
 	  w[i]=h;
@@ -379,10 +379,10 @@ int svdcmp(eusfloat_t **a, int m, int n, eusfloat_t w[], eusfloat_t **v)
   return 1;
 }
 
-void tred2(eusfloat_t **a, int n, eusfloat_t d[], eusfloat_t e[])
+void tred2(double **a, int n, double d[], double e[])
 {
   int l,k,j,i;
-  eusfloat_t scale,hh,h,g,f;
+  double scale,hh,h,g,f;
   for (i=n;i>=2;i--) {
     l=i-1;
     h=scale=0.0;
@@ -447,11 +447,11 @@ void tred2(eusfloat_t **a, int n, eusfloat_t d[], eusfloat_t e[])
   }
 }
 
-int tqli(eusfloat_t d[], eusfloat_t e[], int n, eusfloat_t **z)
+int tqli(double d[], double e[], int n, double **z)
 {
-  eusfloat_t pythag(eusfloat_t a, eusfloat_t b);
+  double pythag(double a, double b);
   int m,l,iter,i,k;
-  eusfloat_t s,r,p,g,f,dd,c,b;
+  double s,r,p,g,f,dd,c,b;
 
   for (i=2;i<=n;i++) e[i-1]=e[i]; // Convenient to renumber the elements of e. 
   e[n]=0.0;
@@ -460,7 +460,7 @@ int tqli(eusfloat_t d[], eusfloat_t e[], int n, eusfloat_t **z)
     do {
       for (m=l;m<=n-1;m++) { // Look for a single small subdiagonal element to split the matrix.
 	dd=fabs(d[m])+fabs(d[m+1]);
-	if ((eusfloat_t)(fabs(e[m])+dd) == dd) break;
+	if ((double)(fabs(e[m])+dd) == dd) break;
       }
       if (m != l) {
 	if (iter++ == 30) {nrerror("Too many iterations in tqli"); return -1;}
@@ -501,9 +501,9 @@ int tqli(eusfloat_t d[], eusfloat_t e[], int n, eusfloat_t **z)
   return 1;
 }
 
-eusfloat_t pythag(eusfloat_t a, eusfloat_t b)
+double pythag(double a, double b)
 {
-  eusfloat_t absa, absb;
+  double absa, absb;
   absa=fabs(a);
   absb=fabs(b);
   if (absa > absb) return absa*sqrt(1.0+SQR(absb/absa));

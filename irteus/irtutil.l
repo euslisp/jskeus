@@ -274,7 +274,7 @@
    (when interpolatingp
      (setq position (send self :interpolation))
      (incf time dt)
-     (incf segment-time dt)
+     (setq segment-time (- time (if (= segment 0) 0 (nth (1- segment) time-list))))
      (when (> time (nth segment time-list))
        (setq segment-time (- time (nth segment time-list)))
        (incf segment))
