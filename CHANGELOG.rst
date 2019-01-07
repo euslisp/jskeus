@@ -2,6 +2,75 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* .travis-osx.sh: need install make by brew (`#535 <https://github.com/euslisp/jskeus/issues/535>`_)
+* try to run more irt tests on arm machine (`#533 <https://github.com/euslisp/jskeus/issues/533>`_)
+  * ubuntu_arm64:trusty takes more than 50 min, so skip irteus-demo.l
+  * irteus/nr.c: check rv1/w/f + anorm == anorm with eusfloat_t type
+  * irteus/{irtc.c,nr.c}: use double for nr codes
+  * irteus/irtutil.l interpolator :pass-time : calculate segment-time from time minus previous time-list, (incf segment-time dt) accumulate errors, specially 32bit machine
+  * irteus/test/test-irt-motion.l: run all test with compiled code
+  * irteus/test/geo.l: (body+ c1 b d1 c2 d2 c3 d3 c4 d4) could not pass the test on arm 32bit, use truncated version
+  * irteus/test/geo.l somehow both 32/64 arm architecture needs to return #f(0 0 0) for small normalized vectors
+  * irteus/test/mathtest.l: 9.656790+06 is too large for 32bit machine
+  * irteus/test/mathtest.l: add test for pseudo-inverse2 to check if svdcmp failed to converge
+  * irteus/test/test-pointcloud.l To test test-pointcloud.l with compiled code requires https://github.com/euslisp/EusLisp/pull/357
+* [irtmodel.l]fix bug of :angle-vector for multi-dof joint (`#532 <https://github.com/euslisp/jskeus/issues/532>`_)
+  * add test code to check bug of :angle-vector for multi-dof joint `#529 <https://github.com/euslisp/jskeus/issues/529>`_
+  * add more test on min-max-joint-table (`#534 <https://github.com/euslisp/jskeus/issues/534>`_)
+* travis.{yml,sh}: set travis to fail when gcc outputs compile warnings (`#527 <https://github.com/euslisp/jskeus/issues/527>`_e)
+* [irteus/irtviewer.l] support changing floor color. (`#528 <https://github.com/euslisp/jskeus/issues/528>`_ from mmurooka/floor-color
+  * [jskeus/doc] add irtviewer.tex and figures for irtviewer manual.
+  * [irteus/irtviewer.l] add :draw-origin, :draw-floor, and :floor-color.
+  * [irteus/irtviewer.l] support changing floor color.
+* remove all compile warning (`#526 <https://github.com/euslisp/jskeus/issues/526>`_)
+  * add -DLinux to Makefile.LinuxARM
+  * enable debian_arm64:stretch
+  * add WFLAGS to Makefile
+  * remove all compile warning for eus0
+* .travis.yml: add debian:stretch test (`#525 <https://github.com/euslisp/jskeus/issues/525>`_)
+  * Fix the compile on Debian stretch. `#524 <https://github.com/euslisp/jskeus/issues/524>`_
+  * set debian_arm64:stretch allow_failures
+  * Fix the compile on Debian stretch.
+    Must like the comment above says, gcc 6 on Debian
+    Stretch doesn't like redefining sin, cos, etc and throws
+    an error.  Fix this problem by not redefining on Debian Stretch.
+* [irtrobot.l] check if target coords is function or coordinates, also work if target coords is list of functions. (`#503 <https://github.com/euslisp/jskeus/issues/503>`_)
+  * [irteus/irtmodel.l] Add :xm :ym :zm comment for rotation-axis keyword-argument.
+  * [irtrobot.l] allow to use both list and atom of function(s) for target-coords, Fixed `#476 <https://github.com/euslisp/jskeus/issues/476>`_
+* add test with compiled lisp (`#522 <https://github.com/euslisp/jskeus/issues/522>`_)
+  * .travis.sh: add compiled test
+  * remove do-until-key x/10 message, debug (print r) code
+  * test/robot-model-usage.l : reduce output message for travis
+  * test/irteus-demo.l : reduce output message for travis
+  * test/irteus-demo.l: use debug-veiw nil to reduce output message
+  * test/full-body-ik.l: add debug-view option
+  * test/geo.l: test-body+ test-vector-angle needs irteus to avoid 'outer circuit not found' and 'undefined function c-isnan
+  * test/matrix.l  : c-isnan test, disable test-matrix-concatenate-noargs,test-matrix-concatenate-single-matrix,test-matrix-concatenate-multiple-matrices becaues of 'undefined function concatenate-matrix needs irteus
+  * test/mathtest.l : diagnoal, minor-matrix, atan2, outer-product-matrix, quaternion, matrix-log, pseudo-inverse, sr-inverse, manipulability, eigen decompose, sv/ql solve, lu-solve2, matrix-determinant, qr/ql-decompose needs irteus
+  * test/coords.l : test-makecoords-quaternion needs quaternion2matrix defined in irteus
+  * remove test codes which are moved to EusLisp https://github.com/euslisp/EusLisp/pull/316
+  * add test with compiled lisp
+  * re-define method within defun is not working with compiled code (`#523 <https://github.com/euslisp/jskeus/issues/523>`_)
+    - do not run test code on compile, but run when load
+* fix for osx and newer compiler (gcc >= 7 OR clang >=9) (`#520 <https://github.com/euslisp/jskeus/issues/520>`_)
+  * disable DISPLAY for osx
+  * gcc >= 7 OR clang >=9 dislike redefinition of sqrt/cos/fin/fabs ...
+  * Disable redefinition of sqrt/cos/... to avoid some errors on macOS
+  * fix osx travis
+    - remove homebrew/x11, which is deprecated
+    - do not run brew update, because brew update compile all module from source and it takes more than 1 hour
+    - copy setup process from euslisp/.travis-os.sh
+    - do not install x11 server
+    - export LIBGL_ALLOW_SOFTWARE=1 suggested by https://api.travis-ci.org/v3/job/403422947/log.txt
+    - make -j with 2
+    - add exit 0 end of .travis-osx.sh
+    - run as script, instead of source
+* [doc] Add example when IK target-coords function introduced in `#514 <https://github.com/euslisp/jskeus/issues/514>`_ (`#518 <https://github.com/euslisp/jskeus/issues/518>`_)
+  * Add sample of ik using functional target-coords
+* Contributors: Chris Lalancette, Guilherme Affonso, Kei Okada, Kentaro Wada, Masaki Murooka, Naoki Hiraoka, Iori Yanokura
+
 1.2.0 (2018-07-19)
 ------------------
 * to use IMPLIB we need run LIBNR first (`#512 <https://github.com/euslisp/jskeus/issues/512>`_, `#513 <https://github.com/euslisp/jskeus/issues/513>`_)
