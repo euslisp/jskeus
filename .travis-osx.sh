@@ -35,6 +35,7 @@ setup_brew_test() {
 
 setup_make() {
     travis_time_start brew.install-deps
+    brew list make &>/dev/null || brew install make
     brew list jpeg &>/dev/null || brew install jpeg
     brew list libpng &>/dev/null || brew install libpng
     brew list mesalib-glw &>/dev/null || brew install mesalib-glw
