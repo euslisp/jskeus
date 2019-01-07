@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.1 (2019-01-07)
+------------------
 * .travis-osx.sh: need install make by brew (`#535 <https://github.com/euslisp/jskeus/issues/535>`_)
 * try to run more irt tests on arm machine (`#533 <https://github.com/euslisp/jskeus/issues/533>`_)
   * ubuntu_arm64:trusty takes more than 50 min, so skip irteus-demo.l
