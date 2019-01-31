@@ -35,6 +35,8 @@
    (let ((m (pqpmakemodel))
 	 vs v1 v2 v3 (id 0))
      (setf (get self :pqpmodel) m)
+     (when (null fs)
+       (return-from :make-pqpmodel m))
      (pqpbeginmodel m)
      (dolist (f fs)
        (dolist (poly (face-to-triangle-aux f))
