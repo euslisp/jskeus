@@ -31,6 +31,7 @@
 
 (comp:compile-file-if-src-newer "irtgeo.l" user::*objdir*)
 (comp:compile-file-if-src-newer "pqp.l" user::*objdir*)
+(comp:compile-file-if-src-newer "eusbullet.l" user::*objdir*)
 (comp:compile-file-if-src-newer "irtscene.l" user::*objdir*)
 (comp:compile-file-if-src-newer "irtmodel.l" user::*objdir*)
 (comp:compile-file-if-src-newer "irtsensor.l" user::*objdir*)

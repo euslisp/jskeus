@@ -44,7 +44,7 @@ MODULES.L=irt_modules.l
 EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 
 IRTEUS=irtmath irtutil irtgraph pgsql time
-IRTEUSG=irtgeo pqp irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud
+IRTEUSG=irtgeo pqp irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud eusbullet
 IRTEUSX=irtx
 IRTEUSIMG=irtimage eusjpeg png
 IRTEUSGL=irtgl irtglrgb irtviewer
@@ -138,7 +138,7 @@ $(IRTEUSOBJS) $(INSTALLOBJDIR)/compile_irt.log: $(IRTEUS_L)
 	-rm -f $(IRTEUS_C) $(IRTEUS_H)
 
 $(IRTEUSGOBJS): $(INSTALLOBJDIR)/compile_irtg.log
-$(IRTEUSGOBJS) $(INSTALLOBJDIR)/compile_irtg.log: $(IRTEUSG_L)
+$(IRTEUSGOBJS) $(INSTALLOBJDIR)/compile_irtg.log: $(IRTEUSG_L) $(INSTALLLIBDIR)/$(LPFX)BULLET.$(LSFX)
 	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l > $(INSTALLOBJDIR)/compile_irtg.log
 	-rm -f $(IRTEUSG_C) $(IRTEUSG_H)
 
@@ -159,6 +159,12 @@ $(IRTEUSGLOBJS) $(INSTALLOBJDIR)/compile_irtgl.log: $(IRTEUSGL_L)
 
 PQP/$(ARCHDIR)/libPQP-static.a:
 	make -C PQP
+
+$(INSTALLLIBDIR)/$(LPFX)BULLET.$(LSFX): BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX)
+	cp BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX) $(INSTALLLIBDIR)/$(LPFX)BULLET.$(LSFX)
+
+BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX):
+	make -C BULLET
 
 $(LIBNR): $(NROBJECTS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBNR) $(NROBJECTS)
@@ -189,6 +195,7 @@ clean:
 	-rm -f $(INSTALLOBJDIR)/compile_*.log
 	chmod a-x Makefile* *.l *.c
 	(cd PQP;make clean)
+	(cd BULLET;make clean)
 	(cd $(EUSDIR)/lisp/image/jpeg/; make clean)
 	-rm -f $(EUSDIR)/lib/llib/pgsql.c $(EUSDIR)/lib/llib/pgsql.h
 	-rm -f $(EUSDIR)/lib/llib/time.c $(EUSDIR)/lib/llib/time.h
@@ -211,6 +218,7 @@ $(INSTALLOBJDIR)/irtglrgb.$(OSFX): irtglrgb.l
 $(INSTALLOBJDIR)/irtviewer.$(OSFX): irtviewer.l
 $(INSTALLOBJDIR)/irtimage.$(OSFX): irtimage.l
 $(INSTALLOBJDIR)/pqp.$(OSFX): pqp.l
+$(INSTALLOBJDIR)/eusbullet.$(OSFX): eusbullet.l
 $(INSTALLOBJDIR)/png.$(OSFX): png.l
 $(INSTALLOBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l
 $(INSTALLOBJDIR)/time.$(OSFX): $(EUSDIR)/lib/llib/time.l
