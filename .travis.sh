@@ -51,6 +51,7 @@ for test_l in irteus/test/*.l; do
 
     # osrf/ubuntu_arm64:trusty takes >50 min, skip irteus-demo.l
     [[ "$DOCKER_IMAGE" == *"arm64:trusty"* && $test_l =~ irteus-demo.l ]] && continue;
+    [[ ( "$DOCKER_IMAGE" == *"trusty"* || "$DOCKER_IMAGE" == *"jessie"* ) && $test_l =~ test-eusbullet-collision.l ]] && continue;
 
     travis_time_start jskeus.source.${test_l##*/}.test
 

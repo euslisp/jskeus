@@ -30,6 +30,18 @@ INSTALLBINDIR=$(IRTEUSDIR)/$(ARCHDIR)/bin
 INSTALLOBJDIR=$(IRTEUSDIR)/$(ARCHDIR)/obj
 INSTALLLIBDIR=$(IRTEUSDIR)/$(ARCHDIR)/lib
 
+# check bullet version
+BULLET_VER_MAJOR:=$(shell pkg-config bullet --modversion | cut -f1 -d.)
+BULLET_VER_MINOR:=$(shell pkg-config bullet --modversion | cut -f2 -d.)
+export BULLET_GE_2_83=$(shell [ $(BULLET_VER_MAJOR) -gt 2 -o \( $(BULLET_VER_MAJOR) -eq 2 -a $(BULLET_VER_MINOR) -ge 83 \) ] && echo true)
+ifeq ($(BULLET_GE_2_83), true)
+    EUSBULLET=eusbullet
+else
+    EUSBULLET=
+endif
+$(info "--      BULLET_GE_2_83 = ${BULLET_GE_2_83}") # BULLET_GE_2_83 is environment variable because referenced in compile_irtg.l
+$(info "--      EUSBULLET = ${EUSBULLET}")
+
 # common
 WFLAGS= #-Wall
 
@@ -44,7 +56,7 @@ MODULES.L=irt_modules.l
 EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 
 IRTEUS=irtmath irtutil irtgraph pgsql time
-IRTEUSG=irtgeo pqp irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud eusbullet
+IRTEUSG=irtgeo pqp irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud $(EUSBULLET)
 IRTEUSX=irtx
 IRTEUSIMG=irtimage eusjpeg png
 IRTEUSGL=irtgl irtglrgb irtviewer
@@ -161,10 +173,14 @@ PQP/$(ARCHDIR)/libPQP-static.a:
 	make -C PQP
 
 $(INSTALLLIBDIR)/$(LPFX)BULLET.$(LSFX): BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX)
-	cp BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX) $(INSTALLLIBDIR)/$(LPFX)BULLET.$(LSFX)
+	if [ ${BULLET_GE_2_83} ]; then \
+		cp BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX) $(INSTALLLIBDIR)/$(LPFX)BULLET.$(LSFX); \
+	fi
 
 BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX):
-	make -C BULLET
+	if [ ${BULLET_GE_2_83} ]; then \
+		make -C BULLET; \
+	fi
 
 $(LIBNR): $(NROBJECTS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBNR) $(NROBJECTS)
