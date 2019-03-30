@@ -1,0 +1,10 @@
+CC = c++ -O2 -falign-functions=8 -fPIC 
+OBJOPT = -o 
+OUTOPT = -o 
+LD = c++
+SOFLAGS = -shared
+EXELD = c++
+EXESFX = 
+LSFX = so
+LPFX = lib
+LIBS = -L$(ARCHDIR) -lRAPID 

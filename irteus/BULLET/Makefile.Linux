@@ -1,0 +1,19 @@
+CC = c++ -O2
+OBJOPT = -o 
+OUTOPT = -o 
+LD = c++
+SOFLAGS = -shared
+EXELD = c++
+EXESFX = 
+LSFX = so
+LPFX = lib
+LIBS = -L$(ARCHDIR) -lRAPID 
+
+
+ifeq ($(shell /bin/uname -m), x86_64)
+CC += -m32 
+LD += -m32
+EXELD += -m32 
+endif
+
+
