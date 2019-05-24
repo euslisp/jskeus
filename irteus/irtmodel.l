@@ -1960,9 +1960,14 @@
               (when (and (derivedp obj bodyset-link)
                          (eq (send obj :analysis-level) :coords))
                 (send-all (obj . geo::bodies) :worldcoords))
-              (dolist (e (cdr (send obj :edges)))
-                (send *viewer* :viewsurface :3d-line
-                      (e . pvert) (e . nvert) :depth-test t))))
+              (if (derivedp obj bodyset-link)
+                  (dolist (b (send obj :bodies))
+                    (dolist (e (cdr (send b :edges)))
+                      (send *viewer* :viewsurface :3d-line
+                            (e . pvert) (e . nvert) :depth-test t)))
+                  (dolist (e (cdr (send obj :edges)))
+                    (send *viewer* :viewsurface :3d-line
+                          (e . pvert) (e . nvert) :depth-test t)))))
           )
         (send *viewer* :viewsurface :line-width pwidth)
         (send *viewer* :viewsurface :point-size psize)
