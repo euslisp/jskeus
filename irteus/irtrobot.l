@@ -667,6 +667,7 @@
          (start-with-double-support t)
          (end-with-double-support t)
          (ik-thre 1) (ik-rthre (deg2rad 1))
+         (q 1.0) (r 1e-6) ;; Q is weighting of output error and R is weighting of input.
          (calc-zmp t))
    "Calculate walking pattern from foot step list and return pattern list as a list of angle-vector, root-coords, time, and so on."
    (let* ((res) (ret) (tm 0)
@@ -678,7 +679,8 @@
            :default-step-height default-step-height :default-double-support-ratio 0.2
            :default-zmp-offsets dzo :all-limbs al
            :thre ik-thre :rthre ik-rthre
-           :start-with-double-support start-with-double-support :end-with-double-support end-with-double-support)
+           :start-with-double-support start-with-double-support :end-with-double-support end-with-double-support
+           :q q :r r)
 
      (while (null (setq ret (send gg :proc-one-tick :type :cycloid :debug t :solve-angle-vector-args solve-angle-vector-args))))
      (if calc-zmp (dotimes (i 2) (send self :calc-zmp))) ;; for zmp initialization
