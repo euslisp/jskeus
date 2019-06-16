@@ -1981,9 +1981,9 @@
           (leg-order (mapcar #'(lambda (l) (position l legs)) all-limbs))
           (fix-coords (append swing-leg-coords support-leg-coords)))
      (unless (memq :thre args)
-       (append args (list :thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) ik-thre (* 5 ik-thre))) all-limbs))))
+       (setq args (append args (list :thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) ik-thre (* 5 ik-thre))) all-limbs)))))
      (unless (memq :rthre args)
-       (append args (list :rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) ik-rthre (* 5 ik-rthre)))) all-limbs))))
+       (setq args (append args (list :rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) ik-rthre (* 5 ik-rthre)))) all-limbs)))))
      (send* robot :move-centroid-on-foot
             :both all-limbs :target-centroid-pos cog
             :fix-limbs-target-coords (mapcar #'(lambda (idx) (elt fix-coords idx)) leg-order)
