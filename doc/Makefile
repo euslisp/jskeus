@@ -14,7 +14,6 @@ all: pdf
 	rm -fr ${TMPDIR}
 
 copy_eus_tex:
-	exit
 	-mkdir -p ${TMPDIR}/fig
 	cp ../eus/doc/jlatex/*.tex ${TMPDIR}
 	cp ../eus/doc/jlatex/*.sty ${TMPDIR}
