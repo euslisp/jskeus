@@ -25,7 +25,13 @@ copy_eus_tex:
 		irteusgl ../eus/lib/llib/documentation.l "(make-document \"../irteus/$$x.l\" \"${TMPDIR}/$$x-func.tex\")" "(exit)"; \
         done
 
-toc: copy_eus_tex
+current.tex:
+	echo "% CURRENT_TAG" > ${TMPDIR}/current.tex
+	echo "\\\\newcommand{\\\\eusversion}[0]{"`cd ../eus; git describe --tags $$(git rev-list --tags --max-count=1) | sed s/EusLisp-//`"}" >> ${TMPDIR}/current.tex
+	echo "\\\\newcommand{\\\\irteusversion}[0]{"`git describe --tags $$(git rev-list --tags --max-count=1)`"}" >> ${TMPDIR}/current.tex
+	cat ${TMPDIR}/current.tex
+
+toc: copy_eus_tex current.tex
 	(cd ${TMPDIR}; makeindex jmanual.tex)
 
 dvi: toc
@@ -57,4 +63,3 @@ html: copy_eus_tex
 	sed -i 's@^%\\\ifnum 42146@\\\ifnum 42146@' ${TMPDIR}/jmanual.tex
 	cp -r ${TMPDIR}/html ./
 	rm -fr ${TMPDIR}
-
