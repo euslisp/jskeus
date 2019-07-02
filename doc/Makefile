@@ -18,7 +18,8 @@ copy_eus_tex:
 	cp ../eus/doc/jlatex/*.tex ${TMPDIR}
 	cp ../eus/doc/jlatex/*.sty ${TMPDIR}
 	cp -r ../eus/doc/jlatex/fig/* ./fig/* ${TMPDIR}/fig/
-	for x in ${TMPDIR}/fig/*.jpg; do ebb -b $$x; extractbb $$x;done
+	(cd ${TMPDIR};for x in fig/*.ps;  do ps2ps $$x $$x.new; mv $$x.new $$x; done) ### ???? we need to run ps2ps to pass gs??
+	(cd ${TMPDIR};for x in fig/*.jpg; do extractbb $$x; done) # workaround for https://github.com/backtracking/bibtex2html/issues/9
 	cp *.tex ${TMPDIR}
 	platex --version | grep utf8 || nkf --in-place -e ${TMPDIR}/*.tex
 	for x in irtrobot irtmodel irtsensor irtscene irtdyna irtgeo irtgl irtutil irtviewer irtx irtmath irtbvh irtcollada irtgraph irtimage irtpointcloud png pqp; do\
