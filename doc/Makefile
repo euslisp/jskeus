@@ -63,3 +63,40 @@ html: copy_eus_tex
 	sed -i 's@^%\\\ifnum 42146@\\\ifnum 42146@' ${TMPDIR}/jmanual.tex
 	cp -r ${TMPDIR}/html ./
 	rm -fr ${TMPDIR}
+
+latex.py:
+	wget https://raw.githubusercontent.com/jobh/latex.py/master/latex.py
+
+rst: current.tex copy_eus_tex latex.py
+	cp latex.py ../eus/doc/latex/preamble.tex ${TMPDIR}
+	for file in ${TMPDIR}/*.tex; do \
+	   name=`basename $$file .tex`; \
+	   if [ \"$$name\" = \"test\" -o \"$$name\" = \"jmanual\" ]; then continue; fi; \
+	   echo \"Converting $$name.tex to $$name.rst\"; \
+	   (cd ${TMPDIR}; python3 latex.py -2 -L preamble.tex $$name.tex > /tmp/tmp_$$name.tex); \
+	   pandoc /tmp/tmp_$$name.tex -o $$name.rst -V documentclass=ltjarticle --latex-engine=lualatex; \
+	   sed -i 's@.. figure:: \(.*\).ps@.. figure:: \1.png@g' $$name.rst;  # use png for figures \
+	done
+	for file in ../eus/doc/jlatex/fig/*.ps; do \
+	   name=`basename $$file .ps`; \
+	   echo \"Converting $$name.ps to $$name.png\";  ### ???? we need to run ps2ps to pass gs?? does not happy with pstopnm \
+	   pstopnm -stdout ../eus/doc/jlatex/fig/$$name.ps | pnmflip -rotate270 | pnmtopng - > fig/$$name.png; \
+	done
+	cp jmanual.tex /tmp/jmanual.tex
+	sed -i 's@\\input{\(.*\)}@..include:: \1\n@g' /tmp/jmanual.tex     ### convert \input in tex to bypass pandoc EXCEPT current
+	sed -i '/..include:: current/r ${TMPDIR}/current.tex' /tmp/jmanual.tex  ### convert \input in tex to bypass pandoc EXCEPT current
+	sed -i 's@\\part{\(.*\)}@.. toctree:: \1@' /tmp/jmanual.tex  # convert \part in tex to bypass pandoc
+	sed -i ':a;/^[^%].*\\\\$$/{N;s/\\\\\n//;ba}' /tmp/jmanual.tex # concatinate title/author multi lines
+	sed -i '/^\\vspace{10mm}$$/d' /tmp/jmanual.tex # remove vspace{10mm} within title to pass pandoc
+	pandoc --no-wrap -s /tmp/jmanual.tex -o jmanual.rst -V documentclass=ltjarticle --latex-engine=lualatex
+	sed -i 's@..include:: \(.*\)@   \1@' jmanual.rst # restore ..include for rst
+	sed -i 's@.. toctree:: \(.*\)@.. toctree::\n   :maxdepth: 2\n   :caption: \1@' jmanual.rst  # restore ..toctree for rst
+	sed -i 's@\*\* \*\*@\*\*\n\*\*@g' jmanual.rst # add newline after ** ** in title
+	sed -i 's@** -\(.*\)$$@**\n\n-\1\n@' jmanual.rst # add newline before -ロボットモデリングの拡張 in title
+	sed -i -ne '3!{p;d;};h;n;p;g;p' jmanual.rst  ## swap 2nd and 3rd line
+	sed -i -ne '4!{p;d;};h;n;:1;7!{N;b1};G;h;n;p;g;p' jmanual.rst  ## swap lines https://www.unix.com/shell-programming-and-scripting/85230-swapping-switching-2-lines-using-sed.html
+	sed -i -ne '2h;2!H;$${g;s/\n/ /;p}' jmanual.rst  ## concatenate EusLisp and Reference Manual (https://unix.stackexchange.com/questions/188264/want-to-substitute-only-first-occurence-with-sed)
+	sed -i 's/^:Author:/:Authors: -/' jmanual.rst # use :authors: insteqad of :author:
+	sed -ie '/^:Authors:/ {p;s/.*//;N; s/\n/\ \ \ \ \ \ \ \ \ \ -\ /;}' jmanual.rst # add authors after :authors:
+	head -n 20 jmanual.rst
+
