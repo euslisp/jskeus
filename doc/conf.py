@@ -147,6 +147,8 @@ if on_rtd:
 
     sh("mkdir -p _build/html")
     sh("cd _build/html; ln -sf jmanual.html index.html; ls -al")
+    sh("find _build/html -type f -a -name 'j*.html' -a ! -name 'jmanual.html' -a -exec sed -i 's@github.com/euslisp/jskeus/blob/\(.*\)/doc/@github.com/euslisp/EusLisp/blob/\1/doc/jlatex/@' {} \;")
+    # sh("sed -i 's@github.com/euslisp/jskeus/blob/\(.*\)/doc/@github.com/euslisp/EusLisp/blob/\1/doc/jlatex/@' _build/html/j!(manual).html || echo OK")
 
 
 
