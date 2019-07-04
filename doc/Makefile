@@ -54,7 +54,7 @@ distclean: clean
 html: dvi
 	mkdir -p ${TMPDIR}/html
 	(cd ${TMPDIR}; TRANSPARENT_COLOR="#ffffff" charset="UTF-8" latex2html -dir ${TMPDIR}/html -local_icons -split +3 -auto_prefix -init_file ${PWD}/../eus/doc/latex/.latex2html-init -iso_language JP -address "This document was generated using the LaTeX2HTML translator on `date` from <a href=\"http://github.com/euslisp/jskeus.git\">jskeus</a> version <a href=\"http://github.com/euslisp/jskeus/commit/`git -C ${PWD} rev-parse --verify HEAD`\">`git log -1  --oneline`</a>" -html_version="4.0,unicode" jmanual)
-	(cd ${TMPDIR}/html; for imgfile in jmanual-img*.png; do pngtopnm $$imgfile > /tmp/$$imgfile.pnm; pnmtopng -transparent white /tmp/$$imgfile.pnm > $$imgfile; done)
+	(cd ${TMPDIR}/html; for imgfile in jmanual-img*.png; do pngtopnm $$imgfile > /tmp/$$imgfile.pnm; pnmtopng -transparent white /tmp/$$imgfile.pnm > $$imgfile || echo "Failed to convert $$imgfile"; done)
 	(cd ${TMPDIR}/html; sed -i 's@</TITLE>@</TITLE>\n<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">@' j*.html index.html)
 	cp -r ${TMPDIR}/html ./
 
