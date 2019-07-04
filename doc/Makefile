@@ -51,19 +51,12 @@ clean:
 distclean: clean
 	rm -f *.dvi *.pdf
 
-html: copy_eus_tex
-	nkf --in-place -u ${TMPDIR}/*.tex
-	mkdir ${TMPDIR}/html
-	sed -i 's@^\(\\\usepackage.*{hyperref}\)@%\1@' ${TMPDIR}/jmanual.tex
-	sed -i 's@\\\documentclass\[\]{jarticle}@\\\documentclass\[\]{article}@' ${TMPDIR}/jmanual.tex
-	sed -i 's@^\\\ifnum 42146@%\\\ifnum 42146@' ${TMPDIR}/jmanual.tex
-	(cd ${TMPDIR}; charset="UTF-8" latex2html -dir ${TMPDIR}/html -local_icons -auto_prefix -iso_language JP jmanual)
+html: dvi
+	mkdir -p ${TMPDIR}/html
+	(cd ${TMPDIR}; TRANSPARENT_COLOR="#ffffff" charset="UTF-8" latex2html -dir ${TMPDIR}/html -local_icons -split +3 -auto_prefix -init_file ${PWD}/../eus/doc/latex/.latex2html-init -iso_language JP -address "This document was generated using the LaTeX2HTML translator on `date` from <a href=\"http://github.com/euslisp/jskeus.git\">jskeus</a> version <a href=\"http://github.com/euslisp/jskeus/commit/`git -C ${PWD} rev-parse --verify HEAD`\">`git log -1  --oneline`</a>" -html_version="4.0,unicode" jmanual)
+	(cd ${TMPDIR}/html; for imgfile in jmanual-img*.png; do pngtopnm $$imgfile > /tmp/$$imgfile.pnm; pnmtopng -transparent white /tmp/$$imgfile.pnm > $$imgfile; done)
 	(cd ${TMPDIR}/html; sed -i 's@</TITLE>@</TITLE>\n<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">@' j*.html index.html)
-	sed -i 's@%\(\\\usepackage.*{hyperref}\)@\1@' ${TMPDIR}/jmanual.tex
-	sed -i 's@\\\documentclass\[\]{article}@\\\documentclass\[\]{jarticle}@' ${TMPDIR}/jmanual.tex
-	sed -i 's@^%\\\ifnum 42146@\\\ifnum 42146@' ${TMPDIR}/jmanual.tex
 	cp -r ${TMPDIR}/html ./
-	rm -fr ${TMPDIR}
 
 latex.py:
 	wget https://raw.githubusercontent.com/jobh/latex.py/master/latex.py
