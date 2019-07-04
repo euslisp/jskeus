@@ -76,9 +76,9 @@ author = u'Toshihiro Matsui, JSK Robotics Laboratory'
 # built documents.
 #
 # The short X.Y version.
-eusversion=subprocess.check_output(['git', 'describe', '--tags', subprocess.check_output(['git', 'rev-list', '--tags', '--max-count=1'], cwd='../eus').strip()], cwd='../eus').strip().replace('EusLisp-','')
 
-irtversion=subprocess.check_output(['git', 'describe', '--tags', subprocess.check_output(['git', 'rev-list', '--tags', '--max-count=1']).strip()]).strip()
+eusversion=str(subprocess.check_output(['git', 'describe', '--tags', subprocess.check_output(['git', 'rev-list', '--tags', '--max-count=1'], cwd='../eus').strip()], cwd='../eus').strip()).replace('EusLisp-','')
+irtversion=str(subprocess.check_output(['git', 'describe', '--tags', subprocess.check_output(['git', 'rev-list', '--tags', '--max-count=1']).strip()]).strip())
 version = u'{} / {}'.format(eusversion,irtversion)
 # The full version, including alpha/beta/rc tags.
 release = irtversion
