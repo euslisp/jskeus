@@ -23,6 +23,28 @@
 ///
 
 
+// for eus.h
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <setjmp.h>
+#include <errno.h>
+#include <sstream>
+
+#define class   eus_class
+#define throw   eus_throw
+#define export  eus_export
+#define vector  eus_vector
+#define string  eus_string
+#include <eus.h> // include eus.h just for eusfloat_t ...
+#undef class
+#undef throw
+#undef export
+#undef vector
+#undef string
+
+
 #include <btBulletCollisionCommon.h>
 #include <BulletCollision/NarrowPhaseCollision/btGjkCollisionDescription.h>
 #include <BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h>
@@ -176,41 +198,53 @@ long setMargin(long modelAddr, double margin)
 };
 
 extern "C" {
-  long callMakeSphereModel(double radius)
+  eusinteger_t callMakeSphereModel(double r)
   {
-    return makeSphereModel(radius);
+    return makeSphereModel(r);
   }
 
-  long callMakeBoxModel(double xsize, double ysize, double zsize)
+  eusinteger_t callMakeBoxModel(double xsize, double ysize, double zsize)
   {
     return makeBoxModel(xsize, ysize, zsize);
   }
 
-  long callMakeCylinderModel(double radius, double height)
+  eusinteger_t callMakeCylinderModel(double radius, double height)
   {
     return makeCylinderModel(radius, height);
   }
 
-  long callMakeCapsuleModel(double radius, double height)
+  eusinteger_t callMakeCapsuleModel(double radius, double height)
   {
     return makeCapsuleModel(radius, height);
   }
 
-  long callMakeMeshModel(double *verticesPoints, long numVertices)
+  eusinteger_t callMakeMeshModel(eusfloat_t *verticesPoints, eusinteger_t numVertices)
   {
-    return makeMeshModel(verticesPoints, numVertices);
+    double _verticesPoints[numVertices];
+    for (int i = 0; i < numVertices; i++ ) { _verticesPoints[i] = verticesPoints[i]; }
+    return makeMeshModel(_verticesPoints, numVertices);
   }
 
-  long callCalcCollisionDistance(long modelAddrA, long modelAddrB,
-                                 double *posA, double *quatA, double *posB, double *quatB,
-                                 double *dist, double *dir, double *pA, double *pB)
+  eusinteger_t callCalcCollisionDistance(eusinteger_t modelAddrA, eusinteger_t modelAddrB,
+					 eusfloat_t *posA, eusfloat_t *quatA, eusfloat_t *posB, eusfloat_t *quatB,
+					 eusfloat_t *dist, eusfloat_t *dir, eusfloat_t *pA, eusfloat_t *pB)
   {
-    return calcCollisionDistance(modelAddrA, modelAddrB,
-                                 posA, quatA, posB, quatB,
-                                 dist, dir, pA, pB);
+    double _posA[3], _quatA[4], _posB[3], _quatB[4];
+    double _dist[1], _dir[3], _pA[3], _pB[3];
+    eusinteger_t ret;
+    for (int i = 0; i < 3; i++ ) {_posA[i] = posA[i]; _posB[i] = posB[i]; }
+    for (int i = 0; i < 4; i++ ) {_quatA[i] = quatA[i]; _quatB[i] = quatB[i]; }
+    _dist[0] = dist[0];
+    for (int i = 0; i < 3; i++ ) {_dir[i] = dir[i]; _pA[i] = pA[i]; _pB[i] = pB[i];}
+    ret = calcCollisionDistance(modelAddrA, modelAddrB,
+				_posA, _quatA, _posB, _quatB,
+				_dist, _dir, _pA, _pB);
+    dist[0] = _dist[0];
+    for (int i = 0; i < 3; i++ ) {dir[i] = _dir[i]; pA[i] = _pA[i]; pB[i] = _pB[i];}
+    return ret;
   }
 
-  long callSetMargin(long modelAddr, double margin)
+  eusinteger_t callSetMargin(eusinteger_t modelAddr, double margin)
   {
     return setMargin(modelAddr, margin);
   }
