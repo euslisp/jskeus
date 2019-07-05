@@ -33,7 +33,7 @@ INSTALLLIBDIR=$(IRTEUSDIR)/$(ARCHDIR)/lib
 # check bullet version
 BULLET_VER_MAJOR:=$(shell pkg-config bullet --modversion | cut -f1 -d.)
 BULLET_VER_MINOR:=$(shell pkg-config bullet --modversion | cut -f2 -d.)
-export BULLET_GE_2_83=$(shell [ $(BULLET_VER_MAJOR) -gt 2 -o \( $(BULLET_VER_MAJOR) -eq 2 -a $(BULLET_VER_MINOR) -ge 83 \) ] && echo true)
+BULLET_GE_2_83=$(shell [ $(BULLET_VER_MAJOR) -gt 2 -o \( $(BULLET_VER_MAJOR) -eq 2 -a $(BULLET_VER_MINOR) -ge 83 \) ] && echo true)
 ifeq ($(BULLET_GE_2_83), true)
     EUSBULLET=eusbullet
 else
@@ -151,7 +151,7 @@ $(IRTEUSOBJS) $(INSTALLOBJDIR)/compile_irt.log: $(IRTEUS_L)
 
 $(IRTEUSGOBJS): $(INSTALLOBJDIR)/compile_irtg.log
 $(IRTEUSGOBJS) $(INSTALLOBJDIR)/compile_irtg.log: $(IRTEUSG_L) $(INSTALLLIBDIR)/$(LPFX)BULLET.$(LSFX)
-	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l > $(INSTALLOBJDIR)/compile_irtg.log
+	BULLET_GE_2_83=$(BULLET_GE_2_83) $(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l > $(INSTALLOBJDIR)/compile_irtg.log
 	-rm -f $(IRTEUSG_C) $(IRTEUSG_H)
 
 $(IRTEUSXOBJS): $(INSTALLOBJDIR)/compile_irtx.log
@@ -177,7 +177,7 @@ $(INSTALLLIBDIR)/$(LPFX)BULLET.$(LSFX): BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX)
 		cp BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX) $(INSTALLLIBDIR)/$(LPFX)BULLET.$(LSFX); \
 	fi
 
-BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX):
+BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX): BULLET/BulletCollision.cpp
 	if [ ${BULLET_GE_2_83} ]; then \
 		make -C BULLET; \
 	fi
