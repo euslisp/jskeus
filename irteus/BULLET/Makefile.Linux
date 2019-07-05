@@ -1,4 +1,4 @@
-CC = c++ -O2
+CC = c++ -O2 -DLinux -DGCC -I$(EUSDIR)/include
 OBJOPT = -o 
 OUTOPT = -o 
 LD = c++

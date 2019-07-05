@@ -1,4 +1,4 @@
-CC = c++ -O2 -fPIC
+CC = c++ -O2 -fPIC -falign-functions=4 -DLinux -DGCC -I$(EUSDIR)/include
 OBJOPT = -o 
 OUTOPT = -o 
 LD = c++

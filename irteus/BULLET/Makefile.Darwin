@@ -1,4 +1,4 @@
-CC = c++ -O2 -falign-functions=8 -fPIC 
+CC = c++ -O2 -falign-functions=8 -fPIC -DDarwin -DGCC -I$(EUSDIR)/include
 OBJOPT = -o 
 OUTOPT = -o 
 LD = c++
