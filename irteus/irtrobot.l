@@ -331,8 +331,12 @@
             (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target)))
     &allow-other-keys)
    "solve inverse kinematics, move move-target to target-coords
-    look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords
-    link-list is set by default based on move-target -> root link link-list"
+    target-coords and move-target should be given.
+    link-list is set by default based on move-target -> root link link-list
+    :look-at-target
+    ~ target head looks at. This task is best-effort and only head joints are used. :look-at-target supports t, nil, float-vector, coords, list of float-vector, list of coords.
+    other-keys
+    ~ :inverse-kinematics internally calls :inverse-kinematics of cascaded-cords class and args are passed to it. See the explanation of :inverse-kinematics of cascaded-cords class."
    (if (or (atom target-coords) (functionp target-coords)) (setq target-coords (list target-coords)))
    (when (null (every #'(lambda (x) (or (coordinates-p x) (functionp x))) target-coords))
      (warn ";; error: all target-coords should be Coordinates or functions, but get ~A~%" target-coords)
@@ -461,7 +465,20 @@
      &allow-other-keys)
     "fullbody inverse kinematics for legged robot.
      necessary args : target-coords, move-target, and link-list must include legs' (or leg's) parameters
-                      ex. (send *robot* :fullbody-inverse-kinematics (list rarm-tc rleg-tc lleg-tc) :move-target (list rarm-mt rleg-mt lleg-mt) :link-list (list rarm-ll rleg-ll lleg-ll))"
+                      ex. (send *robot* :fullbody-inverse-kinematics (list rarm-tc rleg-tc lleg-tc) :move-target (list rarm-mt rleg-mt lleg-mt) :link-list (list rarm-ll rleg-ll lleg-ll))
+    :min
+    ~ lower position limit of root link virtual joint (x y z roll pitch yaw). Default is #f(-500[mm] -500[mm]  -500[mm] -20[deg] -20[deg] -10[deg]).
+    :max
+    ~ upper position limit of root link virtual joint (x y z roll pitch yaw). Default is #f(500[mm] 500[mm] 25[mm] 20[deg] 20[deg] 10[deg]).
+    :root-link-virtual-joint-weight
+    ~ float-vector of inverse weight of velocity of root link virtual joint or a function which returns the float-vector (x y z roll pitch yaw). This works in the same way as :additional-weight-list in cascaded-coords::inverse-kinematics. Default is #f(0.1 0.1 0.1 0.1 0.5 0.5).
+    :joint-args
+    ~ list of other arguments passed to :init function of root link virtual joint (6dof-joint class).
+    ~~ :max-joint-velocity
+    ~~~ limit of velocity of root link virtual joint (x y z roll pitch yaw). Default is #f((/ 0.08 0.05)[m/s] (/ 0.08 0.05)[m/s] (/ 0.08 0.05)[m/s] (/ pi 4)[rad/s] (/ pi 4)[rad/s] (/ pi 4)[rad/s]))
+    other-keys
+    ~ :fullbody-inverse-kinematics internally calls :inverse-kinematics and args are passed to it. See the explanation of :inverse-kinematics.
+    "
     (with-append-root-joint ;; inverse-kinematics with root-link
      (link-list-with-robot-6dof self link-list
                                 :joint-class 6dof-joint
