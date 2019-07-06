@@ -358,7 +358,8 @@
          &allow-other-keys)
    "move move-target using dif-pos and dif-rot,
     look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords
-    link-list is set by default based on move-target -> root link link-list"
+    link-list is set by default based on move-target -> root link link-list
+    :inverse-kinematics-loop internally calls :inverse-kinematics-loop function of cascaded-coords class. See the explanation of :inverse-kinematics-loop in cascaded-coords class."
    (if (or (atom target-coords) (functionp target-coords)) (setq target-coords (list target-coords)))
    (prog1
        (send-super* :inverse-kinematics-loop dif-pos dif-rot
