@@ -2040,25 +2040,27 @@ z方向の移動量と回転方向は左手の逆運動学の計算に考慮さ�
 
 (let* ((rleg-coords (send *robot* :rleg :end-coords :copy-worldcoords))
        (lleg-coords (send *robot* :lleg :end-coords :copy-worldcoords)))
-   (send *robot* :fullbody-inverse-kinematics
-         (list rleg-coords
-               lleg-coords
-               (make-coords :pos (float-vector 400 100 -600)))
-         :move-target
-         (list (send *robot* :rleg :end-coords)
-               (send *robot* :lleg :end-coords)
-               (send *robot* :larm :end-coords))
-         :link-list
-         (list (send *robot* :link-list (send *robot* :rleg :end-coords :parent))
-               (send *robot* :link-list (send *robot* :lleg :end-coords :parent))
-               (send *robot* :link-list (send *robot* :larm :end-coords :parent)))
-         :translation-axis (list t t t)
-         :rotation-axis (list t t nil)
-         :target-centroid-pos (midpoint 0.5 (send *robot* :rleg :end-coords :worldpos)
-                                            (send *robot* :lleg :end-coords :worldpos))
-         :cog-translation-axis :z)
-      (send *obj* :locate (send *robot* :centroid) :world)
-      (send *irtviewer* :draw-objects))
+  (send *robot* :torso :waist-p :joint-angle 10)
+  (send *robot* :fullbody-inverse-kinematics
+        (list rleg-coords
+              lleg-coords
+              (make-coords :pos (float-vector 400 100 -600)))
+        :move-target
+        (list (send *robot* :rleg :end-coords)
+              (send *robot* :lleg :end-coords)
+              (send *robot* :larm :end-coords))
+        :link-list
+        (list (send *robot* :link-list (send *robot* :rleg :end-coords :parent))
+              (send *robot* :link-list (send *robot* :lleg :end-coords :parent))
+              (send *robot* :link-list (send *robot* :larm :end-coords :parent)))
+        :translation-axis (list t t t)
+        :rotation-axis (list t t nil)
+        :target-centroid-pos (midpoint 0.5
+                                       (send *robot* :rleg :end-coords :worldpos)
+                                       (send *robot* :lleg :end-coords :worldpos))
+        :cog-translation-axis :z)
+  (send *obj* :locate (send *robot* :centroid) :world)
+  (send *irtviewer* :draw-objects))
 \end{verbatim}
 }
 
@@ -2082,10 +2084,11 @@ z方向の移動量と回転方向は左手の逆運動学の計算に考慮さ�
 :cog-translation-axis :z)
 \end{verbatim}
 }
-の行では重心の逆運動学を指定しており、\verb|:cog-translation-axis :z|で
-z方向の重心の移動は許した状態で\verb|:target-centroid-pos|で目標位置として
+の行では重心の逆運動学を指定している。\verb|:cog-translation-axis :z|で
+z方向の重心の移動は許した状態で、\verb|:target-centroid-pos|で目標重心位置として
 両足の中間の座標を与えることによって、重心のxy座標を両足の中間に一致させる
-条件のもとで逆運動学を解くことになる。
+条件のもとで逆運動学を解くことができる。これらの引数は、デフォルト値になっている
+ので、省略可能である。
 
 \subsubsection{外力を考慮したfullbody-inverse-kinematicsを解く例}
 \begin{figure}[htb]
@@ -2158,7 +2161,7 @@ z方向の重心の移動は許した状態で\verb|:target-centroid-pos|で目�
                                      :moment-list moment-list))
 \end{verbatim}
 }
-の行で外力、外モーメントを考慮している。force-listは右手に作用する外力と左手に作用する外力のリスト、force-listは右手に作用する外モーメントと左手に作用する外モーメントのリストであり、単位はそれぞれ[N]、[Nm]である。:calc-static-balance-pointは、現在の両手の位置に作用する外力外モーメントと現在の重心の位置に作用する重力に対してバランスが取れる足裏圧力中心の位置を返す関数である。:centroid-offset-funcは\verb|float-vector|クラスを返す関数を指定することができ、現在の重心位置の代わりにこの関数の返り値を用いて目標重心位置との距離に応じた逆運動学を解く。\verb|:cog-translation-axis :z|でz方向の重心の移動は許した状態で\verb|:target-centroid-pos|で目標重心位置として両足の中間の座標を与えることによって、:centroid-offset-funcの返り値、即ちバランスが取れる足裏圧力中心のxy座標を両足の中間に一致させる逆運動学を解くことになる。
+の行で外力、外モーメントを考慮している。force-listは右手に作用する外力と左手に作用する外力のリスト、force-listは右手に作用する外モーメントと左手に作用する外モーメントのリストであり、単位はそれぞれ[N]、[Nm]である。:calc-static-balance-pointは、現在の両手の位置に作用する外力外モーメントと現在の重心の位置に作用する重力に対して釣り合う足裏圧力中心の位置を返す関数である。:centroid-offset-funcは\verb|float-vector|クラスを返す関数を指定することができ、現在の重心位置の代わりにこの関数の返り値を用いて目標重心位置との距離を縮める逆運動学を解く。\verb|:cog-translation-axis :z|でz方向の重心の移動は許した状態で\verb|:target-centroid-pos|で目標重心位置として両足の中間の座標を与えることによって、:centroid-offset-funcの返り値、即ち外力に釣り合いがとれる足裏圧力中心のxy座標を、両足の中間に一致させる逆運動学を解くことができる。
 
  \subsection{ロボットモデル}
 
