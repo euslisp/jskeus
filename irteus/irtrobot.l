@@ -1037,7 +1037,7 @@
    "Calculate static balance point which is equivalent to static extended ZMP.
     The output is expressed by the world coordinates.
     target-points are end-effector points on which force-list and moment-list apply.
-    force-list [N] and moment-list [Nm] are list of force and moment at target-points.
+    force-list [N] and moment-list [Nm] are list of force and moment that robot receives at target-points.
     static-balance-point-height is height of static balance point [mm]."
    (let* ((sbp (float-vector 0 0 static-balance-point-height))
           (mg (* 1e-6 (send self :weight update-mass-properties) (elt *g-vec* 2))))
@@ -1049,7 +1049,7 @@
                            (+ nume
                               (- (* (- (elt tp 2) static-balance-point-height) (elt f idx))
                                  (* (elt tp idx) (elt f 2)))
-                              (case idx (0 (- (elt m 1))) (1 (elt m 0))))
+                              (* 1e3 (case idx (0 (elt m 1)) (1 (- (elt m 0))))))
                            denom (- denom (elt f 2))))
                  force-list moment-list target-points)
          (setf (elt sbp idx) (/ nume denom))
