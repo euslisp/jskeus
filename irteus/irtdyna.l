@@ -1446,7 +1446,7 @@
 	   (R+btPb-1bt (m* R+btPb-1 bt))
 	   (qt (scale-matrix Q ct)))
       (dotimes (i delay)
-	(let* ((qt (if (= i (1- delay)) (m* P qt) qt))
+	(let* ((qt (if (= i (1- delay)) (m* P ct) qt))
                (fa (m* R+btPb-1 (m* bt (m* gsi qt)))))
           (setq gsi (m* A-bKt gsi))
           (dotimes (ii input-dim)
