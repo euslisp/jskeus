@@ -1042,6 +1042,27 @@
      (fullbody-ik-with-look-at robot :debug-view nil))
     ))
 
+(deftest test-go-pos-params->footstep-list
+    (let ((testfunc #'(lambda (x y th)
+                        (let* ((sc (send (send *sample-robot* :foot-midcoords) :copy-worldcoords))
+                               (tc (send (make-coords :pos (float-vector x y 0) :rpy (float-vector (deg2rad th) 0 0)) :transform sc :world))
+                               (footstep-list (send *sample-robot* :go-pos-params->footstep-list x y th))
+                               (gc (midcoords 0.5 (car (reverse footstep-list)) (cadr (reverse footstep-list))))
+                               (diff (send tc :transformation gc :local))
+                               (tran (send sc :transformation gc :local)))
+                          (assert (and
+                                   (eps= (elt (send diff :pos) 0) 0.0)
+                                   (eps= (elt (send diff :pos) 1) 0.0)
+                                   (eps= (rad2deg (elt (car (rpy-angle (send diff :rot))) 0)) 0.0))
+                                  (format nil "trans: input(~A ~A ~A) result(~A ~A ~A)" x y th (elt (send tran :pos) 0) (elt (send tran :pos) 1) (rad2deg (elt (car (rpy-angle (send tran :rot))) 0))))))))
+      (send *sample-robot* :reset-pose)
+      (send *sample-robot* :fix-leg-to-coords (make-coords))
+      (funcall testfunc 500 150 45)
+      (funcall testfunc -500 150 180)
+      (send *sample-robot* :fix-leg-to-coords (make-coords :rpy (float-vector  pi/2 0 0)))
+      (funcall testfunc 0 -150 135)
+      (send *sample-robot* :fix-leg-to-coords (make-coords :rpy (float-vector  pi 0 0)))
+      (funcall testfunc 500 150 90)))
 
 ;; Test calling calc-walk-pattern-from-footstep-list N times
 ;;   This test is for bug reported in https://github.com/euslisp/jskeus/issues/286.
