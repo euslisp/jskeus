@@ -687,7 +687,49 @@
          (ik-thre 1) (ik-rthre (deg2rad 1))
          (q 1.0) (r 1e-6) ;; Q is weighting of output error and R is weighting of input.
          (calc-zmp t))
-   "Calculate walking pattern from foot step list and return pattern list as a list of angle-vector, root-coords, time, and so on."
+   "Calculate walking pattern from foot step list and return pattern list as a list of angle-vector, root-coords, time, and so on.
+    footstep-list should be given.
+    :footstep-list
+    ~ (list footstep1 footstep2 ...). :footstep-list can be any length. Each footstep indicates the destinations of swing legs in each step.
+    ~ footstep should be list of coordinate whose :name is identical with one swing leg and whose coords is the destination of that leg. If number of swing legs in a step is one, the footstep can be a coordinate.
+    ~ footstep1 is only for intialization and not executed.
+    :default-step-height
+    ~ Height of swing leg cycloid trajectories. Default is 50[mm].
+    :dt
+    ~ Sampling time of preview control and output walk pattern. Default is 0.1[s].
+    :default-step-time
+    ~ Reference time of each step. The first 10 percent and the last 10 percent of default-step-time is double support phase. Default is 1.0[s].
+    :solve-angle-vector-args
+    ~ :move-centroid-on-foot is used to solve IK in :calc-walk-pattern-from-footstep-list. :solve-angle-vector-args is passed to :move-centroid-on-foot in the form of (send* self :move-centroid-on-foot ... solve-angle-vector-args). Default is nil.
+    :debug-view
+    ~ Set t to show visualization. Default is nil.
+    :all-limbs
+    ~ list of limb names. In each walking step, limbs in :all-limbs but not assigned as swing legs by :footstep-list are considered to be support legs. Default is '(:rleg :lleg) sorted in force-sensors order.
+    :default-zmp-offsets
+    ~ (list limbname1 offset1 limbname2 offset2 ...). :default-zmp-offsets should include every limb in :all-limbs. offset is a float-vector[mm] and local offset of reference zmp position from end-coords. Default offset is #F(0 0 0)[mm].
+    :init-pose-function
+    ~ A function which initialize robot's pose. Walking pattern is generated from this initial pose. :init-pose-function is called once at the start of walking pattern generation in the form of (funcall init-pose-function). Default is #'(lambda () (send self :move-centroid-on-foot :both '(:rleg :lleg))).
+    :start-with-double-support
+    ~ At the start of walking pattern generation, the initial position of reference zmp is
+    ~~ t: midpoint of all-limbs.
+    ~~ nil: midpoint of swing legs of footstep1.
+    ~ Default is t.
+    :end-with-double-support
+    ~ At the end of walking pattern generation, the final position of reference zmp is
+    ~~ t: midpoint of all-limbs.
+    ~~ nil: midpoint of support legs of the last footstep.
+    ~ Default is t.
+    :ik-thre
+    ~ Threshold for position error to terminate IK iteration. Default is 1[mm].
+    :ik-rthre
+    ~ Threshold for rotation error to terminate IK iteration. Default is (deg2rad 1)[rad].
+    :q
+    ~ Weight Q of the cost function of preview control. Default is 1.0.
+    :r
+    ~ Weight R of the cost function of preview control. Default is 1e-6.
+    :calc-zmp
+    ~ Set t to calculate resultant ZMP after IK. The calculated ZMP is visualized if :debug-view is t, and stored as czmp in return value. Default is t.
+   "
    (let* ((res) (ret) (tm 0)
           (gg (instance gait-generator :init self dt)))
      (funcall init-pose-function)
