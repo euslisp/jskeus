@@ -1180,6 +1180,10 @@
 ;;; riccati equation class
 ;;;  solve steady solution of riccati equation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Sample
+;;; (send (instance riccati-equation :init AA bb cc QQ RR) :solve)
+;; irteusgl$ (send (instance riccati-equation :init (make-matrix 4 4 '((0 0 1 0) (0 0 0 1) (34.67763 0 0 0) (-679.76829 0 0 0))) (make-matrix 4 1 '((0) (0) (-1.27842) (32.73032))) (make-matrix 2 4 '((1 0 0 0) (0 1 0 0))) 4 7) :solve)
+;; (#2f((1.757195e+05 0.0 0.0 0.0) (0.0 4.0 0.0 0.0) (0.0 0.0 1.757195e+05 0.0) (0.0 0.0 0.0 4.0)) #2f((-27.0313 0.0 0.0 0.0)))
 (defclass riccati-equation
   :super propertied-object
   :slots (A b c P Q R K
@@ -1211,6 +1215,65 @@
           (setq P prevP)
           )))
       (warn ";; ERROR in (reccati (:solve)) : Counld not convergence ~A~%" diffP)
+      ))
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; riccati equation class by Arimoto Potter method
+;;;  solve riccati equation based on eigenvalue decomposition
+;;;   http://www.humachine.fr.dendai.ac.jp/lec/SDRE_%E3%83%86%E3%82%AF%E3%83%8E%E3%82%BB%E3%83%B3%E3%82%BF%E8%AC%9B%E6%BC%9405.pdf
+;;;   http://www.maizuru-ct.ac.jp/control/kawata/study/book3/matlab/chap08/doc/sec842.html
+;;;   http://stlab.ssi.ist.hokudai.ac.jp/yuhyama/lecture/linearsys/st8-8up.pdf
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Sample
+;;; (send (instance riccati-equation-arimoto-potter-method :init AA BB QQ RR) :solve)
+;; irteusgl$ (send (instance riccati-equation-arimoto-potter-method :init (make-matrix 4 4 '((0 0 1 0) (0 0 0 1) (34.67763 0 0 0) (-679.76829 0 0 0))) (make-matrix 4 1 '((0) (0) (-1.27842) (32.73032))) (make-matrix 4 4 '((4 0 0 0) (0 4 0 0) (0 0 4 0) (0 0 0 4))) (make-matrix 1 1 '((7)))) :solve)
+;; (#2f((35705.6 314.265 12343.3 441.199) (314.265 7.02923 111.06 4.17625) (12343.3 111.06 4331.8 156.495) (441.199 4.17625 156.495 5.82846)) #2f((-191.33 -0.755929 -59.3904 -1.3284)))
+(defclass riccati-equation-arimoto-potter-method
+  :super propertied-object
+  :slots (A B Q R
+          P K
+          ))
+(defmethod riccati-equation-arimoto-potter-method
+  (:init (AA BB QQ RR)
+    (setq A AA B BB Q QQ R RR))
+  (:solve ()
+    (let* ((n (car (array-dimensions A))) ;; dimensions n
+           (H11 A)
+           (H12 (m* (m* (scale-matrix -1 B) (inverse-matrix R)) (transpose B)))
+           (H21 (scale-matrix -1 Q))
+           (H22 (scale-matrix -1 (transpose A)))
+           (Hamilton (concatenate-matrix-column
+                      (concatenate-matrix-row H11 H12)
+                      (concatenate-matrix-row H21 H22))) ;; Hamilton matrix (2n*2n size)
+           Lambda V V-negative-eigen V1 V2)
+      ;; (setq Hamilton (make-matrix 3 3 '((0 6 -1) (6 2 -16) (-5 20 -10)))) ;; Eigen values of this matrix are complex number
+      ;;;;; Eigenvalue Decomposition for Hamilton Matrix (to solve Eigen Values and Eigen Vectors) ;;;;;
+      (if (= (norm (cadr (qr-decompose Hamilton))) 0) ;; Eigen values are real number only
+          (progn
+            (setq Lambda (car (eigen-decompose Hamilton))) ;; all eigen values (2n size float-vector)
+            (setq V (cadr (eigen-decompose Hamilton)))) ;; matrix composed of counterpart eigen vectors (2n*2n size)
+        (progn
+          (warn ";; ERROR in (reccati (:solve)) : Eigen Values of Hamilton Matrix are Complex Number, so Counterpart Eigen Vectors are NOT Supported by (eigen-decompose) function.~%")
+          (return-from :solve))
+        )
+      ;;;;; Generate Matrix Composed of Eigen Vectors which have Negative Eigen Values (2n*n size) ;;;;;
+      (dotimes (i (* 2 n))
+        (if (< (elt Lambda i) 0) ;; negative eigen values only
+            (push (matrix-column V i) V-negative-eigen)
+          ))
+      (setq V-negative-eigen (reverse V-negative-eigen))
+      (setq V-negative-eigen (apply 'matrix V-negative-eigen))
+      (setq V-negative-eigen (transpose V-negative-eigen))
+      ;; (print V-negative-eigen)
+      ;;;;; Split V-negative-eigen into Two Rows ;;;;;
+      (setq V1 (m* (concatenate-matrix-row (unit-matrix n) (make-matrix n n)) V-negative-eigen)) ;; upper row matrix of V-negative-eigen ((E O)*V-negative-eigen)
+      (setq V2 (m* (concatenate-matrix-row (make-matrix n n) (unit-matrix n)) V-negative-eigen)) ;; lower row matrix of V-negative-eigen ((O E)*V-negative-eigen)
+      (setq P (m* V2 (inverse-matrix V1))) ;; solution P of riccati equation:  P = V2*invV1
+      ;; (format-array P)
+      (setq K (m* (m* (inverse-matrix R) (transpose B)) P)) ;; LQR state feedback gain K:  u = -Kx = -(invR*transB*P)x
+      ;; (warn "K = ~a~%" K)
+      (return-from :solve (list P K))
       ))
   )
 
