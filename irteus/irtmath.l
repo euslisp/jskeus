@@ -42,6 +42,47 @@
        (setf (aref vec i) 0.0))
      result))
 
+(defun inverse-matrix-complex (cmat)
+  "returns inverse matrix of complex matrix"
+  ;; cmat = (list A B) = A + B*j  (j is imaginary unit)
+  ;; inv(cmat) = (list C D) = C + D*j
+  ;; solve C and D from (A + B*j)*(C + D*j) = E
+  ;; https://hitotu.at.webry.info/201405/article_1.html
+  (let* ((A (car cmat)) ;; n*n size
+         (B (cadr cmat)) ;; n*n size
+         C ;; n*n size
+         D ;; n*n size
+         F C-D
+         (n (car (array-dimensions A))))
+    (setq F (concatenate-matrix-column
+             (concatenate-matrix-row A (scale-matrix -1.0 B))
+             (concatenate-matrix-row B A))) ;; 2n*2n size
+    ;; (warn "det(F) = ~a~%" (matrix-determinant F))
+    ;; (if (eps= (matrix-determinant F) 0 1.0e-10)
+    ;; (if (eps= (matrix-determinant F) 0 1.0e-5)
+    (if (= (matrix-determinant F) 0)
+        (progn
+          (warn ";; could not solve inverse-matrix-complex because matrix-determinant = 0~%")
+          (return-from inverse-matrix-complex))
+      (progn
+        (setq C-D (m* (inverse-matrix F) (concatenate-matrix-column (unit-matrix n) (make-matrix n n)))) ;; [C D]^{T} = inv(F)*[E O]^{T}
+        (setq C (m* (concatenate-matrix-row (unit-matrix n) (make-matrix n n)) C-D)) ;; C = [E O]*[C D]^{T}
+        (setq D (m* (concatenate-matrix-row (make-matrix n n) (unit-matrix n)) C-D)) ;; D = [O E]*[C D]^{T}
+        (list C D))
+      )
+    ))
+
+(defun m*-complex (cmat1 cmat2)
+  "returns complex matrix 1 * complex matrix 2"
+  ;; cmat1 = (list A B) = A + B*j  (j is imaginary unit)
+  ;; cmat2 = (list C D) = C + D*j
+  (let* ((A (car cmat1))
+         (B (cadr cmat1))
+         (C (car cmat2))
+         (D (cadr cmat2)))
+    (list (m- (m* A C) (m* B D)) (m+ (m* A D) (m* B C))) ;; (A + B*j)*(C + D*j) = (A*C - B*D) + (A*D + B*C)*j
+    ))
+
 (defun diagonal (v)
   "make diagonal matrix from given vecgtor, diagonal #f(1 2) ->#2f((1 0)(0 2))"
   (let* ((size (length v))
@@ -369,6 +410,93 @@
 	    )))
       (setf (matrix-column evector i) tv))
     (list evalue evector)))
+
+(defun eigen-decompose-complex (m)
+  ;; m is real square matrix
+  (let* ((evalue-real (car (qr-decompose m)))
+         (evalue-imag (cadr (qr-decompose m)))
+         (l (length evalue-real))
+         (evalue (make-list l))
+         (evector-real (make-matrix l l))
+         (evector-imag (make-matrix l l))
+         lambda-i lambda-i-real lambda-i-imag
+         U11 U12 U21 U22 U
+         v-i v-i-real v-i-imag)
+    (dotimes (i l)
+      (setf (elt evalue i) (float-vector (elt evalue-real i) (elt evalue-imag i))))
+    (sort evalue #'(lambda (x y) (> (elt x 0) (elt y 0)))) ;; sort Re(evalue) in descending order
+    (dotimes (i l)
+      (setq lambda-i (elt evalue i))
+      (setq lambda-i-real (elt lambda-i 0))
+      (setq lambda-i-imag (elt lambda-i 1))
+      (setf (elt evalue-real i) lambda-i-real)
+      (setf (elt evalue-imag i) lambda-i-imag)
+      ;;;;; solve v_{i}^{real} and v_{i}^{imag}
+      ;;;;; s.t. (M-\lambda_{i}*E)*v_{i} = O,  (det(M-\lambda_{i}*E) = 0)
+      ;;;;; s.t. \lambda_{i} = \lambda_{i}^{real} + \lambda_{i}^{imag}*j,  (j is imaginary unit)
+      ;;;;; s.t. v_{i} = v_{i}^{real} + v_{i}^{imag}*j  (v_{i} \neq O)
+      (setq U11 (m+ m (scale-matrix (- lambda-i-real) (unit-matrix l)))) ;; M-\lambda_{i}^{real}*E  (l*l size)
+      (setq U12 (scale-matrix lambda-i-imag (unit-matrix l))) ;; \lambda_{i}^{imag}*E  (l*l size)
+      (setq U21 (scale-matrix (- lambda-i-imag) (unit-matrix l))) ;; -\lambda_{i}^{imag}*E  (l*l size)
+      (setq U22 (m+ m (scale-matrix (- lambda-i-real) (unit-matrix l)))) ;; M-\lambda_{i}^{real}*E  (l*l size)
+      (setq U (concatenate-matrix-column
+               (concatenate-matrix-row U11 U12)
+               (concatenate-matrix-row U21 U22))) ;; (2l*2l size)
+      (setq v-i (solve-non-zero-vector-from-det0-matrix U)) ;; solve [v_{i}^{real} v_{i}^{imag}]^{T}  s.t.  U * [v_{i}^{real} v_{i}^{imag}]^{T} = O
+      (setq v-i-real (transform (concatenate-matrix-row (unit-matrix l) (make-matrix l l)) v-i)) ;; v_{i}^{real} = [E O] * [v_{i}^{real} v_{i}^{imag}]^{T}
+      (setq v-i-imag (transform (concatenate-matrix-row (make-matrix l l) (unit-matrix l)) v-i)) ;; v_{i}^{imag} = [O E] * [v_{i}^{real} v_{i}^{imag}]^{T}
+      (setf (matrix-column evector-real i) v-i-real)
+      (setf (matrix-column evector-imag i) v-i-imag)
+      )
+    (list (list evalue-real evalue-imag) (list evector-real evector-imag))
+    ))
+
+;; solve non-zero-vector v from determinant-zero-matrix M, when M*v=O and det(M)=0
+(defun solve-non-zero-vector-from-det0-matrix (M)
+  ;; M is real square matrix which satisfies det(M)=0 (i.e. inverse matrix of M does NOT exist)
+  ;; (unless (eps= (matrix-determinant M) 0 1.0e-10)
+  (unless (eps= (matrix-determinant M) 0 1.0e-5)
+    (warn ";; ERROR : det(M) is NOT equal to 0 (i.e. inverse matrix of M exists).~%")
+    (return-from solve-non-zero-vector-from-det0-matrix))
+  (let* ((l (car (array-dimensions M)))
+         mm mmm tv ttv pv r w j (j-max 10))
+    (setq mm M)
+    (setq mmm (copy-matrix mm))
+    ;; inverse iteration
+    ;; using lu
+    (when (setq pv (lu-decompose mm))
+      ;; make random vector
+      (setq tv (instantiate float-vector l))
+      ;; generate non-zero random vector
+      (while (eps= (norm tv) 0)
+        (dotimes (i l) (setf (elt tv i) (- (random 1.0) 0.5)))
+        (setq tv (normalize-vector tv)))
+      ;;
+      (setq ttv tv j 0)
+      (loop
+       (setq tv (lu-solve mm pv tv))
+       (setq tv (normalize-vector tv))
+       ;; exit loop when no updates
+       (if (or (>= (incf j) j-max) (eps= (distance ttv tv) 0))
+           (return-from nil))
+       ;; update non-zero vector
+       (when (> j (/ j-max 2))
+         (setq mm M)
+         (setq pv (lu-decompose mm))
+         (if (null pv) (return-from nil))
+         )
+       (setq ttv tv))
+      (when (>= j j-max)
+        (setq pv nil))
+      )
+    (unless pv
+      (setq r (sv-decompose mmm))
+      (setq w (elt r 1))
+      (dotimes (j (length w))
+        (if (< (abs (elt w j)) 1e-4)
+            (setq tv (matrix-column (elt r 2) j))
+          )))
+    tv))
 
 ;; lmeds
 ;;http://www-pse.cheme.kyoto-u.ac.jp/~kano/document/text-PCA.pdf
