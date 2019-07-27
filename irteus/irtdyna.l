@@ -1245,34 +1245,38 @@
            (H22 (scale-matrix -1 (transpose A)))
            (Hamilton (concatenate-matrix-column
                       (concatenate-matrix-row H11 H12)
-                      (concatenate-matrix-row H21 H22))) ;; Hamilton matrix (2n*2n size)
-           Lambda V V-negative-eigen V1 V2)
-      ;; (setq Hamilton (make-matrix 3 3 '((0 6 -1) (6 2 -16) (-5 20 -10)))) ;; Eigen values of this matrix are complex number
+                      (concatenate-matrix-row H21 H22))) ;; Hamilton matrix (2n*2n size matrix)
+           Lambda V
+           V-negative-eigen-real V-negative-eigen-imag V-negative-eigen
+           V1-real V1-imag V1
+           V2-real V2-imag V2)
       ;;;;; Eigenvalue Decomposition for Hamilton Matrix (to solve Eigen Values and Eigen Vectors) ;;;;;
-      (if (= (norm (cadr (qr-decompose Hamilton))) 0) ;; Eigen values are real number only
-          (progn
-            (setq Lambda (car (eigen-decompose Hamilton))) ;; all eigen values (2n size float-vector)
-            (setq V (cadr (eigen-decompose Hamilton)))) ;; matrix composed of counterpart eigen vectors (2n*2n size)
-        (progn
-          (warn ";; ERROR in (reccati (:solve)) : Eigen Values of Hamilton Matrix are Complex Number, so Counterpart Eigen Vectors are NOT Supported by (eigen-decompose) function.~%")
-          (return-from :solve))
-        )
-      ;;;;; Generate Matrix Composed of Eigen Vectors which have Negative Eigen Values (2n*n size) ;;;;;
+      (setq Lambda (car (eigen-decompose-complex Hamilton))) ;; all eigen values '(Re(Lambda) Im(Lambda)) = '(#f(2n size float-vector) #f(2n size float-vector))
+      (setq V (cadr (eigen-decompose-complex Hamilton))) ;; matrix composed of counterpart eigen vectors '(Re(V) Im(V)) = '(#2f(2n*2n size matrix) #2f(2n*2n size matrix))
+      ;;;;; Generate Matrix Composed of Eigen Vectors which have "Negative Real Part" Eigen Values (2n*n size matrix) ;;;;;
       (dotimes (i (* 2 n))
-        (if (< (elt Lambda i) 0) ;; negative eigen values only
-            (push (matrix-column V i) V-negative-eigen)
-          ))
-      (setq V-negative-eigen (reverse V-negative-eigen))
-      (setq V-negative-eigen (apply 'matrix V-negative-eigen))
-      (setq V-negative-eigen (transpose V-negative-eigen))
+        (if (< (elt (car Lambda) i) 0) ;; "negative real part" eigen values only
+            (progn
+              (push (matrix-column (car V) i) V-negative-eigen-real)
+              (push (matrix-column (cadr V) i) V-negative-eigen-imag))
+          )
+        )
+      (setq V-negative-eigen (mapcar #'(lambda (x) (transpose (apply 'matrix (reverse x)))) (list V-negative-eigen-real V-negative-eigen-imag)))
       ;; (print V-negative-eigen)
       ;;;;; Split V-negative-eigen into Two Rows ;;;;;
-      (setq V1 (m* (concatenate-matrix-row (unit-matrix n) (make-matrix n n)) V-negative-eigen)) ;; upper row matrix of V-negative-eigen ((E O)*V-negative-eigen)
-      (setq V2 (m* (concatenate-matrix-row (make-matrix n n) (unit-matrix n)) V-negative-eigen)) ;; lower row matrix of V-negative-eigen ((O E)*V-negative-eigen)
-      (setq P (m* V2 (inverse-matrix V1))) ;; solution P of riccati equation:  P = V2*invV1
-      ;; (format-array P)
-      (setq K (m* (m* (inverse-matrix R) (transpose B)) P)) ;; LQR state feedback gain K:  u = -Kx = -(invR*transB*P)x
-      ;; (warn "K = ~a~%" K)
+      (setq V1-real (m* (concatenate-matrix-row (unit-matrix n) (make-matrix n n)) (car V-negative-eigen))) ;; upper row matrix of Re(V-negative-eigen),  Re(V1) = [E O] * Re(V-negative-eigen)
+      (setq V1-imag (m* (concatenate-matrix-row (unit-matrix n) (make-matrix n n)) (cadr V-negative-eigen))) ;; upper row matrix of Im(V-negative-eigen),  Im(V1) = [E O] * Im(V-negative-eigen)
+      (setq V1 (list V1-real V1-imag))
+      (setq V2-real (m* (concatenate-matrix-row (make-matrix n n) (unit-matrix n)) (car V-negative-eigen))) ;; lower row matrix of Re(V-negative-eigen),  Re(V2) = [O E] * Re(V-negative-eigen)
+      (setq V2-imag (m* (concatenate-matrix-row (make-matrix n n) (unit-matrix n)) (cadr V-negative-eigen))) ;; lower row matrix of Im(V-negative-eigen),  Im(V2) = [O E] * Im(V-negative-eigen)
+      (setq V2 (list V2-real V2-imag))
+      (setq P (m*-complex V2 (inverse-matrix-complex V1))) ;; solution P of riccati equation:  P = V2 * inv(V1)
+      (unless (eps= (norm (array-entity (cadr P))) 0.0) ;; If Im(P) \neq O
+        (warn ";; !!WARNING!! : imaginary part of riccati solution Im(P) should be zero matrix.~%")
+        (warn ";; Im(P) = ~a~%" (cadr P))
+        )
+      (setq P (car P)) ;; P = Re(P), Im(P) = O
+      (setq K (m* (m* (inverse-matrix R) (transpose B)) P)) ;; LQR state feedback gain K:  u = -Kx = -(inv(R)*trans(B)*P)x
       (return-from :solve (list P K))
       ))
   )
