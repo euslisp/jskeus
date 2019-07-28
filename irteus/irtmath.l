@@ -442,6 +442,9 @@
       (setq U (concatenate-matrix-column
                (concatenate-matrix-row U11 U12)
                (concatenate-matrix-row U21 U22))) ;; (2l*2l size)
+      (warn "i = ~a~%" i) ;; for debug
+      (warn "(matrix-determinant U) = ~a~%" (matrix-determinant U)) ;; for debug
+      (warn "(eps= (matrix-determinant U) 0 1.0e-5) = ~a~%" (eps= (matrix-determinant U) 0 1.0e-5)) ;; for debug
       (setq v-i (solve-non-zero-vector-from-det0-matrix U)) ;; solve [v_{i}^{real} v_{i}^{imag}]^{T}  s.t.  U * [v_{i}^{real} v_{i}^{imag}]^{T} = O
       (setq v-i-real (transform (concatenate-matrix-row (unit-matrix l) (make-matrix l l)) v-i)) ;; v_{i}^{real} = [E O] * [v_{i}^{real} v_{i}^{imag}]^{T}
       (setq v-i-imag (transform (concatenate-matrix-row (make-matrix l l) (unit-matrix l)) v-i)) ;; v_{i}^{imag} = [O E] * [v_{i}^{real} v_{i}^{imag}]^{T}
@@ -457,6 +460,8 @@
   ;; (unless (eps= (matrix-determinant M) 0 1.0e-10)
   (unless (eps= (matrix-determinant M) 0 1.0e-5)
     (warn ";; ERROR : det(M) is NOT equal to 0 (i.e. inverse matrix of M exists).~%")
+    (warn "(matrix-determinant M) = ~a~%" (matrix-determinant M)) ;; for debug
+    (warn "M = ~a~%" M) ;; for debug
     (return-from solve-non-zero-vector-from-det0-matrix))
   (let* ((l (car (array-dimensions M)))
          mm mmm tv ttv pv r w j (j-max 10))
