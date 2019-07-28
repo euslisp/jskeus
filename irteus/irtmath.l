@@ -442,22 +442,6 @@
       (setq U (concatenate-matrix-column
                (concatenate-matrix-row U11 U12)
                (concatenate-matrix-row U21 U22))) ;; (2l*2l size)
-      ;; for debug (START)
-      (if (= i 0)
-          (progn
-            (warn "U = ~a~%" U)
-            (dotimes (j (car (array-dimensions U)))
-              (dotimes (k (cadr (array-dimensions U)))
-                (warn "U(~a,~a) = ~1,16f~%" j k (aref U j k))
-                )
-              (warn "================~%")
-              )
-            (warn "(matrix-determinant U) = ~1,16f~%" (matrix-determinant U))
-            (warn "det1 = ~1,16f~%" (matrix-determinant #2f((-10.3444205811409233 2.0 3.0 4.0 0.0 0.0 0.0 0.0) (5.0 -5.3444205811409233 7.0 8.0 0.0 0.0 0.0 0.0) (9.0 4.0 -16.3444205811409233 3.0 0.0 0.0 0.0 0.0) (-1.0 0.0 3.0 -16.3444205811409233 0.0 0.0 0.0 0.0) (0.0 0.0 0.0 0.0 -10.3444205811409233 2.0 3.0 4.0) (0.0 0.0 0.0 0.0 5.0 -5.3444205811409233 7.0 8.0) (0.0 0.0 0.0 0.0 9.0 4.0 -16.3444205811409233 3.0) (0.0 0.0 0.0 0.0 -1.0 0.0 3.0 -16.3444205811409233))))
-            (setq *UM* #2f((-10.3444205811409233 2.0 3.0 4.0 0.0 0.0 0.0 0.0) (5.0 -5.3444205811409233 7.0 8.0 0.0 0.0 0.0 0.0) (9.0 4.0 -16.3444205811409233 3.0 0.0 0.0 0.0 0.0) (-1.0 0.0 3.0 -16.3444205811409233 0.0 0.0 0.0 0.0) (0.0 0.0 0.0 0.0 -10.3444205811409233 2.0 3.0 4.0) (0.0 0.0 0.0 0.0 5.0 -5.3444205811409233 7.0 8.0) (0.0 0.0 0.0 0.0 9.0 4.0 -16.3444205811409233 3.0) (0.0 0.0 0.0 0.0 -1.0 0.0 3.0 -16.3444205811409233)))
-            (warn "det2 = ~1,16f~%" (matrix-determinant *UM*))
-            ))
-      ;; for debug (END)
       (setq v-i (solve-non-zero-vector-from-det0-matrix U)) ;; solve [v_{i}^{real} v_{i}^{imag}]^{T}  s.t.  U * [v_{i}^{real} v_{i}^{imag}]^{T} = O
       (setq v-i-real (transform (concatenate-matrix-row (unit-matrix l) (make-matrix l l)) v-i)) ;; v_{i}^{real} = [E O] * [v_{i}^{real} v_{i}^{imag}]^{T}
       (setq v-i-imag (transform (concatenate-matrix-row (make-matrix l l) (unit-matrix l)) v-i)) ;; v_{i}^{imag} = [O E] * [v_{i}^{real} v_{i}^{imag}]^{T}
@@ -471,7 +455,8 @@
 (defun solve-non-zero-vector-from-det0-matrix (M)
   ;; M is real square matrix which satisfies det(M)=0 (i.e. inverse matrix of M does NOT exist)
   ;; (unless (eps= (matrix-determinant M) 0 1.0e-10)
-  (unless (eps= (matrix-determinant M) 0 1.0e-5)
+  ;; (unless (eps= (matrix-determinant M) 0 1.0e-5)
+  (unless (eps= (matrix-determinant M) 0)
     (warn ";; ERROR : det(M) is NOT equal to 0 (i.e. inverse matrix of M exists).~%")
     (return-from solve-non-zero-vector-from-det0-matrix))
   (let* ((l (car (array-dimensions M)))
