@@ -1190,10 +1190,17 @@
             A-bKt R+btPb-1 ;; for buffer
             ))
 (defmethod riccati-equation
-  (:init (AA bb cc QQ RR) 
+  (:init (AA bb cc QQ RR)
+    "Initialize riccati-equation.
+     A, B, C are state eq matrices.
+     q, r are weighting parameters (scalar) of LQR evaluation function."
     (setq A AA b BB c CC Q QQ R RR)
     (setq P (make-matrix (array-dimension c 1) (array-dimension c 1))))
   (:solve ()
+    "Solve riccati-equation.
+     Return (list P K).
+     P is solution (matrix) of riccati equation based on iterative method.
+     K is LQR state feedback gain (matrix):  u = -Kx = -(inv(R)*trans(B)*P)x."
     (let (diffP
 	  (At (transpose A))
 	  (bt (transpose b))
@@ -1236,8 +1243,15 @@
           ))
 (defmethod riccati-equation-arimoto-potter-method
   (:init (AA BB QQ RR)
+    "Initialize riccati-equation-arimoto-potter-method.
+     A, B are state eq matrices.
+     Q, R are weighting matrices of LQR evaluation function."
     (setq A AA B BB Q QQ R RR))
   (:solve ()
+    "Solve riccati-equation-arimoto-potter-method.
+     Return (list P K).
+     P is solution (matrix) of riccati equation based on Arimoto Potter method (eigenvalue decomposition method).
+     K is LQR state feedback gain (matrix):  u = -Kx = -(inv(R)*trans(B)*P)x."
     (let* ((n (car (array-dimensions A))) ;; dimensions n
            (H11 A)
            (H12 (m* (m* (scale-matrix -1 B) (inverse-matrix R)) (transpose B)))
