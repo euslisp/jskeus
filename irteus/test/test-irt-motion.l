@@ -915,6 +915,21 @@
                           0 5))))
     ))
 
+;;test for go-pos-params->footstep-list
+(defun test-go-pos-params->footstep-list (robot x y th)
+  (let* ((sc (send (send robot :foot-midcoords) :copy-worldcoords))
+         (tc (send (make-coords :pos (float-vector x y 0) :rpy (float-vector (deg2rad th) 0 0)) :transform sc :world))
+         (footstep-list (send robot :go-pos-params->footstep-list x y th))
+         (gc (midcoords 0.5 (car (reverse footstep-list)) (cadr (reverse footstep-list))))
+         (diff (send tc :transformation gc :local))
+         )
+    (and
+     (eps= (elt (send diff :pos) 0) 0.0)
+     (eps= (elt (send diff :pos) 1) 0.0)
+     (eps= (rad2deg (elt (car (rpy-angle (send diff :rot))) 0)) 0.0))
+    )
+  )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; unit tests
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1042,6 +1057,60 @@
      (fullbody-ik-with-look-at robot :debug-view nil))
     ))
 
+(deftest test-go-pos-params->footstep-list-test_0_500_0_0
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 500 0 0)))
+
+(deftest test-go-pos-params->footstep-list-test_0_0_150_0
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 0 150 0)))
+
+(deftest test-go-pos-params->footstep-list-test_0_0_-150_0
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 0 -150 0)))
+
+(deftest test-go-pos-params->footstep-list-test_0_0_0_45
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 0 0 45)))
+
+(deftest test-go-pos-params->footstep-list-test_0_0_0_-45
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 0 0 -45)))
+
+(deftest test-go-pos-params->footstep-list-test_0_0_0_180
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 0 0 180)))
+
+(deftest test-go-pos-params->footstep-list-test_0_0_0_-180
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 0 0 -180)))
+
+(deftest test-go-pos-params->footstep-list-test_0_500_150_45
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 500 150 45)))
+
+(deftest test-go-pos-params->footstep-list-test_pi/2_500_150_45
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords :rpy (float-vector pi/2 0 0)))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 500 150 45)))
+
+(deftest test-go-pos-params->footstep-list-test_-pi/2_500_150_45
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords :rpy (float-vector -pi/2 0 0)))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 500 150 45)))
+
+(deftest test-go-pos-params->footstep-list-test_pi_500_150_45
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords :rpy (float-vector pi 0 0)))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 500 150 45)))
 
 ;; Test calling calc-walk-pattern-from-footstep-list N times
 ;;   This test is for bug reported in https://github.com/euslisp/jskeus/issues/286.
