@@ -35,12 +35,11 @@ BULLET_VER_MAJOR:=$(shell pkg-config bullet --modversion | cut -f1 -d.)
 BULLET_VER_MINOR:=$(shell pkg-config bullet --modversion | cut -f2 -d.)
 BULLET_GE_2_83=$(shell [ $(BULLET_VER_MAJOR) -gt 2 -o \( $(BULLET_VER_MAJOR) -eq 2 -a $(BULLET_VER_MINOR) -ge 83 \) ] && echo true)
 ifeq ($(BULLET_GE_2_83), true)
-    EUSBULLET=eusbullet
+    HAVE_BULLET=1
 else
-    EUSBULLET=
+    HAVE_BULLET=0
 endif
-$(info "--      BULLET_GE_2_83 = ${BULLET_GE_2_83}") # BULLET_GE_2_83 is environment variable because referenced in compile_irtg.l
-$(info "--      EUSBULLET = ${EUSBULLET}")
+$(info "--      HAVE_BULLET = ${HAVE_BULLET}")
 
 # common
 WFLAGS= #-Wall
@@ -56,7 +55,7 @@ MODULES.L=irt_modules.l
 EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 
 IRTEUS=irtmath irtutil irtgraph pgsql time
-IRTEUSG=irtgeo pqp irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud $(EUSBULLET)
+IRTEUSG=irtgeo pqp irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud eusbullet
 IRTEUSX=irtx
 IRTEUSIMG=irtimage eusjpeg png
 IRTEUSGL=irtgl irtglrgb irtviewer
@@ -151,7 +150,7 @@ $(IRTEUSOBJS) $(INSTALLOBJDIR)/compile_irt.log: $(IRTEUS_L)
 
 $(IRTEUSGOBJS): $(INSTALLOBJDIR)/compile_irtg.log
 $(IRTEUSGOBJS) $(INSTALLOBJDIR)/compile_irtg.log: $(IRTEUSG_L) $(INSTALLLIBDIR)/$(LPFX)BULLET.$(LSFX)
-	BULLET_GE_2_83=$(BULLET_GE_2_83) $(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l > $(INSTALLOBJDIR)/compile_irtg.log
+	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l > $(INSTALLOBJDIR)/compile_irtg.log
 	-rm -f $(IRTEUSG_C) $(IRTEUSG_H)
 
 $(IRTEUSXOBJS): $(INSTALLOBJDIR)/compile_irtx.log
@@ -173,14 +172,10 @@ PQP/$(ARCHDIR)/libPQP-static.a:
 	make -C PQP
 
 $(INSTALLLIBDIR)/$(LPFX)BULLET.$(LSFX): BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX)
-	if [ ${BULLET_GE_2_83} ]; then \
-		cp BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX) $(INSTALLLIBDIR)/$(LPFX)BULLET.$(LSFX); \
-	fi
+	cp BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX) $(INSTALLLIBDIR)/$(LPFX)BULLET.$(LSFX)
 
 BULLET/$(ARCHDIR)/$(LPFX)BULLET.$(LSFX): BULLET/BulletCollision.cpp
-	if [ ${BULLET_GE_2_83} ]; then \
-		make -C BULLET MACHINE=$(MACHINE); \
-	fi
+	make -C BULLET MACHINE=$(MACHINE) HAVE_BULLET=$(HAVE_BULLET)
 
 $(LIBNR): $(NROBJECTS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBNR) $(NROBJECTS)

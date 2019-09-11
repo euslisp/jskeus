@@ -1,6 +1,6 @@
 include Makefile.$(ARCHDIR)
 
-CFLAGS		= -I. -I.. -D$(ARCHDIR) -D$(MACHINE) `pkg-config bullet --cflags`
+CFLAGS		= -I. -I.. -D$(ARCHDIR) -D$(MACHINE) -DHAVE_BULLET=$(HAVE_BULLET) `pkg-config bullet --cflags`
 LDFLAGS		= -L. -L.. `pkg-config bullet --libs`
 
 .SUFFIXES: .cpp

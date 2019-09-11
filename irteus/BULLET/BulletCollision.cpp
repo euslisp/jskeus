@@ -45,13 +45,22 @@
 #undef string
 
 
+#if HAVE_BULLET
 #include <btBulletCollisionCommon.h>
 #include <BulletCollision/NarrowPhaseCollision/btGjkCollisionDescription.h>
 #include <BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h>
 #include <BulletCollision/NarrowPhaseCollision/btComputeGjkEpaPenetration.h>
 #include <LinearMath/btGeometryUtil.h>
+#endif
+
+#if HAVE_BULLET
+#define CALL_WITH_BULLET_CHECK(X) X
+#else
+#define CALL_WITH_BULLET_CHECK(X) fprintf(stderr, "jskeus is compiled without bullet, so you can not use function %s, Please install bullet >= 2.83\n", __PRETTY_FUNCTION__); return -1;
+#endif
 
 
+#if HAVE_BULLET
 struct btDistanceInfo
 { // this class is copied from https://github.com/bulletphysics/bullet3/blob/master/test/collision/btDistanceInfo.h
   btVector3 m_pointOnA;
@@ -196,39 +205,43 @@ long setMargin(long modelAddr, double margin)
   ((btConvexShape *)modelAddr)->setMargin(CONVEX_DISTANCE_MARGIN+margin);
   return 0;
 };
+#endif
 
 extern "C" {
   eusinteger_t callMakeSphereModel(double r)
   {
-    return makeSphereModel(r);
+    CALL_WITH_BULLET_CHECK(return makeSphereModel(r);)
   }
 
   eusinteger_t callMakeBoxModel(double xsize, double ysize, double zsize)
   {
-    return makeBoxModel(xsize, ysize, zsize);
+    CALL_WITH_BULLET_CHECK(return makeBoxModel(xsize, ysize, zsize);)
   }
 
   eusinteger_t callMakeCylinderModel(double radius, double height)
   {
-    return makeCylinderModel(radius, height);
+    CALL_WITH_BULLET_CHECK(return makeCylinderModel(radius, height);)
   }
 
   eusinteger_t callMakeCapsuleModel(double radius, double height)
   {
-    return makeCapsuleModel(radius, height);
+    CALL_WITH_BULLET_CHECK(return makeCapsuleModel(radius, height);)
   }
 
   eusinteger_t callMakeMeshModel(eusfloat_t *verticesPoints, eusinteger_t numVertices)
   {
+#if HAVE_BULLET
     double _verticesPoints[numVertices];
     for (int i = 0; i < numVertices; i++ ) { _verticesPoints[i] = verticesPoints[i]; }
-    return makeMeshModel(_verticesPoints, numVertices);
+#endif
+    CALL_WITH_BULLET_CHECK(return makeMeshModel(_verticesPoints, numVertices);)
   }
 
   eusinteger_t callCalcCollisionDistance(eusinteger_t modelAddrA, eusinteger_t modelAddrB,
-					 eusfloat_t *posA, eusfloat_t *quatA, eusfloat_t *posB, eusfloat_t *quatB,
-					 eusfloat_t *dist, eusfloat_t *dir, eusfloat_t *pA, eusfloat_t *pB)
+                                         eusfloat_t *posA, eusfloat_t *quatA, eusfloat_t *posB, eusfloat_t *quatB,
+                                         eusfloat_t *dist, eusfloat_t *dir, eusfloat_t *pA, eusfloat_t *pB)
   {
+#if HAVE_BULLET
     double _posA[3], _quatA[4], _posB[3], _quatB[4];
     double _dist[1], _dir[3], _pA[3], _pB[3];
     eusinteger_t ret;
@@ -237,15 +250,16 @@ extern "C" {
     _dist[0] = dist[0];
     for (int i = 0; i < 3; i++ ) {_dir[i] = dir[i]; _pA[i] = pA[i]; _pB[i] = pB[i];}
     ret = calcCollisionDistance(modelAddrA, modelAddrB,
-				_posA, _quatA, _posB, _quatB,
-				_dist, _dir, _pA, _pB);
+                                _posA, _quatA, _posB, _quatB,
+                                _dist, _dir, _pA, _pB);
     dist[0] = _dist[0];
     for (int i = 0; i < 3; i++ ) {dir[i] = _dir[i]; pA[i] = _pA[i]; pB[i] = _pB[i];}
-    return ret;
+#endif
+    CALL_WITH_BULLET_CHECK(return ret;)
   }
 
   eusinteger_t callSetMargin(eusinteger_t modelAddr, double margin)
   {
-    return setMargin(modelAddr, margin);
+    CALL_WITH_BULLET_CHECK(return setMargin(modelAddr, margin);)
   }
 }
