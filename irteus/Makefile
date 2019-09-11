@@ -31,9 +31,11 @@ INSTALLOBJDIR=$(IRTEUSDIR)/$(ARCHDIR)/obj
 INSTALLLIBDIR=$(IRTEUSDIR)/$(ARCHDIR)/lib
 
 # check bullet version
-BULLET_VER_MAJOR:=$(shell pkg-config bullet --modversion | cut -f1 -d.)
-BULLET_VER_MINOR:=$(shell pkg-config bullet --modversion | cut -f2 -d.)
-BULLET_GE_2_83=$(shell [ $(BULLET_VER_MAJOR) -gt 2 -o \( $(BULLET_VER_MAJOR) -eq 2 -a $(BULLET_VER_MINOR) -ge 83 \) ] && echo true)
+BULLET_VER_MAJOR:=$(shell pkg-config bullet --modversion --silence-errors | cut -f1 -d.)
+BULLET_VER_MINOR:=$(shell pkg-config bullet --modversion --silence-errors | cut -f2 -d.)
+ifneq ($(and $(BULLET_VER_MAJOR),$(BULLET_VER_MINOR)),)
+  BULLET_GE_2_83=$(shell [ $(BULLET_VER_MAJOR) -gt 2 -o \( $(BULLET_VER_MAJOR) -eq 2 -a $(BULLET_VER_MINOR) -ge 83 \) ] && echo true)
+endif
 ifeq ($(BULLET_GE_2_83), true)
     HAVE_BULLET=1
 else
