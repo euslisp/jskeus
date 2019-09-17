@@ -33,39 +33,39 @@
 (export '(bt-collision-distance bt-collision-check))
 
 
-;; long callMakeSphereModel(double radius)
+;; eusinteger_t callMakeSphereModel(eusfloat_t *r)
 (defforeign _bt-make-sphere-model
   *eusbullet-lib*
   "callMakeSphereModel"
-  (:float)
+  (:string)
   :integer
   )
 
-;; long callMakeBoxModel(double xsize, double ysize, double zsize)
+;; eusinteger_t callMakeBoxModel(eusfloat_t *xyz)
 (defforeign _bt-make-box-model
   *eusbullet-lib*
   "callMakeBoxModel"
-  (:float :float :float)
+  (:string)
   :integer
   )
 
-;; long callMakeCylinderModel(double radius, double height)
+;; eusinteger_t callMakeCylinderModel(eusfloat_t *rh)
 (defforeign _bt-make-cylinder-model
   *eusbullet-lib*
   "callMakeCylinderModel"
-  (:float :float)
+  (:string)
   :integer
   )
 
-;; long callMakeCapsuleModel(double radius, double height)
+;; eusinteger_t callMakeCapsuleModel(eusfloat_t *rh)
 (defforeign _bt-make-capsule-model
   *eusbullet-lib*
   "callMakeCapsuleModel"
-  (:float :float)
+  (:string)
   :integer
   )
 
-;; long callMakeMeshModel(double *verticesPoints, long numVertices)
+;; eusinteger_t callMakeMeshModel(eusfloat_t *verticesPoints, eusinteger_t numVertices)
 (defforeign _bt-make-mesh-model
   *eusbullet-lib*
   "callMakeMeshModel"
@@ -73,9 +73,9 @@
   :integer
   )
 
-;; long callCalcCollisionDistance(long modelAddrA, long modelAddrB,
-;;                                double *posA, double *quatA, double *posB, double *quatB,
-;;                                double *dist, double *dir, double *pA, double *pB)
+;; eusinteger_t callCalcCollisionDistance(eusinteger_t modelAddrA, eusinteger_t modelAddrB,
+;;                                          eusfloat_t *posA, eusfloat_t *quatA, eusfloat_t *posB, eusfloat_t *quatB,
+;;                                          eusfloat_t *dist, eusfloat_t *dir, eusfloat_t *pA, eusfloat_t *pB)
 (defforeign _bt-calc-collision-distance
   *eusbullet-lib*
   "callCalcCollisionDistance"
@@ -85,11 +85,11 @@
   :integer
   )
 
-;; long callSetMargin(long modelAddr, double margin)
+;; eusinteger_t callSetMargin(eusinteger_t modelAddr, eusfloat_t *margin)
 (defforeign _bt-set-margin
   *eusbullet-lib*
   "callSetMargin"
-  (:integer :float)
+  (:integer :string)
   :integer
   )
 
@@ -99,21 +99,23 @@
   (cond ((assoc :sphere csg)
          (setq m
                (_bt-make-sphere-model
-                (* 1e-3 (user::radius-of-sphere b)))
+                (float-vector (* 1e-3 (user::radius-of-sphere b))))
                ))
         ((assoc :cube csg)
          (setq m
                (_bt-make-box-model
-                (* 1e-3 (user::x-of-cube b))
-                (* 1e-3 (user::y-of-cube b))
-                (* 1e-3 (user::z-of-cube b)))
-               ))
+                (float-vector
+                 (* 1e-3 (user::x-of-cube b))
+                 (* 1e-3 (user::y-of-cube b))
+                 (* 1e-3 (user::z-of-cube b)))
+                )))
         ((assoc :cylinder csg)
          (setq m
                (_bt-make-cylinder-model
-                (* 1e-3 (user::radius-of-cylinder b))
-                (* 1e-3 (user::height-of-cylinder b)))
-               ))
+                (float-vector
+                 (* 1e-3 (user::radius-of-cylinder b))
+                 (* 1e-3 (user::height-of-cylinder b)))
+                )))
         (t
          (setq m
                (_bt-make-mesh-model
@@ -124,7 +126,7 @@
                 ))
          ))
   (when margin
-    (_bt-set-margin m margin))
+    (_bt-set-margin m (float-vector margin)))
   m)
 
 (defmethod cascaded-coords
@@ -144,7 +146,7 @@
                                (mapcar #'(lambda (v) (send self :inverse-transform-vector v)) vs)))
                  (length vs)
                  ))
-          (_bt-set-margin m fat)
+          (_bt-set-margin m (float-vector fat))
           ))
    (setf (get self :btmodel) m)
    m)

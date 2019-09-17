@@ -208,24 +208,24 @@ long setMargin(long modelAddr, double margin)
 #endif
 
 extern "C" {
-  eusinteger_t callMakeSphereModel(double r)
+  eusinteger_t callMakeSphereModel(eusfloat_t *r)
   {
-    CALL_WITH_BULLET_CHECK(return makeSphereModel(r);)
+    CALL_WITH_BULLET_CHECK(return makeSphereModel(r[0]);)
   }
 
-  eusinteger_t callMakeBoxModel(double xsize, double ysize, double zsize)
+  eusinteger_t callMakeBoxModel(eusfloat_t *xyz)
   {
-    CALL_WITH_BULLET_CHECK(return makeBoxModel(xsize, ysize, zsize);)
+    CALL_WITH_BULLET_CHECK(return makeBoxModel(xyz[0], xyz[1], xyz[2]);)
   }
 
-  eusinteger_t callMakeCylinderModel(double radius, double height)
+  eusinteger_t callMakeCylinderModel(eusfloat_t *rh)
   {
-    CALL_WITH_BULLET_CHECK(return makeCylinderModel(radius, height);)
+    CALL_WITH_BULLET_CHECK(return makeCylinderModel(rh[0], rh[1]);)
   }
 
-  eusinteger_t callMakeCapsuleModel(double radius, double height)
+  eusinteger_t callMakeCapsuleModel(eusfloat_t *rh)
   {
-    CALL_WITH_BULLET_CHECK(return makeCapsuleModel(radius, height);)
+    CALL_WITH_BULLET_CHECK(return makeCapsuleModel(rh[0], rh[1]);)
   }
 
   eusinteger_t callMakeMeshModel(eusfloat_t *verticesPoints, eusinteger_t numVertices)
@@ -258,8 +258,8 @@ extern "C" {
     CALL_WITH_BULLET_CHECK(return ret;)
   }
 
-  eusinteger_t callSetMargin(eusinteger_t modelAddr, double margin)
+  eusinteger_t callSetMargin(eusinteger_t modelAddr, eusfloat_t *margin)
   {
-    CALL_WITH_BULLET_CHECK(return setMargin(modelAddr, margin);)
+    CALL_WITH_BULLET_CHECK(return setMargin(modelAddr, margin[0]);)
   }
 }
