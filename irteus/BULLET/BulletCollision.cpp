@@ -231,8 +231,8 @@ extern "C" {
   eusinteger_t callMakeMeshModel(eusfloat_t *verticesPoints, eusinteger_t numVertices)
   {
 #if HAVE_BULLET
-    double _verticesPoints[numVertices];
-    for (int i = 0; i < numVertices; i++ ) { _verticesPoints[i] = verticesPoints[i]; }
+    double _verticesPoints[3*numVertices];
+    for (int i = 0; i < 3 * numVertices; i++ ) { _verticesPoints[i] = verticesPoints[i]; }
 #endif
     CALL_WITH_BULLET_CHECK(return makeMeshModel(_verticesPoints, numVertices);)
   }
