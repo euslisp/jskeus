@@ -41,6 +41,7 @@ setup_make() {
     brew list mesalib-glw &>/dev/null || brew install mesalib-glw
     brew list wget &>/dev/null || brew install wget
     brew list poppler &>/dev/null || brew install poppler
+    brew list bullet &>/dev/null || brew install bullet
     travis_time_end
 
     # travis_time_start install.x11

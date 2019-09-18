@@ -30,6 +30,19 @@ INSTALLBINDIR=$(IRTEUSDIR)/$(ARCHDIR)/bin
 INSTALLOBJDIR=$(IRTEUSDIR)/$(ARCHDIR)/obj
 INSTALLLIBDIR=$(IRTEUSDIR)/$(ARCHDIR)/lib
 
+# check bullet version
+BULLET_VER_MAJOR:=$(shell pkg-config bullet --modversion --silence-errors | cut -f1 -d.)
+BULLET_VER_MINOR:=$(shell pkg-config bullet --modversion --silence-errors | cut -f2 -d.)
+ifneq ($(and $(BULLET_VER_MAJOR),$(BULLET_VER_MINOR)),)
+  BULLET_GE_2_83=$(shell [ $(BULLET_VER_MAJOR) -gt 2 -o \( $(BULLET_VER_MAJOR) -eq 2 -a $(BULLET_VER_MINOR) -ge 83 \) ] && echo true)
+endif
+ifeq ($(BULLET_GE_2_83), true)
+    HAVE_BULLET=1
+else
+    HAVE_BULLET=0
+endif
+$(info "--      HAVE_BULLET = ${HAVE_BULLET}")
+
 # common
 WFLAGS= #-Wall
 
@@ -40,11 +53,16 @@ LIBDIR=$(EUSDIR)/$(ARCHDIR)/lib
 PQPLIBDIR=PQP/$(ARCHDIR)
 PQPLIB=-L$(PQPLIBDIR) -lPQP-static
 
+ifeq ($(HAVE_BULLET), 1)
+  BULLETCFLAGS=`pkg-config bullet --cflags` -DHAVE_BULLET=$(HAVE_BULLET)
+  BULLETLIB=`pkg-config bullet --libs`
+endif
+
 MODULES.L=irt_modules.l
 EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 
 IRTEUS=irtmath irtutil irtgraph pgsql time
-IRTEUSG=irtgeo pqp irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud
+IRTEUSG=irtgeo pqp bullet irtcollision irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud
 IRTEUSX=irtx
 IRTEUSIMG=irtimage eusjpeg png
 IRTEUSGL=irtgl irtglrgb irtviewer
@@ -100,7 +118,7 @@ IRTEUSGL_H=$(addprefix $(INSTALLOBJDIR)/,$(addsuffix .h,$(IRTEUSGL)))
 IRTEUSGL_L=$(addsuffix .l,$(IRTEUSGL))
 
 IRTCOBJECTS=$(INSTALLOBJDIR)/irtc.$(OSFX) $(INSTALLOBJDIR)/irtgeoc.$(OSFX)
-IRTGCOBJECTS=$(INSTALLOBJDIR)/CPQP.$(OSFX) $(INSTALLOBJDIR)/euspqp.$(OSFX)
+IRTGCOBJECTS=$(INSTALLOBJDIR)/CPQP.$(OSFX) $(INSTALLOBJDIR)/euspqp.$(OSFX) $(INSTALLOBJDIR)/CBULLET.$(OSFX) $(INSTALLOBJDIR)/eusbullet.$(OSFX)
 IRTIMGCOBJECTS=$(INSTALLOBJDIR)/euspng.$(OSFX)
 IRTGLCOBJECTS=$(INSTALLOBJDIR)/irtglc.$(OSFX)
 NROBJECTS=$(INSTALLOBJDIR)/nr.$(OSFX)
@@ -121,7 +139,7 @@ $(LIBIRTEUS): $(IRTEUSOBJS) $(IRTCOBJECTS) $(LIBNR)
 
 $(LIBIRTEUSG): $(IRTEUSGOBJS) $(IRTGCOBJECTS) $(LIBNR) PQP/$(ARCHDIR)/libPQP-static.a
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSG) $(IRTEUSGOBJS) \
-		$(IRTGCOBJECTS) $(IMPLIB) $(PQPLIB)
+		$(IRTGCOBJECTS) $(IMPLIB) $(PQPLIB) $(BULLETLIB)
 
 $(LIBIRTEUSX): $(IRTEUSXOBJS) $(LIBNR)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSX) $(IRTEUSXOBJS) $(IMPLIB)
@@ -210,7 +228,9 @@ $(INSTALLOBJDIR)/irtgl.$(OSFX): irtgl.l
 $(INSTALLOBJDIR)/irtglrgb.$(OSFX): irtglrgb.l
 $(INSTALLOBJDIR)/irtviewer.$(OSFX): irtviewer.l
 $(INSTALLOBJDIR)/irtimage.$(OSFX): irtimage.l
+$(INSTALLOBJDIR)/irtcollision.$(OSFX): irtcollision.l
 $(INSTALLOBJDIR)/pqp.$(OSFX): pqp.l
+$(INSTALLOBJDIR)/bullet.$(OSFX): bullet.l
 $(INSTALLOBJDIR)/png.$(OSFX): png.l
 $(INSTALLOBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l
 $(INSTALLOBJDIR)/time.$(OSFX): $(EUSDIR)/lib/llib/time.l
@@ -226,6 +246,10 @@ $(INSTALLOBJDIR)/CPQP.$(OSFX): CPQP.C defun.h
 	$(CXX) $(CXXFLAGS) -c CPQP.C $(OBJOPT)$(INSTALLOBJDIR)/CPQP.$(OSFX)
 $(INSTALLOBJDIR)/euspqp.$(OSFX): euspqp.c defun.h
 	$(CC) $(CFLAGS) $(WFLAGS) -c euspqp.c $(OBJOPT)$(INSTALLOBJDIR)/euspqp.$(OSFX)
+$(INSTALLOBJDIR)/CBULLET.$(OSFX): CBULLET.cpp defun.h
+	$(CXX) $(CXXFLAGS) $(BULLETCFLAGS) -c CBULLET.cpp $(OBJOPT)$(INSTALLOBJDIR)/CBULLET.$(OSFX)
+$(INSTALLOBJDIR)/eusbullet.$(OSFX): eusbullet.c defun.h
+	$(CC) $(CFLAGS) $(WFLAGS) -c eusbullet.c $(OBJOPT)$(INSTALLOBJDIR)/eusbullet.$(OSFX)
 $(INSTALLOBJDIR)/euspng.$(OSFX): euspng.c defun.h
 	$(CC) $(CFLAGS) $(WFLAGS) -c euspng.c $(OBJOPT)$(INSTALLOBJDIR)/euspng.$(OSFX)
 $(INSTALLOBJDIR)/nr.$(OSFX): nr.c defun.h
