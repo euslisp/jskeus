@@ -69,6 +69,18 @@
          (error "invalid collision algorithm: ~a~%" *collision-algorithm*)))
   )
 
+(defun collision-check-objects
+    (obj1 obj2 &rest args &key &allow-other-keys)
+  "Check collision between obj1 and obj2.
+   obj1 and obj2 should be list of models.
+   If return value is nil, no collision.
+   Otherwise (return value is t), collision."
+  (dolist (o1 obj1)
+    (dolist (o2 obj2)
+      (if (> (collision-check o1 o2) 0)
+          (return-from collision-check-objects t))))
+  nil)
+
 (defun select-collision-algorithm
     (alg)
   "Select collision algorithm.
