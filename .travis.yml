@@ -34,6 +34,11 @@ matrix:
       cache: apt
       env: DOCKER_IMAGE=osrf/ubuntu_armhf:xenial
     - os: linux
+      dist: melodic
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=osrf/ubuntu_armhf:bionic
+    - os: linux
       dist: trusty
       sudo: required
       cache: apt
@@ -43,6 +48,11 @@ matrix:
       sudo: required
       cache: apt
       env: DOCKER_IMAGE=osrf/ubuntu_arm64:xenial
+    - os: linux
+      dist: melodic
+      sudo: required
+      cache: apt
+      env: DOCKER_IMAGE=osrf/ubuntu_arm64:bionic
     - os: linux
       dist: trusty
       sudo: required
