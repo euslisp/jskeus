@@ -23,6 +23,12 @@ travis_time_end() {
     set -x
 }
 
+setup_brew_update() {
+    travis_time_start brew.reset
+    brew update-reset
+    travis_time_end
+}
+
 setup_brew_test() {
     travis_time_start brew.install
     brew install euslisp/jskeus/jskeus --HEAD
@@ -41,6 +47,7 @@ setup_make() {
     brew list mesalib-glw &>/dev/null || brew install mesalib-glw
     brew list wget &>/dev/null || brew install wget
     brew list poppler &>/dev/null || brew install poppler
+    brew list bullet &>/dev/null || brew install bullet
     travis_time_end
 
     # travis_time_start install.x11
@@ -60,6 +67,9 @@ setup_make() {
     export EXIT_STATUS=0; for test_l in irteus/test/*.l; do irteusgl $test_l; export EXIT_STATUS=`expr $? + $EXIT_STATUS`; done;echo "Exit status : $EXIT_STATUS"; [ $EXIT_STATUS == 0 ] || exit 1
     travis_time_end
 }
+
+setup_brew_update
+
 if [ "$TRAVIS_PULL_REQUEST" = "false" -a "$TRAVIS_BRANCH" = "master" ]; then
     setup_brew_test
 else
