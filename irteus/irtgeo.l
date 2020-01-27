@@ -53,9 +53,9 @@
 		     (:y #f(0 1 0))
 		     (:z #f(0 0 1))))
 	 )
-  (:difference-position 
+  (:difference-position
    (coords &key (translation-axis t))
-   "return diffece in positoin of given coords, translation-axis can take (:x, :y, :z, :xy, :yz, :zx)."
+   "return difference in position of given coords, translation-axis can take (:x, :y, :z, :xy, :yz, :zx)."
    (let ((dif-pos
 	  (send self :inverse-transform-vector (send coords :worldpos))))
      (case
@@ -69,7 +69,7 @@
      dif-pos))
   (:difference-rotation
    (coords &key (rotation-axis t))
-   "return diffece in rotation of given coords, rotation-axis can take (:x, :y, :z, :xx, :yy, :zz, :xm, :ym, :zm)"
+   "return difference in rotation of given coords, rotation-axis can take (:x, :y, :z, :xx, :yy, :zz, :xm, :ym, :zm)"
    (labels
     ((need-mirror-for-nearest-axis
       (coords0 coords1 axis)
