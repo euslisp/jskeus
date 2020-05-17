@@ -239,11 +239,11 @@
     args
     &key
     ((:position-list pl) (send self :position-list)) ;; list of control point
-    ((:time-list tl) (send self :time-list))   ;; list of time from start for each control point, time in fisrt contrall point is zero, so length of this list is length of control point minus 1
+    ((:time-list tl) (send self :time-list))   ;; list of time from start for each control point, time in first contrall point is zero, so length of this list is length of control point minus 1
     &allow-other-keys)
    "Initialize interpolator
    position-list: list of control point
-   time-list: list of time from start for each control point, time in fisrt contrall point is zero, so length of this list is length of control point minus 1"
+   time-list: list of time from start for each control point, time in first contrall point is zero, so length of this list is length of control point minus 1"
    (setq position-list pl)
    (setq time-list tl)
    (if (/= (length position-list) (1+ (length time-list)))
@@ -545,7 +545,7 @@ t
 ;;  (#\r (format t "retry~%") t)
 ;;  )
 (defmacro read-char-case (str &rest clauses)
-"read one charactor with lower caes
+"read one character with lower caes
 (read-char-case \"y or n or r: \"
  (#\y (format t \"yes~%\") t)
  (#\n (format t \"no~%\") t)
@@ -585,7 +585,7 @@ t
 (defconstant TCSAFLUSH 2)
 (defconstant ICANON #0x0002)
 (defun kbhit ()
-  "Checks the console for a keystroke. retuns keycode value if a key has been pressed, otherwise it returns nil. Note that this does not work well on Emacs Shell mode, run EusLisp program from terminal shell."
+  "Checks the console for a keystroke. returns keycode value if a key has been pressed, otherwise it returns nil. Note that this does not work well on Emacs Shell mode, run EusLisp program from terminal shell."
   (let ((attr-orig (unix::tcgetattr 0))
         (buf "0")
         attr ret)

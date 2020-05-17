@@ -449,7 +449,7 @@
     ))
 
 (defun find-color (color)
-  "returns color vector of given color name, the name is defiend in https://github.com/euslisp/jskeus/blob/master/irteus/irtglrgb.l"
+  "returns color vector of given color name, the name is defined in https://github.com/euslisp/jskeus/blob/master/irteus/irtglrgb.l"
   (let (v c)
     (setq v
       (cond
