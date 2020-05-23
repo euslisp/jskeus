@@ -8,21 +8,21 @@ notifications:
   slack: jsk-robotics:Av7tc8wj3IWkLYvlTzHE7x2g
 matrix:
   include:
-    - os: linux
-      dist: trusty
-      sudo: required
-      cache: apt
-      env: DOCKER_IMAGE=ubuntu:trusty
-    - os: linux
-      dist: trusty
-      sudo: required
-      cache: apt
-      env: DOCKER_IMAGE=ubuntu:xenial
-    - os: linux
-      dist: trusty
-      sudo: required
-      cache: apt
-      env: DOCKER_IMAGE=ubuntu:bionic
+    # - os: linux
+    #   dist: trusty
+    #   sudo: required
+    #   cache: apt
+    #   env: DOCKER_IMAGE=ubuntu:trusty
+    # - os: linux
+    #   dist: trusty
+    #   sudo: required
+    #   cache: apt
+    #   env: DOCKER_IMAGE=ubuntu:xenial
+    # - os: linux
+    #   dist: trusty
+    #   sudo: required
+    #   cache: apt
+#      env: DOCKER_IMAGE=ubuntu:bionic
     - os: linux
       dist: trusty
       sudo: required
@@ -33,32 +33,32 @@ matrix:
       sudo: required
       cache: apt
       env: DOCKER_IMAGE=osrf/ubuntu_armhf:xenial
-    - os: linux
-      dist: trusty
-      sudo: required
-      cache: apt
-      env: DOCKER_IMAGE=osrf/ubuntu_arm64:trusty
-    - os: linux
-      dist: trusty
-      sudo: required
-      cache: apt
-      env: DOCKER_IMAGE=osrf/ubuntu_arm64:xenial
-    - os: linux
-      dist: trusty
-      sudo: required
-      cache: apt
-      env: DOCKER_IMAGE=debian:stretch
-    - os: linux
-      dist: trusty
-      sudo: required
-      cache: apt
-      env: DOCKER_IMAGE=osrf/debian_arm64:stretch
-    - os: linux
-      dist: trusty
-      sudo: required
-      cache: apt
-      env: BUILD_DOC=true
-    - os: osx
+    # - os: linux
+    #   dist: trusty
+    #   sudo: required
+    #   cache: apt
+    #   env: DOCKER_IMAGE=osrf/ubuntu_arm64:trusty
+    # - os: linux
+    #   dist: trusty
+    #   sudo: required
+    #   cache: apt
+    #   env: DOCKER_IMAGE=osrf/ubuntu_arm64:xenial
+    # - os: linux
+    #   dist: trusty
+    #   sudo: required
+    #   cache: apt
+    #   env: DOCKER_IMAGE=debian:stretch
+    # - os: linux
+    #   dist: trusty
+    #   sudo: required
+    #   cache: apt
+    #   env: DOCKER_IMAGE=osrf/debian_arm64:stretch
+    # - os: linux
+    #   dist: trusty
+    #   sudo: required
+    #   cache: apt
+    #   env: BUILD_DOC=true
+    # - os: osx
   # allow_failures:
   #   - env: DOCKER_IMAGE=osrf/debian_arm64:stretch
 before_install: # Use this to prepare the system to install prerequisites or dependencies
