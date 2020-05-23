@@ -1,15 +1,16 @@
 diff --git a/lisp/comp/comp.l b/lisp/comp/comp.l
-index abf7b7b..60c0ab5 100644
+index abf7b7b..2de9219 100644
 --- a/lisp/comp/comp.l
 +++ b/lisp/comp/comp.l
-@@ -1226,6 +1226,7 @@
- 		 (verbose *verbose*)
- 		 (entry (lisp::gencname-tail (pathname-name file)))
- 		 (o))
-+#-(and :arm :word-size=32) ;; armhf does not work with -O2, see https://github.com/euslisp/EusLisp/pull/427
-    (if (and (integerp c-optimize)
- 	    (> c-optimize 0)
- 	    ;; (not (member :gcc *features*))
+@@ -1232,6 +1232,8 @@
+ 	    )
+ 	(setq *coptflags* (format nil " -O~A" c-optimize))
+ 	(setq *coptflags* ""))
++#+(and :arm :word-size=32) ;; armhf does not work with -O2, see https://github.com/euslisp/EusLisp/pull/427
++   (setq *coptflags* "")
+    (setq *optimize* optimize
+ 	 *safety* safety
+ 	 *verbose* verbose)
 diff --git a/lisp/comp/trans.l b/lisp/comp/trans.l
 index 3088d63..efe2e66 100644
 --- a/lisp/comp/trans.l
