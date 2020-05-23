@@ -51,7 +51,7 @@ script:
   # Test doc generation
   - if [ "$BUILD_DOC" == "true" ]; then sudo apt-get install -y -qq git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng-dev xfonts-100dpi xfonts-75dpi pkg-config libbullet-dev; fi
   - if [ "$BUILD_DOC" == "true" ]; then make; fi
-  - if [ "$BUILD_DOC" == "true" ]; then sudo apt-get install -y -qq texlive-binaries texlive-lang-cjk poppler-utils nkf latex2html; fi
+  - if [ "$BUILD_DOC" == "true" ]; then sudo apt-get install -y -qq texlive-binaries texlive-lang-cjk texlive-lang-japanese poppler-utils nkf latex2html; fi
   - if [ "$BUILD_DOC" == "true" ]; then (source bashrc.eus; cd doc/; make pdf); fi
   - if [ "$BUILD_DOC" == "true" ]; then (source bashrc.eus; cd doc/; make html); fi
 after_failure:
