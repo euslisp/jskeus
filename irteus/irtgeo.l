@@ -383,10 +383,15 @@
 	 (v2 (nth (mod (1+  num) len) vers)) )
     (unless (> (v. (v* (v- v1 v0) (v- v2 v1)) (send f :normal)) 0)
 	    (return-from face-to-tessel-triangle nil))
-    (let ((poly (make-face-from-vertices
+    (let ((poly
+#-(and :arm :word-size=32)
+	        (make-face-from-vertices
                  (mapcar #'(lambda (v) (cons v (mapcan
                                                 #'(lambda (e) (if (memq v (send e :vertices)) (list (instance edge :init :pvertex (send e :pvertex f) :nvertex (send e :nvertex f)))))
-                                                (send f :edges)))) (list v0 v1 v2))))
+                                                (send f :edges)))) (list v0 v1 v2)))
+#+(and :arm :word-size=32)
+	        (make-face-from-vertices (list (list v0) (list v1) (list v2)))
+		)
 	  (rvers (remove v0 (remove v1 (remove v2 vers)))) not-intersectp)
       (setq not-intersectp
             (and (every #'(lambda (x) (not (eq ':inside (send poly :insidep x)))) rvers)
@@ -414,10 +419,13 @@
 	 (len (length vers))
 	 (rvers (remove (nth (mod num len) vers) vers)))
     (if (<= (length rvers) 2) (return-from face-to-triangle-rest-polygon nil))
+#-(and :arm :word-size=32) ;; armhf does not work with -O2, see https://github.com/euslisp/EusLisp/pull/427
     (make-face-from-vertices
      (mapcar #'(lambda (v)
                  (cons v (mapcan #'(lambda (e) (if (memq v (send e :vertices)) (list e)))
                                  (append (mapcar #'(lambda (e) (instance edge :init :pvertex (send e :pvertex f) :nvertex (send e :nvertex f))) (send f :edges)) edgs)))) rvers))
+#+(and :arm :word-size=32)
+    (make-face-from-vertices (mapcar #'(lambda (v) (list v)) rvers))
     ))
 
 ;;;
