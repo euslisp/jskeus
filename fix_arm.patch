@@ -1,0 +1,89 @@
+diff --git a/lisp/c/eus.c b/lisp/c/eus.c
+index c2b8757..695b4ad 100644
+--- a/lisp/c/eus.c
++++ b/lisp/c/eus.c
+@@ -748,39 +748,28 @@ static void initclasses()
+ 			   "IDLE", "WAIT");
+   C_THREAD=speval(THREAD);
+ /*13*/
+-  CODE=basicclass("COMPILED-CODE",C_OBJECT,&codecp,4,"CODEVECTOR","QUOTEVECTOR",
+-		  "TYPE","ENTRY");
+-  C_CODE=speval(CODE);
+-/*14*/
+-  FCODE=basicclass("FOREIGN-CODE",C_CODE,&fcodecp,3,"ENTRY2","PARAMTYPES","RESULTTYPE"); /* kanehiro's patch 2000.12.13 */
+-  C_FCODE=speval(FCODE);
+-/*15*/
+-#if (WORD_SIZE == 64)
+-  CLOSURE=basicclass("CLOSURE",C_CODE,&closurecp,
++  CODE=basicclass("COMPILED-CODE",C_OBJECT,&codecp,
+ #if ARM // ARM uses entry2 in struct closure in eus.h
+-		     4,"ENTRY2",
++		  5,"CODEVECTOR","QUOTEVECTOR","TYPE","ENTRY","ENTRY2"
+ #else
+-		     3,
++		  4,"CODEVECTOR","QUOTEVECTOR","TYPE","ENTRY"
+ #endif
+-		     "ENV0","ENV1","ENV2");
+-#else
+-  CLOSURE=basicclass("CLOSURE",C_CODE,&closurecp,
+-#if ARM // ARM uses entry2 in struct closure in eus.h
+-		     3,"ENTRY2",
++		  );
++  C_CODE=speval(CODE);
++/*14*/
++  FCODE=basicclass("FOREIGN-CODE",C_CODE,&fcodecp,
++#if ARM
++		   2,"PARAMTYPES","RESULTTYPE"
+ #else
+-		     2,
+-#endif
+-		     "ENV1","ENV2");
++		   3,"ENTRY2","PARAMTYPES","RESULTTYPE"
+ #endif
++		   ); /* kanehiro's patch 2000.12.13 */
++  C_FCODE=speval(FCODE);
++/*15*/
++  CLOSURE=basicclass("CLOSURE",C_CODE,&closurecp,3,"ENV0","ENV1","ENV2");
+   C_CLOSURE=speval(CLOSURE);
+ /* 16    ---new for Solaris */
+-  LDMODULE=basicclass("LOAD-MODULE",C_CODE, &ldmodulecp,
+-#if ARM // ARM uses entry2 in struct ldmodule in eus.h
+-		      4,"ENTRY2",
+-#else
+-		      3,
+-#endif
+-		      "SYMBOL-TABLE","OBJECT-FILE", "HANDLE");
++  LDMODULE=basicclass("LOAD-MODULE",C_CODE, &ldmodulecp,2,"SYMBOL-TABLE","OBJECT-FILE", "HANDLE");
+   C_LDMOD=speval(LDMODULE);
+ /*17*/
+   LABREF=basicclass("LABEL-REFERENCE",C_OBJECT,&labrefcp,4,
+diff --git a/lisp/c/makes.c b/lisp/c/makes.c
+index eaf18f3..8034db3 100644
+--- a/lisp/c/makes.c
++++ b/lisp/c/makes.c
+@@ -292,7 +292,11 @@ pointer (*f)();
+   fentaddr= (eusinteger_t)f>>2;
+   cd->c.code.entry=makeint(fentaddr);
+ #if ARM
+-  cd->c.code.entry2=makeint((eusinteger_t)f);
++#if (WORD_SIZE == 64)
++  cd->c.code.entry2=makeint(((eusinteger_t)f)&0x00000000ffffffff);
++#else
++  cd->c.code.entry2=makeint(((eusinteger_t)f)&0x0000ffff);
++#endif
+ #endif
+   return(cd);}
+ 
+@@ -513,7 +517,11 @@ pointer (*f)();
+   clo->c.clo.subrtype=SUBR_FUNCTION;
+   clo->c.clo.entry=makeint((eusinteger_t)f>>2);
+ #if ARM
+-  clo->c.clo.entry2=makeint((eusinteger_t)f);
++#if (WORD_SIZE == 64)
++  clo->c.clo.entry2=makeint(((eusinteger_t)f)&0x00000000ffffffff);
++#else
++  clo->c.clo.entry2=makeint(((eusinteger_t)f)&0x0000ffff);
++#endif
+ #endif
+   clo->c.clo.env0=e0;
+   clo->c.clo.env1=e1; /*makeint((int)e1>>2);*/

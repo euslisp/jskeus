@@ -36,6 +36,8 @@ travis_time_end
 
 travis_time_start script.make # All commands must exit with code 0 on success. Anything else is considered failure.
 cd jskeus
+make eus
+(cd eus; patch -p1 < ../fix_arm.patch)
 if [[ "$DOCKER_IMAGE" == *"trusty"* || "$DOCKER_IMAGE" == *"jessie"* ]]; then
     make WFLAGS="-Werror=implicit-int -Werror=implicit-function-declaration -Werror=unused-result"
 else
