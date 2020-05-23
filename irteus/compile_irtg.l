@@ -27,6 +27,7 @@
         (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
   ))
 
+(load "trans.l")
 (in-package "GEOMETRY")
 
 (comp:compile-file-if-src-newer "irtgeo.l" user::*objdir*)

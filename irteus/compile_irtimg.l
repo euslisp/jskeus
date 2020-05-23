@@ -28,6 +28,7 @@
         (format nil "~A/~A/obj/" *eusdir* (unix:getenv "ARCHDIR"))
   ))
 
+(load "trans.l")
 (in-package "IMAGE")
 (if (eq (unix:access (format nil "~A/lisp/image/jpeg/" *eusdir*) unix::O_RDWR) t)
     (comp:compile-file-if-src-newer (format nil "~A/lisp/image/jpeg/eusjpeg.l" *eusdir*) user::*objdir*)

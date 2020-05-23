@@ -67,7 +67,7 @@ for test_l in irteus/test/*.l; do
 
     travis_time_start jskeus.compiled.${test_l##*/}.test
 
-    irteusgl "(let ((o (namestring (merge-pathnames \".o\" \"$test_l\"))) (so (namestring (merge-pathnames \".so\" \"$test_l\")))) (compile-file \"$test_l\" :o o) (if (probe-file so) (load so) (exit 1))))"
+    irteusgl irteus/trans.l "(let ((o (namestring (merge-pathnames \".o\" \"$test_l\"))) (so (namestring (merge-pathnames \".so\" \"$test_l\")))) (compile-file \"$test_l\" :o o) (if (probe-file so) (load so) (exit 1))))"
     export TMP_EXIT_STATUS=$?
 
     travis_time_end `expr 32 - $TMP_EXIT_STATUS`

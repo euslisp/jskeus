@@ -22,6 +22,7 @@
 ;;; above copyright notice remains intact.  
 ;;;
 
+(load "trans.l")
 (in-package "USER")
 
 (unless (boundp '*objdir*)
