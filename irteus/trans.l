@@ -1,4 +1,13 @@
 (in-package "COMPILER")
+#+(and :arm :word-size=32)
+(progn
+(defparameter *optimize* 1)
+(unless (assoc :compile-file-org (send compiler :methods))
+  (rplaca (assoc :compile-file (send compiler :methods)) :compile-file-org))
+(defmethod compiler
+  (:compile-file
+   (file &rest args)
+   (send* self :compile-file-org file :c-optimize 0 args)))
 (defmethod translator
  (:enter (cname lname)
     (terpri cfile)
@@ -9,8 +18,9 @@
     (format cfile "register context *ctx;~%")
     (format cfile "register int n; register pointer argv[]; pointer env;~%")
     (format cfile "{ register pointer *local=ctx->vsp;~%")
-    (format cfile "  volatile pointer w;~%")
+    (format cfile "  pointer w;~%")
     (format cfile "  register pointer *fqv=qv;~%")
     (format cfile "  volatile numunion nu;~%")
     )
  )
+)
