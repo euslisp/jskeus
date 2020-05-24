@@ -58,32 +58,24 @@ index c2b8757..695b4ad 100644
  /*17*/
    LABREF=basicclass("LABEL-REFERENCE",C_OBJECT,&labrefcp,4,
 diff --git a/lisp/c/makes.c b/lisp/c/makes.c
-index eaf18f3..8034db3 100644
+index eaf18f3..b4ea3a1 100644
 --- a/lisp/c/makes.c
 +++ b/lisp/c/makes.c
-@@ -292,7 +292,11 @@ pointer (*f)();
+@@ -292,7 +292,7 @@ pointer (*f)();
    fentaddr= (eusinteger_t)f>>2;
    cd->c.code.entry=makeint(fentaddr);
  #if ARM
 -  cd->c.code.entry2=makeint((eusinteger_t)f);
-+#if (WORD_SIZE == 64)
-+  cd->c.code.entry2=makeint(((eusinteger_t)f)&0x00000000ffffffff);
-+#else
-+  cd->c.code.entry2=makeint(((eusinteger_t)f)&0x0000ffff);
-+#endif
++  cd->c.code.entry2=makeint(((eusinteger_t)f)&0x3);
  #endif
    return(cd);}
  
-@@ -513,7 +517,11 @@ pointer (*f)();
+@@ -513,7 +513,7 @@ pointer (*f)();
    clo->c.clo.subrtype=SUBR_FUNCTION;
    clo->c.clo.entry=makeint((eusinteger_t)f>>2);
  #if ARM
 -  clo->c.clo.entry2=makeint((eusinteger_t)f);
-+#if (WORD_SIZE == 64)
-+  clo->c.clo.entry2=makeint(((eusinteger_t)f)&0x00000000ffffffff);
-+#else
-+  clo->c.clo.entry2=makeint(((eusinteger_t)f)&0x0000ffff);
-+#endif
++  clo->c.clo.entry2=makeint(((eusinteger_t)f)&0x3);
  #endif
    clo->c.clo.env0=e0;
    clo->c.clo.env1=e1; /*makeint((int)e1>>2);*/
