@@ -630,6 +630,23 @@
   (setq *irtviewer* (instance x::irtviewer-dummy)))
 
 
+(defmacro with-save-mpeg (fname &rest forms)
+  `(let ()
+     (send *irtviewer* :logging :clear)
+     (send *irtviewer* :logging :start)
+     ,@forms
+     (send *irtviewer* :save-mpeg :fname ,fname)
+     (send *irtviewer* :logging :stop)
+     ))
+(defmacro with-save-animgif (fname &rest forms)
+  `(let ()
+     (send *irtviewer* :logging :clear)
+     (send *irtviewer* :logging :start)
+     ,@forms
+     (send *irtviewer* :save-animgif :fname ,fname)
+     (send *irtviewer* :logging :stop)
+     ))
+
 (in-package "GL")
 
 (provide :irtviewer "$Id$")
