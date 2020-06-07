@@ -43,7 +43,7 @@
      result))
 
 (defun inverse-matrix-complex (cmat)
-  "returns inverse matrix of complex matrix"
+  "returns inverse matrix of complex square matrix"
   ;; cmat = (list A B) = A + B*j  (j is imaginary unit)
   ;; inv(cmat) = (list C D) = C + D*j
   ;; solve C and D from (A + B*j)*(C + D*j) = E
@@ -412,6 +412,7 @@
     (list evalue evector)))
 
 (defun eigen-decompose-complex (m)
+  "returns eigen decomposition from real square matrix"
   ;; m is real square matrix
   (let* ((evalue-real (car (qr-decompose m)))
          (evalue-imag (cadr (qr-decompose m)))
@@ -453,6 +454,7 @@
 
 ;; solve non-zero-vector v from determinant-zero-matrix M, when M*v=O and det(M)=0
 (defun solve-non-zero-vector-from-det0-matrix (M)
+  "solves non-zero-vector v from real square determinant-zero-matrix mat, when mat*v=O and det(mat)=0"
   ;; M is real square matrix which satisfies det(M)=0 (i.e. inverse matrix of M does NOT exist)
   ;; (unless (eps= (matrix-determinant M) 0 1.0e-10)
   ;; (unless (eps= (matrix-determinant M) 0 1.0e-5)
