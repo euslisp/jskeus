@@ -155,7 +155,7 @@
 		    )))
     ))
 
-(defun matrix-log (m) ;; matrix-log retuns [-pi, pi]
+(defun matrix-log (m) ;; matrix-log returns [-pi, pi]
  "returns matrix log of given m, it returns [-pi, pi]"
  (let* ((qq (matrix2quaternion m))
         (q0 (elt qq 0))

@@ -432,7 +432,7 @@
                 ((:max-joint-torque mjt)
                  (float-vector 100 100 100)) ;; [Nm] [Nm] [Nm]
 		&allow-other-keys)
-         "Create instance of sphere-joint. min/max are defiend as a region of angular velocity in degree."
+         "Create instance of sphere-joint. min/max are defind as a region of angular velocity in degree."
     (setq axis (list :x :y :z))
     (send-super* :init :min min :max max
                  :max-joint-velocity mjv
@@ -2056,7 +2056,7 @@
     ~~ Ratio of centroid velocity used in calculation of joint position difference to centroid position difference. max 1.0. Default is 1.0.
     ~ :min-loop
     ~~ Minimam loop count. Defalt (/ stop 10).
-    ~~ If integer is specified, :inverse-kinematics-loop does returns :ik-continues and continueing solving IK.
+    ~~ If integer is specified, :inverse-kinematics-loop does returns :ik-continues and continuing solving IK.
     ~~ If min-loop is nil, do not consider loop counting for IK convergence.
     ~ other-keys
     ~~ :move-joints-avoidance is internally called and args are passed to it. See the explanation of :move-joints-avoidance.
@@ -2706,7 +2706,7 @@
     &allow-other-keys)
    "Solve inverse-kinematics for closed loop forward kinematics.
     Move move-target to target-coords with link-list.
-    link-list loop should be close when move-target reachs target-coords.
+    link-list loop should be close when move-target reaches target-coords.
     constrained-joint-list is list of joints specified given joint angles in closed loop.
     constrained-joint-angle-list is list of joint-angle for constrained-joint-list."
    ;; Set joint-angle
