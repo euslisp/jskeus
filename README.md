@@ -127,12 +127,12 @@ PDF files are also available from [here](https://github.com/euslisp/jskeus/raw/m
 
 For Ubuntu users:
 ```
-$ sudo apt-get install git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi gsfonts-x11 texlive-fonts-extra xfonts-100dpi-transcoded xfonts-75dpi-transcoded msttcorefonts
+$ sudo apt-get install git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi gsfonts-x11 texlive-fonts-extra xfonts-100dpi-transcoded xfonts-75dpi-transcoded msttcorefonts pkg-config libbullet-dev
 ```
 
 For Mac OSX users using Homebrew:
 ```
-$ brew install jpeg libpng mesalib-glw wget
+$ brew install jpeg libpng mesalib-glw wget bullet
 ```
 
 '''NOTE:'''
