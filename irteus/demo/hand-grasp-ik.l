@@ -56,7 +56,7 @@
        (setq r
              (sort
               (mapcar #'(lambda (l)
-                          (pqp-collision-distance l c0))
+                          (collision-distance l c0))
                       (flatten (link-descendants (send j :child-link))))
               #'<= #'car))
        (if (evenp (/ i 400))
