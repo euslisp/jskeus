@@ -67,10 +67,21 @@
 
 (defmethod cascaded-coords
   (:make-btmodel
-   (&key (fat 0))
+   (&key (fat 0) ((:faces fs)))
     "Make bullet model and save pointer of the bullet model."
-   (let (vs m)
-     (cond ((derivedp self body)
+   (let (vs m v v1 v2 v3)
+     (cond (fs
+            (setq vs (flatten (send-all fs :vertices)))
+            (setq m
+                  (btmakemeshmodel
+                   (scale 1e-3 ;; [m]
+                          (apply #'concatenate float-vector
+                                 (mapcar #'(lambda (v) (send self :inverse-transform-vector v)) vs)))
+                   (length vs)
+                   ))
+            (btsetmargin m fat)
+            )
+           ((derivedp self body)
             (setq m
                   (bt-make-model-from-body self :margin fat))
             )
