@@ -96,6 +96,59 @@
      )
     ))
 
+(defun test-collision-distance
+    (obj1 obj2)
+  (let* ((bbox-radius
+          (elt (v- (send (send obj1 :box) :center) (send (send obj1 :box) :minpoint)) 1))
+         (cnt 0)
+         (dist)
+         (approx-dist-min)
+         (approx-dist-max)
+         (ret1) (ret2) (ret3)
+         )
+    (send obj1 :set-color (float-vector 1 0 0) 0.5)
+    (send obj2 :set-color (float-vector 0 1 0) 0.4)
+    (objects (list obj1 obj2))
+    (do-until-key
+     ;; move object
+     (incf cnt)
+     (send obj1 :newcoords
+           (make-coords :pos (float-vector (* 300.0 (sin (/ cnt 20.0))) 50 0)))
+     (send obj1 :worldcoords)
+     (send *irtviewer* :draw-objects)
+     ;; get pqp/bullet distance
+     ;; PQP requries geo::PQP_FIRST_CONTACT, where as bullet does not need this
+     (setf (get obj1 :pqpmodel) nil) (setf (get obj1 :btmodel) nil) ;; clear cache
+     (setf (get obj2 :pqpmodel) nil) (setf (get obj2 :btmodel) nil)
+     (setq ret1 (collision-check obj1 obj2 geo::PQP_FIRST_CONTACT))
+     (setf (get obj1 :pqpmodel) nil) (setf (get obj1 :btmodel) nil) ;; clear cache
+     (setf (get obj2 :pqpmodel) nil) (setf (get obj2 :btmodel) nil)
+     (setq ret2 (collision-check obj1 obj2))
+     (setf (get obj1 :pqpmodel) nil) (setf (get obj1 :btmodel) nil) ;; clear cache
+     (setf (get obj2 :pqpmodel) nil) (setf (get obj2 :btmodel) nil)
+     (send obj1 :make-collisionmodel :faces (send obj1 :faces))
+     (send obj2 :make-collisionmodel :faces (send obj2 :faces))
+     (setq ret3 (collision-check obj1 obj2))
+     (assert (and (eq ret1 ret2) (eq ret1 ret3)))
+     ;; get approximate distance and compare
+     (setq approx-dist-max
+           (norm (v- (send (send obj1 :box) :center) (send (send obj2 :box) :center))))
+     (setq approx-dist-min
+           (- approx-dist-max (+ bbox-radius bbox-radius)))
+     ;(format t "ret: ~A/~A/~A dist-min: ~A, (~A ~A)~%" ret1 ret2 ret3 approx-dist-min (> ret1 0) (< approx-dist-min 0))
+     (assert (or (and (> ret1 0) (< approx-dist-min 5))
+                 (and (= ret1 0) (> approx-dist-min -5))))
+     ;; draw
+     (when (> ret1 0)
+       (send obj1 :draw-on :flush nil :width 16 :color (float-vector 1 0.4 0.4))
+       (send obj2 :draw-on :flush nil :width 16 :color (float-vector 0.4 1 0.4)))
+     (send *irtviewer* :viewer :flush)
+     (unix::usleep (* 20 1000))
+     (when (> cnt 100)
+       (return-from nil nil))
+     )
+    ))
+
 (when *collision-algorithm-pqp*
 
 (deftest test-collision-sphere-analytical-pqp
@@ -121,6 +174,12 @@
    (make-cone (float-vector 0 0 200) (list (float-vector -200 -200 0) (float-vector 200 -200 0) (float-vector 0 250 0))) ;; cone is treated as mesh
    (make-cube 200 200 300))
   )
+
+(deftest test-collision-distance-pqp
+  (select-collision-algorithm *collision-algorithm-pqp*)
+  (test-collision-distance
+   (make-cube 200 200 200)
+   (make-cube 200 200 200)))
 
 )
 
@@ -149,6 +208,12 @@
    (make-cone (float-vector 0 0 200) (list (float-vector -200 -200 0) (float-vector 200 -200 0) (float-vector 0 250 0))) ;; cone is treated as mesh
    (make-cube 200 200 300))
   )
+
+(deftest test-collision-distance-bullet
+  (select-collision-algorithm *collision-algorithm-bullet*)
+  (test-collision-distance
+   (make-cube 200 200 200)
+   (make-cube 200 200 200)))
 
 )
 
