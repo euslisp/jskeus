@@ -121,4 +121,12 @@ pointer ___eusbullet(register context *ctx, int n, register pointer *argv)
     defun(ctx, "BTMAKEMESHMODEL", mod, BTMAKEMESHMODEL, NULL);
     defun(ctx, "BTCALCCOLLISIONDISTANCE", mod, BTCALCCOLLISIONDISTANCE, NULL);
     defun(ctx, "BTSETMARGIN", mod, BTSETMARGIN, NULL);
+
+    pointer ALGO_BULLET;
+    ALGO_BULLET=defconst(ctx,"*COLLISION-ALGORITHM-BULLET*",ALGO_BULLET,userpkg);
+#if HAVE_BULLET
+    ALGO_BULLET->c.sym.speval=defkeyword(ctx,"BULLET");
+#else
+    ALGO_BULLET->c.sym.speval=NIL;
+#endif
 }

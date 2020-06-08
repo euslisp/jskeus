@@ -27,9 +27,8 @@
 (require :pqp)
 (require :bullet)
 
-(defconstant *collision-algorithm-pqp* :pqp)
-(defconstant *collision-algorithm-bullet* :bullet)
-(defvar *collision-algorithm* *collision-algorithm-pqp*)
+(if (and (boundp '*collision-algorithm-pqp*) (boundp '*collision-algorithm-bullet*))
+    (defvar *collision-algorithm* (or *collision-algorithm-pqp* *collision-algorithm-bullet*)))
 
 (defmethod cascaded-coords
   (:make-collisionmodel

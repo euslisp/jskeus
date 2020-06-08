@@ -181,6 +181,14 @@ pointer ___euspqp(register context *ctx, int n, register pointer *argv)
     defun(ctx, "PQPADDTRI", mod, PQPADDTRI, NULL);
     defun(ctx, "PQPCOLLIDE", mod, PQPCOLLIDE, NULL);
     defun(ctx, "PQPDISTANCE", mod, PQPDISTANCE, NULL);
+
+    pointer ALGO_PQP;
+    ALGO_PQP=defconst(ctx,"*COLLISION-ALGORITHM-PQP*",ALGO_PQP,userpkg);
+#if HAVE_PQP
+    ALGO_PQP->c.sym.speval=defkeyword(ctx,"PQP");
+#else
+    ALGO_PQP->c.sym.speval=NIL;
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

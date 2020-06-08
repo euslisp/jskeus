@@ -256,11 +256,11 @@ $(INSTALLOBJDIR)/irtgeoc.$(OSFX): irtgeoc.c $(filter-out $(INSTALLOBJDIR)/irtgeo
 $(INSTALLOBJDIR)/CPQP.$(OSFX): CPQP.C defun.h
 	$(CXX) $(CXXFLAGS) $(PQPCFLAGS) -c CPQP.C $(OBJOPT)$(INSTALLOBJDIR)/CPQP.$(OSFX)
 $(INSTALLOBJDIR)/euspqp.$(OSFX): euspqp.c defun.h
-	$(CC) $(CFLAGS) $(WFLAGS) -c euspqp.c $(OBJOPT)$(INSTALLOBJDIR)/euspqp.$(OSFX)
+	$(CC) $(CFLAGS) $(WFLAGS) $(PQPCFLAGS) -c euspqp.c $(OBJOPT)$(INSTALLOBJDIR)/euspqp.$(OSFX)
 $(INSTALLOBJDIR)/CBULLET.$(OSFX): CBULLET.cpp defun.h
 	$(CXX) $(CXXFLAGS) $(BULLETCFLAGS) -c CBULLET.cpp $(OBJOPT)$(INSTALLOBJDIR)/CBULLET.$(OSFX)
 $(INSTALLOBJDIR)/eusbullet.$(OSFX): eusbullet.c defun.h
-	$(CC) $(CFLAGS) $(WFLAGS) -c eusbullet.c $(OBJOPT)$(INSTALLOBJDIR)/eusbullet.$(OSFX)
+	$(CC) $(CFLAGS) $(WFLAGS) $(BULLETCFLAGS) -c eusbullet.c $(OBJOPT)$(INSTALLOBJDIR)/eusbullet.$(OSFX)
 $(INSTALLOBJDIR)/euspng.$(OSFX): euspng.c defun.h
 	$(CC) $(CFLAGS) $(WFLAGS) -c euspng.c $(OBJOPT)$(INSTALLOBJDIR)/euspng.$(OSFX)
 $(INSTALLOBJDIR)/nr.$(OSFX): nr.c defun.h
