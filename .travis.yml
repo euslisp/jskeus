@@ -19,6 +19,10 @@ matrix:
     - os: linux
       env: DOCKER_IMAGE=ubuntu:bionic
     - os: linux
+      env: DOCKER_IMAGE=ubuntu:bionic COLLISION_LIB=PQP
+    - os: linux
+      env: DOCKER_IMAGE=ubuntu:bionic COLLISION_LIB=BULLET
+    - os: linux
       env: DOCKER_IMAGE=osrf/ubuntu_armhf:trusty
     - os: linux
       env: DOCKER_IMAGE=osrf/ubuntu_armhf:xenial
@@ -45,7 +49,7 @@ install:
 script:
   - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
   - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then COUNT=10; while [ $COUNT -gt 0 -a ! -e $CI_SOURCE_PATH/eus ] ; do echo $COUNT; sleep 1; GIT_SSL_NO_VERIFY=true git clone --depth 10 http://github.com/euslisp/EusLisp $CI_SOURCE_PATH/eus; COUNT=`expr $COUNT - 1`; done; fi # running git clone within arm VM is very slow
-  - if [ "$TRAVIS_OS_NAME" == "linux" -a "$BUILD_DOC" != "true" ]; then docker run --rm -i -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "DOCKER_IMAGE=$DOCKER_IMAGE" -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" -a "$BUILD_DOC" != "true" ]; then docker run --rm -i -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "DOCKER_IMAGE=$DOCKER_IMAGE" -e "COLLISION_LIB=$COLLISION_LIB" -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"; fi
   # Test installing head version jskeus via Homebrew formula
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then $CI_SOURCE_PATH/.travis-osx.sh; fi
   # Test doc generation

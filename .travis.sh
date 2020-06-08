@@ -29,6 +29,20 @@ sudo apt-get install -qq -y git make gcc g++ libjpeg-dev libxext-dev libx11-dev 
 # sudo apt-get install -qq -y texlive-latex-base ptex-bin latex2html nkf poppler-utils || echo "ok" # 16.04 does ont have ptex bin
 travis_time_end
 
+if [[ "$COLLISION_LIB" != "" ]]; then
+    travis_time_start setup.collision_lib
+
+    if [[ "$COLLISION_LIB" != "PQP" ]]; then
+        rm -fr $CI_SOURCE_PATH/irteus/PQP
+    fi
+
+    if [[ "$COLLISION_LIB" != "BULLET" ]]; then
+        dpkg -r libbullet-dev
+    fi
+
+    travis_time_end
+fi
+
 travis_time_start install # Use this to install any prerequisites or dependencies necessary to run your build
 cd ${HOME}
 ln -s $CI_SOURCE_PATH jskeus
