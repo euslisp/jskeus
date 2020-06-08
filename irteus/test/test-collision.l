@@ -50,16 +50,6 @@
      )
     ))
 
-(deftest test-collision-sphere-analytical-pqp
-  (select-collision-algorithm *collision-algorithm-pqp*)
-  (test-collision-sphere-analytical)
-  )
-
-(deftest test-collision-sphere-analytical-bullet
-  (select-collision-algorithm *collision-algorithm-bullet*)
-  (test-collision-sphere-analytical)
-  )
-
 (defun test-collision-object-approx
     (obj1 obj2)
   (let* ((bbox-radius1
@@ -106,26 +96,21 @@
      )
     ))
 
+(when *collision-algorithm-pqp*
+
+(deftest test-collision-sphere-analytical-pqp
+  (select-collision-algorithm *collision-algorithm-pqp*)
+  (test-collision-sphere-analytical)
+  )
+
 (deftest test-collision-cube-approx-pqp
   (select-collision-algorithm *collision-algorithm-pqp*)
   (test-collision-object-approx
    (make-cube 100 150 200) (make-cube 200 200 300))
   )
 
-(deftest test-collision-cube-approx-bullet
-  (select-collision-algorithm *collision-algorithm-bullet*)
-  (test-collision-object-approx
-   (make-cube 100 150 200) (make-cube 200 200 300))
-  )
-
 (deftest test-collision-cylinder-approx-pqp
   (select-collision-algorithm *collision-algorithm-pqp*)
-  (test-collision-object-approx
-   (make-cylinder 100 200) (make-cube 200 200 300))
-  )
-
-(deftest test-collision-cylinder-approx-bullet
-  (select-collision-algorithm *collision-algorithm-bullet*)
   (test-collision-object-approx
    (make-cylinder 100 200) (make-cube 200 200 300))
   )
@@ -137,12 +122,35 @@
    (make-cube 200 200 300))
   )
 
+)
+
+(when *collision-algorithm-bullet*
+
+(deftest test-collision-sphere-analytical-bullet
+  (select-collision-algorithm *collision-algorithm-bullet*)
+  (test-collision-sphere-analytical)
+  )
+
+(deftest test-collision-cube-approx-bullet
+  (select-collision-algorithm *collision-algorithm-bullet*)
+  (test-collision-object-approx
+   (make-cube 100 150 200) (make-cube 200 200 300))
+  )
+
+(deftest test-collision-cylinder-approx-bullet
+  (select-collision-algorithm *collision-algorithm-bullet*)
+  (test-collision-object-approx
+   (make-cylinder 100 200) (make-cube 200 200 300))
+  )
+
 (deftest test-collision-mesh-approx-bullet
   (select-collision-algorithm *collision-algorithm-bullet*)
   (test-collision-object-approx
    (make-cone (float-vector 0 0 200) (list (float-vector -200 -200 0) (float-vector 200 -200 0) (float-vector 0 250 0))) ;; cone is treated as mesh
    (make-cube 200 200 300))
   )
+
+)
 
 (eval-when (load eval)
   (run-all-tests)
