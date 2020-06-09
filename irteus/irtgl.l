@@ -460,7 +460,7 @@
        ((symbolp color)
 	(setq c (find-if #'(lambda (o) (eq (send o :name) color))
 			 *face-colors*))
-	(if c (send c :diffuse) (warn "Color name not found ")))
+	(if c (send c :diffuse) (warn ";; Color name not found ~A~%" color)))
        (t color)))
     (unless v (setq v (float-vector 0.5 0.5 0.5)))
     v))
@@ -470,8 +470,7 @@
   (let (fc dif)
     (when (setq fc (get abody :face-color))
       (unless (vectorp fc)
-	(warn "transparent: body ~A param ~A face-color ~A~%" abody param fc)
-	(setq fc (find-color fc)))
+        (setq fc (find-color fc)))
       (if (= (length fc) 3)
 	  (setq fc
 	    (concatenate float-vector fc #f(0))))

@@ -1977,8 +1977,8 @@
 		  :create :name :grey100
 		  :diffuse #f(0.99609375 0.99609375 0.99609375))
 	(instance colormaterial
-		  :create :name :DarkGrey
-		  :diffuse #f(0.66015625 0.66015625 0.66015625))
+		  :create :name :silver
+		  :diffuse #f(0.75 0.75 0.75))
 	(instance colormaterial
 		  :create :name :DarkGray
 		  :diffuse #f(0.66015625 0.66015625 0.66015625))
