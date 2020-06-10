@@ -27,6 +27,8 @@
 (require :pqp)
 (require :bullet)
 
+;; set *collision-algorithm* from available libraries.
+;; need to cehck if *collision-algorithm-pqp*/*collision-algorithm-bullet* exists, becuase it does not defined during compile time
 (if (and (boundp '*collision-algorithm-pqp*) (boundp '*collision-algorithm-bullet*))
     (defvar *collision-algorithm* (or *collision-algorithm-pqp* *collision-algorithm-bullet*)))
 

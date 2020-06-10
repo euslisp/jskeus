@@ -30,26 +30,26 @@
 (export '(bt-collision-distance bt-collision-check))
 
 (defun bt-make-model-from-body
-    (b &key (csg (send b :csg)) (margin nil))
+    (b &key (csg (send b :csg)) (margin 0))
   "Make bullet model from body."
   (let (m)
     (cond ((assoc :sphere csg)
            (setq m
                  (btmakespheremodel
-                  (* 1e-3 (user::radius-of-sphere b)))
+                  (* 1e-3 (+ (user::radius-of-sphere b) margin)))
                  ))
           ((assoc :cube csg)
            (setq m
                  (btmakeboxmodel
-                  (* 1e-3 (user::x-of-cube b))
-                  (* 1e-3 (user::y-of-cube b))
-                  (* 1e-3 (user::z-of-cube b))
+                  (* 1e-3 (+ (user::x-of-cube b) (* margin 2)))
+                  (* 1e-3 (+ (user::y-of-cube b) (* margin 2)))
+                  (* 1e-3 (+ (user::z-of-cube b) (* margin 2)))
                   )))
           ((assoc :cylinder csg)
            (setq m
                  (btmakecylindermodel
-                  (* 1e-3 (user::radius-of-cylinder b))
-                  (* 1e-3 (user::height-of-cylinder b))
+                  (* 1e-3 (+ (user::radius-of-cylinder b) margin))
+                  (* 1e-3 (+ (user::height-of-cylinder b) margin))
                   )))
           (t
            (setq m
@@ -59,9 +59,8 @@
                                 (mapcar #'(lambda (v) (send b :inverse-transform-vector v)) (send b :vertices))))
                   (length (send b :vertices))
                   ))
+           (if (> margin 0) (btsetmargin m (* 1e-3 margin)))
            ))
-    (when margin
-      (btsetmargin m margin))
     m)
   )
 
