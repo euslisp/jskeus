@@ -16,8 +16,7 @@
 \AtBeginDvi{\special{pdf:tounicode 90ms-RKSJ-UCS2}}\fi
 
 %%%
-\newcommand{\eusversion}{9.00}
-\newcommand{\irteusversion}{1.00}
+\input{current}
 
 
 \flushbottom
@@ -115,14 +114,14 @@
 \newcommand{\bfx}[1]{\index{#1}{\bf #1}}
 \newcommand{\emx}[1]{\index{#1}{\em #1}}
 
-\newcommand{\longdescription}[3]{
-\index{#1}
-\begin{emtabbing}
-{\bf #1} 
-\it #2
+\newcommand{\longdescription}[4]{
+\index{#2}
+\begin{tabbing}
+{\bf #2} \rm \hspace{3mm} \= \`[#1] \\
+\> \it #3
+\end{tabbing}
 \rm
-\end{emtabbing}
-\desclist{#3}
+\desclist{#4}
 }
 
 \newcommand{\funcdesc}[3]{\functiondescription{#1}{#2}{関数}{#3}}
@@ -165,14 +164,14 @@
 {\large \today} \\ }
 
 \author{
-irteus \irteusversion\\
+(irteus \irteusversion)~~\\
 東京大学大学院　\\
 情報理工学系研究科　知能機械情報学専攻\\
 {\large 野沢 峻一 , 植田 亮平, 岡田 慧} \\
 ueda@jsk.t.u-tokyo.ac.jp nozawa@jsk.t.u-tokyo.ac.jp k-okada@jsk.t.u-tokyo.ac.jp\\
 〒113-8656 東京都文京区本郷7-3-1 工学部2号館7階73B2 
 \\
-EusLisp \eusversion\\
+(EusLisp \eusversion)~~\\
 通商産業省　工業技術院 \\
 電子技術総合研究所 知能システム部 \\
 {\large 松井 俊浩, 原 功, 中垣 博文(九州電力)} \\
@@ -232,17 +231,18 @@ matsui@etl.go.jp, hara@etl.go.jp, nakagaki@etl.go.jp\\
 \input{irtviewer}
 %% irtviewer.l
 
-\input{pqp}
+\input{irtcollision}
+%% irtcollision.l
 %% pqp.l
+%% bullet.l
 
-\section{BVHデータ}
- \input{irtbvh-func}
-\section{Colladaデータ}
- \input{irtcollada-func}
-\section{ポイントクラウドデータ}
- \input{irtpointcloud-func}
-\section{グラフ表現}
- \input{irtgraph-func}
+\input{irtbvh}
+
+\input{irtcollada}
+
+\input{irtpointcloud}
+
+\input{irtgraph}
 
 %% irtbvh.l
 %% irtcollada.l
@@ -251,17 +251,7 @@ matsui@etl.go.jp, hara@etl.go.jp, nakagaki@etl.go.jp\\
 %% irtpointcloud.l
 %% png.l
 
-\section{irteus拡張}
- \subsection{GL/X表示}
-  \input{irtgl-func}
-  \input{irtx-func}
- \subsection{ユーティリティ関数}
- \input{irtutil-func}
- \subsection{数学関数}
- \input{irtmath-func}
- \subsection{画像関数}
- \input{irtimage-func}
- \input{png-func}
+\input{irtext}
 %% irtgl.l
 %% irtutil.l
 %% irtviewer.l

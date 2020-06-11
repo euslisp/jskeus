@@ -1,4 +1,4 @@
-## [JSK EusLisp repository](http://jskeus.sourceforge.net) [![Build Status](https://travis-ci.org/euslisp/jskeus.png?branch=master)](https://travis-ci.org/euslisp/jskeus)
+## [JSK EusLisp repository](http://jskeus.sourceforge.net) [![Build Status](https://travis-ci.org/euslisp/jskeus.png?branch=master)](https://travis-ci.org/euslisp/jskeus) [![Documentation Status](https://readthedocs.org/projects/jskeus/badge/?version=latest)](https://jskeus.readthedocs.io/ja/latest/?badge=latest)
 
 [![Join the chat at https://gitter.im/euslisp/jskeus](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/euslisp/jskeus?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -127,12 +127,12 @@ PDF files are also available from [here](https://github.com/euslisp/jskeus/raw/m
 
 For Ubuntu users:
 ```
-$ sudo apt-get install git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi gsfonts-x11 texlive-fonts-extra xfonts-100dpi-transcoded xfonts-75dpi-transcoded msttcorefonts
+$ sudo apt-get install git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi gsfonts-x11 texlive-fonts-extra xfonts-100dpi-transcoded xfonts-75dpi-transcoded msttcorefonts pkg-config libbullet-dev
 ```
 
 For Mac OSX users using Homebrew:
 ```
-$ brew install jpeg libpng mesalib-glw wget
+$ brew install jpeg libpng mesalib-glw wget bullet
 ```
 
 '''NOTE:'''

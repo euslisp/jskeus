@@ -871,6 +871,65 @@
                                     (send robot :calc-static-balance-point :force-list (list #f(10 20 0) #f(25 20 0))))))
     ))
 
+;; test for static balance point
+(defun fullbody-ik-with-forces-moments (robot &key (debug-view :no-message))
+  (send robot :newcoords (make-coords))
+  (send robot :reset-pose)
+  (send robot :fix-leg-to-coords (make-coords))
+  (send robot :legs :move-end-pos (float-vector 0 0 50))
+  (send robot :fix-leg-to-coords (make-coords))
+  (objects (list robot))
+  (let* ((centroid-thre 10)
+         (force-list '(#f(10 20 0) #f(25 20 0)))
+         (moment-list '(#f(20 -10 0) #f(10 -20 0)))
+         (result
+          (send robot :fullbody-inverse-kinematics
+                (list (send robot :rleg :end-coords :copy-worldcoords)
+                      (send robot :lleg :end-coords :copy-worldcoords)
+                      (make-coords :pos #f(150 -300 600))
+                      (make-coords :pos #f(150 300 600)))
+                :move-target (mapcar #'(lambda (x)
+                                         (send robot x :end-coords))
+                                     (list :rleg :lleg :rarm :larm))
+                :link-list (mapcar #'(lambda (x)
+                                       (send robot :link-list (send robot x :end-coords :parent)))
+                                   (list :rleg :lleg :rarm :larm))
+                :centroid-thre centroid-thre
+                :centroid-offset-func #'(lambda () (send robot :calc-static-balance-point :force-list force-list :moment-list moment-list))
+                :debug-view debug-view)))
+    (and result
+         (> centroid-thre (distance (apply #'midpoint 0.5 (send robot :legs :end-coords :worldpos))
+                                    (send robot :calc-static-balance-point :force-list force-list :moment-list moment-list)))
+         ;;check static balance
+         ;;The sum of force and moment that robot receives at target-points, ZMP and centroid should be almost zero (except yaw moment).
+         (> 1.0
+            (norm (subseq (transform (send robot :calc-grasp-matrix
+                                           (append (mapcar #'(lambda (x) (send robot x :end-coords :worldpos)) (list :rarm :larm))
+                                                   (list (send robot :centroid)
+                                                         (send (send robot :foot-midcoords) :worldpos))))
+                                     (concatenate float-vector
+                                                  (mapcan #'(lambda (f m) (concatenate cons f m))
+                                                          force-list moment-list)
+                                                  (v- (scale (* 1e-6 (send robot :weight)) *g-vec*)) #F(0 0 0)
+                                                  (v- (scale (* 1e-6 (send robot :weight)) *g-vec*) (reduce #'v+ force-list)) #F(0 0 0)))
+                          0 5))))
+    ))
+
+;;test for go-pos-params->footstep-list
+(defun test-go-pos-params->footstep-list (robot x y th)
+  (let* ((sc (send (send robot :foot-midcoords) :copy-worldcoords))
+         (tc (send (make-coords :pos (float-vector x y 0) :rpy (float-vector (deg2rad th) 0 0)) :transform sc :world))
+         (footstep-list (send robot :go-pos-params->footstep-list x y th))
+         (gc (midcoords 0.5 (car (reverse footstep-list)) (cadr (reverse footstep-list))))
+         (diff (send tc :transformation gc :local))
+         )
+    (and
+     (eps= (elt (send diff :pos) 0) 0.0)
+     (eps= (elt (send diff :pos) 1) 0.0)
+     (eps= (rad2deg (elt (car (rpy-angle (send diff :rot))) 0)) 0.0))
+    )
+  )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; unit tests
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -954,6 +1013,10 @@
   (assert
    (fullbody-ik-with-forces *sample-robot*)))
 
+(deftest test-fullbody-ik-with-forces-moments-samplerobot
+  (assert
+   (fullbody-ik-with-forces-moments *sample-robot*)))
+
 (deftest test-fullbody-ik-draw-param-check-samplerobot
   (dotimes (i 5) (send *sample-robot* :move-centroid-on-foot :both '(:rleg :lleg)))
   (assert
@@ -994,6 +1057,60 @@
      (fullbody-ik-with-look-at robot :debug-view nil))
     ))
 
+(deftest test-go-pos-params->footstep-list-test_0_500_0_0
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 500 0 0)))
+
+(deftest test-go-pos-params->footstep-list-test_0_0_150_0
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 0 150 0)))
+
+(deftest test-go-pos-params->footstep-list-test_0_0_-150_0
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 0 -150 0)))
+
+(deftest test-go-pos-params->footstep-list-test_0_0_0_45
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 0 0 45)))
+
+(deftest test-go-pos-params->footstep-list-test_0_0_0_-45
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 0 0 -45)))
+
+(deftest test-go-pos-params->footstep-list-test_0_0_0_180
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 0 0 180)))
+
+(deftest test-go-pos-params->footstep-list-test_0_0_0_-180
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 0 0 -180)))
+
+(deftest test-go-pos-params->footstep-list-test_0_500_150_45
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 500 150 45)))
+
+(deftest test-go-pos-params->footstep-list-test_pi/2_500_150_45
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords :rpy (float-vector pi/2 0 0)))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 500 150 45)))
+
+(deftest test-go-pos-params->footstep-list-test_-pi/2_500_150_45
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords :rpy (float-vector -pi/2 0 0)))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 500 150 45)))
+
+(deftest test-go-pos-params->footstep-list-test_pi_500_150_45
+  (send *sample-robot* :reset-pose)
+  (send *sample-robot* :fix-leg-to-coords (make-coords :rpy (float-vector pi 0 0)))
+  (assert (test-go-pos-params->footstep-list *sample-robot* 500 150 45)))
 
 ;; Test calling calc-walk-pattern-from-footstep-list N times
 ;;   This test is for bug reported in https://github.com/euslisp/jskeus/issues/286.

@@ -89,6 +89,13 @@
   (assert
    (every #'identity (test-preview-control-0 :preview-controller-class extended-preview-controller))))
 
+(deftest test-test-extended-preview-control-0-QR
+  (assert
+   (every #'identity (mapcar #'(lambda (x y) (and (eps= (cadr (memq :zmp x)) (cadr (memq :zmp y)))
+                                                  (eps= (cadr (memq :cog x)) (cadr (memq :cog y)))))
+                             (test-preview-control-0 :preview-controller-class extended-preview-controller :q 1 :r 1e-6)
+                             (test-preview-control-0 :preview-controller-class extended-preview-controller :q 1e1 :r 1e-5)))))
+
 (deftest test-test-preview-control-1
   (assert
    (every #'identity (test-preview-control-1))))
