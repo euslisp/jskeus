@@ -180,7 +180,7 @@
         (cond ((< (- dist dist-fat) (* fat 1.5)) 3)
               (t 2))
         "distance between objects ~7,3f ~7,3f ~7,3f~%" (- dist dist-fat ) dist dist-fat)
-       (assert (< (* fat 1.1) (- dist dist-fat) (* fat 2.1))))
+       (assert (< (* fat 1.05) (- dist dist-fat) (* fat 2.1))))
      ;;
      (send (elt ret2 1) :draw-on :flush nil :width 8 :size 50 :color (float-vector 1 0.4 0.4))
      (send (elt ret2 2) :draw-on :flush nil :width 8 :size 50 :color (float-vector 0.4 1 0.4))
