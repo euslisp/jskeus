@@ -43,6 +43,13 @@ else
 endif
 $(info "--      HAVE_BULLET = ${HAVE_BULLET}")
 
+ifneq ($(wildcard PQP/*),)
+    HAVE_PQP=1
+else
+    HAVE_PQP=0
+endif
+$(info "--      HAVE_PQP = ${HAVE_PQP}")
+
 # common
 WFLAGS= #-Wall
 
@@ -50,8 +57,12 @@ BINDIR=$(EUSDIR)/$(ARCHDIR)/bin
 OBJDIR=$(EUSDIR)/$(ARCHDIR)/obj
 LIBDIR=$(EUSDIR)/$(ARCHDIR)/lib
 
-PQPLIBDIR=PQP/$(ARCHDIR)
-PQPLIB=-L$(PQPLIBDIR) -lPQP-static
+ifeq ($(HAVE_PQP), 1)
+  PQPCFLAGS=-DHAVE_PQP=$(HAVE_PQP)
+  PQPLIBDIR=PQP/$(ARCHDIR)
+  PQPLIB=-L$(PQPLIBDIR) -lPQP-static
+  PQPLIBSTATIC=PQP/$(ARCHDIR)/libPQP-static.a
+endif
 
 ifeq ($(HAVE_BULLET), 1)
   BULLETCFLAGS=`pkg-config bullet --cflags` -DHAVE_BULLET=$(HAVE_BULLET)
@@ -137,7 +148,7 @@ $(LIBIRTEUS): $(IRTEUSOBJS) $(IRTCOBJECTS) $(LIBNR)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUS) $(IRTEUSOBJS) \
 		$(IRTCOBJECTS) $(IMPLIB)
 
-$(LIBIRTEUSG): $(IRTEUSGOBJS) $(IRTGCOBJECTS) $(LIBNR) PQP/$(ARCHDIR)/libPQP-static.a
+$(LIBIRTEUSG): $(IRTEUSGOBJS) $(IRTGCOBJECTS) $(LIBNR)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSG) $(IRTEUSGOBJS) \
 		$(IRTGCOBJECTS) $(IMPLIB) $(PQPLIB) $(BULLETLIB)
 
@@ -206,7 +217,7 @@ clean:
 	-rm -f $(EUSDIR)/irteus
 	-rm -f $(INSTALLOBJDIR)/compile_*.log
 	chmod a-x Makefile* *.l *.c
-	(cd PQP;make clean)
+	[ -e PQP ] && (cd PQP;make clean)
 	(cd $(EUSDIR)/lisp/image/jpeg/; make clean)
 	-rm -f $(EUSDIR)/lib/llib/pgsql.c $(EUSDIR)/lib/llib/pgsql.h
 	-rm -f $(EUSDIR)/lib/llib/time.c $(EUSDIR)/lib/llib/time.h
@@ -236,20 +247,20 @@ $(INSTALLOBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l
 $(INSTALLOBJDIR)/time.$(OSFX): $(EUSDIR)/lib/llib/time.l
 $(INSTALLOBJDIR)/eusjpeg.$(OSFX): $(EUSDIR)/lisp/image/jpeg/eusjpeg.l
 
-$(INSTALLOBJDIR)/irtc.$(OSFX): irtc.c $(filter-out $(INSTALLOBJDIR)/irtc.$(OSFX),$(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS)) defun.h
+$(INSTALLOBJDIR)/irtc.$(OSFX): irtc.c $(filter-out $(INSTALLOBJDIR)/irtc.$(OSFX),$(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) $(PQPLIBSTATIC) $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS)) defun.h
 	$(CC) $(CFLAGS) $(WFLAGS) -c irtc.c $(OBJOPT)$(INSTALLOBJDIR)/irtc.$(OSFX)
-$(INSTALLOBJDIR)/irtglc.$(OSFX): irtglc.c $(filter-out $(INSTALLOBJDIR)/irtglc.$(OSFX),$(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS)) defun.h
+$(INSTALLOBJDIR)/irtglc.$(OSFX): irtglc.c $(filter-out $(INSTALLOBJDIR)/irtglc.$(OSFX),$(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) $(PQPLIBSTATIC) $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS)) defun.h
 	$(CC) $(CFLAGS) $(WFLAGS) -c irtglc.c $(OBJOPT)$(INSTALLOBJDIR)/irtglc.$(OSFX)
-$(INSTALLOBJDIR)/irtgeoc.$(OSFX): irtgeoc.c $(filter-out $(INSTALLOBJDIR)/irtgeoc.$(OSFX), $(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) PQP/$(ARCHDIR)/libPQP-static.a $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS)) defun.h
+$(INSTALLOBJDIR)/irtgeoc.$(OSFX): irtgeoc.c $(filter-out $(INSTALLOBJDIR)/irtgeoc.$(OSFX), $(IRTEUSOBJS) $(IRTEUSGOBJS) $(IRTGCOBJECTS) $(PQPLIBSTATIC) $(IRTEUSXOBJS) $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS)) defun.h
 	$(CC) $(CFLAGS) $(WFLAGS) -c irtgeoc.c $(OBJOPT)$(INSTALLOBJDIR)/irtgeoc.$(OSFX)
 $(INSTALLOBJDIR)/CPQP.$(OSFX): CPQP.C defun.h
-	$(CXX) $(CXXFLAGS) -c CPQP.C $(OBJOPT)$(INSTALLOBJDIR)/CPQP.$(OSFX)
+	$(CXX) $(CXXFLAGS) $(PQPCFLAGS) -c CPQP.C $(OBJOPT)$(INSTALLOBJDIR)/CPQP.$(OSFX)
 $(INSTALLOBJDIR)/euspqp.$(OSFX): euspqp.c defun.h
-	$(CC) $(CFLAGS) $(WFLAGS) -c euspqp.c $(OBJOPT)$(INSTALLOBJDIR)/euspqp.$(OSFX)
+	$(CC) $(CFLAGS) $(WFLAGS) $(PQPCFLAGS) -c euspqp.c $(OBJOPT)$(INSTALLOBJDIR)/euspqp.$(OSFX)
 $(INSTALLOBJDIR)/CBULLET.$(OSFX): CBULLET.cpp defun.h
 	$(CXX) $(CXXFLAGS) $(BULLETCFLAGS) -c CBULLET.cpp $(OBJOPT)$(INSTALLOBJDIR)/CBULLET.$(OSFX)
 $(INSTALLOBJDIR)/eusbullet.$(OSFX): eusbullet.c defun.h
-	$(CC) $(CFLAGS) $(WFLAGS) -c eusbullet.c $(OBJOPT)$(INSTALLOBJDIR)/eusbullet.$(OSFX)
+	$(CC) $(CFLAGS) $(WFLAGS) $(BULLETCFLAGS) -c eusbullet.c $(OBJOPT)$(INSTALLOBJDIR)/eusbullet.$(OSFX)
 $(INSTALLOBJDIR)/euspng.$(OSFX): euspng.c defun.h
 	$(CC) $(CFLAGS) $(WFLAGS) -c euspng.c $(OBJOPT)$(INSTALLOBJDIR)/euspng.$(OSFX)
 $(INSTALLOBJDIR)/nr.$(OSFX): nr.c defun.h

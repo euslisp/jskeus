@@ -27,9 +27,10 @@
 (require :pqp)
 (require :bullet)
 
-(defconstant *collision-algorithm-pqp* :pqp)
-(defconstant *collision-algorithm-bullet* :bullet)
-(defvar *collision-algorithm* *collision-algorithm-pqp*)
+;; set *collision-algorithm* from available libraries.
+;; need to cehck if *collision-algorithm-pqp*/*collision-algorithm-bullet* exists, becuase it does not defined during compile time
+(if (and (boundp '*collision-algorithm-pqp*) (boundp '*collision-algorithm-bullet*))
+    (defvar *collision-algorithm* (or *collision-algorithm-pqp* *collision-algorithm-bullet*)))
 
 (defmethod cascaded-coords
   (:make-collisionmodel
@@ -57,13 +58,15 @@
   )
 
 (defun collision-check
-    (model1 model2 &rest args &key &allow-other-keys)
+    (model1 model2 &rest args)
   "Check collision between model1 and model2.
    If return value is 0, no collision.
    Otherwise (return value is 1), collision."
   (cond ((eq *collision-algorithm* *collision-algorithm-pqp*)
+         (if (symbolp (car args)) (setq args (append (list geo::PQP_FIRST_CONTACT) args)))
          (apply #'pqp-collision-check model1 model2 args))
         ((eq *collision-algorithm* *collision-algorithm-bullet*)
+         (if (numberp (car args)) (setq args (cdr args)))
          (apply #'bt-collision-check model1 model2 args))
         (t
          (error "invalid collision algorithm: ~a~%" *collision-algorithm*)))
