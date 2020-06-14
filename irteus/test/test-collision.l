@@ -194,6 +194,22 @@
      )
     ))
 
+(load "models/darwin.l")
+;; use add no-face link for euscollada-robot, use darwin-robot to override
+(defmethod darwin-robot
+  ;; make collision model from faces or gl-vertices
+  (:make-collision-model-for-links
+   (&key (fat 0) ((:links ls) (send self :links)))
+   ;;
+   ;; for append camera links for test code
+   (let (l)
+     (setq l (instance bodyset-link :init (make-cascoords) :name "dummy-link"))
+     (send (car links) :add-child-links l)
+     (setq links (append links (list l)))
+     (setq ls (send self :links)))
+   )
+  )
+
 (when *collision-algorithm-pqp*
 
 (deftest test-collision-sphere-analytical-pqp
@@ -249,6 +265,7 @@
   (test-collision-distance-fat
    (body+ (make-cube 200 200 100) (make-cube 100 100 300))
    (body+ (make-cube 200 200 100) (make-cube 100 100 300))))
+
 )
 
 (when *collision-algorithm-bullet*
@@ -308,6 +325,24 @@
    (body+ (make-cube 200 200 100) (make-cube 100 100 300))))
 
 )
+
+;; not sure why, but put this function within (when *collision-algorithm-pqp* causes errors...
+(deftest test-self-collision-check-pqp
+  (when *collision-algorithm-pqp*
+    (setq *collision-algorithm* *collision-algorithm-pqp*)
+    (let (robot)
+      (setq robot (instance darwin-robot :init))
+      (send robot :self-collision-check)
+      )))
+
+
+(deftest test-self-collision-check-bullet
+  (when  *collision-algorithm-bullet*
+    (setq *collision-algorithm* *collision-algorithm-bullet*)
+    (let (robot)
+      (setq robot (instance darwin-robot :init))
+      (send robot :self-collision-check)
+      )))
 
 (eval-when (load eval)
   (run-all-tests)
