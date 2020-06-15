@@ -148,6 +148,16 @@
   (:path-cost (from arc to)
     (send arc :cost)))
 
+
+(defclass image-node
+  :super node
+  :slots (thumbnail))
+(defmethod image-node
+  (:thumbnail
+   (&optional arg)
+   (if arg (setq thumbnail arg)
+     thumbnail)))
+
 ;;=======================================
 ;; jsk standard graph
 ;;  . costed-graph with start and goal
@@ -207,11 +217,21 @@ Args:
                 (cdr (assoc n node-alist))))
         (format strm "digraph ~A {~%" title)
         (dolist (target-node nodes)
-          (format strm "   ")
-          (format strm "~A [label = \"~A\"];~%"
-                  (graphviz-node-name target-node)
-                  (send target-node :name))
-          )
+          ;; if node is instane of subclass of image-node and has thubmnail, draw the thumbnail
+          (if (derivedp target-node image-node)
+              (if (send target-node :thumbnail)
+                  (progn
+                    (format strm "   ")
+                    (format strm "~A [shape=none, label = \"~A\", image=\"~A\", imagescale=true];~%"
+                            (graphviz-node-name target-node)
+                            (send target-node :name)
+                            (send target-node :thumbnail)
+                            )))
+            (progn
+              (format strm "   ")
+              (format strm "~A [label = \"~A\"];~%"
+                      (graphviz-node-name target-node)
+                      (send target-node :name)))))
         ;; first of all, write result-path
         (let ((result-tbl (make-hash-table :test #'equal))
               (draw-tbl (make-hash-table :test #'equal))
