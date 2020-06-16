@@ -217,16 +217,15 @@ Args:
                 (cdr (assoc n node-alist))))
         (format strm "digraph ~A {~%" title)
         (dolist (target-node nodes)
-          ;; if node is instane of subclass of image-node and has thubmnail, draw the thumbnail
+          ;; if node is instane of subclass of image-node, draw the thumbnail
           (if (derivedp target-node image-node)
-              (if (send target-node :thumbnail)
-                  (progn
-                    (format strm "   ")
-                    (format strm "~A [shape=none, label = \"~A\", image=\"~A\", imagescale=true];~%"
-                            (graphviz-node-name target-node)
-                            (send target-node :name)
-                            (send target-node :thumbnail)
-                            )))
+              (progn
+                (format strm "   ")
+                (format strm "~A [shape=none, label = \"~A\", image=\"~A\", imagescale=true];~%"
+                        (graphviz-node-name target-node)
+                        (send target-node :name)
+                        (send target-node :thumbnail)
+                        ))
             (progn
               (format strm "   ")
               (format strm "~A [label = \"~A\"];~%"
