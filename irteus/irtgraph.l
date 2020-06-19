@@ -38,10 +38,11 @@
 
 (defclass node
   :super propertied-object
-  :slots (arc-list))
+  :slots (arc-list image))
 (defmethod node
-  (:init (n)
+  (:init (n &optional image)
     (send self :name n)
+    (send self :image image)
     self)
   (:arc-list ()
     arc-list)
@@ -56,6 +57,8 @@
   (:unlink (n)
     (setq arc-list
 	  (remove-if #'(lambda(a)(eq n (send a :to))) arc-list)))
+  (:image (&optional im)
+          (if im (setq image im)) image)
   )
 
 (defclass arc
@@ -148,6 +151,7 @@
   (:path-cost (from arc to)
     (send arc :cost)))
 
+
 ;;=======================================
 ;; jsk standard graph
 ;;  . costed-graph with start and goal
@@ -208,10 +212,12 @@ Args:
         (format strm "digraph ~A {~%" title)
         (dolist (target-node nodes)
           (format strm "   ")
-          (format strm "~A [label = \"~A\"];~%"
+          (format strm "~A [label = \"~A\" ~A];~%"
                   (graphviz-node-name target-node)
-                  (send target-node :name))
-          )
+                  (send target-node :name)
+                  (if (send target-node :image)
+                      (format nil ", image=\"~A\", imagescale=true" (send target-node :image))
+                    "")))
         ;; first of all, write result-path
         (let ((result-tbl (make-hash-table :test #'equal))
               (draw-tbl (make-hash-table :test #'equal))
