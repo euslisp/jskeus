@@ -592,9 +592,9 @@
   (cond
    ((or (null x::*display*) (= x::*display* 0))
     (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")
-    (setq *irtviewer* (instance irtviewer-dummy))
-    (setq *viewer* (instance viewer-dummy))
-    (setf (get *viewer* :pickviewer) *irtviewer*))
+    (make-irtviewer-dummy))
+   ((memq :no-window args)
+    (make-irtviewer-no-window))
    (t
     (setq *irtviewer* (send-lexpr (instantiate x::irtviewer) :create args))))
    *irtviewer*)
@@ -653,8 +653,10 @@
 
 (defun make-irtviewer-dummy (&rest args)
   (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")
-  (setq *irtviewer* (instance x::irtviewer-dummy)))
-
+  (setq *irtviewer* (instance irtviewer-dummy))
+  (setq *viewer* (instance viewer-dummy))
+  (setf (get *viewer* :pickviewer) *irtviewer*)
+  *irtviewer*)
 
 (defun geo::default-pixmapsurface (&rest args)
   (send-lexpr (instantiate gl::glpixmapsurface) :create args))
