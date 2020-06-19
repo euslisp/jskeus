@@ -94,6 +94,7 @@
 	  (hither 200.0) (yon 50000.0)
 	  (width 500) (height 500)
           ((:draw-origin do) 150) ((:draw-floor df) nil) ((:floor-color fc) #f(1 1 1))
+          (call-super t)
 	  &allow-other-keys)
    (let ()
      (setq left-right-angle 60
@@ -102,8 +103,9 @@
 	   viewtarget (float-vector 0 0 0)
            draw-origin do draw-floor df floor-color fc
            logging-flag nil)
-     (send-super* :create :width width :height height :title title
-		  :event-mask '(:configure) args)
+     (if call-super
+         (send-super* :create :width width :height height :title title
+                      :event-mask '(:configure) args))
      (setq gl::*perspective-far* yon)
      (setq gl::*perspective-near* hither)
      (setq viewer (apply #'user::view :parent self
@@ -644,9 +646,47 @@
   (:nomethod (&rest args) t)
   ) ;;
 
+(defclass irtviewer-no-window
+  :super propertied-object
+  :slots (irtviewer))
+(defmethod irtviewer-no-window
+  (:init (&rest args)
+   (setq irtviewer (instantiate x::irtviewer))
+   self)
+  (:create (&rest args)
+   (send* irtviewer :create :call-super nil :alternate t args))
+  (:resize (newwidth newheight)
+   ;; (setq x::width newwidth x::height newheight)
+   ;; (send-super  :resize newwidth newheight) ; re-define resize, to skip resize xwindow
+   (send self :viewer :viewsurface :resize newwidth newheight)
+   (send self :viewer :viewsurface :makecurrent)
+   (send self :viewer :viewsurface :3d-mode)
+   (let ((wh-max (max newwidth newheight)))
+     (send (send self :viewer :viewport)
+           :resize :width wh-max :height (- wh-max)
+           :xcenter (/ newwidth 2) :ycenter (/ newheight 2)))
+   (send self :redraw))
+  (:nomethod (&rest args)
+   (send* irtviewer args))
+  ) ;;
+
 (defun make-irtviewer-dummy (&rest args)
   (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")
   (setq *irtviewer* (instance x::irtviewer-dummy)))
+
+
+(defun geo::default-pixmapsurface (&rest args)
+  (send-lexpr (instantiate gl::glpixmapsurface) :create args))
+(defun make-irtviewer-no-window (&rest args)
+  (setf (symbol-function 'geo::default-viewsurface-orig)
+        (symbol-function 'geo::default-viewsurface))
+  (setf (symbol-function 'geo::default-viewsurface)
+        (symbol-function 'geo::default-pixmapsurface))
+  (setq *irtviewer* (instance irtviewer-no-window :init))
+  (send-lexpr *irtviewer* :create args)
+  (setf (symbol-function 'geo::default-viewsurface)
+        (symbol-function 'geo::default-viewsurface-orig))
+  *irtviewer*)
 
 
 (defmacro with-save-mpeg (fname &rest forms)
