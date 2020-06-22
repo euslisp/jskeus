@@ -55,8 +55,8 @@
            (setq m
                  (btmakemeshmodel
                   (scale 1e-3 ;; [m]
-                         (apply #'concatenate float-vector
-                                (mapcar #'(lambda (v) (send b :inverse-transform-vector v)) (send b :vertices))))
+                         (apply #'float-vector (apply #'concatenate cons
+                                (mapcar #'(lambda (v) (send b :inverse-transform-vector v)) (send b :vertices)))))
                   (length (send b :vertices))
                   ))
            (if (> margin 0) (btsetmargin m (* 1e-3 margin)))
@@ -74,8 +74,8 @@
             (setq m
                   (btmakemeshmodel
                    (scale 1e-3 ;; [m]
-                          (apply #'concatenate float-vector
-                                 (mapcar #'(lambda (v) (send self :inverse-transform-vector v)) vs)))
+                          (apply #'float-vector (apply #'concatenate cons
+                                 (mapcar #'(lambda (v) (send self :inverse-transform-vector v)) vs))))
                    (length vs)
                    ))
             (btsetmargin m fat)
@@ -89,8 +89,8 @@
             (setq m
                   (btmakemeshmodel
                    (scale 1e-3 ;; [m]
-                          (apply #'concatenate float-vector
-                                 (mapcar #'(lambda (v) (send self :inverse-transform-vector v)) vs)))
+                          (apply #'float-vector (apply #'concatenate cons
+                                 (mapcar #'(lambda (v) (send self :inverse-transform-vector v)) vs))))
                    (length vs)
                    ))
             (btsetmargin m fat)

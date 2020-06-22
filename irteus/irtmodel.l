@@ -2661,15 +2661,25 @@
      pairs))
   (:self-collision-check
    (&key (mode :all) (pairs (send self :collision-check-pairs)) (collision-func 'collision-check))
-   (let ((cpairs) (col-count 0))
+   (let ((cpairs) (col-count 0) (invalid-links))
      (dolist (p pairs)
-       (let ((colp (/= (funcall collision-func (car p) (cdr p)) 0)))
-	 (when colp
-	   (incf col-count)
-	   (if (eq mode :first)
-	       (return-from :self-collision-check p)
-	     (push p cpairs)))
-	 ))
+       (if (and (send (car p) :faces) (send (cdr p) :faces))
+           (let ((colp (/= (funcall collision-func (car p) (cdr p)) 0)))
+             (when colp
+               (incf col-count)
+               (if (eq mode :first)
+                   (return-from :self-collision-check p)
+                 (push p cpairs))))
+         (progn
+           (when (and (null (send (car p) :faces)) (null (member (car p) invalid-links)))
+             (warning-message 3 "skip collision between ~A (~A) because of no faces~%"
+                          (send (car p) :name) (length (send (car p) :faces)))
+             (push (car p) invalid-links))
+           (when (and (null (send (cdr p) :faces)) (null (member (cdr p) invalid-links)))
+             (warning-message 3 "skip collision between ~A (~A) because of no faces~%"
+                              (send (cdr p) :name) (length (send (cdr p) :faces)))
+             (push (cdr p) invalid-links)))
+         ))
      cpairs))
   (:calc-grasp-matrix
    (contact-points

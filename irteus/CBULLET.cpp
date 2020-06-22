@@ -117,6 +117,9 @@ long BT_MakeCapsuleModel(double radius, double height)
 long BT_MakeMeshModel(double *verticesPoints, long numVertices)
 {
   btConvexHullShape* pshape = new btConvexHullShape();
+  if (numVertices == 0) {
+    fprintf(stderr, "BT_MakeMeshModel with numVertices == 0\n");
+  }
 #define SHRINK_FOR_MARGIN false
   if (SHRINK_FOR_MARGIN) {
     // Shrink vertices for default margin CONVEX_DISTANCE_MARGIN,
