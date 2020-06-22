@@ -52,7 +52,7 @@
            ;; you can set optional ik convergence check by additional-check function
            :additional-check #'(lambda ()
                                  ;; calculate :inverse-kinematics-loop until collision distance becomes large enough. (> 80mm, in this case)
-                                 (let ((dist (car (pqp-collision-distance (send *robot* :rarm :elbow-p :child-link) *box*))))
+                                 (let ((dist (car (collision-distance (send *robot* :rarm :elbow-p :child-link) *box*))))
                                    (> dist 80)))
 	   )
      (send *box* :translate (float-vector 0 0 (* 7 (sin tm))))

@@ -446,7 +446,7 @@
          (let (a)
            (setq a (send self :open-hand))
            (while (> a 0)
-             (if (pqp-collision-check-objects
+             (if (collision-check-objects
                   (list (send self :joint-fr :child-link)
                         (send self :joint-fl :child-link))
                   (list obj))

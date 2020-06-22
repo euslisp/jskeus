@@ -30,47 +30,57 @@
 (export '(bt-collision-distance bt-collision-check))
 
 (defun bt-make-model-from-body
-    (b &key (csg (send b :csg)) (margin nil))
+    (b &key (csg (send b :csg)) (margin 0))
   "Make bullet model from body."
   (let (m)
     (cond ((assoc :sphere csg)
            (setq m
                  (btmakespheremodel
-                  (* 1e-3 (user::radius-of-sphere b)))
+                  (* 1e-3 (+ (user::radius-of-sphere b) margin)))
                  ))
           ((assoc :cube csg)
            (setq m
                  (btmakeboxmodel
-                  (* 1e-3 (user::x-of-cube b))
-                  (* 1e-3 (user::y-of-cube b))
-                  (* 1e-3 (user::z-of-cube b))
+                  (* 1e-3 (+ (user::x-of-cube b) (* margin 2)))
+                  (* 1e-3 (+ (user::y-of-cube b) (* margin 2)))
+                  (* 1e-3 (+ (user::z-of-cube b) (* margin 2)))
                   )))
           ((assoc :cylinder csg)
            (setq m
                  (btmakecylindermodel
-                  (* 1e-3 (user::radius-of-cylinder b))
-                  (* 1e-3 (user::height-of-cylinder b))
+                  (* 1e-3 (+ (user::radius-of-cylinder b) margin))
+                  (* 1e-3 (+ (user::height-of-cylinder b) margin))
                   )))
           (t
            (setq m
                  (btmakemeshmodel
                   (scale 1e-3 ;; [m]
-                         (apply #'concatenate float-vector
-                                (mapcar #'(lambda (v) (send b :inverse-transform-vector v)) (send b :vertices))))
+                         (apply #'float-vector (apply #'concatenate cons
+                                (mapcar #'(lambda (v) (send b :inverse-transform-vector v)) (send b :vertices)))))
                   (length (send b :vertices))
                   ))
+           (if (> margin 0) (btsetmargin m (* 1e-3 margin)))
            ))
-    (when margin
-      (btsetmargin m margin))
     m)
   )
 
 (defmethod cascaded-coords
   (:make-btmodel
-   (&key (fat 0))
+   (&key (fat 0) ((:faces fs)))
     "Make bullet model and save pointer of the bullet model."
-   (let (vs m)
-     (cond ((derivedp self body)
+   (let (vs m v v1 v2 v3)
+     (cond (fs
+            (setq vs (flatten (send-all fs :vertices)))
+            (setq m
+                  (btmakemeshmodel
+                   (scale 1e-3 ;; [m]
+                          (apply #'float-vector (apply #'concatenate cons
+                                 (mapcar #'(lambda (v) (send self :inverse-transform-vector v)) vs))))
+                   (length vs)
+                   ))
+            (btsetmargin m fat)
+            )
+           ((derivedp self body)
             (setq m
                   (bt-make-model-from-body self :margin fat))
             )
@@ -79,8 +89,8 @@
             (setq m
                   (btmakemeshmodel
                    (scale 1e-3 ;; [m]
-                          (apply #'concatenate float-vector
-                                 (mapcar #'(lambda (v) (send self :inverse-transform-vector v)) vs)))
+                          (apply #'float-vector (apply #'concatenate cons
+                                 (mapcar #'(lambda (v) (send self :inverse-transform-vector v)) vs))))
                    (length vs)
                    ))
             (btsetmargin m fat)

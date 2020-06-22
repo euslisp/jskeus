@@ -432,7 +432,7 @@
                 ((:max-joint-torque mjt)
                  (float-vector 100 100 100)) ;; [Nm] [Nm] [Nm]
 		&allow-other-keys)
-         "Create instance of sphere-joint. min/max are defiend as a region of angular velocity in degree."
+         "Create instance of sphere-joint. min/max are defind as a region of angular velocity in degree."
     (setq axis (list :x :y :z))
     (send-super* :init :min min :max max
                  :max-joint-velocity mjv
@@ -778,8 +778,8 @@
      (send (send j :parent-link) :add-child-links (send j :child-link))
      )
    (send self :update-descendants)
-   ;; Make default collision shape by pqp
-   (dolist (l (send self :links)) (send l :make-pqpmodel))
+   ;; Make default collision shape
+   (dolist (l (send self :links)) (send l :make-collisionmodel))
    )
   (:links (&rest args) "Returns links, or args is passed to links" (user::forward-message-to-all links args))
   (:joint-list (&rest args) "Returns joint list, or args is passed to joints" (user::forward-message-to-all joint-list args))
@@ -917,7 +917,7 @@
      (when overwrite-collision-model
        (setf (get l0 :pqpmodel) nil)    
        (setf (get l1 :pqpmodel) nil)
-       (pqp-collision-check l0 l1 geo::PQP_FIRST_CONTACT :fat fat :fat2 fat2))
+       (collision-check l0 l1 geo::PQP_FIRST_CONTACT :fat fat :fat2 fat2))
 
      (send self :make-min-max-table-using-collision-check
            l0 l1 joint0 joint1 joint-range0 joint-range1 min-joint0 min-joint1 fat fat2 debug margin)
@@ -949,7 +949,7 @@
                   ((and (eq flag :free) (/= (mod i skip-count) 0) (<= i (- joint-range0 skip-count)))
                    (setq c t))
                   (t
-                   (setq c (= (pqp-collision-check l0 l1 geo::PQP_FIRST_CONTACT :fat fat :fat2 fat2) 0))
+                   (setq c (= (collision-check l0 l1 geo::PQP_FIRST_CONTACT :fat fat :fat2 fat2) 0))
                    (cond 
                     ((and (eq flag :low-limit) c) 
                      (setq flag :free))
@@ -1327,7 +1327,7 @@
 	     (setf (elt col-list i) nil)
 	     )
 	 (progn
-	   (setq np (nconc (pqp-collision-distance (car pair) (cadr pair) :qsize 2) (list (float-vector 0 0 0) i)))
+	   (setq np (nconc (collision-distance (car pair) (cadr pair) :qsize 2) (list (float-vector 0 0 0) i)))
 	   (if (<= (car np) distance-limit)
 	       (progn
 		 (if (and warnp (< (car np) 1.0))
@@ -2056,7 +2056,7 @@
     ~~ Ratio of centroid velocity used in calculation of joint position difference to centroid position difference. max 1.0. Default is 1.0.
     ~ :min-loop
     ~~ Minimam loop count. Defalt (/ stop 10).
-    ~~ If integer is specified, :inverse-kinematics-loop does returns :ik-continues and continueing solving IK.
+    ~~ If integer is specified, :inverse-kinematics-loop does returns :ik-continues and continuing solving IK.
     ~~ If min-loop is nil, do not consider loop counting for IK convergence.
     ~ other-keys
     ~~ :move-joints-avoidance is internally called and args are passed to it. See the explanation of :move-joints-avoidance.
@@ -2660,16 +2660,26 @@
        )
      pairs))
   (:self-collision-check
-   (&key (mode :all) (pairs (send self :collision-check-pairs)) (collision-func 'pqp-collision-check))
-   (let ((cpairs) (col-count 0))
+   (&key (mode :all) (pairs (send self :collision-check-pairs)) (collision-func 'collision-check))
+   (let ((cpairs) (col-count 0) (invalid-links))
      (dolist (p pairs)
-       (let ((colp (/= (funcall collision-func (car p) (cdr p)) 0)))
-	 (when colp
-	   (incf col-count)
-	   (if (eq mode :first)
-	       (return-from :self-collision-check p)
-	     (push p cpairs)))
-	 ))
+       (if (and (send (car p) :faces) (send (cdr p) :faces))
+           (let ((colp (/= (funcall collision-func (car p) (cdr p)) 0)))
+             (when colp
+               (incf col-count)
+               (if (eq mode :first)
+                   (return-from :self-collision-check p)
+                 (push p cpairs))))
+         (progn
+           (when (and (null (send (car p) :faces)) (null (member (car p) invalid-links)))
+             (warning-message 3 "skip collision between ~A (~A) because of no faces~%"
+                          (send (car p) :name) (length (send (car p) :faces)))
+             (push (car p) invalid-links))
+           (when (and (null (send (cdr p) :faces)) (null (member (cdr p) invalid-links)))
+             (warning-message 3 "skip collision between ~A (~A) because of no faces~%"
+                              (send (cdr p) :name) (length (send (cdr p) :faces)))
+             (push (cdr p) invalid-links)))
+         ))
      cpairs))
   (:calc-grasp-matrix
    (contact-points
@@ -2706,7 +2716,7 @@
     &allow-other-keys)
    "Solve inverse-kinematics for closed loop forward kinematics.
     Move move-target to target-coords with link-list.
-    link-list loop should be close when move-target reachs target-coords.
+    link-list loop should be close when move-target reaches target-coords.
     constrained-joint-list is list of joints specified given joint angles in closed loop.
     constrained-joint-angle-list is list of joint-angle for constrained-joint-list."
    ;; Set joint-angle

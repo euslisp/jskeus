@@ -122,6 +122,56 @@
 	    "solve A* problem successfully")
     ))
 
+;; test image graph
+(load "models/h3-robot.l")
+(load "models/h3s-robot.l")
+(load "models/h4-robot.l")
+(load "models/h7-robot.l")
+
+(deftest test-image-node ()
+  (let ((g (instance graph))
+        (node-h3 (instance node :name "h3"))
+        (node-h3s (instance node :name"h3s"))
+        (node-h4 (instance node :name "h4"))
+        (node-h7 (instance node :name "h7"))
+        (h3-thumbnail "/tmp/h3.png")
+        (h3s-thumbnail "/tmp/h3s.png")
+        (h4-thumbnail "/tmp/h4.png")
+        (h7-thumbnail "/tmp/h7.png"))
+
+    ;; setup irtviewer
+    (make-irtviewer)
+    ;; (make-irtviewer :no-window t) ;; requires https://github.com/euslisp/EusLisp/pull/438 and https://github.com/euslisp/jskeus/pull/574
+    ;; (make-irtviewer)
+    (send *irtviewer* :change-background #f(255 255 255))
+    (send *irtviewer* :resize 200 200)
+    (send *irtviewer* :draw-origin nil)
+    (setq viewsurface (instance gl::glviewsurface :init :width 300 :height 300))
+
+    ;; save pictures for thumnail
+    (objects (list (h3)))
+    (send *irtviewer* :viewer :viewsurface :write-to-image-file h3-thumbnail)
+    (send node-h3 :image h3-thumbnail)
+    (objects (list (h3s)))
+    (send *irtviewer* :viewer :viewsurface :write-to-image-file h3s-thumbnail)
+    (send node-h3s :image h3s-thumbnail)
+    (objects (list (h4)))
+    (send *irtviewer* :viewer :viewsurface :write-to-image-file h4-thumbnail)
+    (send node-h4 :image h4-thumbnail)
+    (objects (list (h7)))
+    (send *irtviewer* :viewer :viewsurface :write-to-image-file h7-thumbnail)
+    (send node-h7 :image h7-thumbnail)
+
+    ;; add edges between nodes and push nodes to graph
+    (send g :nodes (list node-h3 node-h3s node-h4 node-h7))
+    (send g :add-arc-from-to node-h3 node-h3s)
+    (send g :add-arc-from-to node-h3 node-h4)
+    (send g :add-arc-from-to node-h4 node-h7)
+
+    ;; write graph to pdf file
+    (warning-message 2 "write to /tmp/robots_in_jsk.pdf~%")
+    (send g :write-to-pdf "/tmp/robots_in_jsk.pdf" nil "robots_in_jsk")
+    g))
 
 (eval-when (load eval)
   (run-all-tests)
