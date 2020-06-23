@@ -374,13 +374,15 @@
 
 ;; return polygon if triangable ,unless return nil.
 ;; this function = sharpp + trianglable + insidep
-(defun face-to-tessel-triangle (f num)
+(defun face-to-tessel-triangle (f num &optional (*epsilon* 1e-10))
   "return polygon if triangable, return nil if it is not."
+  #-(or :x86_64 :aarch64)
+  (setq *epsilon* (* 1000.0 *epsilon*));; for 32bit system
   (let* ((vers (send f :vertices))
 	 (len (length (cdr vers)))
-	 (v0 (nth (mod (1- (+ num len)) len) vers))
-	 (v1 (nth (mod num len) vers))
-	 (v2 (nth (mod (1+  num) len) vers)) )
+	 (v0 (nth (mod (1- (+ num len)) len) vers)) ;; num - 1 th
+	 (v1 (nth (mod num len) vers)) ;; v1: num th
+	 (v2 (nth (mod (1+  num) len) vers)) );; v2: num + 1 th
     (unless (> (v. (v* (v- v1 v0) (v- v2 v1)) (send f :normal)) 0)
 	    (return-from face-to-tessel-triangle nil))
     (let ((poly (make-face-from-vertices
@@ -389,7 +391,13 @@
                                                 (send f :edges)))) (list v0 v1 v2))))
 	  (rvers (remove v0 (remove v1 (remove v2 vers)))) not-intersectp)
       (setq not-intersectp
-            (and (every #'(lambda (x) (not (eq ':inside (send poly :insidep x)))) rvers)
+            (and (every #'(lambda (x) (not (eq ':inside (send poly :insidep x)))) rvers) ;; all rvers are not :inside
+                 (every #'(lambda (e) ;; all rvers are not on the edges of poly / allow the same pvert/nvert
+                            (every #'(lambda (v)
+                                       (let ((p (send e :colinear-point v *epsilon*)))
+                                         (not (and p (eps-in-range 0.0 p 1.0 (- *epsilon*)))
+                                              )))
+                                   rvers)) (send poly :edges))
                  (if (> (length rvers) 3)
                      (every #'(lambda (e)
                                 ;; if not intersect return t;
@@ -400,8 +408,8 @@
                                       (eq r :outside)
                                       (and (consp r)
                                            (eq (car r) :intersect)
-                                           (not (eps-in-range 0.0 (elt r 1) 1.0 -0.001))
-                                           (not (eps-in-range 0.0 (elt r 2) 1.0 -0.001))))))
+                                           (not (eps-in-range 0.0 (elt r 1) 1.0 (- *epsilon*)))
+                                           (not (eps-in-range 0.0 (elt r 2) 1.0 (- *epsilon*)))))))
                             (send (instance face :init :vertices (butlast rvers)) :edges))
                    t)))
       (if not-intersectp
