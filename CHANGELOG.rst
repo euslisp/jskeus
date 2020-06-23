@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.2 (2020-06-23)
+------------------
 * [irteus/irtgl.l] add :string method to glviewsurface. (`#530 <https://github.com/euslisp/jskeus/issues/530>`_)
 * add irtstl.l, irtwrl.l : copied from wrl2eus.l and read-stl.l (`#248 <https://github.com/euslisp/jskeus/issues/248>`_)
 
