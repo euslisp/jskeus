@@ -58,7 +58,7 @@
      (setq
       data
       (if (some #'(lambda (obj)
-                    (setq r (car (pqp-collision-distance self obj)))
+                    (setq r (car (collision-distance self obj)))
                     (< r bumper-threshold)) objs) 1 0))))
   (:draw (vwer) (send self :draw-sensor vwer))
   (:draw-sensor

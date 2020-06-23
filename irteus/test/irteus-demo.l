@@ -34,6 +34,26 @@
 (deftest test-particle
   (particle))
 
+(load "models/darwin.l")
+;; use :make-collisionmdoel for euscollada-robot, use darwin-robot to override
+(defmethod darwin-robot
+  ;; make collision model from faces or gl-vertices
+  (:make-collision-model-for-links
+   (&key (fat 0) ((:links ls) (send self :links)))
+   (dolist (ll ls)
+     (send ll :make-collisionmodel
+             :fat fat
+             :faces (flatten (mapcar #'(lambda (x)
+                                         (cond
+                                          ((find-method x :def-gl-vertices)
+                                           (send (x . glvertices) :convert-to-faces :wrt :world))
+                                          (t
+                                           (send x :faces))))
+                                     (send ll :bodies)))))
+   )
+  )
+
+
 ;; check whether all ik are solved for walking examples
 (deftest test-walk-motion-for-sample-robot
   (assert

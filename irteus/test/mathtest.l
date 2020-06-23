@@ -5,10 +5,15 @@
 (defun eps-matrix= (m1 m2 &optional (eps *epsilon*))
    (eps= (distance (array-entity m1) (array-entity m2)) 0.0 eps))
 
+(defun eps-complex-matrix= (cm1 cm2 &optional (eps *epsilon*))
+  (and
+   (eps= (distance (array-entity (car cm1)) (array-entity (car cm2))) 0.0 eps)
+   (eps= (distance (array-entity (cadr cm1)) (array-entity (cadr cm2))) 0.0 eps)))
+
 (deftest mathtest
-  (let (m1 m2 m3 m4 m5 m6 m7 r u s v val vec)
+  (let (m1 m2 m3 m4 m5 m6 m7 cm8 inv-cm8 m9 r u s v val vec val-complex vec-complex)
     ;;
-    ;; diagnoal, minor-matrix, atan2, outer-product-matrix, quaternion, matrix-log, pseudo-inverse, sr-inverse, manipulability, eien decompose, sv/ql solve, lu-solve2, matrix-determinant, qr/ql-decompose
+    ;; diagnoal, minor-matrix, atan2, outer-product-matrix, quaternion, matrix-log, pseudo-inverse, sr-inverse, manipulability, eigen decompose, sv/ql solve, lu-solve2, matrix-determinant, qr/ql-decompose, inverse-matrix-complex, eigen-decompose-complex
     ;;
     (assert (eps-matrix= (diagonal #f(1 2)) #2f((1 0) (0 2))) "check diagonal")
 
@@ -82,7 +87,7 @@
     ;; matrix-determinant http://en.wikipedia.org/wiki/Determinant
     (assert (eps= (matrix-determinant #2f((-2  2 -3)(-1 1 3)(2 0 -1))) 18.0) "matrix-determinant")
 
-    ;; qr-decompose (car) is eigenvalue , what is cdr?
+    ;; qr-decompose (car) is real part of eigenvalue , qr-decompose (cadr) is imaginary part of eigenvalue
     (assert (eps-v= #f(3 1 2) (car (qr-decompose #2f((2 0 1)(0 2 0)(1 0 2))))) "qr-decompose")
     ;; ql-decompose
     (setq m6 #2f((2 0 1)(0 2 0)(1 0 2))) 
@@ -98,6 +103,23 @@
     (setq m7 #2f((1.0 0.0 0.0 0.0 0.0 0.0) (0.0 1.0 0.0 0.0 0.0 0.0) (0.0 0.0 1.0 0.0 0.0 0.0) (0.0 -0.0647909045219421 -0.1271851658821106 1.0 0.0 0.0) (0.0647909045219421 0.0 0.0192958638072014 0.0 1.0 0.0) (0.1271851658821106 -0.0192958638072014 0.0 0.0 0.0 1.0)))
     (assert (pseudo-inverse2 m7) "psesudo-inverse2 (might be svdcmp failing)")
     (assert (eps-matrix= (m* m7 (pseudo-inverse2 m7)) (unit-matrix 6)) "psesudo-inverse2")
+
+    ;; inverse matrix of complex matrix
+    (setq cm8 (list #2f((1 2 3) (5 6 7) (9 4 -5)) #2f((-3 1 0) (0 -2 0) (0 0 0.1)))) ;; cm8 is complex matrix (list A B) = A + B*j  (j is imaginary unit)
+    (setq inv-cm8 (inverse-matrix-complex cm8)) ;; inv(cm8)
+    (assert (eps-complex-matrix=
+             (m*-complex cm8 inv-cm8) ;; cm8 * inv(cm8)
+             (list (unit-matrix 3) (make-matrix 3 3)) ;; E
+             ) "inverse-matrix-complex")
+
+    ;; eigen decompose with complex number
+    (setq m9 #2f((1 2 3 4) (5 6 7 8) (9 4 -5 3) (-1 0 3 -5))) ;; this matrix has complex number eigenvalue
+    (setq val-complex (car (eigen-decompose-complex m9))) ;; Lambda
+    (setq vec-complex (cadr (eigen-decompose-complex m9))) ;; V
+    (assert (eps-complex-matrix=
+             (m*-complex (list m9 (make-matrix 4 4)) vec-complex) ;; m9 * V
+             (m*-complex vec-complex (mapcar #'(lambda (x) (diagonal x)) val-complex)) ;; V * Lambda
+             ) "eigen-decompose-complex")
     ))
 
 (eval-when (load eval)
