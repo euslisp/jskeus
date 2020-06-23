@@ -2,6 +2,119 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [irteus/irtgl.l] add :string method to glviewsurface. (`#530 <https://github.com/euslisp/jskeus/issues/530>`_)
+* add irtstl.l, irtwrl.l : copied from wrl2eus.l and read-stl.l (`#248 <https://github.com/euslisp/jskeus/issues/248>`_)
+
+  * fix eus2stl, check if the body has glvertices, see https://github.com/jsk-ros-pkg/jsk_model_tools/pull/208#issuecomment-316715445
+  * run triangulation within esu2stl ( https://github.com/jsk-ros-pkg/jsk_model_tools/pull/208#issuecomment-316548668 )
+  * add irtstl.l, irtwrl.l : copied from wrl2eus.l and read-stl.l
+
+* Fix triangulation of face-to-tessel-triangle (`#562 <https://github.com/euslisp/jskeus/issues/562>`_)
+* modify node to support image option, and update :write-to-dot so that .dot can include image (`#573 <https://github.com/euslisp/jskeus/issues/573>`_)
+
+  * add test code to genrate node with images
+  * add node and modify write-to-dot so that .dot can include image
+
+* [:self-collision-check] ignore links which do not have :faces (`#571 <https://github.com/euslisp/jskeus/issues/571>`_)
+* update :self-collision-check, warn message when link without faces is included in collision-check-pairs
+* Add eusbullet for using bullet collision function (implement with c defun) (`#570 <https://github.com/euslisp/jskeus/issues/570>`_)
+
+  * add test-self-collision-check-pqp/bullet
+  * fix btmakemeshmodel when faces is nil
+  * CBULLE.cpp print 'BT_MakeMeshModel with numVertices == 0'
+  * do not add pqp triangle to object which do not have :faces
+　* relax test for cube-pqp
+  * - add comment why we check boundp *collision-algorithm-{pqp,bullet}* before defvar *collision-algorithm*
+    - setmargin of bullet only works with mesh model to add margin for primitive geometry shape, set directory as geometric parameters
+  * add test-collision-distance-fat, to check if :fat works
+  * use :make-collsionmodel for euscollada-robot
+  * use collision-* instaed of ppq-collision-*
+  * irtcollision.l: collision-check add geo::PQP_FIRST_CONTACT for PQP and remove it for BULLET
+  * add &key faces in :make-btmodel, to compatible with :make-pqpmodel
+  * test/test-collision.l: add test-collision-distance
+  * run test-collision-*ALGO* only when that ALGO is available
+  * set *COLLISION-ALGORITHM-BULLET* and *COLLISION-ALGORITHM-PQP* if it is available
+  * fix Makefile when PQP is not found
+  * add travis job to check COLLISION_LIB
+
+* [irteus/irtmath.l] Add inverse matrix of complex matrix and eigen decompose considering complex number (`#554 <https://github.com/euslisp/jskeus/issues/554>`_)
+
+  * [irteus/irtmath.l] Add documents of functions
+  * [irteus/irtmath.l] Fix matrix-determinant check of solve-non-zero-vector-from-det0-matrix
+  * [irteus/irtmath.l] Debug print travis matrix-determinant
+  * [irteus/irtmath.l] Debug print travis mathtest.l
+  * [irteus/irtmath.l] Add inverse matrix of complex matrix and eigen decompose considering complex number
+
+* warn misisng color names (`#558 <https://github.com/euslisp/jskeus/issues/558>`_)
+* add documentation of :calc-walk-pattern-from-footstep-list (`#550 <https://github.com/euslisp/jskeus/issues/550>`_)
+* pythag is nolonger used in irteus/irtc.c (`#563 <https://github.com/euslisp/jskeus/issues/563>`_)
+* fix spelling to pass Debian packaging criteria (`#564 <https://github.com/euslisp/jskeus/issues/564>`_)
+* add save-animgif, save-mpeg, save-image functions (`#560 <https://github.com/euslisp/jskeus/issues/560>`_)
+
+  * add with-save-mpeg, with-save-animgif macro
+  * add save-animgif, save-mpeg, save-image functions
+
+* use travis by using  bionic@travis (`#565 <https://github.com/euslisp/jskeus/issues/565>`_)
+
+  * install platex
+  * use travis on bionic
+
+* irtgeo.l: fix triangulation reported in `#455 <https://github.com/euslisp/jskeus/issues/455>`_
+
+  * irteus/test: add test-triangulation.l for testing mesh triangulation
+
+* [irtgeo.l] fix minor typo (`#559 <https://github.com/euslisp/jskeus/issues/559>`_)
+* Add eusbullet for using bullet collision function (implement with c defun) (`#555 <https://github.com/euslisp/jskeus/issues/555>`_)
+
+  * doc: update collision document.
+  * irteus: add eusbullet.
+
+* add 'brew update-reset' to travis/OSX (`#557 <https://github.com/euslisp/jskeus/issues/557>`_)
+* fix bug of extended-preview-controller (`#551 <https://github.com/euslisp/jskeus/issues/551>`_)
+
+  * [irteus-demo.l] add test-test-extended-preview-control-0-QR
+
+* fix bug of go-pos-params->footstep-list (`#552 <https://github.com/euslisp/jskeus/issues/552>`_)
+
+  * [test-irt-motion]have one deftest for each assert clause
+  * [test-irtmotion.l]fix test-go-pos-params->footstep-list-test
+  * fix bug of go-pos-params->footstep-list
+
+* [irtrobot.l test-irt-motion.l] fix sign and unit of moment in :calc-static-balance-point. add a test related to this (`#541 <https://github.com/euslisp/jskeus/issues/541>`_)
+* [irtrobot.l]add keyworld Q, R to :calc-walk-pattern-from-footstep-list (`#546 <https://github.com/euslisp/jskeus/issues/546>`_)
+* Add detail documentation of inverse kinematics (`#549 <https://github.com/euslisp/jskeus/issues/549>`_)
+
+  * fix document (irtmodel.tex)
+  * use .jpg (not .png)
+  * add detail documentation of inverse-kinematics
+
+* [irtmodel.l] fix bag of :draw-collision-debug-view (`#542 <https://github.com/euslisp/jskeus/issues/542>`_)
+* [irtdyna.l] fix bag of gait-generator::solve-av-by-move-centroid-on-foot (`#545 <https://github.com/euslisp/jskeus/issues/545>`_)
+
+* add rst target in doc/Makefile for sphinx-build (`#548 <https://github.com/euslisp/jskeus/issues/548>`_)
+
+  * sometimes pnmtopng fails on 14.04(travis)
+  * migrate to circleci 2.0, give feedback to github issue, reomve circle.yml and add .circleci
+  * update doc/Makefile: html
+  * conf.py: conver to str befor run replace('EusLisp-','')
+  * add readthedocs badge
+  * force rewrite EditOnGithub link
+  * fix for 18.04?
+  * add conf.py for sphinx
+  * add rst target in doc/Makefile for sphinx-build
+  * add irtbvh.tex irtcollada.tex irtpointcloud.tex irtgraph.tex irtext.tex for sphinx-build, also we welcome to add more explanation for these functions
+  * use git command to get current euslisp/irteus version for tex
+  * remove wrong command (exit) in copy_eus_tex https://github.com/euslisp/jskeus/pull/116
+  * remove jessie from travis: https://discourse.ros.org/t/kinetic-builds-disabled-on-eol-platform-debian-jessie/5051
+  * Update jmanual.pdf
+
+* Update \longdescription command (`#539 <https://github.com/euslisp/jskeus/issues/539>`_)
+* Update \longdescription according to Euslisp/`#359 <https://github.com/euslisp/jskeus/issues/359>`_
+
+* Contributors: Guilherme Affonso, Kei Okada, Kohei Kimura, Masaki Murooka, Naoki Hiraoka, Naoya Yamaguchi, Yohei Kakiuchi, Yoichiro Kawamura
+
 1.2.1 (2019-01-07)
 ------------------
 * .travis-osx.sh: need install make by brew (`#535 <https://github.com/euslisp/jskeus/issues/535>`_)
