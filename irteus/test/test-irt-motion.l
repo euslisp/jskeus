@@ -7,10 +7,10 @@
 (load "irteus/demo/sample-arm-model.l")
 (load "irteus/demo/sample-multidof-arm-model.l")
 (load "irteus/demo/special-joints.l")
+
 (unless (boundp '*sample-robot*)
-  (setq *sample-robot* (instance sample-robot :init))
-  (unless (or (null x::*display*) (= x::*display* 0))
-    (objects (list *sample-robot*))))
+  (setq *sample-robot* (instance sample-robot :init)))
+
 (unless (boundp '*sarm-robot*)
   (setq *sarm-robot* (instance sample-multidof-arm-robot :init)))
 
@@ -19,10 +19,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; test zmp
-(defun test-zmp-comomn
-  (robot &key ((:viewer vw) (if (boundp '*irtviewer*) *irtviewer*)))
-  (unless (or (null x::*display*) (= x::*display* 0))
-    (objects (list robot)))
+(defun test-zmp-comomn (robot)
+  (objects (list robot))
   (every
    #'identity
    (mapcar #'(lambda (leg)
@@ -31,11 +29,9 @@
                  (send robot :reset-pose)
                  (send robot :fix-leg-to-coords (make-coords) '(:rleg :lleg))
                  (send robot :calc-zmp)
-                 (unless (or (null x::*display*) (= x::*display* 0))
-                   (send vw :look-all))
+                 (send *irtviewer* :look-all)
                  (send robot :move-centroid-on-foot leg '(:rleg :lleg))
-                 (unless (or (null x::*display*) (= x::*display* 0))
-                   (send vw :look-all))
+                 (send *irtviewer* :look-all)
                  ;; if angle-vector and root-coords are updated, zmp does not equal to cog because inertia term exists
                  (push (not (eps= (norm (subseq (v- (send robot :centroid) (send robot :calc-zmp)) 0 2)) 0.0)) zmp-cog-p)
                  (send robot :calc-zmp)
@@ -64,8 +60,7 @@
 (defun check-torque-for-one-joint-its-own-weight-common (robot jnt ja)
   (init-pose-torque-tests robot)
   (send jnt :joint-angle ja)
-  (unless (or (null x::*display*) (= x::*display* 0))
-    (send *irtviewer* :draw-objects))
+  (send *irtviewer* :draw-objects)
   (send robot :weight) ;; for calculating c-til and m-til
   (let* ((weight-force (scale (* 0.001 (send (send jnt :child-link) :get :m-til))
                               (scale -0.001 *g-vec*)))
@@ -101,10 +96,9 @@
     (eps= torque-diff 0.0)))
 
 (defun test-torque-from-its-own-weight-common
-  (robot &key ((:viewer vw) (if (boundp '*irtviewer*) *irtviewer*)) (debug-view))
+  (robot &key (debug-view))
   (init-pose-torque-tests robot)
-  (unless (or (null x::*display*) (= x::*display* 0))
-    (objects (list robot)))
+  (objects (list robot))
     (every #'identity
            (mapcar #'(lambda (jnt)
                        (every #'identity
@@ -121,8 +115,7 @@
 (defun check-torque-for-one-joint-ext-force-common (robot jnt ja)
   (init-pose-torque-tests robot)
   (send jnt :joint-angle ja)
-  (unless (or (null x::*display*) (= x::*display* 0))
-    (send *irtviewer* :draw-objects))
+  (send *irtviewer* :draw-objects)
   (send robot :weight) ;; for calculating c-til and m-til
   (let* ((ax ;; axis to convert link-weight-moment -> joint torque
           (normalize-vector (send (send (send jnt :parent-link :copy-worldcoords)
@@ -158,10 +151,9 @@
       (eps= torque-diff 0.0))))
 
 (defun test-torque-from-ext-force-common
-  (robot &key ((:viewer vw) (if (boundp '*irtviewer*) *irtviewer*)) (debug-view))
+  (robot &key (debug-view))
   (init-pose-torque-tests robot)
-  (unless (or (null x::*display*) (= x::*display* 0))
-    (objects (list robot)))
+  (objects (list robot))
     (every #'identity
            (mapcar #'(lambda (jnt)
                        (every #'identity
@@ -242,8 +234,7 @@
   (if (eq robot-class sarmclass)
       (send *robot* :angle-vector #f(0.0 0.0 90.0 0.0 90.0 90.0 0.0 0.0)))
   (send *robot* :newcoords (make-coords))
-  (unless (or (null x::*display*) (= x::*display* 0))
-    (objects (list *robot* *ground*)))
+  (objects (list *robot* *ground*))
   (let ((robot-link-list
          (if use-wholebody
              (send *robot* :link-list (send *robot* :end-coords :parent)))))
@@ -294,8 +285,7 @@
   (joint-class)
   (setq *robot* (instance sample-multidof-joint-robot :init :joint-class joint-class
 		      :child-init-coords (make-coords :pos #f(100 200 300) :rpy (list (deg2rad 10) (deg2rad 20) (deg2rad 30)))))
-  (unless (or (null x::*display*) (= x::*display* 0))
-    (objects (list *robot* (send *robot* :end-coords))))
+  (objects (list *robot* (send *robot* :end-coords)))
   (let ((div 100.0) (max-dif-pos 0.0) (max-dif-rot 0.0) (range 90)
 	(ja (send *robot* :joint :joint-angle))
 	(ec (send *robot* :end-coords :copy-worldcoords))
@@ -329,11 +319,10 @@
        (if (> (norm (send ec :difference-rotation calc-ec)) max-dif-rot)
 	   (setq max-dif-rot (norm (send ec :difference-rotation calc-ec))))
 
-       (unless (or (null x::*display*) (= x::*display* 0))
-         (send *irtviewer* :draw-objects :flush nil)
-         (send ec :draw-on :flush nil :size 400)
-         (send calc-ec :draw-on :flush nil :color #f(1 0 0))
-         (send *irtviewer* :viewer :flush))
+       (send *irtviewer* :draw-objects :flush nil)
+       (send ec :draw-on :flush nil :size 400)
+       (send calc-ec :draw-on :flush nil :color #f(1 0 0))
+       (send *irtviewer* :viewer :flush)
        ))
     (list max-dif-pos max-dif-rot)))
 
@@ -344,8 +333,7 @@
   ;; Initialize
   (setq *robot* (instance sample-multidof-joint-robot :init :joint-class joint-class
                           :child-init-coords (make-coords :pos #f(100 200 300) :rpy (list (deg2rad 10) (deg2rad 20) (deg2rad 30)))))
-  (unless (or (null x::*display*) (= x::*display* 0))
-    (objects (list *robot*)))
+  (objects (list *robot*))
   (if (= (length (send *robot* :angle-vector)) 3)
       (send *robot* :angle-vector #f(15.1 -25.2 35.3))
     (send *robot* :angle-vector #f(20.0 -30.0 40.0 15.1 -25.2 35.3)))
@@ -405,8 +393,7 @@
   (test-load-ik-fail-log-common
    robot
    #'(lambda (robot)
-       (unless (or (null x::*display*) (= x::*display* 0))
-         (objects (list robot)))
+       (objects (list robot))
        (send robot :newcoords (make-coords))
        (send robot :inverse-kinematics
              (mapcar #'(lambda (x) (send (send robot x :end-coords :copy-worldcoords) :translate #f(10000 0 0) :world)) '(:rarm :larm))
@@ -424,8 +411,7 @@
        (send robot :reset-pose)
        (let ((b (make-cylinder 10 250)))
          (send b :move-coords (send robot :larm :end-coords) (send b :worldcoords))
-         (unless (or (null x::*display*) (= x::*display* 0))
-           (objects (list robot b)))
+         (objects (list robot b))
          (let ((c (make-cascoords :pos (send b :transform-vector (float-vector 0 0 250)))))
            (send b :assoc c)
            (send (send robot :larm :end-coords :parent) :assoc b)
@@ -513,11 +499,11 @@
 ;; check torque calculation comparing methods to calculate ext-force and ext-moment and robot root-link configuration
 (defun draw-objects-torque
   (robot tq)
-  (when (not (or (null x::*display*) (= x::*display* 0)))
-    (send *irtviewer* :draw-objects :flush nil)
-    (send (send (car (send robot :links)) :worldcoords) :draw-on :flush nil :color #f(0 1 1))
-    (send robot :draw-torque (send *irtviewer* :viewer) :torque-vector tq)
-    (send *irtviewer* :viewer :viewsurface :flush))
+  (send *irtviewer* :draw-objects :flush nil)
+  (send (send (car (send robot :links)) :worldcoords) :draw-on :flush nil :color #f(0 1 1))
+  (if (derivedp (send *irtviewer* :viewer) viewer)
+      (send robot :draw-torque (send *irtviewer* :viewer) :torque-vector tq))
+  (send *irtviewer* :viewer :viewsurface :flush)
   )
 
 (defun test-calc-torque-from-motion-list
@@ -526,8 +512,7 @@
    target-coords ;; contact coords
    &key (static-p nil) (dt 0.005)
         (calc-torque-mode :tq-without-ext-wrench))
-  (unless (or (null x::*display*) (= x::*display* 0))
-    (objects (list robot)))
+  (objects (list robot))
   (let* ((tq-list-without-ext-wrench
           (mapcar #'(lambda (rs)
                       (send robot :angle-vector (cadr (memq :angle-vector rs)))
@@ -584,8 +569,7 @@
   (let ((motion-list))
     (send robot :init-pose)
     (if fix-root (send robot :newcoords (make-coords :pos fix-pos :rpy fix-rpy)))
-    (unless (or (null x::*display*) (= x::*display* 0))
-      (objects (list robot)))
+    (objects (list robot))
     (dotimes (i max-idx)
       (let ((ang (* 90 (sin (deg2rad i)))))
         (send-all (send robot :joint-list) :joint-angle ang)
@@ -604,8 +588,7 @@
   (let ((motion-list))
     (send robot :init-pose)
     (if fix-root (send robot :newcoords (make-coords :pos fix-pos :rpy fix-rpy)))
-    (unless (or (null x::*display*) (= x::*display* 0))
-      (objects (list robot)))
+    (objects (list robot))
     (dotimes (i max-idx)
       (let ((ang (* 45 (sin (deg2rad i)))))
         (send robot :angle-vector (list (- ang) (* 2 ang) (- ang)))
@@ -625,8 +608,7 @@
   (let ((motion-list))
     (send robot :init-pose)
     (if fix-root (send robot :newcoords (make-coords :pos fix-pos :rpy fix-rpy)))
-    (unless (or (null x::*display*) (= x::*display* 0))
-      (objects (list robot)))
+    (objects (list robot))
     (dotimes (i max-idx)
       (let ((ang (* 45 (sin (deg2rad i)))))
         (send-all (send robot :joint-list) :joint-angle ang)
@@ -667,8 +649,7 @@
   (let ((motion-list))
     (send robot :reset-pose)
     (send robot :fix-leg-to-coords (make-coords :pos fix-pos :rpy fix-rpy))
-    (unless (or (null x::*display*) (= x::*display* 0))
-      (objects (list robot)))
+    (objects (list robot))
     (dotimes (i max-idx)
       (let ((ang (sin (deg2rad (* 2 i)))))
         (send robot :move-centroid-on-foot
