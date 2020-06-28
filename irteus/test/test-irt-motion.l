@@ -99,16 +99,14 @@
   (robot &key (debug-view))
   (init-pose-torque-tests robot)
   (objects (list robot))
-    (every #'identity
-           (mapcar #'(lambda (jnt)
-                       (every #'identity
-                              (mapcar #'(lambda (ang) (check-torque-for-one-joint-its-own-weight-common robot jnt ang))
-                                      (if (> (max-angle-with-inf-check-torque-tests jnt) 0 (min-angle-with-inf-check-torque-tests jnt))
-                                          (list (max-angle-with-inf-check-torque-tests jnt) 0 (min-angle-with-inf-check-torque-tests jnt))
-                                        (list (max-angle-with-inf-check-torque-tests jnt) (min-angle-with-inf-check-torque-tests jnt)))
-                                      )))
-                   (send robot :joint-list)))
-    )
+  (every #'(lambda (jnt)
+             (every #'(lambda (ang) (check-torque-for-one-joint-its-own-weight-common robot jnt ang))
+                    (if (> (max-angle-with-inf-check-torque-tests jnt) 0 (min-angle-with-inf-check-torque-tests jnt))
+                        (list (max-angle-with-inf-check-torque-tests jnt) 0 (min-angle-with-inf-check-torque-tests jnt))
+                      (list (max-angle-with-inf-check-torque-tests jnt) (min-angle-with-inf-check-torque-tests jnt)))
+                    ))
+         (send robot :joint-list))
+  )
 
 ;; check torque comparing toroques from ext-force with torques from :torque-vector
 ;; however, currently robots start torque check from initial-pose (all joints are 0) so that yaw joints are not checked.
@@ -154,16 +152,14 @@
   (robot &key (debug-view))
   (init-pose-torque-tests robot)
   (objects (list robot))
-    (every #'identity
-           (mapcar #'(lambda (jnt)
-                       (every #'identity
-                              (mapcar #'(lambda (ang) (check-torque-for-one-joint-ext-force-common robot jnt ang))
-                                      (if (> (max-angle-with-inf-check-torque-tests jnt) 0 (min-angle-with-inf-check-torque-tests jnt))
-                                          (list (max-angle-with-inf-check-torque-tests jnt) 0 (min-angle-with-inf-check-torque-tests jnt))
-                                        (list (max-angle-with-inf-check-torque-tests jnt) (min-angle-with-inf-check-torque-tests jnt)))
-                                      )))
-                   (send robot :joint-list)))
-    )
+  (every #'(lambda (jnt)
+             (every #'(lambda (ang) (check-torque-for-one-joint-ext-force-common robot jnt ang))
+                    (if (> (max-angle-with-inf-check-torque-tests jnt) 0 (min-angle-with-inf-check-torque-tests jnt))
+                        (list (max-angle-with-inf-check-torque-tests jnt) 0 (min-angle-with-inf-check-torque-tests jnt))
+                      (list (max-angle-with-inf-check-torque-tests jnt) (min-angle-with-inf-check-torque-tests jnt))
+                      )))
+         (send robot :joint-list))
+  )
 
 ;; sample mobile robot
 (defclass sample-mobile-robot
