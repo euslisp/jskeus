@@ -2113,11 +2113,13 @@
        ;; argument check
        (unless (= (length translation-axis) (length rotation-axis)
                   (length move-target) (length link-list)
-                  (length dif-pos) (length dif-rot))
-         (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A dif-pos ~A dif-rot ~A~%"
+                  (length dif-pos) (length dif-rot)
+                  (length thre) (length rthre))
+         (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A dif-pos ~A dif-rot ~A thre ~A rthre ~A~%"
                (length translation-axis) (length rotation-axis)
                (length move-target) (length link-list)
-               (length dif-pos) (length dif-rot))
+               (length dif-pos) (length dif-rot)
+               (length thre) (length rthre))
          (return-from :inverse-kinematics-loop :ik-continues))
 
        (if (memq :tmp-dims ik-args)
@@ -2393,10 +2395,12 @@
      (if (and additional-vel (or (atom additional-vel) (functionp additional-vel))) (setq additional-vel (list additional-vel)))
      ;; argument check
      (unless (= (length translation-axis) (length rotation-axis)
-                (length move-target) (length link-list) (length target-coords))
-       (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A target-coords ~A~%"
+                (length move-target) (length link-list) (length target-coords)
+                (length thre) (length rthre))
+       (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A target-coords ~A thre ~A rthre ~A~%"
              (length translation-axis) (length rotation-axis)
-             (length move-target) (length link-list) (length target-coords))
+             (length move-target) (length link-list) (length target-coords)
+             (length thre) (length rthre))
        (return-from :inverse-kinematics t))
      (unless (= (length additional-jacobi) (length additional-vel))
        (warn ";; ERROR: list length differ : additional-jacobi ~A additional-vel ~A~%"
