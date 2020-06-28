@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.3 (2020-06-29)
+------------------
 * [irteus/irtmodel.l] In method inverse-kinematics, check length of thre and rthre is equal to move-target (`#536 <https://github.com/euslisp/jskeus/issues/536>`_)
 
 * clearfy license (`#575 <https://github.com/euslisp/jskeus/issues/575>`_)
