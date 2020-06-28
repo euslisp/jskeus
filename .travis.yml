@@ -45,6 +45,11 @@ install:
   # Define some config vars
   - export CI_SOURCE_PATH=$(pwd)
   - export REPOSITORY_NAME=${PWD##*/}
+  # Use latest docker.io
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce; fi
   - if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then sudo apt-get install -y -qq qemu-user-static git; fi
 script:
   - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
