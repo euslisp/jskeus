@@ -2,6 +2,23 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [irteus/irtmodel.l] In method inverse-kinematics, check length of thre and rthre is equal to move-target (`#536 <https://github.com/euslisp/jskeus/issues/536>`_)
+
+* clearfy license (`#575 <https://github.com/euslisp/jskeus/issues/575>`_)
+  * we forget to change licence to BSD when we move EusLisp license to BSD in 2010, see bottom line of page 3 in https://github.com/euslisp/jskeus/blob/1.0.0/doc/jmanual.pdf, (Version 9.00 is releaced, The license is changed to BSD
+
+* Fix compile on DOCKER_IMAGE=ubuntu:bionic COLLISION_LIB=PQP (`#577 <https://github.com/euslisp/jskeus/issues/577>`_)
+
+  * skip test-torque-from-its-own-weight-common for compiled code
+  * simplify every #'identity (mapcar #'(lamnda -> every #'(lambda
+  * remove eval-when from test-irt-motion.l, defmethod within defun
+  * do not have to use x::*display*, we have dummy-irtviewer
+  * use same label function within deftest failes only with COLLISOIN_LIB=PQP
+
+* Contributors: Kei Okada, Tatsuya Ishikawa
+
 1.2.2 (2020-06-23)
 ------------------
 * [irteus/irtgl.l] add :string method to glviewsurface. (`#530 <https://github.com/euslisp/jskeus/issues/530>`_)
