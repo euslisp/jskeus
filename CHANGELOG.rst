@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.4 (2020-07-03)
+------------------
 * fix for debian release
 
   * check EUSDIR/lisp/image/jpeg is writable (`#580 <https://github.com/euslisp/jskeus/issues/580>`_)
