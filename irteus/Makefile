@@ -237,7 +237,7 @@ clean:
 	-rm -f $(INSTALLOBJDIR)/compile_*.log
 	chmod a-x Makefile* *.l *.c
 	[ -e PQP ] && (cd PQP;make clean)
-	(cd $(EUSDIR)/lisp/image/jpeg/; make clean)
+	if [ -w $(EUSDIR)/lisp/image/jpeg/ ]; then make -C $(EUSDIR)/lisp/image/jpeg/ clean; else echo "EUSDIR/lisp/image/jpeg/ is not writable"; fi
 	-rm -f $(EUSDIR)/lib/llib/pgsql.c $(EUSDIR)/lib/llib/pgsql.h
 	-rm -f $(EUSDIR)/lib/llib/time.c $(EUSDIR)/lib/llib/time.h
 
