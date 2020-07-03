@@ -2,6 +2,16 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix for debian release
+
+  * check EUSDIR/lisp/image/jpeg is writable (`#580 <https://github.com/euslisp/jskeus/issues/580>`_)
+  * add irteus man pages (`#579 <https://github.com/euslisp/jskeus/issues/579>`_)
+  * clearfly bullet licensesf( `#578 <https://github.com/euslisp/jskeus/issues/578>`_)
+
+* Contributors: Kei Okada
+
 1.2.3 (2020-06-29)
 ------------------
 * [irteus/irtmodel.l] In method inverse-kinematics, check length of thre and rthre is equal to move-target (`#536 <https://github.com/euslisp/jskeus/issues/536>`_)
