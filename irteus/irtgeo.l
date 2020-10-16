@@ -393,6 +393,9 @@
 
 ;; return polygon if triangable ,unless return nil.
 ;; this function = sharpp + trianglable + insidep
+;; input face should be simple. see
+;;   Make Simple function in Triangulatio by Ear Clipping by David Eberly
+;;   http://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf
 (defun face-to-tessel-triangle (f num &optional (*epsilon* 1e-10))
   "return polygon if triangable, return nil if it is not."
   #-(or :x86_64 :aarch64)
@@ -426,10 +429,12 @@
                                       (eq r :parallel)
                                       (eq r :outside)
                                       (and (consp r)
+                                           (eq (car r) :colinear))
+                                      (and (consp r)
                                            (eq (car r) :intersect)
                                            (not (eps-in-range 0.0 (elt r 1) 1.0 (- *epsilon*)))
                                            (not (eps-in-range 0.0 (elt r 2) 1.0 (- *epsilon*)))))))
-                            (send (instance face :init :vertices (butlast rvers)) :edges))
+                            (send (instance face :init :vertices (remove v1 (cdr vers))) :edges))
                    t)))
       (if not-intersectp
 	  poly
@@ -468,7 +473,24 @@
                                                          (car v) (cdr v))))
                          (when (and (<= 0.0 (car p) 1.0)
                                     (< 0.0 (cadr p) 1.0))
-                           (list e))))
+                           (list e))
+                         (when (and (< 0.0 (car p) 1.0)
+                                    (or (= 0.0 (cadr p)) (= 1.0 (cadr p))))
+                           nil) ;; not implemented yet
+                         ;; duplicated vertices exist
+                         (when (and (or (= 0.0 (car p)) (= 1.0 (car p)))
+                                    (or (= 0.0 (cadr p)) (= 1.0 (cadr p)))
+                                    (not (or (memq (car v) (send e :vertices)) (memq (cdr v) (send e :vertices)))))
+                           (let* ((ev (if (= 0.0 (car p)) (e . pvert) (e . nvert)))
+                                  (ein (find-if #'(lambda (e) (eq ev (e . nvert))) (flatten (append (send-all hs :edges) (send f :edges)))))
+                                  (eout (find-if #'(lambda (e) (eq ev (e . pvert))) (flatten (append (send-all hs :edges) (send f :edges)))))
+                                  (v0 (eout . nvert))
+                                  (v1 (if (= 0.0 (cadr p)) (cdr v) (car v)))
+                                  (v2 (ein . pvert)))
+                             (when (< (mod (+ (vector-angle (v- v0 ev) (v- v1 ev) (send f :normal)) 2PI) 2PI)
+                                      (mod (+ (vector-angle (v- v0 ev) (v- v2 ev) (send f :normal)) 2PI) 2PI))
+                               (list e))))
+                         ))
                    (flatten (append (send-all hs :edges) (send f :edges)))))
           (unless r
             ;; r is mutually visible vertices
