@@ -41,18 +41,11 @@
   (let ((plate (make-cube 1000 1000 5))
         (params ;; params for holes (list (list segments radius center) .. )
          (list
-          #| ;; failed even after ...
           (list  9 87.841726125643674550 (float-vector -250.0 -250.0 0.0))
           (list  6 36.824839027036261996 (float-vector -250.0  250.0 0.0))
           (list  9 52.020745915260789616 (float-vector  250.0 -250.0 0.0))
           (list 10 51.644968476707617810 (float-vector  250.0  250.0 0.0))
           (list  6 63.093857512806295063 (float-vector    0.0    0.0 0.0))
-          |#
-          (list  9 87.8 (float-vector -250.0 -250.0 0.0))
-          (list  6 36.8 (float-vector -250.0  250.0 0.0))
-          (list  9 52.0 (float-vector  250.0 -250.0 0.0))
-          (list 10 51.6 (float-vector  250.0  250.0 0.0))
-          (list  6 63.0 (float-vector    0.0    0.0 0.0))
           ))
         aface faces lines)
 
@@ -92,7 +85,7 @@
   )
 
 (deftest test-triangulation-with-hole
-  (triangulation-concave)
+  (triangulation-with-multi-hole)
   )
 
 (eval-when (load eval)
