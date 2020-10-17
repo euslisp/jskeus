@@ -399,7 +399,7 @@
 (defun face-to-tessel-triangle (f num &optional (*epsilon* 1e-10))
   "return polygon if triangable, return nil if it is not."
   #-(or :x86_64 :aarch64)
-  (setq *epsilon* (* 1000.0 *epsilon*));; for 32bit system
+  (setq *epsilon* (* 10000.0 *epsilon*));; for 32bit system
   (let* ((vers (send f :vertices))
 	 (len (length (cdr vers)))
 	 (v0 (nth (mod (1- (+ num len)) len) vers)) ;; num - 1 th
