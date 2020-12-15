@@ -1,4 +1,4 @@
-## [JSK EusLisp repository](http://jskeus.sourceforge.net) [![Build Status](https://travis-ci.org/euslisp/jskeus.png?branch=master)](https://travis-ci.org/euslisp/jskeus) [![Documentation Status](https://readthedocs.org/projects/jskeus/badge/?version=latest)](https://jskeus.readthedocs.io/ja/latest/?badge=latest)
+## [JSK EusLisp repository](http://https://github.com/euslisp/jskeus) [![Build Status](https://travis-ci.com/euslisp/jskeus.png?branch=master)](https://travis-ci.com/euslisp/jskeus) [![Documentation Status](https://readthedocs.org/projects/jskeus/badge/?version=latest)](https://jskeus.readthedocs.io/ja/latest/?badge=latest)
 
 [![Join the chat at https://gitter.im/euslisp/jskeus](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/euslisp/jskeus?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
