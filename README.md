@@ -7,18 +7,20 @@ This repository contains software developed and used by [JSK](http://www.jsk.t.u
 
 ## 1. Getting started
 
-### 1.1 Install binary (RECOMMENDED: Ubuntu 14.04)
+### 1.1 Install binary (RECOMMENDED: Ubuntu 18.04)
 
 #### 1.1.1 Setup ROS repository
+
+Please set `ROS_DISTRO` environment variable to your ROS distro. For example, if you use 18.04, run `export ROS_DISTRO=melodic`.
 ```
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
 wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
+echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
 sudo apt-get update
 ```
 #### 1.1.2 Install Euslisp
 ```
-sudo apt-get install ros-indigo-euslisp
+sudo apt-get install ros-$ROS_DISTRO-euslisp
 ```
 
 ### 1.2 Install via Homebrew (OSX)
@@ -65,13 +67,13 @@ You can skip this procedure if you have already setup your ROS system
 ```
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
 wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
+echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
 sudo apt-get update
 ```
 #### 3.1.2 Install pr2/euslisp programs
 
 ```
-sudo apt-get install ros-indigo-pr2eus
+sudo apt-get install ros-$ROS_DISTRO-pr2eus
 ```
 
 ### 3.3 Running demo programs
@@ -173,7 +175,7 @@ $ echo "source ~/bashrc.eus" >> ~/.bashrc
 
 #### 3.6.3  Install ROS and jsk-ros-pkg repository
 
-See http://wiki.ros.org/indigo/Installation/Source for more details
+See http://wiki.ros.org/$ROS_DISTRO/Installation/Source for more details
 
 ```
 $ sudo apt-get install python-rosdep python-rosinstall-generator python-wstool python-rosinstall build-essential
