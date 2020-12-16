@@ -10,6 +10,10 @@ dist: bionic
 sudo: required
 cache: apt
 services: docker
+addons:
+  homewbrew:
+    packages:
+      [make, jpeg, libpng, mesalib-glw, wget, poppler, bullet]
 matrix:
   include:
     - os: linux
