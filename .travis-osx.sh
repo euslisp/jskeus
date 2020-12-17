@@ -40,16 +40,6 @@ setup_brew_test() {
 }
 
 setup_make() {
-    travis_time_start brew.install-deps
-    brew list make &>/dev/null || brew install make
-    brew list jpeg &>/dev/null || brew install jpeg
-    brew list libpng &>/dev/null || brew install libpng
-    brew list mesalib-glw &>/dev/null || brew install mesalib-glw
-    brew list wget &>/dev/null || brew install wget
-    brew list poppler &>/dev/null || brew install poppler
-    brew list bullet &>/dev/null || brew install bullet
-    travis_time_end
-
     # travis_time_start install.x11
     # wget http://xquartz.macosforge.org/downloads/SL/XQuartz-2.7.6.dmg
     # hdiutil attach XQuartz-2.7.6.dmg
