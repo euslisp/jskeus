@@ -164,7 +164,7 @@
 
 
 (defun matrix2quaternion (m)
-  "returns quaternion of given matrix"
+  "returns quaternion (w x y z) of given matrix"
   (let (q0 q1 q2 q3  mq^2
 	   (q0^2 (/ (+ 1 (aref m 0 0) (aref m 1 1) (aref m 2 2)) 4))
 	   (q1^2 (/ (+ 1 (aref m 0 0) (- (aref m 1 1)) (- (aref m 2 2))) 4))
@@ -196,7 +196,7 @@
     (float-vector q0 q1 q2 q3)))
 
 (defun quaternion2matrix (q)
-  "returns matrix of given quaternion"
+  "returns matrix of given quaternion (w x y z)"
   (let ((q0 (elt q 0)) (q1 (elt q 1)) (q2 (elt q 2)) (q3 (elt q 3)))
     (unless (eps= (v. q q) 1.0 0.01)
         (warning-message 1 ";; quaternion2matrix : invalid input ~A, the norm is not 1~%" q))
