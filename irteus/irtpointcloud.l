@@ -15,11 +15,30 @@
 ;;; Workshop on Concurrent Object-based Systems,
 ;;;  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ;;;
-;;; Permission to use this software for educational, research
-;;; and non-profit purposes, without fee, and without a written
-;;; agreement is hereby granted to all researchers working on
-;;; the IRT project at the University of Tokyo, provided that the
-;;; above copyright notice remains intact.  
+;;; Redistribution and use in source and binary forms, with or without
+;;; modification, are permitted provided that the following conditions are met:
+;;;
+;;; * Redistributions of source code must retain the above copyright notice,
+;;;   this list of conditions and the following disclaimer.
+;;; * Redistributions in binary form must reproduce the above copyright notice,
+;;;   this list of conditions and the following disclaimer in the documentation
+;;;   and/or other materials provided with the distribution.
+;;; * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+;;;   (JSK) nor the names of its contributors may be used to endorse or promote
+;;;   products derived from this software without specific prior written
+;;;   permission.
+;;;
+;;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;;; THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;;; PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+;;; CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;;; EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;;; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;;; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;;; WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;;; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+;;; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;;;
 
 
@@ -227,7 +246,7 @@
      ret))
   (:set-color
    (col &optional (_transparent))
-   (if col (send self :point-color))
+   (if col (send self :point-color col))
    (if _transparent (send self :transparent _transparent)))
   (:point-color (&optional pc) (if pc (setq pcolor pc)) pcolor)
   (:point-size (&optional ps) (if ps (setq psize ps)) psize)
@@ -248,7 +267,7 @@
        (incf psize (or (array-dimension (send p :points)  0) 0))
        (incf csize (or (array-dimension (send p :colors)  0) 0))
        (incf nsize (or (array-dimension (send p :normals) 0) 0)))
-     (let (pmat cmat nmat (cntr 0) size)
+     (let (pmat cmat nmat pp cc nn (cntr 0) size)
        (setq pmat (if (> psize 0) (make-matrix asize 3))
              cmat (if (> csize 0) (make-matrix asize 3))
              nmat (if (> nsize 0) (make-matrix asize 3)))
@@ -545,10 +564,28 @@
           (send coords :worldrot)
           mat mat)))
      ret))
+  (:set-offset (cds &key (create))
+   (send self :transform-points cds :create create))
   (:convert-to-world (&key (create))
+   "transform points and normals with self coords. converted points data should be at the same position as displayed"
+   (send self :move-origin-to (make-coords) :create create))
+  (:move-origin-to (neworigin &key (create))
+   "origin of point cloud is moved to neworigin. moved points data should be at the same position as displayed"
    (let ((ret
-          (send self :transform-points (send self :worldcoords) :create create)))
+          (send self :transform-points
+                (send (send self :copy-worldcoords) :transform
+                      (send neworigin :inverse-transformation) :world)
+                :create create)
+          ))
      (send ret :reset-coords)
+     (cond
+      ((and parent (not create)) ;; assocced
+       (send self :transform
+             (send (send (send parent :worldcoords) :inverse-transformation)
+                   :transform neworigin))
+       )
+      (t
+       (send ret :transform neworigin)))
      (send self :worldcoords)
      ret))
   ;; (:add-normal ())
@@ -577,7 +614,7 @@
    (gl::glDisable gl::GL_LIGHTING)
 
    (gl::glpushmatrix)
-   (gl::glmultmatrixf (array-entity (transpose (send worldcoords :4x4) gl::*temp-matrix*)))
+   (gl::glmultmatrixf (array-entity (transpose (send (send self :worldcoords) :4x4) gl::*temp-matrix*)))
     ;; draw coords
    (when (> asize 0.1)
      (gl::glLineWidth (float awidth))
@@ -622,17 +659,17 @@
 
        (gl::glEnableClientState gl::GL_VERTEX_ARRAY)
        (if tmp-color (gl::glEnableClientState gl::GL_COLOR_ARRAY))
-       #-:x86_64
+       #-(or :x86_64 :aarch64)
        (if tmp-color
            (gl::glColorPointer (if transparent 4 3)
                                gl::GL_FLOAT 0 (array-entity (if transparent tcarray tmp-color))))
-       #+:x86_64
+       #+(or :x86_64 :aarch64)
        (if tmp-color
            (gl::glColorPointer (if transparent 4 3)
                                gl::GL_DOUBLE 0 (array-entity (if transparent tcarray tmp-color))))
-       #-:x86_64
+       #-(or :x86_64 :aarch64)
        (gl::glVertexPointer 3 gl::GL_FLOAT 0 (array-entity parray))
-       #+:x86_64
+       #+(or :x86_64 :aarch64)
        (gl::glVertexPointer 3 gl::GL_DOUBLE 0 (array-entity parray))
        (gl::glDrawArrays gl::GL_POINTS 0 (array-dimension parray 0))
        (gl::glDisableClientState gl::GL_VERTEX_ARRAY)

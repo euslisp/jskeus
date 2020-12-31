@@ -1,6 +1,7 @@
 all: eus-installed irteus-installed manuals bashrc.eus
 
-GIT_EUSURL=http://github.com/euslisp/EusLisp
+GIT_EUSURL ?= http://github.com/euslisp/EusLisp
+GIT_EUSBRANCH ?= master
 
 EUSC_PATCH=eus.c_CUSTUM_EUSDIR.patch
 
@@ -26,6 +27,9 @@ ifeq ($(OS),Linux)
   export MAKEFILE=Makefile.Linux64
  else
  ifneq (, $(findstring armv,$(MACHINE)))
+  export ARCHDIR=LinuxARM
+  export MAKEFILE=Makefile.LinuxARM
+ else ifneq (, $(findstring aarch,$(MACHINE)))
   export ARCHDIR=LinuxARM
   export MAKEFILE=Makefile.LinuxARM
  else
@@ -58,7 +62,7 @@ bashrc.eus:
 export EUSDIR=$(EUSDIR) \n\
 export ARCHDIR=$(ARCHDIR) \n\
 export PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$EUSDIR/\$$ARCHDIR/lib:\$$PATH \n\
-export LD_LIBRARY_PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
+export LD_LIBRARY_PATH=\$$EUSDIR/\$$ARCHDIR/lib:\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
 "' > bashrc.eus
 	@bash -c 'echo -e "\e[1;32m;; generating bashrc.eus ...\n;;\e[m"'
 	@bash -c 'echo -e "\e[1;32m;;   mv bashrc.eus ~/bashrc.eus\e[m"'
@@ -67,13 +71,13 @@ export LD_LIBRARY_PATH=\$$EUSDIR/\$$ARCHDIR/bin:\$$LD_LIBRARY_PATH \n\
 	@cat bashrc.eus
 
 eus:
-	COUNT=10; while [ $$COUNT -gt 0 -a ! -e eus ] ; do echo $$COUNT; sleep 1; GIT_SSL_NO_VERIFY=true git clone --depth 10 $(GIT_EUSURL) eus; COUNT=`expr $$COUNT - 1`; done; #	
+	COUNT=10; while [ $$COUNT -gt 0 -a ! -e eus ] ; do echo $$COUNT; sleep 1; GIT_SSL_NO_VERIFY=true git clone --depth 10 $(GIT_EUSURL) -b $(GIT_EUSBRANCH) eus; COUNT=`expr $$COUNT - 1`; done; #
 
 eus-installed: eus
-	cd eus/lisp && ln -sf $(MAKEFILE) Makefile && make eus0 eus1 eus2 eusg eusx eusgl eus
+	cd eus/lisp && ln -sf $(MAKEFILE) Makefile && $(MAKE) eus0 eus1 eus2 eusg eusx eusgl eus
 
-irteus-installed:
-	cd irteus; make
+irteus-installed: eus-installed
+	cd irteus; $(MAKE)
 
 clean:
 	-rm -f bashrc.eus manual.pdf jmanual.pdf

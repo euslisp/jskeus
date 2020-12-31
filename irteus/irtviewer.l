@@ -15,11 +15,30 @@
 ;;; Workshop on Concurrent Object-based Systems,
 ;;;  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ;;;
-;;; Permission to use this software for educational, research
-;;; and non-profit purposes, without fee, and without a written
-;;; agreement is hereby granted to all researchers working on
-;;; the IRT project at the University of Tokyo, provided that the
-;;; above copyright notice remains intact.  
+;;; Redistribution and use in source and binary forms, with or without
+;;; modification, are permitted provided that the following conditions are met:
+;;;
+;;; * Redistributions of source code must retain the above copyright notice,
+;;;   this list of conditions and the following disclaimer.
+;;; * Redistributions in binary form must reproduce the above copyright notice,
+;;;   this list of conditions and the following disclaimer in the documentation
+;;;   and/or other materials provided with the distribution.
+;;; * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+;;;   (JSK) nor the names of its contributors may be used to endorse or promote
+;;;   products derived from this software without specific prior written
+;;;   permission.
+;;;
+;;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;;; THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;;; PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+;;; CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;;; EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;;; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;;; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;;; WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;;; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+;;; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;;;
 
 (in-package "X")
@@ -64,7 +83,9 @@
 	  drawmode
           draw-origin
           draw-floor
-          ))
+          floor-color
+          image-sequence
+          logging-flag))
 (defmethod irtviewer
   (:create
    (&rest args
@@ -72,14 +93,15 @@
 	  (view-name (gensym "title"))
 	  (hither 200.0) (yon 50000.0)
 	  (width 500) (height 500)
-          ((:draw-origin do) 150) ((:draw-floor df) nil)
+          ((:draw-origin do) 150) ((:draw-floor df) nil) ((:floor-color fc) #f(1 1 1))
 	  &allow-other-keys)
    (let ()
      (setq left-right-angle 60
 	   up-down-angle 20
 	   viewpoint (float-vector 700 400 250)
 	   viewtarget (float-vector 0 0 0)
-           draw-origin do draw-floor df)
+           draw-origin do draw-floor df floor-color fc
+           logging-flag nil)
      (send-super* :create :width width :height height :title title
 		  :event-mask '(:configure) args)
      (setq gl::*perspective-far* yon)
@@ -267,7 +289,8 @@
   (:draw-objects
    (&rest args)
    (send viewer :viewsurface :makecurrent)
-   (apply #'gl::draw-globjects viewer draw-things :draw-origin draw-origin :draw-floor draw-floor args))
+   (if logging-flag (send self :push-image))
+   (apply #'gl::draw-globjects viewer draw-things :draw-origin draw-origin :draw-floor draw-floor :floor-color floor-color args))
   (:objects
    (&rest args)
    (when
@@ -286,22 +309,237 @@
   (:select-drawmode
    (mode)
    (when (not (eq mode drawmode))
-     (dolist (obj draw-things)
-       (setf (get obj :GL-DISPLAYLIST-ID) nil)
-       (case mode
-         (user::hid
-          (setf (get obj :gl-hiddenline) (list (cons nil t))))
-         (t
-          (setf (get obj :gl-hiddenline) nil)))))
+     (let ((glcon ((send self :viewer :viewsurface) . gl::glcon)))
+       (dolist (obj draw-things)
+         (gl::delete-displaylist-id (get obj :GL-DISPLAYLIST-ID))
+         (setf (get obj :GL-DISPLAYLIST-ID) nil)
+         (case mode
+           (user::hid
+            (setf (get obj :gl-hiddenline) (list (cons glcon t))))
+           (t
+            (setf (get obj :gl-hiddenline) nil))))))
    (setq drawmode mode)
    drawmode)
   (:flush () (if viewer (send viewer :viewsurface :glflush)))
   (:change-background (col)
    (let ((vs (send self :viewer :viewsurface)))
+     (send vs :makecurrent)
      (setq (vs . x::bg-color) col)
      (gl::glClearColorfv col)))
+  (:draw-origin
+   (&optional (tmp-draw-origin :null))
+   "get/set draw-origin"
+   (if (not (eq tmp-draw-origin :null)) (setq draw-origin tmp-draw-origin) draw-origin))
+  (:draw-floor
+   (&optional (tmp-draw-floor :null))
+   "get/set draw-floor"
+   (if (not (eq tmp-draw-floor :null)) (setq draw-floor tmp-draw-floor) draw-floor))
+  (:floor-color
+   (&optional (tmp-floor-color :null))
+   "get/set floor-color"
+   (if (not (eq tmp-floor-color :null)) (setq floor-color tmp-floor-color) floor-color))
   )
-   
+
+;; save functions
+(defun make-mpeg-from-images
+    (mpgfile images
+             &key (delete t)
+             (delay 1))
+  (let ((counter 0) (basename (pathname-name mpgfile))
+        (random-str (random 65536))
+	ppm-filename cmd)
+    ;; check animgif commands (convert, ffmpeg)
+    (when (/= (unix::system "which convert > /dev/null") 0)
+      (warning-message 1 "(make-animgif-from-images) requires 'convert' command.~%")
+      (return-from make-mpeg-from-images nil))
+    (when (/= (unix::system "which ffmpeg > /dev/null") 0)
+      (warning-message 1 "(make-mpeg-from-images) requires 'ffmpeg' command.~%")
+      (return-from make-mpeg-from-images nil))
+    ;;
+    (if (string= ".mpg" (subseq basename (- (length basename) 4)))
+	(setq basename (subseq basename 0 (- (length basename) 4))))
+
+    (dolist (pm images)
+      (setq ppm-filename (format nil "/tmp/~A-~A-~0,7d.ppm" basename random-str counter))
+      (cond ((oddp (send pm :width))
+             (user::write-image-file (format nil "/tmp/~A-~A.ppm" basename random-str) pm)
+             (unix::system (format nil "convert ~A -resize ~Ax~A\! ~A"
+                                   (format nil "/tmp/~A-~A.ppm" basename random-str)
+                                   (* (round (/ (send pm :width) 2)) 2)
+                                   (* (round (/ (send pm :height) 2)) 2)
+                                   ppm-filename)))
+            (t
+             (user::write-image-file ppm-filename pm)))
+      (format t ";; writing ~A of ~A images...~C" ppm-filename (length images) #x0d)
+      (incf counter))
+    (unix:system (format nil "rm -f ~A.mpg" basename))
+    (setq cmd
+          (format
+           nil
+           "ffmpeg -framerate ~A -i /tmp/~A-~A-%07d.ppm -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p ~A.mpg" (/ 25 delay) basename random-str basename))
+    (if *debug* (warn cmd))
+    (unix:system cmd)
+
+    (format t ";; generate ~A.mpg from ~A images~%" basename (length images))
+    (if delete (unix:system  (format nil "rm /tmp/~A-~A*.ppm" basename random-str)))
+    ))
+
+
+(defun make-animgif-from-images
+  (giffile images
+	   &key (delete t)
+	   transparent
+	   (loop t)
+	   (delay 10)
+           (background "000000"))
+  (let* ((counter 0) (basename (pathname-name giffile))
+	 gif-filename ppm-filename (gif-filenames " ")
+	 cmd)
+    ;; check animgif commands (convert, gifsicle)
+    (when (/= (unix::system "which convert > /dev/null") 0)
+      (warning-message 1 "(make-animgif-from-images) requires 'convert' command.~%")
+      (return-from make-animgif-from-images nil))
+    (when (/= (unix::system "which gifsicle > /dev/null") 0)
+      (warning-message 1 "(make-animgif-from-images) requires 'gifsicle' command.~%")
+      (return-from make-animgif-from-images nil))
+    ;;
+    (if (string= ".gif" (subseq basename (- (length basename) 4)))
+	(setq basename (subseq basename 0 (- (length basename) 4))))
+    (setq gif-filename (format nil "~A.gif" basename))
+    (dolist (pm images)
+      (setq ppm-filename (format nil "/tmp/~A~A.ppm" basename counter))
+      (setq gif-filename (format nil "./tmp~A.gif" counter))
+      (setq gif-filenames (concatenate string gif-filenames " " gif-filename))
+      (user::write-image-file ppm-filename pm)
+      (format t ";; writing ~A of ~A images...~C" ppm-filename (length images) #x0d)
+      (finish-output t)
+      (unix:system (format nil "convert ~A ~A"  ppm-filename gif-filename))
+      (if delete (unix:system (format nil "rm ~A " ppm-filename)))
+      (incf counter))
+    (setq cmd
+	  (format
+	   nil
+	   "gifsicle -O2 -D2 -w --delay=~A ~A ~A --colors 256 ~A > ~A.gif"
+	   delay
+	   (if transparent (format nil "-t#~A" background) "")
+	   (if loop "--loop" "")
+	   gif-filenames basename))
+    (if *debug* (warn cmd))
+    (unix:system cmd)
+
+    (format t ";; generate ~A.gif from ~A images~%" basename (length images))
+    (if delete (unix:system  (format nil "rm ~A " gif-filenames)))
+    ))
+
+(defmethod irtviewer
+  (:logging
+   (&optional (flag :on))
+   "start/stop logging
+    :clear    Clear log
+    :start    Start logging
+    :restart  Stop and restart logging
+    :stop     Stop logging
+   "
+   (case
+       flag
+     ((:clear)
+      (send self :clear-image-sequence))
+     ((:start :on) ;; :on 'start is for backward compatibility
+      (setq logging-flag t)
+      (send self :push-image))
+     ((:restart)
+      (send self :logging :clear)
+      (send self :logging :start))
+     ((:stop :end :off)
+      (send self :push-image)
+      (setq logging-flag nil)))
+   )
+  (:clear-log () (send self :clear-image-sequence))
+  ;; store images to image-sequence
+  (:push-image
+   ()
+   (push (send viewer :viewsurface :getglimage
+	       :width (- (send viewer :viewsurface :width) 1)
+	       :height (send viewer :viewsurface :height))
+	 image-sequence))
+  (:clear-image-sequence ()(setq image-sequence nil))
+  (:image-sequence () (reverse image-sequence))
+  ;; save functions
+  (:save-mpeg
+   (&key (fname "anim.mpg")
+	 (delay 5) (delete t))
+   "':save-mpeg' saves logged images as mpeg.
+     To start image log, run ':logging :start' and to stop log, run ':logging :stop'.
+     Note that ':logging :stop' did not clear the logged sequence, so you need to run
+     ':logging :clear'.
+     :save-anmigif' did not stop nor clear the image sequence, so you have to run them manuualy"
+   (let ((bg-color ((send self :viewer :viewsurface) . x::bg-color)))
+     (unless (send self :image-sequence)
+       (send self :push-image)) ;; make sure at least we have one images
+     (make-mpeg-from-images
+      fname (send self :image-sequence)
+      :delay delay
+      :delete delete)
+     ))
+  (:save-animgif
+   (&key (fname "anim.gif")
+	 (delay 5) (transparent t) (loop t)
+	 (delete t))
+   "':save-anmigif' saves logged images as animation gif.
+     To start image log, run ':logging :start' and to stop log, run ':logging :stop'.
+     Note that ':logging :stop' did not clear the logged sequence, so you need to run
+     ':logging :clear'.
+     :save-anmigif' did not stop nor clear the image sequence, so you have to run them manuualy"
+   (let ((bg-color ((send self :viewer :viewsurface) . x::bg-color)))
+     (unless (send self :image-sequence)
+       (send self :push-image)) ;; make sure at least we have one images
+     (make-animgif-from-images
+      fname (send self :image-sequence)
+      :delay delay
+      :loop loop
+      :delete delete
+      :transparent transparent
+      :background (cond ((float-vector-p bg-color)
+                         (format nil "~0,2x~0,2x~0,2x"
+                                 (round (* 255 (min 1 (elt bg-color 0))))
+                                 (round (* 255 (min 1 (elt bg-color 1))))
+                                 (round (* 255 (min 1 (elt bg-color 2))))))
+                        (t "000000")))
+     ))
+  (:save-animgif
+   (&key (fname "anim.gif")
+	 (delay 5) (transparent t) (loop t)
+	 (delete t))
+   "':save-anmigif' saves logged images as animation gif.
+     To start image log, run ':logging :start' and to stop log, run ':logging :stop'.
+     Note that ':logging :stop' did not clear the logged sequence, so you need to run
+     ':logging :clear'.
+     :save-anmigif' did not stop nor clear the image sequence, so you have to run them manuualy"
+   (let ((bg-color ((send self :viewer :viewsurface) . x::bg-color)))
+     (unless (send self :image-sequence)
+       (send self :push-image)) ;; make sure at least we have one images
+     (make-animgif-from-images
+      fname (send self :image-sequence)
+      :delay delay
+      :loop loop
+      :delete delete
+      :transparent transparent
+      :background (cond ((float-vector-p bg-color)
+                         (format nil "~0,2x~0,2x~0,2x"
+                                 (round (* 255 (min 1 (elt bg-color 0))))
+                                 (round (* 255 (min 1 (elt bg-color 1))))
+                                 (round (* 255 (min 1 (elt bg-color 2))))))
+                        (t "000000")))
+     ))
+  (:save-image
+   (filename)
+   "save curent view to image, supported formats are jpg/png/pnm"
+   (user::write-image-file filename
+                           (send viewer :viewsurface :getglimage
+                                 :width (- (send viewer :viewsurface :width) 1)
+                                 :height (send viewer :viewsurface :height))))
+  )
+
 (defun draw-things (objs)
   (cond
    ((atom objs)
@@ -366,7 +604,8 @@
   :width     width of the window
   :height    height of the window
   :draw-origin size of origin arrow, use nil to disable it
-  :draw-floor  use t to view floor"
+  :draw-floor  use t to view floor
+  :floor-color floor color. default is #f(1 1 1), i.e. white."
   (cond
    ((or (null x::*display*) (= x::*display* 0))
     (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")
@@ -409,6 +648,23 @@
   (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")
   (setq *irtviewer* (instance x::irtviewer-dummy)))
 
+
+(defmacro with-save-mpeg (fname &rest forms)
+  `(let ()
+     (send *irtviewer* :logging :clear)
+     (send *irtviewer* :logging :start)
+     ,@forms
+     (send *irtviewer* :save-mpeg :fname ,fname)
+     (send *irtviewer* :logging :stop)
+     ))
+(defmacro with-save-animgif (fname &rest forms)
+  `(let ()
+     (send *irtviewer* :logging :clear)
+     (send *irtviewer* :logging :start)
+     ,@forms
+     (send *irtviewer* :save-animgif :fname ,fname)
+     (send *irtviewer* :logging :stop)
+     ))
 
 (in-package "GL")
 

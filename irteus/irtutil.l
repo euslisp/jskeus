@@ -15,11 +15,30 @@
 ;;; Workshop on Concurrent Object-based Systems,
 ;;;  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ;;;
-;;; Permission to use this software for educational, research
-;;; and non-profit purposes, without fee, and without a written
-;;; agreement is hereby granted to all researchers working on
-;;; the IRT project at the University of Tokyo, provided that the
-;;; above copyright notice remains intact.  
+;;; Redistribution and use in source and binary forms, with or without
+;;; modification, are permitted provided that the following conditions are met:
+;;;
+;;; * Redistributions of source code must retain the above copyright notice,
+;;;   this list of conditions and the following disclaimer.
+;;; * Redistributions in binary form must reproduce the above copyright notice,
+;;;   this list of conditions and the following disclaimer in the documentation
+;;;   and/or other materials provided with the distribution.
+;;; * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+;;;   (JSK) nor the names of its contributors may be used to endorse or promote
+;;;   products derived from this software without specific prior written
+;;;   permission.
+;;;
+;;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;;; THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;;; PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+;;; CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;;; EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;;; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;;; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;;; WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;;; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+;;; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;;;
 
 (in-package "USER")
@@ -27,11 +46,13 @@
 (export '(forward-message-to forward-message-to-all))
 
 (defun forward-message-to (to args)
+  "forward _args_ message to _to_ object"
   (if to
       (if args (send* to args) to)
     (if *debug* (warn ";; (forward-message-to ~A ~A) ~%" to args))))
 
 (defun forward-message-to-all (to args)
+  "forward _args_ message to all _to_ object"
   (if to
       (if args (apply #'send-all to args) to)
     (if *debug* (warn ";; (forward-message-to-all ~A ~A) ~%" to args))))
@@ -51,6 +72,7 @@
      ))
 
 (defmacro do-until-key (&rest forms)
+  "iterate forms until any key input"
   `(do-until-key-with-check t ,@forms))
 
 (defmacro do-until-key-with-timer
@@ -207,6 +229,191 @@
                  syms)
      ,@bodies))
 
+;; interpolations
+(defclass interpolator
+  :super propertied-object
+  :slots ((position-list :type cons) ;; list of control point
+          (time-list :type cons)  ;; list of time[sec] from start for each control point
+          ;;
+          (position :type float-vector)   ;; current data point
+          (time :type float)          ;; time [sec] from start
+          (segment-num :type integer) ;; number of total segment
+          (segment-time :type float)  ;; time[sec] with in each segment
+          (segment :type integer)     ;; index of segment which is currently processing
+          (interpolatingp :type symbol)
+          ))
+
+(defmethod interpolator
+  (:init
+   ()
+   "Abstract class of interpolator"
+   (setq time 0.0)
+   (setq segment-time 0.0)
+   (setq segment 0)
+   (setq segment-num 0)
+   (setq interpolatingp nil)
+   self)
+  (:reset
+   (&rest
+    args
+    &key
+    ((:position-list pl) (send self :position-list)) ;; list of control point
+    ((:time-list tl) (send self :time-list))   ;; list of time from start for each control point, time in first contrall point is zero, so length of this list is length of control point minus 1
+    &allow-other-keys)
+   "Initialize interpolator
+   position-list: list of control point
+   time-list: list of time from start for each control point, time in first contrall point is zero, so length of this list is length of control point minus 1"
+   (setq position-list pl)
+   (setq time-list tl)
+   (if (/= (length position-list) (1+ (length time-list)))
+       (warning-message 1 "length of position-list must be length of time-list + 1"))
+   (setq time 0.0)
+   (setq segment-time 0.0)
+   (setq segment 0)
+   ;; segment-num must be length of position-list minus 1.
+   (setq segment-num (1- (length position-list)))
+   (setq interpolatingp nil))
+
+  ;; accessor to slots
+  (:position-list () "returns position list" position-list)
+  (:position () "returns current position" position)
+  (:time-list () "returns time list" time-list)
+  (:time () "returns current time" time)
+  (:segment-time () "returns time[sec] with in each segment" segment-time)
+  (:segment () "returns index of segment which is currently processing" segment)
+  (:segment-num () "returns number of total segment" segment-num)
+  (:interpolatingp () "returns if it is currently processing" interpolatingp)
+
+  ;; operation
+  (:start-interpolation () "start interpolation" (setq interpolatingp t))
+  (:stop-interpolation () "stop interpolation" (setq interpolatingp nil))
+  (:pass-time
+   (dt)
+   "process interpolation for dt[sec]"
+   (when interpolatingp
+     (setq position (send self :interpolation))
+     (incf time dt)
+     (setq segment-time (- time (if (= segment 0) 0 (nth (1- segment) time-list))))
+     (when (> time (nth segment time-list))
+       (setq segment-time (- time (nth segment time-list)))
+       (incf segment))
+     (when (>= segment segment-num)
+       (setq position (car (last position-list)))
+       (send self :reset))
+     position))
+  )
+
+(defclass linear-interpolator
+  :super interpolator)
+(defmethod linear-interpolator
+  ;;
+  (:interpolation
+   ()
+   "Linear interpolator"
+   (let* ((v1 (nth segment position-list))
+	  (v2 (nth (1+ segment) position-list))
+	  (t1+t2 (- (nth segment time-list) (if (> segment 0) (nth (1- segment) time-list) 0))) ;; total time of segment
+	  (t1 segment-time)
+	  (t2 (- t1+t2 t1)))
+     (setq v1 (scale (/ t2 t1+t2) v1))
+     (setq v2 (scale (/ t1 t1+t2) v2))
+     (v+ v1 v2)))
+  )
+
+;; Minimum Jerk trajectory generation, a.k.a Hoff & Arbib, described in the documents
+;; http://mplab.ucsd.edu/tutorials/minimumJerk.pdf (you can find copy of this at http://www.shadmehrlab.org/book/minimumjerk.pdf)
+;;
+;; Hoff B, Arbib MA (1992) A model of the effects of speed, accuracy, and
+;; perturbation on visually guided reaching. In: Control of arm movement
+;; in space: neurophysiological and computational approaches
+;; (Caminiti R, Johnson PB, Burnod Y, eds), pp 285-306.
+
+(defclass minjerk-interpolator
+  :super interpolator
+  :slots (velocity acceleration velocity-list acceleration-list))
+(defmethod minjerk-interpolator
+  (:velocity () "returns current velocity" velocity)
+  (:velocity-list () "returns velocity list" velocity-list)
+  (:acceleration () "returns current acceleration" acceleration)
+  (:acceleration-list () "returns acceleration list" acceleration-list)
+  (:reset
+   (&rest args
+    &key
+    ((:velocity-list vl) (send self :velocity-list))
+    ((:acceleration-list al) (send self :acceleration-list))
+    &allow-other-keys)
+   "minjerk interopolator
+    position-list : list of control point
+    velocity-list : list of velocity in each control point
+    acceleration-list : list of acceleration in each control point"
+   (send-super* :reset args)
+   (setq velocity-list (if vl vl (make-list (1+ segment-num) :initial-element (instantiate float-vector (length (car position-list))))))
+   (setq acceleration-list (if al al (make-list (1+ segment-num) :initial-element (instantiate float-vector (length (car position-list))))))
+   )
+
+  (:interpolation
+   ()
+   "Minjerk interpolator, a.k.a Hoff & Arbib
+
+    Example code is:
+(setq l (instance minjerk-interpolator :init))
+(send l :reset :position-list (list #f(1 2 3) #f(3 4 5) #f(1 2 3)) :time-list (list 0.1 0.18))
+(send l :start-interpolation)
+(while (send l :interpolatingp) (send l :pass-time 0.02) (print (send l :position)))
+"
+   (let* ((xi (nth segment position-list))
+          (xf (nth (1+ segment) position-list))
+          (vi (nth segment velocity-list))
+          (vf (nth (1+ segment) velocity-list))
+          (ai (nth segment acceleration-list))
+          (af (nth (1+ segment) acceleration-list))
+          ;;
+          (t1+t2 (- (nth segment time-list) (if (> segment 0) (nth (1- segment) time-list) 0))) ;; total time of segment
+          ;; A=(gx-(x+v*t+(a/2.0)*t*t))/(t*t*t)
+          ;; B=(gv-(v+a*t))/(t*t)
+          ;; C=(ga-a)/t
+          (A  (scale (/ 1.0 (* t1+t2 t1+t2 t1+t2)) (v- xf (reduce #'v+ (list xi (scale t1+t2 vi) (scale (* t1+t2 t1+t2) (scale 0.5 ai)))))))
+          (B  (scale (/ 1.0 (* t1+t2 t1+t2))      (v- vf (v+ vi (scale t1+t2 ai)))))
+          (C  (scale (/ 1.0 (* t1+t2))           (v- af ai)))
+          ;; a0=x
+          ;; a1=v
+          ;; a2=a/2.0
+          ;; a3=10*A-4*B+0.5*C
+          ;;; a4=(-15*A+7*B-C)/t
+          ;; a5=(6*A-3*B+0.5*C)/(t*t)
+          (a0 xi)
+          (a1 vi)
+          (a2 (scale 0.5 ai))
+          (a3 (v+ (v- (scale 10 A) (scale 4 B)) (scale 0.5 C)))
+          (a4 (scale (/ 1.0 t1+t2) (v- (v+ (scale -15 A) (scale 7 B)) C)))
+          (a5 (scale (/ 1.0 t1+t2 t1+t2) (v+ (v+ (scale 6 A) (scale -3 B)) (scale 0.5 C))))
+          )
+     ;; x=a0+a1*t+a2*t*t+a3*t*t*t+a4*t*t*t*t+a5*t*t*t*t*t
+     ;; v=a1+2*a2*t+3*a3*t*t+4*a4*t*t*t+5*a5*t*t*t*t
+     ;; a=2*a2+6*a3*t+12*a4*t*t+20*a5*t*t*t
+     (setq position
+           (reduce #'v+ (list a0
+                              (scale (expt segment-time 1) a1) (scale (expt segment-time 2) a2)
+                              (scale (expt segment-time 3) a3) (scale (expt segment-time 4) a4)
+                              (scale (expt segment-time 5) a5)))
+           velocity
+           (reduce #'v+ (list a1
+                              (scale (expt segment-time 1) a2) (scale (expt segment-time 2) a3)
+                              (scale (expt segment-time 3) a4) (scale (expt segment-time 4) a5)))
+           acceleration
+           (reduce #'v+ (list a2
+                              (scale (expt segment-time 1) a3) (scale (expt segment-time 2) a4)
+                              (scale (expt segment-time 3) a5))))
+     position))
+  ;
+  )
+#| example
+(setq l (instance minjerk-interpolator :init))
+(send l :reset :position-list (list #f(1 2 3) #f(3 4 5) #f(1 2 3)) :time-list (list 0.1 0.18))
+(send l :start-interpolation)
+(while (send l :interpolatingp) (send l :pass-time 0.02) (print (send l :position)))
+|#
+
 ;; color utils
 (defun his2rgb (h &optional (i 1.0) (s 1.0) ret)
   "convert his to rgb (0 <= h <= 360, 0.0 <= i <= 1.0, 0.0 <= s <= 1.0)"
@@ -296,6 +503,11 @@
 ;;                1.00024
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmacro bench (&rest args)
+  "calculating execution time using mtimer, bench returns the value of args where the arbitrary lisp form
+(bench (unix:sleep 1))
+;; time -> 1.0001[s]
+t
+"
   (let ((tm (gensym))
         (str (gensym)))
     `(let ((,tm (instance mtimer :init))
@@ -308,6 +520,10 @@
          (format t ";; ~A -> ~A[s]~%" ,str (send ,tm :stop))))))
 
 (defmacro bench2 (&rest args)
+  "calculating execution time using mtimer, bench2 returns the execution time of args where the arbitrary lisp form
+(bench2 (unix:sleep 1))
+1.00024
+"
   (let ((tm (gensym)))
     `(let ((,tm (instance mtimer :init)))
        (send ,tm :start)
@@ -348,6 +564,12 @@
 ;;  (#\r (format t "retry~%") t)
 ;;  )
 (defmacro read-char-case (str &rest clauses)
+"read one character with lower caes
+(read-char-case \"y or n or r: \"
+ (#\y (format t \"yes~%\") t)
+ (#\n (format t \"no~%\") t)
+ (#\r (format t \"retry~%\") t))
+"
   (let ((ch (gensym))
         (missed-return (gensym))
         (flag (gensym)))
@@ -365,8 +587,41 @@
            )
          ,flag))))
 
+
+;;; from termbits.h
+(defcstruct termios
+  (c_iflag      :integer)
+  (c_oflag      :integer)
+  (c_cflag      :integer)
+  (c_lflag      :integer)
+  (c_line       :char)
+  (c_cc         :char 19)
+  (c_ispeed     :integer)
+  (c_ospeed     :integer))
+
+(defconstant TCSANOW 0)
+(defconstant TCSADRAIN 1)
+(defconstant TCSAFLUSH 2)
+(defconstant ICANON #0x0002)
+(defun kbhit ()
+  "Checks the console for a keystroke. returns keycode value if a key has been pressed, otherwise it returns nil. Note that this does not work well on Emacs Shell mode, run EusLisp program from terminal shell."
+  (let ((attr-orig (unix::tcgetattr 0))
+        (buf "0")
+        attr ret)
+    (setq attr (copy-list attr-orig))
+    ;; 1000 1010 0011 1011
+    (setf (termios-c_lflag attr) (logand (termios-c_lflag attr) (lognot ICANON)))
+    (unix::tcsetattr 0 TCSANOW attr)
+    (when (= (unix::select-read-fd 1 0.001) 1)
+      (unix::uread 0 buf 1)
+      (setq ret (elt buf 0)))
+    (unix::tcsetattr 0 TCSANOW attr-orig)
+    ret))
+;;
+
 ;; piped fork returning result as list
 (defun piped-fork-returns-list (cmd &optional args)
+  "piped fork returning result as list"
   (let ((strm (apply #'piped-fork cmd args)))
     (unwind-protect
         (let ((ret) (buf))

@@ -15,11 +15,30 @@
 ;;; Workshop on Concurrent Object-based Systems,
 ;;;  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ;;;
-;;; Permission to use this software for educational, research
-;;; and non-profit purposes, without fee, and without a written
-;;; agreement is hereby granted to all researchers working on
-;;; the IRT project at the University of Tokyo, provided that the
-;;; above copyright notice remains intact.  
+;;; Redistribution and use in source and binary forms, with or without
+;;; modification, are permitted provided that the following conditions are met:
+;;;
+;;; * Redistributions of source code must retain the above copyright notice,
+;;;   this list of conditions and the following disclaimer.
+;;; * Redistributions in binary form must reproduce the above copyright notice,
+;;;   this list of conditions and the following disclaimer in the documentation
+;;;   and/or other materials provided with the distribution.
+;;; * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+;;;   (JSK) nor the names of its contributors may be used to endorse or promote
+;;;   products derived from this software without specific prior written
+;;;   permission.
+;;;
+;;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;;; THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;;; PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+;;; CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;;; EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;;; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;;; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;;; WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;;; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+;;; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;;;
 
 (require :irtglrgb)
@@ -98,6 +117,22 @@
                     (t (error "~A is not display list" alist))))
           (error "could not find viewers for ~A" alist))))) ;; t
    ))
+
+(defun transpose-image-rows (img &optional ret)
+  (let* ((h (send img :height))
+         (step (* (send img :width) (send img :components)))
+         (src (send img :entity)))
+    (cond
+      (ret
+       (unless (and (eq (send img :height) (send ret :height))
+                    (eq (send img :width) (send ret :width))
+                    (eq (send img :components) (send ret :components)))
+         (error "invalid return image format"))
+       (ctranspose-image-rows h step src (send ret :entity))
+       ret)
+      (t
+       (ctranspose-image-rows h step src)
+       img))))
 
 (unless (assoc :color-org (send glviewsurface :methods))
   (rplaca (assoc :color (send glviewsurface :methods)) :color-org))
@@ -181,30 +216,42 @@
 	 ((:imagebuf imgbuf) (make-string (* width height 3)))
          (depthbuf))
    "Get current view to a image object. It returns color-image24 object."
-   (let ()
+   (let ((img (instance image::color-image24 :init width height imgbuf)))
      (send self :makecurrent)
-     (glReadBuffer GL_BACK)
+     (glReadBuffer GL_FRONT)
      (glPixelStorei GL_PACK_ALIGNMENT 1)
      (glReadPixels x y width height GL_RGB GL_UNSIGNED_BYTE imgbuf)
-     #-:x86_64
+     #-(or :x86_64 :aarch64)
      (if depthbuf (glReadPixels x y width height GL_DEPTH_COMPONENT GL_FLOAT depthbuf))
-     #+:x86_64
+     #+(or :x86_64 :aarch64)
      (when depthbuf
        (let ((fv (user::dvector2float-bytestring depthbuf)))
 	 (glReadPixels x y width height GL_DEPTH_COMPONENT GL_FLOAT fv)
 	 (user::float-bytestring2dvector fv depthbuf)))
      ;; transpose
-     (let ((b (make-string (* width height 3))))
-       (dotimes (x width)
-	 (dotimes (y height)
-	   (dotimes (z 3)
-	     (setf (elt b (+ (* (- height y 1) width 3) (* x 3) z))
-		   (elt imgbuf (+ (* y width 3) (* x 3) z))))))
-       (instance image::color-image24 :init width height b))
-     ))
+     (transpose-image-rows img)
+     img))
+  (:string
+   (x y str &optional (fid x:font-courb24))
+   "Draw string to irtviewer. x:font-courb24 and x::font-helvetica-bold-12 are supported for fid."
+   (send self :makecurrent)
+   (glMatrixMode GL_PROJECTION)
+   (glPushMatrix)
+   (send self :2d-mode)
+   (unless (eq (get self :glxusexfont) fid)
+     (setf (get self :glxusexfont) fid)
+     (glxUseXfont fid 32 96 (+ 1000 32)))
+   (glRasterPos2i (round x) (- (send self :height) (round y)))
+   (glListBase 1000)
+   (glCallLists (length str) GL_UNSIGNED_BYTE str)
+   (send self :3d-mode)
+   (glMatrixMode GL_PROJECTION)
+   (glPopMatrix)
+   (glMatrixMode GL_MODELVIEW)
+   )
   )
 
-(defun draw-globjects (vwr draw-things &key (clear t) (flush t) (draw-origin 150) (draw-floor nil))
+(defun draw-globjects (vwr draw-things &key (clear t) (flush t) (draw-origin 150) (draw-floor nil) (floor-color #f(1 1 1)))
   (let (pcolor)
     (resetperspective (send vwr :viewing) (send vwr :viewsurface))
     (if clear (send vwr :viewsurface :clear))
@@ -226,7 +273,7 @@
              (s 5000) (-s (- s)))
         (glDisable GL_LIGHTING)
         (glBegin GL_LINES)
-        (glColor3fv #f(1 1 1))
+        (glColor3fv floor-color)
         (do ((y -s (+ y l)))
             ((> y s))
           (do ((x -s (+ x l)))
@@ -297,9 +344,12 @@
         (glEnable GL_CULL_FACE)
         (glCullFace GL_FRONT)
 
-        (mapc #'(lambda (aface)
-                  (draw-face aface nil nil))
-              (send abody :faces))
+        (dolist (aface (send abody :faces))
+          (glBegin GL_POLYGON)
+          (glNormal3fv (transform (transpose (send abody :worldrot)) (send aface :normal)))
+          (dolist (e (send aface :edges))
+            (glVertex3fv (send abody :inverse-transform-vector (send e :pvertex aface))))
+          (glEnd))
 
         (glDisable GL_CULL_FACE)
         (glDisable GL_POLYGON_OFFSET_FILL)
@@ -436,7 +486,7 @@
     ))
 
 (defun find-color (color)
-  "returns color vector of given color name, the name is defiend in https://github.com/euslisp/jskeus/blob/master/irteus/irtglrgb.l"
+  "returns color vector of given color name, the name is defined in https://github.com/euslisp/jskeus/blob/master/irteus/irtglrgb.l"
   (let (v c)
     (setq v
       (cond
@@ -447,7 +497,7 @@
        ((symbolp color)
 	(setq c (find-if #'(lambda (o) (eq (send o :name) color))
 			 *face-colors*))
-	(if c (send c :diffuse) (warn "Color name not found ")))
+	(if c (send c :diffuse) (warn "Color name (~A) not found~%" color)))
        (t color)))
     (unless v (setq v (float-vector 0.5 0.5 0.5)))
     v))
@@ -472,6 +522,7 @@
   (:draw-on
    (&key ((:viewer vwer) *viewer*)
          flush (width 1) (color #f(1 1 1)))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color))
 	 (v (float-vector 0 0 0)))
@@ -488,6 +539,7 @@
   (:draw-on
    (&key ((:viewer vwer) *viewer*)
          flush (width 1) (color #f(1 1 1)))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color))
 	 (v (float-vector 0 0 0)))
@@ -517,6 +569,7 @@
   (:draw-on
    (&key ((:viewer vwer) *viewer*)
          flush (width 1) (color #f(1 1 1)))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color)))
      (send vwer :viewsurface :line-width width)
@@ -574,6 +627,7 @@
    (&key ((:viewer vwer) user::*viewer*)
 	 flush (width (get self :width)) (color (get self :color))
 	 (size (get self :size)))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color))
 	 (v (float-vector 0 0 0)) v2)
@@ -608,6 +662,7 @@
   (:draw-on
    (&key ((:viewer vwer) *viewer*)
          flush (width 1) (color #f(1 1 1)) (size 50))
+   (if flush (send vwer :viewsurface :makecurrent))
    (let ((pwidth (send vwer :viewsurface :line-width))
          (pcolor (send vwer :viewsurface :color))
 	 (v (float-vector 0 0 0)))
@@ -881,12 +936,17 @@ if flat option is true, use-flat-shader"
                     (flatten (send* self :convert-to-faces args)))))
      (send fs :transform (send self :worldcoords))
      fs))
-  (:set-offset (cds)
+  (:set-offset (cds &key (create))
    "move vertices in this object using given coordinates, this method change values of vertices. coordinates's method such as :transform just change view of this object"
    (let* ((zero (float-vector 0 0 0))
           (wpos (send cds :worldpos))
-          (wrot (send cds :worldrot)))
-     (dolist (minfo mesh-list)
+          (wrot (send cds :worldrot))
+          ret)
+     (if create
+         (setq ret
+               (instance glvertices :init (copy-object mesh-list)))
+       (setq ret self))
+     (dolist (minfo (ret . mesh-list))
        (let ((vmat (cadr (assoc :vertices minfo)))
              (nmat (cadr (assoc :normals minfo))))
          (user::c-coords-transform-vector
@@ -894,7 +954,13 @@ if flat option is true, use-flat-shader"
          (when nmat
            (user::c-coords-transform-vector
             zero wrot nmat nmat))))
-     self))
+     ret))
+  (:convert-to-world (&key (create))
+   "move vertices in this object using self's coordinates. vertices data should be moved as the same as displayed"
+   (let ((ret (send self :set-offset (send self :worldcoords) :create create)))
+     (send ret :reset-coords)
+     (send self :worldcoords)
+     ret))
   (:glvertices (&optional (name) (test #'string=))
    "create individual glvertices objects from mesh-list. if name is given, search mesh has the same name"
    (let (ret)
@@ -1081,24 +1147,24 @@ if flat option is true, use-flat-shader"
            (unless (and teximg texcoords) (setq texcoords nil))
            ;;
            (glEnableClientState GL_VERTEX_ARRAY)
-#+:x86_64
+#+(or :x86_64 :aarch64)
            (glVertexPointer 3 GL_DOUBLE 0 (array-entity vertices))
-#-:x86_64
+#-(or :x86_64 :aarch64)
            (glVertexPointer 3 GL_FLOAT 0 (array-entity vertices))
            ;;
            (when normals
              (glEnableClientState GL_NORMAL_ARRAY)
-#+:x86_64
+#+(or :x86_64 :aarch64)
              (glNormalPointer GL_DOUBLE 0 (array-entity normals))
-#-:x86_64
+#-(or :x86_64 :aarch64)
              (glNormalPointer GL_FLOAT 0 (array-entity normals))
              )
            ;;
            (when texcoords
              (glEnableClientState GL_TEXTURE_COORD_ARRAY)
-#+:x86_64
+#+(or :x86_64 :aarch64)
              (glTexCoordPointer 2 GL_DOUBLE 0 texcoords)
-#-:x86_64
+#-(or :x86_64 :aarch64)
              (glTexCoordPointer 2 GL_FLOAT 0 texcoords)
              )
 
@@ -1112,10 +1178,10 @@ if flat option is true, use-flat-shader"
              (when tp
                (cond
                 (indices
-#+:x86_64
+#+(or :x86_64 :aarch64)
                  (glDrawElements tp (length indices) GL_UNSIGNED_INT
                                  (user::lvector2integer-bytestring indices))
-#-:x86_64
+#-(or :x86_64 :aarch64)
                  (glDrawElements tp (length indices) GL_UNSIGNED_INT indices)
                  )
                 (t
@@ -1154,21 +1220,69 @@ if flat option is true, use-flat-shader"
    (unless bbox
      (send self :calc-bounding-box))
    bbox)
+  (:make-pqpmodel (&key (fat 0))
+   (let ((m (geo::pqpmakemodel))
+         v1 v2 v3 (id 0))
+     (dolist (mesh mesh-list) ;; check triangle model
+       (let ((tp (cadr (assoc :type mesh))))
+         (unless (eq tp :triangles)
+           (warn ";; not supported mesh type -> ~A" tp)
+           (geo::pqpdeletemodel m)
+           (return-from :make-pqpmodel nil))))
+     (setq v1 (float-vector 0 0 0))
+     (setq v2 (float-vector 0 0 0))
+     (setq v3 (float-vector 0 0 0))
+     (geo::pqpbeginmodel m)
+     (dolist (mesh mesh-list)
+       (let* ((vlst (cadr (assoc :vertices mesh)))
+              (idces (cadr (assoc :indices mesh)))
+              (idlen (* (/ (length idces) 3) 3)))
+         (cond
+           (idces
+            (do ((v 0 (+ v 3)))
+                ((>= v idlen))
+              (user::c-matrix-row vlst (elt idces    v   ) v1)
+              (user::c-matrix-row vlst (elt idces (+ v 1)) v2)
+              (user::c-matrix-row vlst (elt idces (+ v 2)) v3)
+              (when (not (= fat 0))
+                (v+ v1 (scale fat (normalize-vector v1)) v1)
+                (v+ v2 (scale fat (normalize-vector v2)) v2)
+                (v+ v3 (scale fat (normalize-vector v3)) v3))
+              (geo::pqpaddtri m v1 v2 v3 id)
+              (incf id)
+              ))
+           (t
+            (do ((v 0 (+ v 3)))
+                ((>= v (array-dimension vlst 0)))
+              (user::c-matrix-row vlst    v    v1)
+              (user::c-matrix-row vlst (+ v 1) v2)
+              (user::c-matrix-row vlst (+ v 2) v3)
+              (when (not (= fat 0))
+                (v+ v1 (scale fat (normalize-vector v1)) v1)
+                (v+ v2 (scale fat (normalize-vector v2)) v2)
+                (v+ v3 (scale fat (normalize-vector v3)) v3))
+              (geo::pqpaddtri m v1 v2 v3 id)
+              (incf id)
+              )))
+         ))
+     (geo::pqpendmodel m)
+     m
+     ))
   )
 
 ;;;
 (defclass glbody
   :super body
-  :slots (glvertices)
+  :slots (aglvertices)
   )
 (defmethod glbody
-  (:glvertices (&rest args) (forward-message-to glvertices args))
+  (:glvertices (&rest args) (user::forward-message-to aglvertices args))
   (:draw (vwr)
-   (when glvertices
-     (send glvertices :draw vwr)))
+   (when aglvertices
+     (send aglvertices :draw vwr)))
   (:set-color (&rest args)
    (send-super* :set-color args)
-   (when glvertices (send* glvertices :set-color args)))
+   (when aglvertices (send* aglvertices :set-color args)))
   )
 
 ;;; glvertices utility
@@ -1225,6 +1339,93 @@ flst is list of geomatry::face"
         (push (list :material material) msh))
       (instance gl::glvertices :init (list msh)))
     ))
+
+(defun _dump-wrl-shape (strm mesh &key ((:scale scl) 1.0) (use_ambient nil)
+                             (use_normal nil) (use_texture nil)
+                             &allow-other-keys)
+  (let* ((tp   (cadr (assoc :type      mesh))) ;; type should be :triangle
+         (indx (cadr (assoc :indices   mesh))) ;; should have index
+         (vmat (cadr (assoc :vertices  mesh)))
+         (matl (cadr (assoc :material  mesh)))
+         (tcds (cadr (assoc :texcoords mesh)))
+         (nmat (cadr (assoc :normals mesh)))
+         (len (/ (length (array-entity vmat)) 3)))
+    (format strm "    Shape {~%")
+    (let ((col   (cadr (assoc :color matl)))
+          (amb   (cadr (assoc :ambient matl)))
+          (diff  (cadr (assoc :diffuse matl)))
+          (spec  (cadr (assoc :specular matl)))
+          (emi   (cadr (assoc :emission matl)))
+          (shin  (cadr (assoc :shininess matl)))
+          (trans (cadr (assoc :transparency matl)))
+          (matfile (cadr (assoc :filename matl))))
+      (format strm "      appearance Appearance {
+        material Material {~%")
+      (if diff
+          (format strm "          diffuseColor     ~A ~A ~A~%" (elt diff 0) (elt diff 1) (elt diff 2)))
+      (if (and use_ambient amb)
+          (format strm "          diffuseColor     ~A ~A ~A~%" (elt amb 0) (elt amb 1) (elt amb 2)))
+      (if spec
+          (format strm "          specularColor    ~A ~A ~A~%" (elt spec 0) (elt spec 1) (elt spec 2)))
+      (if emi
+          (format strm "          emissiveColor    ~A ~A ~A~%" (elt emi 0) (elt emi 1) (elt emi 2)))
+      (if shin
+          (format strm "          shininess        ~A~%" shin))
+      (if trans
+          (format strm "          transparency     ~A~%" trans))
+      (format strm "          ambientIntensity 0~%") ;; ??
+      (format strm "        }~%")
+      (format strm "      }~%" )
+      )
+    (format strm "      geometry IndexedFaceSet {
+        ccw    TRUE
+        convex TRUE
+        solid  FALSE
+        creaseAngle 0
+        coord  Coordinate {
+          point [~%")
+    (let ((p (float-vector 0 0 0)))
+      (dotimes (i len)
+        (user::c-matrix-row vmat i p)
+        (format strm "~8,8f ~8,8f ~8,8f,~%" (* scl (elt p 0)) (* scl (elt p 1)) (* scl (elt p 2)))
+        ))
+    (format strm "                ]
+        }~%")
+    (when (and use_normal nmat)
+    ;;;; normal
+    ;;(format strm "        normal Normal { vector [~%")
+    ;; nx ny nz,
+    ;;(format strm "        ] } #normal~%")
+      )
+    (when (and use_texture tcds)
+    ;;;; texcoords
+    ;;(format strm "        texCoord TextureCoordinate { point [~%")
+    ;; t s,
+    ;;(format strm "        ] } #texCoord~%")
+      )
+    (format strm "        coordIndex [~%")
+    (dotimes (i (/ (length indx) 3))
+      (format strm "~D, ~D, ~D, -1,~%"
+              (elt indx    (* i 3))
+              (elt indx (+ (* i 3) 1))
+              (elt indx (+ (* i 3) 2))))
+    (format strm "        ]
+      } #IndexedFaceSet
+    } #Shape~%")
+    ))
+
+(defun write-wrl-from-glvertices (fname glv &rest args)
+  "write .wrl file from instance of glvertices"
+  (let ((mesh-list (glv . gl::mesh-list)))
+    (with-open-file
+     (strm fname :direction :output)
+     (format strm "Transform {~%")
+     (format strm "  children [~%")
+     (dolist (mesh mesh-list)
+       (apply #'_dump-wrl-shape strm mesh args))
+     (format strm "  ] #children~%")
+     (format strm "} #Transform~%")
+     )))
 
 #| ;; sample of glvertices
 (setq ver-lst (list

@@ -15,11 +15,30 @@
 ;;; Workshop on Concurrent Object-based Systems,
 ;;;  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ;;;
-;;; Permission to use this software for educational, research
-;;; and non-profit purposes, without fee, and without a written
-;;; agreement is hereby granted to all researchers working on
-;;; the IRT project at the University of Tokyo, provided that the
-;;; above copyright notice remains intact.  
+;;; Redistribution and use in source and binary forms, with or without
+;;; modification, are permitted provided that the following conditions are met:
+;;;
+;;; * Redistributions of source code must retain the above copyright notice,
+;;;   this list of conditions and the following disclaimer.
+;;; * Redistributions in binary form must reproduce the above copyright notice,
+;;;   this list of conditions and the following disclaimer in the documentation
+;;;   and/or other materials provided with the distribution.
+;;; * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+;;;   (JSK) nor the names of its contributors may be used to endorse or promote
+;;;   products derived from this software without specific prior written
+;;;   permission.
+;;;
+;;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;;; THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;;; PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+;;; CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;;; EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;;; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;;; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;;; WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;;; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+;;; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;;;
 
 (in-package "USER")
@@ -452,9 +471,13 @@
 		   :link-list link-list
 		   :translation-axis translation-axis args)
 	    args)
-     (send self :calc-vel-for-cog cog-gain translation-axis target-centroid-pos
-           :centroid-offset-func centroid-offset-func
-           :update-mass-properties nil)
+     (let ((cvel
+            (send self :calc-vel-for-cog cog-gain translation-axis target-centroid-pos
+                  :centroid-offset-func centroid-offset-func
+                  :update-mass-properties nil)))
+       (when (send self :get :ik-target-error)
+         (push cvel (cdr (assoc :centroid (send self :get :ik-target-error)))))
+       cvel)
      )
     )
   (:calc-vel-for-cog
@@ -577,7 +600,7 @@
 	 ;; buffers for calculation
 	 (tmp-va (float-vector 0 0 0)))
    (if debug-view (format t ";; forward-all-kinematics link = ~A~%" (send self :name)))
-   (when parent-link
+   (when (and parent-link (derivedp (send self :parent) bodyset-link)) ;; exclude if root-link
      (let* ((paxis (case (joint . axis)
 		     (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1))
 		     (:xx #f(1 0 0)) (:yy #f(0 1 0)) (:zz #f(0 0 1))
@@ -654,7 +677,7 @@
      (setq force (v+ force (send child :force) force)
 	   moment (v+ moment (send child :moment) moment)))
 
-   (when (and joint parent-link)
+   (when (and joint parent-link (derivedp (send self :parent) bodyset-link)) ;; exclude if root-link
      (send joint :joint-torque
 	   (+ (v. (send self :get :spacial-velocity-jacobian) force)
 	      (v. (send self :get :angular-velocity-jacobian) moment))))
@@ -751,7 +774,9 @@
          (root-spacial-acceleration (float-vector 0 0 0))
          (root-angular-acceleration (float-vector 0 0 0))
          (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
-   (let ((torque-vector (instantiate float-vector (length joint-list))))
+   (let ((torque-vector (instantiate float-vector (length joint-list)))
+         (analysis-level-org (mapcar #'(lambda (l) (send l :analysis-level)) (send self :links))))
+     (send-all (send self :links) :analysis-level :coords)
      (all-child-links
       (car (send self :links))
       #'(lambda (l)
@@ -785,6 +810,7 @@
           (send l :ext-moment (float-vector 0 0 0))))
      (dotimes (i (length torque-vector))
        (setf (elt torque-vector i) (send (elt joint-list i) :joint-torque)))
+     (mapcar #'(lambda (l org) (send l :analysis-level org)) (send self :links) analysis-level-org)
      torque-vector))
   (:calc-root-coords-vel-acc-from-pos
    (dt root-coords)
@@ -868,15 +894,18 @@
            :joint-acceleration-vector jav)
      ))
   (:calc-torque-from-ext-wrenches
-   (&key (force-list) (moment-list) (target-coords))
+   (&key (force-list) (moment-list) (target-coords) ((:jacobi tmp-jacobi)))
    (let* ((link-list (mapcar #'(lambda (tc) (send self :link-list (send tc :parent))) target-coords))
           (jacobi
-           (send self :calc-jacobian-from-link-list
-                 link-list
-                 :move-target target-coords
-                 :transform-coords (mapcar #'(lambda (x) (make-coords)) target-coords)
-                 :rotation-axis (make-list (length target-coords) :initial-element t)
-                 :translation-axis (make-list (length target-coords) :initial-element t)))
+           (if tmp-jacobi
+               tmp-jacobi
+             (send self :calc-jacobian-from-link-list
+                   link-list
+                   :move-target target-coords
+                   :transform-coords (mapcar #'(lambda (x) (make-coords)) target-coords)
+                   :rotation-axis (make-list (length target-coords) :initial-element t)
+                   :translation-axis (make-list (length target-coords) :initial-element t))
+             ))
           (wrenches
            (mapcar #'(lambda (f m) (concatenate float-vector f m)) force-list moment-list))
           (tq (transform (transpose jacobi)
@@ -888,29 +917,35 @@
      (dotimes (i (length ul))
        (setf (elt ret-tq (position (send (elt ul i) :joint) joint-list)) (elt tq i)))
      ret-tq))
-  ;; calculate Zero Moment Point based on Inverse Dynamics
-  ;;   necessary arguments -> av and root-coords
   (:calc-zmp
     (&optional (av (send self :angle-vector))
                (root-coords (send (car (send self :links)) :copy-worldcoords))
-     &key (pZMPz 0.0) ;; ZMP height [mm]
-          (dt 0.005) ;; dt [s]
+     &key (pZMPz 0.0)
+          (dt 0.005)
           (update t) (debug-view)
           (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
-    (unless update (return-from :calc-zmp (send self :get :zmp)))
+    "Calculate Zero Moment Point based on Inverse Dynamics.
+     The output is expressed by the world coordinates, 
+     and depends on historical robot states of the past 3 steps. Step is incremented when this method is called.
+     After solving Inverse Dynamics, ZMP is calculated from total root-link force and moment.
+     necessary arguments -> av and root-coords.
+     If update is t, call inverse dynamics, otherwise, just return zmp from total root-link force and moment.
+     dt [s] is time step used only when update is t.
+     pZMPz is ZMP height [mm].
+     After this method, (send robot :get :zmp) is ZMP and (send robot :get :zmp-moment) is moment around ZMP."
+    (when update
+      ;; under no external forces and moments
+      (all-child-links
+       (car (send self :links))
+       #'(lambda (l)
+           (send l :ext-force (float-vector 0 0 0))
+           (send l :ext-moment (float-vector 0 0 0))))
 
-    ;; under no external forces and moments
-    (all-child-links
-     (car (send self :links))
-     #'(lambda (l)
-	      (send l :ext-force (float-vector 0 0 0))
-	      (send l :ext-moment (float-vector 0 0 0))))
-
-    (send self :calc-torque
-          :dt dt :av av :root-coords root-coords
-          :debug-view debug-view
-          :calc-statics-p nil
-          :calc-torque-buffer-args calc-torque-buffer-args)
+      (send self :calc-torque
+            :dt dt :av av :root-coords root-coords
+            :debug-view debug-view
+            :calc-statics-p nil
+            :calc-torque-buffer-args calc-torque-buffer-args))
 
     ;; calculate ZMP from force and moment of root-link
     (let* ((f0 (send (car (send self :links)) :force)) ;; [N]
@@ -1045,18 +1080,31 @@
   ;; method to calculate fullbody mass properties
   (:weight ;; total weight
    (&optional (update-mass-properties t))
+   "Calculate total robot weight [g].
+    If update-mass-properties argument is t, propagate total mass prop calculation for all links and returns total robot weight.
+    Otherwise, do not calculate total weight, just returns pre-computed total robot weight."
    (if update-mass-properties (send self :update-mass-properties))
    (send (car (send self :links)) :get :m-til))
   (:centroid ;; total centroid
    (&optional (update-mass-properties t))
+   "Calculate total robot centroid (Center Of Gravity, COG) [mm] in euslisp world coordinates.
+    If update-mass-properties argument is t, propagate total mass prop calculation for all links and returns total robot centroid.
+    Otherwise, do not calculate total mass prop, just returns pre-computed total robot centroid."
    (if update-mass-properties (send self :update-mass-properties))
    (send (car (send self :links)) :get :c-til))
+  (:inertia-tensor ;; total inertia tensor
+   (&optional (update-mass-properties t))
+   "Calculate total robot inertia tensor [g $mm^2$] around total robot centroid in euslisp world coordinates.
+    If update-mass-properties argument is t, propagate total mass prop calculation for all links and returns total robot inertia tensor.
+    Otherwise, do not calculate total mass prop, just returns pre-computed total robot inertia tensor."
+   (if update-mass-properties (send self :update-mass-properties))
+   (send (car (send self :links)) :get :I-til))
 
   ;; preview filter
   (:preview-control-dynamics-filter
    (dt ;; [s]
     avs ;; input motion : (list (list :angle-vector av :root-coords rc) ....)
-    &key (preview-class preview-control)
+    &key (preview-controller-class preview-controller)
          (cog-method :move-base-pos)
          (delay 0.8)) ;; [s]
    ;; generate av-list
@@ -1065,8 +1113,9 @@
              (send self :angle-vector (cadr (memq :angle-vector av)))
              (send self :move-coords (cadr (memq :root-coords av)) (car (send self :links)))))
      (update-robot-state (car avs))
-     (let ((df (instance preview-dynamics-filter
-                         :init dt (elt (send self :centroid) 2) preview-class :delay delay))
+     (let ((df (instance preview-control-cart-table-cog-trajectory-generator
+                         :init dt (elt (send self :centroid) 2) :delay delay :initialize-queue-p t
+                         :preview-controller-class preview-controller-class))
            (r))
        (dotimes (i 2) (send self :calc-zmp))
        (let ((ret-list) (last-av) (ret-avs) (last-zmp) (av)
@@ -1085,12 +1134,12 @@
                   (rzmp (let ((tmp-zmp (cadr (memq :zmp av))))
                           (if tmp-zmp (setq last-zmp tmp-zmp) last-zmp)))
                   (dzmp (v- zmp rzmp)))
-             (setq r (send df :update (list av zmp (copy-object (send self :centroid)) rzmp) (if av dzmp nil)))
+             (setq r (send df :update-xk (if av dzmp nil) (list av zmp (copy-object (send self :centroid)) rzmp)))
              (when r
-               (push (list (send df :av) r) ret-list)
+               (push (list (send df :current-additional-data) r) ret-list)
                (let ((pav (send self :angle-vector))
                      (prc (send self :copy-worldcoords)))
-                 (update-robot-state (car (send df :av)))
+                 (update-robot-state (car (send df :current-additional-data)))
                  (case cog-method
                    (:move-centroid-on-foot
                     (send self :move-centroid-on-foot :both '(:lleg :rleg)
@@ -1129,6 +1178,7 @@
                         (send (send self :centroid) :draw-on :flush nil :size 300 :color #f(1 0 0))
                         (send (cadr (car ret)) :draw-on :flush nil :size 400)
                         (send zmp :draw-on :flush t :size 300 :color #f(1 0 0))
+                        (x::window-main-one)
                         (unix:usleep 10000)
                         (setq tm (+ tm dt))
                         (list :time tm :output-zmp zmp :input-zmp (cadr (car ret))
@@ -1167,8 +1217,8 @@
       (do ((loop 0 (1+ loop)))
 	  ((>= loop 10000))
 	(let* ((tmp-PA (m* P A)))
-          (setq R+btPb-1 (/ 1.0 (+ R (aref (m* bt (m* P b)) 0 0)))
-                K (scale-matrix R+btPb-1 (m* bt tmp-PA)))
+          (setq R+btPb-1 (inverse-matrix (m+ (scale-matrix R (unit-matrix (array-dimension b 1))) (m* bt (m* P b))))
+                K (m* R+btPb-1 (m* bt tmp-PA)))
           (let ((prevP (m- (m+ (m* At tmp-pa)
                                (m* ct (scale-matrix Q c)))
                            (m* (m* (m* At P) b) K))))
@@ -1184,25 +1234,280 @@
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; preview-control class to compute reference COG from reference ZMP
-;;;  (refer to "Biped Walking Pattern Generation by using Preview Control of Zero-Moment Point", ICRA 2003, p.1620-1626, Shuuji KAJITA, Fumio KANEHIRO, Kenji KANEKO, Kiyoshi FUJIWARA, Kensuke HARADA, Kazuhito YOKOI and Hirohisa HIRUKAWA
-;;;            "Humanoid Robot (in Japanese)", Ohmsha, 2005, Shuji Kajita, ISBN 4-274-20058-2)
+;;; preview-controller class
 ;;;  A, b, c -> system configuration matrices
-;;;  xk, uk  -> COG() and input for controller at "k"
-;;;             xk -> 3 x 2 matrix, uk -> 1 x 2 matrix (2 represents x and y)
+;;;  uk -> input for controller at the time "k"
+;;;  xk -> state variable
 ;;;  delay -> preview step calculated from predictive time (delay = N)
-;;;  p1-n -> reference ZMP queue (time is k, k+1, ... k+N)
+;;;  y1-n -> reference queue (time is k, k+1, ... k+N)
 ;;;  state equation of this system is
 ;;;   xk+1 = A xk + b uk
-;;;   pk   = c xk
-;;;  unit system -> [mm], [s]
+;;;   yk   = c xk
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defclass preview-control
+(defclass preview-controller
   :super riccati-equation
-  :slots (xk uk delay f1-n p1-n dim cog-z zmp-z))
-(defmethod preview-control
+  :slots (xk uk delay f1-n y1-n queue-index initialize-queue-p additional-data-queue finishedp initialized-p output-dim input-dim))
+(defmethod preview-controller
   (:init
-    (dt _zc ;; dt -> sampling time[s], _zc is height of COG[mm]
+    (dt
+     &key (q) (r)
+          ((:delay d))
+          ((:A _A))
+          ((:B _B))
+          ((:C _C))
+          (state-dim (array-dimension _A 0))
+          ((:output-dim odim) (array-dimension _C 0))
+          ((:input-dim idim) (array-dimension _B 1))
+          (init-xk (instantiate float-vector (array-dimension _A 0)))
+          (init-uk (make-matrix (array-dimension _B 1) 1))
+          ((:initialize-queue-p iqp)))
+    "Initialize preview-controller.
+     Q is weighting of output error and R is weighting of input.
+     dt is sampling time [s].
+     delay is preview time [s].
+     init-xk is initial state value.
+     A, B, C are state eq matrices.
+     If initialize-queue-p is t, fill all queue by the first input at the begenning, otherwise, do not fill queue at the first."
+    (setq delay (round (/ d dt)) initialize-queue-p iqp output-dim odim input-dim idim)
+    (send-super :init _A _B _C q r)
+    (setq queue-index 0)
+    (when (null xk)
+      (setq xk (make-matrix state-dim 1))
+      (dotimes (i state-dim)
+        (setf (aref xk i 0) (elt init-xk i))))
+    (setq uk init-uk)
+    (send self :solve)
+    (send self :calc-f)
+    self)
+  (:calc-f () ;; calculate preview gain for k+1, ... k+N.
+    (setq f1-n (make-matrix input-dim (* output-dim (1+ delay)))) ;; (matrix-row f1-n 0) is dummy to being mutiplied by p1-n
+    (let* ((gsi (unit-matrix (array-dimension c 1)))
+	   (bt (transpose b))
+	   (ct (transpose c)))
+      (dotimes (i delay)
+	(let* ((qt (scale-matrix Q ct))
+	       (fa (m* R+btPb-1 (m* bt (m* gsi qt)))))
+          (setq gsi (m* A-bKt gsi))
+          (dotimes (ii input-dim)
+            (dotimes (jj output-dim)
+              (setf (aref f1-n ii (+ (* output-dim (1+ i)) jj)) (aref fa ii jj))))
+          ))))
+  (:calc-u () (setq uk (m- (m* f1-n y1-n) (m* K xk))))
+  (:calc-xk () ;; update xk+1
+    (setq xk (m+ (m* A xk) (m* b (send self :calc-u)))))
+  ;;
+  (:update-xk
+   (p &optional (add-data))
+   "Update xk by inputting reference output.
+    Return value : nil (initializing) => return values (middle) => nil (finished)
+    If p is nil, automatically the last value in queue is used as input and preview controller starts finishing."
+    ;; initialize
+    (if p
+        (progn
+          (unless initialized-p
+            (incf queue-index)
+            (setq initialized-p (>= queue-index (1+ delay))))
+          (when (null y1-n)
+            (setq y1-n (make-matrix (* output-dim (1+ delay)) 1))
+            (setq additional-data-queue (make-list (1+ delay)))
+            (if initialize-queue-p
+                (dotimes (i (1+ delay))
+                  (dotimes (j output-dim)
+                    (setf (aref y1-n (+ (* output-dim i) j) 0) (elt p j)))
+                  (setf (elt additional-data-queue i) add-data)))
+            )
+          (unless initialize-queue-p
+            (when (< queue-index (1+ delay))
+              (dotimes (j output-dim)
+                (setf (aref y1-n (+ (* output-dim queue-index) j) 0) (elt p j)))
+              (setf (elt additional-data-queue queue-index) add-data)
+              (return-from :update-xk nil))))
+      (progn
+        (decf queue-index)
+        (setq p (send self :last-reference-output-vector))
+        (if (<= queue-index 0) (setq finishedp t))))
+    ;; update y1-n
+    (dotimes (i delay)
+      (dotimes (j output-dim)
+        (setf (aref y1-n (+ (* output-dim i) j) 0) (aref y1-n (+ (* output-dim (1+ i)) j) 0)))
+      (setf (elt additional-data-queue i) (elt additional-data-queue (1+ i))))
+    (dotimes (j output-dim)
+      (setf (aref y1-n (+ (* output-dim delay) j) 0) (elt p j)))
+    (setf (elt additional-data-queue delay) add-data)
+    ;;
+    (send self :calc-xk)
+    ;; return
+    (if (and initialized-p (not finishedp))
+        (list (send self :current-reference-output-vector)
+              (send self :current-state-vector)
+              (send self :current-output-vector)))
+    )
+  (:finishedp
+   ()
+   "Finished or not."
+   finishedp)
+  (:last-reference-output-vector
+   ()
+   "Last value of reference output queue vector (y_k+N_ref).
+    Last value is latest future value."
+   (subseq y1-n (* output-dim delay) (+ output-dim (* output-dim delay)))) ;; tail of queue
+  (:current-reference-output-vector
+   ()
+   "First value of reference output queue vector (y_k_ref).
+    First value is oldest future value and it can be used as current reference value."
+   (subseq y1-n 0 output-dim)) ;; head of queue
+  (:current-state-vector
+   ()
+   "Current state value (xk)."
+   (matrix-column xk 0)
+   )
+  (:current-output-vector
+   ()
+   "Current output value (yk)."
+   (matrix-column (m* c xk) 0))
+  (:current-additional-data
+   ()
+   "Current additional data value.
+    First value of additional-data-queue."
+   (car additional-data-queue)
+   )
+  (:pass-preview-controller
+   (reference-output-vector-list)
+   "Get preview controller results from reference-output-vector-list and returns list."
+   (let ((r) (ret))
+     ;; Wait until initialize
+     (while (not (setq r (send self :update-xk (pop reference-output-vector-list) nil))))
+     (push r ret)
+     ;; Get value until finish
+     (while (setq r (send self :update-xk (pop reference-output-vector-list) nil))
+       (push r ret))
+     (reverse ret)
+     ))
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; extended-preview-controller class
+;;;  this class is error system of preview-control class
+;;;  (refer to "Digital Preview Control (in Japanese)", SangyoToshoKabusikiGaisha, Takeshi Tsuchiya and Tadashi Egami)
+;;;  orgA, orgb, orgc -> system configuration matrices
+;;;  xk* -> [y_k^T, dxk^T]^T
+;;;  state equation of this system is
+;;;   xk+1* = A xk* + b duk
+;;;   yk   = c xk*
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass extended-preview-controller
+  :super preview-controller
+  :slots (orgA orgB orgC xk*))
+
+(defmethod extended-preview-controller
+  (:init
+    (dt
+     &key (q) (r) ((:delay d))
+          ((:A _orgA)) ((:B _orgB)) ((:C _orgC))
+          (init-xk (instantiate float-vector (array-dimension _orgA 0)))
+          (init-uk (make-matrix (array-dimension _orgB 1) 1))
+          (state-dim (array-dimension _orgA 0))
+          ((:initialize-queue-p iqp))
+          (q-mat))
+    "Initialize preview-controller in extended system (error system).
+     Q is weighting of output error and R is weighting of input.
+     dt is sampling time [s].
+     delay is preview time [s].
+     init-xk is initial state value.
+     A, B, C are state eq matrices for original system and slot variables A,B,C are used for error system matrices.
+     If initialize-queue-p is t, fill all queue by the first input at the begenning, otherwise, do not fill queue at the first."
+    (setq orgA _orgA orgB _orgB orgC _orgC)
+    (setq output-dim (array-dimension orgC 0))
+    (setq input-dim (array-dimension orgB 1))
+    (let* ((org-state-dim (array-dimension orgA 0))
+           (new-state-dim (+ output-dim org-state-dim))
+           (tmpcA (m* orgc orgA))
+           (newA (make-matrix new-state-dim new-state-dim))
+           (tmpcb (m* orgc orgB))
+           (newb (make-matrix new-state-dim (array-dimension orgB 1)))
+           (newC (make-matrix output-dim new-state-dim)))
+      (dotimes (i output-dim)
+        (setf (aref newA i i) 1.0))
+      (dotimes (i output-dim)
+        (dotimes (j org-state-dim)
+          (setf (aref newA i (+ output-dim j)) (aref tmpcA i j))))
+      (dotimes (i org-state-dim)
+        (dotimes (j org-state-dim)
+          (setf (aref newA (+ output-dim i) (+ output-dim j)) (aref orgA i j))))
+      (dotimes (i output-dim)
+        (dotimes (j input-dim)
+          (setf (aref newb i j) (aref tmpcb i j))))
+      (dotimes (i org-state-dim)
+        (dotimes (j input-dim)
+          (setf (aref newb (+ output-dim i) j) (aref orgb i j))))
+      (if q-mat
+          (dotimes (i output-dim)
+            (setf (aref newC i i) (aref q-mat i i)))
+        (dotimes (i output-dim)
+          (setf (aref newC i i) 1.0)))
+      (send-super :init
+                  dt
+                  :A newA :b newb :c newC :state-dim state-dim
+                  :q q :r r :delay d :init-xk init-xk :init-uk init-uk :initialize-queue-p iqp :output-dim output-dim :input-dim input-dim)
+      (when (null xk*)
+        (setq xk* (make-matrix new-state-dim 1))
+        (let ((init-y (m* orgC xk)))
+          (dotimes (i output-dim)
+            (setf (aref xk* i 0) (aref init-y i 0))))
+        )
+      self))
+  ;;
+  (:calc-f ()
+    (setq f1-n (make-matrix input-dim (* output-dim (1+ delay))))
+    (let* ((gsi (unit-matrix (array-dimension c 1)))
+	   (bt (transpose b))
+	   (ct (transpose c))
+	   (R+btPb-1bt (m* R+btPb-1 bt))
+	   (qt (scale-matrix Q ct)))
+      (dotimes (i delay)
+	(let* ((qt (if (= i (1- delay)) (m* P ct) qt))
+               (fa (m* R+btPb-1 (m* bt (m* gsi qt)))))
+          (setq gsi (m* A-bKt gsi))
+          (dotimes (ii input-dim)
+            (dotimes (jj output-dim)
+              (setf (aref f1-n ii (+ (* output-dim (1+ i)) jj)) (aref fa ii jj))))
+          ))))
+  (:calc-u
+   ()
+   (let ((uk* (m- (m* f1-n y1-n) (m* K xk*))))
+     (setq uk (m+ uk* uK))
+     uk*))
+  (:calc-xk ()
+    (setq xk* (m+ (m* A xk*) (m* b (send self :calc-u))))
+    (dotimes (i (array-dimension orgA 0))
+      (setf (aref xk i 0)
+            (+ (aref xk i 0)
+               (aref xk* (+ output-dim i) 0))))
+    )
+  (:current-output-vector
+   ()
+   "Current additional data value.
+    First value of additional-data-queue."
+   (subseq (matrix-column xk* 0) 0 output-dim)
+   )
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; COG (xy) trajectory generator using preview-control convert reference ZMP from reference COG
+;;;  (refer to "Biped Walking Pattern Generation by using Preview Control of Zero-Moment Point", ICRA 2003, p.1620-1626, Shuuji KAJITA, Fumio KANEHIRO, Kenji KANEKO, Kiyoshi FUJIWARA, Kensuke HARADA, Kazuhito YOKOI and Hirohisa HIRUKAWA
+;;;            "Humanoid Robot (in Japanese)", Ohmsha, 2005, Shuji Kajita, ISBN 4-274-20058-2)
+;;; A,B,C -> cart-table system
+;;; xk -> 3 x 2 matrix (3 = COG pos, vel, acc, 2 = x, y)
+;;; uk -> 1 x 2 matrix (COG jark of x and y)
+;;  yk -> zmp
+;;; unit system -> [mm], [s]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defclass preview-control-cart-table-cog-trajectory-generator
+  :super propertied-object
+  :slots (pcs cog-z zmp-z))
+(defmethod preview-control-cart-table-cog-trajectory-generator
+  (:init
+    (dt _zc
      &key (q 1) (r 1e-6)
           ((:delay d) 1.6)
           (init-xk (float-vector 0 0 0))
@@ -1212,187 +1517,79 @@
           ((:B _B) (make-matrix 3 1 (list (list (* (/ 1.0 6.0) dt dt dt))
                                           (list (* 0.5 dt dt))
                                           (list dt))))
-          ((:C _C) (make-matrix 1 3 (list (list 1.0 0.0 (- (/ _zc (elt *g-vec* 2))))))))
-    (setq delay (round (/ d dt)) dim 2 cog-z _zc)
-    (send-super :init _A _B _C q r)
-    (when (null xk)
-      (setq xk (make-matrix 3 dim))
-      (setf (matrix-row xk 0) (subseq init-xk 0 dim)))
-    (send self :solve)
-    (send self :calc-f)
+          ((:C _C) (make-matrix 1 3 (list (list 1.0 0.0 (- (/ _zc (elt *g-vec* 2)))))))
+          ((:initialize-queue-p iqp))
+          (preview-controller-class extended-preview-controller))
+    "COG (xy) trajectory generator using preview-control convert reference ZMP from reference COG.
+     dt -> sampling time[s], _zc is height of COG [mm].
+     preview-controller-class is preview controller class (extended-preview-controller by default).
+     For other arguments, please see preview-controller and extended-preview-controller :init documentation."
+    (setq pcs
+          (list (instance preview-controller-class
+                          :init dt :q q :r r :delay d
+                          :init-xk (float-vector (elt init-xk 0) 0 0)
+                          :A _A :B _B :C _C :state-dim 3 :initialize-queue-p iqp)
+                (instance preview-controller-class
+                          :init dt :q q :r r :delay d
+                          :init-xk (float-vector (elt init-xk 1) 0 0)
+                          :A _A :B _B :C _C :state-dim 3 :initialize-queue-p iqp)))
+    (setq cog-z _zc)
     self)
   ;; getter methods
-  (:delay () delay)
-  (:refcog () (float-vector (elt (matrix-row xk 0) 0)
-                            (elt (matrix-row xk 0) 1)
-                            cog-z))
-  (:cart-zmp (&optional (_c c)) ;; table-cart zmp as an output variable
-    (let ((p (m* _c xk)))
-      (float-vector (aref p 0 0)
-                    (aref p 0 1)
-                    zmp-z)))
+  (:refcog
+   ()
+   "Reference COG [mm]."
+   (float-vector (elt (send (car pcs) :current-state-vector) 0) (elt (send (cadr pcs) :current-state-vector) 0) cog-z))
+  (:cart-zmp ()
+   "Cart-table system ZMP[mm] as an output variable."
+   (float-vector (elt (send (car pcs) :current-output-vector) 0)
+                 (elt (send (cadr pcs) :current-output-vector) 0)
+                 zmp-z))
   (:last-refzmp ()
-    (let ((p (matrix-row p1-n delay))) ;; tail of refzmp queue
-      (float-vector (elt p 0)
-                    (elt p 1)
-                    zmp-z)))
+   "Reference zmp at the last of queue."
+   (float-vector (elt (send (car pcs) :last-reference-output-vector) 0)
+                 (elt (send (cadr pcs) :last-reference-output-vector) 0)
+                 zmp-z))
   (:current-refzmp ()
-    (let ((p (matrix-row p1-n 0))) ;; head of refzmp queue
-      (float-vector (elt p 0)
-                    (elt p 1)
-                    zmp-z)))
+   "Current reference zmp at the first of queue."
+   (float-vector (elt (send (car pcs) :current-reference-output-vector) 0)
+                 (elt (send (cadr pcs) :current-reference-output-vector) 0)
+                 zmp-z))
   ;;
-  (:calc-f () ;; calculate preview gain for k+1, ... k+N.
-    (setq f1-n (make-matrix 1 (1+ delay))) ;; (matrix-row f1-n 0) is dummy to being mutiplied by p1-n
-    (let* ((gsi (unit-matrix (array-dimension c 1)))
-	   (bt (transpose b))
-	   (ct (transpose c)))
-      (dotimes (i delay)
-	(let* ((qt (scale-matrix Q ct))
-	       (fa (scale-matrix R+btPb-1 (m* bt (m* gsi qt)))))
-          (setq gsi (m* A-bKt gsi))
-          (setf (aref f1-n 0 (1+ i)) (aref fa 0 0))
-          ))))
-  (:calc-u () (m- (m* f1-n p1-n) (m* K xk)))
-  (:calc-xk () ;; update xk+1
-    (setq xk (m+ (m* A xk) (m* b (send self :calc-u)))))
-  ;;
-  (:update-xk (p)
-    (setq zmp-z (elt p 2))
-    ;; update p1-n
-    (when (null p1-n)
-      (setq p1-n (make-matrix (1+ delay) dim))
-      (dotimes (i (1+ delay)) (setf (matrix-row p1-n i) (subseq p 0 dim))))
-    (dotimes (i delay) (setf (matrix-row p1-n i) (matrix-row p1-n (1+ i))))
-    (setf (matrix-row p1-n delay) (subseq p 0 dim))
-    ;;
-    (send self :calc-xk))
-  (:cog-z () cog-z)
+  (:update-xk
+   (p &optional (add-data))
+   "Update xk and returns zmp and cog values.
+    For arguments, please see preview-controller and extended-preview-controller :update-xk."
+    (if p (setq zmp-z (elt p 2)))
+    (let ((ret (list (send (car pcs) :update-xk (subseq p 0 1) add-data)
+                     (send (cadr pcs) :update-xk (subseq p 1 2) add-data))))
+      (setq ret (and (car ret) (cadr ret)))
+      (if ret
+          (list
+           (send self :current-refzmp)
+           (send self :refcog)
+           (send self :cart-zmp)))))
+  (:finishedp () "Finished or not." (and (send (car pcs) :finishedp) (send (cadr pcs) :finishedp)))
+  (:current-additional-data () "Current additional data value." (send (car pcs) :current-additional-data))
+  (:pass-preview-controller
+   (reference-output-vector-list)
+   "Get preview controller results from reference-output-vector-list and returns list."
+   (let ((r) (ret))
+     ;; Wait until initialize
+     (while (not (setq r (send self :update-xk (pop reference-output-vector-list) nil))))
+     (push r ret)
+     ;; Get value until finish
+     (while (setq r (send self :update-xk (pop reference-output-vector-list) nil))
+       (push r ret))
+     (reverse ret)
+     ))
+  (:cog-z () "COG Z [mm]." cog-z)
   (:update-cog-z (zc)
-    (setf (aref c 0 2) (- (/ zc (elt *g-vec* 2))))
-    (send self :solve)
-    (send self :calc-f))
-  )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; extended-preview-control class to compute reference COG from reference ZMP
-;;;  this class is error system of preview-control class
-;;;  (refer to "Digital Preview Control (in Japanese)", SangyoToshoKabusikiGaisha, Takeshi Tsuchiya and Tadashi Egami)
-;;;  orgA, orgb, orgc -> system configuration matrices for original table-cart model
-;;;  xk* -> [p^T, dxk^T]^T, (1+3) x 2 matrix
-;;;  state equation of this system is
-;;;   xk+1* = A xk* + b duk
-;;;   pk   = c xk*
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defclass extended-preview-control
-  :super preview-control
-  :slots (orgA orgB orgC xk*))
-
-(defmethod extended-preview-control
-  (:init
-    (dt zc &key (q 1.0) (r 1.0e-6) ((:delay d) 1.6) (init-xk (float-vector 0 0 0)))
-    (setq orgA (make-matrix 3 3 (list (list 1 dt (* 0.5 dt dt))
-                                    (list 0 1 dt)
-                                    (list 0 0 1)))
-          orgb (make-matrix 3 1 (list (list (* (/ 1.0 6.0) dt dt dt))
-                                    (list (* 0.5 dt dt))
-                                    (list dt)))
-          orgc (make-matrix 1 3 (list (list 1.0 0.0 (- (/ zc (elt *g-vec* 2)))))))
-    (let* ((tmpAc (m* orgc orgA))
-           (newA (make-matrix
-                  (+ 1 (cadr (array-dimensions tmpAc)))
-                  (+ 3 (car (array-dimensions tmpAc)))))
-           (tmpcb (m* orgc orgb))
-           (newb (make-matrix
-                  (+ 1 (car (array-dimensions orgb))) 1)))
-      (setf (aref newA 0 0) 1.0)
-      (dotimes (i (cadr (array-dimensions tmpAc)))
-        (setf (aref newA 0 (+ 1 i)) (aref tmpAc 0 i)))
-      (dotimes (i (car (array-dimensions orgA)))
-        (dotimes (j (cadr (array-dimensions orgA)))
-          (setf (aref newA (+ 1 i) (+ 1 j)) (aref orgA i j))))
-      (setf (aref newb 0 0) (aref tmpcb 0 0))
-      (dotimes (i (car (array-dimensions orgb)))
-        (setf (aref newb (+ 1 i) 0) (aref orgb i 0)))
-      ;; (concatenate-matrix-column
-      ;;  (concatenate-matrix-row (make-matrix 1 1 (list (list 1.0))) (m* orgc orgA))
-      ;;  (concatenate-matrix-row (make-matrix 3 1 (list (list 0) (list 0) (list 0))) orgA))
-      ;; (concatenate-matrix-column (m* orgc orgb) orgb)
-      (send-super :init
-                  dt zc
-                  :A newA :b newb
-                  :c (make-matrix 1 4 (list (list 1.0 0.0 0.0 0.0)))
-                  :q q :r r :delay d :init-xk init-xk))
-    (when (null xk*)
-      (setq xk* (make-matrix 4 dim))
-      (setf (matrix-row xk* 0) (subseq init-xk 0 dim)))
-    self)
-  ;; getter methods
-  (:cart-zmp () (send-super :cart-zmp orgc))
-  ;;
-  (:calc-f ()
-    (setq f1-n (make-matrix 1 (1+ delay)))
-    (let* ((gsi (unit-matrix (array-dimension c 1)))
-	   (bt (transpose b))
-	   (ct (transpose c))
-	   (R+btPb-1bt (scale-matrix R+btPb-1 bt))
-	   (qt (scale-matrix Q ct)))
-      (dotimes (i delay)
-	(let* ((qt (if (= i (1- delay)) (m* P qt) qt))
-               (fa (scale-matrix R+btPb-1 (m* bt (m* gsi qt)))))
-          (setq gsi (m* A-bKt gsi))
-	  (setf (aref f1-n 0 (1+ i)) (aref fa 0 0))
-          ))))
-  (:calc-u () (m- (m* f1-n p1-n) (m* K xk*)))
-  (:calc-xk ()
-    (setq xk* (m+ (m* A xk*) (m* b (send self :calc-u))))
-    (dotimes (i 3)
-      (setf (matrix-row xk i)
-            (v+ (matrix-row xk i)
-                (matrix-row xk* (1+ i)))))
-    )
-  )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; preview-dynamics-filter class to handle variables about preview control
-;;;  avs -> queue of variables for preview control (k, k+1, ..., k+N)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defclass preview-dynamics-filter
-  :super propertied-object
-  :slots (avs counter finishedp preview-controller))
-
-(defmethod preview-dynamics-filter
-  (:init (dt zc &optional (preview-class preview-control)
-                &rest args)
-    (setq counter 0
-          finishedp nil
-          preview-controller (instance* preview-class :init dt zc args)
-          avs (make-list (1+ (send preview-controller :delay))))
-    self)
-  ;;
-  (:finishedp () finishedp)
-  (:av () (car avs)) ;; get parameters at "k"
-  (:cart-zmp () (send preview-controller :cart-zmp))
-  (:refcog () (send preview-controller :refcog))
-  (:cog-z () (send preview-controller :cog-z))
-  ;;
-  (:update (av p)
-    (let (r)
-      (dotimes (i (send preview-controller :delay)) (setf (elt avs i) (elt avs (1+ i))))
-      (setf (elt avs (send preview-controller :delay)) av)
-      (cond (p
-	     (send preview-controller :update-xk p)
-	     (if (< counter (send preview-controller :delay)) 	     
-		 (incf counter)
-	       (setq r t)))
-	    (t ;; (null p)
-	     (send preview-controller :update-xk
-                   (send preview-controller :last-refzmp))
-	     (if (> counter 0) (setq r (decf counter)))))
-      (if (<= counter 0) (setq finishedp t))
-      (if r (cons (send preview-controller :current-refzmp)
-		  (send preview-controller :refcog)) nil)
-      ))
+   (mapcar #'(lambda (pc)
+               (setf (aref (pc . c) 0 2) (- (/ zc (elt *g-vec* 2))))
+               (send pc :solve)
+               (send pc :calc-f))
+           pcs))
   )
 
 ;;
@@ -1422,11 +1619,19 @@
           default-zmp-offsets ;; zmp offset list in the legs' end-coords ;; (list rleg-zmp-offset lleg-zmp-offset)
           finalize-p ;; Are all footstep-node-list executed? finalize flag for make-gait-parameter. Is this necessary?
           ;; preview controller parameters
-          preview-controller ;; preview controller for ZMP -> COG
+          apreview-controller ;; preview controller for ZMP -> COG
           all-limbs
           end-with-double-support
           ik-thre ;; position thre for ik
           ik-rthre ;; rotaiotn thre fo rik
+          ;; Smooth interpolation for swing-leg-proj-ratio
+          swing-leg-proj-ratio-interpolation-acc
+          swing-leg-proj-ratio-interpolation-vel
+          swing-leg-proj-ratio-interpolation-pos
+          ;; Smooth interpolation for swing-rot-ratio
+          swing-rot-ratio-interpolation-acc
+          swing-rot-ratio-interpolation-vel
+          swing-rot-ratio-interpolation-pos
           )
   )
 
@@ -1515,6 +1720,12 @@
           all-limbs al
           ik-thre thre ik-rthre rthre
           end-with-double-support ewds)
+    (setq swing-leg-proj-ratio-interpolation-pos 0
+          swing-leg-proj-ratio-interpolation-vel 0
+          swing-leg-proj-ratio-interpolation-acc 0
+          swing-rot-ratio-interpolation-pos 0
+          swing-rot-ratio-interpolation-vel 0
+          swing-rot-ratio-interpolation-acc 0)
     (let ((current-swing-limbs
            (send self :get-footstep-limbs (car footstep-node-list))))
       (send self :append-support-leg-list
@@ -1538,12 +1749,12 @@
     (send self :append-step-height-list 0.0)
     (pop footstep-node-list)
     ;; currently, not error system
-    (setq preview-controller (instance preview-dynamics-filter :init
+    (setq apreview-controller (instance preview-control-cart-table-cog-trajectory-generator :init
                                        dt (- (elt cog 2) (elt (car refzmp-cur-list) 2))
-                                       extended-preview-control
                                        :delay delay
                                        :q q :r r
                                        :init-xk cog
+                                       :preview-controller-class extended-preview-controller
                                        )
           swing-leg-src-coords current-swing-leg-dst-coords
           refzmp-next (send self :get-limbs-zmp
@@ -1602,14 +1813,25 @@
             (send self :get-limbs-zmp (car (last support-leg-coords-list)) (car (last support-leg-list))))
       (send self :append-step-height-list default-step-height)
       t))
+  (:calc-hoffarbib-pos-vel-acc
+   (tmp-remain-time tmp-goal old-acc old-vel old-pos)
+   (let* ((jerk (+ (+ (* (/ -9.0 tmp-remain-time) old-acc)
+                      (* (/ -36.0 (expt tmp-remain-time 2)) old-vel))
+                   (* (/ 60.0 (expt tmp-remain-time 3)) (- tmp-goal old-pos))))
+          (new-acc (+ old-acc (* dt jerk)))
+          (new-vel (+ old-vel (* dt new-acc)))
+          (new-pos (+ old-pos (* dt new-vel))))
+     (list new-acc new-vel new-pos)
+     ))
   ;; calculate swing leg coords
   (:calc-current-swing-leg-coords
     (ratio src dst &key (type :shuffling) (step-height default-step-height))
+    ;; Calculate swing leg coords
     (case type
       (:shuffling
         (midcoords ratio src dst))
       (:cycloid
-        (send self :cycloid-midcoords ratio src dst step-height))
+        (send self :cycloid-midcoords ratio src dst step-height :rot-ratio swing-rot-ratio-interpolation-pos))
       )
     )
   (:calc-ratio-from-double-support-ratio
@@ -1639,6 +1861,23 @@
      ))
   (:calc-one-tick-gait-parameter
    (type)
+   ;; Calculate swing leg rot ratio
+   (let ((default-half-double-support-count (truncate (* 0.5 default-double-support-ratio one-step-len))))
+     (cond
+      ((> index-count (- one-step-len default-half-double-support-count)) ;; initial double support period
+       (setq swing-rot-ratio-interpolation-pos 0
+             swing-rot-ratio-interpolation-vel 0
+             swing-rot-ratio-interpolation-acc 0))
+      ((< index-count default-half-double-support-count) ;; final double support period
+       (setq swing-rot-ratio-interpolation-pos 1.0
+             swing-rot-ratio-interpolation-vel 0
+             swing-rot-ratio-interpolation-acc 0))
+      (t ;; swing period
+       (multiple-value-setq
+        (swing-rot-ratio-interpolation-acc swing-rot-ratio-interpolation-vel swing-rot-ratio-interpolation-pos)
+        (send self :calc-hoffarbib-pos-vel-acc
+              (* (1+ (- index-count default-half-double-support-count)) dt) 1.0 swing-rot-ratio-interpolation-acc swing-rot-ratio-interpolation-vel swing-rot-ratio-interpolation-pos))
+       )))
    (list (car support-leg-list)
          (car support-leg-coords-list)
          (mapcar #'(lambda (sw-sc sw-dc)
@@ -1649,16 +1888,25 @@
                  swing-leg-src-coords (car swing-leg-dst-coords-list))
          (send self :calc-current-refzmp
                refzmp-prev (car refzmp-cur-list) refzmp-next)
-         (let ((swing-leg-proj-coords
-                (mapcar #'(lambda (sw-sc sw-dc)
-                            (midcoords
-                             (send self :calc-ratio-from-double-support-ratio)
-                             sw-sc sw-dc))
+         (let* ((swing-leg-proj-ratio
+                 (progn
+                   (if (= index-count one-step-len)
+                       (setq swing-leg-proj-ratio-interpolation-pos 0
+                             swing-leg-proj-ratio-interpolation-vel 0
+                             swing-leg-proj-ratio-interpolation-acc 0))
+                   (multiple-value-setq
+                    (swing-leg-proj-ratio-interpolation-acc swing-leg-proj-ratio-interpolation-vel swing-leg-proj-ratio-interpolation-pos)
+                    (send self :calc-hoffarbib-pos-vel-acc
+                          (* index-count dt) 1.0 swing-leg-proj-ratio-interpolation-acc swing-leg-proj-ratio-interpolation-vel swing-leg-proj-ratio-interpolation-pos))
+                   swing-leg-proj-ratio-interpolation-pos))
+                (swing-leg-proj-coords
+                 (mapcar #'(lambda (sw-sc sw-dc)
+                             (midcoords swing-leg-proj-ratio sw-sc sw-dc))
                         swing-leg-src-coords (car swing-leg-dst-coords-list)))
                (limbs
                 (append (send self :get-counter-footstep-limbs (car support-leg-list))
                         (car support-leg-list))))
-           (+ (send preview-controller :cog-z)
+           (+ (send apreview-controller :cog-z)
               (elt (send self :get-limbs-zmp
                          (append swing-leg-proj-coords (car support-leg-coords-list))
                          limbs) 2))
@@ -1681,17 +1929,17 @@
     (let* ((preview-data ;; data to push to preview-controller's que
             (if support-leg-coords-list
                 (send self :calc-one-tick-gait-parameter type)))
-           (dd (send preview-controller :update ;; return value from preview-controller
-                     preview-data (if preview-data (elt preview-data 3))))
-           (gp (send preview-controller :av))) ;; gait parameter
-      (if dd (setf (elt (cdr dd) 2) (elt gp 4))) ;; overwrite 
+           (dd (send apreview-controller :update-xk ;; return value from preview-controller
+                     (if preview-data (elt preview-data 3)) preview-data))
+           (gp (send apreview-controller :current-additional-data))) ;; gait parameter
+      (if dd (setf (elt (cadr dd) 2) (elt gp 4))) ;; overwrite 
       (let ((ret (if (and dd solve-angle-vector)
                      (append (send self :solve-angle-vector
-                                   (elt gp 0) (elt gp 1) (elt gp 2) (cdr dd)
+                                   (elt gp 0) (elt gp 1) (elt gp 2) (cadr dd)
                                    :solve-angle-vector solve-angle-vector
                                    :solve-angle-vector-args solve-angle-vector-args)
-                             (if debug (append (butlast gp 2) (list (cdr dd)
-                                                                  (send preview-controller :cart-zmp))
+                             (if debug (append (butlast gp 2) (list (cadr dd)
+                                                                  (send apreview-controller :cart-zmp))
                                                (last gp)
                                                ))))))
         (when (>= 0 (decf index-count))
@@ -1747,17 +1995,17 @@
   (:solve-av-by-move-centroid-on-foot
    (support-leg support-leg-coords swing-leg-coords cog robot
    &rest args &key (cog-gain 3.5) (stop 100) (additional-nspace-list) &allow-other-keys)
-   (let ((legs
-          (append (send self :get-counter-footstep-limbs support-leg)
-                  support-leg))
-         (fix-coords (append swing-leg-coords support-leg-coords)))
+   (let* ((legs (append (send self :get-counter-footstep-limbs support-leg)
+                        support-leg))
+          (leg-order (mapcar #'(lambda (l) (position l legs)) all-limbs))
+          (fix-coords (append swing-leg-coords support-leg-coords)))
      (unless (memq :thre args)
-       (append args (list :thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) ik-thre (* 5 ik-thre))) legs))))
+       (setq args (append args (list :thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) ik-thre (* 5 ik-thre))) all-limbs)))))
      (unless (memq :rthre args)
-       (append args (list :rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) ik-rthre (* 5 ik-rthre)))) legs))))
+       (setq args (append args (list :rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) ik-rthre (* 5 ik-rthre)))) all-limbs)))))
      (send* robot :move-centroid-on-foot
-            :both legs :target-centroid-pos cog
-            :fix-limbs-target-coords fix-coords
+            :both all-limbs :target-centroid-pos cog
+            :fix-limbs-target-coords (mapcar #'(lambda (idx) (elt fix-coords idx)) leg-order)
             :cog-gain cog-gain :stop stop
             :additional-nspace-list
             (append
@@ -1806,11 +2054,11 @@
   ;;   goal   -> goal pos
   ;;   height -> max height of step
   (:cycloid-midcoords
-   (ratio start goal height &key (top-ratio 0.5))
+   (ratio start goal height &key (top-ratio 0.5) (rot-ratio ratio))
    (let ((cp (send self :cycloid-midpoint ratio (send start :worldpos) (send goal :worldpos)
                    height :top-ratio top-ratio)))
      (make-coords :pos cp
-                  :rot (send (midcoords ratio start goal) :worldrot))))
+                  :rot (send (midcoords rot-ratio start goal) :worldrot))))
   )
 
 (in-package "GEOMETRY")

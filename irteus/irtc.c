@@ -15,18 +15,37 @@
 /// Workshop on Concurrent Object-based Systems,
 ///  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ///
-/// Permission to use this software for educational, research
-/// and non-profit purposes, without fee, and without a written
-/// agreement is hereby granted to all researchers working on
-/// the IRT project at the University of Tokyo, provided that the
-/// above copyright notice remains intact.  
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///
+/// * Redistributions of source code must retain the above copyright notice,
+///   this list of conditions and the following disclaimer.
+/// * Redistributions in binary form must reproduce the above copyright notice,
+///   this list of conditions and the following disclaimer in the documentation
+///   and/or other materials provided with the distribution.
+/// * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+///   (JSK) nor the names of its contributors may be used to endorse or promote
+///   products derived from this software without specific prior written
+///   permission.
+///
+/// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+/// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+/// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+/// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+/// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+/// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+/// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+/// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+/// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+/// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+/// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
 #include "eus.h"
 #include "nr.h"
 #include <math.h>
 extern pointer ___irtc();
-static register_irtc()
+static void register_irtc()
 { add_module_initializer("___irtc", ___irtc);}
 
 #define colsize(p) (intval(p->c.ary.dim[1]))
@@ -46,7 +65,7 @@ pointer argv[];
 /* (SV_SOLVE mat vec &optional ret) */
 { 
   pointer a,b,x;
-  eusfloat_t **aa, *bb, *xx;
+  double **aa, *bb, *xx;
   int i, j, s;
 
   ckarg2(2,3);
@@ -93,7 +112,7 @@ pointer argv[];
 /* (SV_DECOMPOSE mat) */
 { 
   pointer a,ru,rv,rw, rr;
-  eusfloat_t **u, **v, *w, y;
+  double **u, **v, *w, y;
   int c, r, i, j, *idx, k, pc=0;;
 
   ckarg(1);
@@ -167,7 +186,7 @@ pointer argv[];
 /* (LU-SOLVE mat perm bvector [result]) */
 { pointer a,p,b,x;
   int i, j, s;
-  eusfloat_t **aa, *cols;
+  double **aa, *cols;
   int *indx;
 
   ckarg2(3,4);
@@ -205,7 +224,7 @@ int n;
 pointer argv[];
 /* (LU-DECOMPOSE mat [result] [tmp-vector]) */
 { pointer a,result,pv;
-  eusfloat_t **aa, d;
+  double **aa, d;
   int i, j, s, stat, *indx;
 
   ckarg2(1,3);
@@ -252,7 +271,7 @@ int n;
 pointer argv[];
 { pointer a,result;
   numunion nu;
-  eusfloat_t **aa, d;
+  double **aa, d;
   int i, j, s, stat, *indx;
 
   ckarg2(1,2);
@@ -290,7 +309,7 @@ int n;
 pointer argv[];
 { pointer a,result;
   numunion nu;
-  eusfloat_t **u, **v, *w, y;
+  double **u, **v, *w, y;
   int c, r, i, j, k, *idx;
 
   ckarg2(1,2);
@@ -360,8 +379,8 @@ pointer argv[];
  *
  */
 
-int matrix2quaternion(eusfloat_t *c, eusfloat_t *q){
-  eusfloat_t q02, q12, q22, q32;
+int matrix2quaternion(double *c, double *q){
+  double q02, q12, q22, q32;
   q02 = (1 + c[0*3+0] + c[1*3+1] + c[2*3+2]) / 4;
   q12 = (1 + c[0*3+0] - c[1*3+1] - c[2*3+2]) / 4;
   q22 = (1 - c[0*3+0] + c[1*3+1] - c[2*3+2]) / 4;
@@ -394,8 +413,8 @@ int matrix2quaternion(eusfloat_t *c, eusfloat_t *q){
   }
 }
 
-int quaternion2matrix(eusfloat_t *q, eusfloat_t *c){
-  eusfloat_t q0 = q[0], q1 = q[1], q2 = q[2], q3 = q[3];
+int quaternion2matrix(double *q, double *c){
+  double q0 = q[0], q1 = q[1], q2 = q[2], q3 = q[3];
   // (+ (* q0 q0) (* q1 q1) (- (* q2 q2)) (- (* q3 q3)))
   c[0*3+0] = q0*q0 + q1*q1 - q2*q2 - q3*q3;
   // (* 2 (- (* q1 q2) (* q0 q3)))
@@ -417,9 +436,9 @@ int quaternion2matrix(eusfloat_t *q, eusfloat_t *c){
 }
 
 
-int quaternion_multiply(eusfloat_t *q1, eusfloat_t *q2, eusfloat_t *q3){
-  eusfloat_t q10 = q1[0], q11 = q1[1], q12 = q1[2], q13 = q1[3];
-  eusfloat_t q20 = q2[0], q21 = q2[1], q22 = q2[2], q23 = q2[3];
+int quaternion_multiply(double *q1, double *q2, double *q3){
+  double q10 = q1[0], q11 = q1[1], q12 = q1[2], q13 = q1[3];
+  double q20 = q2[0], q21 = q2[1], q22 = q2[2], q23 = q2[3];
   // (+ (* q10 q20) (- (* q11 q21)) (- (* q12 q22)) (- (* q13 q23)))
   q3[0] = q10*q20 - q11*q21 - q12*q22 - q13*q23;
   // (+ (* q10 q21)    (* q11 q20)     (* q12 q23)  (- (* q13 q22)))
@@ -438,7 +457,7 @@ pointer MATTIMES3(ctx,n,argv)
   register int i;
   register pointer p,result;
   eusfloat_t *c1,*c2,*c3;
-  eusfloat_t q1[4], q2[4], q3[4], q;
+  double q1[4], q2[4], q3[4], q;
   
   ckarg2(2,3);
   c1 = argv[0]->c.ary.entity->c.fvec.fv;
@@ -447,19 +466,28 @@ pointer MATTIMES3(ctx,n,argv)
   else result = makematrix(ctx,3,3);
   c3 = result->c.ary.entity->c.fvec.fv;
 
+#if (WORD_SIZE == 32)
+  double pc1[9], pc2[9], pc3[9];
+  for(i = 0; i < 9; i++ ) { pc1[i] = c1[i]; pc2[i] = c2[i]; pc3[i] = c3[i]; }
+#else
+  double *pc1=c1, *pc2=c2, *pc3=c3;
+#endif
   /*
      (setf c3 (quaternion2matrix 
 	       (normalize-vector (quaternion*
 				  (matrix2quaternion c1) 
 				  (matrix2quaternion c2)))))
   */
-  matrix2quaternion(c1, q1);
-  matrix2quaternion(c2, q2);
+  matrix2quaternion(pc1, q1);
+  matrix2quaternion(pc2, q2);
   quaternion_multiply(q1, q2, q3);
   //noromalize-vector
   q = sqrt(q3[0]*q3[0]+q3[1]*q3[1]+q3[2]*q3[2]+q3[3]*q3[3]);
   q3[0] /= q; q3[1] /= q; q3[2] /= q; q3[3] /= q;
-  quaternion2matrix(q3, c3);
+  quaternion2matrix(q3, pc3);
+#if (WORD_SIZE == 32)
+  for(i = 0; i < 9; i++ ) { c3[i] = pc3[i]; }
+#endif
 
   return(result);
 }
@@ -532,11 +560,11 @@ pointer MATMINUS(ctx,n,argv)
   return(result);
 }
 
-void balanc(eusfloat_t **a, int n)
+void balanc(double **a, int n)
 {
-  eusfloat_t RADIX = 2.0;
+  double RADIX = 2.0;
   int last,j,i;
-  eusfloat_t s,r,g,f,c,sqrdx;
+  double s,r,g,f,c,sqrdx;
   sqrdx=RADIX*RADIX;
   last=0;
   while (last == 0) {
@@ -573,10 +601,10 @@ void balanc(eusfloat_t **a, int n)
 }
 
 #define SWAP(g,h) {y=(g);(g)=(h);(h)=y;}
-void elmhes(eusfloat_t **a, int n)
+void elmhes(double **a, int n)
 {
   int m,j,i;
-  eusfloat_t y,x;
+  double y,x;
   for (m=2;m<n;m++) { // m is called r + 1 in the text.
     x=0.0;
     i=m;
@@ -605,10 +633,10 @@ void elmhes(eusfloat_t **a, int n)
   }
 }
 
-int hqr(eusfloat_t **a, int n, eusfloat_t wr[], eusfloat_t wi[])
+int hqr(double **a, int n, double wr[], double wi[])
 {
   int nn,m,l,k,j,its,i,mmin;
-  eusfloat_t z,y,x,w,v,u,t,s,r,q,p,anorm;
+  double z,y,x,w,v,u,t,s,r,q,p,anorm;
   anorm=0.0; // Compute matrix norm for possible use inlocating  single small subdiagonal element. 
   for (i=1;i<=n;i++)
     for (j=max(i-1,1);j<=n;j++)
@@ -621,7 +649,7 @@ int hqr(eusfloat_t **a, int n, eusfloat_t wr[], eusfloat_t wi[])
       for (l=nn;l>=2;l--) { // Begin iteration: look for single small subdiagonal element. 
 	s=fabs(a[l-1][l-1])+fabs(a[l][l]);
 	if (s == 0.0) s=anorm;
-	if ((eusfloat_t)(fabs(a[l][l-1]) + s) == s) {
+	if ((double)(fabs(a[l][l-1]) + s) == s) {
 	  a[l][l-1]=0.0;
 	  break;
 	}
@@ -672,7 +700,7 @@ int hqr(eusfloat_t **a, int n, eusfloat_t wr[], eusfloat_t wi[])
 	    if (m == l) break;
 	    u=fabs(a[m][m-1])*(fabs(q)+fabs(r));
 	    v=fabs(p)*(fabs(a[m-1][m-1])+fabs(z)+fabs(a[m+1][m+1]));
-	    if ((eusfloat_t)(u+v) == v) break; // Equation (11.6.26).
+	    if ((double)(u+v) == v) break; // Equation (11.6.26).
 	  }
 	  for (i=m+2;i<=nn;i++) {
 	    a[i][i-2]=0.0;
@@ -731,15 +759,6 @@ int hqr(eusfloat_t **a, int n, eusfloat_t wr[], eusfloat_t wi[])
   return 1;
 }
 
-eusfloat_t pythag(eusfloat_t a, eusfloat_t b)
-{
-  eusfloat_t absa, absb;
-  absa=fabs(a);
-  absb=fabs(b);
-  if (absa > absb) return absa*sqrt(1.0+SQR(absb/absa));
-  else return (absb == 0.0 ? 0.0 : absb*sqrt(1.0+SQR(absa/absb)));
-}
-
 pointer QL_DECOMPOSE(ctx,n,argv)
 register context *ctx;
 int n;
@@ -747,7 +766,7 @@ pointer argv[];
 /* (QL_DECOMPOSE mat) */
 {
   pointer a,re,rv;
-  eusfloat_t **aa, *d, *e;
+  double **aa, *d, *e;
   int c, i, j;
 
   ckarg(1);
@@ -797,7 +816,7 @@ pointer argv[];
 /* (QR_DECOMPOSE mat) */
 {
   pointer a,rr,ri, r;
-  eusfloat_t **aa, *wr, *wi;
+  double **aa, *wr, *wi;
   int c, i, j, pc=0;
 
   ckarg(1);
@@ -838,8 +857,178 @@ pointer argv[];
   free_nr_vector(wi,1,c);
 
   while(pc-->0) vpop();
-  return (cons(ctx,rr,cons(ctx,ri,NIL)));};
+  return (cons(ctx,rr,cons(ctx,ri,NIL)));}
 
+///
+static pointer VMEAN(ctx, n, argv)
+/* make mean of vector, vmean #f(1 2 3) -> 2.0 */
+/* (vmean X) => (/ (+ x_0 x_1 ... x_n) (length x)), where X := [x_0, ..., x_n] */
+register context *ctx;
+int n;
+register pointer *argv;
+{
+  int i,fn;
+  double sum=0;
+  pointer pcur;
+  numunion nu;
+  ckarg(1);
+  if (isvector(argv[0])) {
+    fn = vecsize(argv[0]);
+    if (isfltvector(argv[0])) {
+      for (i = 0; i < fn; i++){ sum += argv[0]->c.fvec.fv[i];}
+    }
+    else if (isintvector(argv[0])) {
+      for (i = 0; i < fn; i++){ sum += argv[0]->c.ivec.iv[i];}
+    }
+    else if (isptrvector(argv[0])) {
+      for (i = 0; i < fn; i++){
+        if ( isint(argv[0]->c.vec.v[i]) ) {
+          sum += intval(argv[0]->c.vec.v[i]);
+        }
+        else if ( isflt(argv[0]->c.vec.v[i]) ) {
+          sum += fltval(argv[0]->c.vec.v[i]);
+        }
+        else error(E_NONUMBER);
+      }
+    }
+    else error(E_NONUMBER);
+  }
+  else if (islist(argv[0])) {
+    fn = 0;
+    pcur = argv[0];
+    do {
+      if ( isint(ccar(pcur)) ) {
+        sum += intval(ccar(pcur));
+      }
+      else if ( isflt(ccar(pcur)) ) {
+        sum += fltval(ccar(pcur));
+      }
+      else error(E_NONUMBER);
+      fn++;
+      pcur = ccdr(pcur);
+    } while ( iscons(pcur) );
+  }
+  else error(E_NOVECTOR);
+
+  sum = (double)(sum/fn);
+  return(makeflt(sum));
+}
+
+static pointer VARIANCE(ctx, n, argv)
+/* make variance of vector, variance #f(1 2 3) -> 0.6 */
+/* (variance X) => (vmean Z), where Z := [x_i^2 - mu_x^2], */
+/* where X := [x_0, ..., x_n], mu_x := (vmean X) */
+register context *ctx;
+int n;
+register pointer *argv;
+{
+  int i,fn;
+  double res=0;
+  double ave=0;
+  numunion nu;
+  pointer pcur;
+  ckarg(1);
+  ave = fltval(VMEAN(ctx,n,argv));
+
+  if (isvector(argv[0])) {
+    fn = vecsize(argv[0]);
+    if (isfltvector(argv[0])) {
+      for (i = 0; i < fn; i++){ res += pow( (argv[0]->c.fvec.fv[i] - ave), 2);}
+    }
+    else if (isintvector(argv[0])) {
+      for (i = 0; i < fn; i++){ res += pow( (argv[0]->c.ivec.iv[i] - ave), 2);}
+    }
+    else if (isptrvector(argv[0])) {
+      for (i = 0; i < fn; i++){
+        if ( isint(argv[0]->c.vec.v[i]) ) {
+          res += pow( (intval(argv[0]->c.vec.v[i]) - ave), 2);
+        }
+        else if ( isflt(argv[0]->c.vec.v[i]) ) {
+          res += pow( (fltval(argv[0]->c.vec.v[i]) - ave), 2);
+        }
+        else error(E_NONUMBER);
+      }
+    }
+    else error(E_NONUMBER);
+  }
+  else if (islist(argv[0])) {
+    fn = 0;
+    pcur = argv[0];
+    do {
+      if ( isint(ccar(pcur)) ) {
+        res += pow( (intval(ccar(pcur)) - ave), 2);
+      }
+      else if ( isflt(ccar(pcur)) ) {
+        res += pow( (fltval(ccar(pcur)) - ave), 2);
+      }
+      else error(E_NONUMBER);
+      fn++;
+      pcur = ccdr(pcur);
+    } while ( iscons(pcur) );
+  }
+  else error(E_NOVECTOR);
+
+  res = (double)(res/fn);
+  return(makeflt(res));
+}
+
+static pointer COVARIANCE(ctx, n, argv)
+/* make co-variance of vector, covariance #f(1 2 3) #(0 2 4) -> 1.3 */
+/* (covariance X Y) => (vmean Z) */
+/* where Z := [(x_i - mu_x) * (y_i - mu_y)], i=0, ... ,n */
+/* X := [x_0, ... ,x_n], Y := [y_0, ... ,y_n], mu_x := (vmean X), m_y := (vmean Y) */
+register context *ctx;
+int n;
+register pointer *argv;
+{
+  int i,fn;
+  double res=0;
+  double ave0=0, ave1=0;
+  numunion nu;
+  int isf, isi, isl;
+  ckarg(2);
+  if (!((isf=isfltvector(argv[0])) && isfltvector(argv[1])) &&
+      !((isi=isintvector(argv[0])) && isintvector(argv[1])) &&
+      !((isl=islist(argv[0])) && islist(argv[1])))
+    error(E_TYPEMISMATCH);
+  if (isf || isi) {
+#define ckvsize(a,b) ((a->c.vec.size==b->c.vec.size)?vecsize(a):(int)error(E_VECINDEX))
+    fn=ckvsize(argv[0], argv[1]);
+  }else{ // isl
+    if (!((fn = intval(LENGTH(ctx,1,&(argv[0])))) == intval(LENGTH(ctx,1,&(argv[1]))))) error(E_SEQINDEX);
+  }
+
+  ave0 = fltval(VMEAN(ctx,1,&(argv[0])));
+  ave1 = fltval(VMEAN(ctx,1,&(argv[1])));
+
+  if (isf) {
+    eusfloat_t *a, *b;
+    a=argv[0]->c.fvec.fv; b=argv[1]->c.fvec.fv;
+    for(i=0; i<fn; i++)
+      res+=((a[i]-ave0) * (b[i]-ave1));
+    res/=(fn-1);
+  }else if (isi) {
+    eusinteger_t *a, *b;
+    a=argv[0]->c.ivec.iv; b=argv[1]->c.ivec.iv;
+    for(i=0; i<fn; i++)
+      res+=((a[i]-ave0) * (b[i]-ave1));
+    res/=(fn-1);
+  }else if (isl) {
+    pointer a,b;
+    a=argv[0]; b=argv[1];
+    while (islist (a)){
+      res+=((ckfltval(ccar(a))-ave0) * (ckfltval(ccar(b))-ave1));
+      a=ccdr(a);
+      b=ccdr(b);
+    }
+    res/=(fn-1);
+  }else{
+    error(E_NOSEQ);
+  }
+  return(makeflt(res));
+}
+
+#include "defun.h" // redefine defun for update defun() API
 pointer ___irtc(ctx,n,argv, env)
 register context *ctx;
 int n;
@@ -847,17 +1036,20 @@ pointer argv[];
 pointer env;
 {
   pointer mod=argv[0];
-  defun(ctx,"ROTM3*",mod,MATTIMES3);
-  defun(ctx,"M+",mod,MATPLUS);
-  defun(ctx,"M-",mod,MATMINUS);
-  defun(ctx,"SV-SOLVE",mod,SV_SOLVE);
-  defun(ctx,"SV-DECOMPOSE",mod,SV_DECOMPOSE);
-  defun(ctx,"LU-SOLVE2",mod,LU_SOLVE2);
-  defun(ctx,"LU-DECOMPOSE2",mod,LU_DECOMPOSE2);
-  defun(ctx,"MATRIX-DETERMINANT",mod,MATRIX_DETERMINANT);
-  defun(ctx,"PSEUDO-INVERSE2",mod,PSEUDO_INVERSE2);
-  defun(ctx,"QL-DECOMPOSE",mod,QL_DECOMPOSE);
-  defun(ctx,"QR-DECOMPOSE",mod,QR_DECOMPOSE);
+  defun(ctx,"ROTM3*",mod,MATTIMES3,NULL);
+  defun(ctx,"M+",mod,MATPLUS,NULL);
+  defun(ctx,"M-",mod,MATMINUS,NULL);
+  defun(ctx,"SV-SOLVE",mod,SV_SOLVE,NULL);
+  defun(ctx,"SV-DECOMPOSE",mod,SV_DECOMPOSE,NULL);
+  defun(ctx,"LU-SOLVE2",mod,LU_SOLVE2,NULL);
+  defun(ctx,"LU-DECOMPOSE2",mod,LU_DECOMPOSE2,NULL);
+  defun(ctx,"MATRIX-DETERMINANT",mod,MATRIX_DETERMINANT,NULL);
+  defun(ctx,"PSEUDO-INVERSE2",mod,PSEUDO_INVERSE2,NULL);
+  defun(ctx,"QL-DECOMPOSE",mod,QL_DECOMPOSE,NULL);
+  defun(ctx,"QR-DECOMPOSE",mod,QR_DECOMPOSE,NULL);
+  defun(ctx,"VMEAN",mod,VMEAN,NULL);
+  defun(ctx,"VARIANCE",mod,VARIANCE,NULL);
+  defun(ctx,"COVARIANCE",mod,COVARIANCE,NULL);
 
   /* irteus-version */
   extern pointer QVERSION;

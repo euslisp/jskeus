@@ -2,6 +2,663 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.2.4 (2020-07-03)
+------------------
+* fix for debian release
+
+  * check EUSDIR/lisp/image/jpeg is writable (`#580 <https://github.com/euslisp/jskeus/issues/580>`_)
+  * add irteus man pages (`#579 <https://github.com/euslisp/jskeus/issues/579>`_)
+  * clearfly bullet licensesf( `#578 <https://github.com/euslisp/jskeus/issues/578>`_)
+
+* Contributors: Kei Okada
+
+1.2.3 (2020-06-29)
+------------------
+* [irteus/irtmodel.l] In method inverse-kinematics, check length of thre and rthre is equal to move-target (`#536 <https://github.com/euslisp/jskeus/issues/536>`_)
+
+* clearfy license (`#575 <https://github.com/euslisp/jskeus/issues/575>`_)
+  * we forget to change licence to BSD when we move EusLisp license to BSD in 2010, see bottom line of page 3 in https://github.com/euslisp/jskeus/blob/1.0.0/doc/jmanual.pdf, (Version 9.00 is releaced, The license is changed to BSD
+
+* Fix compile on DOCKER_IMAGE=ubuntu:bionic COLLISION_LIB=PQP (`#577 <https://github.com/euslisp/jskeus/issues/577>`_)
+
+  * skip test-torque-from-its-own-weight-common for compiled code
+  * simplify every #'identity (mapcar #'(lamnda -> every #'(lambda
+  * remove eval-when from test-irt-motion.l, defmethod within defun
+  * do not have to use x::*display*, we have dummy-irtviewer
+  * use same label function within deftest failes only with COLLISOIN_LIB=PQP
+
+* Contributors: Kei Okada, Tatsuya Ishikawa
+
+1.2.2 (2020-06-23)
+------------------
+* [irteus/irtgl.l] add :string method to glviewsurface. (`#530 <https://github.com/euslisp/jskeus/issues/530>`_)
+* add irtstl.l, irtwrl.l : copied from wrl2eus.l and read-stl.l (`#248 <https://github.com/euslisp/jskeus/issues/248>`_)
+
+  * fix eus2stl, check if the body has glvertices, see https://github.com/jsk-ros-pkg/jsk_model_tools/pull/208#issuecomment-316715445
+  * run triangulation within esu2stl ( https://github.com/jsk-ros-pkg/jsk_model_tools/pull/208#issuecomment-316548668 )
+  * add irtstl.l, irtwrl.l : copied from wrl2eus.l and read-stl.l
+
+* Fix triangulation of face-to-tessel-triangle (`#562 <https://github.com/euslisp/jskeus/issues/562>`_)
+* modify node to support image option, and update :write-to-dot so that .dot can include image (`#573 <https://github.com/euslisp/jskeus/issues/573>`_)
+
+  * add test code to genrate node with images
+  * add node and modify write-to-dot so that .dot can include image
+
+* [:self-collision-check] ignore links which do not have :faces (`#571 <https://github.com/euslisp/jskeus/issues/571>`_)
+* update :self-collision-check, warn message when link without faces is included in collision-check-pairs
+* Add eusbullet for using bullet collision function (implement with c defun) (`#570 <https://github.com/euslisp/jskeus/issues/570>`_)
+
+  * add test-self-collision-check-pqp/bullet
+  * fix btmakemeshmodel when faces is nil
+  * CBULLE.cpp print 'BT_MakeMeshModel with numVertices == 0'
+  * do not add pqp triangle to object which do not have :faces
+　* relax test for cube-pqp
+  * - add comment why we check boundp *collision-algorithm-{pqp,bullet}* before defvar *collision-algorithm*
+    - setmargin of bullet only works with mesh model to add margin for primitive geometry shape, set directory as geometric parameters
+  * add test-collision-distance-fat, to check if :fat works
+  * use :make-collsionmodel for euscollada-robot
+  * use collision-* instaed of ppq-collision-*
+  * irtcollision.l: collision-check add geo::PQP_FIRST_CONTACT for PQP and remove it for BULLET
+  * add &key faces in :make-btmodel, to compatible with :make-pqpmodel
+  * test/test-collision.l: add test-collision-distance
+  * run test-collision-*ALGO* only when that ALGO is available
+  * set *COLLISION-ALGORITHM-BULLET* and *COLLISION-ALGORITHM-PQP* if it is available
+  * fix Makefile when PQP is not found
+  * add travis job to check COLLISION_LIB
+
+* [irteus/irtmath.l] Add inverse matrix of complex matrix and eigen decompose considering complex number (`#554 <https://github.com/euslisp/jskeus/issues/554>`_)
+
+  * [irteus/irtmath.l] Add documents of functions
+  * [irteus/irtmath.l] Fix matrix-determinant check of solve-non-zero-vector-from-det0-matrix
+  * [irteus/irtmath.l] Debug print travis matrix-determinant
+  * [irteus/irtmath.l] Debug print travis mathtest.l
+  * [irteus/irtmath.l] Add inverse matrix of complex matrix and eigen decompose considering complex number
+
+* warn misisng color names (`#558 <https://github.com/euslisp/jskeus/issues/558>`_)
+* add documentation of :calc-walk-pattern-from-footstep-list (`#550 <https://github.com/euslisp/jskeus/issues/550>`_)
+* pythag is nolonger used in irteus/irtc.c (`#563 <https://github.com/euslisp/jskeus/issues/563>`_)
+* fix spelling to pass Debian packaging criteria (`#564 <https://github.com/euslisp/jskeus/issues/564>`_)
+* add save-animgif, save-mpeg, save-image functions (`#560 <https://github.com/euslisp/jskeus/issues/560>`_)
+
+  * add with-save-mpeg, with-save-animgif macro
+  * add save-animgif, save-mpeg, save-image functions
+
+* use travis by using  bionic@travis (`#565 <https://github.com/euslisp/jskeus/issues/565>`_)
+
+  * install platex
+  * use travis on bionic
+
+* irtgeo.l: fix triangulation reported in `#455 <https://github.com/euslisp/jskeus/issues/455>`_
+
+  * irteus/test: add test-triangulation.l for testing mesh triangulation
+
+* [irtgeo.l] fix minor typo (`#559 <https://github.com/euslisp/jskeus/issues/559>`_)
+* Add eusbullet for using bullet collision function (implement with c defun) (`#555 <https://github.com/euslisp/jskeus/issues/555>`_)
+
+  * doc: update collision document.
+  * irteus: add eusbullet.
+
+* add 'brew update-reset' to travis/OSX (`#557 <https://github.com/euslisp/jskeus/issues/557>`_)
+* fix bug of extended-preview-controller (`#551 <https://github.com/euslisp/jskeus/issues/551>`_)
+
+  * [irteus-demo.l] add test-test-extended-preview-control-0-QR
+
+* fix bug of go-pos-params->footstep-list (`#552 <https://github.com/euslisp/jskeus/issues/552>`_)
+
+  * [test-irt-motion]have one deftest for each assert clause
+  * [test-irtmotion.l]fix test-go-pos-params->footstep-list-test
+  * fix bug of go-pos-params->footstep-list
+
+* [irtrobot.l test-irt-motion.l] fix sign and unit of moment in :calc-static-balance-point. add a test related to this (`#541 <https://github.com/euslisp/jskeus/issues/541>`_)
+* [irtrobot.l]add keyworld Q, R to :calc-walk-pattern-from-footstep-list (`#546 <https://github.com/euslisp/jskeus/issues/546>`_)
+* Add detail documentation of inverse kinematics (`#549 <https://github.com/euslisp/jskeus/issues/549>`_)
+
+  * fix document (irtmodel.tex)
+  * use .jpg (not .png)
+  * add detail documentation of inverse-kinematics
+
+* [irtmodel.l] fix bag of :draw-collision-debug-view (`#542 <https://github.com/euslisp/jskeus/issues/542>`_)
+* [irtdyna.l] fix bag of gait-generator::solve-av-by-move-centroid-on-foot (`#545 <https://github.com/euslisp/jskeus/issues/545>`_)
+
+* add rst target in doc/Makefile for sphinx-build (`#548 <https://github.com/euslisp/jskeus/issues/548>`_)
+
+  * sometimes pnmtopng fails on 14.04(travis)
+  * migrate to circleci 2.0, give feedback to github issue, reomve circle.yml and add .circleci
+  * update doc/Makefile: html
+  * conf.py: conver to str befor run replace('EusLisp-','')
+  * add readthedocs badge
+  * force rewrite EditOnGithub link
+  * fix for 18.04?
+  * add conf.py for sphinx
+  * add rst target in doc/Makefile for sphinx-build
+  * add irtbvh.tex irtcollada.tex irtpointcloud.tex irtgraph.tex irtext.tex for sphinx-build, also we welcome to add more explanation for these functions
+  * use git command to get current euslisp/irteus version for tex
+  * remove wrong command (exit) in copy_eus_tex https://github.com/euslisp/jskeus/pull/116
+  * remove jessie from travis: https://discourse.ros.org/t/kinetic-builds-disabled-on-eol-platform-debian-jessie/5051
+  * Update jmanual.pdf
+
+* Update \longdescription command (`#539 <https://github.com/euslisp/jskeus/issues/539>`_)
+* Update \longdescription according to Euslisp/`#359 <https://github.com/euslisp/jskeus/issues/359>`_
+
+* Contributors: Guilherme Affonso, Kei Okada, Kohei Kimura, Masaki Murooka, Naoki Hiraoka, Naoya Yamaguchi, Yohei Kakiuchi, Yoichiro Kawamura
+
+1.2.1 (2019-01-07)
+------------------
+* .travis-osx.sh: need install make by brew (`#535 <https://github.com/euslisp/jskeus/issues/535>`_)
+* try to run more irt tests on arm machine (`#533 <https://github.com/euslisp/jskeus/issues/533>`_)
+  * ubuntu_arm64:trusty takes more than 50 min, so skip irteus-demo.l
+  * irteus/nr.c: check rv1/w/f + anorm == anorm with eusfloat_t type
+  * irteus/{irtc.c,nr.c}: use double for nr codes
+  * irteus/irtutil.l interpolator :pass-time : calculate segment-time from time minus previous time-list, (incf segment-time dt) accumulate errors, specially 32bit machine
+  * irteus/test/test-irt-motion.l: run all test with compiled code
+  * irteus/test/geo.l: (body+ c1 b d1 c2 d2 c3 d3 c4 d4) could not pass the test on arm 32bit, use truncated version
+  * irteus/test/geo.l somehow both 32/64 arm architecture needs to return #f(0 0 0) for small normalized vectors
+  * irteus/test/mathtest.l: 9.656790+06 is too large for 32bit machine
+  * irteus/test/mathtest.l: add test for pseudo-inverse2 to check if svdcmp failed to converge
+  * irteus/test/test-pointcloud.l To test test-pointcloud.l with compiled code requires https://github.com/euslisp/EusLisp/pull/357
+* [irtmodel.l]fix bug of :angle-vector for multi-dof joint (`#532 <https://github.com/euslisp/jskeus/issues/532>`_)
+  * add test code to check bug of :angle-vector for multi-dof joint `#529 <https://github.com/euslisp/jskeus/issues/529>`_
+  * add more test on min-max-joint-table (`#534 <https://github.com/euslisp/jskeus/issues/534>`_)
+* travis.{yml,sh}: set travis to fail when gcc outputs compile warnings (`#527 <https://github.com/euslisp/jskeus/issues/527>`_e)
+* [irteus/irtviewer.l] support changing floor color. (`#528 <https://github.com/euslisp/jskeus/issues/528>`_ from mmurooka/floor-color
+  * [jskeus/doc] add irtviewer.tex and figures for irtviewer manual.
+  * [irteus/irtviewer.l] add :draw-origin, :draw-floor, and :floor-color.
+  * [irteus/irtviewer.l] support changing floor color.
+* remove all compile warning (`#526 <https://github.com/euslisp/jskeus/issues/526>`_)
+  * add -DLinux to Makefile.LinuxARM
+  * enable debian_arm64:stretch
+  * add WFLAGS to Makefile
+  * remove all compile warning for eus0
+* .travis.yml: add debian:stretch test (`#525 <https://github.com/euslisp/jskeus/issues/525>`_)
+  * Fix the compile on Debian stretch. `#524 <https://github.com/euslisp/jskeus/issues/524>`_
+  * set debian_arm64:stretch allow_failures
+  * Fix the compile on Debian stretch.
+    Must like the comment above says, gcc 6 on Debian
+    Stretch doesn't like redefining sin, cos, etc and throws
+    an error.  Fix this problem by not redefining on Debian Stretch.
+* [irtrobot.l] check if target coords is function or coordinates, also work if target coords is list of functions. (`#503 <https://github.com/euslisp/jskeus/issues/503>`_)
+  * [irteus/irtmodel.l] Add :xm :ym :zm comment for rotation-axis keyword-argument.
+  * [irtrobot.l] allow to use both list and atom of function(s) for target-coords, Fixed `#476 <https://github.com/euslisp/jskeus/issues/476>`_
+* add test with compiled lisp (`#522 <https://github.com/euslisp/jskeus/issues/522>`_)
+  * .travis.sh: add compiled test
+  * remove do-until-key x/10 message, debug (print r) code
+  * test/robot-model-usage.l : reduce output message for travis
+  * test/irteus-demo.l : reduce output message for travis
+  * test/irteus-demo.l: use debug-veiw nil to reduce output message
+  * test/full-body-ik.l: add debug-view option
+  * test/geo.l: test-body+ test-vector-angle needs irteus to avoid 'outer circuit not found' and 'undefined function c-isnan
+  * test/matrix.l  : c-isnan test, disable test-matrix-concatenate-noargs,test-matrix-concatenate-single-matrix,test-matrix-concatenate-multiple-matrices becaues of 'undefined function concatenate-matrix needs irteus
+  * test/mathtest.l : diagnoal, minor-matrix, atan2, outer-product-matrix, quaternion, matrix-log, pseudo-inverse, sr-inverse, manipulability, eigen decompose, sv/ql solve, lu-solve2, matrix-determinant, qr/ql-decompose needs irteus
+  * test/coords.l : test-makecoords-quaternion needs quaternion2matrix defined in irteus
+  * remove test codes which are moved to EusLisp https://github.com/euslisp/EusLisp/pull/316
+  * add test with compiled lisp
+  * re-define method within defun is not working with compiled code (`#523 <https://github.com/euslisp/jskeus/issues/523>`_)
+    - do not run test code on compile, but run when load
+* fix for osx and newer compiler (gcc >= 7 OR clang >=9) (`#520 <https://github.com/euslisp/jskeus/issues/520>`_)
+  * disable DISPLAY for osx
+  * gcc >= 7 OR clang >=9 dislike redefinition of sqrt/cos/fin/fabs ...
+  * Disable redefinition of sqrt/cos/... to avoid some errors on macOS
+  * fix osx travis
+    - remove homebrew/x11, which is deprecated
+    - do not run brew update, because brew update compile all module from source and it takes more than 1 hour
+    - copy setup process from euslisp/.travis-os.sh
+    - do not install x11 server
+    - export LIBGL_ALLOW_SOFTWARE=1 suggested by https://api.travis-ci.org/v3/job/403422947/log.txt
+    - make -j with 2
+    - add exit 0 end of .travis-osx.sh
+    - run as script, instead of source
+* [doc] Add example when IK target-coords function introduced in `#514 <https://github.com/euslisp/jskeus/issues/514>`_ (`#518 <https://github.com/euslisp/jskeus/issues/518>`_)
+  * Add sample of ik using functional target-coords
+* Contributors: Chris Lalancette, Guilherme Affonso, Kei Okada, Kentaro Wada, Masaki Murooka, Naoki Hiraoka, Iori Yanokura
+
+1.2.0 (2018-07-19)
+------------------
+* to use IMPLIB we need run LIBNR first (`#512 <https://github.com/euslisp/jskeus/issues/512>`_, `#513 <https://github.com/euslisp/jskeus/issues/513>`_)
+* update function using defun() for https://github.com/euslisp/EusLisp/pull/116 (`#511 <https://github.com/euslisp/jskeus/issues/511>`_)
+* Fix invalid indexing in collision link pair calculation (`#461 <https://github.com/euslisp/jskeus/issues/461>`_)
+  * increase assert error for [test-samplerobot-walk-pattern-ntimes]
+  * add more information (test-samplerobot-walk-pattern-ntimes)
+  * returns (i - 1) ??
+  * remove (= (length link-list) 1) code, that should be included in subseq logic
+  * Add checking of index in collision link pair calculation (`#459 <https://github.com/euslisp/jskeus/issues/459>`_)
+  * Add test code to check invalid indexing of collision link pair calculation (https://github.com/euslisp/jskeus/issues/459)
+* [irteus/test/geo.l] add test-vector-angle. (`#485 <https://github.com/euslisp/jskeus/issues/485>`_)
+* [irteus/irtgeo.l] move :move-coords method from cascaded-coords class to coordinates class. (`#486 <https://github.com/euslisp/jskeus/issues/486>`_)
+* add ubuntu:bionic to .travis.yml (`#508 <https://github.com/euslisp/jskeus/issues/508>`_)
+  * add ARCHDIR/lib to LD_LIBRARY_PATH
+  * gnu gcc 7 complains with re-definition of math.h
+  ```
+  In file included from irteus/PQP/src/PQP.h:44:0,
+  from irteus/CPQP.C:25:
+  irteus/PQP/src/PQP_Compile.h: In function 'float sqrt(float)':
+  irteus/PQP/src/PQP_Compile.h:47:26: error: 'float sqrt(float)' conflicts with a previous declaration
+  inline float sqrt(float x) { return (float)sqrt((double)x); }
+  ^
+  In file included from /usr/include/c++/7/math.h:36:0,
+  from irteus/PQP/src/PQP_Compile.h:46,
+  from irteus/PQP/src/PQP.h:44,
+  from irteus/CPQP.C:25:
+  /usr/include/c++/7/cmath:463:3: note: previous declaration 'constexpr float std::sqrt(float)'
+  sqrt(float __x)
+  ^~~~
+  ```
+  * from trusty, use libpng-dev instead of libpng12-dev
+  * add ubuntu:bionic to .travis.yml
+* set minjerk end position to last given value (`#469 <https://github.com/euslisp/jskeus/issues/469>`_)
+* [irteus/test/matrix.l] add test case of rotating around x-axis (`#483 <https://github.com/euslisp/jskeus/issues/483>`_)
+* debug :copy-state-to of rikiya-bvh-robot-model to map euscollada-robot correcly (`#437 <https://github.com/euslisp/jskeus/issues/437>`_)
+  * add rikiya-file tum and cmu files
+  * debug :copy-state-to of rikiya-bvh-robot-model to map euscollada-robot correctly
+  * debug :copy-state-to method of rikiya-bvh-robot-model to accept euscollada-robot correctly
+* cascaded-link: inverse-kinematics, fix error message both :link-list and :move-target is required (`#435 <https://github.com/euslisp/jskeus/issues/435>`_)
+* CMakeList.txt: enable to run compile when .o is removed (`#430 <https://github.com/euslisp/jskeus/issues/430>`_)
+* fix load time.l in current directory (`#429 <https://github.com/euslisp/jskeus/issues/429>`_)
+* add documentation to :move-coords (`#471 <https://github.com/euslisp/jskeus/issues/471>`_)
+* Allow one to specify euslisp repository and branch from command line (`#505 <https://github.com/euslisp/jskeus/issues/505>`_)
+* [irtrobot.l] Fix typo, contenious rotatoin -> continuous rotation (`#504 <https://github.com/euslisp/jskeus/issues/504>`_)    
+* Add test to check gensym reading. (`#501 <https://github.com/euslisp/jskeus/issues/501>`_)
+* Fix typo of 'midrot' function,  "returns .... given two matrix r1 and r2 instead of r1 and r1" (`#498 <https://github.com/euslisp/jskeus/issues/498>`_)
+* [test, test-pointcloud] fix eps of significant figure for 32bit system (`#497 <https://github.com/euslisp/jskeus/issues/497>`_)
+* [test, test-pointcloud] fix eps for 32bit system (`#495 <https://github.com/euslisp/jskeus/issues/495>`_)
+* [irteus/test/geo.l] test distance method of face class. (`#484 <https://github.com/euslisp/jskeus/issues/484>`_)
+  * [irteus/test/geo.l] add test-face-distance to check distance method of face class. https://github.com/euslisp/EusLisp/pull/261 problem is checked.
+* Fix typo and misunderstanding in README.md (`#488 <https://github.com/euslisp/jskeus/issues/488>`_)
+* fixed :convert-to-world in pointcloud (`#490 <https://github.com/euslisp/jskeus/issues/490>`_)
+  * [irtpointcloud] fix :convert-to-world is wrong if it was assoced
+  * [test, pointcloud] add test for pointcloud
+* Fix bug in calculation of :cog-translation-axis (`#481 <https://github.com/euslisp/jskeus/issues/481>`_)
+  * [irteus/irtmodel.l] Fix bug of :cog-translation-axis (https://github.com/euslisp/jskeus/pull/481). Do not define case sentence. Use :calc-target-axis-dimension.
+  * [irteus/test/test-irt-motion.l] Add test to check :cog-translation-axis dimensions.
+* [jskeus/irteus/irtmodel.l][test/joint.l] fix target joint table in :angle-vector and update test (`#478 <https://github.com/euslisp/jskeus/issues/478>`_)
+  * [jskeus/irteus/irtmodel.l] fix joint variable of getting target joint min-max-table.
+  * [jskeus/irteus/test/joint.l] check whether joint angle overwritten with min-max-table is on the edge of table shape. min-max-table test becomes failure with this update because of https://github.com/euslisp/jskeus/pull/477 issue.
+  * [jskeus/irteus/test/joint.l] fix incorrect condition about min-max-table-view in min-max-table test.
+  * [jskeus/irteus/test/joint.l] update min and max angle of joint.
+  * [jskeus/irteus/test/joint.l] update algortihm to set and check min-max-table matrix value. generated table shape and check result do not change. this update enables to change min or max joint angle to other value.
+  * [jskeus/irteus/test/joint.l] fix mistaken idx to access table matrix.
+  * [jskeus/irteus/test/joint.l] fix joint for setting table matrix size.
+  * [jskeus/irteus/test/joint.l] fix incorrect keyword for setting min /max angle of joint.
+  * [jskeus/irteus/test/joint.l] fix color symbol typo.
+* [irtsensor.l, camera-model] fix lighting when generating camera images by camera-model (`#475 <https://github.com/euslisp/jskeus/issues/475>`_)
+* irtscene.l: remove optional args from :spots (`#462 <https://github.com/euslisp/jskeus/issues/462>`_)
+* add x::window-main-one within display code of `:inverse-kinematics`, `:calc-walk-pattern-from-footstep-list` and `:preview-control-dynamics-filter`. So that we can interactively change viewpoint during demo programs(`#457 <https://github.com/euslisp/jskeus/issues/457>`_)
+  * demo: add x::window-main-one after :flush or :draw-objects
+  * irteus/irtdyna.l: add x::window-main-one in :preview-control-dynamics-filter
+  * irteus/irtrobotl.l: add x::window-main-one in :calc-walk-pattern-from-footstep-list
+  * irteus/irtmodel.l: add x::window-main-one in :inverse-kinematics with :debug-view t
+* Fix typo (segmnet -> segment) in irtutil.l (`#458 <https://github.com/euslisp/jskeus/issues/458>`_)
+* circle.yml run apt-get update before apt-get install (`#456 <https://github.com/euslisp/jskeus/issues/456>`_)
+* add kbhit() (`#438 <https://github.com/euslisp/jskeus/issues/438>`_)
+* [irteus/pqp.l, doc/pqp.tex] Add examples for pqp collision check functions in jmanual. Add documentation string for pqp collision functions. (`#448 <https://github.com/euslisp/jskeus/issues/448>`_)
+* .travis.yml : add travis job to run doc generation with BUILD_DOC=true (`#453 <https://github.com/euslisp/jskeus/issues/453>`_)
+* [doc, irtmodel] documentation string should be compiled by latex (`#449 <https://github.com/euslisp/jskeus/issues/449>`_)
+* [irteus/irtrobot.l,irtmodel.l] Fix bug in https://github.com/euslisp/jskeus/issues/445, add documentation to with-append-root-joint, and fix comment message in :fullbody-inverse-kinematics. (`#446 <https://github.com/euslisp/jskeus/issues/446>`_)
+* Fix camera model ( `#433 <https://github.com/euslisp/jskeus/issues/433>`_)
+  * irteus/demo/sample-camera-model.l: add sample-robot-camera
+  * irteus/demo/sample-robot-model.l: fix camera orientation
+  * irteus/irtsensor.l: (defmethod camera-model (:draw-sensor )) use screen of viwing
+* add documentation string
+  * irtutils.l (`#439 <https://github.com/euslisp/jskeus/issues/439>`_)
+  * speed-to-angle/angle-to-speed, joint-velocity,joint-aceleration,joint-torque,max-joint-velocity,ax-joint-torque (`#440 <https://github.com/euslisp/jskeus/issues/440>`_)
+* [irtscene.l] error when spot name is empty (`#441 <https://github.com/euslisp/jskeus/issues/441>`_)
+* [irteus/kalmanlib.l] adaptive kalman filter demo / cleanup kalman demo (`#426 <https://github.com/euslisp/jskeus/issues/426>`_ from furushchev/kalman
+* [irtdyna.l] describe coordinates used in :calc-zmp and :calc-static-balance-point. refer `#415 <https://github.com/euslisp/jskeus/issues/415>`_, `#419 <https://github.com/euslisp/jskeus/issues/419>`_ (`#423 <https://github.com/euslisp/jskeus/issues/423>`_ )
+* irtdyna.l: :inertia-tensor fix documentation for tex (`#424 <https://github.com/euslisp/jskeus/issues/424>`_)
+* [irteus/irtgraph.l] update, graph output to dot file (add label to arcs) (`#421 <https://github.com/euslisp/jskeus/issues/421>`_)
+* Contributors: Guilherme de Campos Affonso, Ryo Koyama, Kei Okada, Masaki Murooka, Masayuki Inaba, Naoya Yamaguchi, Shunichi Nozawa, Yohei Kakiuchi, Yuki Furuta, Iori Yanokura, Éricles Lima, Óscar Carrasco
+
+1.1.0 (2017-03-07)
+------------------
+* Add vector-variance and covariance-matrix (`#418 <https://github.com/euslisp/jskeus/issues/418>`_)
+  * add documentation to vector-variance and covariance-matrix
+  * add vector-variance and covariance-matrix
+* [irteus.irtscene.l] add :remove-wall for scene-model (`#417 <https://github.com/euslisp/jskeus/issues/417>`_)
+* [irteus/irtpointcloud.l] fix bug of :set-color. (`#416 <https://github.com/euslisp/jskeus/issues/416>`_)
+* Adapt to moved formulae: homebrew/homebrew-x11 -> euslisp/homebrew-jskeus
+  Fix `#412 <https://github.com/euslisp/jskeus/issues/412>`_
+* irtgl.l/irtpointcloud.l: add :aarch64 (`#410 <https://github.com/euslisp/jskeus/issues/410>`_)
+* Contributors: Kei Okada, Kentaro Wada, Masaki Murooka, Yohei Kakiuchi, Yuki Furuta
+
+1.0.14 (2016-12-30)
+-------------------
+* update bvh2eus (`#400 <https://github.com/EusLisp/jskeus/issues/400>`_)
+  * fix documentation of bvh2eus
+  * support :objects keyword for bvh2eus
+  * check if the robot has correspond joint
+  * add copy-state-to to rikiya-bvh-model
+  * add {rikiya/cmu/tmu}-bvh2eus
+* add :makecurrent in :draw-on, this will fix https://github.com/euslisp/jskeus/issues/401 (`#402 <https://github.com/EusLisp/jskeus/issues/402>`_ )
+* irtrobot.l: :inverse-kinematics-loop-for-look-at : use joint-list from joint of link-liste (`#408 <https://github.com/EusLisp/jskeus/issues/408>`_ )
+* load lib/llib/time.l from .so object. Fix https://github.com/euslisp/jskeus/issues/292 (`#409 <https://github.com/EusLisp/jskeus/issues/409>`_ )
+* irtviewer.l: Add :makecurrent in :change-background. Fix https://github.com/euslisp/jskeus/issues/404 (`#406 <https://github.com/EusLisp/jskeus/issues/406>`_ )
+* Update kalmanlib (`#396 <https://github.com/EusLisp/jskeus/issues/396>`_)
+  * [irteus/kalmanlib.l] add kalmanlib sample of accelerated motion
+  * [irteus/kalmanlib.l] allow larger dimension of H than A in kalman filter model
+  * [irteus/kalmanlib.l] add controller term in model
+* add circle.yaml : run make doc in circleci (`#395 <https://github.com/EusLisp/jskeus/issues/395>`_)
+* add test/queue.l for https://github.com/euslisp/EusLisp/pull/185 (`#394 <https://github.com/EusLisp/jskeus/issues/394>`_ )
+* Contributors: Ryo Koyama, Kei Okada, Shun Hasegawa
+
+1.0.13 (2016-08-02)
+-------------------
+* add linear/minjerk-interpolator https://github.com/euslisp/jskeus/pull/391
+  * add linear/minjerk-interpolator
+  * add irteus/test/interpolator.l
+  * add doc for interpolators
+
+* mathtest.l : fix wrongly comment out-ed at https://github.com/euslisp/jskeus/pull/364 (https://github.com/euslisp/jskeus/pull/390 )
+
+* add test for eps>, eps<, eps>=, eps<= https://github.com/euslisp/jskeus/pull/385 (#385)
+  * mathtest.l : fix wrongly comment out-ed at https://github.com/euslisp/jskeus/pull/364
+  * mathtest.l : add test for eps<, eps>, eps<=, eps>=, see section 14 of the manual.pdf
+  * mathtest.l : add test for eps= and eps<>
+
+* Enable to set eps for orient-coords-to-axis https://github.com/euslisp/jskeus/pull/392
+  * [irteus/irtgeo.l] Enable to set eps for orient-coords-to-axis (*epsilon* is used for acos and this is too big in terms of angle error).
+
+* implement function for transpose image (https://github.com/euslisp/jskeus/pull/388 )
+  * [irteus/irtglc.c,irtues/irtext.l,Makefile] add irtglc.c / implement function for transpose image (https://github.com/euslisp/jskeus/pull/388 )
+  * [irteus/irtgl.l] add interface for transpose image function in irtglc.c; replace lisp code for transpose image with C code.
+  * [irteus/test/rendering.l] add test for transpose
+  * [irteus/test/pr2.png] add test image
+
+* irtdyna.l : add condition whther parent is root-link or not in irtdyna.l, and add test for calculate torque when using with-append-root-joint in irteus/test/test-irt-motion.l https://github.com/euslisp/jskeus/pull/382
+* irtdyna.l: set analysis level :coords in :calc-torque-from-vel-acc (irtdyna.l) https://github.com/euslisp/jskeus/pull/383
+
+* [irteus/irtrobot.l] Add all-limbs as robot limb information to motion result from calc-walk-pattern (https://github.com/euslisp/jskeus/pull/379 )
+
+* Calculate smooth swing foot rotation for walking motion (https://github.com/euslisp/jskeus/pull/378 )
+  * [irtdyna.l] Enable to calculate ZMP from total force/moment when update is t in :calc-zmp
+  * [demo/walk-motion.l] Reduce execution time for small robot walking sample by reducing footstep number
+  * [demo/walk-motion.l] Fix default rotation-axis to use all t by default.
+  * [irtdyna.l] Calculate smooth swing foot rotation for walking motion.
+
+* Fix calculation of swing-leg-proj-coords to be smooth trajectory. (https://github.com/euslisp/jskeus/pull/371 )
+  * [irteus/irtdyna.l] Add hoffarbib calculation for swing-leg-proj-coords calculation to smooth trajectory. Previous sigmoig sometimes return discontinuous trajectory.
+
+* Update for stair walk https://github.com/euslisp/jskeus/pull/366
+  * [demo/walk-motion.l,test/irteus-demo.l] Add sample for stair climb. Add test for stair-climb and single-support walking.
+  * [irtdyna.l] Use sigmoid to smooth z (cog, root, ...) trajectory.
+
+* [irteus/irtdyna.l] Add getting method for robot total inertia-tensor. Add and update documentation strings for mass prop calculation. https://github.com/euslisp/jskeus/pull/363
+
+* add armv8(jessie) returns aarch64 (https://github.com/euslisp/jskeus/pull/364)
+  * add arm8(jessie) returns aarch64
+  * docker 16.04 does not have sudo installed
+  * .travis.yml: add testing on ARM arach for both ubuntu/debian, debian for amd64, osx
+  * .travis.sh: do not install tex
+  * .travis.yml : allow_failure for osx
+
+* Support parallel Compile
+  * compile\_*.log depends on .l files (https://github.com/euslisp/jskeus/pull/375 )
+  * irteus/Makefile: support parallel compile (https://github.com/euslisp/jskeus/pull/373)
+  * Makefile: use $(MAKE) instaed of make
+  * Makefile: irteus-installed depends on eus-installed
+
+* OSX support
+  * test/transparent.l: fix for osx, ru_maxrss retuns huge value on osx, so we check if the growth rate of vmrss (https://github.com/euslisp/jskeus/pull/377)
+  * [.travis.yml] add .travis-osx.sh for building on OSX (https://github.com/euslisp/jskeus/pull/302 )
+  * Test installing jskeus by Homebrew via Push to master (https://github.com/euslisp/jskeus/pull/370 )
+
+* update travis.yml to use 16.04 (https://github.com/euslisp/jskeus/pull/357) 
+  * .travis.sh: docker 16.04 does not have sudo nor ptex-bin
+  * .travis.yml : test on both 14.04 and 16.04
+  * .travis.sh add make for docker
+  * .travis.yml: use docker to run travis.sh
+  * .travis.sh: verbose apt-get update
+  * [.travis.sh, travis.yml] split build file into .travis.sh
+  * enable unittest.l cehcking #359
+  * update travis.yml to use 14.04
+  * [.travis.sh] Add apt-get update before apt-get execution https://github.com/euslisp/jskeus/pull/367
+
+* README.md: make is not installed on plain debian/ubuntu, need to apt-get intall make (https://github.com/euslisp/jskeus/pull/365 )
+
+* Update Testing
+  * [irteus/test/vector.l] fix compare NaN  (https://github.com/euslisp/jskeus/pull/361) 
+  * test/vector.l: test for nan/info read https://github.com/euslisp/EusLisp/pull/162 (https://github.com/euslisp/EusLisp/pull/354 )
+  * Enable unittest.l checking. (https://github.com/euslisp/EusLisp/pull/359 )
+  * [irteus/test/unittest.l, .travis.yml] Enable unittest.l checking. Remove removing of failure (https://github.com/jsk-ros-pkg/jsk_roseus/pull/21#issuecomment-205101195) and add neglection of exitting.
+  * [irteus/test/unittest.l] Add more print message to debug unittest.l. (https://github.com/euslisp/EusLisp/pull/358)
+
+* Contributors: Furushchev, Kei Okada, Kentaro Wada, Ryo Terasawa, Shunichi Nozawa
+
+1.0.12 (2016-03-20)
+-------------------
+
+* Walking for Quadruped Robot (https://github.com/euslisp/jskeus/issues/353)
+
+  * [irteus/demo/walk-motion.l, irteus/test/irteus-demo.l] add a calc-walk-pattern-from-footstep-list test for rotation-axis option
+  * [irteus/irtdyna.l] match the order of target-coords and link-list and rotation-axis, translation-axis, thre, rthre and so on
+
+* Fullbody Look at (https://github.com/euslisp/jskeus/issues/351)
+
+  * [jskeus/irteus/demo,test] add test for look-at ik.
+  * [jskeus/irteus/demo] add look-at-ik.l
+
+* Speed up access to end-coords (https://github.com/euslisp/jskeus/pull/342)
+
+  * [irteus/irtrobot.l] Fasten access for end-coords and root-link by not using assoc searching
+
+* Update :calc-grasp-matrix (https://github.com/euslisp/jskeus/pull/341)
+
+  * [irteus/test/test-irt-motion.l] Add test code for calc-grasp-matrix
+  * [irteus/irtmodel.l] Update :calc-grasp-matrix. Add documentation string and support rotation matrices.
+
+* Add example for irtscene (https://github.com/euslisp/jskeus/pull/340)
+
+  * [irteus/demo/scene.l] add sample code for irtscene
+
+* update Collision codes  (https://github.com/euslisp/jskeus/pull/339)
+
+  * [irteus/irtmodel.l] Enable to change distance-limit for collision-checking
+  * [irteus/irtmodel.l] Add comment for what is included in col-list.
+
+* add sample program for virtual joint  (https://github.com/euslisp/jskeus/pull/338)
+
+  * [demo/demo.l,virtual-joints.l,test/irteus-demo.l] Add example for virtual joint and include it in unittest for irt demos.
+
+* add make-fan-cylinder function (https://github.com/euslisp/jskeus/pull/337)
+
+  * [irteus/irtgeo.l] Add make-fan-cylinder function from euslib/jsk/jskgeo.l
+
+* Fix rotation nchange bug of sphere/6dof-joint (https://github.com/euslisp/jskeus/pull/336)
+
+  * [irteus/irtmodel.l] Fix rotation change bug of sphere-joint and 6dof-joint zero orientation setting, tested in the previous commit (test/test-irt-motion.l).
+  * [irteus/test/test-irt-motion.l] Add test for zero setting for orientation of 6dof-joint and sphere-joint. If zero vector is set as :joint-angle :relative t, worldrot should not change.
+
+* :calc-static-balance-point returns nan for the 1st time (https://github.com/euslisp/jskeus/issues/330)
+
+  * [irteus/irtrobot.l] Fix bug of omission of update-mass-properties.
+  * [irteus/test/test-irt-motion.l] Add test code to check the bug reported in https://github.com/euslisp/jskeus/issues/330#issuecomment-169544613
+
+* Fix coginit bug of calc-walk-pattern-from-footste-list (https://github.com/euslisp/jskeus/issues/286)
+
+  * [irteus/irtrobot.l] Use :centroid method. This is :update-mass-properties and getting :c-til. So, we can update total COG information on initializing of calc-walk-pattern-from-footstep-list.
+  * [irteus/test/test-irt-motion.l] Add test code for calc-walk-pattern-from-footstep-list. (https://github.com/euslisp/jskeus/issues/327)
+
+* Support output/input dimension more than 1 for Preview Control (https://github.com/euslisp/jskeus/issues/324)
+
+  * [irteus/irtdyna.l] Support output dimension > 1 and input dimension > 1 for Preview Control classes
+
+* OSX support (https://github.com/euslisp/jskeus/issues/315)
+
+  * Add installing description via homebrew
+  * Test HEAD version euslisp which is installed via Homebrew
+
+* Fixed code for displaying objects with hidden-line mode. (https://github.com/euslisp/jskeus/issues/308, https://github.com/euslisp/jskeus/issues/309)
+
+  * [irteus/demo/sample-camera-model.l] add sample for using hidden line mode with camera-model
+  * [irteus/irtsensor.l] add :select-drawmode method to camera-model
+  * [irteus/irtscene.l] add :(add|remove)-(object(s)|spot(s)) methods
+  * [irteus/irtgl.l] fix drawing hidden-line
+  * [irteus/irtviewer.l] fix :select-drawmode method in irtviewer
+
+* Enable to clear :ik-draw-on-params (https://github.com/euslisp/jskeus/issues/323)
+
+  * [irtmodel.l] Add explanations for inverse-kinematics visualization.
+  * [test/test-irt-motion.l] Add test for :ik-draw-on-params clear check
+  * [irteus/irtmodel.l] Clear :ik-draw-on-params at the end of :inverese-kinematics-loop (by garaemon)
+
+* write fk section in doc (https://github.com/euslisp/jskeus/issues/325)
+  * [doc/irtmodel.tex] add fk section in doc
+  * [doc/irtmodel.tex] add sample code for updating :analysis-level in manual
+
+* irtmodel, disdyna : misc updates
+
+  * [irteus/irtmodel.l] Check additional-check function if exists regardless of success flag. (https://github.com/euslisp/jskeus/pull/345)
+  * [irteus/irtdyna.l] Enable to set jacobi from outside of :calc-torque-from-ext-wrenches (https://github.com/euslisp/jskeus/pull/344)
+  * [irteus/irtmodel.l] Remove unnecessary calculation of target joint dimension (https://github.com/euslisp/jskeus/pull/343)
+  * [irteus/irtmodel.l] Remove unused local variables (https://github.com/euslisp/jskeus/pull/339)
+  * [jskeus/irtmodel.l] Add comment about joint order for :calc-jacobian-from-link-list (https://github.com/euslisp/jskeus/pull/335)
+  * [irteus/irtdyna.l] Add mass properties calculation doc. (https://github.com/euslisp/jskeus/issues/328)
+  * [doc/irtmodel.tex] Fix typo in doc/irtmodel.tex (https://github.com/euslisp/jskeus/issues/300)
+  * [irteus/demo/sample-camera-model.l] fix (sample-get-camera-image-2) https://github.com/euslisp/jskeus/issues/268
+  * [irteus/test/mathtest.l] fix random with random state (https://github.com/euslisp/jskeus/issues/298)
+
+* Contributors: Yuki Furuta, Kei Okada, Kentaro Wada, Kohei Kimura, Masaki Murooka, Shunichi Nozawa, Yohei Kakiuchi, Eisoku Kuroiwa,  Shinaro Noda
+
+1.0.11 (2015-11-02)
+-------------------
+
+* Misc updates
+
+  * README.md : re-organize documents, put all export information to the end of the page
+  * README.md: update to 14.04
+  * Added Gitter badge
+  * add slack notification
+
+* irtsensor.l : update get-image
+
+  * irtsensor.l: add method documents
+  * [irtsensor.l] fix #294 for correct fx/fy
+  * [test/robot-model-usage.l] add test for sample-get-camera-image, disabled for now
+  * [demo/sample-camera-model.l] add sample-get-camera-image-1 and sample-get-camera-image-2
+  * irtsensor.l: support (&optinal cv) for create-viewer
+  * [irtsensor.l] overwrite default perspective view using :newprojection
+  * [test/robot-model-usage.l] add test for :ray and :screen-point of camera class of samplerobot
+  * add test for :ray and :screen-point of camera class
+  * fix image position from models
+  * add :create-viewer method to camera-model
+  * add sample for getting image and pointcloud from camera sensor
+  * [irtsensor] fix get image and pointcloud from camera model
+
+* add test for random and make-random-state
+
+  * [irteus/test/mathtest.l] add test for random / make-random-state
+
+* irtrobot : update fullbody ik
+
+  * [irteus/irtrobot.l] Use cog-null-space as nil in  :fullbody-inverse-kinematics by default.
+  * [irtrobot.l] Add comments and check force, moment, target-coords checking
+  * [irteus/irtrobot.l] Calculate ext-wrench torque from total-wrench
+  * [irteus/irtmodel.l] Fix cog translation axis t
+  * [irteus/irtmodel.l, irtrobot.l] Reduce default min-loop for :fullbody-inveser-kinematics and :inverse-kinematics-for-closed-loop-forward-kinematics
+  * [irtmodel.l] Add usec to ik log file name to prevent conflict of file names called within one second.
+  * [test/test-irt-motion.l] Add test for new ik success/fail file and debug log file
+  * [irtdyna.l, irtmodel.l] Add ik debug information log including max loop count and target error transition.
+
+* irtrobot : update footstep
+
+  * [irteus/irtrobot.l] fix unit system of footstep-parameter
+  * [irteus/irtrobot.l] fix a step-count-method for y-axis in go-pos-params->footstep-list
+  * [irteus/demo] use go-pos-quadruped-params->footstep-list fucntion in order to get foot step list in quadruped walking motion
+  * [irteus] add a foot step generator function for quadruped walking
+  * [irteus/irtrobot.l, irteus/test/test-irt-motion.l] Add static balance point method and test for it.
+  * [irteus/irtrobot.l] Align default limbs based on order of force-sensors
+
+* irtrobot : support-polygon
+
+  * [irteus/irtrobot.l, irteus/demo/crank-motion.l] Modify  support-polygon method to support convex hull of given name and    add example to crank-motion (#263)
+
+* irtgl.l :
+
+  * add :make-pqpmodel method to glvertices
+
+* irtgeo.l :
+
+  * Add :worldcoords method to line to objects in irtviewer
+
+* euspng.c :
+
+  * Do not print debug message when writing a png file
+
+* irtmath.l :
+
+  * [irteus/test/matrix.l] Add test codes for concatenate-matrix functions which check arguments and concatenation results
+  * [irteus/irtmath.l] Add concatenate matrix functions moved from euslib/jsk/jsk.l.
+
+* Contributors: Eisoku Kuroiwa, Yuki Furuta, Kei Okada, Ryo KOYAMA, Ryohei Ueda, Shunichi Nozawa, The Gitter Badger, Yohei Kakiuchi
+
+1.0.10 (2015-08-18)
+-------------------
+* [irteus/test/time.l] add test for time add/subtruct (https://github.com/euslisp/EusLisp/pull/128)
+* [irteus/kalmanlib.l] add adaptive flag
+* [irteus/kalmanlib.l] add show P_k method
+* [irteus/test/string.l] add test for url encoding
+* .update-doc.sh:  skip contents, commit png/jpg files
+* [irteus/demo/*.l] Use ;; at the begenning of print message to escape documentation from demo function usage.
+* [irteus/demo/closed-loop.l, special-joints.l, walk-motion.l] Add print message for demo functions.
+* [jskeus/irteus/test/character.l] add test for character
+* [irteus/test/number.l] add test for eus number
+* [irteus/irtmodel.l] Make pqpmodel in :init-ending
+* [irteus/irtmodel.l] Add check collision argument to :inverse-kinematics and nil by default according to https://github.com/euslisp/jskeus/issues/95
+* (irtpointcloud) fix removing global variables https://github.com/euslisp/jskeus/pull/223#issuecomment-120209460
+
+* irteus/irtdyna (preview controller)
+
+  * [irteus/irtdyna.l] Fix documentation string to avoid eus documentation tex error
+  * [demo/walk-motion.l, irtdyna.l] Rename preview controller cog generator class
+  * [demo/walk-motion.l, test/irteus-demo.l] Update preview control example (long walk, impulsive force, liear zmp transition).
+  * [irteus/irtdyna.l] Add documentation and use extended-preview-controller for COG generator by default.
+  * [irteus/demo/walk-motion.l, irteus/irtdyna.l] Add :pass-preview-controller to add reference list
+  * [irteus/irtdyna.l] Return cart zmp
+  * [demo/walk-motion.l, irtdyna.l, test/irteus-demo.l] Update class names. Rename old preview-control => preview-control-cogxy-trajectory-generator.
+  * [irteus/demo/walk-motion.l, irteus/irtdyna.l] Use preview controller classes and remove extended-preview-control
+  * [irteus/irtdyna.l] Use preview-controller-base queue value directly and remove preview-dynamics-filter class
+  * [irteus/irtdyna.l] Fix indent
+  * [irteus/irtdyna.l] remove duplicated codes
+  * [irteus/irtdyna.l] Move queue handling and initialization and finalization check to preview-controller-base
+  * [irteus/irtdyna.l] Add queue data to preview-controller-base class
+  * [irteus/irtdyna.l] Update state getter methods
+  * [irteus/irtdyna.l] Enable to select queue initalization
+  * [irteus/irtdyna.l] Add extended-preview-control-base class
+  * [irteus/irtdyna.l] Update preview-controller-base updating and add methods for getter.
+  * [demo/walk-motion.l] Update quad sample. Especially in the :go-backward-over nil case, target cog was infeasible
+  * [irteus/demo/sample-robot-model.l] Inrease joint range for shoulder pitch and crotch pitch according to existent real robot joint ranges.
+  * [irteus/irtmodel.l, irteus/irtrobot.l] Do not use lambda function for additional-jacobi and additional-vel by default.
+  * [irteus/demo/walk-motion.l, irteus/test/irteus-demo.l] Add test for both preview-control and extended-preview-control
+  * [irteus/irtdyna.l] Add base class for preview controller which
+    does not include cog and zmp
+
+* irteus/irtgl.l (glvertices)
+
+  * add write-wrl-from-glvertices function
+  * fix glbody, same name of slot veriable and class
+  * add :convert-to-world method to glvertices
+
+* irteus/irtmodel.l
+
+  * [irteus/irtmodel.l] Use dump-command as :fail-only by default.
+  * [irteus/irtmodel.l] Set success flag in one line
+  * [test/test-irt-motion.l] Add unittest for dump-command
+  * [irteus/irtmodel.l] Introduce dump-command as mode according to discussion in https://github.com/euslisp/jskeus/commit/8f9e79e4f24b86cc66fdf3d4bec1a71b878b099e#commitcomment-12334678
+
+* irteus/irtmodel.l closed-loop
+
+  * [irteus/irtmodel.l, irteus/demo/special-joints.l] Add method to calculate velocity for interlocking joint constraint. Use it in sample program.
+  * [irteus/irtrobot.l] Remove unused arguments.
+  * [irteus/irtrobot.l] Reduce too match mass properties calculation.
+  * [demo/closed-loop.l, demo/special-joints.l] Fix print usage style to match demo.l style.
+  * [irteus/demo/demo.l, irteus/test/irteus-demo.l] Add closed-loop sample and special-joint sample to demo.l and unittest.
+  * [irteus/demo/special-joints.l] Add special joints examples. Currently, interlocking joint are defined.
+  * [irteus/irtmodel.l] Add interlocking joint methods.
+  * [irteus/irtrobot.l] Fix additional-vel to argument
+  * add argument cog-null-space. set cog jacobian to additional-jacobi in :fullbody-inverse-kinematics
+  * add arguments additional-jacobi and additional-vel to cascaded-link :inverse-kinematics
+  * [irteus/test/test-irt-motion.l] Add test program for check-collision
+
+* Contributors: Yuki Furuta, Kamada Hitoshi, Kei Okada, Ryohei Ueda, Shunichi Nozawa, Yohei Kakiuchi, Masaki Murooka
+
 1.0.9 (2015-07-09)
 ------------------
 * irtpointcloud.l: impliment :append methods on pointcloud

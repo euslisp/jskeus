@@ -410,6 +410,63 @@ $ (send r :angle-vector (float-vector 30))
 \end{verbatim}
 }
 
+\subsubsection{EusLispにおける順運動学計算}
+
+順運動学計算を行うには，cascaded-corods, bodyset, bodyset-link 各クラ
+スに定義された :worldcoords メソッドを用いる．
+:worldcoords メソッドは，ルートリンクが見つかる（親リンクがなくなる）
+か， スロット変数 changed が nil であるリンク
+（一度順運動学計算を行ったことがある）が見つかるまで
+さかのぼって親リンクの :worldcoords メソッドを呼び出すことで
+順運動学計算を行う．
+その際，スロット変数 changed を nil で上書く．
+したがって，二度目の :worldcoords メソッドの呼び出しでは，一度計算され
+たリンクの順運動学計算は行われず，即座にリンクの位置姿勢情報を取り出す
+ことができる．
+
+また，bodyset-link クラスの :worldcoords メソッドは, level 引数を取る
+ことができ，それが :coords である場合には，リンクのもつ bodies スロット変数
+の順運動学計算は行われない．
+bodies にリンクの頂点を構成する faceset が含まれている場合には，これら
+についての順運動学計算を省略することで大幅な高速化が期待できるだろう．
+なお， level 引数の初期値には，リンクのもつ analysis-level スロット変数
+が用いられるため，常に bodies の順運動学計算を行わない場合は，
+リンクのインスタンス l について
+\verb|(send l :analysis-level :coords)|
+とすればよい．
+
+{\baselineskip=10pt
+\begin{verbatim}
+(defmethod bodyset-link
+  (:worldcoords
+   (&optional (level analysis-level))
+   (case
+    level
+    (:coords (send-message self cascaded-coords :worldcoords))
+    (t       (send-super :worldcoords)))
+   ))
+
+(defmethod bodyset
+  (:worldcoords
+   ()
+   (when changed
+     (send-super :worldcoords)
+     (dolist (b bodies) (send b :worldcoords)))
+   worldcoords))
+
+(defmethod cascaded-coords
+ (:worldcoords  ()      ;calculate rot and pos in the world
+   (when changed
+      (if parent
+          (transform-coords (send parent :worldcoords) self
+worldcoords)
+          (send worldcoords :replace-coords self))
+      (send self :update)
+      (setf changed nil))
+   worldcoords))
+\end{verbatim}
+}
+
 \subsection{ロボットの動作生成}
 
 %% \subsubsection{座標系の表現}
@@ -1454,7 +1511,7 @@ M_{r} \bm{E}_3 & - M_{r} \hat{\bm{p}}_{B\to G}\\
      ;;
      (setq b (body+ (make-cube 10 10 20 :pos #f(0 0 10)) (make-cube 300 300 2)))
      (send b :set-color :white)
-     (setq l1 (instance bodyset-link :init (make-cascoords) :bodies (list b) :name 'l2))
+     (setq l1 (instance bodyset-link :init (make-cascoords) :bodies (list b) :name 'l1))
      (send l1 :assoc l2)
      ;;
      (setq j1 (instance rotational-joint :init :name 'j1
@@ -1880,6 +1937,232 @@ concatenate result-type a bは a bを
 \verb|:look-at-target|は移動中に首の向きを常に対象を見つづけるようにす
 るという指令である．
 
+\subsubsection{inverse-kinematicsのtarget-coordsに関数を指定する例}
+
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.49\columnwidth]{fig/dual-arm-ik.jpg}
+    \caption{Example of Dual Arm InverseKinematics}
+    \labfig{dual-arm-ik}
+  \end{center}
+\end{figure}
+
+:inverse-kinematicsの引数target-coordsは\verb|coordinates|クラス以外に
+\verb|coordinates|クラスを返す関数を指定することができる。
+以下に示すプログラムは2つの腕を利用してカクテルをふる動作を行うものである(\reffig{dual-arm-ik})。
+
+{\baselineskip=10pt
+\begin{verbatim}
+(load "irteus/demo/sample-robot-model.l")
+(setq *robot* (instance sample-robot :init))
+(setq *obj* (make-cylinder 20 100))
+(send *obj* :set-color #f(1 1 0))
+(send *robot* :reset-pose)
+(objects (list *robot* *obj*))
+
+(send *robot* :inverse-kinematics
+      (list (make-coords :pos #f(400 0 0)))
+      :move-target
+      (list (send *robot* :larm :end-coords))
+      :link-list
+      (list (send *robot* :link-list
+                  (send (send *robot* :larm :end-coords) :parent)
+                  (car (send *robot* :larm :links))))
+      :translation-axis (list t)
+      :rotation-axis (list nil))
+
+(let* ((cnt 0.0))
+  (do-until-key
+   (incf cnt 0.1)
+   (send *robot* :inverse-kinematics
+         (list (make-coords :pos (float-vector (+ 400 (* 100 (sin cnt))) (* 50 (cos cnt)) 0))
+               #'(lambda ()
+                   (send (send (send *robot* :larm :end-coords) :copy-worldcoords)
+                         :translate #f(0 0 100) :local)))
+         :move-target
+         (list (send *robot* :larm :end-coords)
+               (send *robot* :rarm :end-coords))
+         :link-list
+         (list (send *robot* :link-list
+                     (send (send *robot* :larm :end-coords) :parent)
+                     (car (send *robot* :larm :links)))
+               (send *robot* :link-list
+                     (send (send *robot* :rarm :end-coords) :parent)
+                     (car (send *robot* :rarm :links))))
+         :translation-axis (list :z t)
+         :rotation-axis (list nil :z))
+   (send *obj* :newcoords (send (send *robot* :larm :end-coords) :copy-worldcoords))
+   (send *irtviewer* :draw-objects)))
+\end{verbatim}
+}
+
+{\baselineskip=10pt
+\begin{verbatim}
+         (list (make-coords :pos (float-vector (+ 400 (* 100 (sin cnt))) (* 50 (cos cnt)) 0))
+               #'(lambda ()
+                   (send (send (send *robot* :larm :end-coords) :copy-worldcoords)
+                         :translate #f(0 0 100) :local)))
+\end{verbatim}
+}
+
+の行で実際にtarget-coordsに関数を指定している。
+この例では、まずカクテルを持つ左手の位置を最初に決める。この時に
+\verb|:translation-axis :z|, \verb|:rotation-axis nil|となっているため、
+z方向の移動量と回転方向は左手の逆運動学の計算に考慮されない。
+そして、決まった左手の位置に対して関数が評価されることで
+手先のlocal座標から見てz方向に100の位置に対して右手の位置が決まる。
+この時、右手の拘束条件は\verb|:translation-axis t|, \verb|:rotation-axis :z|となっ
+ているためz方向、つまりカクテルの長さ方向を軸としてその軸に対する回転は許した条
+件で逆運動学を解くことになる。
+このように、拘束条件を踏まえて逆運動学を解きたい場合にはtarget-coordsを関数とし
+て扱うことが必要になる。
+
+\subsubsection{重心位置を考慮したfullbody-inverse-kinematicsの例}
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.49\columnwidth]{fig/full-body-ik.jpg}
+    \caption{Example of InverseKinematics with root link virtual joint}
+    \labfig{full-body-ik}
+  \end{center}
+\end{figure}
+:fullbody-inverse-kinematicsはロボットの関節に加えてベースリンク仮想ジョイントを駆動した
+逆運動学を解く関数である。以下に示すプログラムは、両足を地面に固定し、重心を両足の上に
+位置させた状態で、左手を目標に到達させる動作を行うものである。
+{\baselineskip=10pt
+\begin{verbatim}
+(load "irteus/demo/sample-robot-model.l")
+(setq *robot* (instance sample-robot :init))
+(send *robot* :reset-pose)
+(setq *obj* (make-cylinder 10 600))
+(send *obj* :rotate pi :x)
+(send *obj* :set-color #f(1 1 0))
+(objects (list *robot* *obj*))
+
+(let* ((rleg-coords (send *robot* :rleg :end-coords :copy-worldcoords))
+       (lleg-coords (send *robot* :lleg :end-coords :copy-worldcoords)))
+  (send *robot* :torso :waist-p :joint-angle 10)
+  (send *robot* :fullbody-inverse-kinematics
+        (list rleg-coords
+              lleg-coords
+              (make-coords :pos (float-vector 400 100 -600)))
+        :move-target
+        (list (send *robot* :rleg :end-coords)
+              (send *robot* :lleg :end-coords)
+              (send *robot* :larm :end-coords))
+        :link-list
+        (list (send *robot* :link-list (send *robot* :rleg :end-coords :parent))
+              (send *robot* :link-list (send *robot* :lleg :end-coords :parent))
+              (send *robot* :link-list (send *robot* :larm :end-coords :parent)))
+        :translation-axis (list t t t)
+        :rotation-axis (list t t nil)
+        :target-centroid-pos (midpoint 0.5
+                                       (send *robot* :rleg :end-coords :worldpos)
+                                       (send *robot* :lleg :end-coords :worldpos))
+        :cog-translation-axis :z)
+  (send *obj* :locate (send *robot* :centroid) :world)
+  (send *irtviewer* :draw-objects))
+\end{verbatim}
+}
+
+{\baselineskip=10pt
+\begin{verbatim}
+(list rleg-coords
+      lleg-coords
+      (make-coords :pos (float-vector 400 100 -600)))
+\end{verbatim}
+}
+の行でtarget-coordsに右足、左足、左手の目標位置姿勢を指定している。
+右足、左足は動かさないため、現在の座標をコピーしたものを与えている。
+このときに、\verb|:translation-axis (list t t t)|, \verb|:rotation-axis (list t t nil)|
+となっているため、右足、左足は位置姿勢を完全に拘束し、左手は姿勢の
+回転は許した条件で逆運動学を解くことになる。
+
+{\baselineskip=10pt
+\begin{verbatim}
+:target-centroid-pos (midpoint 0.5 (send *robot* :rleg :end-coords :worldpos)
+                                   (send *robot* :lleg :end-coords :worldpos))
+:cog-translation-axis :z)
+\end{verbatim}
+}
+の行では重心の逆運動学を指定している。\verb|:cog-translation-axis :z|で
+z方向の重心の移動は許した状態で、\verb|:target-centroid-pos|で目標重心位置として
+両足の中間の座標を与えることによって、重心のxy座標を両足の中間に一致させる
+条件のもとで逆運動学を解くことができる。これらの引数は、デフォルト値になっている
+ので、省略可能である。
+
+\subsubsection{外力を考慮したfullbody-inverse-kinematicsを解く例}
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.49\columnwidth]{fig/static-balance-ik.jpg}
+    \caption{Example of InverseKinematics with external force}
+    \labfig{static-balance-ik}
+  \end{center}
+\end{figure}
+ロボットが外力、外モーメントを受ける場合、外力による足裏まわりのモーメントと
+釣り合うようにロボットの重心をオフセットすることによって、バランスをとることができる。
+以下に示すプログラムは両手に外力、外モーメントが加わる場合に、両手両足を目標の位置に
+到達させかつバランスが取れる姿勢を逆運動学によって求めるものである。
+
+{\baselineskip=10pt
+\begin{verbatim}
+(load "irteus/demo/sample-robot-model.l")
+(setq *robot* (instance sample-robot :init))
+(send *robot* :reset-pose)
+(setq *obj* (make-cylinder 10 600))
+(objects (list *robot*))
+
+(let* ((force-list '(#f(-20 0 0) #f(-20 0 0)))
+       (moment-list '(#f(10 0 0) #f(10 0 0))))
+
+  (send *robot* :fullbody-inverse-kinematics
+        (list (send *robot* :rleg :end-coords :copy-worldcoords)
+              (send *robot* :lleg :end-coords :copy-worldcoords)
+              (make-coords :pos #f(400 -300 0))
+              (make-coords :pos #f(400 300 0)))
+        :move-target (mapcar #'(lambda (x)
+                                 (send *robot* x :end-coords))
+                             (list :rleg :lleg :rarm :larm))
+        :link-list (mapcar #'(lambda (x)
+                               (send *robot* :link-list (send *robot* x :end-coords :parent)))
+                           (list :rleg :lleg :rarm :larm))
+        :centroid-offset-func #'(lambda () (send *robot* :calc-static-balance-point
+                                             :force-list force-list
+                                             :moment-list moment-list))
+        :target-centroid-pos (midpoint 0.5 (send *robot* :rleg :end-coords :worldpos)
+                                            (send *robot* :lleg :end-coords :worldpos))
+        :cog-translation-axis :z)
+  (send *irtviewer* :draw-objects)
+
+  ;; draw force
+  (mapcar
+   #'(lambda (f cc)
+       (let* ((prev-color (send *viewer* :viewsurface :color))
+              (prev-width (send *viewer* :viewsurface :line-width)))
+         (send *viewer* :viewsurface :color #F(1 0.3 1))
+         (send *viewer* :viewsurface :line-width 5)
+         (send *irtviewer* :viewer :draw-arrow
+               (send cc :worldpos)
+               (v+ (send cc :worldpos) (scale 10 f)))
+         (send *viewer* :viewsurface :color prev-color)
+         (send *viewer* :viewsurface :line-width prev-width)))
+   force-list
+   (list (send *robot* :rarm :end-coords)
+         (send *robot* :larm :end-coords)))
+  (send *irtviewer* :viewer :viewsurface :flush)
+  )
+\end{verbatim}
+}
+
+この例では、
+{\baselineskip=10pt
+\begin{verbatim}
+:centroid-offset-func #'(lambda () (send *robot* :calc-static-balance-point
+                                     :force-list force-list
+                                     :moment-list moment-list))
+\end{verbatim}
+}
+の行で外力、外モーメントを考慮している。force-listは右手に作用する外力と左手に作用する外力のリスト、force-listは右手に作用する外モーメントと左手に作用する外モーメントのリストであり、単位はそれぞれ[N]、[Nm]である。:calc-static-balance-pointは、現在の両手の位置に作用する外力外モーメントと現在の重心の位置に作用する重力に対して釣り合う足裏圧力中心の位置を返す関数である。:centroid-offset-funcは\verb|float-vector|クラスを返す関数を指定することができ、現在の重心位置の代わりにこの関数の返り値を用いて目標重心位置との距離を縮める逆運動学を解く。\verb|:cog-translation-axis :z|でz方向の重心の移動は許した状態で\verb|:target-centroid-pos|で目標重心位置として両足の中間の座標を与えることによって、:centroid-offset-funcの返り値、即ち外力に釣り合いがとれる足裏圧力中心のxy座標を、両足の中間に一致させる逆運動学を解くことができる。
+
  \subsection{ロボットモデル}
 
 ロボットの身体はリンクとジョイントから構成されるが、それぞれ
@@ -1902,4 +2185,230 @@ concatenate result-type a bは a bを
  \subsection{環境モデル}
   \input{irtscene-func}
  \subsection{動力学計算・歩行動作生成}
+\subsubsection{歩行動作生成}
+歩行動作は予見制御を用いて生成される。文献\footnote{
+Humanoid Robot (in Japanese), Shuji Kajita, Ohmsha, 2005, ISBN 4-274-20058-2
+}\footnote{
+Biped Walking Pattern Generation by using Preview Control of Zero-Moment Point, Shuji Kajita and Fumio Kanehiro and Kenji Kaneko and Kiyoshi Fujiwara and Kensuke Harada and Kazuhito Yokoi and Hirohisa Hirukawa, ICRA 2003, p.1620-1626, 2006
+}\footnote{
+最適予見制御と一般化予測制御, 江上 正 and土谷 武士, 計測と制御, 39 巻, 5 号, p.337-342, 2000
+}に述べられている式や文章を引用しつつ、説明する。
+
+歩行動作は以下の手順で生成される。
+\begin{enumerate}
+\item 脚の逆運動学が解ける範囲内の歩幅で、ロボットが足をつく位置と時間を計画する。
+\item 地面についていない足は、次につく位置までサイクロイド補間する。
+\item ZMPが地面についている足の位置とできる限り一致するような重心軌道を生成する。
+\item 計画された足と重心の軌道を満たすような関節角度軌道を逆運動学によって逐次求める。
+\end{enumerate}
+ここでは、3の手順について詳しく説明する。
+
+X方向の運動について、始めに次のような制御系を考える。Y方向の運動についても同様に議論することが可能である。
+\begin{eqnarray}
+  && \left\{
+  \begin{array}{l}
+    x_{k+1} = A x_k + b u_k \\
+    p_k = c x_k
+  \end{array}
+  \right. \eqlabel{preview_control}\\
+  && x_k \equiv \left[
+    \begin{array}{c}
+      x(k\Delta t)\\
+      \dot x(k\Delta t)\\
+      \ddot x(k\Delta t)
+    \end{array}
+    \right] ~~~~ u_k \equiv u(k\Delta t) ~~~~ p_k \equiv p(k\Delta t)\nonumber\\
+  && A \equiv \left[
+    \begin{array}{c c c}
+      1 & \Delta t & \Delta t^2 / 2\\
+      0 & 1 & \Delta t\\
+      0 & 0 & 1
+    \end{array}
+    \right] ~~~~ b \equiv \left[
+    \begin{array}{c}
+      \Delta t^3 / 6\\
+      \Delta t^2 / 2\\
+      \Delta t
+    \end{array}
+    \right] ~~~~ c \equiv \left[
+    \begin{array}{c c c}
+      1 & 0 & -z_c/g
+    \end{array}
+    \right]\nonumber
+\end{eqnarray}
+$x$はロボットの重心位置、$u$は重心の加速度の時間微分(jerk)、$p$はZMPである。
+
+次に、このシステムを次のような拡大系に置き換える。
+\begin{eqnarray}
+  && \left\{
+  \begin{array}{l}
+    x^\ast_{k+1} = \tilde{A} x^\ast_k + \tilde{b} \Delta u_k \\
+    p_k = \tilde{c} x^\ast_k
+  \end{array}
+  \right. \eqlabel{extended_preview_control}\\
+  && \Delta u_k \equiv u_k - u_{k-1} ~~~~ \Delta x_k \equiv x_k - x_{k-1} ~~~~ x^\ast_k \equiv \left[
+    \begin{array}{c}
+      p_k\\
+      \Delta x_k
+    \end{array}
+    \right] \nonumber\\
+  && \tilde{A} \equiv \left[
+    \begin{array}{c c}
+      1 & cA\\
+      0 & A
+    \end{array}
+    \right] ~~~~ \tilde{b} \equiv \left[
+    \begin{array}{c}
+      cb\\
+      b
+    \end{array}
+    \right] ~~~~ \tilde{c} \equiv \left[
+    \begin{array}{c c c c}
+      1 & 0 & 0 & 0
+    \end{array}
+    \right]\nonumber
+\end{eqnarray}
+この\eqref{extended_preview_control}のシステムに対して、次のコスト関数を最小化するような制御入力を求める。
+\begin{eqnarray}
+  J_k = \sum_{j=k}^{\infty} \{Q(p_{j}^{ref} - p_{j})^2 + R\Delta u_{j}^2\} \eqlabel{extended_preview_control_costfunc}
+\end{eqnarray}
+これは、以下のようにして求められる。
+まず、十分大きい自然数$M$を用いて次のコスト関数を考え、次に$M \rightarrow \infty$とすることで\eqref{extended_preview_control_costfunc}を最小化する制御入力を得る。
+\begin{eqnarray}
+  J_k^M = \sum_{j=k}^{M-1} \{Q(p_{j}^{ref} - p_{j})^2 + R\Delta u_{j}^2\} \eqlabel{extended_preview_control_costfuncM}
+\end{eqnarray}
+$J_k^M$の最小値を$J_k^{M\ast}$とすると、\eqref{extended_preview_control_costfuncM}から次の関係が成り立つ。
+\begin{eqnarray}
+  J_k^{M\ast} = \min_{\Delta u_k} \{Q(p_k^{ref} - p_k)^2 + R\Delta u_k^2 + J_{k+1}^{M\ast}\}  \eqlabel{extended_preview_control_costfunc2}
+\end{eqnarray}
+ここで、$J_k^{M\ast}$を次のようにおく。
+\begin{eqnarray}
+  J_k^{M\ast} = x_k^{\ast T} P_k^M x_k^\ast + \theta_k^{MT} x_k^\ast + \phi_k^M \eqlabel{extended_preview_control_J}
+\end{eqnarray}
+これを用いて、\eqref{extended_preview_control_costfunc2}の右辺を$\Delta u_k$で偏微分した値が0であることから、次の式を得る。
+\begin{eqnarray}
+  0 = && \frac{\partial}{\partial \Delta u_k} \{ Q(p_k^{ref} - p_k)^2 + R\Delta u_k^2 + (\tilde{A} x^\ast_k + \tilde{b} \Delta u_k)^T P_{k+1}^M (\tilde{A} x^\ast_k + \tilde{b} \Delta u_k) + \theta_{k+1}^{MT} (\tilde{A} x^\ast_k + \tilde{b} \Delta u_k) + \phi_{k+1}^M \} \nonumber\\
+  0 =&& \Delta u_k^T R + \Delta u_k^T \tilde{b}^T P_{k+1}^M \tilde{b} + x_k^{\ast T} \tilde{A}^T P_{k+1}^M \tilde{b} + \frac{1}{2} \theta_{k+1}^{MT} \tilde{b} \nonumber \\
+  \Delta u_k =&& -(\tilde{b}^T P_{k+1}^M \tilde{b} + R )^{-1} \tilde{b}^T P_{k+1}^M \tilde{A} x_k^\ast - \frac{1}{2} (\tilde{b}^T P_{k+1}^M \tilde{b} + R )^{-1} \tilde{b}^T \theta_{k+1}^M\eqlabel{extended_preview_control_u}
+\end{eqnarray}
+これを\eqref{extended_preview_control_costfunc2}に代入することで、以下を得る。
+\begin{eqnarray}
+  && x_k^{\ast T} P_k^M x_k^\ast + \theta_k^{M T} x_k^\ast + \phi_k^M \nonumber \\
+  =&& x_k^{\ast T} (\tilde{c}^T Q \tilde{c} + \tilde{A}^T P_{k+1}^M \tilde{A} - \tilde{A}^T P_{k+1}^M \tilde{b} (\tilde{b}^T P_{k+1}^M \tilde{b} + R )^{-1} \tilde{b}^T P_{k+1}^M \tilde{A}) x_k^\ast \nonumber\\
+  && + \{-2 \tilde{c}^T Q p_k^{ref} + \tilde{A}^T \theta_{k+1}^M - \tilde{A}^T P_{k+1}^M \tilde{b} (\tilde{b}^T P_{k+1}^M \tilde{b} + R )^{-1} \tilde{b}^T \theta_{k+1}^M \}^T x_k^\ast \nonumber\\
+  && + Q p_k^{ref 2} - \frac{1}{4} \theta_{k+1}^{MT} \tilde{b} (\tilde{b}^T P_{k+1}^M \tilde{b} + R )^{-1} \tilde{b}^T \theta_{k+1}^M + \phi_{k+1}^M
+\end{eqnarray}
+これが任意の$x_k^{\ast T}$に対し成り立つので、
+\begin{eqnarray}
+  P_k^M &=& \tilde{c}^T Q \tilde{c} + \tilde{A}^T P_{k+1}^M \tilde{A} - \tilde{A}^T P_{k+1}^M \tilde{b} (\tilde{b}^T P_{k+1}^M \tilde{b} + R )^{-1} \tilde{b}^T P_{k+1}^M \tilde{A} \eqlabel{extended_preview_control_P}\\
+  \theta_k^M &=& -2 \tilde{c}^T Q p_k^{ref} + \{\tilde{A}^T - \tilde{A}^T P_{k+1}^M \tilde{b} (\tilde{b}^T P_{k+1}^M \tilde{b} + R )^{-1} \tilde{b}^T\} \theta_{k+1}^M \eqlabel{extended_preview_control_theta}\\
+  \phi_k^M &=& Q p_k^{ref 2} - \frac{1}{4} \theta_{k+1}^{MT} \tilde{b} (\tilde{b}^T P_{k+1}^M \tilde{b} + R )^{-1} \tilde{b}^T \theta_{k+1}^M + \phi_{k+1}^M
+\end{eqnarray}
+境界条件を考えると、\eqref{extended_preview_control_costfuncM}は$k = M$において$J_{k+M}^{M\ast} = 0$であるから、$k = M$において\eqref{extended_preview_control_J}が任意の$x_{M}^\ast$で恒等的に成り立つ条件を考えて、$P_{M}^M = 0$、$\theta_{M}^M = 0$、$\phi_{M}^M = 0$である。したがって、十分小さい$j$において$P_{k+j}^M$は\eqref{extended_preview_control_P}の定常解$P$となり、次の式を満たす。
+\begin{eqnarray}
+  P &=& \tilde{c}^T Q \tilde{c} + \tilde{A}^T P \tilde{A} - \tilde{A}^T P \tilde{b} (\tilde{b}^T P \tilde{b} + R )^{-1} \tilde{b}^T P \tilde{A} \eqlabel{extended_preview_control_P2}
+\end{eqnarray}
+以後、$M \rightarrow \infty$として考える。自然数$N$を考えて、$j > N$において$p_{k+j}^{ref} = p_{k+N}^{ref}$と仮定すると、\eqref{extended_preview_control_theta}は次のように表せる。(\eqref{extended_preview_control_P2}は十分小さい$j$における$P_{k+j}$でのみ成り立たつが、十分大きな$j$では$(\tilde{A} - \tilde{b} K)^{T j} \rightarrow 0$と仮定し無視した。)($K \equiv (\tilde{b}^T P \tilde{b} + R )^{-1} \tilde{b}^T P \tilde{A}$とおいた。)
+\begin{eqnarray}
+  \theta_k &=& -2 \tilde{c}^T Q p_k^{ref} + (\tilde{A} - \tilde{b} K)^T \theta_{k+1} \nonumber\\
+  &=& -2 \{ \tilde{c}^T Q p_k^{ref} + (\tilde{A} - \tilde{b} K)^T \tilde{c}^T Q p_{k+1}^{ref} + \cdots + (\tilde{A} - \tilde{b} K)^{T N-2} \tilde{c}^T Q p_{k+N-1}^{ref} \nonumber\\
+  & & + (\tilde{A} - \tilde{b} K)^{T N-1} \tilde{c}^T Q p_{k+N}^{ref} + (\tilde{A} - \tilde{b} K)^{T N} \tilde{c}^T Q p_{k+N+1}^{ref} + (\tilde{A} - \tilde{b} K)^{T (N+1)} \tilde{c}^T Q p_{k+N+2}^{ref} + \cdots \} \nonumber \\
+  &=& -2 \{ \tilde{c}^T Q p_k^{ref} + (\tilde{A} - \tilde{b} K)^T \tilde{c}^T Q p_{k+1}^{ref} + \cdots + (\tilde{A} - \tilde{b} K)^{T N-2} \tilde{c}^T Q p_{k+N-1}^{ref} \nonumber\\
+  & & + (\tilde{A} - \tilde{b} K)^{T N-1} \tilde{c}^T Q p_{k+N}^{ref} + (\tilde{A} - \tilde{b} K)^{T N} \tilde{c}^T Q p_{k+N}^{ref} + (\tilde{A} - \tilde{b} K)^{T (N+1)} \tilde{c}^T Q p_{k+N}^{ref} + \cdots \} \nonumber \\
+  &=& -2 \sum_{j=1}^{N-1} \{ (\tilde{A} - \tilde{b} K)^{T j-1} \tilde{c}^T Q p_{k+j}^{ref} \} -2 \sum_{j=N}^{\infty} \{ (\tilde{A} - \tilde{b} K)^{T j-1} \tilde{c}^T Q p_{k+N}^{ref} \}\eqlabel{extended_preview_control_theta2}
+\end{eqnarray}
+ここで\eqref{extended_preview_control_P2}を$K$を用いて表現すると、
+\begin{eqnarray}
+  P &=& \tilde{c}^T Q \tilde{c} + (\tilde{A} - \tilde{b} K)^T P \tilde{A} \eqlabel{extended_preview_control_P3}
+\end{eqnarray}
+が得られる。この両辺に$P \tilde{A}$を加え整理すると、
+\begin{eqnarray}
+  (I - (\tilde{A} - \tilde{b} K)^{T}) P \tilde{A} &=& P (\tilde{A} - I) + \tilde{c}^T Q \tilde{c} \eqlabel{extended_preview_control_P4}
+\end{eqnarray}
+となる。ここで$\tilde{A} = \left[\begin{array}{c c} 1 & cA\\ 0 & A \end{array} \right]$、$\tilde{c} = \left[\begin{array}{c c c c} 1 & 0 & 0 & 0 \end{array} \right]$を利用すると、\eqref{extended_preview_control_P4}の第1列目の等式から、
+\begin{eqnarray}
+  (I - (\tilde{A} - \tilde{b} K)^{T}) P \tilde{c}^T &=& \tilde{c}^T Q \eqlabel{extended_preview_control_P5}
+\end{eqnarray}
+が成り立つ。この\eqref{extended_preview_control_P5}を\eqref{extended_preview_control_theta2}に代入すると、
+\begin{eqnarray}
+  \theta_k &=& -2 \sum_{j=1}^{N-1} \{ (\tilde{A} - \tilde{b} K)^{T j-1} \tilde{c}^T Q p_{k+j}^{ref} \} -2 (\tilde{A} - \tilde{b} K)^{T N-1} P \tilde{c}^T p_{k+N}^{ref} \eqlabel{extended_preview_control_theta3}
+\end{eqnarray}
+を得る。この\eqref{extended_preview_control_theta3}を\eqref{extended_preview_control_u}に代入することで、\eqref{extended_preview_control_costfunc}を最小化する最適制御入力$\Delta u_k$が得られる。
+\begin{eqnarray}
+  \Delta u_k &=& -K x_k^\ast + \sum_{j=1}^N \tilde{f}_j p_{k+j}^{ref}\eqlabel{extended_preview_control_u2}\\
+  \tilde{f}_j &=& \begin{cases}
+    (\tilde{b}^T P \tilde{b} + R )^{-1} \tilde{b}^T (\tilde{A} - \tilde{b} K)^{T j-1} \tilde{c}^T Q & (j<N) \\
+    (\tilde{b}^T P \tilde{b} + R )^{-1} \tilde{b}^T (\tilde{A} - \tilde{b} K)^{T N-1} P \tilde{c}^T & (j=N)
+  \end{cases}\nonumber
+\end{eqnarray}
+初期状態$x_1^\ast$と目標ZMP軌道$p_{1}^{ref},~p_{2}^{ref},~\cdots$が与えられれば、\eqref{extended_preview_control_u2}と\eqref{extended_preview_control}のシステムによって$\Delta u_1,~x_2^\ast,~\Delta u_2,~x_3^\ast,~\cdots$が順次求まる。これによって、ZMPが地面についている足の位置とできる限り一致するような重心軌道を生成することができる。
+
+\subsubsection{歩行動作生成の例}
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.49\columnwidth]{fig/walk-motion.jpg}
+    \caption{Example of walk pattern generation}
+    \labfig{walk-motion}
+  \end{center}
+\end{figure}
+
+\verb|robot-model|クラスには、オフライン歩行動作生成を行い歩行軌道を返す関数:calc-walk-pattern-from-footstep-listが定義されている。この関数は、1歩ごとの足をつく位置のリストを与えると、ZMPがこの位置に出来る限り近くなるような歩行動作を生成する。以下に示すプログラムは、:calc-walk-pattern-from-footstep-listを用いて歩行動作生成を行うものである(\reffig{walk-motion})。
+
+{\baselineskip=10pt
+\begin{verbatim}
+(load "irteus/demo/sample-robot-model.l")
+(setq *robot* (instance sample-robot :init))
+(send *robot* :reset-pose)
+(send *robot* :fix-leg-to-coords (make-coords))
+(objects (list *robot*))
+
+(let ((footstep-list
+       (list (make-coords :coords (send *robot* :rleg :end-coords :copy-worldcoords) :name :rleg)
+             (make-coords :coords (send (send *robot* :lleg :end-coords :copy-worldcoords)
+                                        :translate #f(100 0 0)) :name :lleg)
+             (make-coords :coords (send (send *robot* :rleg :end-coords :copy-worldcoords)
+                                        :translate #f(200 0 0)) :name :rleg)
+             (make-coords :coords (send (send *robot* :lleg :end-coords :copy-worldcoords)
+                                        :translate #f(300 0 0)) :name :lleg)
+             (make-coords :coords (send (send *robot* :rleg :end-coords :copy-worldcoords)
+                                        :translate #f(400 0 0)) :name :rleg)
+             (make-coords :coords (send (send *robot* :lleg :end-coords :copy-worldcoords)
+                                        :translate #f(400 0 0)) :name :lleg))))
+  (objects (append (list *robot*) footstep-list))
+
+  (send *robot* :calc-walk-pattern-from-footstep-list
+        footstep-list
+        :default-step-height 50
+        :default-step-time 1.0
+        :dt 0.1
+        :debug-view t)
+  )
+\end{verbatim}
+}
+変数\verb|footstep-list|に足をつく位置のリストをセットし、:calc-walk-pattern-from-footstep-listに与えている。\verb|footstep-list|の各要素は、\verb|:name|にいずれの脚かを指定する必要がある。\verb|footstep-list|の最初の要素は初期化のために用いられ、実際にロボットが脚を踏み出すのは次の要素以降の位置に対してである。\verb|:default-step-height 50|では遊脚をサイクロイド補間するときの高さを50[mm]に指定している。\verb|:default-step-time 1.0|は一歩あたりの時間を1.0[s]に指定している。\verb|:dt 0.1|は予見制御のサンプリングタイムと生成される軌道の間隔を0.1[s]に指定している。なお、\verb|:default-step-height|、\verb|:default-step-time|、\verb|:dt|はデフォルト値がこの値となっているため、実際にはこれらの値を設定する必要はない。
+
+
+次に示すプログラムは、移動したい目的地を与えると\verb|footstep-list|を自動で生成して歩行動作生成を行うものである。
+{\baselineskip=10pt
+\begin{verbatim}
+(load "irteus/demo/sample-robot-model.l")
+(setq *robot* (instance sample-robot :init))
+(send *robot* :reset-pose)
+(send *robot* :fix-leg-to-coords (make-coords))
+(objects (list *robot*
+               (apply #'midcoords 0.5 (send *robot* :legs :end-coords))
+               (send (send (apply #'midcoords 0.5 (send *robot* :legs :end-coords))
+                           :translate #F(500 150 0)) :rotate (deg2rad 45) :z)))
+
+(send *robot* :calc-walk-pattern-from-footstep-list
+      (send *robot* :go-pos-params->footstep-list
+            500 150 45) ;; x[mm] y[mm] th[deg]
+      :debug-view t
+      )
+\end{verbatim}
+}
+\verb|footstep-list|として\verb|(send *robot* :go-pos-params->footstep-list 500 150 45)|の返り値を与えて、先の例と同様\verb|:calc-walk-pattern-from-footstep-list|関数で歩行動作を生成している。
+
+\verb|:go-pos-params->footstep-list|関数は、2本足で立ったロボットについて、脚の逆運動学が解ける範囲内で現在の位置から目的地までの\verb|footstep-list|を生成する関数であり、ここでは前に500[mm]、左に150[mm]移動し、左に45[deg]体を回転させるような\verb|footstep-list|を生成している。
+
   \input{irtdyna-func}

@@ -15,11 +15,30 @@
 ;;; Workshop on Concurrent Object-based Systems,
 ;;;  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ;;;
-;;; Permission to use this software for educational, research
-;;; and non-profit purposes, without fee, and without a written
-;;; agreement is hereby granted to all researchers working on
-;;; the IRT project at the University of Tokyo, provided that the
-;;; above copyright notice remains intact.  
+;;; Redistribution and use in source and binary forms, with or without
+;;; modification, are permitted provided that the following conditions are met:
+;;;
+;;; * Redistributions of source code must retain the above copyright notice,
+;;;   this list of conditions and the following disclaimer.
+;;; * Redistributions in binary form must reproduce the above copyright notice,
+;;;   this list of conditions and the following disclaimer in the documentation
+;;;   and/or other materials provided with the distribution.
+;;; * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+;;;   (JSK) nor the names of its contributors may be used to endorse or promote
+;;;   products derived from this software without specific prior written
+;;;   permission.
+;;;
+;;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;;; THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;;; PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+;;; CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;;; EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;;; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;;; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;;; WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;;; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+;;; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;;;
 
 (in-package "USER")
@@ -38,9 +57,9 @@
 (defmethod joint
   (:init (&key (name (intern (format nil "joint~A" (sys::address self)) "KEYWORD"))
                ((:child-link clink)) ((:parent-link plink))
-	       (min -90) (max 90)
-	       ((:max-joint-velocity mjv))
-               ((:max-joint-torque mjt))
+	       (min -90) (max 90) ;; use deg/mm unit
+	       ((:max-joint-velocity mjv)) ;; use SI(m/s,rad/s) unit
+               ((:max-joint-torque mjt)) ;; use SI(N,Nm) unit
 	       ((:joint-min-max-table mm-table))
                ((:joint-min-max-target mm-target))
 	       &allow-other-keys)
@@ -76,15 +95,31 @@
    "Returns child link of this joint. if any arguments is set, it is passed to the child-link."
    (user::forward-message-to child-link args))
   (:calc-dav-gain (dav i periodic-time) (warn "subclass's respoinsibility (send ~s :calc-dav-gain)~%" self))
-  (:joint-dof () (warn "subclass's respoinsibility (send ~s :joint-dof)~%" self))
-  (:speed-to-angle (&rest args) (warn "subclass's respoinsibility (send ~s :speed-to-angle)~%" self))
-  (:angle-to-speed (&rest args) (warn "subclass's respoinsibility (send ~s :angle-to-speed)~%" self))
+  (:joint-dof ()
+   "Returns Degree of Freedom of this joint."
+   (warn "subclass's respoinsibility (send ~s :joint-dof)~%" self))
+  (:speed-to-angle (&rest args)
+   "Returns values in deg/mm unit of input value in SI(rad/m) unit."
+   (warn "subclass's respoinsibility (send ~s :speed-to-angle)~%" self))
+  (:angle-to-speed (&rest args)
+   "Returns values in SI(rad/m) unit of input value in deg/mm unit."
+   (warn "subclass's respoinsibility (send ~s :angle-to-speed)~%" self))
   (:calc-jacobian (&rest args) (warn "subclass's respoinsibility (send ~s :calc-jacobian)~%" self))
-  (:joint-velocity (&optional jv) (if jv (setq joint-velocity jv) joint-velocity))
-  (:joint-acceleration (&optional ja) (if ja (setq joint-acceleration ja) joint-acceleration))
-  (:joint-torque (&optional jt) (if jt (setq joint-torque jt) joint-torque))
-  (:max-joint-velocity (&optional mjv) (if mjv (setq max-joint-velocity mjv) max-joint-velocity))
-  (:max-joint-torque (&optional mjt) (if mjt (setq max-joint-torque mjt) max-joint-torque))
+  (:joint-velocity (&optional jv)
+   "If jv is set, it updates joint-velocity of this instance. :joint-velocity returns velocity of this joint in SI(m/s, rad/s) unit."
+   (if jv (setq joint-velocity jv) joint-velocity))
+  (:joint-acceleration (&optional ja)
+   "If ja is set, it updates joint-acceleration of this instance. :joint-acceleration returns acceleration of this joint in SI(m/$s^2$, rad/$s^2$) unit."
+   (if ja (setq joint-acceleration ja) joint-acceleration))
+  (:joint-torque (&optional jt)
+   "If jt is set, it updates joint-torque of this instance. :joint-torque returns torque of this joint in SI(N, Nm) unit."
+   (if jt (setq joint-torque jt) joint-torque))
+  (:max-joint-velocity (&optional mjv)
+   "If mjv is set, it updates min-joint-velocity of this instance. :min-joint-velocity returns velocity of this joint in SI(m/s, rad/s)  unit."
+   (if mjv (setq max-joint-velocity mjv) max-joint-velocity))
+  (:max-joint-torque (&optional mjt)
+   "If mjt is set, it updates min-joint-torque of this instance. :min-joint-torque returns velocity of this joint in SI(N, Nm) unit."
+   (if mjt (setq max-joint-torque mjt) max-joint-torque))
   (:joint-min-max-table (&optional mm-table) (if mm-table (setq joint-min-max-table mm-table) joint-min-max-table))
   (:joint-min-max-target (&optional mm-target) (if mm-target (setq joint-min-max-target mm-target) joint-min-max-target))
   (:joint-min-max-table-angle-interpolate
@@ -219,8 +254,8 @@
      joint-angle))
   (:joint-dof () "Returns DOF of rotational joint, 1." 1)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-scalar self dav i periodic-time))
-  (:speed-to-angle (v) (rad2deg v))
-  (:angle-to-speed (v) (deg2rad v))
+  (:speed-to-angle (v) "Returns degree of given input in radian" (rad2deg v))
+  (:angle-to-speed (v) "Returns radian of given input in degree" (deg2rad v))
   (:calc-jacobian (&rest args) (apply #'calc-jacobian-rotational args))
   )
 
@@ -271,8 +306,8 @@
      joint-angle))
   (:joint-dof () "Returns DOF of linear joint, 1." 1)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-scalar self dav i periodic-time))
-  (:speed-to-angle (v) (* 1000 v))
-  (:angle-to-speed (v) (* 0.001 v))
+  (:speed-to-angle (v) "Returns [mm] of given input in [m]" (* 1000 v))
+  (:angle-to-speed (v) "Returns [m] of given input in [mm]" (* 0.001 v))
   (:calc-jacobian (&rest args) (apply #'calc-jacobian-linear args))
   )
 
@@ -315,10 +350,10 @@
      joint-angle))
   (:joint-dof () "Returns DOF of linear joint, 2." 2)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
-  (:speed-to-angle (dv)
+  (:speed-to-angle (dv) "Returns [mm/deg] of given input in SI unit [m/rad]"
                    (float-vector (* 1000 (elt dv 0))
                                  (rad2deg (elt dv 1))))
-  (:angle-to-speed (dv)
+  (:angle-to-speed (dv) "Returns SI unit [m/rad] of given input in [mm/deg]"
                    (float-vector (* 0.001 (elt dv 0))
                                  (deg2rad (elt dv 1))))
   (:calc-jacobian
@@ -373,11 +408,11 @@
    joint-angle)
   (:joint-dof () "Returns DOF of linear joint, 3." 3)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
-  (:speed-to-angle (dv)
+  (:speed-to-angle (dv) "Returns [mm/deg] of given input in SI unit [m/rad]"
                    (float-vector (* 1000 (elt dv 0))
                                  (* 1000 (elt dv 1))
                                  (rad2deg (elt dv 2))))
-  (:angle-to-speed (dv)
+  (:angle-to-speed (dv) "Returns SI unit [m/rad] of given input in [mm/deg]"
                    (float-vector (* 0.001 (elt dv 0))
                                  (* 0.001 (elt dv 1))
                                  (deg2rad (elt dv 2))))
@@ -416,7 +451,7 @@
                 ((:max-joint-torque mjt)
                  (float-vector 100 100 100)) ;; [Nm] [Nm] [Nm]
 		&allow-other-keys)
-         "Create instance of sphere-joint. min/max are defiend as a region of angular velocity in degree."
+         "Create instance of sphere-joint. min/max are defind as a region of angular velocity in degree."
     (setq axis (list :x :y :z))
     (send-super* :init :min min :max max
                  :max-joint-velocity mjv
@@ -427,26 +462,31 @@
     self)
   (:joint-angle
     (&optional v &key relative &allow-other-keys)
-    "return joint-angle if v is not set, if v is given, set joint angle. v is joint-angle vector by axis-angle representation, i.e (scale rotation-angle-from-default-coords[deg] axis-unit-vector)"
-    ;; v is anguler velocity [deg]
+    "return joint-angle if v is not set, if v is given, set joint angle.
+     v is joint-angle vector [deg] by axis-angle representation, i.e (scale rotation-angle-from-default-coords[deg] axis-unit-vector)"
     (when v
-      ;; if relative nil
-      ;; v is equivalent to orthogonal orientation matrix calculated from (send (send world-default-coords :transformation child-link) :worldrot)
-      (unless relative (setq joint-angle v))
-      (let* ((drot (matrix-exponent (map float-vector #'deg2rad joint-angle))))
-	(if relative
-	    ;; if relative t
-	    ;; v is calculated from difference-rotation or jacobian
-	    (let ((vec (map float-vector #'deg2rad v)))
-	      (unless (eps= (norm vec) 0.0 1e-20)
-		(m* (rotation-matrix (norm vec) (normalize-vector vec)) drot drot))))
-	;; min max check
-	(let* ((dr (map float-vector #'rad2deg (matrix-log drot))))
-	  (setq joint-angle (vmin (vmax dr min-angle) max-angle)))
-	;; update child-link
-	(send child-link :replace-coords default-coords)
-	(send child-link :transform
-	      (make-coords :rot (matrix-exponent (map float-vector #'deg2rad joint-angle))))))
+      ;; Update joint-angle
+      (cond
+       (relative
+        ;; if relative t
+        ;; v is axis-angle difference vector calculated from difference-rotation or jacobian
+        (let ((vec (map float-vector #'deg2rad v)))
+          (unless (eps= (norm vec) 0.0 1e-20)
+            ;; If vec is large, update joint-angle
+            (let ((drot (matrix-exponent (map float-vector #'deg2rad joint-angle))))
+              (m* (rotation-matrix (norm vec) (normalize-vector vec)) drot drot)
+              (setq joint-angle (map float-vector #'rad2deg (matrix-log drot))))
+            )))
+       (t
+        ;; if relative nil
+        ;; v is axis-angle equivalent to orthogonal orientation matrix calculated from (send (send world-default-coords :transformation child-link) :worldrot)
+        (setq joint-angle v)))
+      ;; min max check
+      (setq joint-angle (vmin (vmax joint-angle min-angle) max-angle))
+      ;; update child-link
+      (send child-link :replace-coords default-coords)
+      (send child-link :transform
+            (make-coords :rot (matrix-exponent (map float-vector #'deg2rad joint-angle)))))
     joint-angle)
   (:joint-angle-rpy ;; v and return-value -> [deg] and (float-vector yaw roll pitch)
     (&optional v &key relative)
@@ -461,11 +501,11 @@
     (map float-vector #'rad2deg (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad joint-angle))))))
   (:joint-dof () "Returns DOF of linear joint, 3." 3)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
-  (:speed-to-angle (dv)
+  (:speed-to-angle (dv) "Returns degree of given input in radian"
                    (float-vector (rad2deg (elt dv 0))
                                  (rad2deg (elt dv 1))
                                  (rad2deg (elt dv 2))))
-  (:angle-to-speed (dv)
+  (:angle-to-speed (dv) "Returns radian of given input in degree"
                    (float-vector (deg2rad (elt dv 0))
                                  (deg2rad (elt dv 1))
                                  (deg2rad (elt dv 2))))
@@ -569,29 +609,38 @@
     (&optional v &key relative &allow-other-keys) ;; v [mm] [deg]
     "Return joint-angle if v is not set, if v is given, set joint angle vector, which is 6D vector of 3D translation[mm] and 3D rotation[deg], i.e. (find-if #'(lambda (x) (eq (send (car x) :name) 'sphere-joint)) (documentation :joint-angle))"
     (when v
-      (let (dp drot)
-	;; translation
-	(setq dp (if relative
-		     (v+ (subseq joint-angle 0 3) (subseq v 0 3))
-		   (subseq v 0 3)))
-	(setq dp (vmin (vmax dp (subseq min-angle 0 3)) (subseq max-angle 0 3)))
-	;; rotation
-	(unless relative (dotimes (i 3) (setf (elt joint-angle (+ i 3)) (elt v (+ i 3)))))
-	(setq drot (matrix-exponent (map float-vector #'deg2rad (subseq joint-angle 3 6))))
-	(if relative
-	    (let ((vec (map float-vector #'deg2rad (subseq v 3 6))))
-	      (unless (eps= (norm vec) 0.0 1e-20)
-		(m* (rotation-matrix (norm vec) (normalize-vector vec)) drot drot))))
-	;; min max check
-	(let* ((dr (map float-vector #'rad2deg (matrix-log drot))))
-	  (setq dr (vmin (vmax dr (subseq min-angle 3 6)) (subseq max-angle 3 6)))
-	  (dotimes (i 3)
-	    (setf (elt joint-angle i) (elt dp i))
-	    (setf (elt joint-angle (+ i 3)) (elt dr i)))
-	  ;; update child-link
-	  (send child-link :replace-coords default-coords)
-	  (send child-link :transform
-		(make-coords :rot (matrix-exponent (map float-vector #'deg2rad dr)) :pos dp)))))
+      (let (joint-angle-pos joint-angle-rot)
+        ;; Update joint-angle
+        ;;   translation
+        (setq joint-angle-pos (if relative
+                                  (v+ (subseq joint-angle 0 3) (subseq v 0 3))
+                                (subseq v 0 3)))
+        ;;   rotation
+        (cond
+         (relative
+          ;; if relative t
+          ;; rotation part of v is axis-angle difference vector calculated from difference-rotation or jacobian
+          (let ((vec (map float-vector #'deg2rad (subseq v 3 6))))
+            (if (eps= (norm vec) 0.0 1e-20)
+                (setq joint-angle-rot (subseq joint-angle 3 6))
+              (let ((drot (matrix-exponent (map float-vector #'deg2rad (subseq joint-angle 3 6)))))
+                (m* (rotation-matrix (norm vec) (normalize-vector vec)) drot drot)
+                (setq joint-angle-rot (map float-vector #'rad2deg (matrix-log drot))))
+              )))
+         (t
+          ;; if relative nil
+          ;; rotation part of v is axis-angle equivalent to orthogonal orientation matrix calculated from (send (send world-default-coords :transfor
+          (setq joint-angle-rot (subseq v 3 6))
+          ))
+        (dotimes (i 3)
+          (setf (elt joint-angle i) (elt joint-angle-pos i))
+          (setf (elt joint-angle (+ i 3)) (elt joint-angle-rot i)))
+        ;; min max check
+        (setq joint-angle (vmin (vmax joint-angle min-angle) max-angle))
+        ;; update child-link
+        (send child-link :replace-coords default-coords)
+        (send child-link :transform
+              (make-coords :rot (matrix-exponent (map float-vector #'deg2rad joint-angle-rot)) :pos joint-angle-pos))))
     joint-angle)
   (:joint-angle-rpy ;; v and return-value -> [deg] and (float-vector yaw roll pitch)
     (&optional v &key relative)
@@ -610,14 +659,14 @@
 		 (map float-vector #'rad2deg (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad (subseq joint-angle 3 6))))))))
   (:joint-dof () "Returns DOF of linear joint, 6." 6)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
-  (:speed-to-angle (dv)
+  (:speed-to-angle (dv) "Returns [mm/deg] of given input in SI unit [m/rad]"
                    (float-vector (* 1000 (elt dv 0))
                                  (* 1000 (elt dv 1))
                                  (* 1000 (elt dv 2))
                                  (rad2deg (elt dv 3))
                                  (rad2deg (elt dv 4))
                                  (rad2deg (elt dv 5))))
-  (:angle-to-speed (dv)
+  (:angle-to-speed (dv) "Returns SI unit [m/rad] of given input in [mm/deg]"
                    (float-vector (* 0.001 (elt dv 0))
                                  (* 0.001 (elt dv 1))
                                  (* 0.001 (elt dv 2))
@@ -747,7 +796,10 @@
      (send (send j :child-link) :add-parent-link (send j :parent-link))
      (send (send j :parent-link) :add-child-links (send j :child-link))
      )
-   (send self :update-descendants))
+   (send self :update-descendants)
+   ;; Make default collision shape
+   (dolist (l (send self :links)) (send l :make-collisionmodel))
+   )
   (:links (&rest args) "Returns links, or args is passed to links" (user::forward-message-to-all links args))
   (:joint-list (&rest args) "Returns joint list, or args is passed to joints" (user::forward-message-to-all joint-list args))
   (:link (name) "Return a link with given name." (find name links :test #'equal :key #'(lambda (x) (send x :name))))
@@ -776,16 +828,16 @@
              ;; currently only 1dof joint is supported
              (when (and (= (send j :joint-dof) 1) (= (send (send j :joint-min-max-target) :joint-dof) 1))
                ;; find index of joint-min-max-target
-               (let* ((ii 0) (jj (elt joint-list ii))
+               (let* ((ii 0) (jj (elt joint-list ii)) (ji 0)
                      tmp-joint-angle tmp-joint-min-angle tmp-joint-max-angle
                      tmp-target-joint-angle tmp-target-joint-min-angle tmp-target-joint-max-angle)
                  (while (not (eq jj (send j :joint-min-max-target)))
-                   (incf ii) (setq jj (elt joint-list ii)))
-                 (setq tmp-joint-angle (elt vec i) tmp-target-joint-angle (elt vec ii))
+                   (incf ii) (incf ji (send jj :joint-dof)) (setq jj (elt joint-list ii)))
+                 (setq tmp-joint-angle (elt vec i) tmp-target-joint-angle (elt vec ji))
                  (setq tmp-joint-min-angle (send j :joint-min-max-table-min-angle tmp-target-joint-angle)
                        tmp-joint-max-angle (send j :joint-min-max-table-max-angle tmp-target-joint-angle))
-                 (setq tmp-target-joint-min-angle (send j :joint-min-max-table-min-angle tmp-joint-angle)
-                       tmp-target-joint-max-angle (send j :joint-min-max-table-max-angle tmp-joint-angle))
+                 (setq tmp-target-joint-min-angle (send jj :joint-min-max-table-min-angle tmp-joint-angle)
+                       tmp-target-joint-max-angle (send jj :joint-min-max-table-max-angle tmp-joint-angle))
                  (cond ((<= tmp-joint-min-angle tmp-joint-angle tmp-joint-max-angle) ;; ok
                         ;; force change joint-angle to avoid problem
                         (setq (j . joint-angle) tmp-joint-angle
@@ -796,8 +848,8 @@
                             ((> i 1))
                           (setq tmp-joint-min-angle (send j :joint-min-max-table-min-angle tmp-target-joint-angle)
                                 tmp-joint-max-angle (send j :joint-min-max-table-max-angle tmp-target-joint-angle))
-                          (setq tmp-target-joint-min-angle (send j :joint-min-max-table-min-angle tmp-joint-angle)
-                                tmp-target-joint-max-angle (send j :joint-min-max-table-max-angle tmp-joint-angle))
+                          (setq tmp-target-joint-min-angle (send jj :joint-min-max-table-min-angle tmp-joint-angle)
+                                tmp-target-joint-max-angle (send jj :joint-min-max-table-max-angle tmp-joint-angle))
 
                           (if (< tmp-joint-angle tmp-joint-min-angle)
                               (incf tmp-joint-angle (* (- tmp-joint-min-angle tmp-joint-angle) i)))
@@ -811,7 +863,7 @@
                         (setq (j . joint-angle) tmp-joint-angle
                               (jj . joint-angle) tmp-target-joint-angle)
                         (setf (elt vec i) tmp-joint-angle)
-                        (setf (elt vec ii) tmp-target-joint-angle)
+                        (setf (elt vec ji) tmp-target-joint-angle)
                         )
                        );; cond
                );; let*
@@ -884,7 +936,7 @@
      (when overwrite-collision-model
        (setf (get l0 :pqpmodel) nil)    
        (setf (get l1 :pqpmodel) nil)
-       (pqp-collision-check l0 l1 geo::PQP_FIRST_CONTACT :fat fat :fat2 fat2))
+       (collision-check l0 l1 geo::PQP_FIRST_CONTACT :fat fat :fat2 fat2))
 
      (send self :make-min-max-table-using-collision-check
            l0 l1 joint0 joint1 joint-range0 joint-range1 min-joint0 min-joint1 fat fat2 debug margin)
@@ -916,7 +968,7 @@
                   ((and (eq flag :free) (/= (mod i skip-count) 0) (<= i (- joint-range0 skip-count)))
                    (setq c t))
                   (t
-                   (setq c (= (pqp-collision-check l0 l1 geo::PQP_FIRST_CONTACT :fat fat :fat2 fat2) 0))
+                   (setq c (= (collision-check l0 l1 geo::PQP_FIRST_CONTACT :fat fat :fat2 fat2) 0))
                    (cond 
                     ((and (eq flag :low-limit) c) 
                      (setq flag :free))
@@ -1084,13 +1136,22 @@
 	      (tmp-v3b (instantiate float-vector 3))
 	      (tmp-m33 (make-matrix 3 3))
 	      &allow-other-keys)
-   "Calculate jacobian matrix from link-list and move-target. Unit system is [m] or [rad], not [mm] or [deg]."
+   "Calculate jacobian matrix from link-list and move-target. Jacobian is represented in :transform-coords. Unit system is [m] or [rad], not [mm] or [deg].
+   Joint order for this jacobian matrix follows link-list order. Joint torque[Nm] order is also the same.
+    Ex1. One-Arm
+    (setq *rarm-link-list* (send *robot* :link-list (send *robot* :rarm :end-coords :parent)))
+    (send-all *rarm-link-list* :joint)
+    Ex2. Two-Arm
+    (setq *arms-link-list* (mapcar #'(lambda (l) (send *robot* :link-list (send *robot* l :end-coords :parent))) '(:rarm :larm)))
+    (send-all (send *robot* :calc-union-link-list *arms-link-list*) :joint)
+   "
    (let* (len ul row
 	  child-reverse union-link-list
-	  j)
+	  j jdim)
      (unless fik (setq fik (make-matrix dim fik-len)))
 ;;
      (setq union-link-list (send self :calc-union-link-list link-list))
+     (setq jdim (send self :calc-target-joint-dimension union-link-list))
      (if (atom (car link-list)) (setq link-list (list link-list)))
      (if (atom move-target) (setq move-target (list move-target)))
      (if (atom transform-coords) (setq transform-coords (list transform-coords)))
@@ -1099,7 +1160,7 @@
 ;;
      (do ((col col-offset (+ col (send j :joint-dof)))
 	  (i 0 (1+ i)))
-         ((>= col (+ col-offset (send self :calc-target-joint-dimension union-link-list))))
+         ((>= col (+ col-offset jdim)))
        (setq ul (elt union-link-list i) row 0)
        (dotimes (m (length link-list))
          (let ((link-list (elt link-list m))
@@ -1228,15 +1289,16 @@
         (warn "collision-links : ~A~%" (send-all collision-links :name))
         (warn "parnet-links    : ~A~%" (send-all parent-links :name)))
       (dolist (link-list link-lists)
+        ;; https://github.com/euslisp/jskeus/issues/459
+        ;; originally introduced in https://github.com/euslisp/jskeus/commit/b0e3b482f8469241b2bfd9e9c607c19542b4d234
+        ;; heuristics to skip adjacent links with same axis
         (setq valid-link-list
-	      (if (= (length link-list) 1)
-		  link-list
-		(subseq
-		 link-list
-		 (let ((i 1))
-		   (while (eps= (distance (send (elt link-list 0) :worldpos)
-					  (send (elt link-list i) :worldpos)) 0.0)
-		     (incf i)) i))))
+              (subseq  ;; returns link-list when it's length is 1
+               link-list
+               (do ((i 1 (1+ i)))
+                   ((not (and (< i (1- (length link-list)))
+                              (eps= (distance (send (elt link-list 0) :worldpos)
+                                              (send (elt link-list i) :worldpos)) 0.0))) (1- i)))))
         (setq index-links
               (mapcar #'(lambda (l) (position l valid-link-list)) collision-links))
         (when (and debug (not (memq :no-message debug)))
@@ -1266,11 +1328,11 @@
    (&rest args
 	  &key union-link-list (warnp t)
           ((:collision-avoidance-link-pair pair-list))
+          ((:collision-distance-limit distance-limit) 10) ;; [mm]
 	  &allow-other-keys)
    (let* ((pair-len (length pair-list))
 	  (col-list (send self :get :collision-distance))
-	  (distance-limit 10)
-	  (sc 0.0) np pair)
+          np pair)
      (when (or (null union-link-list) (= pair-len 0))
        (return-from :collision-avoidance-calc-distance nil))
      (if (or (null col-list) (/= (length col-list) pair-len))
@@ -1284,7 +1346,7 @@
 	     (setf (elt col-list i) nil)
 	     )
 	 (progn
-	   (setq np (nconc (pqp-collision-distance (car pair) (cadr pair) :qsize 2) (list (float-vector 0 0 0) i)))
+	   (setq np (nconc (collision-distance (car pair) (cadr pair) :qsize 2) (list (float-vector 0 0 0) i)))
 	   (if (<= (car np) distance-limit)
 	       (progn
 		 (if (and warnp (< (car np) 1.0))
@@ -1297,6 +1359,12 @@
 	       (setf (elt col-list i) np)))
            (scale 0.001 (normalize-vector (v- (elt np 1) (elt np 2) (elt np 3)) (elt np 3)) (elt np 3))
 	   ))) ;; dotimes
+     ;; Element of "col-list" (variable "np") is list of:
+     ;;   distance-between-pair1<->pair2
+     ;;   nearest-point-on-pair1
+     ;;   nearest-point-on-pair2
+     ;;   direction-vector-from-p2->p1
+     ;;   index-of-this-pair-within-collision-avoidance-link-pair
      (sort col-list #'<= #'(lambda (p) (car p)))
      (send self :put :collision-distance col-list)
      t))
@@ -1371,7 +1439,6 @@
             &allow-other-keys)
    (send* self :collision-avoidance-calc-distance args)
    (let ((pair-len (length pair-list)) (n 0)
-         (min-distance (car (elt (send self :get :collision-distance) 0)))
          (dav-col (instantiate float-vector fik-len)))
      (send self :put :collision-pair-list pair-list)
      (if (atom (car link-list)) (setq link-list (list link-list)))
@@ -1620,7 +1687,7 @@
           (null-space) (debug-view)
           (additional-nspace-list) ;; (list (list link1 var1) (list link2 var2) ...) ;; var is value or function (lambda)
 	  ;; if user wants to use cog-jacobian as null-space, please set cog-gain(> 0.0) and target-centroid-pos
-	  (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
+	  (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
           (weight (fill (instantiate float-vector fik-len) 1.0))
           (update-mass-properties t)
           (tmp-nspace (instantiate float-vector fik-len)))
@@ -1629,13 +1696,15 @@
           (send self :calc-nspace-from-joint-limit
                 avoid-nspace-gain union-link-list weight debug-view tmp-nspace))
     ;; add null-space from cog-jacobian
-    (if (and (> cog-gain 0.0) target-centroid-pos)
-	(setq tmp-nspace
-	      (v+ (send self :cog-jacobian-balance-nspace union-link-list
-			:weight weight :centroid-offset-func centroid-offset-func
-                        :update-mass-properties update-mass-properties
-			:target-centroid-pos target-centroid-pos :cog-gain cog-gain :translation-axis cog-translation-axis)
-		  tmp-nspace tmp-nspace)))
+    ;;   when cog-null-space is nil, null-space from cog-jacobian is not added
+    (when cog-null-space
+      (if (and (> cog-gain 0.0) target-centroid-pos)
+          (setq tmp-nspace
+                (v+ (send self :cog-jacobian-balance-nspace union-link-list
+                          :weight weight :centroid-offset-func centroid-offset-func
+                          :update-mass-properties update-mass-properties
+                          :target-centroid-pos target-centroid-pos :cog-gain cog-gain :translation-axis cog-translation-axis)
+                    tmp-nspace tmp-nspace))))
     ;; add null-space from arguments
     (dolist (ls additional-nspace-list)
       (let ((ll-pos (position (car ls) union-link-list :test #'equal)))
@@ -1670,7 +1739,7 @@
               (avoid-collision-joint-gain 1.0)
               ((:collision-avoidance-link-pair pair-list)
                (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args)) :debug (cadr (memq :debug-view args))))
-	      (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
+	      (cog-gain 0.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
               (additional-weight-list) (additional-nspace-list)
               (tmp-len (instantiate float-vector fik-len))
               (tmp-len2 (instantiate float-vector fik-len))
@@ -1679,7 +1748,41 @@
               (tmp-mcc (make-matrix fik-len fik-len))
               (tmp-mcc2 (make-matrix fik-len fik-len))
               (debug-view) (jacobi)
-	    &allow-other-keys)
+              &allow-other-keys)
+   ":move-joints-avoidance is called in :inverse-kinematics-loop. In this method, calculation of joint position difference are executed and joint positon are moved.
+    Optional arguments:
+    ~ :weight
+    ~~ float-vector of inverse weight of velocity of each joint or a function which returns the float-vector or a list which returns the float-vector. Length of the float-vector should be same as the number of columns of the jacobian. If :weight is a function or a list, it is called in each IK loop as (funcall weight union-link-list) or (eval weight). :weight is used in calculation of weighted norm of joint velocity for sr-inverse. Default is the float-vector filled with 1.
+    ~ :null-space
+    ~~ float-vector of joint velocity or a function which returns the float-vector or a list which returns the float-vector. Length of the float-vector should be same as the number of columns of the jacobian. If :null-space is a function or a list, it is called in each IK loop as (funcall null-space) or (eval null-space). This joint velocity is applied in null space of main task in each IK loop. Default is nil.
+    ~ :avoid-nspace-gain
+    ~ gain of joint velocity to avoid joint limit applied in null space of main task in each IK loop. The avoiding velocity is calculated as $(((t_max + t_min)/2 - t) / ((t_max - t_min)/2))^2$. Default is 0.01.
+    ~ :avoid-weight-gain
+    ~~ gain of dH/dt in calcuration of avoiding joint limits weight. :weight is devided by this avoiding joint limits weight. Default is 1.0.
+    ~~ If :avoid-nspace-gain is 0, :weight is multipled by :weight instead.
+    ~ :avoid-collision-distance
+    ~~ yellow zone. 0.1avoid-collision-distance is regarded as orange zone.
+    ~~ If :avoid-collision-joint-gain is smaller than or equal to 0.0, yellow zone and orange zone become inactive. Default is 200[mm].
+    ~ :avoid-collision-null-gain
+    ~~ $k_{null}$. Default is 1.0.
+    ~ :avoid-collision-joint-gain
+    ~~ $k_{joint}$. Default is 1.0.
+    ~ :collision-avoidance-link-pair
+    ~~ (list (list link1 link2) (list link3 link4) ...) with any length. Collision between paired links is cared. Default is (send self :collision-avoidance-link-pair-from-link-list link-list :obstacles (cadr (memq :obstacles args))).
+    ~ :additional-weight-list
+    ~~ (list (list target-link1 additional-weight1) (list target-link2 additional-weight2) ...) with any length. The component of :weight corresponding to the parent joint of target-link is scaled by additional-weight. additional-weight should be float (if 1 dof), float-vector with length of the joint dof, or a function which returns the float or float-vector. if additional-weight is a function, it is called in each IK loop as (funcall additional-weight). Default is nil.
+    ~ :additional-nspace-list
+    ~~ (list (list target-link1 var1) (list target-link2 var2) ...) with any length. In each IK loop, the parent joint of target-link is moved by the amount of var in null space of main task. var should be float (if 1dof), float-vector with the same length of the target joint dof, or a function which returns the float or float-vector.If var is float-vector, it is called in each IK loop as (funcall var). Default is nil.
+    ~ other-keys
+    ~~ :manipulability-limit
+    ~~~ If manipulability of jacobian is smaller than manipulability-limit, diagonal matrix is added in calculation of sr-inverse. Default is 0.1.
+    ~ :manipulability-gain
+    ~~ Weight of diagonal matrix in calculation of sr-inverse. Weight is calculated as (* manipulability-gain (expt (- 1.0 (/ manipulability manipulability-limit)) 2)). Default is 0.001.
+    ~~ :collision-distance-limit
+    ~~~ Threshold for collision detection. If collision is detected, the distance between the colliding links is considered to be :collision-distance-limit instead of actual distance. Default is 10[mm].
+    ~~ :move-joints-hook
+    ~~~ A function which is called right after joints are moved in each IK loop as (funcall move-joints-hook). Default is nil.
+   "
    (let* (joint-angle-limit-nspace
 	  dav dtheta 
           null-space-collision-avoidance
@@ -1781,7 +1884,7 @@
            (send self :calc-inverse-kinematics-nspace-from-link-list
                  link-list :union-link-list union-link-list
                  :avoid-nspace-gain avoid-nspace-gain :debug-view debug-view
-		 :cog-gain cog-gain :target-centroid-pos target-centroid-pos :centroid-offset-func centroid-offset-func
+		 :cog-gain cog-gain :target-centroid-pos target-centroid-pos :centroid-offset-func centroid-offset-func :cog-null-space cog-null-space
                  :update-mass-properties nil
                  :cog-translation-axis cog-translation-axis
                  :weight weight :fik-len fik-len :null-space null-space :tmp-nspace tmp-nspace
@@ -1819,10 +1922,11 @@
      t))
   ;;
   (:inverse-kinematics-args
-   (&rest args &key union-link-list rotation-axis translation-axis
+   (&rest args &key union-link-list rotation-axis translation-axis additional-jacobi-dimension
           &allow-other-keys)
    (let* ((c (send self :calc-target-joint-dimension union-link-list))
-          (r (send self :calc-target-axis-dimension rotation-axis translation-axis))
+          ;; add dimensions of additonal-jacobi
+          (r (+ (send self :calc-target-axis-dimension rotation-axis translation-axis) additional-jacobi-dimension))
           (fik (make-matrix r c))
           (ret (make-matrix c r))
           (wmat (make-matrix c c))
@@ -1909,9 +2013,14 @@
               (when (and (derivedp obj bodyset-link)
                          (eq (send obj :analysis-level) :coords))
                 (send-all (obj . geo::bodies) :worldcoords))
-              (dolist (e (cdr (send obj :edges)))
-                (send *viewer* :viewsurface :3d-line
-                      (e . pvert) (e . nvert) :depth-test t))))
+              (if (derivedp obj bodyset-link)
+                  (dolist (b (send obj :bodies))
+                    (dolist (e (cdr (send b :edges)))
+                      (send *viewer* :viewsurface :3d-line
+                            (e . pvert) (e . nvert) :depth-test t)))
+                  (dolist (e (cdr (send obj :edges)))
+                    (send *viewer* :viewsurface :3d-line
+                          (e . pvert) (e . nvert) :depth-test t)))))
           )
         (send *viewer* :viewsurface :line-width pwidth)
         (send *viewer* :viewsurface :point-size psize)
@@ -1940,24 +2049,40 @@
     target-coords                 ;required for debug-view
     (jacobi)
     (additional-check)
-    (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
+    (additional-jacobi) (additional-vel)
+    ;; Cog convergence params
+    (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil) (cog-gain 1.0)
     (min-loop (/ stop 10))
     debug-view ik-args
     &allow-other-keys)
    ":inverse-kinematics-loop is one loop calculation for :inverse-kinematics.
     In this method, joint position difference satisfying workspace difference (dif-pos, dif-rot) are calculated and euslisp model joint angles are updated.
     Optional arguments:
-     :additional-check
-       This argument is to add optional best-effort convergence conditions.
-       :additional-check should be function or lambda.
-       best-effort => In :inverse-kinematics-loop, 'success' is overwritten by '(and success additional-check)'
-                      In :inverse-kinematics, 'success is not overwritten.
-                      So, :inverse-kinematics-loop wait until ':additional-check' becomes 't' as possible,
-                      but ':additional-check' is neglected in the final :inverse-kinematics return.
-     :min-loop
-       Minimam loop count (nil by default).
-       If integer is specified, :inverse-kinematics-loop does returns :ik-continues and continueing solving IK.
-       If min-loop is nil, do not consider loop counting for IK convergence.
+    ~ :dif-pos-ratio
+    ~~ Ratio of spacial velocity used in calculation of joint position difference to workspace difference (after :p-limit applied). Default is 1.0.
+    ~ :dif-rot-ratio
+    ~~ Ratio of angular velocity used in calculation of joint position difference to workspace difference (after :r-limit applied). Default is 1.0.
+    ~ :jacobi
+    ~~ A jacobian of all move-target or a function that returns the jacobian. When a function is given, It is called in every IK loop as (funcall jacobi link-list move-target translation-axis rotation-axis). Default is (send* self :calc-jacobian-from-link-list link-list :translation-axis translation-axis :rotation-axis rotation-axis :move-target move-target method-args).
+    ~ :additional-check
+    ~~ This argument is to add optional best-effort convergence conditions. Default is nil (no additional check). :additional-check should be function or lambda.
+    ~~ best-effort =>
+    ~~~ In :inverse-kinematics-loop, 'success' is overwritten by '(and success additional-check)'
+    ~~~ In :inverse-kinematics, 'success is not overwritten.
+    ~~~ So, :inverse-kinematics-loop wait until ':additional-check' becomes 't' as possible,
+    ~~~ but ':additional-check' is neglected in the final :inverse-kinematics return.
+    ~ :cog-gain
+    ~~ Ratio of centroid velocity used in calculation of joint position difference to centroid position difference. max 1.0. Default is 1.0.
+    ~ :min-loop
+    ~~ Minimam loop count. Defalt (/ stop 10).
+    ~~ If integer is specified, :inverse-kinematics-loop does returns :ik-continues and continuing solving IK.
+    ~~ If min-loop is nil, do not consider loop counting for IK convergence.
+    ~ other-keys
+    ~~ :move-joints-avoidance is internally called and args are passed to it. See the explanation of :move-joints-avoidance.
+    ~~ :p-limit
+    ~~~ Maximum spacial velocity of each move-target in one IK loop. Default is 100.0[mm].
+    ~~ :r-limit
+    ~~~ Maximum angular velocity of each move-target in one IK loop. Default is 0.5[rad].
     "
    (if target-centroid-pos (send self :update-mass-properties))
    ;; dif-pos, dif-rot, move-target, rotation-axis, translation-axis, link-list
@@ -1978,7 +2103,7 @@
 	   (send *viewer* :viewsurface :clear))
        (if (atom (car link-list)) (setq link-list (list link-list)))
        (if (atom move-target) (setq move-target (list move-target)))
-       (if (atom target-coords) (setq target-coords (list target-coords)))
+       (if (or (atom target-coords) (functionp target-coords)) (setq target-coords (list target-coords)))
        (if (atom dif-pos) (setq dif-pos (list dif-pos)))
        (if (atom dif-rot) (setq dif-rot (list dif-rot)))
        (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
@@ -1988,11 +2113,13 @@
        ;; argument check
        (unless (= (length translation-axis) (length rotation-axis)
                   (length move-target) (length link-list)
-                  (length dif-pos) (length dif-rot))
-         (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A dif-pos ~A dif-rot ~A~%"
+                  (length dif-pos) (length dif-rot)
+                  (length thre) (length rthre))
+         (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A dif-pos ~A dif-rot ~A thre ~A rthre ~A~%"
                (length translation-axis) (length rotation-axis)
                (length move-target) (length link-list)
-               (length dif-pos) (length dif-rot))
+               (length dif-pos) (length dif-rot)
+               (length thre) (length rthre))
          (return-from :inverse-kinematics-loop :ik-continues))
 
        (if (memq :tmp-dims ik-args)
@@ -2027,7 +2154,7 @@
 		   rotation-axis translation-axis thre rthre
 		   centroid-thre target-centroid-pos centroid-offset-func cog-translation-axis
                    :update-mass-properties nil))
-       (if (and additional-check success)
+       (if additional-check
            (setq success (and success (funcall additional-check))))
 
        ;; calculation of move-coords velocities from vel-p and vel-r
@@ -2044,15 +2171,61 @@
                    (* 1000.0 (norm vel-p)) (elt thre i) (norm vel-r) (elt rthre i)))
            (dotimes (j (length vel-p)) (setf (elt tmp-dim j) (* dif-pos-ratio (elt vel-p j))))
            (dotimes (j (length vel-r)) (setf (elt tmp-dim (+ j (length vel-p))) (* dif-rot-ratio (elt vel-r j))))
+           (when (send self :get :ik-target-error)
+             (push (list vel-p vel-r) (cdr (assoc (read-from-string (format nil ":target-~d" i)) (send self :get :ik-target-error)))))
            ))
        (dotimes (i (length tmp-dims))
          (dotimes (j (length (elt tmp-dims i)))
            (setf (elt tmp-dim (+ j vec-count)) (elt (elt tmp-dims i) j)))
          (incf vec-count (length (elt tmp-dims i))))
        
+       ;; Use cog jacobian as first task
+       (when (and (not cog-null-space) target-centroid-pos)
+         (setq additional-jacobi
+               (append (list (send self :calc-cog-jacobian-from-link-list
+                                   :update-mass-properties nil
+                                   :link-list union-link-list
+                                   :translation-axis cog-translation-axis))
+                       additional-jacobi))
+         (let ((tmp-cog-gain (if (> cog-gain 1.0) 1.0 cog-gain)))
+           (setq additional-vel
+                 (append (list
+                          (send self :calc-vel-for-cog tmp-cog-gain cog-translation-axis target-centroid-pos
+                                :centroid-offset-func centroid-offset-func
+                                :update-mass-properties nil))
+                         additional-vel))
+           (when (send self :get :ik-target-error)
+             (push (car additional-vel) (cdr (assoc :centroid (send self :get :ik-target-error)))))
+           ))
+       ;; append additional-jacobi and additional-vel
+       (let (add-vel-list (row0) add-vel add-jacobi)
+         (when additional-jacobi
+           (setq add-vel-list (mapcar #'(lambda (x) (if (functionp x) (funcall x link-list) x)) additional-vel))
+           (setq row0 (- (length tmp-dim) (reduce #'+ (mapcar #'length add-vel-list))))
+           (dotimes (i-add-jacobi (length additional-jacobi))
+             (setq add-jacobi (elt additional-jacobi i-add-jacobi))
+             (setq add-jacobi (if (functionp add-jacobi) (funcall add-jacobi link-list) add-jacobi))
+             (setq add-vel (elt add-vel-list i-add-jacobi))
+             (dotimes (i-row (array-dimension add-jacobi 0))
+               ;; set additional-jacobi
+               (dotimes (i-col (array-dimension jacobi 1))
+                 (setf (aref jacobi (+ row0 i-row) i-col) (aref add-jacobi i-row i-col)))
+               (setf (elt tmp-dim (+ row0 i-row)) (elt add-vel i-row))
+               )
+             (setq row0 (+ row0 (length add-vel)))
+             (when (and debug-view (not (memq :no-message debug-view)))
+               (format-array add-jacobi (format nil "add-J~a    :" i-add-jacobi))
+               (format-array add-vel (format nil "add-v~a    :" i-add-jacobi)))
+             (when (send self :get :ik-target-error)
+               (if (and (not cog-null-space) target-centroid-pos (/= i-add-jacobi 0)) ;; First additional-vel is for COG, so neglect
+                   (push (car additional-vel) (cdr (assoc (read-from-string (format nil ":additional-~d" (- i-add-jacobi 1))) (send self :get :ik-target-error))))))
+             )))
+
        ;; check loop end
        (if success
-           :ik-succeed
+           (progn
+             (send self :put :ik-draw-on-params nil) ;; Clear :ik-draw-on-params
+             :ik-succeed)
          (progn
            (when (and debug-view (not (memq :no-clear debug-view)) *viewer*)
              (send *viewer* :viewsurface :clear))
@@ -2065,6 +2238,12 @@
                           :jacobi jacobi :debug-view debug-view
                           ;; buffer for calculation
                           method-args)
+           ;; Visualizaion for :inverse-kinematics-loop. In :inverse-kinematics-loop,
+           ;;   1. Calculate of current value and target value
+           ;;   2. Solve inverse kinematics, update robot state, and update robot's viewer state
+           ;;   3. Add current value and target value viewer draw-on information.
+           ;;   4. Call (send *viewer* :viewsurface :flush) and everything are displayed.
+           ;;   For 3, we need to store information of 1 through :draw-collision-debug-view or :ik-draw-on-params
            (when (and debug-view  *viewer*)
              (send *viewer* :draw-objects :clear nil :flush nil)
              ;;
@@ -2076,9 +2255,10 @@
                  (send (elt target-coords i) :draw-on :flush nil :color #f(1 0 0))))
              (dolist (p (send self :get :ik-draw-on-params))
                (send* (car p) :draw-on :flush nil (cdr p)))
-             (send self :put :ik-draw-on-params nil)
              (if (not (memq :no-flush debug-view)) (send *viewer* :viewsurface :flush))
+             (x::window-main-one)
              )
+           (send self :put :ik-draw-on-params nil) ;; Clear :ik-draw-on-params
            :ik-continues)
          )
        ))
@@ -2102,12 +2282,69 @@
                           ((atom move-target) (deg2rad 1))
                           (t (make-list (length move-target) :initial-element (deg2rad 1)))))
                   (union-link-list)
-		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z)
-		  (dump-command t) (periodic-time 0.5) ;; [s]
+		  (centroid-thre 1.0) (target-centroid-pos) (centroid-offset-func) (cog-translation-axis :z) (cog-null-space nil)
+		  (dump-command :fail-only) (periodic-time 0.5) ;; [s]
+                  (check-collision)
+                  (additional-jacobi) (additional-vel)
 		  &allow-other-keys)
-   "Move move-target to target-coords."
+   "Move move-target to target-coords.
+   ;; target-coords, link-list and move-target need to be given.
    ;; target-coords, move-target, rotation-axis, translation-axis, link-list
    ;; -> both list and atom OK.
+    :target-coords
+    ~ The coordinate of the target, or a function that returns coordinates. When a function is given, it is called in every IK loop as (funcall target-coords). Use a list of targets to solve the IK relative to multiple end links simultaneously.
+    :stop
+    ~ Maximum number for IK iteration. Default is 50.
+    :link-list
+    ~ List of links to control. When the target-coords is list, this should be a list of lists.
+    :move-target
+    ~ Specify end-effector coordinate. When the target-coords is list, this should be list too.
+    :debug-view
+    ~  Set t to show debug message and visualization. Use :no-message to just show the irtview image. Default is nil.
+    :warnp
+    ~ Set nil to not display debug message when the IK failed. Default is t.
+    :revert-if-fail
+    ~ Set nil to keep the angle posture of IK solve iteration. Default is t, which return to original position when IK fails.
+    :rotation-axis
+    ~ Use nil for position only IK. :x, :y, :z for the constraint around axis with plus direction, :-x :-y :-z for axis with minus direction. :zz :yy :zz for direction free axis. :xm :ym :zm for allowing rotation with respect to mirror direction. When the target-coords is list, this should be list too. Default is t.
+    :translation-axis
+    ~ :x :y :z for constraint along the x, y, z axis. :xy :yz :zx for plane. Default is t.
+    :joint-args
+    ~ Arguments passed to joint as (send* joint :joint-angle angle :relative t joint-args). Default nil.
+    :thre
+    ~ Threshold for position error to terminate IK iteration. Default is 1 [mm].
+    :rthre
+    ~ Threshold for rotation error to terminate IK iteration. Default is 0.017453 [rad] (1 deg).
+    :union-link-list
+    ~ a function that returns union of link-list called as (funcall union-link-list link-list). Default is (send self :calc-union-link-list link-list).
+    :centroid-thre
+    ~ Threshold for centroid position error to terminate IK iteration. Default is 1 [mm].
+    :target-centroid-pos
+    ~ The float-vector of the target centroid position. Default is nil.
+    :centroid-offset-func
+    ~ A function that returns centroid position. This function is called in each IK loop as (funcall centroid-offset-func). Default is (send self :centroid).
+    :cog-translation-axis
+    ~ :x :y :z for constraint along the x, y, z axis. :xy :yz :zx for plane. t for point. Default is :z.
+    :cog-null-space
+    ~ t: centroid position task is solved in null space of the main task. Default is nil.
+    :dump-command
+    ~should be t, nil, :always, :fail-only, :always-with-debug-log, or :fail-only-with-debug-log. Log are success/fail log and ik debug information log.
+    ~~ t or :always           : dump log both in success and fail (for success/fail log).
+    ~~ :always-with-debug-log : dump log both in success and fail (for success/fail log and ik debug information log).
+    ~~ :fail-only             : dump log only in fail (for success/fail log).
+    ~~ :always-with-debug-log : dump log only in fail (for success/fail log and ik debug information log).
+    ~~ nil                    : do not dump log.
+    :periodic-time
+    ~ The amount of joint angle modification in each IK loop is scaled not to violate joint velocity limit \times :periodic-time. Default is 0.5[s].
+    :check-collision
+    ~ Set t to return false when self collision occurs at found IK solution. Default is nil. To avoid collision within IK loop, use set links to collision-avoidance-links slot of cascaded-link.
+    :additional-jacobi
+    ~ The jacobian of the additional main task, or a function that returns the jacobian. When a function is given, it is called in every IK loop as (funcall additional-jacobi link-list). Use a list of additional-jacobi to solve the IK for multiple additional task. Default is nil.
+    :additional-vel
+    ~ The velocity of additional main task, or a function that returns the velocity. When a function is given, it is called in every IK loop as (funcall additional-vel link-list). The velocity should be expressed in the same coordinates as corresponding additional-jacobi. When the additional-jacobi is list, this should be a list of same length. Default is nil.
+    other-keys
+    ~ function :inverse-kinematics-loop is internally called and args are passed to it. See the explanation of :inverse-kinematics-loop."
+   (if (or (atom target-coords) (functionp target-coords)) (setq target-coords (list target-coords)))
    (let* ((loop 0)
           (union-link-list (if (functionp union-link-list) (funcall union-link-list link-list) (send self :calc-union-link-list link-list)))
           (av0 (send-all (remove-duplicates
@@ -2119,35 +2356,28 @@
 	  ;;
           (success t) 
 	  (old-analysis-level (send-all union-link-list :analysis-level))
-          command-directory command-filename command-id ik-args)       
+          ik-args collision-status
+          ;; Parameters for log file
+          command-directory command-filename command-id
+          initial-target-coords initial-av initial-log-str
+          )       
      (send-all union-link-list :analysis-level :coords)
      ;; argument check
      (when (or (null link-list) (null move-target))
-       (warn ";; ERROR: :link-list or :move-target required~%")
+       (warn ";; ERROR: both :link-list and :move-target required~%")
        (return-from :inverse-kinematics t))
      (if (and (null translation-axis) (null rotation-axis))
          (return-from :inverse-kinematics t))
-     ;; setup fname for log
+     ;; setup initial parameters for logging
      (when dump-command
-       (setq command-directory
-	     (format nil "/tmp/irtmodel-ik-~A" (unix::getpid))
-	     command-id
-	     (let ((lt (unix::localtime))) (substitute #\0 #\  (format nil "~A-~04d-~02d-~02d-~02d-~02d-~02d" (send (class self) :name) (+ 1900 (elt lt 5)) (+ 1 (elt lt 4)) (elt lt 3) (elt lt 2) (elt lt 1) (elt lt 0))))
-	     command-filename
-	     (format nil "~A/~A.l" command-directory command-id))
-       (unix::mkdir command-directory)
-       (with-open-file
-	(f (format nil "~A/~A.l" command-directory command-id) :direction :output)
-	(format f ";; ik ~A log at ~A on ~A~%;;~%" (if success "success" "fail") (string-trim '(10) (unix:asctime (unix:localtime))) lisp::lisp-implementation-version)
-	(format f ";; link-list ~A~%" link-list)
-	(format f ";; move-target ~A~%" move-target)
-	(format f ";; rotatoin-axis ~A, translation-axis ~A~%" rotation-axis translation-axis)
-	(format f ";; thre ~A, rthre ~A, stop ~A~%" thre rthre stop)
-	(if (atom target-coords)
-	    (dump-structure f `(setq c0 ,target-coords))
-	  (dump-structure f `(setq c0 ',(mapcar #'(lambda (x) x) target-coords))))
-	(dump-structure f `(setq av0 ,(send self :angle-vector)))
-	))
+	(setq initial-log-str
+              (format nil ";; ik ~A log at ~A on ~A~%;;~%" (if success "success" "fail") (string-trim '(10) (unix:asctime (unix:localtime))) lisp::lisp-implementation-version))
+        (setq initial-log-str (format nil "~A;; link-list ~A~%" initial-log-str link-list))
+	(setq initial-log-str (format nil "~A;; move-target ~A~%" initial-log-str move-target))
+	(setq initial-log-str (format nil "~A;; rotatoin-axis ~A, translation-axis ~A~%" initial-log-str rotation-axis translation-axis))
+	(setq initial-log-str (format nil "~A;; thre ~A, rthre ~A, stop ~A~%" initial-log-str thre rthre stop))
+  (setq initial-target-coords `(setq c0 ',(mapcar #'(lambda (x) x) target-coords)))
+        (setq initial-av `(setq av0 ,(send self :angle-vector))))
      ;; atom -> list
      (when debug-view
        (if (atom debug-view) (setq debug-view (list debug-view)))
@@ -2157,23 +2387,45 @@
 	 (push :no-flush debug-view)))
      (if (atom (car link-list)) (setq link-list (list link-list)))
      (if (atom move-target) (setq move-target (list move-target)))
-     (if (atom target-coords) (setq target-coords (list target-coords)))
      (if (atom rotation-axis) (setq rotation-axis (list rotation-axis)))
      (if (atom translation-axis) (setq translation-axis (list translation-axis)))
      (if (atom thre) (setq thre (list thre)))
      (if (atom rthre) (setq rthre (list rthre)))
+     (if (and additional-jacobi (or (atom additional-jacobi) (functionp additional-jacobi))) (setq additional-jacobi (list additional-jacobi)))
+     (if (and additional-vel (or (atom additional-vel) (functionp additional-vel))) (setq additional-vel (list additional-vel)))
      ;; argument check
      (unless (= (length translation-axis) (length rotation-axis)
-                (length move-target) (length link-list) (length target-coords))
-       (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A target-coords ~A~%"
+                (length move-target) (length link-list) (length target-coords)
+                (length thre) (length rthre))
+       (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A target-coords ~A thre ~A rthre ~A~%"
              (length translation-axis) (length rotation-axis)
-             (length move-target) (length link-list) (length target-coords))
+             (length move-target) (length link-list) (length target-coords)
+             (length thre) (length rthre))
        (return-from :inverse-kinematics t))
-     (setq ik-args (nconc (send* self :inverse-kinematics-args
-				      :translation-axis translation-axis
-				      :rotation-axis rotation-axis
-				      :union-link-list union-link-list args) args))
+     (unless (= (length additional-jacobi) (length additional-vel))
+       (warn ";; ERROR: list length differ : additional-jacobi ~A additional-vel ~A~%"
+             (length additional-jacobi) (length additional-vel))
+       (return-from :inverse-kinematics t))
+     (let ((tmp-additional-jacobi (mapcar #'(lambda (aj) (if (functionp aj) (funcall aj link-list) aj)) additional-jacobi)))
+       (setq ik-args (nconc (send* self :inverse-kinematics-args
+                                   :translation-axis translation-axis
+                                   :rotation-axis rotation-axis
+                                   ;; evaluate additional-jacobi function and calculate row dimension of additional-jacobi
+                                   :additional-jacobi-dimension
+                                   (+ (if (and (not cog-null-space) target-centroid-pos)
+                                          (send self :calc-target-axis-dimension nil cog-translation-axis)
+                                        0)
+                                      (reduce #'+ (mapcar #'(lambda (aj) (array-dimension (if (functionp aj) (funcall aj link-list) aj) 0)) tmp-additional-jacobi)))
+                                   :union-link-list union-link-list args) args)))
      (send self :reset-joint-angle-limit-weight-old union-link-list) ;; reset weight
+     (when (memq dump-command '(:always-with-debug-log :fail-only-with-debug-log))
+       ;; If ik debug information log is enabled, initialize empty list for ik target errors.
+       (send self :put :ik-target-error
+             (append
+              (let ((tmp-count -1)) (mapcar #'(lambda (x) (list (read-from-string (format nil ":target-~d" (incf tmp-count))))) (make-list (length target-coords)))) ;; For target-coords error
+              (if target-centroid-pos (list (list :centroid))) ;; For taget-centroid-pos error
+              (let ((tmp-count -1)) (mapcar #'(lambda (x) (list (read-from-string (format nil ":additional-~d" (incf tmp-count))))) (make-list (length additional-vel)))) ;; For additional-vel error
+              )))
      
      ;; inverse kinematics loop
      (while (< (incf loop) stop)
@@ -2201,6 +2453,8 @@
                               :move-target move-target
                               :union-link-list union-link-list
                               :thre thre :rthre rthre
+                              :additional-jacobi additional-jacobi
+                              :additional-vel additional-vel
                               :debug-view debug-view
                               :ik-args ik-args args))
          (when (eq success :ik-succeed)
@@ -2225,13 +2479,45 @@
                    :update-mass-properties nil)))
         ;; update difference
      (mapcar #'(lambda (l a) (send l :analysis-level a)) union-link-list old-analysis-level)
-     ;; rename log file
-     (when dump-command
-       (unix::rename (format nil "~A/~A.l" command-directory command-id ) (setq command-filename (format nil "~A/~A-~A.l" command-directory command-id (if (or success (not revert-if-fail)) "success" "failure")))))
      ;; reset weight
      (send self :reset-joint-angle-limit-weight-old union-link-list)
+     ;; Get final ik success result flag
+     (if check-collision (setq collision-status (send self :self-collision-check)))
+     (setq success (and (or success (not revert-if-fail)) (not collision-status)))
+     ;; Dump log
+     (when (or (memq dump-command '(:always :always-with-debug-log t))
+               (and (memq dump-command '(:fail-only :fail-only-with-debug-log)) (not success)))
+       (setq command-directory
+	     (format nil "/tmp/irtmodel-ik-~A" (unix::getpid))
+	     command-id ;; command-id including [robot name], [localtime], and [usec time]
+             (let ((lt (unix::localtime)) (gtd (cadr (unix::gettimeofday))))
+               (substitute #\0 #\  (format nil "~A-~04d-~02d-~02d-~02d-~02d-~02d-~A-~A-~A"
+                                           (send (class self) :name) ;; name
+                                           (+ 1900 (elt lt 5)) (+ 1 (elt lt 4)) (elt lt 3) (elt lt 2) (elt lt 1) (elt lt 0) ;; localtime
+                                           (subseq (format nil "~0,6d" gtd) 0 2) (subseq (format nil "~0,6d" gtd) 2 4) (subseq (format nil "~0,6d" gtd) 4) ;; usec
+                                           )))
+             command-filename (format nil "~A/~A-~A.l" command-directory command-id (if success "success" "failure")))
+       (unix::mkdir command-directory)
+       (with-open-file
+	(f command-filename :direction :output)
+        (format f "~A" initial-log-str)
+        (dump-structure f initial-target-coords)
+        (dump-structure f initial-av)
+        )
+       (if (memq dump-command '(:fail-only-with-debug-log :always-with-debug-log)) ;; For ik debug information log
+           (with-open-file
+            (f (format nil "~A/~A-~A-debug-log.l" command-directory command-id (if success "success" "failure")) :direction :output)
+            (format f "(setq *ik-loop* ~A~%" loop)
+            (format f "      *ik-target-error* '~A~%" (mapcar #'(lambda (x) (append (list (car x)) (reverse (cdr x)))) (send self :get :ik-target-error)))
+            (format f "      *ik-target-error-thre* '~A)~%"
+                    (append
+                     (let ((tmp-count -1)) (mapcar #'(lambda (tr rtr) (list (read-from-string (format nil ":target-~d" (incf tmp-count))) (list (* 1e-3 tr) rtr))) thre rthre)) ;; For target-coords threshold (thre[m], rthre[rad])
+                     (if target-centroid-pos (list (list :centroid (* 1e-3 centroid-thre)))))) ;; For target-centroid-pos threshold [m]
+            (remprop self :ik-target-error)
+            ))
+       )
      ;; check solved or not
-     (if (or success (not revert-if-fail))
+     (if success
          (send self :angle-vector)
        (progn
 	 (when warnp
@@ -2245,6 +2531,7 @@
            (warn ";;  coords : ~a~%" 
                  (send (let ((p self)) (while (send p :parent) (setq p (send p :parent))) p) :worldcoords))
 	   (warn ";;  angles : ~a~%" av0)
+	   (if check-collision (warn ";;  collision : ~a~%" collision-status))
 	   (warn ";;    args : ~a~%" (append (list target-coords) args))
 	   (when dump-command
 	     (let (i print-args command-init command-setup command-args)
@@ -2396,31 +2683,49 @@
        )
      pairs))
   (:self-collision-check
-   (&key (mode :all) (pairs (send self :collision-check-pairs)) (collision-func 'pqp-collision-check))
-   (let ((cpairs) (col-count 0))
+   (&key (mode :all) (pairs (send self :collision-check-pairs)) (collision-func 'collision-check))
+   (let ((cpairs) (col-count 0) (invalid-links))
      (dolist (p pairs)
-       (let ((colp (/= (funcall collision-func (car p) (cdr p)) 0)))
-	 (when colp
-	   (incf col-count)
-	   (if (eq mode :first)
-	       (return-from :self-collision-check p)
-	     (push p cpairs)))
-	 ))
+       (if (and (send (car p) :faces) (send (cdr p) :faces))
+           (let ((colp (/= (funcall collision-func (car p) (cdr p)) 0)))
+             (when colp
+               (incf col-count)
+               (if (eq mode :first)
+                   (return-from :self-collision-check p)
+                 (push p cpairs))))
+         (progn
+           (when (and (null (send (car p) :faces)) (null (member (car p) invalid-links)))
+             (warning-message 3 "skip collision between ~A (~A) because of no faces~%"
+                          (send (car p) :name) (length (send (car p) :faces)))
+             (push (car p) invalid-links))
+           (when (and (null (send (cdr p) :faces)) (null (member (cdr p) invalid-links)))
+             (warning-message 3 "skip collision between ~A (~A) because of no faces~%"
+                              (send (cdr p) :name) (length (send (cdr p) :faces)))
+             (push (cdr p) invalid-links)))
+         ))
      cpairs))
-  ;; calc grasp matrix
-  ;;  -> grasp matrix is defined as
-  ;;   | E_3    0   E_3    0   ... |
-  ;;   | p1_hat E_3 p2_hat E_3 ... |
   (:calc-grasp-matrix
-   (contact-points &optional (ret (make-matrix 6 (* 6 (length contact-points))))) ;; contact-points [mm]
-   (let ((contact-matrices (mapcar #'(lambda (x) (outer-product-matrix (scale 1e-3 x))) contact-points)))
+   (contact-points
+    &key (ret (make-matrix 6 (* 6 (length contact-points))))
+         (contact-rots (mapcar #'(lambda (r) (unit-matrix 3)) contact-points)))
+   "Calc grasp matrix.
+      Grasp matrix is defined as
+       | E_3 0   E_3 0   ... |
+       | p1x E_3 p2x E_3 ... |
+    Arguments:
+      contact-points is list of contact points[mm].
+      contact-rots is list of contact coords rotation[rad].
+      If contact-rots is specified, grasp matrix as follow:
+       | R1    0  R2    0  ... |
+       | p1xR1 R1 p2xR2 R2 ... |"
+   (let* ((contact-matrices (mapcar #'(lambda (p r) (m* (outer-product-matrix (scale 1e-3 p)) r)) contact-points contact-rots)))
      (dotimes (c (length contact-points))
        (dotimes (i 3)
-	 (setf (aref ret i (+ (* c 6) i)) 1.0)
-	 (setf (aref ret (+ 3 i) (+ (* c 6) 3 i)) 1.0)
-	 (dotimes (j 3)
-	   (setf (aref ret (+ 3 i) (+ (* c 6) j)) (aref (elt contact-matrices c) i j))
-	   )))
+         (dotimes (j 3)
+           (setf (aref ret i (+ (* c 6) j)) (aref (elt contact-rots c) i j))
+           (setf (aref ret (+ 3 i) (+ (* c 6) 3 j)) (aref (elt contact-rots c) i j))
+           (setf (aref ret (+ 3 i) (+ (* c 6) j)) (aref (elt contact-matrices c) i j))
+           )))
      ret))
   ;; closed loop kinematics method
   (:inverse-kinematics-for-closed-loop-forward-kinematics
@@ -2430,10 +2735,11 @@
          (move-joints-hook) (additional-weight-list)
          ;; closed loop params
          (constrained-joint-list) (constrained-joint-angle-list)
+         (min-loop 2) ;; 2 is minimum loop count
     &allow-other-keys)
    "Solve inverse-kinematics for closed loop forward kinematics.
     Move move-target to target-coords with link-list.
-    link-list loop should be close when move-target reachs target-coords.
+    link-list loop should be close when move-target reaches target-coords.
     constrained-joint-list is list of joints specified given joint angles in closed loop.
     constrained-joint-angle-list is list of joint-angle for constrained-joint-list."
    ;; Set joint-angle
@@ -2456,8 +2762,55 @@
           :additional-weight-list
           (append additional-weight-list
                   (mapcar #'(lambda (jnt) (list (send jnt :child-link) 0.0)) constrained-joint-list))
+          :min-loop min-loop
           args)
    )
+  (:calc-jacobian-for-interlocking-joints
+   (link-list &key (interlocking-joint-pairs (send self :interlocking-joint-pairs)))
+   "Calculate jacobian to keep interlocking joint velocity same.
+    d\theta_0 = d\theta_1 => [... 0 1 0 ... 0 -1 0 .... ][...d\theta_0...d\theta_1...]"
+   (let* ((union-link-list (send self :calc-union-link-list link-list))
+          (jl (send-all union-link-list :joint))
+          (pairs (remove-if-not #'(lambda (pair) (and (find (car pair) jl) (find (cdr pair) jl))) interlocking-joint-pairs))
+          (jacobi (make-matrix (length pairs) (send self :calc-target-joint-dimension union-link-list))))
+     (mapcar #'(lambda (pair)
+                 (let ((idx (reduce #'+ (send-all (subseq jl 0 (position (car pair) jl)) :joint-dof))))
+                   (setf (aref jacobi (position pair pairs) idx) 1.0))
+                 (let ((idx (reduce #'+ (send-all (subseq jl 0 (position (cdr pair) jl)) :joint-dof))))
+                   (setf (aref jacobi (position pair pairs) idx) -1.0)))
+             pairs)
+     jacobi))
+  (:calc-vel-for-interlocking-joints
+   (link-list &key (interlocking-joint-pairs (send self :interlocking-joint-pairs)))
+   "Calculate 0 velocity for keeping interlocking joint at the same joint angle."
+   (let* ((jl (send-all (send self :calc-union-link-list link-list) :joint))
+          (pairs (remove-if-not #'(lambda (pair) (and (find (car pair) jl) (find (cdr pair) jl))) interlocking-joint-pairs))
+          (vel (instantiate float-vector (length pairs))))
+     vel))
+  (:set-midpoint-for-interlocking-joints
+   (&key (interlocking-joint-pairs (send self :interlocking-joint-pairs)))
+   "Set interlocking joints at mid point of each joint angle."
+   (mapcar #'(lambda (pair)
+               (let ((mid (* 0.5 (+ (send (car pair) :joint-angle) (send (cdr pair) :joint-angle)))))
+                 (send (car pair) :joint-angle mid)
+                 (send (cdr pair) :joint-angle mid)))
+           interlocking-joint-pairs)
+   )
+  (:interlocking-joint-pairs
+   ()
+   "Interlocking joint pairs.
+    pairs are (list (cons joint0 joint1) ... )
+    If users want to use interlocking joints, please overwrite this method."
+   )
+  (:check-interlocking-joint-angle-validity
+   (&key (angle-thre 0.001) ;; [deg]
+         (interlocking-joint-pairs (send self :interlocking-joint-pairs)))
+   "Check if all interlocking joint pairs are same values."
+   (let ((ret
+          (mapcar #'(lambda (pair)
+                      (> angle-thre (abs (- (send (car pair) :joint-angle) (send (cdr pair) :joint-angle)))))
+                  interlocking-joint-pairs)))
+     (every #'identity ret)))
   )
 
 (defun all-child-links (s &optional (pred #'identity))
@@ -2786,14 +3139,39 @@
       )))
 
 (defmacro with-append-root-joint (params &rest bodies)
+  ;; Return value:
+  ;;   list of link-list
+  ;; Arguments:
+  ;;   params := (output-link-list robot input-link-list :joint-class joint-class :joint-args joint-args)
+  ;;     output-link-list, robot, input-link-list : Necessary parameters
+  ;;     joint-class, joint-args : Additional parameter, which can be omitted
+  ;;     If joint-class is omitted, 6dof-joint is used as root-joint.
+  ;;     If joint-args is omitted, nil.
+  ;;   bodies : any S-expressions.
+  ;; Supported types of input-link-list:
+  ;;   1. link-list
+  ;;        input-link-list : (list link0 link1 ...)
+  ;;        =>
+  ;;        output-link-list : (list root-link link0 link1 ...)
+  ;;   2. list of link-list (without "nil")
+  ;;        input-link-list : (list (list link00 link01 ...) (list link10 link11 ...) ...)
+  ;;        =>
+  ;;        output-link-list : (list (list root-link link00 link01 ...) (list root-link link10 link11 ...) ...)
+  ;;   3. list of link-list including "nil", where "nil" derived from move-target at the root-link
+  ;;        input-link-list : (list nil (list link00 link01 ...) ...)
+  ;;        =>
+  ;;        output-link-list : (list (list root-link) (list root-link link00 link01 ...) ...)
+  ;; More info:
+  ;;   Please see irtrobot.l's :fullbody-inverse-kinematics for usage and arguments.
+  ;;   Please see test/test-irt-motion.l for testing and types of input-link-list.
   (with-gensyms
    (robot link-list vlink rlink joint-args)
    `(progn
       (let ((,robot ,(cadr params))
             (,link-list
-             (if (atom (car ,(caddr  params)))
-                 (list ,(caddr  params))
-               ,(caddr  params)))
+             (if (every #'listp ,(caddr  params)) ;; Check all is list or not. Note that both (list link-list-0 link-list-1) and (list link-list-0 nil) is "t" at this check.
+                 ,(caddr  params)
+               (list ,(caddr  params))))
             (,joint-args ,(cadr (member :joint-args params))))
         (let ((,vlink (instance bodyset-link :init (make-cascoords)
                                 :bodies (list (make-cube 150 10 400))

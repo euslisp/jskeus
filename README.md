@@ -1,81 +1,31 @@
-## [JSK EusLisp repository](http://jskeus.sourceforge.net) [![Build Status](https://travis-ci.org/euslisp/jskeus.png?branch=master)](https://travis-ci.org/euslisp/jskeus)
+## [JSK EusLisp repository](http://https://github.com/euslisp/jskeus) [![Build Status](https://travis-ci.com/euslisp/jskeus.png?branch=master)](https://travis-ci.com/euslisp/jskeus) [![Documentation Status](https://readthedocs.org/projects/jskeus/badge/?version=latest)](https://jskeus.readthedocs.io/ja/latest/?badge=latest)
+
+[![Join the chat at https://gitter.im/euslisp/jskeus](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/euslisp/jskeus?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
-This repository containts software devleoped and used by [JSK](http://www.jsk.t.u-tokyo.ac.jp )at The University of Tokyo.
+This repository contains software developed and used by [JSK](http://www.jsk.t.u-tokyo.ac.jp) at The University of Tokyo.
 
 ## 1. Getting started
 
-### 1.1 Install binary (Ubuntu 12.04)
+### 1.1 Install binary (RECOMMENDED: Ubuntu 18.04)
 
 #### 1.1.1 Setup ROS repository
+
+Please set `ROS_DISTRO` environment variable to your ROS distro. For example, if you use 18.04, run `export ROS_DISTRO=melodic`.
 ```
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
 wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-echo "source /opt/ros/hydro/setup.bash" >> ~/.bashrc
+echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
 sudo apt-get update
 ```
 #### 1.1.2 Install Euslisp
 ```
-sudo apt-get install ros-hydro-euslisp
+sudo apt-get install ros-$ROS_DISTRO-euslisp
 ```
 
-### 1.2 Install from source code
-#### 1.2.1 Installing dependent libraries
-
-for Ubuntu users
+### 1.2 Install via Homebrew (OSX)
 ```
-$ sudo apt-get install git gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi msttcorefonts
-```
-
-for Ubuntu 11.04 or later, install more fonts.
-```
-$ sudo apt-get install gsfonts-x11 texlive-fonts-extra xfonts-100dpi-transcoded xfonts-75dpi-transcoded
-```
-
-for Mac OSX users using MacPorts
-```
-$ sudo port install jpeg libpng mesa xorg-libX11 wget
-```
-for Mac OSX users using Homebrew
-```
-$ brew install jpeg libpng mesalib-glw wget
-```
-
-'''NOTE:'''
-EusLisp needs X11 Library, but Mac OSX mountain lion no longer support it. So you need to install substitution [XQuartz](http://xquartz.macosforge.org/landing/).
-
-Also for Mac OSX lion (or older) users it's better to install the latest XQuartz for the safety.
-
-(If XQuartz is older than 2.7.3, the installation of EusLisp will fail. You should install the latest XQuartz.)
-
-
-for Raspberry Pi users using debian(Raspbian "wheezy")
-```
-$ sudo apt-get install git gcc g++ libjpeg62-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi
-## additional install for using OpenGL on raspberry pi
-$ sudo apt-get install libgl1-mesa-dri xserver-xorg-video-vesa xutils
-```
-for Cygwin(now working with 32bit only)
-```
-Packages listed below should be intalled using setup.exe.
-
-git, gcc-core, gcc-g++, make
-libjpeg-devel, libpng-devel
-libGL-devel, libGLU-devel, libglut-devel, libX11-devel, libXext-devel
-xorg-server
-X-start-menu-icons (for startxwin.exe)
-mesa-demo (for glxinfo)
-bitmap fonts (all bitmap font packages -75dpi, -100dpi, -misc )
-```
-
-
-#### 1.2.2 Downloading and building EusLisp
-```
-$ git clone http://github.com/euslisp/jskeus jskeus
-$ cd jskeus
-$ make
-you will see instructions to add EUSDIR, ARCHDIR, PATH, LD_LIBRARY_PATH environment variable in your bashrc to invoke euslisp program
-$ echo "source ~/bashrc.eus" >> ~/.bashrc
+brew install euslisp/jskeus/jskeus
 ```
 
 ## 2 Playing with Demo programs
@@ -109,44 +59,26 @@ $ irteusgl models/irt-all-objects.l "(make-all-objects)"
 
 ## 3 Getting started for ROS and PR2 users
 
-### 3.1 Install binaries (Ubuntu 12.04)
+### 3.1 Install binaries (RECOMMENDED: Ubuntu 14.04)
 
 #### 3.1.1 Setup ROS repository
 
-You can skip this procdeure if you already setup ROS system
+You can skip this procedure if you have already setup your ROS system
 ```
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
 wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-echo "source /opt/ros/hydro/setup.bash" >> ~/.bashrc
+echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
 sudo apt-get update
 ```
 #### 3.1.2 Install pr2/euslisp programs
 
 ```
-sudo apt-get install ros-hydro-pr2eus
-```
-
-### 3.2 Install from source
-
-#### 3.2.1  Install ROS and jsk-ros-pkg repository
-
-See http://wiki.ros.org/hydro/Installation/Source for more detail
-
-```
-$ sudo apt-get install python-rosdep python-rosinstall-generator python-wstool python-rosinstall build-essential
-$ mkdir -p ~/ros_catkin_ws/src
-$ cd ~/ros_catkin_ws/src
-$ wstool init src https://raw.githubusercontent.com/jsk-ros-pkg/jsk_pr2eus/master/.rosinstall
-$ wget https://raw.githubusercontent.com/jsk-ros-pkg/jsk_travis/master/rosdep-install.sh
-$ sh ./rosdep-install.sh
-$ cd ..
-$ catkin_make
-$ source devel/setup.bash
+sudo apt-get install ros-$ROS_DISTRO-pr2eus
 ```
 
 ### 3.3 Running demo programs
 
-#### 3.3.1 Visualizinot pr2 robot
+#### 3.3.1 Visualization of pr2 robot
 ```
 $ rosrun euscollada pr2.sh
 ```
@@ -155,7 +87,7 @@ $ rosrun euscollada pr2.sh
 
 #### 3.3.2 For real PR2 users
 
-After you set `ROS_MASTER_URI` and `ROS_IP` to your PR2 robot (or simulated PR2), try following command
+After you set `ROS_MASTER_URI` and `ROS_IP` to your PR2 robot (or simulated PR2), try the following command:
 
 ```
 $ roscd pr2eus
@@ -176,21 +108,87 @@ $ rossetip
 ![./pr2-read-state.launch](images/Pr2-read-state.png)
 
 
-see roseus package in http://github.com/jsk-ros-pkg repository for ROS client library for euslisp
+Have a look at roseus package in http://github.com/jsk-ros-pkg repository for ROS client library for euslisp
 
 ### 3.4 Support and Trouble Shooting
 
 
-Use [issue tracker](https://github.com/euslisp/jskeus/issues) for get support
+Open an issue on our [issue tracker](https://github.com/euslisp/jskeus/issues) if something doesn't work as expected, or if you want new features implemented.
 
-Use [pull requests](https://github.com/euslisp/jskeus/pulls) to report bugs or patches.
+Use the [pull requests](https://github.com/euslisp/jskeus/pulls) system to send us solutions for the issues so we can implement them in this repository.
 
-### 3.5 Online Documents (Currently only Japanese is avilable)
+### 3.5 Online Documents (Currently only Japanese is available)
 
 See online [manual](http://euslisp.github.io/jskeus/)
 
 PDF files are also available from [here](https://github.com/euslisp/jskeus/raw/master/doc/jmanual.pdf)
 
-### 3.6 Acknowledgment
+### 3.6 Install euslisp from source code  (EXPERTS ONLY)
 
-The software in this repository is based on [EusLisp language](http://euslisp.sourceforge.net).
+#### 3.6.1 Installing dependent libraries
+
+For Ubuntu users:
+```
+$ sudo apt-get install git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi gsfonts-x11 texlive-fonts-extra xfonts-100dpi-transcoded xfonts-75dpi-transcoded msttcorefonts pkg-config libbullet-dev
+```
+
+For Mac OSX users using Homebrew:
+```
+$ brew install jpeg libpng mesalib-glw wget bullet
+```
+
+'''NOTE:'''
+EusLisp needs X11 Library, but Mac OSX mountain lion no longer supports it. Given this case, you'll need to install [XQuartz](http://xquartz.macosforge.org/landing/).
+
+Also for Mac OSX lion (or older) users it's better to install the latest XQuartz for safety and compatibility reasons.
+
+(If XQuartz is older than 2.7.3, the installation of EusLisp will fail. You should install the latest XQuartz.)
+
+
+For Raspberry Pi users using debian(Raspbian "wheezy"):
+```
+$ sudo apt-get install git gcc g++ libjpeg62-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi
+## additional install for using OpenGL on raspberry pi
+$ sudo apt-get install libgl1-mesa-dri xserver-xorg-video-vesa xutils
+```
+For Cygwin(only works with 32bit systems)
+```
+Packages listed below should be intalled using setup.exe.
+
+git, gcc-core, gcc-g++, make
+libjpeg-devel, libpng-devel
+libGL-devel, libGLU-devel, libglut-devel, libX11-devel, libXext-devel
+xorg-server
+X-start-menu-icons (for startxwin.exe)
+mesa-demo (for glxinfo)
+bitmap fonts (all bitmap font packages -75dpi, -100dpi, -misc )
+```
+
+#### 3.6.2 Downloading and building EusLisp
+```
+$ git clone http://github.com/euslisp/jskeus jskeus
+$ cd jskeus
+$ make
+you will see instructions to add EUSDIR, ARCHDIR, PATH, LD_LIBRARY_PATH environment variable in your bashrc to invoke euslisp program
+$ echo "source ~/bashrc.eus" >> ~/.bashrc
+```
+
+#### 3.6.3  Install ROS and jsk-ros-pkg repository
+
+See http://wiki.ros.org/$ROS_DISTRO/Installation/Source for more details
+
+```
+$ sudo apt-get install python-rosdep python-rosinstall-generator python-wstool python-rosinstall build-essential
+$ mkdir -p ~/ros_catkin_ws/src
+$ cd ~/ros_catkin_ws/src
+$ wstool init src https://raw.githubusercontent.com/jsk-ros-pkg/jsk_pr2eus/master/.rosinstall
+$ wget https://raw.githubusercontent.com/jsk-ros-pkg/jsk_travis/master/rosdep-install.sh
+$ sh ./rosdep-install.sh
+$ cd ..
+$ catkin_make
+$ source devel/setup.bash
+```
+
+### 3.7 Acknowledgment
+
+Software in this repository is based on the [EusLisp language](http://euslisp.sourceforge.net).

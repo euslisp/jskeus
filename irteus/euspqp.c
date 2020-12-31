@@ -15,11 +15,30 @@
 /// Workshop on Concurrent Object-based Systems,
 ///  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ///
-/// Permission to use this software for educational, research
-/// and non-profit purposes, without fee, and without a written
-/// agreement is hereby granted to all researchers working on
-/// the IRT project at the University of Tokyo, provided that the
-/// above copyright notice remains intact.  
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///
+/// * Redistributions of source code must retain the above copyright notice,
+///   this list of conditions and the following disclaimer.
+/// * Redistributions in binary form must reproduce the above copyright notice,
+///   this list of conditions and the following disclaimer in the documentation
+///   and/or other materials provided with the distribution.
+/// * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+///   (JSK) nor the names of its contributors may be used to endorse or promote
+///   products derived from this software without specific prior written
+///   permission.
+///
+/// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+/// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+/// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+/// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+/// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+/// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+/// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+/// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+/// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+/// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+/// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
 #pragma init (register_euspqp)
@@ -27,7 +46,7 @@
 #include "eus.h"
 
 extern pointer ___euspqp();
-static register_euspqp()
+static void register_euspqp()
 { add_module_initializer("___euspqp", ___euspqp);}
 
 extern eusinteger_t PQP_MakeModel();
@@ -76,7 +95,7 @@ pointer PQPADDTRI(register context *ctx, int n, register pointer *argv)
     eusfloat_t *fv1=argv[1]->c.fvec.fv;
     eusfloat_t *fv2=argv[2]->c.fvec.fv;
     eusfloat_t *fv3=argv[3]->c.fvec.fv;
-    int id = (int)argv[4]>>2;
+    eusinteger_t id = ((eusinteger_t)argv[4])>>2;
     double dv1[3], dv2[3], dv3[3];
     dv1[0] = fv1[0]; dv1[1] = fv1[1]; dv1[2] = fv1[2]; 
     dv2[0] = fv2[0]; dv2[1] = fv2[1]; dv2[2] = fv2[2]; 
@@ -99,7 +118,7 @@ pointer PQPCOLLIDE(register context *ctx, int n, register pointer *argv)
     eusfloat_t *fr2=argv[3]->c.ary.entity->c.fvec.fv;
     eusfloat_t *ft2=argv[4]->c.fvec.fv;
     eusinteger_t m2=intval(argv[5]);
-    int flag=(int)argv[6]>>2;
+    eusinteger_t flag=((eusinteger_t)argv[6])>>2;
     double dr1[3][3], dr2[3][3], dt1[3], dt2[3];
 
     /*printf("addr1=0x%x, addr2=0x%x, flag=%d\n", m1>>2, m2>>2, flag);*/
@@ -170,17 +189,25 @@ pointer PQPDISTANCE(register context *ctx, int n, register pointer *argv)
     return (makeflt(distance));
 }
 
+#include "defun.h" // redefine defun for update defun() API
 pointer ___euspqp(register context *ctx, int n, register pointer *argv)
 {
     pointer mod=argv[0];
+    defun(ctx, "PQPMAKEMODEL", mod, PQPMAKEMODEL, NULL);
+    defun(ctx, "PQPDELETEMODEL", mod, PQPDELETEMODEL, NULL);
+    defun(ctx, "PQPBEGINMODEL", mod, PQPBEGINMODEL, NULL);
+    defun(ctx, "PQPENDMODEL", mod, PQPENDMODEL, NULL);
+    defun(ctx, "PQPADDTRI", mod, PQPADDTRI, NULL);
+    defun(ctx, "PQPCOLLIDE", mod, PQPCOLLIDE, NULL);
+    defun(ctx, "PQPDISTANCE", mod, PQPDISTANCE, NULL);
 
-    defun(ctx, "PQPMAKEMODEL", mod, PQPMAKEMODEL);
-    defun(ctx, "PQPDELETEMODEL", mod, PQPDELETEMODEL);
-    defun(ctx, "PQPBEGINMODEL", mod, PQPBEGINMODEL);
-    defun(ctx, "PQPENDMODEL", mod, PQPENDMODEL);
-    defun(ctx, "PQPADDTRI", mod, PQPADDTRI);
-    defun(ctx, "PQPCOLLIDE", mod, PQPCOLLIDE);
-    defun(ctx, "PQPDISTANCE", mod, PQPDISTANCE);
+    pointer ALGO_PQP;
+    ALGO_PQP=defconst(ctx,"*COLLISION-ALGORITHM-PQP*",ALGO_PQP,userpkg);
+#if HAVE_PQP
+    ALGO_PQP->c.sym.speval=defkeyword(ctx,"PQP");
+#else
+    ALGO_PQP->c.sym.speval=NIL;
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

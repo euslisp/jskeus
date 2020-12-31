@@ -15,11 +15,30 @@
 ;;; Workshop on Concurrent Object-based Systems,
 ;;;  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ;;;
-;;; Permission to use this software for educational, research
-;;; and non-profit purposes, without fee, and without a written
-;;; agreement is hereby granted to all researchers working on
-;;; the IRT project at the University of Tokyo, provided that the
-;;; above copyright notice remains intact.  
+;;; Redistribution and use in source and binary forms, with or without
+;;; modification, are permitted provided that the following conditions are met:
+;;;
+;;; * Redistributions of source code must retain the above copyright notice,
+;;;   this list of conditions and the following disclaimer.
+;;; * Redistributions in binary form must reproduce the above copyright notice,
+;;;   this list of conditions and the following disclaimer in the documentation
+;;;   and/or other materials provided with the distribution.
+;;; * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+;;;   (JSK) nor the names of its contributors may be used to endorse or promote
+;;;   products derived from this software without specific prior written
+;;;   permission.
+;;;
+;;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;;; THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;;; PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+;;; CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;;; EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;;; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;;; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;;; WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;;; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+;;; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;;;
 
 (in-package "USER")
@@ -97,18 +116,31 @@
                                                      head-end-coords torso-end-coords))))
      )
    )
+  ;; End-coords accessor
+  (:rarm-end-coords () rarm-end-coords)
+  (:larm-end-coords () larm-end-coords)
+  (:rleg-end-coords () rleg-end-coords)
+  (:lleg-end-coords () lleg-end-coords)
+  (:head-end-coords () head-end-coords)
+  (:torso-end-coords () torso-end-coords)
+  ;; Root-link accessor
+  (:rarm-root-link () rarm-root-link)
+  (:larm-root-link () larm-root-link)
+  (:rleg-root-link () rleg-root-link)
+  (:lleg-root-link () lleg-root-link)
+  (:head-root-link () head-root-link)
+  (:torso-root-link () torso-root-link)
   (:limb
    (limb method &rest args)
    (let (ret)
      (case method
        (:end-coords 
 	(user::forward-message-to 
-	 (cdr (assoc (intern (format nil "~A-END-COORDS" (string-upcase limb)))
-		     (send self :slots)))
+         (send self (read-from-string (format nil "~A-END-COORDS" limb)))
 	 args))
        (:root-link
 	(user::forward-message-to 
-	 (cdr (assoc (intern (format nil "~A-ROOT-LINK" (string-upcase limb))) (send self :slots)))
+         (send self (read-from-string (format nil "~A-ROOT-LINK" limb)))
 	 args))
        (:angle-vector
 	(if args
@@ -200,7 +232,7 @@
                 (make-coords :pos (car args))
                 (v- (car args) (send move-target :worldpos))))
               target-orient move-orient axis-orient axis-orient2 head-weight head-nspace jid)
-         ;; this code assuming that the robot does not have contenious rotatoin joint for neck-y
+         ;; this code assuming that the robot does not have continuous rotation joint for neck-y
          (setq p-dif-rot dif-rot
                dif-pos (send move-target :difference-position target-coords :translation-axis nil)
                dif-rot (send move-target :difference-rotation target-coords :rotation-axis :z))
@@ -210,7 +242,7 @@
          (setq target-orient (matrix-column (send target-coords :worldrot) 2)
                move-orient (matrix-column (send move-target :worldrot) 2))
          (setq jid 0)
-         (dolist (j (send self :head :joint-list))
+         (dolist (j (send-all link-list :joint))
            (setq axis-orient (send j :parent-link :rotate-vector (case (j . axis) (:x #f(1 0 0)) (:y #f(0 1 0)) (:z #f(0 0 1)) (:-x #f(-1 0 0)) (:-y #f(0 -1 0)) (:-z #f(0 0 -1)) (t (j . axis)))))
            ;; direciton of non continuous area
            (setq axis-orient2 (send j :parent-link :rotate-vector #f(-1 0 0)))
@@ -318,9 +350,16 @@
             (mapcar #'(lambda (mt) (send self :link-list (send mt :parent))) move-target)))
     &allow-other-keys)
    "solve inverse kinematics, move move-target to target-coords
-    look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords
-    link-list is set by default based on move-target -> root link link-list"
-   (if (atom target-coords) (setq target-coords (list target-coords)))
+    target-coords and move-target should be given.
+    link-list is set by default based on move-target -> root link link-list
+    :look-at-target
+    ~ target head looks at. This task is best-effort and only head joints are used. :look-at-target supports t, nil, float-vector, coords, list of float-vector, list of coords.
+    other-keys
+    ~ :inverse-kinematics internally calls :inverse-kinematics of cascaded-cords class and args are passed to it. See the explanation of :inverse-kinematics of cascaded-cords class."
+   (if (or (atom target-coords) (functionp target-coords)) (setq target-coords (list target-coords)))
+   (when (null (every #'(lambda (x) (or (coordinates-p x) (functionp x))) target-coords))
+     (warn ";; error: all target-coords should be Coordinates or functions, but get ~A~%" target-coords)
+     (return-from :inverse-kinematics nil))
    (prog1
        (send-super* :inverse-kinematics target-coords
                     :move-target move-target :link-list link-list args)
@@ -338,8 +377,9 @@
          &allow-other-keys)
    "move move-target using dif-pos and dif-rot,
     look-at-target suppots t, nil, float-vector, coords, list of float-vector, list of coords
-    link-list is set by default based on move-target -> root link link-list"
-   (if (atom target-coords) (setq target-coords (list target-coords)))
+    link-list is set by default based on move-target -> root link link-list
+    :inverse-kinematics-loop internally calls :inverse-kinematics-loop function of cascaded-coords class. See the explanation of :inverse-kinematics-loop in cascaded-coords class."
+   (if (or (atom target-coords) (functionp target-coords)) (setq target-coords (list target-coords)))
    (prog1
        (send-super* :inverse-kinematics-loop dif-pos dif-rot
                     :link-list link-list :move-target move-target
@@ -375,25 +415,36 @@
          (dt 0.005)
          (av (send self :angle-vector))
          (root-coords (send (car (send self :links)) :copy-worldcoords))
-         (calc-torque-buffer-args (send self :calc-torque-buffer-args)))
+         (calc-torque-buffer-args (send self :calc-torque-buffer-args))
+         (distribute-total-wrench-to-torque-method (if (and (not (every #'null (send self :legs))) ;; For legged robots
+                                                            (not (and force-list moment-list target-coords))) ;; If no force-list, moment-list, target-coords are specified
+                                                       :distribute-total-wrench-to-torque-method-default)))
    "Returns torque vector"
-   (unless (every #'null (send self :legs)) ;; for legged robot, set default external force and moment at the end-effectors
-     (unless target-coords
-       (dolist (limb '(:rleg :lleg))
-         (if (send self limb)
-             (push (send self limb :end-coords) target-coords))))
-     (unless (or force-list moment-list) ;; force [N], moment [Nm]
-       ;; set default force & moment by solving mimimum internal forces
-       (let* ((ret-fm (send self :calc-contact-wrenches-from-total-wrench (send-all target-coords :worldpos))))
-         (setq force-list (car ret-fm) moment-list (cadr ret-fm))
-         )))
-   (send self :calc-torque
-              :debug-view debug-view
-              :calc-statics-p calc-statics-p
-              :av av :root-coords root-coords :dt dt
-              :force-list force-list :moment-list moment-list :target-coords target-coords
-              :calc-torque-buffer-args calc-torque-buffer-args)
-   )
+   (let ((ret-tq
+          (send self :calc-torque
+                :debug-view debug-view
+                :calc-statics-p calc-statics-p
+                :av av :root-coords root-coords :dt dt
+                :force-list force-list :moment-list moment-list :target-coords target-coords
+                :calc-torque-buffer-args calc-torque-buffer-args)))
+     (when (find-method self distribute-total-wrench-to-torque-method)
+       (let ((ext-wrench-tq (send self distribute-total-wrench-to-torque-method)))
+         (dotimes (i (length ret-tq))
+           (setf (elt ret-tq i) (- (elt ret-tq i) (elt ext-wrench-tq i)))
+           (send (elt joint-list i) :joint-torque (elt ret-tq i)))))
+     ret-tq
+     ))
+  (:distribute-total-wrench-to-torque-method-default
+   ()
+   ;; set default force & moment by solving mimimum internal forces
+   (let ((target-coords))
+     (dolist (limb '(:rleg :lleg))
+       (if (send self limb)
+           (push (send self limb :end-coords) target-coords)))
+     (let* ((ret-fm (send self :calc-contact-wrenches-from-total-wrench (send-all target-coords :worldpos)
+                          :total-wrench (concatenate float-vector (send (car (send self :links)) :force) (send (car (send self :links)) :moment)))))
+       (send self :calc-torque-from-ext-wrenches :force-list (car ret-fm) :moment-list (cadr ret-fm) :target-coords target-coords)
+       )))
   (:calc-force-from-joint-torque
    (limb all-torque &key (move-target (send self limb :end-coords)) (use-torso))
    "Calculates end-effector force and moment from joint torques."
@@ -424,20 +475,39 @@
           ;; default cog-jacobian parameters : target-centroid-pos, cog-gain, and centroid-thre
           (target-centroid-pos (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos))) ;; <- target centroid position.
           (cog-gain 1.0) ;; <- cog gain for null-space calculation. cog-gain should be over zero.
+          (cog-translation-axis :z) ;; translation-axis of cog
+          (centroid-offset-func nil) ;; offset function for cog
           (centroid-thre 5.0) ;; cog convergence threshould [mm]
           (additional-weight-list)
           (joint-args nil)
+          (cog-null-space nil)
+          (min-loop 2) ;; 2 is minimum loop count
      &allow-other-keys)
     "fullbody inverse kinematics for legged robot.
      necessary args : target-coords, move-target, and link-list must include legs' (or leg's) parameters
-                      ex. (send *robot* :fullbody-inverse-kinematics (list rarm-tc rleg-tc lleg-tc) :move-target (list rarm-mt rleg-mt lleg-mt) :link-list (list rarm-ll rleg-ll lleg-ll))"
-    (with-append-root-joint ;; inverse-kinematics with base-link
+                      ex. (send *robot* :fullbody-inverse-kinematics (list rarm-tc rleg-tc lleg-tc) :move-target (list rarm-mt rleg-mt lleg-mt) :link-list (list rarm-ll rleg-ll lleg-ll))
+    :min
+    ~ lower position limit of root link virtual joint (x y z roll pitch yaw). Default is #f(-500[mm] -500[mm]  -500[mm] -20[deg] -20[deg] -10[deg]).
+    :max
+    ~ upper position limit of root link virtual joint (x y z roll pitch yaw). Default is #f(500[mm] 500[mm] 25[mm] 20[deg] 20[deg] 10[deg]).
+    :root-link-virtual-joint-weight
+    ~ float-vector of inverse weight of velocity of root link virtual joint or a function which returns the float-vector (x y z roll pitch yaw). This works in the same way as :additional-weight-list in cascaded-coords::inverse-kinematics. Default is #f(0.1 0.1 0.1 0.1 0.5 0.5).
+    :joint-args
+    ~ list of other arguments passed to :init function of root link virtual joint (6dof-joint class).
+    ~~ :max-joint-velocity
+    ~~~ limit of velocity of root link virtual joint (x y z roll pitch yaw). Default is #f((/ 0.08 0.05)[m/s] (/ 0.08 0.05)[m/s] (/ 0.08 0.05)[m/s] (/ pi 4)[rad/s] (/ pi 4)[rad/s] (/ pi 4)[rad/s]))
+    other-keys
+    ~ :fullbody-inverse-kinematics internally calls :inverse-kinematics and args are passed to it. See the explanation of :inverse-kinematics.
+    "
+    (with-append-root-joint ;; inverse-kinematics with root-link
      (link-list-with-robot-6dof self link-list
                                 :joint-class 6dof-joint
                                 :joint-args (append (list :min min :max max) joint-args))
      (send* self :inverse-kinematics target-coords
             :move-target move-target :link-list link-list-with-robot-6dof
             :cog-gain cog-gain :centroid-thre centroid-thre :target-centroid-pos target-centroid-pos
+            :cog-translation-axis cog-translation-axis :centroid-offset-func centroid-offset-func :cog-null-space cog-null-space
+            :min-loop min-loop
             :additional-weight-list
             (append
              additional-weight-list
@@ -518,7 +588,12 @@
     &key (wrt :world)
          ;; :wrt is :local => calc local zmp for robot's root-link coords
          ;; :wrt is :world => calc world zmp for robot
-         (limbs '(:rleg :lleg))
+         (limbs
+          (if (send self :force-sensors)
+              (remove nil (mapcar #'(lambda (fs)
+                                      (find-if #'(lambda (l) (equal fs (car (send self l :force-sensors)))) '(:rleg :lleg)))
+                                  (send self :force-sensors)))
+            '(:rleg :lleg)))
          (force-sensors (mapcar #'(lambda (l) (send self :force-sensor l)) limbs))
          (cop-coords (mapcar #'(lambda (l) (send self l :end-coords)) limbs))
          (fz-thre 1e-3) ;; [N]
@@ -617,25 +692,74 @@
    (footstep-list
     &key (default-step-height 50) (dt 0.1) (default-step-time 1.0)
          (solve-angle-vector-args) (debug-view nil)
-         ((:all-limbs al) '(:rleg :lleg))
+         ((:all-limbs al)
+          (if (send self :force-sensors)
+              (remove nil (mapcar #'(lambda (fs)
+                                      (find-if #'(lambda (l) (equal fs (car (send self l :force-sensors)))) '(:rleg :lleg)))
+                                  (send self :force-sensors)))
+            '(:rleg :lleg)))
          ((:default-zmp-offsets dzo)
           (mapcan #'(lambda (x) (list x (float-vector 0 0 0))) al)) ;; [mm]
          (init-pose-function #'(lambda () (send self :move-centroid-on-foot :both '(:rleg :lleg))))
          (start-with-double-support t)
          (end-with-double-support t)
          (ik-thre 1) (ik-rthre (deg2rad 1))
+         (q 1.0) (r 1e-6) ;; Q is weighting of output error and R is weighting of input.
          (calc-zmp t))
-   "Calculate walking pattern from foot step list and return pattern list as a list of angle-vector, root-coords, time, and so on."
+   "Calculate walking pattern from foot step list and return pattern list as a list of angle-vector, root-coords, time, and so on.
+    footstep-list should be given.
+    :footstep-list
+    ~ (list footstep1 footstep2 ...). :footstep-list can be any length. Each footstep indicates the destinations of swing legs in each step.
+    ~ footstep should be list of coordinate whose :name is identical with one swing leg and whose coords is the destination of that leg. If number of swing legs in a step is one, the footstep can be a coordinate.
+    ~ footstep1 is only for intialization and not executed.
+    :default-step-height
+    ~ Height of swing leg cycloid trajectories. Default is 50[mm].
+    :dt
+    ~ Sampling time of preview control and output walk pattern. Default is 0.1[s].
+    :default-step-time
+    ~ Reference time of each step. The first 10 percent and the last 10 percent of default-step-time is double support phase. Default is 1.0[s].
+    :solve-angle-vector-args
+    ~ :move-centroid-on-foot is used to solve IK in :calc-walk-pattern-from-footstep-list. :solve-angle-vector-args is passed to :move-centroid-on-foot in the form of (send* self :move-centroid-on-foot ... solve-angle-vector-args). Default is nil.
+    :debug-view
+    ~ Set t to show visualization. Default is nil.
+    :all-limbs
+    ~ list of limb names. In each walking step, limbs in :all-limbs but not assigned as swing legs by :footstep-list are considered to be support legs. Default is '(:rleg :lleg) sorted in force-sensors order.
+    :default-zmp-offsets
+    ~ (list limbname1 offset1 limbname2 offset2 ...). :default-zmp-offsets should include every limb in :all-limbs. offset is a float-vector[mm] and local offset of reference zmp position from end-coords. Default offset is #F(0 0 0)[mm].
+    :init-pose-function
+    ~ A function which initialize robot's pose. Walking pattern is generated from this initial pose. :init-pose-function is called once at the start of walking pattern generation in the form of (funcall init-pose-function). Default is #'(lambda () (send self :move-centroid-on-foot :both '(:rleg :lleg))).
+    :start-with-double-support
+    ~ At the start of walking pattern generation, the initial position of reference zmp is
+    ~~ t: midpoint of all-limbs.
+    ~~ nil: midpoint of swing legs of footstep1.
+    ~ Default is t.
+    :end-with-double-support
+    ~ At the end of walking pattern generation, the final position of reference zmp is
+    ~~ t: midpoint of all-limbs.
+    ~~ nil: midpoint of support legs of the last footstep.
+    ~ Default is t.
+    :ik-thre
+    ~ Threshold for position error to terminate IK iteration. Default is 1[mm].
+    :ik-rthre
+    ~ Threshold for rotation error to terminate IK iteration. Default is (deg2rad 1)[rad].
+    :q
+    ~ Weight Q of the cost function of preview control. Default is 1.0.
+    :r
+    ~ Weight R of the cost function of preview control. Default is 1e-6.
+    :calc-zmp
+    ~ Set t to calculate resultant ZMP after IK. The calculated ZMP is visualized if :debug-view is t, and stored as czmp in return value. Default is t.
+   "
    (let* ((res) (ret) (tm 0)
           (gg (instance gait-generator :init self dt)))
      (funcall init-pose-function)
      ;; initial move centroid on foot
      (send gg :initialize-gait-parameter
-           footstep-list default-step-time (send (car (send self :links)) :get :c-til)
+           footstep-list default-step-time (send self :centroid)
            :default-step-height default-step-height :default-double-support-ratio 0.2
            :default-zmp-offsets dzo :all-limbs al
            :thre ik-thre :rthre ik-rthre
-           :start-with-double-support start-with-double-support :end-with-double-support end-with-double-support)
+           :start-with-double-support start-with-double-support :end-with-double-support end-with-double-support
+           :q q :r r)
 
      (while (null (setq ret (send gg :proc-one-tick :type :cycloid :debug t :solve-angle-vector-args solve-angle-vector-args))))
      (if calc-zmp (dotimes (i 2) (send self :calc-zmp))) ;; for zmp initialization
@@ -651,20 +775,22 @@
              (end-coords-list (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) (gg . all-limbs)))
              (contact-state (elt ret 8))
              )
-         (if debug-view
+         (when debug-view
              (send self :draw-gg-debug-view
                    end-coords-list
                    contact-state
                    (elt ret 5) ;; rz
                    (elt ret 6) ;; cog
                    (elt ret 7) ;; pz
-                   czmp dt))
+                   czmp dt)
+             (x::window-main-one))
          (push
           (list :angle-vector (car ret)
                 :root-coords (cadr ret)
                 :czmp czmp :zmp (elt ret 5) :cog (elt ret 6)
                 :time tm
                 :pz (elt ret 7)
+                :all-limbs al
                 :contact-state contact-state
                 :end-coords-list end-coords-list
                 )
@@ -742,7 +868,7 @@
                  (list :default-half-offset (float-vector 0 (* 0.5 dol) 0)
                        :forward-offset-length (* fol 0.5 ratio)
                        :outside-offset-length (* ool 0.5 ratio)
-                       :rotate-rad (* frr 0.5 ratio)))
+                       :rotate-rad (deg2rad (* frr 0.5 ratio))))
            )))
      ))
   (:footstep-parameter
@@ -767,49 +893,90 @@
                 (send cc :name leg)
                 cc))))
    "Calculate foot step list from goal x position [mm], goal y position [mm], and goal yaw orientation [deg]."
-   (let* ((x-sign (if (> xx 0.0) 1.0 -1.0))
-          (y-sign (if (> yy 0.0) 1.0 -1.0))
-          (th-sign (if (> th 0.0) 1.0 -1.0))
-          (dx 0.0) (dy 0.0) (dth 0.0) (cnt 0)
+   (let* ((dx xx) (dy yy) (dth th)
           (leg (if (eps= (float yy) 0.0)
                    (if (> th 0.0) :lleg :rleg)
                  (if (> yy 0.0) :lleg :rleg)))
           (mc (apply #'midcoords 0.5 (send self :legs :end-coords :copy-worldcoords)))
-          ;;(mc (make-coords))
+          (gc (send (make-coords :pos (float-vector xx yy 0) :rpy (float-vector (deg2rad th) 0 0)) :transform mc :world))
           (leg-translate-pos
            (mapcar #'(lambda (l)
                        (list l (scale (case l (:rleg -1) (:lleg 1)) defp)))
                    '(:rleg :lleg)))
           (ret (list (funcall gen-go-pos-step-node-func mc (case leg (:lleg :rleg) (:rleg :lleg)) leg-translate-pos))))
      (labels ((do-push-steps
-               (max-cnt func)
-               (setq cnt 0)
-               (dotimes (i max-cnt)
+               (finish-check func)
+               (until (funcall finish-check)
                  (funcall func)
                  (push (funcall gen-go-pos-step-node-func mc leg leg-translate-pos) ret)
                  (setq leg (case leg (:lleg :rleg) (:rleg :lleg)))
-                 (incf cnt)
-                 ))
-              (calc-max-count
-               (val val-max)
-               (1+ (round (floor (- (/ (abs val) val-max) 1e-5))))))
-       (do-push-steps (max (calc-max-count xx xx-max)
-                           (calc-max-count yy yy-max)
-                           (calc-max-count th th-max))
+                  )))
+       (do-push-steps #'(lambda ()
+                          (and (eps= (float dx) 0.0)
+                               (eps= (float dy) 0.0)
+                               (eps= (float dth) 0.0)))
                       #'(lambda ()
-                          (let ((ddx (if (> xx-max (abs (- dx xx))) (- xx dx) (* xx-max x-sign)))
-                                (ddy (cond
-                                      ((oddp cnt) 0.0)
-                                      ((> yy-max (abs (- dy yy))) (- yy dy))
-                                      (t (* yy-max y-sign))))
+                          (let ((ddx (cond
+                                       ((< xx-max dx) xx-max)
+                                       ((> (- xx-max) dx) (- xx-max))
+                                       (t dx)))
+                                (ddy (case leg
+                                       (:rleg
+                                        (cond
+                                          ((< 0.0 dy) 0.0)
+                                          ((> (- yy-max) dy) (- yy-max))
+                                          (t dy)))
+                                       (:lleg
+                                        (cond
+                                          ((< yy-max dy) yy-max)
+                                          ((> 0.0 dy) 0.0)
+                                          (t dy)))
+                                        ))
                                 (ddth (cond
-                                       ((> th-max (abs (- dth th))) (- th dth))
-                                       (t (* th-max th-sign)))))
+                                        ((< th-max dth) th-max)
+                                        ((> (- th-max) dth) (- th-max))
+                                        (t dth))))
                             (send mc :translate (float-vector ddx ddy 0.0))
                             (send mc :rotate (deg2rad ddth) :z)
-                            (setq dx (+ dx ddx) dy (+ dy ddy) dth (+ dth ddth)))))
+                            (let ((diff (send mc :transformation gc :local)))
+                              (setq dx (elt (send diff :pos) 0) dy (elt (send diff :pos) 1) dth (rad2deg (elt (car (rpy-angle (send diff :rot))) 0)))))))
        (push (funcall gen-go-pos-step-node-func mc leg leg-translate-pos) ret)
        (reverse ret))))
+  (:go-pos-quadruped-params->footstep-list
+   (xx yy th ;; [mm] [mm] [deg]
+       &key (type :crawl))
+   "Calculate foot step list for quadruped walking from goal x position [mm], goal y position [mm], and goal yaw orientation [deg]."
+   (let ((biped-fsl (send self :go-pos-params->footstep-list xx yy th :forward-offset-length 100 :rotate-rad 3))
+         quadruped-fsl)
+     ;; calculate foot step list for quad walk
+     (dolist (fs biped-fsl)
+       (let* ((fs-leg-name (send fs :name))
+              (offset (send (send self fs-leg-name :end-coords :copy-worldcoords) :transformation fs :world))
+              (target-arm-name))
+         (case type
+               (:crawl
+                (dolist (l (list fs-leg-name (case fs-leg-name (:lleg :larm) (:rleg :rarm))))
+                  (push (list (make-coords :coords (send (send self l :end-coords :copy-worldcoords) :transform offset :world) :name l))
+                        quadruped-fsl)))
+               (:trot
+                (push (mapcar #'(lambda (l)
+                                  (make-coords :coords (send (send self l :end-coords :copy-worldcoords) :transform offset :world) :name l))
+                              (list fs-leg-name (setq target-arm-name (case fs-leg-name (:lleg :rarm) (:rleg :larm)))))
+                      quadruped-fsl))
+               (:pace
+                (push (mapcar #'(lambda (l)
+                                  (make-coords :coords (send (send self l :end-coords :copy-worldcoords) :transform offset :world) :name l))
+                              (list fs-leg-name (case fs-leg-name (:lleg :larm) (:rleg :rarm))))
+                      quadruped-fsl))
+               (:gallop
+                (push (mapcar #'(lambda (l)
+                                  (make-coords :coords (send (send self l :end-coords :copy-worldcoords) :transform offset :world) :name l))
+                              (list (case fs-leg-name (:rleg :rleg) (:lleg :rarm))
+                                    (case fs-leg-name (:rleg :lleg) (:lleg :larm))))
+                      quadruped-fsl))
+               )))
+     (reverse quadruped-fsl)))
+
   ;; Support polygon methods
   (:support-polygons
    ()
@@ -818,8 +985,17 @@
    support-polygons)
   (:support-polygon
    (name)
-   "Return support polygon with given name."
-   (find name (send self :support-polygons) :test #'equal :key #'(lambda (x) (send x :name))))
+   "Return support polygon.
+    If name is list, return convex hull of all polygons.
+    Otherwise, return polygon with given name"
+   (if (consp name)
+       (instance polygon :init :vertices (quickhull
+                                          (apply
+                                           #'append
+                                           (mapcar #'(lambda (nm)
+                                                       (send (send self :support-polygon nm) :vertices))
+                                                   name))))
+     (find name (send self :support-polygons) :test #'equal :key #'(lambda (x) (send x :name)))))
   (:make-support-polygons
    ()
    (setq support-polygons
@@ -916,6 +1092,36 @@
      (setq links (append links (list l0 l1 l2)))
      (setq joint-list (append joint-list (list j0 j1 j2)))
      ))
+  (:calc-static-balance-point
+   (&key (target-points
+          (mapcar #'(lambda (tmp-arm)
+                      (send (send self tmp-arm :end-coords) :worldpos))
+                  '(:rarm :larm)))
+         (force-list (make-list (length target-points) :initial-element (float-vector 0 0 0)))
+         (moment-list (make-list (length target-points) :initial-element (float-vector 0 0 0)))
+         (static-balance-point-height (elt (apply #'midpoint 0.5 (send self :legs :end-coords :worldpos)) 2))
+         (update-mass-properties t))
+   "Calculate static balance point which is equivalent to static extended ZMP.
+    The output is expressed by the world coordinates.
+    target-points are end-effector points on which force-list and moment-list apply.
+    force-list [N] and moment-list [Nm] are list of force and moment that robot receives at target-points.
+    static-balance-point-height is height of static balance point [mm]."
+   (let* ((sbp (float-vector 0 0 static-balance-point-height))
+          (mg (* 1e-6 (send self :weight update-mass-properties) (elt *g-vec* 2))))
+     (dotimes (idx 2)
+       (let ((denom mg)
+             (nume (* mg (elt (send self :centroid nil) idx))))
+         (mapcar #'(lambda (f m tp)
+                     (setq nume
+                           (+ nume
+                              (- (* (- (elt tp 2) static-balance-point-height) (elt f idx))
+                                 (* (elt tp idx) (elt f 2)))
+                              (* 1e3 (case idx (0 (elt m 1)) (1 (- (elt m 0))))))
+                           denom (- denom (elt f 2))))
+                 force-list moment-list target-points)
+         (setf (elt sbp idx) (/ nume denom))
+         ))
+     sbp))
   )
 (in-package "GEOMETRY")
 

@@ -15,11 +15,30 @@
 /// Workshop on Concurrent Object-based Systems,
 ///  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ///
-/// Permission to use this software for educational, research
-/// and non-profit purposes, without fee, and without a written
-/// agreement is hereby granted to all researchers working on
-/// the IRT project at the University of Tokyo, provided that the
-/// above copyright notice remains intact.  
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///
+/// * Redistributions of source code must retain the above copyright notice,
+///   this list of conditions and the following disclaimer.
+/// * Redistributions in binary form must reproduce the above copyright notice,
+///   this list of conditions and the following disclaimer in the documentation
+///   and/or other materials provided with the distribution.
+/// * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+///   (JSK) nor the names of its contributors may be used to endorse or promote
+///   products derived from this software without specific prior written
+///   permission.
+///
+/// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+/// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+/// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+/// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+/// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+/// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+/// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+/// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+/// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+/// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+/// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
 #pragma init (register_euspng)
@@ -28,7 +47,7 @@
 #include "eus.h"
 
 extern pointer ___euspng();
-static register_euspng()
+static void register_euspng()
 { add_module_initializer("___euspng", ___euspng);}
 
 pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
@@ -36,7 +55,7 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
   char *file_name;
   pointer ret, image_ptr;
   ckarg(1);
-  if (isstring(argv[0])) file_name = argv[0]->c.str.chars;
+  if (isstring(argv[0])) file_name = (char *)(argv[0]->c.str.chars);
   else error(E_NOSTRING);
 
   FILE *fp = fopen(file_name, "rb");
@@ -118,16 +137,16 @@ pointer PNG_READ_IMAGE(register context *ctx, int n, register pointer *argv)
 
 pointer PNG_WRITE_IMAGE(register context *ctx, int n, register pointer *argv)
 {
-  char *file_name, *image_ptr;
+  char *file_name;
+  png_bytep image_ptr;
   int width, height, channels;
   ckarg(5);
-  if (isstring(argv[0])) file_name = argv[0]->c.str.chars;
+  if (isstring(argv[0])) file_name = (char *)(argv[0]->c.str.chars);
   else error(E_NOSTRING);
   width  = ckintval(argv[1]);
   height = ckintval(argv[2]);
   channels  = ckintval(argv[3]);
-  image_ptr = argv[4]->c.str.chars;
-  fprintf(stderr, "%d %d %d %p\n", width, height, channels, image_ptr);
+  image_ptr = (png_bytep)(argv[4]->c.str.chars);
   FILE *fp = fopen(file_name, "wb");
   if (!fp) {
     error(E_OPENFILE);
@@ -151,7 +170,6 @@ pointer PNG_WRITE_IMAGE(register context *ctx, int n, register pointer *argv)
                PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
   png_bytep * row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * height);
   int y, byte_per_scanline = png_get_rowbytes(png_ptr, info_ptr);
-  fprintf(stderr, "%d\n", byte_per_scanline);
   for(y=0;y<height;y++){
     row_pointers[y] = &(image_ptr[y*byte_per_scanline]);
   }
@@ -168,11 +186,12 @@ pointer PNG_WRITE_IMAGE(register context *ctx, int n, register pointer *argv)
   return (T);
 }
 
+#include "defun.h" // redefine defun for update defun() API
 pointer ___euspng(register context *ctx, int n, register pointer *argv)
 {
     pointer mod=argv[0];
 
-    defun(ctx, "PNG-READ-IMAGE",  mod, PNG_READ_IMAGE);
-    defun(ctx, "PNG-WRITE-IMAGE", mod, PNG_WRITE_IMAGE);
+    defun(ctx, "PNG-READ-IMAGE",  mod, PNG_READ_IMAGE, NULL);
+    defun(ctx, "PNG-WRITE-IMAGE", mod, PNG_WRITE_IMAGE, NULL);
 }
 

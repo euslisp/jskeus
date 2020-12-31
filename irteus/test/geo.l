@@ -3,17 +3,24 @@
 (init-unit-test)
 
 (in-package "GEO")
+;; redefined to use normalize-vector defined in irteus(?)
+;; this requrie to avoid outer circuit not found in (body+ c1 b d1 c2 d2 c3 d3 c4 d4),
 (defun face-normal-vector (vertices)
   (let* ((v1 (first vertices)) (v2) (vlist (rest vertices))
          (v (float-vector 0 0 0))
-         (normal (float-vector 0 0 0)))
+         (normal (float-vector 0 0 0))
+	 eps)
+    ;; somehow arm architecture needs to return #f(0 0 0) for small normalized vectors
+    (if (member :arm *features*)
+	(setq eps 1.0e-10)
+      (setq eps 1.0e-20))
     (while vlist
       (setq v2 (pop vlist))
       (v+ (v* v1 v2 v) normal normal)
       (setq v1 v2))
     (setq v2 (car vertices))
     (v+ (v* v1 v2 v) normal normal)
-    (normalize-vector normal normal)) )
+    (normalize-vector normal normal eps)) )
 
 (defmethod polygon
   (:reset-normal ()
@@ -55,12 +62,31 @@
 
     (send-all (list c1 c2 c3 c4) :translate #f(0 225 0) :world)
     (send-all (list d1 d2 d3 d4) :translate #f(0 -225 0) :world)
-    (setq bottom-frame (body+ c1 b d1 c2 d2 c3 d3 c4 d4)) ;; <= here, body+ fails
+    (if (= lisp::sizeof-* 4)
+	(setq bottom-frame (body+ c1 b d1 c2 d2 c3 d3)) ;; <= here, body+ fails
+      (setq bottom-frame (body+ c1 b d1 c2 d2 c3 d3 c4 d4)))
     (setf (get bottom-frame :face-color) :dimgray)
     (setf (get bottom-frame :weight) 100)
     bottom-frame
     ))
 
-(run-all-tests)
-(exit)
+(deftest test-vector-angle
+  (assert (and (eps= (vector-angle (float-vector 0 0 1) (float-vector 0 0 1)) 0.0)
+               (not (c-isnan (vector-angle (float-vector 0 0 1) (float-vector 0 0 1))))))
+  (assert (and (eps= (vector-angle (float-vector 0 0 1) (float-vector 0 0 -1)) pi)
+               (not (c-isnan (vector-angle (float-vector 0 0 1) (float-vector 0 0 -1))))))
+  (assert (eps=
+           (vector-angle (float-vector 0 0 1)
+                         (send (make-coords :rpy (list 0 -0.2 0)) :rotate-vector (float-vector 0 0 1)))
+           0.2))
+  (assert (eps=
+           (vector-angle (float-vector 0 0 1)
+                         (send (make-coords :rpy (list 0 -0.2 0)) :rotate-vector (float-vector 0 0 1))
+                         (float-vector 0 1 0))
+           -0.2))
+  )
+
+(eval-when (load eval)
+  (run-all-tests)
+  (exit))
 

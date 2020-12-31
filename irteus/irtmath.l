@@ -15,11 +15,30 @@
 ;;; Workshop on Concurrent Object-based Systems,
 ;;;  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ;;;
-;;; Permission to use this software for educational, research
-;;; and non-profit purposes, without fee, and without a written
-;;; agreement is hereby granted to all researchers working on
-;;; the IRT project at the University of Tokyo, provided that the
-;;; above copyright notice remains intact.  
+;;; Redistribution and use in source and binary forms, with or without
+;;; modification, are permitted provided that the following conditions are met:
+;;;
+;;; * Redistributions of source code must retain the above copyright notice,
+;;;   this list of conditions and the following disclaimer.
+;;; * Redistributions in binary form must reproduce the above copyright notice,
+;;;   this list of conditions and the following disclaimer in the documentation
+;;;   and/or other materials provided with the distribution.
+;;; * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+;;;   (JSK) nor the names of its contributors may be used to endorse or promote
+;;;   products derived from this software without specific prior written
+;;;   permission.
+;;;
+;;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;;; THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;;; PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+;;; CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;;; EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;;; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;;; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;;; WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;;; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+;;; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;;;
 
 (defun inverse-matrix (mat) ;; redefined
@@ -41,6 +60,47 @@
        (dotimes (j dim) (aset result j i (aref rvec j) ))
        (setf (aref vec i) 0.0))
      result))
+
+(defun inverse-matrix-complex (cmat)
+  "returns inverse matrix of complex square matrix"
+  ;; cmat = (list A B) = A + B*j  (j is imaginary unit)
+  ;; inv(cmat) = (list C D) = C + D*j
+  ;; solve C and D from (A + B*j)*(C + D*j) = E
+  ;; https://hitotu.at.webry.info/201405/article_1.html
+  (let* ((A (car cmat)) ;; n*n size
+         (B (cadr cmat)) ;; n*n size
+         C ;; n*n size
+         D ;; n*n size
+         F C-D
+         (n (car (array-dimensions A))))
+    (setq F (concatenate-matrix-column
+             (concatenate-matrix-row A (scale-matrix -1.0 B))
+             (concatenate-matrix-row B A))) ;; 2n*2n size
+    ;; (warn "det(F) = ~a~%" (matrix-determinant F))
+    ;; (if (eps= (matrix-determinant F) 0 1.0e-10)
+    ;; (if (eps= (matrix-determinant F) 0 1.0e-5)
+    (if (= (matrix-determinant F) 0)
+        (progn
+          (warn ";; could not solve inverse-matrix-complex because matrix-determinant = 0~%")
+          (return-from inverse-matrix-complex))
+      (progn
+        (setq C-D (m* (inverse-matrix F) (concatenate-matrix-column (unit-matrix n) (make-matrix n n)))) ;; [C D]^{T} = inv(F)*[E O]^{T}
+        (setq C (m* (concatenate-matrix-row (unit-matrix n) (make-matrix n n)) C-D)) ;; C = [E O]*[C D]^{T}
+        (setq D (m* (concatenate-matrix-row (make-matrix n n) (unit-matrix n)) C-D)) ;; D = [O E]*[C D]^{T}
+        (list C D))
+      )
+    ))
+
+(defun m*-complex (cmat1 cmat2)
+  "returns complex matrix 1 * complex matrix 2"
+  ;; cmat1 = (list A B) = A + B*j  (j is imaginary unit)
+  ;; cmat2 = (list C D) = C + D*j
+  (let* ((A (car cmat1))
+         (B (cadr cmat1))
+         (C (car cmat2))
+         (D (cadr cmat2)))
+    (list (m- (m* A C) (m* B D)) (m+ (m* A D) (m* B C))) ;; (A + B*j)*(C + D*j) = (A*C - B*D) + (A*D + B*C)*j
+    ))
 
 (defun diagonal (v)
   "make diagonal matrix from given vecgtor, diagonal #f(1 2) ->#2f((1 0)(0 2))"
@@ -104,7 +164,7 @@
 
 
 (defun matrix2quaternion (m)
-  "returns quaternion of given matrix"
+  "returns quaternion (w x y z) of given matrix"
   (let (q0 q1 q2 q3  mq^2
 	   (q0^2 (/ (+ 1 (aref m 0 0) (aref m 1 1) (aref m 2 2)) 4))
 	   (q1^2 (/ (+ 1 (aref m 0 0) (- (aref m 1 1)) (- (aref m 2 2))) 4))
@@ -136,7 +196,7 @@
     (float-vector q0 q1 q2 q3)))
 
 (defun quaternion2matrix (q)
-  "returns matrix of given quaternion"
+  "returns matrix of given quaternion (w x y z)"
   (let ((q0 (elt q 0)) (q1 (elt q 1)) (q2 (elt q 2)) (q3 (elt q 3)))
     (unless (eps= (v. q q) 1.0 0.01)
         (warning-message 1 ";; quaternion2matrix : invalid input ~A, the norm is not 1~%" q))
@@ -155,7 +215,7 @@
 		    )))
     ))
 
-(defun matrix-log (m) ;; matrix-log retuns [-pi, pi]
+(defun matrix-log (m) ;; matrix-log returns [-pi, pi]
  "returns matrix log of given m, it returns [-pi, pi]"
  (let* ((qq (matrix2quaternion m))
         (q0 (elt qq 0))
@@ -178,7 +238,7 @@
     ))
 
 (defun midrot (p r1 r2)
-  "returns mid (or p) rotation matrix of given two matrix r1 and r1"
+  "returns mid (or p) rotation matrix of given two matrix r1 and r2"
   (let (r omega)
     (setq r (m* (transpose r1) r2))
     (setq omega (matrix-log r))
@@ -370,6 +430,96 @@
       (setf (matrix-column evector i) tv))
     (list evalue evector)))
 
+(defun eigen-decompose-complex (m)
+  "returns eigen decomposition from real square matrix"
+  ;; m is real square matrix
+  (let* ((evalue-real (car (qr-decompose m)))
+         (evalue-imag (cadr (qr-decompose m)))
+         (l (length evalue-real))
+         (evalue (make-list l))
+         (evector-real (make-matrix l l))
+         (evector-imag (make-matrix l l))
+         lambda-i lambda-i-real lambda-i-imag
+         U11 U12 U21 U22 U
+         v-i v-i-real v-i-imag)
+    (dotimes (i l)
+      (setf (elt evalue i) (float-vector (elt evalue-real i) (elt evalue-imag i))))
+    (sort evalue #'(lambda (x y) (> (elt x 0) (elt y 0)))) ;; sort Re(evalue) in descending order
+    (dotimes (i l)
+      (setq lambda-i (elt evalue i))
+      (setq lambda-i-real (elt lambda-i 0))
+      (setq lambda-i-imag (elt lambda-i 1))
+      (setf (elt evalue-real i) lambda-i-real)
+      (setf (elt evalue-imag i) lambda-i-imag)
+      ;;;;; solve v_{i}^{real} and v_{i}^{imag}
+      ;;;;; s.t. (M-\lambda_{i}*E)*v_{i} = O,  (det(M-\lambda_{i}*E) = 0)
+      ;;;;; s.t. \lambda_{i} = \lambda_{i}^{real} + \lambda_{i}^{imag}*j,  (j is imaginary unit)
+      ;;;;; s.t. v_{i} = v_{i}^{real} + v_{i}^{imag}*j  (v_{i} \neq O)
+      (setq U11 (m+ m (scale-matrix (- lambda-i-real) (unit-matrix l)))) ;; M-\lambda_{i}^{real}*E  (l*l size)
+      (setq U12 (scale-matrix lambda-i-imag (unit-matrix l))) ;; \lambda_{i}^{imag}*E  (l*l size)
+      (setq U21 (scale-matrix (- lambda-i-imag) (unit-matrix l))) ;; -\lambda_{i}^{imag}*E  (l*l size)
+      (setq U22 (m+ m (scale-matrix (- lambda-i-real) (unit-matrix l)))) ;; M-\lambda_{i}^{real}*E  (l*l size)
+      (setq U (concatenate-matrix-column
+               (concatenate-matrix-row U11 U12)
+               (concatenate-matrix-row U21 U22))) ;; (2l*2l size)
+      (setq v-i (solve-non-zero-vector-from-det0-matrix U)) ;; solve [v_{i}^{real} v_{i}^{imag}]^{T}  s.t.  U * [v_{i}^{real} v_{i}^{imag}]^{T} = O
+      (setq v-i-real (transform (concatenate-matrix-row (unit-matrix l) (make-matrix l l)) v-i)) ;; v_{i}^{real} = [E O] * [v_{i}^{real} v_{i}^{imag}]^{T}
+      (setq v-i-imag (transform (concatenate-matrix-row (make-matrix l l) (unit-matrix l)) v-i)) ;; v_{i}^{imag} = [O E] * [v_{i}^{real} v_{i}^{imag}]^{T}
+      (setf (matrix-column evector-real i) v-i-real)
+      (setf (matrix-column evector-imag i) v-i-imag)
+      )
+    (list (list evalue-real evalue-imag) (list evector-real evector-imag))
+    ))
+
+;; solve non-zero-vector v from determinant-zero-matrix M, when M*v=O and det(M)=0
+(defun solve-non-zero-vector-from-det0-matrix (M)
+  "solves non-zero-vector v from real square determinant-zero-matrix mat, when mat*v=O and det(mat)=0"
+  ;; M is real square matrix which satisfies det(M)=0 (i.e. inverse matrix of M does NOT exist)
+  ;; (unless (eps= (matrix-determinant M) 0 1.0e-10)
+  ;; (unless (eps= (matrix-determinant M) 0 1.0e-5)
+  (unless (eps= (matrix-determinant M) 0)
+    (warn ";; ERROR : det(M) is NOT equal to 0 (i.e. inverse matrix of M exists).~%")
+    (return-from solve-non-zero-vector-from-det0-matrix))
+  (let* ((l (car (array-dimensions M)))
+         mm mmm tv ttv pv r w j (j-max 10))
+    (setq mm M)
+    (setq mmm (copy-matrix mm))
+    ;; inverse iteration
+    ;; using lu
+    (when (setq pv (lu-decompose mm))
+      ;; make random vector
+      (setq tv (instantiate float-vector l))
+      ;; generate non-zero random vector
+      (while (eps= (norm tv) 0)
+        (dotimes (i l) (setf (elt tv i) (- (random 1.0) 0.5)))
+        (setq tv (normalize-vector tv)))
+      ;;
+      (setq ttv tv j 0)
+      (loop
+       (setq tv (lu-solve mm pv tv))
+       (setq tv (normalize-vector tv))
+       ;; exit loop when no updates
+       (if (or (>= (incf j) j-max) (eps= (distance ttv tv) 0))
+           (return-from nil))
+       ;; update non-zero vector
+       (when (> j (/ j-max 2))
+         (setq mm M)
+         (setq pv (lu-decompose mm))
+         (if (null pv) (return-from nil))
+         )
+       (setq ttv tv))
+      (when (>= j j-max)
+        (setq pv nil))
+      )
+    (unless pv
+      (setq r (sv-decompose mmm))
+      (setq w (elt r 1))
+      (dotimes (j (length w))
+        (if (< (abs (elt w j)) 1e-4)
+            (setq tv (matrix-column (elt r 2) j))
+          )))
+    tv))
+
 ;; lmeds
 ;;http://www-pse.cheme.kyoto-u.ac.jp/~kano/document/text-PCA.pdf
 (defun lms (point-list)
@@ -468,6 +618,50 @@
     (elt (sort err #'<) (/ (length err) 2))
     ))
 
+(defun concatenate-matrix-column (&rest args)
+  "Concatenate matrix in column direction."
+  (let (m ml (size-of-column (array-dimension (car args) 1)))
+    (dolist (mat args)
+      (unless (= (array-dimension mat 1) size-of-column)
+        (error ";; concatenate-matrix-column matrix size error (size=~A)~%" (mapcar #'(lambda (x) (array-dimension x 1)) args)))
+      (setq m (if mat (length (matrix-column mat 0)) 0))
+      (dotimes (i m)
+        (push (matrix-row mat i) ml)))
+    (when ml (apply #'matrix (reverse ml)))
+    ))
+
+(defun concatenate-matrix-row (&rest args)
+  "Concatenate matrix in row direction."
+  (let (m ml (size-of-column (array-dimension (car args) 0)))
+    (dolist (mat args)
+      (unless (= (array-dimension mat 0) size-of-column)
+        (error ";; concatenate-matrix-row matrix size error (size=~A)~%" (mapcar #'(lambda (x) (array-dimension x 0)) args)))
+      (setq m (if mat (length (matrix-row mat 0)) 0))
+      (dotimes (i m)
+        (push (matrix-column mat i) ml)))
+    (when ml (transpose (apply #'matrix (reverse ml))))
+    ))
+
+(defun concatenate-matrix-diagonal (&rest args)
+  "Concatenate matrix in diagonal."
+  (let (mat m ll ml vl)
+    (dolist (mm args)
+      (push (if mm (length (matrix-row mm 0)) 0) ll))
+    (setq ll (reverse ll))
+    (dotimes (i (length args))
+      (setq mat (nth i args))
+      (setq m (if mat (length (matrix-column mat 0)) 0))
+      (dotimes (j m)
+        (setq vl nil)
+        (dotimes (k (length ll))
+          (if (= i k) (push (matrix-row mat j) vl)
+            (push (make-array (nth k ll)
+                              :element-type float-vector
+                              :initial-element 0) vl)))
+        (push (apply #'concatenate
+                     (cons float-vector (reverse vl))) ml)))
+    (when ml (apply #'matrix (reverse ml)))
+    ))
 
 #|
 (defun lms-draw (r point-list)
@@ -535,6 +729,30 @@
     (format t ";; lmeds-error   ~10,3f, ~A~%" (lmeds-error r data1) r)
     ))
 |#
+;;
+;; vector functions
+;;
+(defun vector-variance (vector-list)
+  "returns vector, each element represents variance of elements in the same index of vector within vector-list"
+  (let*  ((len (length vector-list))
+          (m (make-matrix len (length (car vector-list)) vector-list))
+          (ret (instantiate float-vector (length (car vector-list)))))
+    (dotimes (i (length ret))
+      (setf (elt ret i) (variance (matrix-column m i))))
+    ret))
+
+(defun covariance-matrix (vector-list)
+  "make covariance matrix of given input vector-list"
+  (let (m n)
+    (setq n (length vector-list))
+    (setq m (make-matrix n n))
+    (dotimes (i n m)
+      (dotimes (j n)
+        (setf (aref m i j)
+              (covariance (elt vector-list i)
+                          (elt vector-list j)))
+        ))
+    ))
 
 ;;
 ;; re-define

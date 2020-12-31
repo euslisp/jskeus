@@ -15,20 +15,39 @@
 /// Workshop on Concurrent Object-based Systems,
 ///  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ///
-/// Permission to use this software for educational, research
-/// and non-profit purposes, without fee, and without a written
-/// agreement is hereby granted to all researchers working on
-/// the IRT project at the University of Tokyo, provided that the
-/// above copyright notice remains intact.  
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///
+/// * Redistributions of source code must retain the above copyright notice,
+///   this list of conditions and the following disclaimer.
+/// * Redistributions in binary form must reproduce the above copyright notice,
+///   this list of conditions and the following disclaimer in the documentation
+///   and/or other materials provided with the distribution.
+/// * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+///   (JSK) nor the names of its contributors may be used to endorse or promote
+///   products derived from this software without specific prior written
+///   permission.
+///
+/// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+/// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+/// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+/// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+/// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+/// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+/// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+/// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+/// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+/// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+/// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
 #ifndef _NR_H_
 #define _NR_H_
 
-static eusfloat_t sqrarg;
+static double sqrarg;
 #define SQR(a) ((sqrarg=(a)) == 0.0 ? 0.0 : sqrarg*sqrarg)
 
-static eusfloat_t maxarg1, maxarg2;
+static double maxarg1, maxarg2;
 #define FMAX(a,b) (maxarg1=(a),maxarg2=(b),(maxarg1) > (maxarg2) ? (maxarg1) : (maxarg2))
 
 static int iminarg1, iminarg2;
@@ -41,22 +60,25 @@ static int iminarg1, iminarg2;
 #define FREE_ARG char*
 
 void nrerror(char error_text[]);
-eusfloat_t *nr_vector(int nl, int nh);
-eusfloat_t **nr_matrix(int nrl, int nrh, int ncl, int nch);
-void free_nr_vector(eusfloat_t *v, int nl, int nh);
-void free_nr_matrix(eusfloat_t **m, int nrl, int nrh, int ncl, int nch);
+double *nr_vector(int nl, int nh);
+double **nr_matrix(int nrl, int nrh, int ncl, int nch);
+void free_nr_vector(double *v, int nl, int nh);
+void free_nr_matrix(double **m, int nrl, int nrh, int ncl, int nch);
 
 #define TINY 1.0e-20
-void lubksb(eusfloat_t **a, int n, int *indx, eusfloat_t b[]);
-int  ludcmp(eusfloat_t **a, int n, int *indx, eusfloat_t *d);
+void lubksb(double **a, int n, int *indx, double b[]);
+int  ludcmp(double **a, int n, int *indx, double *d);
 
-int svdsolve(eusfloat_t **a, int m, int n, eusfloat_t *b, eusfloat_t *x);
-void svbksb(eusfloat_t **u, eusfloat_t *w, eusfloat_t **v, int m, int n, eusfloat_t *b, eusfloat_t *x);
-int svdcmp(eusfloat_t **a, int m, int n, eusfloat_t *w, eusfloat_t **v);
+int svdsolve(double **a, int m, int n, double *b, double *x);
+void svbksb(double **u, double *w, double **v, int m, int n, double *b, double *x);
+int svdcmp(double **a, int m, int n, double *w, double **v);
 
-eusfloat_t pythag(eusfloat_t a, eusfloat_t b);
+void tred2(double **a, int n, double d[], double e[]);
+int tqli(double d[], double e[], int n, double **z);
 
-static copymat(dest,src,size)
+double pythag(double a, double b);
+
+static void copymat(dest,src,size)
 pointer dest,src;
 register int size;
 { register int i;

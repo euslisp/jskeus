@@ -15,11 +15,30 @@
 ;;; Workshop on Concurrent Object-based Systems,
 ;;;  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ;;;
-;;; Permission to use this software for educational, research
-;;; and non-profit purposes, without fee, and without a written
-;;; agreement is hereby granted to all researchers working on
-;;; the IRT project at the University of Tokyo, provided that the
-;;; above copyright notice remains intact.  
+;;; Redistribution and use in source and binary forms, with or without
+;;; modification, are permitted provided that the following conditions are met:
+;;;
+;;; * Redistributions of source code must retain the above copyright notice,
+;;;   this list of conditions and the following disclaimer.
+;;; * Redistributions in binary form must reproduce the above copyright notice,
+;;;   this list of conditions and the following disclaimer in the documentation
+;;;   and/or other materials provided with the distribution.
+;;; * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+;;;   (JSK) nor the names of its contributors may be used to endorse or promote
+;;;   products derived from this software without specific prior written
+;;;   permission.
+;;;
+;;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;;; THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;;; PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+;;; CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;;; EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;;; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;;; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;;; WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;;; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+;;; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;;;
 
 (unless (find-package "COLLADA") (make-package "COLLADA")) ;; define collad package to import collada function
@@ -28,13 +47,13 @@
   (load-library
    (format nil "~A~A/lib/libirteus"
 	   *eusdir* (unix:getenv "ARCHDIR"))
-   '("irtmath" "irtutil" "irtc" "irtgeoc" "irtgraph" "pgsql")))
+   '("irtmath" "irtutil" "irtc" "irtgeoc" "irtgraph" "___time" "___pgsql")))
 (defun load-irteusg ()
   (in-package "GEOMETRY")
   (load-library
    (format nil "~A~A/lib/libirteusg"
 	   *eusdir* (unix:getenv "ARCHDIR"))
-   '("irtgeo" "euspqp" "pqp" "irtscene" "irtmodel" "irtdyna" "irtrobot" "irtsensor" "irtbvh" "irtcollada" "irtpointcloud"))
+   '("irtgeo" "euspqp" "pqp" "irtscene" "irtmodel" "irtdyna" "irtrobot" "irtsensor" "irtbvh" "irtcollada" "irtstl" "irtwrl" "irtpointcloud" "eusbullet" "bullet" "irtcollision"))
   (in-package "USER")
   (import '(collada::convert-irtmodel-to-collada collada::eus2collada)))
 (defun load-irteusx ()
@@ -55,7 +74,7 @@
   (load-library
    (format nil "~A~A/lib/libirteusgl"
 	   *eusdir* (unix:getenv "ARCHDIR"))
-   '("irtglrgb" "irtgl" "irtviewer"))
+   '("irtglrgb" "irtgl" "irtglc" "irtviewer"))
   )
 
 (unless (member (pathname-name *program-name*)

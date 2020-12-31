@@ -10,7 +10,7 @@
 (defmethod 2dof-robot
   (:init ()
          (send-super :init)
-         (setq l3 (send self :make-link (make-cube 40 40 80) #f(0 0 40) :read 'l3))
+         (setq l3 (send self :make-link (make-cube 40 40 80) #f(0 0 40) :red 'l3))
          (setq end-coords (make-cascoords :pos #f(0 0 80)))
          (send l3 :assoc end-coords)
          (send l3 :locate #f(0 0 10))
@@ -23,9 +23,9 @@
                                                (make-cube 300 300 2)) #f(0 0 0) :white 'l1))
          (send l1 :assoc l2)
          (setq j1 (instance rotational-joint :init :parent-link l1 :child-link l2 :axis :z
-                            :min-angle -90 :max-angle 90)
+                            :min -90.0 :max 90.0)
                j2 (instance rotational-joint :init :parent-link l2 :child-link l3 :axis :y
-                            :min-angle -90 :max-angle 90))
+                            :min -60.0 :max 60.0))
          ;;
          (setq links (list l1 l2 l3) joint-list (list j1 j2))
      (send self :init-ending)
@@ -96,8 +96,8 @@
 (deftest test-min-max-table
   (let* ((j1 (send *robot* :j1))
          (j2 (send *robot* :j2))
-         (j1-min-max-table (make-matrix 3 (round (+ 1 (- (send j1 :max-angle) (send j1 :min-angle))))))
-         (j2-min-max-table (make-matrix 3 (round (+ 1 (- (send j2 :max-angle) (send j2 :min-angle))))))
+         (j1-min-max-table (make-matrix 3 (round (+ 1 (- (send j2 :max-angle) (send j2 :min-angle))))))
+         (j2-min-max-table (make-matrix 3 (round (+ 1 (- (send j1 :max-angle) (send j1 :min-angle))))))
          (j1-org-min-angle (send j1 :min-angle)) (j2-org-min-angle (send j2 :min-angle))
          (j1-org-max-angle (send j1 :max-angle)) (j2-org-max-angle (send j2 :max-angle))
          min-max-table-view
@@ -107,9 +107,14 @@
     ;; j1-hash
     (mapcar #'(lambda (self-joint target-joint j-min-max-table)
                 (do ((i (round (send target-joint :min-angle)) (+ i 1))) ((> i (round (send target-joint :max-angle))))
-                    (setf (aref j-min-max-table 0 (round (- i (send self-joint :min-angle)))) i)
-                    (setf (aref j-min-max-table 1 (round (- i (send self-joint :min-angle)))) (- (abs i) (send self-joint :max-angle)))
-                    (setf (aref j-min-max-table 2 (round (- i (send self-joint :min-angle)))) (- (send self-joint :max-angle) (abs i))))
+                    (setf (aref j-min-max-table 0 (round (- i (send target-joint :min-angle)))) i)
+                    (setf (aref j-min-max-table 1 (round (- i (send target-joint :min-angle))))
+                          (- (+ (min (* (/ (send self-joint :max-angle) (send target-joint :max-angle)) i)
+                                     (* -1 (/ (send self-joint :max-angle) (send target-joint :max-angle)) i))
+                                (send self-joint :max-angle))))
+                    (setf (aref j-min-max-table 2 (round (- i (send target-joint :min-angle))))
+                          (- (aref j-min-max-table 1 (round (- i (send target-joint :min-angle))))))
+                    )
                 (send self-joint :joint-min-max-table j-min-max-table)
                 (send self-joint :joint-min-max-target target-joint))
             (list j1 j2)
@@ -128,8 +133,8 @@
           ((> x j1-org-max-angle))
         (do ((y j2-org-min-angle (+ y 1)))
             ((> y j2-org-max-angle))
-          (let* ((j1-min-max (cons (aref j1-min-max-table 1 (round (- y (aref j1-min-max-table 0 0)))) (aref j1-min-max-table 2 (round (- y (aref j1-min-max-table 0 0)))))) ;; j1-min-max-table is functoin of j2
-                 (j2-min-max (cons (aref j2-min-max-table 1 (round (- x (aref j2-min-max-table 0 0)))) (aref j2-min-max-table 2 (round (- x (aref j2-min-max-table 0 0))))))
+          (let* ((j1-min-max (cons (aref j1-min-max-table 1 (round (- y j2-org-min-angle))) (aref j1-min-max-table 2 (round (- y j2-org-min-angle))))) ;; j1-min-max-table is functoin of j2
+                 (j2-min-max (cons (aref j2-min-max-table 1 (round (- x j1-org-min-angle))) (aref j2-min-max-table 2 (round (- x j1-org-min-angle)))))
                  (j1-min (car j1-min-max))
                  (j1-max (cdr j1-min-max))
                  (j2-min (car j2-min-max))
@@ -165,14 +170,30 @@
           (if min-max-table-view
               (format t ";; Is (~A ~A) safe posture? ~A ~A~%" x y (and (= x (send j1 :joint-angle)) (= y (send j2 :joint-angle))) (<= (abs y) (- 90 (abs x))))))
         ;; check in view
-        (cond ((and (= x (send j1 :joint-angle)) (= y (send j2 :joint-angle)) min-max-table-view) ;; with i nlimit
-               (send min-max-table-view :color #x0000ff))
+        (cond ((and (= x (send j1 :joint-angle)) (= y (send j2 :joint-angle))) ;; with i nlimit
+               (if min-max-table-view
+                   (send min-max-table-view :color #x0000ff)))
               (t ;; out of limit
                (if min-max-table-view (format t ";; out of limit ~A -> ~A~%" (float-vector x y) (send *robot* :angle-vector)))
-               (setq ret
-                     (and ret
-                          (< (- (- (abs (send j2 :joint-angle)) (abs j1-org-max-angle)) *epsilon*) (send j1 :joint-angle) (+ (- (abs j1-org-max-angle) (abs (send j2 :joint-angle))) *epsilon*))
-                            (< (- (- (abs (send j1 :joint-angle)) (abs j2-org-max-angle)) *epsilon*) (send j2 :joint-angle) (+ (- (abs j2-org-max-angle) (abs (send j1 :joint-angle))) *epsilon*))))
+               (let* ((j1-max-angle
+                       (+ (min (* (/ j1-org-max-angle j2-org-max-angle) (send j2 :joint-angle))
+                               (* -1 (/ j1-org-max-angle j2-org-max-angle) (send j2 :joint-angle)))
+                          j1-org-max-angle))
+                      (j1-min-angle
+                       (- j1-max-angle))
+                      (j2-max-angle
+                       (+ (min (* (/ j2-org-max-angle j1-org-max-angle) (send j1 :joint-angle))
+                               (* -1 (/ j2-org-max-angle j1-org-max-angle) (send j1 :joint-angle)))
+                          j2-org-max-angle))
+                      (j2-min-angle
+                       (- j2-max-angle)))
+                 (setq ret
+                       (and ret
+                            (and (or (< (- j1-min-angle *epsilon*) (send j1 :joint-angle) (+ j1-min-angle *epsilon*))
+                                     (< (- j1-max-angle *epsilon*) (send j1 :joint-angle) (+ j1-max-angle *epsilon*)))
+                                 (or (< (- j2-min-angle *epsilon*) (send j2 :joint-angle) (+ j2-min-angle *epsilon*))
+                                     (< (- j2-max-angle *epsilon*) (send j2 :joint-angle) (+ j2-max-angle *epsilon*))))
+                            )))
                (when min-max-table-view
                  (send min-max-table-view :color #xff0000)
                  (send min-max-table-view :draw-line
@@ -268,5 +289,126 @@
 (deftest test-make-joint-min-max-table-margin-5deg
   (assert (test-make-joint-min-max-table-common :margin 5)))
 
-(run-all-tests)
-(exit)
+;; https://github.com/euslisp/jskeus/pull/529
+(deftest test-min-max-table-rotatinoal-joint ()
+  (let (b1 b2 j1 j2 r av)
+    (setq b1 (instance bodyset-link :init (make-cascoords) :bodies (list (make-cube 30 30 30))))
+    (setq b2 (instance bodyset-link :init (make-cascoords) :bodies (list (make-cube 30 30 30))))
+    (setq b3 (instance bodyset-link :init (make-cascoords) :bodies (list (make-cube 30 30 30))))
+
+    (setq j1 (instance rotational-joint :init :name "j1" :parent-link b1 :child-link b2 :axis :z :min -2 :max 2))
+    (setq j2 (instance rotational-joint :init :name "j2" :parent-link b2 :child-link b3 :axis :z :min -2 :max 2))
+
+    (send j1 :joint-min-max-target j2)
+    (send j1 :joint-min-max-table (make-matrix 3 5 (list #f(-2 -1  0  1  2)
+							 #f(-2 -2 -2 -2 -2)
+							 #f( 2  1  0  1 -2))))
+    (send j2 :joint-min-max-target j1)
+    (send j2 :joint-min-max-table (make-matrix 3 5 (list #f(-2 -1  0  1  2)
+							 #f(-2 -2 -2 -2 -2)
+							 #f( 2  1  0  1 -2))))
+    ;; instance cascaded coords
+    (setq r (instance cascaded-link :init))
+    (send r :assoc b1)
+    (send b1 :assoc b2)
+    (send b2 :assoc b3)
+    (setq (r . links) (list b1 b2 b3))
+    (setq (r . joint-list) (list j1 j2))
+    (send r :init-ending)
+
+    ;; send j1 :joint-min-matrix-table .... #f( ... 0 ... )
+    ;;                                      #f( .. -2 ... )
+    ;;                                      #f( ..  0 ... )
+    ;;  means if j2 is 0, then min-max value of j1 is -2 and 0
+    (dolist (i '((#f(-2 0) . #f(-2 0))
+		 (#f(-1 0) . #f(-1 0))
+		 (#f( 0 0) . #f( 0 0))
+		 (#f( 1 0) . #f( 0 0))))
+      (warning-message 2 "(send r :angle-vector ~A)~%" (car i))
+      (setq av (send r :angle-vector (car i)))
+      (warning-message 2 " ... returns ~A, expected to ~A~%" av (cdr i))
+      (assert (eps-v= av (cdr i)) ":angle-vector does not returns expected value")
+      )
+
+    (do ((i 0)) ((>= i 1.99)) (incf i 0.1)pp
+	(warning-message 2 "(send r :angle-vector ~A)~%" (float-vector i i))
+	(setq av (send r :angle-vector (float-vector i i)))
+	(warning-message 2 " ... returns ~A, expected to ~A~%" av (if (< i 1)  (float-vector i i) (float-vector 0.98 0.98)))
+	;; NOTE : if i > 1, :angle-vector should return #f(1 1)
+	(assert (eps-v= av (if (< i 1)  (float-vector i i) (float-vector 0.98 0.98)) 0.1) ":angle-vector does not returns expected value")
+        )
+
+    ;; re-define min-max-joint-table https://github.com/euslisp/jskeus/pull/529#issuecomment-451365527
+    (send j1 :joint-min-max-target j2)
+    (send j1 :joint-min-max-table (make-matrix 3 5 (list #f(-2 -1  0  1  2)
+							 #f(-2 -2 -2 -2 -2)
+							 #f( 2  1  0 -1 -2))))
+    (send j2 :joint-min-max-target j1)
+    (send j2 :joint-min-max-table (make-matrix 3 5 (list #f(-2 -1  0  1  2)
+							 #f(-2 -2 -2 -2 -2)
+							 #f( 2  1  0 -1 -2))))
+    (dolist (i '((#f(-2 0) . #f(-2 0))
+		 (#f(-1 0) . #f(-1 0))
+		 (#f( 0 0) . #f( 0 0))
+		 (#f( 1 0) . #f( 0.5 -0.5)) ;;; This should be #f(1 0)??? See https://github.com/euslisp/jskeus/pull/529#issuecomment-451365527
+		 (#f( 2 0) . #f( 1.0 -1.0))))
+      (warning-message 2 "(send r :angle-vector ~A)~%" (car i))
+      (setq av (send r :angle-vector (car i)))
+      (warning-message 2 " ... returns ~A, expected to ~A~%" av (cdr i))
+      (assert (eps-v= av (cdr i)) ":angle-vector does not returns expected value")
+      )
+    ))
+
+
+(deftest test-min-max-table-multidof-joint ()
+  (let (b0 b1 b2 b3 j0 j1 r av)
+    (setq b0 (instance bodyset-link :init (make-cascoords) :bodies (list (make-cube 30 30 30))))
+    (setq b1 (instance bodyset-link :init (make-cascoords) :bodies (list (make-cube 30 30 30))))
+    (setq b2 (instance bodyset-link :init (make-cascoords) :bodies (list (make-cube 30 30 30))))
+    (setq b3 (instance bodyset-link :init (make-cascoords) :bodies (list (make-cube 30 30 30))))
+
+    (setq j0 (instance sphere-joint :init :name "j0" :parent-link b0 :child-link b1))
+    (setq j1 (instance rotational-joint :init :name "j1" :parent-link b1 :child-link b2 :axis :z :min -2 :max 2))
+    (setq j2 (instance rotational-joint :init :name "j2" :parent-link b2 :child-link b3 :axis :z :min -2 :max 2))
+
+    (send j1 :joint-min-max-target j2)
+    (send j1 :joint-min-max-table (make-matrix 3 5 (list #f(-2 -1  0  1  2)
+							 #f(-2 -2 -2 -2 -2)
+							 #f( 2  1  0  1 -2))))
+    (send j2 :joint-min-max-target j1)
+    (send j2 :joint-min-max-table (make-matrix 3 5 (list #f(-2 -1  0  1  2)
+							 #f(-2 -2 -2 -2 -2)
+							 #f( 2  1  0  1 -2))))
+    ;; instance cascaded coords
+    (setq r (instance cascaded-link :init))
+    (send r :assoc b0)
+    (send b0 :assoc b1)
+    (send b1 :assoc b2)
+    (send b2 :assoc b3)
+    (setq (r . links) (list b0 b1 b2 b3))
+    (setq (r . joint-list) (list j0 j1 j2))
+    (send r :init-ending)
+
+    (dolist (i '((#f(-2 0) . #f(-2 0))
+		 (#f(-1 0) . #f(-1 0))
+		 (#f( 0 0) . #f( 0 0))
+		 (#f( 1 0) . #f( 0 0))))
+      (warning-message 2 "(send r :angle-vector ~A)~%" (concatenate float-vector #f(3 3 3) (car i)))
+      (setq av (send r :angle-vector (concatenate float-vector #f(3 3 3) (car i))))
+      (warning-message 2 " ... returns ~A, expected to ~A~%" av (concatenate float-vector #f(3 3 3) (cdr i)))
+      (assert (eps-v= av (concatenate float-vector #f(3 3 3) (cdr i))) ":angle-vector does not returns expected value")
+      )
+
+    (do ((i 0)) ((>= i 1.99)) (incf i 0.1)
+	(warning-message 2 "(send r :angle-vector ~A)~%" (float-vector 3 3 3 i i))
+	(setq av (send r :angle-vector (float-vector 3 3 3 i i)))
+	(warning-message 2 " ... returns ~A, expected to ~A~%" av (if (< i 1)  (float-vector 3 3 3 i i) (float-vector 3 3 3 0.98 0.98)))
+	;; NOTE : if i > 1, :angle-vector should return #f(1 1)
+	(assert (eps-v= av (if (< i 1)  (float-vector 3 3 3 i i) (float-vector 3 3 3 0.98 0.98)) 0.1) ":angle-vector does not returns expected value")
+      )
+
+  ))
+
+(eval-when (load eval)
+  (run-all-tests)
+  (exit))
