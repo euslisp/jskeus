@@ -105,6 +105,31 @@
     ;;    (cadr (memq :time ret-list))
     ;;    :title (format nil "~A interpolator" (send ip-class :name))
     ;;    :xlabel "time [s]" :keylist (list "")))
+
+    ;; check velocitiy
+    (when (assoc :velocity (send ip-class :methods))
+      (let ((position (cadr (memq :data ret-list)))
+            (velocity (cadr (memq :velocity ret-list)))
+            real-vel calc-vel)
+        (dotimes (i (1- (length position)))
+          (setq real-vel (scale (/ 1.0 dt) (v- (elt position (1+ i)) (elt position i)))
+                calc-vel (elt velocity i))
+          (assert (< (norm (v- real-vel calc-vel)) 0.01)
+                  (format nil "pos: ~A, vel:~A, vel:~A, diff:~A~%" (elt position i) real-vel calc-vel (norm (v- real-vel calc-vel)))))
+      ))
+
+    ;; check acceleration
+    (when (assoc :acceleration (send ip-class :methods))
+      (let ((velocity (cadr (memq :velocity ret-list)))
+            (acceleration (cadr (memq :acceleration ret-list)))
+            real-acc calc-acc)
+        (dotimes (i (1- (length velocity)))
+          (setq real-acc (scale (/ 1.0 dt) (v- (elt velocity (1+ i)) (elt velocity i)))
+                calc-acc (elt acceleration i))
+        (assert (< (norm (v- real-acc calc-acc)) 0.02)
+                (format nil "vel: ~A, acc:~A, acc:~A, diff:~A~%" (elt velocity i) real-acc calc-acc (norm (v- real-acc calc-acc)))))
+      ))
+
     ;; check overshoot
     (assert
      (and
