@@ -105,18 +105,18 @@
     ;;    (cadr (memq :time ret-list))
     ;;    :title (format nil "~A interpolator" (send ip-class :name))
     ;;    :xlabel "time [s]" :keylist (list "")))
-    (and
-     (> (reduce #'(lambda (x y) (min x y)) ret-list2) (- -90 *epsilon*))
-     (< (reduce #'(lambda (x y) (max x y)) ret-list2) (+ 90 *epsilon*)))
+    ;; check overshoot
+    (assert
+     (and
+      (> (reduce #'(lambda (x y) (min x y)) ret-list2) (- -90 *epsilon*))
+      (< (reduce #'(lambda (x y) (max x y)) ret-list2) (+ 90 *epsilon*))))
     ))
 
 (deftest test-linear-interpolator ()
-  (let ((res (test-interpolators linear-interpolator)))
-    (assert res)))
+  (let ((res (test-interpolators linear-interpolator)))))
 
 (deftest test-minjerk-absolute-interpolator ()
-  (let ((res (test-interpolators minjerk-interpolator)))
-    (assert res)))
+  (let ((res (test-interpolators minjerk-interpolator)))))
 
 
 #|
