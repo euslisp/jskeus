@@ -70,16 +70,16 @@
               (+ dt (car tm-list))) tm-list)
       (send ip :pass-time dt)
       (push (send ip :position) data-list)
-      (if (find-method ip :vel) (push (send ip :vel) vel-data-list))
-      (if (find-method ip :acc) (push (send ip :acc) acc-data-list))
+      (if (find-method ip :velocity) (push (send ip :velocity) vel-data-list))
+      (if (find-method ip :acceleration) (push (send ip :acceleration) acc-data-list))
       )
     (append
      (list :data (if neglect-first (cdr (reverse data-list)) (reverse data-list))
            :time (if neglect-first (cdr (reverse tm-list)) (reverse tm-list)))
-     (if (find-method ip :vel)
-         (list :vel (if neglect-first (cdr (reverse vel-data-list)) (reverse vel-data-list))))
-     (if (find-method ip :acc)
-         (list :acc (if neglect-first (cdr (reverse acc-data-list)) (reverse acc-data-list))))
+     (if (find-method ip :velocity)
+         (list :velocity (if neglect-first (cdr (reverse vel-data-list)) (reverse vel-data-list))))
+     (if (find-method ip :acceleration)
+         (list :acceleration (if neglect-first (cdr (reverse acc-data-list)) (reverse acc-data-list))))
      )))
 
 (defun test-interpolators
@@ -118,13 +118,16 @@
   (let ((res (test-interpolators minjerk-interpolator)))
     (assert res)))
 
+
 #|
 (load "~/prog/euslib/jsk/gnuplotlib.l")
 (setq r (pos-list-interpolation (list #f(0) #f(30) #f(90) #f(-90) #f(0)) (list 0.25 0.25 0.25 0.25) 0.01))
-(setq r2 (mapcar #'(lambda (x) (elt x 0)) (cadr (memq :data r)))) (graph-view (list r2) (cadr (memq :time r))))
-(graph-view (list r2) (cadr (memq :time r)))
-(print r2)
-(print (length r2))
+(setq r-pos (mapcar #'(lambda (x) (elt x 0)) (cadr (memq :data r))))
+(setq r-vel (mapcar #'(lambda (x) (/ (elt x 0)  10)) (cadr (memq :velocity r))))
+(setq r-acc (mapcar #'(lambda (x) (/ (elt x 0) 100)) (cadr (memq :acceleration r))))
+(graph-view (list r-pos r-vel r-acc) (cadr (memq :time r)) :keylist (list "position" "velocity" "acceleration"))
+(print r-pos)
+(print (length r-pos))
 |#
 
 (eval-when (load eval)
