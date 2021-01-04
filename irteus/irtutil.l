@@ -398,12 +398,12 @@
                               (scale (expt segment-time 5) a5)))
            velocity
            (reduce #'v+ (list a1
-                              (scale (expt segment-time 1) a2) (scale (expt segment-time 2) a3)
-                              (scale (expt segment-time 3) a4) (scale (expt segment-time 4) a5)))
+                              (scale (* 2 (expt segment-time 1)) a2) (scale (* 3 (expt segment-time 2)) a3)
+                              (scale (* 4 (expt segment-time 3)) a4) (scale (* 5 (expt segment-time 4)) a5)))
            acceleration
-           (reduce #'v+ (list a2
-                              (scale (expt segment-time 1) a3) (scale (expt segment-time 2) a4)
-                              (scale (expt segment-time 3) a5))))
+           (reduce #'v+ (list (scale 2 a2)
+                              (scale (* 6 (expt segment-time 1)) a3) (scale (* 12 (expt segment-time 2)) a4)
+                              (scale (* 20 (expt segment-time 3)) a5))))
      position))
   ;
   )

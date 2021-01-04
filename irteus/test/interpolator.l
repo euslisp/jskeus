@@ -114,7 +114,7 @@
         (dotimes (i (1- (length position)))
           (setq real-vel (scale (/ 1.0 dt) (v- (elt position (1+ i)) (elt position i)))
                 calc-vel (elt velocity i))
-          (assert (< (norm (v- real-vel calc-vel)) 0.01)
+          (assert (< (norm (v- real-vel calc-vel)) (if (memq :word-size=64 *features*) 0.01 0.15))
                   (format nil "pos: ~A, vel:~A, vel:~A, diff:~A~%" (elt position i) real-vel calc-vel (norm (v- real-vel calc-vel)))))
       ))
 
@@ -126,7 +126,7 @@
         (dotimes (i (1- (length velocity)))
           (setq real-acc (scale (/ 1.0 dt) (v- (elt velocity (1+ i)) (elt velocity i)))
                 calc-acc (elt acceleration i))
-        (assert (< (norm (v- real-acc calc-acc)) 0.02)
+        (assert (< (norm (v- real-acc calc-acc)) (if (memq :word-size=64 *features*) 0.01 0.15))
                 (format nil "vel: ~A, acc:~A, acc:~A, diff:~A~%" (elt velocity i) real-acc calc-acc (norm (v- real-acc calc-acc)))))
       ))
 
