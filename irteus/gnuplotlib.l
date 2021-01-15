@@ -30,6 +30,8 @@
 
 (defmethod gnuplot
   (:init (host &key (clear t) ((:debug _debug)))
+     (when (eq (unix:system "which gnuplot") 256)
+       (error "gnuplot is not installed. $ sudo apt-get install gnuplot"))
 	 (setq strm 
 	       (cond
 		((string= (unix:gethostname) host)
