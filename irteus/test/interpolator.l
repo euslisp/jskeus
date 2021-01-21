@@ -57,6 +57,35 @@
         ((:interpolator ip) (instance interpolator-class :init))
         (initial-time 0.0) (neglect-first) (vel-vector-list) (acc-vector-list))
   (let* ((data-list) (tm-list) (vel-data-list) (acc-data-list))
+    (assert (= (length pos-list) (1+ (length time-list)))
+            (format nil "check length of pos-list(~A) and tm-list(~A)"
+                    (length pos-list) (length time-list)))
+    (setq vel-vector-list
+          (reverse
+           (do ((i 0 (1+ i)) (vel-list))
+               ((> i (length time-list)) vel-list)
+               (if (or (= i 0) (= i (length time-list)))
+                   (push (instantiate float-vector (length (car pos-list))) vel-list)
+                 (let* ((v0 (scale (/ 1.0  (elt time-list (1- i)))
+                                   (v- (elt pos-list i) (elt pos-list (1- i)))))
+                        (v1 (scale (/ 1.0 (elt time-list i))
+                                   (v- (elt pos-list (1+ i)) (elt pos-list i))))
+                        (v (scale 0.5 (v+ v0 v1))))
+                   (dotimes (i (length v)) (if (< (* (elt v0 i) (elt v1 i)) 0) (setf (elt v i) 0)))
+                   (push v vel-list))))))
+    (setq acc-vector-list
+          (reverse
+           (do ((i 0 (1+ i)) (acc-list))
+               ((> i (length time-list)) acc-list)
+               (if (or (= i 0) (= i (length time-list)))
+                   (push (instantiate float-vector (length (car vel-vector-list))) acc-list)
+                 (let* ((v0 (scale (/ 1.0  (elt time-list (1- i)))
+                                   (v- (elt vel-vector-list i) (elt vel-vector-list (1- i)))))
+                        (v1 (scale (/ 1.0 (elt time-list i))
+                                   (v- (elt vel-vector-list (1+ i)) (elt vel-vector-list i))))
+                        (v (scale 0.5 (v+ v0 v1))))
+                   (dotimes (i (length v)) (if (< (* (elt v0 i) (elt v1 i)) 0) (setf (elt v i) 0)))
+                   (push v acc-list))))))
     (format t "=INPUT~%")
     (format t "time ~A~%" time-list)
     (format t " pos ~A~%" pos-list)
@@ -66,8 +95,8 @@
            :position-list pos-list
            :time-list (let (r) (dolist (n time-list) (push (+ n (if r (car r) 0)) r)) (nreverse r)) ;; list of time[sec] from start for each control point
            (append
-            (if vel-vector-list (list :vel-vector-list vel-vector-list))
-            (if acc-vector-list (list :acc-vector-list acc-vector-list))))
+            (if vel-vector-list (list :velocity-list vel-vector-list))
+            (if acc-vector-list (list :acceleration-list acc-vector-list))))
     (send ip :start-interpolation)
     (while (send ip :interpolatingp)
       (push (if (send ip :interpolatingp)
