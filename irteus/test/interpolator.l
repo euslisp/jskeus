@@ -140,11 +140,78 @@
       (< (reduce #'(lambda (x y) (max x y)) ret-list2) (+ 90 *epsilon*))))
     ))
 
+;; https://github.com/jsk-ros-pkg/jsk_pr2eus/issues/457
+(defun test-interpolators-457
+  (&optional (ip-class linear-interpolator) (dt 0.0001))
+  (let* ((ret-list
+          (pos-list-interpolation
+           (list #f(0) #f(1) #f(2) #f(3) #f(4) #f(5) #f(6) #f(7) #f(8) #f(9))
+           (list 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001)
+           dt
+           :interpolator-class ip-class
+           )))
+    ;; check velocitiy
+    (let ((position (cadr (memq :data ret-list)))
+          (velocity (cadr (memq :velocity ret-list)))
+          real-vel calc-vel)
+      ;; check first and last velocity
+      (assert (eps= (norm (car velocity)) 0.0) (format nil "vel:~A~%" (car velocity)))
+      (assert (eps= (norm (car (last velocity))) 0.0) (format nil "vel:~A~%" (car (last velocity))))
+      ;; check velocity of stable region
+      (dotimes (i (1- (length position)))
+        (when (and (> i (max 2 (* 0.3 (length position))))
+                   (< i (min (- (length position) 3) (* 0.7 (length position)))))
+          (setq real-vel (scale (/ 1.0 dt) (v- (elt position (1+ i)) (elt position i)))
+                calc-vel (elt velocity i))
+          (assert (eps= (norm (v- real-vel calc-vel)) 0)
+                  (format nil "~A pos: ~A, vel:~A, vel:~A, diff:~A~%" i (elt position i) real-vel calc-vel (norm (v- real-vel calc-vel)))))))
+
+    ;; check acceleration
+    (let ((velocity (cadr (memq :velocity ret-list)))
+          (acceleration (cadr (memq :acceleration ret-list)))
+          real-acc calc-acc)
+      ;; check first and last acceleration
+      (assert (eps= (norm (car acceleration)) 0.0) (format nil "acc:~A~%" (car acceleration)))
+      (assert (eps= (norm (car (last acceleration))) 0.0) (format nil "acc:~A~%" (car (last acceleration))))
+      ;; check maximum acceleration
+      (dotimes (i (1- (length velocity)))
+        (when (and (> i (max 2 (* 0.3 (length velocity))))
+                   (< i (min (- (length velocity) 3) (* 0.7 (length velocity)))))
+          (setq real-acc (scale (/ 1.0 dt) (v- (elt velocity (1+ i)) (elt velocity i)))
+                calc-acc (elt acceleration i))
+          (assert (eps= (norm (v- real-acc calc-acc)) 0)
+                  (format nil "~A vel: ~A, acc:~A, acc:~A, diff:~A~%" i (elt velocity i) real-acc calc-acc (norm (v- real-acc calc-acc)))))
+        ))
+
+    (when (and (not (or (null x::*display*) (= x::*display* 0)))
+               (functionp 'graph-view))
+      (let ((r-pos (mapcar #'(lambda (x) (elt x 0)) (cadr (memq :data ret-list))))
+            (r-vel (mapcar #'(lambda (x) (* 0.01 (elt x 0))) (cadr (memq :velocity ret-list))))
+            (r-acc (mapcar #'(lambda (x) (* 0.00001 (elt x 0))) (cadr (memq :acceleration ret-list)))))
+        (graph-view (list r-pos r-vel r-acc) (cadr (memq :time ret-list))
+                    :keylist (list "position" "velocity" "acceleration")
+                    :mode "linespoints")
+        (unix:usleep (* 100 1000))
+        ))
+    ))
+
 (deftest test-linear-interpolator ()
   (let ((res (test-interpolators linear-interpolator)))))
 
 (deftest test-minjerk-absolute-interpolator ()
   (let ((res (test-interpolators minjerk-interpolator)))))
+
+(deftest test-minjerk-absolute-interpolator-457 ()
+  (let ((res (test-interpolators-457 minjerk-interpolator)))))
+
+(deftest test-minjerk-absolute-interpolator-457-00013 ()
+  (let ((res (test-interpolators-457 minjerk-interpolator 0.00013)))))
+
+(deftest test-minjerk-absolute-interpolator-457-0013 ()
+  (let ((res (test-interpolators-457 minjerk-interpolator 0.0013)))))
+
+(deftest test-minjerk-absolute-interpolator-457-0005 ()
+  (let ((res (test-interpolators-457 minjerk-interpolator 0.0005)))))
 
 
 #|
