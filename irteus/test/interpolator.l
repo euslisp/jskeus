@@ -57,6 +57,11 @@
         ((:interpolator ip) (instance interpolator-class :init))
         (initial-time 0.0) (neglect-first) (vel-vector-list) (acc-vector-list))
   (let* ((data-list) (tm-list) (vel-data-list) (acc-data-list))
+    (format t "=INPUT~%")
+    (format t "time ~A~%" time-list)
+    (format t " pos ~A~%" pos-list)
+    (format t " vel ~A~%" vel-vector-list)
+    (format t " acc ~A~%" acc-vector-list)
     (send* ip :reset
            :position-list pos-list
            :time-list (let (r) (dolist (n time-list) (push (+ n (if r (car r) 0)) r)) (nreverse r)) ;; list of time[sec] from start for each control point
@@ -73,6 +78,12 @@
       (if (find-method ip :velocity) (push (send ip :velocity) vel-data-list))
       (if (find-method ip :acceleration) (push (send ip :acceleration) acc-data-list))
       )
+    (format t "=OUTPUT~%")
+    (if (and vel-data-list acc-data-list)
+        (mapcar #'(lambda (tm pos vel acc)
+                    (format t "~7,5f ~7,3f ~13,1f ~13,1f~%"
+                            tm (elt pos 0) (elt vel 0) (elt acc 0)))
+                (reverse tm-list) (reverse data-list) (reverse vel-data-list) (reverse acc-data-list)))
     (append
      (list :data (if neglect-first (cdr (reverse data-list)) (reverse data-list))
            :time (if neglect-first (cdr (reverse tm-list)) (reverse tm-list)))
