@@ -99,12 +99,15 @@
                                      ip)))
            ))
          (ret-list2 (mapcar #'(lambda (x) (elt x 0)) (cadr (memq :data ret-list)))))
-    ;; (unless (or (null x::*display*) (= x::*display* 0))
-    ;;   (graph-view
-    ;;    (list ret-list2)
-    ;;    (cadr (memq :time ret-list))
-    ;;    :title (format nil "~A interpolator" (send ip-class :name))
-    ;;    :xlabel "time [s]" :keylist (list "")))
+    (when (and (not (or (null x::*display*) (= x::*display* 0)))
+               (functionp 'graph-view))
+      (let ((r-pos (mapcar #'(lambda (x) (elt x 0)) (cadr (memq :data ret-list))))
+            (r-vel (mapcar #'(lambda (x) (* 10 (elt x 0))) (cadr (memq :velocity ret-list))))
+            (r-acc (mapcar #'(lambda (x) (* 100 (elt x 0))) (cadr (memq :acceleration ret-list)))))
+        (graph-view (list r-pos r-vel r-acc) (cadr (memq :time ret-list))
+                    :keylist (list "position" "velocity" "acceleration")
+                    :mode "linespoints")
+        ))
 
     ;; check velocitiy
     (when (assoc :velocity (send ip-class :methods))
