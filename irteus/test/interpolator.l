@@ -195,15 +195,17 @@
           (velocity (cadr (memq :velocity ret-list)))
           real-vel calc-vel)
       ;; check first and last velocity
-      (assert (eps= (norm (car velocity)) 0.0) (format nil "vel:~A~%" (car velocity)))
-      (assert (eps= (norm (car (last velocity))) 0.0) (format nil "vel:~A~%" (car (last velocity))))
+      (assert (eps= (norm (car velocity)) 0.0 (if (memq :word-size=64 *features*) *epsilon* 100))
+	      (format nil "vel:~A~%" (car velocity)))
+      (assert (eps= (norm (car (last velocity))) 0.0 (if (memq :word-size=64 *features*) *epsilon* 100))
+	      (format nil "vel:~A~%" (car (last velocity))))
       ;; check velocity of stable region
       (dotimes (i (1- (length position)))
         (when (and (> i (max 2 (* 0.3 (length position))))
                    (< i (min (- (length position) 3) (* 0.7 (length position)))))
           (setq real-vel (scale (/ 1.0 dt) (v- (elt position (1+ i)) (elt position i)))
                 calc-vel (elt velocity i))
-          (assert (eps= (norm (v- real-vel calc-vel)) 0)
+          (assert (eps= (norm (v- real-vel calc-vel)) 0 (if (memq :word-size=64 *features*) *epsilon* 100))
                   (format nil "~A pos: ~A, vel:~A, vel:~A, diff:~A~%" i (elt position i) real-vel calc-vel (norm (v- real-vel calc-vel)))))))
 
     ;; check acceleration
@@ -211,15 +213,17 @@
           (acceleration (cadr (memq :acceleration ret-list)))
           real-acc calc-acc)
       ;; check first and last acceleration
-      (assert (eps= (norm (car acceleration)) 0.0) (format nil "acc:~A~%" (car acceleration)))
-      (assert (eps= (norm (car (last acceleration))) 0.0) (format nil "acc:~A~%" (car (last acceleration))))
+      (assert (eps= (norm (car acceleration)) 0.0 (if (memq :word-size=64 *features*) *epsilon* 100))
+	      (format nil "acc:~A~%" (car acceleration)))
+      (assert (eps= (norm (car (last acceleration))) 0.0 (if (memq :word-size=64 *features*) *epsilon* 100))
+	      (format nil "acc:~A~%" (car (last acceleration))))
       ;; check maximum acceleration
       (dotimes (i (1- (length velocity)))
         (when (and (> i (max 2 (* 0.3 (length velocity))))
                    (< i (min (- (length velocity) 3) (* 0.7 (length velocity)))))
           (setq real-acc (scale (/ 1.0 dt) (v- (elt velocity (1+ i)) (elt velocity i)))
                 calc-acc (elt acceleration i))
-          (assert (eps= (norm (v- real-acc calc-acc)) 0)
+          (assert (eps= (norm (v- real-acc calc-acc)) 0 (if (memq :word-size=64 *features*) *epsilon* 100))
                   (format nil "~A vel: ~A, acc:~A, acc:~A, diff:~A~%" i (elt velocity i) real-acc calc-acc (norm (v- real-acc calc-acc)))))
         ))
 
