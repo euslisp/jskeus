@@ -1123,6 +1123,27 @@
          ))
      sbp))
   )
+
+;;;;;;;;;;;;;;;;
+;; Utilities for object model
+;;;;;;;;;;;;;;;;
+(defclass single-link-model
+  :super cascaded-link
+  :slots ()
+  )
+
+(defmethod single-link-model
+  (:init
+   (&key (name) ((:bodies bs)))
+   (prog1
+       (send-super :init :name name)
+     (setq links (list (instance bodyset-link :init (make-cascoords)
+                                 :bodies bs :name :root-link)))
+     (send self :assoc (car links))
+     (send self :init-ending)
+     ))
+  )
+
 (in-package "GEOMETRY")
 
 (provide :irtrobot "$Id$")
