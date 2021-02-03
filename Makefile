@@ -1,4 +1,4 @@
-all: eus-installed irteus-installed manuals bashrc.eus
+all: eus-installed irteus-installed manuals bashrc.eus man-page
 
 GIT_EUSURL ?= http://github.com/euslisp/EusLisp
 GIT_EUSBRANCH ?= master
@@ -85,10 +85,12 @@ clean:
 	if [ -e eus/lisp ]; then cd eus/lisp; make clean ; fi
 
 wipe: clean
-	-rm -fr eus irteus
-
+	-rm -fr eus irteus; sudo rm /usr/local/share/man/man1/eus.1.gz
 
 doc:
 	cd doc; make
+
+man-page:
+	gzip eus/doc/man/eus.1; sudo make -p /usr/local/share/man/man1/;sudo cp eus/doc/man/eus.1.gz /usr/local/share/man/man1/
 
 .PHONY: doc
