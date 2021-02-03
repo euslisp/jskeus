@@ -132,7 +132,7 @@
                               (float-vector  0  0  1  0)
                               (float-vector  0  0  0  1))))
      self))
-  (:create-viewer (&optional cv)
+  (:create-viewer (&optional cv &key (no-window nil))
    "Create camera viewer, or set viewer"
    (unless (boundp '*irtviewer*) (make-irtviewer))
    (unless cv
@@ -141,7 +141,7 @@
            :x pwidth :y pheight
            :viewing (send self :viewing)
            :viewsurface
-           (instance gl::glviewsurface :create
+           (instance (if no-window gl::glpixmapsurface gl::glviewsurface) :create
                      :glcon ((send *irtviewer* :viewer :viewsurface) . gl::glcon)
                      :title (format nil "~A_view" (send self :name)) :width pwidth :height pheight)
            :title (format nil "~A_view" (send self :name))))
@@ -436,7 +436,7 @@
 
 ;; utility functions
 (defun make-camera-from-param (&key pwidth pheight fx fy cx cy (tx 0) (ty 0) parent-coords name
-                                    create-viewer)
+                                    create-viewer (no-window nil))
   "Create camera object from given parameters."
   (let* ((b (body+ (make-cube 40 30 30)
                    (send (make-cylinder 2 30) :rotate pi/2 :x)
@@ -455,7 +455,7 @@
     (send c :translate (float-vector (- tx) (- ty) 0))
     (send (c . vwing) :translate (float-vector tx ty 0))
     (if parent-coords (send parent-coords :assoc c))
-    (if create-viewer (send c :create-viewer))
+    (if create-viewer (send c :create-viewer nil :no-window no-window))
     c))
 
 (in-package "GEOMETRY")
