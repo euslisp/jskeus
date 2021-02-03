@@ -74,7 +74,7 @@
 	 )
   (:difference-position
    (coords &key (translation-axis t))
-   "return difference in position of given coords, translation-axis can take (:x, :y, :z, :xy, :yz, :zx)."
+   "return difference in position of given coords, translation-axis can take (:x, :y, :z, :xy, :yz, :zx, :yx, :zy, :xz)."
    (let ((dif-pos
 	  (send self :inverse-transform-vector (send coords :worldpos))))
      (case
@@ -88,7 +88,7 @@
      dif-pos))
   (:difference-rotation
    (coords &key (rotation-axis t))
-   "return difference in rotation of given coords, rotation-axis can take (:x, :y, :z, :xx, :yy, :zz, :xm, :ym, :zm)"
+   "return difference in rotation of given coords, rotation-axis can take (:x, :y, :z, :xy, :yz, :zx, :yx, :zy, :xz, :xx, :yy, :zz, :xm, :ym, :zm)"
    (labels
     ((need-mirror-for-nearest-axis
       (coords0 coords1 axis)
@@ -107,6 +107,22 @@
         (setq dif-rot 
               (transform (transpose (send self :worldrot))
                          (scale (acos (v. a0 a1)) (normalize-vector (v* a0 a1))))))
+       ((:xy :yx :yz :zy :zx :xz)
+        (let ((ax1 (case rotation-axis ((:xy :yx) :z) ((:yz :zy) :x) ((:zx :xz) :y)))
+              (ax2 (case rotation-axis ((:xy :yx) :x) ((:yz :zy) :y) ((:zx :xz) :z))))
+          (setq a0 (send self :axis ax1)
+                a1 (send coords :axis ax1))
+          (setq dif-rot
+                (transform (transpose (send self :worldrot))
+                           (scale (acos (v. a0 a1)) (normalize-vector (v* a0 a1)))))
+          (let ((self-coords (if (= 0.0 (norm dif-rot))
+                                 self
+                                 (send (send self :copy-worldcoords) :rotate (norm dif-rot) (normalize-vector dif-rot)))))
+            (setq a0 (send self-coords :axis ax2)
+                  a1 (send coords :axis ax2))
+            (setq dif-rot
+                  (transform (transpose (send self-coords :worldrot))
+                             (scale (acos (v. a0 a1)) (normalize-vector (v* a0 a1))))))))
        ((:xx :yy :zz)
         (let ((axis (case rotation-axis (:xx :x) (:yy :y) (:zz :z))) a0 a2)
           (setq a0 (send self :axis axis))
