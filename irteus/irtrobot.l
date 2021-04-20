@@ -90,12 +90,14 @@
   :slots (larm-end-coords rarm-end-coords
 	  lleg-end-coords rleg-end-coords
 	  head-end-coords torso-end-coords
+      rhand-end-coords lhand-end-coords
 	  larm-root-link rarm-root-link
 	  lleg-root-link rleg-root-link
 	  head-root-link torso-root-link
+      rhand-root-link lhand-root-link
 	  larm-collision-avoidance-links
 	  rarm-collision-avoidance-links
-	  larm rarm lleg rleg torso head
+	  larm rarm lleg rleg torso head rhand lhand
           ;; sensor slots
           force-sensors imu-sensors cameras
           ;;
@@ -113,7 +115,8 @@
      (setq end-coords-list (remove nil (append end-coords-list
                                                (list larm-end-coords rarm-end-coords
                                                      lleg-end-coords rleg-end-coords
-                                                     head-end-coords torso-end-coords))))
+                                                     head-end-coords torso-end-coords
+                                                     rhand-end-coords lhand-end-coords))))
      )
    )
   ;; End-coords accessor
@@ -123,6 +126,8 @@
   (:lleg-end-coords () lleg-end-coords)
   (:head-end-coords () head-end-coords)
   (:torso-end-coords () torso-end-coords)
+  (:rhand-end-coords () rhand-end-coords)
+  (:lhand-end-coords () lhand-end-coords)
   ;; Root-link accessor
   (:rarm-root-link () rarm-root-link)
   (:larm-root-link () larm-root-link)
@@ -130,6 +135,8 @@
   (:lleg-root-link () lleg-root-link)
   (:head-root-link () head-root-link)
   (:torso-root-link () torso-root-link)
+  (:rhand-root-link () rhand-root-link)
+  (:lhand-root-link () lhand-root-link)
   (:limb
    (limb method &rest args)
    (let (ret)
@@ -326,7 +333,11 @@
   (:head (&rest args)
 	 (unless args (setq args (list nil))) (send* self :limb :head args))
   (:torso (&rest args)
-	 (unless args (setq args (list nil))) (send* self :limb :torso args))
+          (unless args (setq args (list nil))) (send* self :limb :torso args))
+  (:lhand (&rest args) 
+     (unless args (setq args (list nil))) (send* self :limb :lhand args))
+  (:rhand (&rest args)
+     (unless args (setq args (list nil))) (send* self :limb :rhand args))
   (:arms (&rest args) (list (send* self :larm args) (send* self :rarm args)))
   (:legs (&rest args) (list (send* self :lleg args) (send* self :rleg args)))
   (:look-at-hand
@@ -573,7 +584,7 @@
    (let ((tmp-limbs
           (remove-duplicates
            (mapcar #'(lambda (l)
-                       (find-if #'(lambda (tmp-limb) (member l (send self tmp-limb :links))) '(:rarm :larm :rleg :lleg :torso :head)))
+                       (find-if #'(lambda (tmp-limb) (member l (send self tmp-limb :links))) '(:rarm :larm :rleg :lleg :torso :head :rhand :lhand)))
                    (send-all (send self :joint-list) :child-link))))
          (ordered-joint-list (send self :joint-list)))
      (format t "    #f(~%      ")
