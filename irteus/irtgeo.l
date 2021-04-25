@@ -396,10 +396,10 @@
 ;; input face should be simple. see
 ;;   Make Simple function in Triangulatio by Ear Clipping by David Eberly
 ;;   http://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf
-(defun face-to-tessel-triangle (f num &optional (*epsilon* 1e-15))
+(defun face-to-tessel-triangle (f num &optional (*epsilon* 1e-10))
   "return polygon if triangable, return nil if it is not."
   #-(or :x86_64 :aarch64)
-  (setq *epsilon* (* 1e9 *epsilon*));; for 32bit system
+  (setq *epsilon* (* 10000.0 *epsilon*));; for 32bit system
   (let* ((vers (send f :vertices))
 	 (len (length (cdr vers)))
 	 (v0 (nth (mod (1- (+ num len)) len) vers)) ;; num - 1 th
