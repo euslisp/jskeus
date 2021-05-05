@@ -441,6 +441,14 @@
                        joint-fl joint-fr))
      (setq collision-avoidance-links (list sarm-b2 sarm-b3 sarm-b4 sarm-b5 sarm-b6))
 
+     ;; limbs
+     (setq rarm (list sarm-b1 sarm-b2 sarm-b3 sarm-b4 sarm-b5 sarm-b6))
+     (setq rarm-root-link sarm-b0)
+     (setq rarm-end-coords end-coords)
+     (setq rhand (list sarm-fr sarm-fl))
+     (setq rhand-root-link sarm-b6)
+     (setq rhand-end-coords end-coords)
+
      (send self :init-ending)
      self))
   (:joint0 (&rest args) (forward-message-to joint0 args))
@@ -458,8 +466,8 @@
    )
   (:move-fingers
    (l)
-   (send joint-fl :joint-angle l)
-   (send joint-fr :joint-angle l))
+   (send self :limb :rhand :angle-vector (float-vector l l))
+   l)
   (:init-ending
    ()
    (setq bodies (flatten (send-all links :bodies)))
@@ -488,8 +496,7 @@
            (setq a (send self :open-hand))
            (while (> a 0)
              (if (collision-check-objects
-                  (list (send self :joint-fr :child-link)
-                        (send self :joint-fl :child-link))
+                  (send self :limb :rhand :links)
                   (list obj))
                  (return))
              (send self :move-fingers a)
