@@ -90,11 +90,11 @@
   :slots (larm-end-coords rarm-end-coords
 	  lleg-end-coords rleg-end-coords
 	  head-end-coords torso-end-coords
-      rhand-end-coords lhand-end-coords
+	  rhand-end-coords lhand-end-coords
 	  larm-root-link rarm-root-link
 	  lleg-root-link rleg-root-link
 	  head-root-link torso-root-link
-      rhand-root-link lhand-root-link
+	  rhand-root-link lhand-root-link
 	  larm-collision-avoidance-links
 	  rarm-collision-avoidance-links
 	  larm rarm lleg rleg torso head rhand lhand
