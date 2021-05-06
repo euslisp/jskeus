@@ -340,6 +340,7 @@
      (unless args (setq args (list nil))) (send* self :limb :rhand args))
   (:arms (&rest args) (list (send* self :larm args) (send* self :rarm args)))
   (:legs (&rest args) (list (send* self :lleg args) (send* self :rleg args)))
+  (:hands (&rest args) (list (send* self :lhand args) (send* self :rhand args)))
   (:look-at-hand
    (l/r)
    "look at hand position, l/r supports :rarm, :larm, :arms, and '(:rarm :larm)"
