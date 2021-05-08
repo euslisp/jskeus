@@ -112,8 +112,10 @@
               (not (every #'null (send self :legs :end-coords)))) ;; for robot with legs end-coords
        (send self :make-support-polygons))
      (setq end-coords-list (remove nil (append end-coords-list
-                                               (mapcar #'(lambda (l) (cdr (assoc :end-coords (cdr (assoc l limb-list)))))
-                                                       '(:larm :rarm :lleg :rleg :head :torso)))))
+                                               (mapcar #'(lambda (l) (cdr (assoc :end-coords l))) limb-list)
+                                               (list larm-end-coords rarm-end-coords ;; obsoleted. for backward compatibility
+                                                     lleg-end-coords rleg-end-coords
+                                                     head-end-coords torso-end-coords))))
      )
    )
   ;; End-coords accessor
