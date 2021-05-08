@@ -442,12 +442,14 @@
      (setq collision-avoidance-links (list sarm-b2 sarm-b3 sarm-b4 sarm-b5 sarm-b6))
 
      ;; limbs
-     (setq rarm (list sarm-b1 sarm-b2 sarm-b3 sarm-b4 sarm-b5 sarm-b6))
-     (setq rarm-root-link sarm-b0)
-     (setq rarm-end-coords end-coords)
-     (setq rhand (list sarm-fr sarm-fl))
-     (setq rhand-root-link sarm-b6)
-     (setq rhand-end-coords end-coords)
+     (send self :add-limb :rarm
+           :end-coords end-coords
+           :links (list sarm-b1 sarm-b2 sarm-b3 sarm-b4 sarm-b5 sarm-b6)
+           :root-link sarm-b0)
+     (send self :add-limb :rhand
+           :end-coords end-coords
+           :links (list sarm-fr sarm-fl)
+           :root-link sarm-b6)
 
      (send self :init-ending)
      self))

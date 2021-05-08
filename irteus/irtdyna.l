@@ -1146,10 +1146,10 @@
                           :centroid-thre 0.1
                           :target-centroid-pos (v- (send self :centroid) (send df :refcog))))
                    (:move-base-pos
-                    (let ((tc (mapcar #'(lambda (l) (send self l :end-coords :copy-worldcoords)) '(:rleg :lleg))))
+                    (let ((tc (mapcar #'(lambda (l) (send self :limb l :end-coords :copy-worldcoords)) '(:rleg :lleg))))
                       (send self :translate (float-vector (- (elt (send df :refcog) 0)) (- (elt (send df :refcog) 1)) 0) :world)
                       (mapcar #'(lambda (l ttc)
-                                  (send self l :inverse-kinematics ttc :thre 0.1 :rthre (deg2rad 0.1)))
+                                  (send self :limb l :inverse-kinematics ttc :thre 0.1 :rthre (deg2rad 0.1)))
                               '(:rleg :lleg) tc)))
                    )
                  (push (list :angle-vector (send self :angle-vector)
@@ -1732,9 +1732,9 @@
             (send self :get-counter-footstep-limbs (car footstep-node-list)))
       (let ((current-support-limbs (car support-leg-list)))
         (send self :append-support-leg-coords-list
-              (mapcar #'(lambda (l) (send robot l :end-coords :copy-worldcoords)) current-support-limbs))
+              (mapcar #'(lambda (l) (send robot :limb l :end-coords :copy-worldcoords)) current-support-limbs))
         (send self :append-swing-leg-dst-coords-list
-              (mapcar #'(lambda (l) (send robot l :end-coords :copy-worldcoords)) current-swing-limbs))
+              (mapcar #'(lambda (l) (send robot :limb l :end-coords :copy-worldcoords)) current-swing-limbs))
         (let ((current-support-leg-coords (car support-leg-coords-list))
               (current-swing-leg-dst-coords (car swing-leg-dst-coords-list)))
           (send self :append-refzmp-cur-list
@@ -1758,7 +1758,7 @@
                                        )
           swing-leg-src-coords current-swing-leg-dst-coords
           refzmp-next (send self :get-limbs-zmp
-                            (mapcar #'(lambda (l) (send robot l :end-coords :copy-worldcoords)) (send self :get-counter-footstep-limbs (send-all (car footstep-node-list) :name)))
+                            (mapcar #'(lambda (l) (send robot :limb l :end-coords :copy-worldcoords)) (send self :get-counter-footstep-limbs (send-all (car footstep-node-list) :name)))
                             (send self :get-counter-footstep-limbs (send-all (car footstep-node-list) :name)))
           refzmp-prev (car refzmp-cur-list))
     (send self :make-gait-parameter)
