@@ -732,20 +732,27 @@
         (rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) 1 5))) fix-limbs))
         (mid 0.5)
         (target-centroid-pos
-         (if (eq leg :both)
-             (apply
-              #'midpoint mid
-              (mapcar
-               #'(lambda (tmp-leg)
-                   (send self :limb tmp-leg :end-coords :worldpos))
-               (remove-if-not #'(lambda (x) (memq x '(:rleg :lleg))) fix-limbs)))
-           (send self :limb leg :end-coords :worldpos)))
+         (cond ((eq leg :both)
+                (apply
+                 #'midpoint mid
+                 (mapcar
+                  #'(lambda (tmp-leg)
+                      (send self :limb tmp-leg :end-coords :worldpos))
+                  (remove-if-not #'(lambda (x) (memq x '(:rleg :lleg))) fix-limbs))))
+               ((listp leg)
+                (scale
+                 (/ 1.0 (length leg))
+                 (reduce #'v+
+                        (mapcar
+                         #'(lambda (tmp-leg)
+                             (send self :limb tmp-leg :end-coords :worldpos)) leg))))
+               (t (send self :limb leg :end-coords :worldpos))))
         (fix-limbs-target-coords
          (mapcar #'(lambda (x) (send self :limb x :end-coords :copy-worldcoords)) fix-limbs))
         (root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5)) ;; use only translation x, y and rotation z
         &allow-other-keys)
    "Move robot COG to change centroid-on-foot location,
-    leg : legs for target of robot's centroid, which should be :both, :rleg, and :lleg.
+    leg : legs for target of robot's centroid, which should be limb (ex. :rleg), list of limbs, and :both (which means '(:rleg :lleg)).
     fix-limbs : limb names which are fixed in this IK."
    (with-move-target-link-list
     (mt ll self fix-limbs)
@@ -753,7 +760,7 @@
       (send* self :fullbody-inverse-kinematics
              fix-limbs-target-coords
              :move-target mt :link-list ll
-             :fix-limbs (remove-if-not #'(lambda (x) (memq x '(:rleg :lleg))) fix-limbs)
+             :fix-limbs fix-limbs
              :root-link-virtual-joint-weight root-link-virtual-joint-weight
              :thre thre :rthre rthre
              :target-centroid-pos target-centroid-pos
