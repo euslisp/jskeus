@@ -218,7 +218,7 @@
 		 (if (memq :collision-avoidance-link-pair args)
 		     (cadr (memq :collision-avoidance-link-pair args))
 		   (send self :collision-avoidance-link-pair-from-link-list link-list
-			 :collision-avoidance-links (send self :linb limb :collision-avoidance-links)))))
+			 :collision-avoidance-links (send self :limb limb :collision-avoidance-links)))))
 	   (send* self :inverse-kinematics (car args)
 		  :move-target (if (memq :move-target args)
 				   (cadr (memq :move-target args))
