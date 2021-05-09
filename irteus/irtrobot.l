@@ -844,7 +844,14 @@
    (let* ((res) (ret) (tm 0)
           (gg (instance gait-generator :init self dt)))
      (funcall init-pose-function)
-     (setq solve-angle-vector-args (append solve-angle-vector-args (list :robot-xv (send self :inverse-rotate-vector #F(1 0 0)))))
+     (setq solve-angle-vector-args
+           (append solve-angle-vector-args
+                   (list :robot-xv (let ((fcoords (make-coords)))
+                                     (dotimes (i (length al))
+                                       (setq fcoords (midcoords (/ 1.0 (+ i 1.0))
+                                                                fcoords
+                                                                (send self :limb (elt al i) :end-coords :worldcoords))))
+                                     (send self :inverse-rotate-vector (send fcoords :rotate-vector #F(1 0 0)))))))
      ;; initial move centroid on foot
      (send gg :initialize-gait-parameter
            footstep-list default-step-time (send self :centroid)
