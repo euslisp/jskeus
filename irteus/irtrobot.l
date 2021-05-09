@@ -191,13 +191,13 @@
         (let ((end-coords (cond (l (cdr (assoc :end-coords l)))
                                 ((member limb '(:rarm :larm :rleg :lleg :head :torso)) ;; obsoleted. for backward compatibility
                                  (send self (read-from-string (format nil "~A-END-COORDS" limb))))
-                                (t (error ";; error: cannot find limb ~A~%" limb)))))
+                                (t nil))))
           (user::forward-message-to end-coords args)))
        (:root-link
         (let ((root-link (cond (l (cdr (assoc :root-link l)))
                                ((member limb '(:rarm :larm :rleg :lleg :head :torso)) ;; obsoleted. for backward compatibility
                                 (send self (read-from-string (format nil "~A-ROOT-LINK" limb))))
-                               (t (error ";; error: cannot find limb ~A~%" limb)))))
+                               (t nil))))
           (user::forward-message-to root-link args)))
        (:angle-vector
 	(if args
@@ -246,7 +246,7 @@
                                                ((member limb '(:rarm :larm :rleg :lleg :head :torso)) ;; obsoleted. for backward compatibility
                                                 (cdr (assoc (intern (format nil "~A-COLLISION-AVOIDANCE-LINKS"
                                                                             (string-upcase limb))) (send self :slots))))
-                                               (t (error ";; error: cannot find limb ~A~%" limb)))))
+                                               (t nil))))
 	 (user::forward-message-to
 	   collision-avoidance-links
 	   args)))
@@ -265,7 +265,7 @@
           (cond (l (cdr (assoc :links l)))
                 ((member limb '(:rarm :larm :rleg :lleg :head :torso)) ;; obsoleted. for backward compatibility
                  (cdr (assoc (intern (string-upcase limb)) (send self :slots))))
-                (t (error ";; error: cannot find limb ~A~%" limb)))))
+                (t nil))))
 	 (t
 	  (let ((limb-joint-name
 		 (intern (format nil "~A-~A" (string-upcase limb) (string-upcase method)) *keyword-package*)))
@@ -487,7 +487,8 @@
          (av (send self :angle-vector))
          (root-coords (send (car (send self :links)) :copy-worldcoords))
          (calc-torque-buffer-args (send self :calc-torque-buffer-args))
-         (distribute-total-wrench-to-torque-method (if (and (not (every #'null (send self :legs))) ;; For legged robots
+         (support-leg-coords-list (remove nil (send self :legs :end-coords)))
+         (distribute-total-wrench-to-torque-method (if (and support-leg-coords-list ;; For legged robots
                                                             (not (and force-list moment-list target-coords))) ;; If no force-list, moment-list, target-coords are specified
                                                        :distribute-total-wrench-to-torque-method-default)))
    "Returns torque vector"
@@ -499,23 +500,19 @@
                 :force-list force-list :moment-list moment-list :target-coords target-coords
                 :calc-torque-buffer-args calc-torque-buffer-args)))
      (when (find-method self distribute-total-wrench-to-torque-method)
-       (let ((ext-wrench-tq (send self distribute-total-wrench-to-torque-method)))
+       (let ((ext-wrench-tq (send self distribute-total-wrench-to-torque-method support-leg-coords-list)))
          (dotimes (i (length ret-tq))
            (setf (elt ret-tq i) (- (elt ret-tq i) (elt ext-wrench-tq i)))
            (send (elt joint-list i) :joint-torque (elt ret-tq i)))))
      ret-tq
      ))
   (:distribute-total-wrench-to-torque-method-default
-   ()
+   (&optional (target-coords (remove nil (send self :legs :end-coords))))
    ;; set default force & moment by solving mimimum internal forces
-   (let ((target-coords))
-     (dolist (limb '(:rleg :lleg))
-       (if (send self :limb limb)
-           (push (send self :limb limb :end-coords) target-coords)))
-     (let* ((ret-fm (send self :calc-contact-wrenches-from-total-wrench (send-all target-coords :worldpos)
-                          :total-wrench (concatenate float-vector (send (car (send self :links)) :force) (send (car (send self :links)) :moment)))))
-       (send self :calc-torque-from-ext-wrenches :force-list (car ret-fm) :moment-list (cadr ret-fm) :target-coords target-coords)
-       )))
+   (let* ((ret-fm (send self :calc-contact-wrenches-from-total-wrench (send-all target-coords :worldpos)
+                        :total-wrench (concatenate float-vector (send (car (send self :links)) :force) (send (car (send self :links)) :moment)))))
+     (send self :calc-torque-from-ext-wrenches :force-list (car ret-fm) :moment-list (cadr ret-fm) :target-coords target-coords)
+     ))
   (:calc-force-from-joint-torque
    (limb all-torque &key (move-target (send self :limb limb :end-coords)) (use-torso))
    "Calculates end-effector force and moment from joint torques."
@@ -701,20 +698,33 @@
    (apply #'midcoords mid (send self :legs :end-coords))
    )
   (:fix-leg-to-coords
-   (fix-coords &optional (l/r :both) &key (mid 0.5) &allow-other-keys) ;; support-leg
+   (fix-coords &optional (legs :both) &key (mid 0.5) &allow-other-keys) ;; support-leg
    "Fix robot's legs to a coords
-    In the following codes, leged robot is assumed."
-   (unless (not (some #'null (send self :legs :links)))
-     (return-from :fix-leg-to-coords nil))
+    In the following codes, leged robot is assumed.
+    legs is :right, :left, :both, limb names (ex. :rleg or coordinates) and list of limb names"
    (let (support-coords tmp-coords move-coords pos rot ra)
      (cond
-      ((or (eq l/r :left) (eq l/r :lleg))
+      ((eq legs :left)
        (setq support-coords
              (send self :limb :lleg :end-coords :copy-worldcoords)))
-      ((or (eq l/r :right) (eq l/r :rleg))
+      ((eq legs :right)
        (setq support-coords
              (send self :limb :rleg :end-coords :copy-worldcoords)))
-      (t
+
+      ((symbolp legs)
+       (setq support-coords
+             (send self :limb legs :end-coords :copy-worldcoords)))
+      ((derivedp legs coordinates)
+       (setq support-coords (send legs :copy-worldcoords)))
+      ((listp legs)
+       (setq support-coords (make-coords))
+       (dotimes (i (length legs))
+         (setq support-coords (midcoords (/ 1.0 (+ i 1.0))
+                                         support-coords
+                                         (cond ((symbolp (elt legs i))
+                                                (send self :limb (elt legs i) :end-coords :copy-worldcoords))
+                                               (t (send (elt legs i) :copy-worldcoords)))))))
+      (t ;;(eq legs :both)
        (setq support-coords
              (midcoords mid
                         (send self :limb :lleg :end-coords :copy-worldcoords)
@@ -745,15 +755,19 @@
                  (reduce #'v+
                         (mapcar
                          #'(lambda (tmp-leg)
-                             (send self :limb tmp-leg :end-coords :worldpos)) leg))))
-               (t (send self :limb leg :end-coords :worldpos))))
+                             (if (symbolp tmp-leg)
+                                 (send self :limb tmp-leg :end-coords :worldpos)
+                                 (send tmp-leg :worldpos))) leg))))
+               (t (if (symbolp leg)
+                      (send self :limb leg :end-coords :worldpos)
+                      (send leg :worldpos)))))
         (fix-limbs-target-coords
          (mapcar #'(lambda (x) (send self :limb x :end-coords :copy-worldcoords)) fix-limbs))
         (root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5)) ;; use only translation x, y and rotation z
         &allow-other-keys)
    "Move robot COG to change centroid-on-foot location,
-    leg : legs for target of robot's centroid, which should be limb (ex. :rleg), list of limbs, and :both (which means '(:rleg :lleg)).
-    fix-limbs : limb names which are fixed in this IK."
+    leg : legs for target of robot's centroid, which should be limb (ex. :rleg or coordinates), list of limbs, and :both (which means '(:rleg :lleg)).
+    fix-limbs : limb names (ex. :rleg or coordinates) which are fixed in this IK."
    (with-move-target-link-list
     (mt ll self fix-limbs)
     (let* ()
@@ -830,6 +844,7 @@
    (let* ((res) (ret) (tm 0)
           (gg (instance gait-generator :init self dt)))
      (funcall init-pose-function)
+     (setq solve-angle-vector-args (append solve-angle-vector-args (list :robot-xv (send self :inverse-rotate-vector #F(1 0 0)))))
      ;; initial move centroid on foot
      (send gg :initialize-gait-parameter
            footstep-list default-step-time (send self :centroid)
@@ -909,25 +924,27 @@
   ;; generate footstep parameter
   ;; currently only default, forward and outside
   (:gen-footstep-parameter
-   (&key (ratio 1.0))
+   (&key (ratio 1.0)
+         (legs '(:rleg :lleg)))
    "Generate footstep parameter"
    (warn ";; generating footstep-parameter...~%")
    (let ((pav (send self :angle-vector))
-         (pc (send self :copy-worldcoords)))
+         (pc (send self :copy-worldcoords))
+         (rleg_ (car legs)) (lleg_ (cadr legs)))
      (send self :reset-pose)
-     (send self :fix-leg-to-coords (make-coords) '(:rleg :lleg))
-     (let ((dol (abs (elt (apply #'v- (send self :legs :end-coords :worldpos)) 1))))
+     (send self :fix-leg-to-coords (make-coords) legs)
+     (let ((dol (abs (elt (apply #'v- (mapcar #'(lambda (l) (send self :limb l :end-coords :worldpos)) legs)) 1))))
        (labels ((ik-test
                  (target-coords-func diff-func &optional (limit-func))
                  (send self :reset-pose)
-                 (send self :fix-leg-to-coords (make-coords) '(:rleg :lleg))
-                 (let* ((tc (send self :limb :rleg :end-coords :copy-worldcoords))
+                 (send self :fix-leg-to-coords (make-coords) legs)
+                 (let* ((tc (send self :limb rleg_ :end-coords :copy-worldcoords))
                         (init-tc (send tc :copy-worldcoords)))
                    (while (and
                            (send self :inverse-kinematics
                                  (funcall target-coords-func tc)
-                                 :link-list (send self :link-list (send self :limb :rleg :end-coords :parent))
-                                 :move-target (send self :limb :rleg :end-coords) :warnp nil)
+                                 :link-list (send self :link-list (send self :limb rleg_ :end-coords :parent))
+                                 :move-target (send self :limb rleg_ :end-coords) :warnp nil)
                            (if limit-func (funcall limit-func tc init-tc) t)
                            ))
                    (funcall diff-func tc init-tc))))
@@ -950,15 +967,16 @@
            )))
      ))
   (:footstep-parameter
-   ()
+   (&key (legs '(:rleg :lleg)))
    (unless (send self :get :footstep-parameter)
-     (send self :gen-footstep-parameter))
+     (send self :gen-footstep-parameter :legs legs))
    (send self :get :footstep-parameter)
    )
   ;; simple footstep gen
   (:go-pos-params->footstep-list
    (xx yy th ;; [mm] [mm] [deg]
-    &key ((:footstep-parameter prm) (send self :footstep-parameter))
+    &key (legs '(:rleg :lleg))
+         ((:footstep-parameter prm) (send self :footstep-parameter :legs legs))
          ((:default-half-offset defp) (cadr (memq :default-half-offset prm)))
          ((:forward-offset-length xx-max) (cadr (memq :forward-offset-length prm)))
          ((:outside-offset-length yy-max) (cadr (memq :outside-offset-length prm)))
@@ -971,24 +989,25 @@
                 (send cc :name leg)
                 cc))))
    "Calculate foot step list from goal x position [mm], goal y position [mm], and goal yaw orientation [deg]."
-   (let* ((dx xx) (dy yy) (dth th)
+   (unless (= (length legs) 2) (error ";; error: length of limbs != 2"))
+   (let* ((dx xx) (dy yy) (dth th) (rleg_ (car legs)) (lleg_ (cadr legs))
           (leg (if (eps= (float yy) 0.0)
-                   (if (> th 0.0) :lleg :rleg)
-                 (if (> yy 0.0) :lleg :rleg)))
-          (mc (apply #'midcoords 0.5 (send self :legs :end-coords :copy-worldcoords)))
+                   (if (> th 0.0) lleg_ rleg_)
+                 (if (> yy 0.0) lleg_ rleg_)))
+          (mc (apply #'midcoords 0.5 (mapcar #'(lambda (l) (send self :limb l :end-coords :copy-worldcoords)) legs)))
           (gc (send (make-coords :pos (float-vector xx yy 0) :rpy (float-vector (deg2rad th) 0 0)) :transform mc :world))
           (leg-translate-pos
            (mapcar #'(lambda (l)
-                       (list l (scale (case l (:rleg -1) (:lleg 1)) defp)))
-                   '(:rleg :lleg)))
-          (ret (list (funcall gen-go-pos-step-node-func mc (case leg (:lleg :rleg) (:rleg :lleg)) leg-translate-pos))))
+                       (list l (scale (cond ((eq l rleg_) -1) ((eq l lleg_) 1)) defp)))
+                   (list rleg_ lleg_)))
+          (ret (list (funcall gen-go-pos-step-node-func mc (cond ((eq leg lleg_) rleg_) ((eq leg rleg_) lleg_)) leg-translate-pos))))
      (labels ((do-push-steps
                (finish-check func)
                (until (funcall finish-check)
                  (funcall func)
                  (push (funcall gen-go-pos-step-node-func mc leg leg-translate-pos) ret)
-                 (setq leg (case leg (:lleg :rleg) (:rleg :lleg)))
-                  )))
+                 (setq leg (cond ((eq leg lleg_) rleg_) ((eq leg rleg_) lleg_)))
+                 )))
        (do-push-steps #'(lambda ()
                           (and (eps= (float dx) 0.0)
                                (eps= (float dy) 0.0)
@@ -998,18 +1017,18 @@
                                        ((< xx-max dx) xx-max)
                                        ((> (- xx-max) dx) (- xx-max))
                                        (t dx)))
-                                (ddy (case leg
-                                       (:rleg
+                                (ddy (cond
+                                       ((eq leg rleg_)
                                         (cond
                                           ((< 0.0 dy) 0.0)
                                           ((> (- yy-max) dy) (- yy-max))
                                           (t dy)))
-                                       (:lleg
+                                       ((eq leg lleg_)
                                         (cond
                                           ((< yy-max dy) yy-max)
                                           ((> 0.0 dy) 0.0)
                                           (t dy)))
-                                        ))
+                                       ))
                                 (ddth (cond
                                         ((< th-max dth) th-max)
                                         ((> (- th-max) dth) (- th-max))
@@ -1022,10 +1041,13 @@
        (reverse ret))))
   (:go-pos-quadruped-params->footstep-list
    (xx yy th ;; [mm] [mm] [deg]
-       &key (type :crawl))
+       &key (type :crawl)
+            (legs '(:rleg :lleg :rarm :larm)))
    "Calculate foot step list for quadruped walking from goal x position [mm], goal y position [mm], and goal yaw orientation [deg]."
-   (let ((biped-fsl (send self :go-pos-params->footstep-list xx yy th :forward-offset-length 100 :rotate-rad 3))
-         quadruped-fsl)
+   (unless (= (length legs) 4) (error ";; error: length of limbs != 4"))
+   (let* ((rleg_ (elt legs 0)) (lleg_ (elt legs 1)) (rarm_ (elt legs 2)) (larm_ (elt legs 3))
+          (biped-fsl (send self :go-pos-params->footstep-list xx yy th :forward-offset-length 100 :rotate-rad 3 :legs (list rleg_ lleg_)))
+          quadruped-fsl)
      ;; calculate foot step list for quad walk
      (dolist (fs biped-fsl)
        (let* ((fs-leg-name (send fs :name))
@@ -1033,24 +1055,24 @@
               (target-arm-name))
          (case type
                (:crawl
-                (dolist (l (list fs-leg-name (case fs-leg-name (:lleg :larm) (:rleg :rarm))))
+                (dolist (l (list fs-leg-name (cond ((eq fs-leg-name lleg_) larm_) ((eq fs-leg-name rleg_) rarm_))))
                   (push (list (make-coords :coords (send (send self :limb l :end-coords :copy-worldcoords) :transform offset :world) :name l))
                         quadruped-fsl)))
                (:trot
                 (push (mapcar #'(lambda (l)
                                   (make-coords :coords (send (send self :limb l :end-coords :copy-worldcoords) :transform offset :world) :name l))
-                              (list fs-leg-name (setq target-arm-name (case fs-leg-name (:lleg :rarm) (:rleg :larm)))))
+                              (list fs-leg-name (setq target-arm-name (cond ((eq fs-leg-name lleg_) rarm_) ((eq fs-leg-name rleg_) larm_)))))
                       quadruped-fsl))
                (:pace
                 (push (mapcar #'(lambda (l)
                                   (make-coords :coords (send (send self :limb l :end-coords :copy-worldcoords) :transform offset :world) :name l))
-                              (list fs-leg-name (case fs-leg-name (:lleg :larm) (:rleg :rarm))))
+                              (list fs-leg-name (cond ((eq fs-leg-name lleg_) larm_) ((eq fs-leg-name rleg_) rarm_))))
                       quadruped-fsl))
                (:gallop
                 (push (mapcar #'(lambda (l)
                                   (make-coords :coords (send (send self :limb l :end-coords :copy-worldcoords) :transform offset :world) :name l))
-                              (list (case fs-leg-name (:rleg :rleg) (:lleg :rarm))
-                                    (case fs-leg-name (:rleg :lleg) (:lleg :larm))))
+                              (list (cond ((eq fs-leg-name rleg_) rleg_) ((eq fs-leg-name lleg_) rarm_))
+                                    (cond ((eq fs-leg-name rleg_) lleg_) ((eq fs-leg-name lleg_) larm_))))
                       quadruped-fsl))
                )))
      (reverse quadruped-fsl)))

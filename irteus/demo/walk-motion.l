@@ -40,6 +40,7 @@
 ;;;
 
 (load "sample-robot-model.l")
+(load "sample-centaur-robot-model.l")
 
 (defun walk-motion
   (robot)
@@ -245,6 +246,39 @@
    #'(lambda () (send *robot* :go-pos-quadruped-params->footstep-list 50 0 0 :type :crawl))
    :go-backward-over go-backward-over))
 (warn "(crawl-walk-motion-for-sample-robot) ;; for walking motion~%")
+
+(defun quad-walk-motion-for-sample-centaur-robot
+  (gen-footstep-func)
+  (unless (boundp '*sample-centaur-robot*)
+    (setq *sample-centaur-robot* (instance sample-centaur-robot :init)))
+  ;; initial quad pose
+  (send *sample-centaur-robot* :reset-pose)
+  (send *sample-centaur-robot* :fix-leg-to-coords (make-coords) '(:rfleg :lfleg :rbleg :lbleg))
+
+  ;; prepare footsteps
+  (let ((footstep-list (funcall gen-footstep-func)))
+    (objects (list *sample-centaur-robot*))
+    ;; solve walk motion
+    (send *sample-centaur-robot* :calc-walk-pattern-from-footstep-list
+          footstep-list :debug-view :no-message
+          :all-limbs '(:rfleg :lfleg :rbleg :lbleg)
+          :init-pose-function
+          #'(lambda ()
+              (send *sample-centaur-robot* :move-centroid-on-foot '(:rfleg :lfleg :rbleg :lbleg) '(:rfleg :lfleg :rbleg :lbleg)))
+          :default-step-height 70)
+      ))
+
+(defun trot-walk-motion-for-sample-centaur-robot
+  ()
+  (quad-walk-motion-for-sample-centaur-robot
+   #'(lambda () (send *sample-centaur-robot* :go-pos-quadruped-params->footstep-list 200 100 0 :legs '(:rfleg :lfleg :rbleg :lbleg) :type :trot))))
+(warn "(trot-walk-motion-for-sample-centaur-robot) ;; for walking motion~%")
+
+(defun crawl-walk-motion-for-sample-centaur-robot
+  ()
+  (quad-walk-motion-for-sample-centaur-robot
+   #'(lambda () (send *sample-centaur-robot* :go-pos-quadruped-params->footstep-list 50 0 0 :legs '(:rfleg :lfleg :rbleg :lbleg) :type :crawl))))
+(warn "(crawl-walk-motion-for-sample-centaur-robot) ;; for walking motion~%")
 
 (defun walk-motion-for-robots ()
   (unless (boundp '*robots*)
