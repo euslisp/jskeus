@@ -66,22 +66,40 @@
          (upper-leg-weight 2152.7) (lower-leg-weight 898.7) (foot-weight 313.5)
          )
    (send-super* :init :name name args)
-   ;; 1. make links links and assoc all links
-   (let ((aroot-link (send self :make-root-link waist-length waist-weight)))
-     (setq torso (send self :make-torso-links torso-length torso-weight)
-           head (send self :make-head-links head-weight)
-           rarm (send self :make-arm-links :rarm
-                      arm-radius upper-arm-length lower-arm-length shoulder-width hand-length
-                      upper-arm-weight lower-arm-weight hand-weight)
-           larm (send self :make-arm-links :larm
-                      arm-radius upper-arm-length lower-arm-length shoulder-width hand-length
-                      upper-arm-weight lower-arm-weight hand-weight)
-           rleg (send self :make-leg-links :rleg
-                      leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset
-                      upper-leg-weight lower-leg-weight foot-weight)
-           lleg (send self :make-leg-links :lleg
-                      leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset
-                      upper-leg-weight lower-leg-weight foot-weight))
+   ;; 1. make links and assoc all links
+   (let* ((aroot-link (send self :make-root-link waist-length waist-weight))
+          (torso-info (send self :make-torso-links torso-length torso-weight))
+          (torso (cdr (assoc :links torso-info)))
+          (torso-end-coords (cdr (assoc :end-coords torso-info)))
+          (torso-root-link (cdr (assoc :root-link torso-info)))
+          (head-info (send self :make-head-links head-weight))
+          (head (cdr (assoc :links head-info)))
+          (head-end-coords (cdr (assoc :end-coords head-info)))
+          (head-root-link (cdr (assoc :root-link head-info)))
+          (rarm-info (send self :make-arm-links :rarm
+                           arm-radius upper-arm-length lower-arm-length shoulder-width hand-length
+                           upper-arm-weight lower-arm-weight hand-weight))
+          (rarm (cdr (assoc :links rarm-info)))
+          (rarm-end-coords (cdr (assoc :end-coords rarm-info)))
+          (rarm-root-link (cdr (assoc :root-link rarm-info)))
+          (larm-info (send self :make-arm-links :larm
+                           arm-radius upper-arm-length lower-arm-length shoulder-width hand-length
+                           upper-arm-weight lower-arm-weight hand-weight))
+          (larm (cdr (assoc :links larm-info)))
+          (larm-end-coords (cdr (assoc :end-coords larm-info)))
+          (larm-root-link (cdr (assoc :root-link larm-info)))
+          (rleg-info (send self :make-leg-links :rleg
+                           leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset
+                           upper-leg-weight lower-leg-weight foot-weight))
+          (rleg (cdr (assoc :links rleg-info)))
+          (rleg-end-coords (cdr (assoc :end-coords rleg-info)))
+          (rleg-root-link (cdr (assoc :root-link rleg-info)))
+          (lleg-info (send self :make-leg-links :lleg
+                           leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset
+                           upper-leg-weight lower-leg-weight foot-weight))
+          (lleg (cdr (assoc :links lleg-info)))
+          (lleg-end-coords (cdr (assoc :end-coords lleg-info)))
+          (lleg-root-link (cdr (assoc :root-link lleg-info))))
      ;; arrange limbs
      (send (car rarm) :translate (float-vector 0 (- shoulder-width) (- torso-length 25)) :world)
      (send (car larm) :translate (float-vector 0 shoulder-width (- torso-length 25)) :world)
@@ -145,10 +163,16 @@
                             jll0 jll1 jll2 jll3 jll4 jll5
                             jlr0 jlr1 jlr2 jlr3 jlr4 jlr5
                             ))
+
+     ;; add limbs
+     (send self :add-limb :torso :links torso :end-coords torso-end-coords :root-link torso-root-link)
+     (send self :add-limb :head :links head :end-coords head-end-coords :root-link head-root-link)
+     (send self :add-limb :rarm :links rarm :end-coords rarm-end-coords :root-link rarm-root-link)
+     (send self :add-limb :larm :links larm :end-coords larm-end-coords :root-link larm-root-link)
+     (send self :add-limb :rleg :links rleg :end-coords rleg-end-coords :root-link rleg-root-link)
+     (send self :add-limb :lleg :links lleg :end-coords lleg-end-coords :root-link lleg-root-link)
+
      ;;    These are for robot-model.
-     (setq larm-root-link (car larm) rarm-root-link (car rarm)
-           lleg-root-link (car lleg) rleg-root-link (car rleg)
-           torso-root-link (car torso) head-root-link (car head))
      (setq collision-avoidance-links (list aroot-link (elt torso 1) (elt larm 3) (elt rarm 3)))
 
      ;; set max torques
@@ -166,23 +190,23 @@
      ;; set sensors
      (setq force-sensors
            (mapcar #'(lambda (l)
-                       (send (send self l :end-coords :parent) :assoc
-                             (make-cascoords :coords (send self l :end-coords :copy-worldcoords)
+                       (send (send self :limb l :end-coords :parent) :assoc
+                             (make-cascoords :coords (send self :limb l :end-coords :copy-worldcoords)
                                              :name (format nil "~A-fsensor" (string-downcase l)))))
                    (list :rarm :larm :rleg :lleg)))
      (setq imu-sensors
            (list (let ((sen (make-cascoords
-                             :worldpos (send (car (send self :torso :waist-p :child-link :bodies)) :centroid)
+                             :worldpos (send (car (send self :limb :torso :waist-p :child-link :bodies)) :centroid)
                              :name "torso-imusensor")))
-                   (send (send self :torso :waist-p :child-link) :assoc sen)
+                   (send (send self :limb :torso :waist-p :child-link) :assoc sen)
                    sen)))
      (setq cameras
            (mapcar #'(lambda (pos name)
                        (let ((sen (instance camera-model :init (make-cylinder 10 20) :name name)))
                          (send sen :rotate pi/2 :y)
                          (send sen :rotate -pi/2 :z)
-                         (send sen :locate (v+ pos (send (car (send (send self :head :neck-p :child-link) :bodies)) :centroid)) :world)
-                         (send (send self :head :neck-p :child-link) :assoc sen)
+                         (send sen :locate (v+ pos (send (car (send (send self :limb :head :neck-p :child-link) :bodies)) :centroid)) :world)
+                         (send (send self :limb :head :neck-p :child-link) :assoc sen)
                          sen))
                    (list (float-vector 0 30 0) (float-vector 0 -30 0))
                    (list "left-camera" "right-camera")))
@@ -205,13 +229,15 @@
      (send bc2 :set-color :green)
      (setq bc2 (instance bodyset-link :init (make-cascoords :pos #f(0 0 -12.5)) :bodies (list bc2) :name :torso-link1 :weight torso-weight))
      (send bc1 :assoc bc2)
-     (list bc1 bc2)))
+     (list (cons :links (list bc1 bc2))
+           (cons :root-link bc1))))
   (:make-head-links
    (head-weight)
    (let ((bh0 (make-default-robot-link 0 50 :y :head-link0))
 	 (bh2 (make-cube 120 100 150))
 	 (bh2e (make-cylinder 10 30))
-	 (bh1))
+	 (bh1)
+	 (end-coords))
      (send bh2 :locate #f(0 0 80))
      (send bh2 :set-color :green)
      (send bh2e :rotate pi/2 :y)
@@ -219,10 +245,12 @@
      (send bh2e :set-color :green)
      (send bh2 :assoc bh2e)
      (setq bh1 (instance bodyset-link :init (make-cascoords) :bodies (list bh2 bh2e) :name :head-link1 :weight head-weight))
-     (setq head-end-coords (make-cascoords :pos #f(60 0 100) :rpy (float-vector 0 pi/2 0)))
-     (send bh1 :assoc head-end-coords)
+     (setq end-coords (make-cascoords :pos #f(60 0 100) :rpy (float-vector 0 pi/2 0)))
+     (send bh1 :assoc end-coords)
      (send bh0 :assoc bh1)
-     (list bh0 bh1)))
+     (list (cons :links (list bh0 bh1))
+           (cons :root-link bh0)
+           (cons :end-coords end-coords))))
   (:make-arm-links
    (l/r arm-radius upper-arm-length lower-arm-length shoulder-width hand-length
         upper-arm-weight lower-arm-weight hand-weight)
@@ -232,21 +260,22 @@
 	 (ba4 (make-default-robot-link lower-arm-length arm-radius :y (read-from-string (format nil "~A-link3" l/r))))
 	 (ba5 (make-default-robot-link 0 arm-radius :z (read-from-string (format nil "~A-link4" l/r))))
 	 (ba6 (make-default-robot-link 0 arm-radius :x (read-from-string (format nil "~A-link5" l/r))))
-	 (ba7 (make-default-robot-link hand-length arm-radius :y (read-from-string (format nil "~A-link6" l/r)))))
+	 (ba7 (make-default-robot-link hand-length arm-radius :y (read-from-string (format nil "~A-link6" l/r))))
+	 (end-coords))
      (send ba3 :weight upper-arm-weight)
      (send ba4 :weight lower-arm-weight)
      (send ba7 :weight hand-weight)
      (case l/r
        (:rarm
-	(setq rarm-end-coords (make-cascoords))
-	(send rarm-end-coords :locate (float-vector 0 0 (- hand-length)))
-	(send rarm-end-coords :rotate pi/2 :y)
-	(send ba7 :assoc rarm-end-coords))
+	(setq end-coords (make-cascoords))
+	(send end-coords :locate (float-vector 0 0 (- hand-length)))
+	(send end-coords :rotate pi/2 :y)
+	(send ba7 :assoc end-coords))
        (:larm
-	(setq larm-end-coords (make-cascoords))
-	(send larm-end-coords :locate (float-vector 0 0 (- hand-length)))
-	(send larm-end-coords :rotate pi/2 :y)
-	(send ba7 :assoc larm-end-coords)))
+	(setq end-coords (make-cascoords))
+	(send end-coords :locate (float-vector 0 0 (- hand-length)))
+	(send end-coords :rotate pi/2 :y)
+	(send ba7 :assoc end-coords)))
      (send ba6 :assoc ba7)
      (send ba5 :assoc ba6)
      (send ba5 :translate (float-vector 0 0 (- lower-arm-length)) :world)
@@ -255,7 +284,9 @@
      (send ba3 :assoc ba4)
      (send ba2 :assoc ba3)
      (send ba1 :assoc ba2)
-     (list ba1 ba2 ba3 ba4 ba5 ba6 ba7)))
+     (list (cons :links (list ba1 ba2 ba3 ba4 ba5 ba6 ba7))
+           (cons :root-link ba1)
+           (cons :end-coords end-coords))))
   (:make-leg-links
    (l/r leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset
         upper-leg-weight lower-leg-weight foot-weight)
@@ -265,7 +296,8 @@
 	  (bl4 (make-default-robot-link (- lower-leg-length (/ leg-radius 2.0)) leg-radius :y (read-from-string (format nil "~A-link3" l/r))))
 	  (bl5 (make-default-robot-link 0 leg-radius :x (read-from-string (format nil "~A-link4" l/r))))
 	  (bl6b (make-cube foot-depth foot-width foot-thickness))
-	  (bl6))
+	  (bl6)
+	  (end-coords))
      (send bl3 :weight upper-leg-weight)
      (send bl4 :weight lower-leg-weight)
      (send bl6b :locate (float-vector foot-offset 0 (- ankle-length)))
@@ -274,13 +306,13 @@
      (send bl6 :weight foot-weight)
      (case l/r
        (:rleg
-	(setq rleg-end-coords (make-cascoords))
-	(send rleg-end-coords :locate (float-vector 0 0 (- (+ ankle-length (/ foot-thickness 2.0)))))
-	(send bl6 :assoc rleg-end-coords))
+	(setq end-coords (make-cascoords))
+	(send end-coords :locate (float-vector 0 0 (- (+ ankle-length (/ foot-thickness 2.0)))))
+	(send bl6 :assoc end-coords))
        (:lleg
-	(setq lleg-end-coords (make-cascoords))
-	(send lleg-end-coords :locate (float-vector 0 0 (- (+ ankle-length (/ foot-thickness 2.0)))))
-	(send bl6 :assoc lleg-end-coords)))
+	(setq end-coords (make-cascoords))
+	(send end-coords :locate (float-vector 0 0 (- (+ ankle-length (/ foot-thickness 2.0)))))
+	(send bl6 :assoc end-coords)))
      (send bl5 :assoc bl6)
      (send bl5 :translate (float-vector 0 0 (- lower-leg-length)) :world)
      (send bl4 :assoc bl5)
@@ -288,7 +320,9 @@
      (send bl3 :assoc bl4)
      (send bl2 :assoc bl3)
      (send bl1 :assoc bl2)
-     (list bl1 bl2 bl3 bl4 bl5 bl6)))
+     (list (cons :links (list bl1 bl2 bl3 bl4 bl5 bl6))
+           (cons :root-link bl1)
+           (cons :end-coords end-coords))))
   (:reset-pose ()
     (send self :angle-vector #f(0.0 0.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0)))
   )
