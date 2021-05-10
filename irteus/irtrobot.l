@@ -702,33 +702,28 @@
    "Fix robot's legs to a coords
     In the following codes, leged robot is assumed.
     legs is :right, :left, :both, limb names (ex. :rleg or coordinates) and list of limb names"
-   (let (support-coords tmp-coords move-coords pos rot ra)
-     (cond
-      ((eq legs :left)
-       (setq support-coords
-             (send self :limb :lleg :end-coords :copy-worldcoords)))
-      ((eq legs :right)
-       (setq support-coords
-             (send self :limb :rleg :end-coords :copy-worldcoords)))
-
-      ((symbolp legs)
-       (setq support-coords
-             (send self :limb legs :end-coords :copy-worldcoords)))
-      ((derivedp legs coordinates)
-       (setq support-coords (send legs :copy-worldcoords)))
-      ((listp legs)
-       (setq support-coords (make-coords))
-       (dotimes (i (length legs))
-         (setq support-coords (midcoords (/ 1.0 (+ i 1.0))
-                                         support-coords
-                                         (cond ((symbolp (elt legs i))
-                                                (send self :limb (elt legs i) :end-coords :copy-worldcoords))
-                                               (t (send (elt legs i) :copy-worldcoords)))))))
-      (t ;;(eq legs :both)
-       (setq support-coords
-             (midcoords mid
-                        (send self :limb :lleg :end-coords :copy-worldcoords)
-                        (send self :limb :rleg :end-coords :copy-worldcoords)))))
+   (let (leg-coords support-coords tmp-coords move-coords pos rot ra)
+     ;; Handle legs argument
+     (when (eq legs :both)
+       (setq legs '(:rleg :lleg)))
+     (unless (listp legs)
+       (setq legs (list legs)))
+     (setq leg-coords (remove nil (mapcar #'(lambda (leg)
+                                              (cond
+                                                ((eq leg :left) (send self :limb :lleg :end-coords))
+                                                ((eq leg :right) (send self :limb :rleg :end-coords))
+                                                ((symbolp leg) (send self :limb leg :end-coords))
+                                                ((derivedp leg coordinates) leg)))
+                                          legs)))
+     (when (null leg-coords)
+       (return-from :fix-leg-to-coords nil)) ;; leged robot is assumed.
+     ;; calculate mid-coords of legs
+     (setq support-coords (make-coords))
+     (dotimes (i (length leg-coords))
+       (setq support-coords (midcoords (/ 1.0 (+ i 1.0))
+                                       support-coords
+                                       (send (elt leg-coords i) :worldcoords))))
+     ;; fix self to target coords
      (setq tmp-coords (send fix-coords :copy-worldcoords))
      (setq move-coords (send support-coords :transformation self))
      (send tmp-coords :transform move-coords :local)
@@ -742,27 +737,25 @@
         (rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) 1 5))) fix-limbs))
         (mid 0.5)
         (target-centroid-pos
-         (cond ((eq leg :both)
-                (apply
-                 #'midpoint mid
-                 (mapcar
-                  #'(lambda (tmp-leg)
-                      (send self :limb tmp-leg :end-coords :worldpos))
-                  (remove-if-not #'(lambda (x) (memq x '(:rleg :lleg))) fix-limbs))))
-               ((listp leg)
-                (scale
-                 (/ 1.0 (length leg))
-                 (reduce #'v+
-                        (mapcar
-                         #'(lambda (tmp-leg)
-                             (if (symbolp tmp-leg)
-                                 (send self :limb tmp-leg :end-coords :worldpos)
-                                 (send tmp-leg :worldpos))) leg))))
-               (t (if (symbolp leg)
-                      (send self :limb leg :end-coords :worldpos)
-                      (send leg :worldpos)))))
+         (let* ((legs (cond ((listp leg) leg) ((eq leg :both) '(:rleg :lleg)) (t (list leg))))
+                (leg-coords (remove nil (mapcar #'(lambda (leg)
+                                                    (cond
+                                                      ((eq leg :left) (send self :limb :lleg :end-coords))
+                                                      ((eq leg :right) (send self :limb :rleg :end-coords))
+                                                      ((symbolp leg) (send self :limb leg :end-coords))
+                                                      ((derivedp leg coordinates) leg)))
+                                                legs))))
+           (scale (/ 1.0 (length leg-coords))
+                  (reduce #'v+ (mapcar #'(lambda (leg) (send leg :worldpos)) leg-coords)))))
         (fix-limbs-target-coords
-         (mapcar #'(lambda (x) (send self :limb x :end-coords :copy-worldcoords)) fix-limbs))
+         (let* ((limbs (if (listp fix-limbs) fix-limbs (list fix-limbs))))
+           (send-all (remove nil (mapcar #'(lambda (limb)
+                                             (cond
+                                               ((eq limb :left) (send self :limb :lleg :end-coords))
+                                               ((eq limb :right) (send self :limb :rleg :end-coords))
+                                               ((symbolp limb) (send self :limb limb :end-coords))
+                                               ((derivedp limb coordinates) limb)))
+                                         limbs)) :copy-worldcoords)))
         (root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5)) ;; use only translation x, y and rotation z
         &allow-other-keys)
    "Move robot COG to change centroid-on-foot location,
