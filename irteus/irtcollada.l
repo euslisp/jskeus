@@ -211,13 +211,13 @@
           (cons :origin                   ;parent -> child transformation
                 (let ((parent (send link :parent)))
                   (send parent :transformation link)))
-          (cons :mesh (eusmodel-mesh-spec link))
+          (cons :mesh (eusmodel-mesh-spec link rt-cds))
           (cons :mass_frame mframe)
           (cons :mass (/ (send link :weight) 1000.0))
           (cons :inertia inertia)
           )))
 
-(defun eusmodel-mesh-spec (link)
+(defun eusmodel-mesh-spec (link rt-cds)
   ;; right?
   (let ((bs (send link :bodies)))
     (mapcar #'(lambda (b)
@@ -227,10 +227,10 @@
                                  (send (geo::body-to-triangles b nil)
                                        :faces))))
                   (send trimesh :set-color (get b :face-color))
-                  ;; move trimesh to origin...
+                  ;; move trimesh to origin(root) relative coordinates
                   (send trimesh
-                        :move-to (send (send b :copy-worldcoords)
-                                       :inverse-transformation))
+                        :move-to (send rt-cds :inverse-transformation))
+                  (send trimesh :worldcoords)
                   trimesh))
             bs)))
 
