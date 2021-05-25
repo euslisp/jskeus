@@ -39,36 +39,38 @@
 ;;; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;;;
 
-(defclass sample-robot
+(defclass sample-centaur-robot
   :super robot-model
   :slots (jc0 jc1 jh0 jh1
               jal0 jal1 jal2 jal3 jal4 jal5 jal6
               jar0 jar1 jar2 jar3 jar4 jar5 jar6
-              jll0 jll1 jll2 jll3 jll4 jll5
-              jlr0 jlr1 jlr2 jlr3 jlr4 jlr5))
-(defmethod sample-robot
+              jllf0 jllf1 jllf2 jllf3 jllf4 jllf5
+              jlrf0 jlrf1 jlrf2 jlrf3 jlrf4 jlrf5
+              jllb0 jllb1 jllb2 jllb3 jllb4 jllb5
+              jlrb0 jlrb1 jlrb2 jlrb3 jlrb4 jlrb5))
+(defmethod sample-centaur-robot
   (:init 
    (&rest args
-    &key (name "sample-robot")
+    &key (name "sample-centaur-robot")
          ;; key word arguments for configure model size
          (leg-radius 50) (upper-leg-length 250) (lower-leg-length 250) (ankle-length 50)
          (crotch-width 75) (foot-depth 200) (foot-width 100) (foot-thickness 25) (foot-offset 50)
 	 (arm-radius 50) (upper-arm-length 275) (lower-arm-length 195) (shoulder-width 150) (hand-length 50)
-         (waist-length 100) (torso-length 200)
+         (waist-height 100) (waist-length 500) (torso-height 200) (torso-length 100)
          ;; mass distribution
          ;;   refering to "WEIGHT, VOLUME, AND CENTER OF MASS OF SEGMENTS OF THE HUMAN BODY", C.E.Clauser et al., AMRL technical report TR-69-70(1969), http://www.dtic.mil/dtic/tr/fulltext/u2/710622.pdf
          ;;   ratio is '((:head 7.3) (:trunk 50.7) (:upper-arm 2.6) (:forearm 1.6) (:hand 0.7) (:tight 10.3) (:calf 4.3) (:foot 1.5))
          ;;   default total mass is 20.9[kg], which is calculated from total-height and avarage 6-years-old-Japanese Male weight http://www.mhlw.go.jp/toukei/youran/data25k/2-06.xls
          (head-weight 1525.7)
-         (torso-weight (/ (* torso-length 10596.3) (+ torso-length waist-length)))
-         (waist-weight (/ (* waist-length 10596.3) (+ torso-length waist-length)))
+         (torso-weight (/ (* torso-height 10596.3) (+ torso-height waist-height)))
+         (waist-weight (/ (* waist-length (/ (* waist-height 10596.3) (+ torso-height waist-height))) torso-length))
          (upper-arm-weight 543.4) (lower-arm-weight 334.4) (hand-weight 146.3)
          (upper-leg-weight 2152.7) (lower-leg-weight 898.7) (foot-weight 313.5)
          )
    (send-super* :init :name name args)
    ;; 1. make links and assoc all links
-   (let* ((aroot-link (send self :make-root-link waist-length waist-weight))
-          (torso-info (send self :make-torso-links torso-length torso-weight))
+   (let* ((aroot-link (send self :make-root-link waist-height waist-length waist-weight))
+          (torso-info (send self :make-torso-links torso-height torso-length torso-weight))
           (torso (cdr (assoc :links torso-info)))
           (torso-end-coords (cdr (assoc :end-coords torso-info)))
           (torso-root-link (cdr (assoc :root-link torso-info)))
@@ -88,24 +90,39 @@
           (larm (cdr (assoc :links larm-info)))
           (larm-end-coords (cdr (assoc :end-coords larm-info)))
           (larm-root-link (cdr (assoc :root-link larm-info)))
-          (rleg-info (send self :make-leg-links :rleg
+          (rfleg-info (send self :make-leg-links :rleg
                            leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset
                            upper-leg-weight lower-leg-weight foot-weight))
-          (rleg (cdr (assoc :links rleg-info)))
-          (rleg-end-coords (cdr (assoc :end-coords rleg-info)))
-          (rleg-root-link (cdr (assoc :root-link rleg-info)))
-          (lleg-info (send self :make-leg-links :lleg
+          (rfleg (cdr (assoc :links rfleg-info)))
+          (rfleg-end-coords (cdr (assoc :end-coords rfleg-info)))
+          (rfleg-root-link (cdr (assoc :root-link rfleg-info)))
+          (lfleg-info (send self :make-leg-links :lleg
                            leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset
                            upper-leg-weight lower-leg-weight foot-weight))
-          (lleg (cdr (assoc :links lleg-info)))
-          (lleg-end-coords (cdr (assoc :end-coords lleg-info)))
-          (lleg-root-link (cdr (assoc :root-link lleg-info))))
+          (lfleg (cdr (assoc :links lfleg-info)))
+          (lfleg-end-coords (cdr (assoc :end-coords lfleg-info)))
+          (lfleg-root-link (cdr (assoc :root-link lfleg-info)))
+          (rbleg-info (send self :make-leg-links :rleg
+                           leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset
+                           upper-leg-weight lower-leg-weight foot-weight))
+          (rbleg (cdr (assoc :links rbleg-info)))
+          (rbleg-end-coords (cdr (assoc :end-coords rbleg-info)))
+          (rbleg-root-link (cdr (assoc :root-link rbleg-info)))
+          (lbleg-info (send self :make-leg-links :lleg
+                           leg-radius upper-leg-length lower-leg-length ankle-length crotch-width foot-depth foot-width foot-thickness foot-offset
+                           upper-leg-weight lower-leg-weight foot-weight))
+          (lbleg (cdr (assoc :links lbleg-info)))
+          (lbleg-end-coords (cdr (assoc :end-coords lbleg-info)))
+          (lbleg-root-link (cdr (assoc :root-link lbleg-info))))
      ;; arrange limbs
-     (send (car rarm) :translate (float-vector 0 (- shoulder-width) (- torso-length 25)) :world)
-     (send (car larm) :translate (float-vector 0 shoulder-width (- torso-length 25)) :world)
-     (send (car rleg) :translate (float-vector 0 (- crotch-width) (+ (- waist-length) -50)) :world)
-     (send (car lleg) :translate (float-vector 0 crotch-width (+ (- waist-length) -50)) :world)
-     (send (car head) :locate (float-vector 0 0 (+ 25 torso-length)))
+     (send aroot-link :translate (float-vector (/ (- torso-length waist-length) 2) 0 0) :world)
+     (send (car rarm) :translate (float-vector 0 (- shoulder-width) (- torso-height 25)) :world)
+     (send (car larm) :translate (float-vector 0 shoulder-width (- torso-height 25)) :world)
+     (send (car rfleg) :translate (float-vector 0 (- crotch-width) (+ (- waist-height) -50)) :world)
+     (send (car lfleg) :translate (float-vector 0 crotch-width (+ (- waist-height) -50)) :world)
+     (send (car rbleg) :translate (float-vector (- torso-length waist-length) (- crotch-width) (+ (- waist-height) -50)) :world)
+     (send (car lbleg) :translate (float-vector (- torso-length waist-length) crotch-width (+ (- waist-height) -50)) :world)
+     (send (car head) :locate (float-vector 0 0 (+ 25 torso-height)))
 
      ;; 2. assoc links
      ;;    Root link should be associated with "self".
@@ -114,8 +131,10 @@
      (send (cadr torso) :assoc (car head))
      (send (cadr torso) :assoc (car rarm))
      (send (cadr torso) :assoc (car larm))
-     (send aroot-link :assoc (car rleg))
-     (send aroot-link :assoc (car lleg))
+     (send aroot-link :assoc (car rfleg))
+     (send aroot-link :assoc (car lfleg))
+     (send aroot-link :assoc (car rbleg))
+     (send aroot-link :assoc (car lbleg))
 
      ;; 3. make all joints
      ;;    Before making joints, you should :assoc all links.
@@ -140,37 +159,54 @@
      (setq jar5 (instance rotational-joint :init :parent-link (elt rarm 4) :child-link (elt rarm 5) :name :rarm-wrist-r :axis :-x))
      (setq jar6 (instance rotational-joint :init :parent-link (elt rarm 5) :child-link (elt rarm 6) :name :rarm-wrist-p :axis :y))
 
-     (setq jll0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt lleg 0) :name :lleg-crotch-y :axis :z))
-     (setq jll1 (instance rotational-joint :init :parent-link (elt lleg 0) :child-link (elt lleg 1) :name :lleg-crotch-r :axis :x))
-     (setq jll2 (instance rotational-joint :init :parent-link (elt lleg 1) :child-link (elt lleg 2) :name :lleg-crotch-p :axis :y :min -120 :max 120))
-     (setq jll3 (instance rotational-joint :init :parent-link (elt lleg 2) :child-link (elt lleg 3) :name :lleg-knee-p :axis :y :min 0))
-     (setq jll4 (instance rotational-joint :init :parent-link (elt lleg 3) :child-link (elt lleg 4) :name :lleg-ankle-p :axis :y))
-     (setq jll5 (instance rotational-joint :init :parent-link (elt lleg 4) :child-link (elt lleg 5) :name :lleg-ankle-r :axis :x))
+     (setq jllf0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt lfleg 0) :name :lfleg-crotch-y :axis :z))
+     (setq jllf1 (instance rotational-joint :init :parent-link (elt lfleg 0) :child-link (elt lfleg 1) :name :lfleg-crotch-r :axis :x))
+     (setq jllf2 (instance rotational-joint :init :parent-link (elt lfleg 1) :child-link (elt lfleg 2) :name :lfleg-crotch-p :axis :y :min -120 :max 120))
+     (setq jllf3 (instance rotational-joint :init :parent-link (elt lfleg 2) :child-link (elt lfleg 3) :name :lfleg-knee-p :axis :y :min 0))
+     (setq jllf4 (instance rotational-joint :init :parent-link (elt lfleg 3) :child-link (elt lfleg 4) :name :lfleg-ankle-p :axis :y))
+     (setq jllf5 (instance rotational-joint :init :parent-link (elt lfleg 4) :child-link (elt lfleg 5) :name :lfleg-ankle-r :axis :x))
 
-     (setq jlr0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt rleg 0) :name :rleg-crotch-y :axis :-z))
-     (setq jlr1 (instance rotational-joint :init :parent-link (elt rleg 0) :child-link (elt rleg 1) :name :rleg-crotch-r :axis :-x))
-     (setq jlr2 (instance rotational-joint :init :parent-link (elt rleg 1) :child-link (elt rleg 2) :name :rleg-crotch-p :axis :y :min -120 :max 120))
-     (setq jlr3 (instance rotational-joint :init :parent-link (elt rleg 2) :child-link (elt rleg 3) :name :rleg-knee-p :axis :y :min 0))
-     (setq jlr4 (instance rotational-joint :init :parent-link (elt rleg 3) :child-link (elt rleg 4) :name :rleg-ankle-p :axis :y))
-     (setq jlr5 (instance rotational-joint :init :parent-link (elt rleg 4) :child-link (elt rleg 5) :name :rleg-ankle-r :axis :-x))
+     (setq jlrf0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt rfleg 0) :name :rfleg-crotch-y :axis :-z))
+     (setq jlrf1 (instance rotational-joint :init :parent-link (elt rfleg 0) :child-link (elt rfleg 1) :name :rfleg-crotch-r :axis :-x))
+     (setq jlrf2 (instance rotational-joint :init :parent-link (elt rfleg 1) :child-link (elt rfleg 2) :name :rfleg-crotch-p :axis :y :min -120 :max 120))
+     (setq jlrf3 (instance rotational-joint :init :parent-link (elt rfleg 2) :child-link (elt rfleg 3) :name :rfleg-knee-p :axis :y :min 0))
+     (setq jlrf4 (instance rotational-joint :init :parent-link (elt rfleg 3) :child-link (elt rfleg 4) :name :rfleg-ankle-p :axis :y))
+     (setq jlrf5 (instance rotational-joint :init :parent-link (elt rfleg 4) :child-link (elt rfleg 5) :name :rfleg-ankle-r :axis :-x))
+
+     (setq jllb0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt lbleg 0) :name :lbleg-crotch-y :axis :z))
+     (setq jllb1 (instance rotational-joint :init :parent-link (elt lbleg 0) :child-link (elt lbleg 1) :name :lbleg-crotch-r :axis :x))
+     (setq jllb2 (instance rotational-joint :init :parent-link (elt lbleg 1) :child-link (elt lbleg 2) :name :lbleg-crotch-p :axis :y :min -120 :max 120))
+     (setq jllb3 (instance rotational-joint :init :parent-link (elt lbleg 2) :child-link (elt lbleg 3) :name :lbleg-knee-p :axis :y :min 0))
+     (setq jllb4 (instance rotational-joint :init :parent-link (elt lbleg 3) :child-link (elt lbleg 4) :name :lbleg-ankle-p :axis :y))
+     (setq jllb5 (instance rotational-joint :init :parent-link (elt lbleg 4) :child-link (elt lbleg 5) :name :lbleg-ankle-r :axis :x))
+
+     (setq jlrb0 (instance rotational-joint :init :parent-link aroot-link :child-link (elt rbleg 0) :name :rbleg-crotch-y :axis :-z))
+     (setq jlrb1 (instance rotational-joint :init :parent-link (elt rbleg 0) :child-link (elt rbleg 1) :name :rbleg-crotch-r :axis :-x))
+     (setq jlrb2 (instance rotational-joint :init :parent-link (elt rbleg 1) :child-link (elt rbleg 2) :name :rbleg-crotch-p :axis :y :min -120 :max 120))
+     (setq jlrb3 (instance rotational-joint :init :parent-link (elt rbleg 2) :child-link (elt rbleg 3) :name :rbleg-knee-p :axis :y :min 0))
+     (setq jlrb4 (instance rotational-joint :init :parent-link (elt rbleg 3) :child-link (elt rbleg 4) :name :rbleg-ankle-p :axis :y))
+     (setq jlrb5 (instance rotational-joint :init :parent-link (elt rbleg 4) :child-link (elt rbleg 5) :name :rbleg-ankle-r :axis :-x))
 
      ;; 4. define slots for robot class
      ;;    links and joint-list for cascaded-link.
-     (setq links (append (list aroot-link) torso head larm rarm lleg rleg))
+     (setq links (append (list aroot-link) torso head larm rarm lfleg rfleg lbleg rbleg))
      (setq joint-list (list jc0 jc1 jh0 jh1
                             jal0 jal1 jal2 jal3 jal4 jal5 jal6
                             jar0 jar1 jar2 jar3 jar4 jar5 jar6
-                            jll0 jll1 jll2 jll3 jll4 jll5
-                            jlr0 jlr1 jlr2 jlr3 jlr4 jlr5
-                            ))
+                            jllf0 jllf1 jllf2 jllf3 jllf4 jllf5
+                            jlrf0 jlrf1 jlrf2 jlrf3 jlrf4 jlrf5
+                            jllb0 jllb1 jllb2 jllb3 jllb4 jllb5
+                            jlrb0 jlrb1 jlrb2 jlrb3 jlrb4 jlrb5))
 
      ;; add limbs
      (send self :add-limb :torso :links torso :end-coords torso-end-coords :root-link torso-root-link)
      (send self :add-limb :head :links head :end-coords head-end-coords :root-link head-root-link)
      (send self :add-limb :rarm :links rarm :end-coords rarm-end-coords :root-link rarm-root-link)
      (send self :add-limb :larm :links larm :end-coords larm-end-coords :root-link larm-root-link)
-     (send self :add-limb :rleg :links rleg :end-coords rleg-end-coords :root-link rleg-root-link)
-     (send self :add-limb :lleg :links lleg :end-coords lleg-end-coords :root-link lleg-root-link)
+     (send self :add-limb :rfleg :links rfleg :end-coords rfleg-end-coords :root-link rfleg-root-link)
+     (send self :add-limb :lfleg :links lfleg :end-coords lfleg-end-coords :root-link lfleg-root-link)
+     (send self :add-limb :rbleg :links rbleg :end-coords rbleg-end-coords :root-link rbleg-root-link)
+     (send self :add-limb :lbleg :links lbleg :end-coords lbleg-end-coords :root-link lbleg-root-link)
 
      ;;    These are for robot-model.
      (setq collision-avoidance-links (list aroot-link (elt torso 1) (elt larm 3) (elt rarm 3)))
@@ -193,7 +229,7 @@
                        (send (send self :limb l :end-coords :parent) :assoc
                              (make-cascoords :coords (send self :limb l :end-coords :copy-worldcoords)
                                              :name (format nil "~A-fsensor" (string-downcase l)))))
-                   (list :rarm :larm :rleg :lleg)))
+                   (list :rarm :larm :rfleg :lfleg :rbleg :lbleg)))
      (setq imu-sensors
            (list (let ((sen (make-cascoords
                              :worldpos (send (car (send self :limb :torso :waist-p :child-link :bodies)) :centroid)
@@ -215,17 +251,17 @@
      self))
   ;; Methods to define robot links
   (:make-root-link
-   (waist-length waist-weight)
-   (let ((bc0 (make-cube 100 200 waist-length)))
-     (send bc0 :locate (float-vector 0 0 (+ (* -0.5 waist-length) -25)))
+   (waist-height waist-length waist-weight)
+   (let ((bc0 (make-cube waist-length 200 waist-height)))
+     (send bc0 :locate (float-vector 0 0 (+ (* -0.5 waist-height) -25)))
      (send bc0 :set-color :green)
      (instance bodyset-link :init (make-cascoords) :bodies (list bc0) :name :waist :weight waist-weight)))
   (:make-torso-links
-   (torso-length torso-weight)
+   (torso-height torso-length torso-weight)
    (let ((bc1 (make-default-robot-link 0 50 :y :torso-link0))
-	 (bc2 (make-cube 100 200 torso-length)))
+	 (bc2 (make-cube torso-length 200 torso-height)))
      (send bc1 :locate #f(0 0 -12.5))
-     (send bc2 :locate (float-vector 0 0 (* 0.5 torso-length)))
+     (send bc2 :locate (float-vector 0 0 (* 0.5 torso-height)))
      (send bc2 :set-color :green)
      (setq bc2 (instance bodyset-link :init (make-cascoords :pos #f(0 0 -12.5)) :bodies (list bc2) :name :torso-link1 :weight torso-weight))
      (send bc1 :assoc bc2)
@@ -324,10 +360,10 @@
            (cons :root-link bl1)
            (cons :end-coords end-coords))))
   (:reset-pose ()
-    (send self :angle-vector #f(0.0 0.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0)))
+    (send self :angle-vector #f(0.0 0.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 10.0 20.0 0.0 -20.0 10.0 0.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0 0.0 0.0 -15.0 30.0 -15.0 0.0)))
   )
 
-(defmethod sample-robot
+(defmethod sample-centaur-robot
   ;; user-defined joint
   (:torso-waist-y (&rest args) (forward-message-to jc0 args))
   (:torso-waist-p (&rest args) (forward-message-to jc1 args))
@@ -347,16 +383,28 @@
   (:rarm-wrist-y (&rest args) (forward-message-to jar4 args))
   (:rarm-wrist-r (&rest args) (forward-message-to jar5 args))
   (:rarm-wrist-p (&rest args) (forward-message-to jar6 args))
-  (:lleg-crotch-y (&rest args) (forward-message-to jll0 args))
-  (:lleg-crotch-r (&rest args) (forward-message-to jll1 args))
-  (:lleg-crotch-p (&rest args) (forward-message-to jll2 args))
-  (:lleg-knee-p (&rest args) (forward-message-to jll3 args))
-  (:lleg-ankle-p (&rest args) (forward-message-to jll4 args))
-  (:lleg-ankle-r (&rest args) (forward-message-to jll5 args))
-  (:rleg-crotch-y (&rest args) (forward-message-to jlr0 args))
-  (:rleg-crotch-r (&rest args) (forward-message-to jlr1 args))
-  (:rleg-crotch-p (&rest args) (forward-message-to jlr2 args))
-  (:rleg-knee-p (&rest args) (forward-message-to jlr3 args))
-  (:rleg-ankle-p (&rest args) (forward-message-to jlr4 args))
-  (:rleg-ankle-r (&rest args) (forward-message-to jlr5 args))
+  (:lfleg-crotch-y (&rest args) (forward-message-to jllf0 args))
+  (:lfleg-crotch-r (&rest args) (forward-message-to jllf1 args))
+  (:lfleg-crotch-p (&rest args) (forward-message-to jllf2 args))
+  (:lfleg-knee-p (&rest args) (forward-message-to jllf3 args))
+  (:lfleg-ankle-p (&rest args) (forward-message-to jllf4 args))
+  (:lfleg-ankle-r (&rest args) (forward-message-to jllf5 args))
+  (:rfleg-crotch-y (&rest args) (forward-message-to jlrf0 args))
+  (:rfleg-crotch-r (&rest args) (forward-message-to jlrf1 args))
+  (:rfleg-crotch-p (&rest args) (forward-message-to jlrf2 args))
+  (:rfleg-knee-p (&rest args) (forward-message-to jlrf3 args))
+  (:rfleg-ankle-p (&rest args) (forward-message-to jlrf4 args))
+  (:rfleg-ankle-r (&rest args) (forward-message-to jlrf5 args))
+  (:lbleg-crotch-y (&rest args) (forward-message-to jllb0 args))
+  (:lbleg-crotch-r (&rest args) (forward-message-to jllb1 args))
+  (:lbleg-crotch-p (&rest args) (forward-message-to jllb2 args))
+  (:lbleg-knee-p (&rest args) (forward-message-to jllb3 args))
+  (:lbleg-ankle-p (&rest args) (forward-message-to jllb4 args))
+  (:lbleg-ankle-r (&rest args) (forward-message-to jllb5 args))
+  (:rbleg-crotch-y (&rest args) (forward-message-to jlrb0 args))
+  (:rbleg-crotch-r (&rest args) (forward-message-to jlrb1 args))
+  (:rbleg-crotch-p (&rest args) (forward-message-to jlrb2 args))
+  (:rbleg-knee-p (&rest args) (forward-message-to jlrb3 args))
+  (:rbleg-ankle-p (&rest args) (forward-message-to jlrb4 args))
+  (:rbleg-ankle-r (&rest args) (forward-message-to jlrb5 args))
   )

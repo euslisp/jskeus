@@ -507,14 +507,14 @@ Other Sites are:
   (:copy-joint-to
    (robot limb joint &optional (sign 1))
    (if (find-method robot (intern (format nil "~A-~A-R" (symbol-name limb) (symbol-name joint)) "KEYWORD"))
-       (send robot limb (intern (format nil "~A-R" (symbol-name joint)) "KEYWORD") :joint-angle
-             (* sign (elt (send self limb joint :joint :joint-angle) 2))))
+       (send robot :limb limb (intern (format nil "~A-R" (symbol-name joint)) "KEYWORD") :joint-angle
+             (* sign (elt (send self :limb limb joint :joint :joint-angle) 2))))
    (if (find-method robot (intern (format nil "~A-~A-P" (symbol-name limb) (symbol-name joint)) "KEYWORD"))
-       (send robot limb (intern (format nil "~A-P" (symbol-name joint)) "KEYWORD") :joint-angle
-             (elt (send self limb joint :joint :joint-angle) 0)))
+       (send robot :limb limb (intern (format nil "~A-P" (symbol-name joint)) "KEYWORD") :joint-angle
+             (elt (send self :limb limb joint :joint :joint-angle) 0)))
    (if (find-method robot (intern (format nil "~A-~A-Y" (symbol-name limb) (symbol-name joint)) "KEYWORD"))
-       (send robot limb (intern (format nil "~A-Y" (symbol-name joint)) "KEYWORD") :joint-angle
-             (* sign (elt (send self limb joint :joint :joint-angle) 1)))))
+       (send robot :limb limb (intern (format nil "~A-Y" (symbol-name joint)) "KEYWORD") :joint-angle
+             (* sign (elt (send self :limb limb joint :joint :joint-angle) 1)))))
   (:copy-state-to
    (robot)
    ;;(warning-message 2 ";; irteus copy-state-to in irtbvh.l robot:~A~%" robot)

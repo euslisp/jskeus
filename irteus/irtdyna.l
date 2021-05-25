@@ -1146,10 +1146,10 @@
                           :centroid-thre 0.1
                           :target-centroid-pos (v- (send self :centroid) (send df :refcog))))
                    (:move-base-pos
-                    (let ((tc (mapcar #'(lambda (l) (send self l :end-coords :copy-worldcoords)) '(:rleg :lleg))))
+                    (let ((tc (mapcar #'(lambda (l) (send self :limb l :end-coords :copy-worldcoords)) '(:rleg :lleg))))
                       (send self :translate (float-vector (- (elt (send df :refcog) 0)) (- (elt (send df :refcog) 1)) 0) :world)
                       (mapcar #'(lambda (l ttc)
-                                  (send self l :inverse-kinematics ttc :thre 0.1 :rthre (deg2rad 0.1)))
+                                  (send self :limb l :inverse-kinematics ttc :thre 0.1 :rthre (deg2rad 0.1)))
                               '(:rleg :lleg) tc)))
                    )
                  (push (list :angle-vector (send self :angle-vector)
@@ -1732,9 +1732,9 @@
             (send self :get-counter-footstep-limbs (car footstep-node-list)))
       (let ((current-support-limbs (car support-leg-list)))
         (send self :append-support-leg-coords-list
-              (mapcar #'(lambda (l) (send robot l :end-coords :copy-worldcoords)) current-support-limbs))
+              (mapcar #'(lambda (l) (send robot :limb l :end-coords :copy-worldcoords)) current-support-limbs))
         (send self :append-swing-leg-dst-coords-list
-              (mapcar #'(lambda (l) (send robot l :end-coords :copy-worldcoords)) current-swing-limbs))
+              (mapcar #'(lambda (l) (send robot :limb l :end-coords :copy-worldcoords)) current-swing-limbs))
         (let ((current-support-leg-coords (car support-leg-coords-list))
               (current-swing-leg-dst-coords (car swing-leg-dst-coords-list)))
           (send self :append-refzmp-cur-list
@@ -1758,7 +1758,7 @@
                                        )
           swing-leg-src-coords current-swing-leg-dst-coords
           refzmp-next (send self :get-limbs-zmp
-                            (mapcar #'(lambda (l) (send robot l :end-coords :copy-worldcoords)) (send self :get-counter-footstep-limbs (send-all (car footstep-node-list) :name)))
+                            (mapcar #'(lambda (l) (send robot :limb l :end-coords :copy-worldcoords)) (send self :get-counter-footstep-limbs (send-all (car footstep-node-list) :name)))
                             (send self :get-counter-footstep-limbs (send-all (car footstep-node-list) :name)))
           refzmp-prev (car refzmp-cur-list))
     (send self :make-gait-parameter)
@@ -1994,7 +1994,8 @@
   ;; solve-angle-vector methods
   (:solve-av-by-move-centroid-on-foot
    (support-leg support-leg-coords swing-leg-coords cog robot
-   &rest args &key (cog-gain 3.5) (stop 100) (additional-nspace-list) &allow-other-keys)
+   &rest args &key (cog-gain 3.5) (stop 100) (additional-nspace-list) (robot-xv) &allow-other-keys)
+   "robot-xv: X diraction of footcoords represented in robot local coordinate"
    (let* ((legs (append (send self :get-counter-footstep-limbs support-leg)
                         support-leg))
           (leg-order (mapcar #'(lambda (l) (position l legs)) all-limbs))
@@ -2003,6 +2004,8 @@
        (setq args (append args (list :thre (mapcar #'(lambda (x) (if (memq x '(:rleg :lleg)) ik-thre (* 5 ik-thre))) all-limbs)))))
      (unless (memq :rthre args)
        (setq args (append args (list :rthre (mapcar #'(lambda (x) (deg2rad (if (memq x '(:rleg :lleg)) ik-rthre (* 5 ik-rthre)))) all-limbs)))))
+     (unless robot-xv
+       (setq robot-xv (case (length legs) (2 #f(1 0 0)) (4 #f(0 0 1)))))
      (send* robot :move-centroid-on-foot
             :both all-limbs :target-centroid-pos cog
             :fix-limbs-target-coords (mapcar #'(lambda (idx) (elt fix-coords idx)) leg-order)
@@ -2012,9 +2015,13 @@
              additional-nspace-list
              (list (list (car (send robot :links))
                          #'(lambda ()
-                             (let* ((fcoords (apply #'midcoords 0.5
-                                                    (mapcar #'(lambda (x) (elt fix-coords (position x legs))) '(:rleg :lleg))))
-                                    (xvr (send robot :rotate-vector (case (length legs) (2 #f(1 0 0)) (4 #f(0 0 1)))))
+                             (let* ((fcoords (let ((coords (make-coords)))
+                                               (dotimes (i (length legs))
+                                                 (setq coords (midcoords (/ 1.0 (+ i 1.0))
+                                                                         coords
+                                                                         (send robot :limb (elt legs i) :end-coords :worldcoords))))
+                                               coords))
+                                    (xvr (send robot :rotate-vector robot-xv))
                                     (xvf (send fcoords :rotate-vector #f(1 0 0))))
                                (if (> (elt (send fcoords :inverse-rotate-vector xvr) 0) 0) (setq xvr (scale -1 xvr)))
                                (dolist (xv (list xvr xvf)) (setf (elt xv 2) 0.0))
