@@ -96,7 +96,7 @@
 	  larm-collision-avoidance-links
 	  rarm-collision-avoidance-links
 	  larm rarm lleg rleg torso head ;; obsoleted. for backward compatibility
-      limb-list
+          limb-list
           ;; sensor slots
           force-sensors imu-sensors cameras
           ;;
@@ -397,7 +397,7 @@
   (:head (&rest args)
 	 (unless args (setq args (list nil))) (send* self :limb :head args))
   (:torso (&rest args)
-          (unless args (setq args (list nil))) (send* self :limb :torso args))
+	 (unless args (setq args (list nil))) (send* self :limb :torso args))
   (:arms (&rest args) (list (send* self :limb :larm args) (send* self :limb :rarm args)))
   (:legs (&rest args) (list (send* self :limb :lleg args) (send* self :limb :rleg args)))
   (:look-at-hand
@@ -487,8 +487,8 @@
          (av (send self :angle-vector))
          (root-coords (send (car (send self :links)) :copy-worldcoords))
          (calc-torque-buffer-args (send self :calc-torque-buffer-args))
-         (support-leg-coords-list (remove nil (send self :legs :end-coords)))
-         (distribute-total-wrench-to-torque-method (if (and support-leg-coords-list ;; For legged robots
+         (support-legs '(:rleg :lleg))
+         (distribute-total-wrench-to-torque-method (if (and (some #'(lambda (l) (send self :limb l)) support-legs) ;; For legged robots
                                                             (not (and force-list moment-list target-coords))) ;; If no force-list, moment-list, target-coords are specified
                                                        :distribute-total-wrench-to-torque-method-default)))
    "Returns torque vector"
@@ -500,19 +500,23 @@
                 :force-list force-list :moment-list moment-list :target-coords target-coords
                 :calc-torque-buffer-args calc-torque-buffer-args)))
      (when (find-method self distribute-total-wrench-to-torque-method)
-       (let ((ext-wrench-tq (send self distribute-total-wrench-to-torque-method support-leg-coords-list)))
+       (let ((ext-wrench-tq (send self distribute-total-wrench-to-torque-method support-legs)))
          (dotimes (i (length ret-tq))
            (setf (elt ret-tq i) (- (elt ret-tq i) (elt ext-wrench-tq i)))
            (send (elt joint-list i) :joint-torque (elt ret-tq i)))))
      ret-tq
      ))
   (:distribute-total-wrench-to-torque-method-default
-   (&optional (target-coords (remove nil (send self :legs :end-coords))))
+   (&optional (limbs '(:rleg :lleg)))
    ;; set default force & moment by solving mimimum internal forces
-   (let* ((ret-fm (send self :calc-contact-wrenches-from-total-wrench (send-all target-coords :worldpos)
-                        :total-wrench (concatenate float-vector (send (car (send self :links)) :force) (send (car (send self :links)) :moment)))))
-     (send self :calc-torque-from-ext-wrenches :force-list (car ret-fm) :moment-list (cadr ret-fm) :target-coords target-coords)
-     ))
+   (let ((target-coords))
+     (dolist (limb limbs)
+       (if (send self :limb limb)
+           (push (send self :limb limb :end-coords) target-coords)))
+     (let* ((ret-fm (send self :calc-contact-wrenches-from-total-wrench (send-all target-coords :worldpos)
+                          :total-wrench (concatenate float-vector (send (car (send self :links)) :force) (send (car (send self :links)) :moment)))))
+       (send self :calc-torque-from-ext-wrenches :force-list (car ret-fm) :moment-list (cadr ret-fm) :target-coords target-coords)
+       )))
   (:calc-force-from-joint-torque
    (limb all-torque &key (move-target (send self :limb limb :end-coords)) (use-torso))
    "Calculates end-effector force and moment from joint torques."
@@ -712,8 +716,7 @@
                                               (cond
                                                 ((eq leg :left) (send self :limb :lleg :end-coords))
                                                 ((eq leg :right) (send self :limb :rleg :end-coords))
-                                                ((symbolp leg) (send self :limb leg :end-coords))
-                                                ((derivedp leg coordinates) leg)))
+                                                (t (send self :limb leg :end-coords))))
                                           legs)))
      (when (null leg-coords)
        (return-from :fix-leg-to-coords nil)) ;; leged robot is assumed.
@@ -742,8 +745,7 @@
                                                     (cond
                                                       ((eq leg :left) (send self :limb :lleg :end-coords))
                                                       ((eq leg :right) (send self :limb :rleg :end-coords))
-                                                      ((symbolp leg) (send self :limb leg :end-coords))
-                                                      ((derivedp leg coordinates) leg)))
+                                                      (t (send self :limb leg :end-coords))))
                                                 legs))))
            (scale (/ 1.0 (length leg-coords))
                   (reduce #'v+ (mapcar #'(lambda (leg) (send leg :worldpos)) leg-coords)))))
@@ -753,14 +755,13 @@
                                              (cond
                                                ((eq limb :left) (send self :limb :lleg :end-coords))
                                                ((eq limb :right) (send self :limb :rleg :end-coords))
-                                               ((symbolp limb) (send self :limb limb :end-coords))
-                                               ((derivedp limb coordinates) limb)))
+                                               (t (send self :limb limb :end-coords))))
                                          limbs)) :copy-worldcoords)))
         (root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5)) ;; use only translation x, y and rotation z
         &allow-other-keys)
    "Move robot COG to change centroid-on-foot location,
     leg : legs for target of robot's centroid, which should be limb (ex. :rleg or coordinates), list of limbs, and :both (which means '(:rleg :lleg)).
-    fix-limbs : limb names (ex. :rleg or coordinates) which are fixed in this IK."
+    fix-limbs : list of limb names which are fixed in this IK."
    (with-move-target-link-list
     (mt ll self fix-limbs)
     (let* ()

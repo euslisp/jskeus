@@ -3127,9 +3127,7 @@
                                (list ,(cadr (member :move-target params)))
                              ,(cadr (member :move-target params))))
                           (t
-                           (mapcar #'(lambda (_limb) (if (symbolp _limb)
-                                                         (send ,robot :limb _limb :end-coords)
-                                                         _limb)) ,limbs))))
+                           (mapcar #'(lambda (_limb) (send ,robot :limb _limb :end-coords)) ,limbs))))
            (,link-list (mapcar
                         #'(lambda (_move-target)
                             (send ,robot :link-list
