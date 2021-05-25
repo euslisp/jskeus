@@ -1995,6 +1995,7 @@
   (:solve-av-by-move-centroid-on-foot
    (support-leg support-leg-coords swing-leg-coords cog robot
    &rest args &key (cog-gain 3.5) (stop 100) (additional-nspace-list) (robot-xv) &allow-other-keys)
+   "robot-xv: X diraction of footcoords represented in robot local coordinate"
    (let* ((legs (append (send self :get-counter-footstep-limbs support-leg)
                         support-leg))
           (leg-order (mapcar #'(lambda (l) (position l legs)) all-limbs))
