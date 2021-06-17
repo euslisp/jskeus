@@ -471,24 +471,29 @@
            (mapcan #'(lambda (e)
                        (let ((p (geo::line-intersection3 (e . pvert) (e . nvert)
                                                          (car v) (cdr v))))
-                         (cond ((and (<= 0.0 (car p) 1.0)
+                         (cond ;; intersects with an edge. not mutually visible.
+                               ((and (<= 0.0 (car p) 1.0)
                                      (< 0.0 (cadr p) 1.0))
                                 (list e))
+                               ;; vertex is on an edge. never happen?
                                ((and (< 0.0 (car p) 1.0)
                                      (or (= 0.0 (cadr p)) (= 1.0 (cadr p))))
                                 nil) ;; not implemented yet
-                               ;; vertex is shared by more than two edges. avoid intersecting.
+                               ;; multiple vertices exist at the same position. avoid crossing. See https://github.com/euslisp/jskeus/pull/585#issuecomment-709988453
                                ((and (or (= 0.0 (car p)) (= 1.0 (car p)))
                                      (or (= 0.0 (cadr p)) (= 1.0 (cadr p)))
                                      (not (or (memq (car v) (send e :vertices)) (memq (cdr v) (send e :vertices)))))
-                                (let* ((ev (if (= 0.0 (car p)) (e . pvert) (e . nvert)))
+                                ;; v0, v1, v2: consecutive vertices in f or h. v1 is at the same position as one of v, but not the same object.
+                                ;; vt: another point of v
+                                ;; If located clockwise around v1 in the order of v2 vt v0, crossing will occur.
+                                (let* ((v1 (if (= 0.0 (car p)) (e . pvert) (e . nvert)))
                                        (ein (find-if #'(lambda (e) (eq ev (e . nvert))) (flatten (append (send-all hs :edges) (send f :edges)))))
+                                       (v0 (ein . pvert))
                                        (eout (find-if #'(lambda (e) (eq ev (e . pvert))) (flatten (append (send-all hs :edges) (send f :edges)))))
-                                       (v0 (eout . nvert))
-                                       (v1 (if (= 0.0 (cadr p)) (cdr v) (car v)))
-                                       (v2 (ein . pvert)))
-                                  (when (< (mod (+ (vector-angle (v- v0 ev) (v- v1 ev) (send f :normal)) 2PI) 2PI)
-                                           (mod (+ (vector-angle (v- v0 ev) (v- v2 ev) (send f :normal)) 2PI) 2PI))
+                                       (v2 (eout . nvert))
+                                       (vt (if (= 0.0 (cadr p)) (cdr v) (car v))))
+                                  (when (< (mod (+ (vector-angle (v- v2 v1) (v- vt v1) (send f :normal)) 2PI) 2PI)
+                                           (mod (+ (vector-angle (v- v2 v1) (v- v0 v1) (send f :normal)) 2PI) 2PI))
                                     (list e)))))
                          ))
                    (flatten (append (send-all hs :edges) (send f :edges)))))
