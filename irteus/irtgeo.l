@@ -421,7 +421,7 @@
                                               )))
                                    rvers)) (send poly :edges))
                  (if (> (length rvers) 3)
-                     (every #'(lambda (e)
+                     (every #'(lambda (e) ;; all edges in rest-polygon do not intersect with the edges of poly / allow the same edge (:colinear)
                                 ;; if not intersect return t;
                                 (let* ((e02 (make-line v0 v2))
                                        (r (send e :intersect-line e02)))
@@ -434,7 +434,7 @@
                                            (eq (car r) :intersect)
                                            (not (eps-in-range 0.0 (elt r 1) 1.0 (- *epsilon*)))
                                            (not (eps-in-range 0.0 (elt r 2) 1.0 (- *epsilon*)))))))
-                            (send (instance face :init :vertices (remove v1 (cdr vers))) :edges))
+                            (send (instance face :init :vertices (remove v1 (butlast vers))) :edges))
                    t)))
       (if not-intersectp
 	  poly
