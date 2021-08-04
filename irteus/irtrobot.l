@@ -594,7 +594,7 @@
                                       (find-if #'(lambda (l) (equal fs (car (send self l :force-sensors)))) '(:rleg :lleg)))
                                   (send self :force-sensors)))
             '(:rleg :lleg)))
-         (force-sensors (mapcar #'(lambda (l) (send self :force-sensor l)) limbs))
+         (force-sensors (mapcar #'(lambda (l) (car (send self l :force-sensors))) limbs))
          (cop-coords (mapcar #'(lambda (l) (send self l :end-coords)) limbs))
          (fz-thre 1e-3) ;; [N]
          (limb-cop-fz-list
