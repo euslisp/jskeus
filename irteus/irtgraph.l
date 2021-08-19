@@ -443,8 +443,11 @@ Args:
           (push (instance solver-node :init (cdr successor)
                           :parent self
                           :action (car successor)
-                          :cost (send prblm :path-cost self
-                                      (car successor) (cdr successor)))
+                          :cost
+                          (if (assoc :cost (send (car successor) :methods))
+                            (send prblm :path-cost self
+                                        (car successor) (cdr successor))
+                            0))
                 ret))
         ret)))
   (:state (&optional arg)
