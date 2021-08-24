@@ -414,6 +414,164 @@
 (while (send l :interpolatingp) (send l :pass-time 0.02) (print (send l :position)))
 |#
 
+(defclass linear-interpolator-SO3
+  :super interpolator)
+(defmethod linear-interpolator-SO3
+  ;;
+  (:interpolation
+   ()
+   "Linear interpolator for SO3"
+   (let* ((v1 (nth segment position-list))
+          (v2 (nth (1+ segment) position-list))
+          (t1+t2 (- (nth segment time-list) (if (> segment 0) (nth (1- segment) time-list) 0))) ;; total time of segment
+          (t1 segment-time))
+     (midrot (/ t1 t1+t2) v1 v2)))
+  )
+
+#| example
+(setq l (instance linear-interpolator-so3 :init))
+(send l :reset :position-list (list (rpy-matrix -pi/2 pi/2 2.7) (rpy-matrix -0.4 0 -pi/2) (rpy-matrix 0 0 0)) :time-list (list 3.0 6.0))
+(send l :start-interpolation)
+(while (send l :interpolatingp) (send l :pass-time 0.1) (print (send l :position)))
+|#
+
+
+;; Smooth Attitude Interpolation
+;; https://github.com/scipy/scipy/files/2932755/attitude_interpolation.pdf
+;;
+;;  +
+;;
+;; Minimum Jerk trajectory generation, a.k.a Hoff & Arbib, described in the documents
+;; http://mplab.ucsd.edu/tutorials/minimumJerk.pdf (you can find copy of this at http://www.shadmehrlab.org/book/minimumjerk.pdf)
+;;
+;; Hoff B, Arbib MA (1992) A model of the effects of speed, accuracy, and
+;; perturbation on visually guided reaching. In: Control of arm movement
+;; in space: neurophysiological and computational approaches
+;; (Caminiti R, Johnson PB, Burnod Y, eds), pp 285-306.
+
+(defclass minjerk-interpolator-SO3
+  :super interpolator
+  :slots (velocity acceleration velocity-list acceleration-list))
+(defmethod minjerk-interpolator-SO3
+  (:velocity () "returns current velocity" velocity)
+  (:velocity-list () "returns velocity list" velocity-list)
+  (:acceleration () "returns current acceleration" acceleration)
+  (:acceleration-list () "returns acceleration list" acceleration-list)
+  (:reset
+   (&rest args
+    &key
+    ((:velocity-list vl) (send self :velocity-list))
+    ((:acceleration-list al) (send self :acceleration-list))
+    &allow-other-keys)
+   "minjerk interopolator-SO3
+    position-list : list of control point (SO3)
+    velocity-list : list of velocity in each control point represented in local frame
+    acceleration-list : list of acceleration in each control point represented in local frame"
+   (send-super* :reset args)
+   (setq velocity-list (if vl vl (make-list (1+ segment-num) :initial-element (instantiate float-vector 3))))
+   (setq acceleration-list (if al al (make-list (1+ segment-num) :initial-element (instantiate float-vector 3))))
+   )
+  (:interpolation
+   ()
+   "Example code is:
+    (setq l (instance linear-interpolator-so3 :init))
+    (send l :reset :position-list (list (rpy-matrix -pi/2 pi/2 2.7) (rpy-matrix -0.4 0 -pi/2) (rpy-matrix 0 0 0)) :time-list (list 3.0 6.0)
+                   :velocity-list (list (float-vector 0 0 0) (float-vector 0 0.9 0) (float-vector 0 0 0))
+                   :acceleration-list (list (float-vector 0 0 0) (float-vector 0 0 0) (float-vector 0 0 0)))
+    (send l :start-interpolation)
+    (while (send l :interpolatingp) (send l :pass-time 0.1) (print (send l :position)))"
+   (let* ((Ri (nth segment position-list))
+          (Rf (nth (1+ segment) position-list))
+          (wi (nth segment velocity-list))
+          (wf (nth (1+ segment) velocity-list))
+          (dwi (nth segment acceleration-list))
+          (dwf (nth (1+ segment) acceleration-list))
+          ;;
+          ;; x := theta
+          (xi (float-vector 0 0 0))
+          (xf (matrix-log (m* (transpose Ri) Rf)))
+          (Af_ (if (equal xi xf)
+                   (unit-matrix 3)
+                   (reduce #'m+ (list (unit-matrix 3)
+                                      (scale-matrix 1/2 (outer-product-matrix xf))
+                                      (scale-matrix (/ (- 1 (/ (/ (norm xf) 2) (tan (/ (norm xf) 2)))) (norm2 xf)) (m* (outer-product-matrix xf) (outer-product-matrix xf)))))))
+          (vi wi)
+          (vf (transform Af_ wf))
+          (dAf_ (if (equal xi xf)
+                    (scale-matrix 0.5 (outer-product-matrix vf))
+                    (reduce #'m+ (list (scale-matrix 1/2 (outer-product-matrix vf))
+                                       (scale-matrix (+ (/ (/ (norm vf) (tan (/ (norm xf) 2))) (* 2 (norm2 xf)))
+                                                        (/ (norm vf) (* 4 (norm xf) (expt (sin (/ (norm xf) 2)) 2)))
+                                                        (- (/ (* 2 (norm vf)) (expt (norm xf) 3))))
+                                                     (m* (outer-product-matrix xf) (outer-product-matrix xf)))
+                                       (scale-matrix (/ (- 1 (/ (/ (norm xf) 2) (tan (/ (norm xf) 2)))) (norm2 xf))
+                                                     (m+ (m* (outer-product-matrix vf) (outer-product-matrix xf)) (m* (outer-product-matrix xf) (outer-product-matrix vf))))))))
+          (ai dwi)
+          (af (v+ (transform dAf_ wf) (transform Af_ dwf)))
+          ;;
+          (t1+t2 (- (nth segment time-list) (if (> segment 0) (nth (1- segment) time-list) 0))) ;; total time of segment
+          ;; A=(gx-(x+v*t+(a/2.0)*t*t))/(t*t*t)
+          ;; B=(gv-(v+a*t))/(t*t)
+          ;; C=(ga-a)/t
+          (A  (scale (/ 1.0 (* t1+t2 t1+t2 t1+t2)) (v- xf (reduce #'v+ (list xi (scale t1+t2 vi) (scale (* t1+t2 t1+t2) (scale 0.5 ai)))))))
+          (B  (scale (/ 1.0 (* t1+t2 t1+t2))       (v- vf (v+ vi (scale t1+t2 ai)))))
+          (C  (scale (/ 1.0 (* t1+t2))             (v- af ai)))
+          ;; a0=x
+          ;; a1=v
+          ;; a2=a/2.0
+          ;; a3=10*A-4*B+0.5*C
+          ;;; a4=(-15*A+7*B-C)/t
+          ;; a5=(6*A-3*B+0.5*C)/(t*t)
+          (a0 xi)
+          (a1 vi)
+          (a2 (scale 0.5 ai))
+          (a3 (v+ (v- (scale 10 A) (scale 4 B)) (scale 0.5 C)))
+          (a4 (scale (/ 1.0 t1+t2) (v- (v+ (scale -15 A) (scale 7 B)) C)))
+          (a5 (scale (/ 1.0 t1+t2 t1+t2) (v+ (v+ (scale 6 A) (scale -3 B)) (scale 0.5 C))))
+
+          ;; x=a0+a1*t+a2*t*t+a3*t*t*t+a4*t*t*t*t+a5*t*t*t*t*t
+          ;; v=a1+2*a2*t+3*a3*t*t+4*a4*t*t*t+5*a5*t*t*t*t
+          ;; a=2*a2+6*a3*t+12*a4*t*t+20*a5*t*t*t
+          (x_ (reduce #'v+ (list a0
+                                 (scale (expt segment-time 1) a1) (scale (expt segment-time 2) a2)
+                                 (scale (expt segment-time 3) a3) (scale (expt segment-time 4) a4)
+                                 (scale (expt segment-time 5) a5))))
+          (v_ (reduce #'v+ (list a1
+                                 (scale (* 2 (expt segment-time 1)) a2) (scale (* 3 (expt segment-time 2)) a3)
+                                 (scale (* 4 (expt segment-time 3)) a4) (scale (* 5 (expt segment-time 4)) a5))))
+          (a_ (reduce #'v+ (list (scale 2 a2)
+                                 (scale (* 6 (expt segment-time 1)) a3) (scale (* 12 (expt segment-time 2)) a4)
+                                 (scale (* 20 (expt segment-time 3)) a5))))
+          (A-1_ (if (= (norm x_) 0)
+                    (unit-matrix 3)
+                    (reduce #'m+ (list (unit-matrix 3)
+                                       (scale-matrix (- (/ (- 1 (cos (norm x_))) (norm2 x_))) (outer-product-matrix x_))
+                                       (scale-matrix (/ (- (norm x_) (sin (norm x_))) (expt (norm x_) 3)) (m* (outer-product-matrix x_) (outer-product-matrix x_)))))))
+          (dA-1v_ (if (= (norm x_) 0)
+                      (float-vector 0 0 0)
+                      (reduce #'v+ (list (scale (* (/ (- (+ (* (norm x_) (sin (norm x_))) (* 2 (- (cos (norm x_)) 1)))) (expt (norm x_) 4)) (v. x_ v_))
+                                                (v* x_ v_))
+                                         (scale (* (/ (- (+ (* 2 (norm x_)) (* (norm x_) (cos (norm x_))) (* -3 (sin (norm x_))))) (expt (norm x_) 5)) (v. x_ v_))
+                                                (v* x_ (v* x_ v_)))
+                                         (scale (/ (- (norm x_) (sin (norm x_))) (expt (norm x_) 3))
+                                                (v* v_ (v* x_ v_)))))))
+          )
+     (setq position (m* Ri (matrix-exponent x_))
+           velocity (transform A-1_ v_)
+           acceleration (v+ (transform A-1_ a_) dA-1v_))
+     position))
+  )
+
+#| example
+(setq l (instance linear-interpolator-so3 :init))
+(send l :reset :position-list (list (rpy-matrix -pi/2 pi/2 2.7) (rpy-matrix -0.4 0 -pi/2) (rpy-matrix 0 0 0)) :time-list (list 3.0 6.0)
+               :velocity-list (list (float-vector 0 0 0) (float-vector 0 0.9 0) (float-vector 0 0 0))
+               :acceleration-list (list (float-vector 0 0 0) (float-vector 0 0 0) (float-vector 0 0 0)))
+(send l :start-interpolation)
+(while (send l :interpolatingp) (send l :pass-time 0.1) (print (send l :position)))
+|#
+
+
 ;; color utils
 (defun his2rgb (h &optional (i 1.0) (s 1.0) ret)
   "convert his to rgb (0 <= h <= 360, 0.0 <= i <= 1.0, 0.0 <= s <= 1.0)"
