@@ -379,14 +379,25 @@ Args:
 ;; obsolated methods and class for backward compatibility
 ;;
 (defmethod node
-  (:add-neighbor (n &optional a)
-    (let ((ar (instance arc :init self n)))
+  (:add-neighbor (n &optional a &key (arc-class arc) (cost nil))
+    (let ((ar (if cost (instance arc-class :init self n cost)
+                (instance arc-class :init self n))))
       (when a (send ar :name a))
       (send self :neighbors)))
   (:neighbors (&optional args)
     (if args (dolist (n args) (instance arc :init self n)))
     (mapcar #'cdr (send self :successors)))
   )
+(defmethod directed-graph
+  (:add-neighbor-from-to (from to &optional name)
+    (send from :add-neighbor to name :arc-class arc)))
+(defmethod costed-graph
+  (:add-neighbor-from-to (from to cost &optional name)
+    (send from :add-neighbor to name :arc-class costed-arc :cost cost)))
+(defmethod graph
+  (:add-neighbor-from-to (from to &optional name)
+    (send-super :add-neighbor-from-to from to 1 name)))
+
 (defclass arced-node
   :super node
   :slots ())
