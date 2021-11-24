@@ -15,11 +15,30 @@
 ;;; Workshop on Concurrent Object-based Systems,
 ;;;  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ;;;
-;;; Permission to use this software for educational, research
-;;; and non-profit purposes, without fee, and without a written
-;;; agreement is hereby granted to all researchers working on
-;;; the IRT project at the University of Tokyo, provided that the
-;;; above copyright notice remains intact.  
+;;; Redistribution and use in source and binary forms, with or without
+;;; modification, are permitted provided that the following conditions are met:
+;;;
+;;; * Redistributions of source code must retain the above copyright notice,
+;;;   this list of conditions and the following disclaimer.
+;;; * Redistributions in binary form must reproduce the above copyright notice,
+;;;   this list of conditions and the following disclaimer in the documentation
+;;;   and/or other materials provided with the distribution.
+;;; * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+;;;   (JSK) nor the names of its contributors may be used to endorse or promote
+;;;   products derived from this software without specific prior written
+;;;   permission.
+;;;
+;;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;;; THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;;; PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+;;; CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;;; EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;;; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;;; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;;; WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;;; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+;;; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;;;
 
 (in-package "USER")
@@ -2094,11 +2113,13 @@
        ;; argument check
        (unless (= (length translation-axis) (length rotation-axis)
                   (length move-target) (length link-list)
-                  (length dif-pos) (length dif-rot))
-         (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A dif-pos ~A dif-rot ~A~%"
+                  (length dif-pos) (length dif-rot)
+                  (length thre) (length rthre))
+         (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A dif-pos ~A dif-rot ~A thre ~A rthre ~A~%"
                (length translation-axis) (length rotation-axis)
                (length move-target) (length link-list)
-               (length dif-pos) (length dif-rot))
+               (length dif-pos) (length dif-rot)
+               (length thre) (length rthre))
          (return-from :inverse-kinematics-loop :ik-continues))
 
        (if (memq :tmp-dims ik-args)
@@ -2374,10 +2395,12 @@
      (if (and additional-vel (or (atom additional-vel) (functionp additional-vel))) (setq additional-vel (list additional-vel)))
      ;; argument check
      (unless (= (length translation-axis) (length rotation-axis)
-                (length move-target) (length link-list) (length target-coords))
-       (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A target-coords ~A~%"
+                (length move-target) (length link-list) (length target-coords)
+                (length thre) (length rthre))
+       (warn ";; ERROR: list length differ : translation-axis ~A rotation-axis ~A move-target ~A link-list ~A target-coords ~A thre ~A rthre ~A~%"
              (length translation-axis) (length rotation-axis)
-             (length move-target) (length link-list) (length target-coords))
+             (length move-target) (length link-list) (length target-coords)
+             (length thre) (length rthre))
        (return-from :inverse-kinematics t))
      (unless (= (length additional-jacobi) (length additional-vel))
        (warn ";; ERROR: list length differ : additional-jacobi ~A additional-vel ~A~%"
@@ -2661,15 +2684,25 @@
      pairs))
   (:self-collision-check
    (&key (mode :all) (pairs (send self :collision-check-pairs)) (collision-func 'collision-check))
-   (let ((cpairs) (col-count 0))
+   (let ((cpairs) (col-count 0) (invalid-links))
      (dolist (p pairs)
-       (let ((colp (/= (funcall collision-func (car p) (cdr p)) 0)))
-	 (when colp
-	   (incf col-count)
-	   (if (eq mode :first)
-	       (return-from :self-collision-check p)
-	     (push p cpairs)))
-	 ))
+       (if (and (send (car p) :faces) (send (cdr p) :faces))
+           (let ((colp (/= (funcall collision-func (car p) (cdr p)) 0)))
+             (when colp
+               (incf col-count)
+               (if (eq mode :first)
+                   (return-from :self-collision-check p)
+                 (push p cpairs))))
+         (progn
+           (when (and (null (send (car p) :faces)) (null (member (car p) invalid-links)))
+             (warning-message 3 "skip collision between ~A (~A) because of no faces~%"
+                          (send (car p) :name) (length (send (car p) :faces)))
+             (push (car p) invalid-links))
+           (when (and (null (send (cdr p) :faces)) (null (member (cdr p) invalid-links)))
+             (warning-message 3 "skip collision between ~A (~A) because of no faces~%"
+                              (send (cdr p) :name) (length (send (cdr p) :faces)))
+             (push (cdr p) invalid-links)))
+         ))
      cpairs))
   (:calc-grasp-matrix
    (contact-points

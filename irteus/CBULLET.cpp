@@ -15,11 +15,30 @@
 /// Workshop on Concurrent Object-based Systems,
 ///  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ///
-/// Permission to use this software for educational, research
-/// and non-profit purposes, without fee, and without a written
-/// agreement is hereby granted to all researchers working on
-/// the IRT project at the University of Tokyo, provided that the
-/// above copyright notice remains intact.
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///
+/// * Redistributions of source code must retain the above copyright notice,
+///   this list of conditions and the following disclaimer.
+/// * Redistributions in binary form must reproduce the above copyright notice,
+///   this list of conditions and the following disclaimer in the documentation
+///   and/or other materials provided with the distribution.
+/// * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+///   (JSK) nor the names of its contributors may be used to endorse or promote
+///   products derived from this software without specific prior written
+///   permission.
+///
+/// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+/// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+/// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+/// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+/// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+/// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+/// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+/// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+/// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+/// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+/// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
 // for eus.h
@@ -59,17 +78,65 @@
 
 
 #if HAVE_BULLET
+
+// The btDistanceInfo class is copied from https://github.com/bulletphysics/bullet3/blob/master/test/collision/btDistanceInfo.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2014 Erwin Coumans http://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.  In
+no event will the authors be held liable for any damages arising from the use of
+this software.  Permission is granted to anyone to use this software for any
+purpose, including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim
+that you wrote the original software. If you use this software in a product, an
+acknowledgment in the product documentation would be appreciated but is not
+required.
+
+2. Altered source versions must be plainly marked as such, and must not be
+misrepresented as being the original software.
+
+3. This notice may not be removed or altered from any source distribution.
+*/
 struct btDistanceInfo
-{ // this class is copied from https://github.com/bulletphysics/bullet3/blob/master/test/collision/btDistanceInfo.h
+{
   btVector3 m_pointOnA;
   btVector3 m_pointOnB;
   btVector3 m_normalBtoA;
   btScalar m_distance;
 };
 
+// The ConvexWrap class is copied from https://github.com/bulletphysics/bullet3/blob/master/test/collision/main.cpp
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2014 Erwin Coumans http://bulletphysics.org
 
+This software is provided 'as-is', without any express or implied warranty.  In
+no event will the authors be held liable for any damages arising from the use of
+this software.  Permission is granted to anyone to use this software for any
+purpose, including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim
+that you wrote the original software. If you use this software in a product, an
+acknowledgment in the product documentation would be appreciated but is not
+required.
+
+2. Altered source versions must be plainly marked as such, and must not be
+misrepresented as being the original software.
+
+3. This notice may not be removed or altered from any source distribution.
+*/
+///Original author: Erwin Coumans, October 2014
+///Initial version of this low-level GJK/EPA/MPR convex-convex collision test
+///You can provide your own support function in combination with the template functions
+///See btComputeGjkEpaSphereSphereCollision below for an example
+///Todo: the test needs proper coverage and using a convex hull point cloud
+///Also the GJK, EPA and MPR should be improved, both quality and performance
 struct ConvexWrap
-{ // this class is copied from https://github.com/bulletphysics/bullet3/blob/master/test/collision/main.cpp
+{
   btConvexShape* m_convex;
   btTransform m_worldTrans;
   inline btScalar getMargin() const
@@ -117,6 +184,9 @@ long BT_MakeCapsuleModel(double radius, double height)
 long BT_MakeMeshModel(double *verticesPoints, long numVertices)
 {
   btConvexHullShape* pshape = new btConvexHullShape();
+  if (numVertices == 0) {
+    fprintf(stderr, "BT_MakeMeshModel with numVertices == 0\n");
+  }
 #define SHRINK_FOR_MARGIN false
   if (SHRINK_FOR_MARGIN) {
     // Shrink vertices for default margin CONVEX_DISTANCE_MARGIN,

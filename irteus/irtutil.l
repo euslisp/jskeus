@@ -15,11 +15,30 @@
 ;;; Workshop on Concurrent Object-based Systems,
 ;;;  IEEE 6th Symposium on Parallel and Distributed Processing, 1994
 ;;;
-;;; Permission to use this software for educational, research
-;;; and non-profit purposes, without fee, and without a written
-;;; agreement is hereby granted to all researchers working on
-;;; the IRT project at the University of Tokyo, provided that the
-;;; above copyright notice remains intact.  
+;;; Redistribution and use in source and binary forms, with or without
+;;; modification, are permitted provided that the following conditions are met:
+;;;
+;;; * Redistributions of source code must retain the above copyright notice,
+;;;   this list of conditions and the following disclaimer.
+;;; * Redistributions in binary form must reproduce the above copyright notice,
+;;;   this list of conditions and the following disclaimer in the documentation
+;;;   and/or other materials provided with the distribution.
+;;; * Neither the name of JSK Robotics Laboratory, The University of Tokyo
+;;;   (JSK) nor the names of its contributors may be used to endorse or promote
+;;;   products derived from this software without specific prior written
+;;;   permission.
+;;;
+;;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;;; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;;; THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;;; PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+;;; CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;;; EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;;; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;;; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;;; WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;;; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+;;; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;;;
 
 (in-package "USER")
@@ -275,11 +294,18 @@
      (setq position (send self :interpolation))
      (incf time dt)
      (setq segment-time (- time (if (= segment 0) 0 (nth (1- segment) time-list))))
-     (when (> time (nth segment time-list))
-       (setq segment-time (- time (nth segment time-list)))
-       (incf segment))
+     (when (eps> time (nth segment time-list) (* 0.1 dt))
+       ;; if time-segment is not aligned, need to fix the data (see https://github.com/jsk-ros-pkg/jsk_pr2eus/issues/457)
+       (while (and (< segment segment-num) (eps> time (nth segment time-list) (* 0.1 dt)))
+         (setq segment-time (- time (nth segment time-list)))
+         (incf segment)))
      (when (>= segment segment-num)
-       (setq position (car (last position-list)))
+       ;; adjust time and segment-time to exact position
+       (setq segment (1- segment-num))
+       (setq time (car (last time-list)))
+       (setq segment-time (- time (if (= segment 0) 0 (nth (1- segment) time-list))))
+       ;; re-calculate :interpolation
+       (setq position (send self :interpolation))
        (send self :reset))
      position))
   )
@@ -379,12 +405,12 @@
                               (scale (expt segment-time 5) a5)))
            velocity
            (reduce #'v+ (list a1
-                              (scale (expt segment-time 1) a2) (scale (expt segment-time 2) a3)
-                              (scale (expt segment-time 3) a4) (scale (expt segment-time 4) a5)))
+                              (scale (* 2 (expt segment-time 1)) a2) (scale (* 3 (expt segment-time 2)) a3)
+                              (scale (* 4 (expt segment-time 3)) a4) (scale (* 5 (expt segment-time 4)) a5)))
            acceleration
-           (reduce #'v+ (list a2
-                              (scale (expt segment-time 1) a3) (scale (expt segment-time 2) a4)
-                              (scale (expt segment-time 3) a5))))
+           (reduce #'v+ (list (scale 2 a2)
+                              (scale (* 6 (expt segment-time 1)) a3) (scale (* 12 (expt segment-time 2)) a4)
+                              (scale (* 20 (expt segment-time 3)) a5))))
      position))
   ;
   )
