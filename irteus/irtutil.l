@@ -294,11 +294,18 @@
      (setq position (send self :interpolation))
      (incf time dt)
      (setq segment-time (- time (if (= segment 0) 0 (nth (1- segment) time-list))))
-     (when (> time (nth segment time-list))
-       (setq segment-time (- time (nth segment time-list)))
-       (incf segment))
+     (when (eps> time (nth segment time-list) (* 0.1 dt))
+       ;; if time-segment is not aligned, need to fix the data (see https://github.com/jsk-ros-pkg/jsk_pr2eus/issues/457)
+       (while (and (< segment segment-num) (eps> time (nth segment time-list) (* 0.1 dt)))
+         (setq segment-time (- time (nth segment time-list)))
+         (incf segment)))
      (when (>= segment segment-num)
-       (setq position (car (last position-list)))
+       ;; adjust time and segment-time to exact position
+       (setq segment (1- segment-num))
+       (setq time (car (last time-list)))
+       (setq segment-time (- time (if (= segment 0) 0 (nth (1- segment) time-list))))
+       ;; re-calculate :interpolation
+       (setq position (send self :interpolation))
        (send self :reset))
      position))
   )
@@ -398,12 +405,12 @@
                               (scale (expt segment-time 5) a5)))
            velocity
            (reduce #'v+ (list a1
-                              (scale (expt segment-time 1) a2) (scale (expt segment-time 2) a3)
-                              (scale (expt segment-time 3) a4) (scale (expt segment-time 4) a5)))
+                              (scale (* 2 (expt segment-time 1)) a2) (scale (* 3 (expt segment-time 2)) a3)
+                              (scale (* 4 (expt segment-time 3)) a4) (scale (* 5 (expt segment-time 4)) a5)))
            acceleration
-           (reduce #'v+ (list a2
-                              (scale (expt segment-time 1) a3) (scale (expt segment-time 2) a4)
-                              (scale (expt segment-time 3) a5))))
+           (reduce #'v+ (list (scale 2 a2)
+                              (scale (* 6 (expt segment-time 1)) a3) (scale (* 12 (expt segment-time 2)) a4)
+                              (scale (* 20 (expt segment-time 3)) a5))))
      position))
   ;
   )
