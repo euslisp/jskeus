@@ -76,9 +76,12 @@
 (let (x-lib pname)
 #+:darwin
 #+:darwin
- (if (probe-file "/opt/local/lib/libX11.dylib")
-     (setq pname "/opt/local/lib/libX11.dylib")
-   (setq pname "/opt/X11/lib/libX11.dylib"))
+ (cond ((probe-file "/opt/local/lib/libX11.dylib")
+        (setq pname "/opt/local/lib/libX11.dylib"))
+       ((probe-file "/usr/local/lib/libX11.dylib")
+        (setq pname "/usr/local/lib/libX11.dylib"))
+       (t
+        (setq pname "/opt/X11/lib/libX11.dylib")))
 #+:cygwin
   (if (probe-file "/usr/bin/cygX11-6.dll")
       (setq pname "/usr/bin/cygX11-6.dll")
