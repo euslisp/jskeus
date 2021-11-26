@@ -51,6 +51,8 @@
    (cond
     ((probe-file "/opt/local/lib/libGL.dylib")
      (setq gl-lib ( load-foreign "/opt/local/lib/libGL.dylib")))
+    ((probe-file "/usr/local/lib/libGL.dylib")
+     (setq gl-lib ( load-foreign "/usr/local/lib/libGL.dylib")))
     (t
      (setq gl-lib ( load-foreign "/opt/X11/lib/libGL.dylib")))))
 #+:cygwin
