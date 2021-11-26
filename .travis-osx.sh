@@ -5,7 +5,7 @@ set -e
 travis_time_start() {
     set +x
     TRAVIS_START_TIME=$(gdate +%s%N)
-    TRAVIS_TIME_ID=$(cat /dev/urandom | gtr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+    TRAVIS_TIME_ID=$(head /dev/urandom | base64 | head -c 8)
     TRAVIS_FOLD_NAME=$1
     echo -e "\e[0Ktraivs_fold:start:$TRAVIS_FOLD_NAME"
     echo -e "\e[0Ktraivs_time:start:$TRAVIS_TIME_ID"
