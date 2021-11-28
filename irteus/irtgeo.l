@@ -487,9 +487,9 @@
                                 ;; vt: another point of v
                                 ;; If located clockwise around v1 in the order of v2 vt v0, crossing will occur.
                                 (let* ((v1 (if (= 0.0 (car p)) (e . pvert) (e . nvert)))
-                                       (ein (find-if #'(lambda (e) (eq ev (e . nvert))) (flatten (append (send-all hs :edges) (send f :edges)))))
+                                       (ein (find-if #'(lambda (e) (eq v1 (e . nvert))) (flatten (append (send-all hs :edges) (send f :edges)))))
                                        (v0 (ein . pvert))
-                                       (eout (find-if #'(lambda (e) (eq ev (e . pvert))) (flatten (append (send-all hs :edges) (send f :edges)))))
+                                       (eout (find-if #'(lambda (e) (eq v1 (e . pvert))) (flatten (append (send-all hs :edges) (send f :edges)))))
                                        (v2 (eout . nvert))
                                        (vt (if (= 0.0 (cadr p)) (cdr v) (car v))))
                                   (when (< (mod (+ (vector-angle (v- v2 v1) (v- vt v1) (send f :normal)) 2PI) 2PI)
