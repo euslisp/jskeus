@@ -302,8 +302,9 @@
                               "replot '/tmp/test-preview-control-data.dat' using 1:3 title 'cog' with lines;"
                               "replot '/tmp/test-preview-control-data.dat' using 1:4 title 'refzmp' with lines;"
                               "pause -1;")))
-        (unix:system (format nil "gnuplot -e \"~A\""
-                             (let ((str "")) (dolist (gpc gp-command-list) (setq str (format nil "~A ~A" str gpc))) str)))))
+        (setq *g* (gnuplot))
+        (send *g* :command (apply #'concatenate string gp-command-list))
+        ))
     (mapcar #'(lambda (tm zmp cog refzmp)
                 (list :time tm :zmp zmp :cog cog :refzmp refzmp))
             tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
@@ -346,8 +347,9 @@
                               "replot '/tmp/test-preview-control-data.dat' using 1:3 title 'cog' with lines;"
                               "replot '/tmp/test-preview-control-data.dat' using 1:4 title 'refzmp' with lines;"
                               "pause -1;")))
-        (unix:system (format nil "gnuplot -e \"~A\""
-                             (let ((str "")) (dolist (gpc gp-command-list) (setq str (format nil "~A ~A" str gpc))) str)))))
+        (setq *g* (gnuplot))
+        (send *g* :command (apply #'concatenate string gp-command-list))
+        ))
     (mapcar #'(lambda (tm zmp cog refzmp)
                 (list :time tm :zmp zmp :cog cog :refzmp refzmp))
             tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
@@ -399,8 +401,9 @@
                               "replot '/tmp/test-preview-control-data.dat' using 1:3 title 'cog' with lines;"
                               "replot '/tmp/test-preview-control-data.dat' using 1:4 title 'refzmp' with lines;"
                               "pause -1;")))
-        (unix:system (format nil "gnuplot -e \"~A\""
-                             (let ((str "")) (dolist (gpc gp-command-list) (setq str (format nil "~A ~A" str gpc))) str)))))
+        (setq *g* (gnuplot))
+        (send *g* :command (apply #'concatenate string gp-command-list))
+        ))
     (mapcar #'(lambda (tm zmp cog refzmp)
                 (list :time tm :zmp zmp :cog cog :refzmp refzmp))
             tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
@@ -445,8 +448,9 @@
                               "replot '/tmp/test-preview-control-data.dat' using 1:3 title 'cog' with lines;"
                               "replot '/tmp/test-preview-control-data.dat' using 1:4 title 'refzmp' with lines;"
                               "pause -1;")))
-        (unix:system (format nil "gnuplot -e \"~A\""
-                             (let ((str "")) (dolist (gpc gp-command-list) (setq str (format nil "~A ~A" str gpc))) str)))))
+        (setq *g* (gnuplot))
+        (send *g* :command (apply #'concatenate string gp-command-list))
+        ))
     (mapcar #'(lambda (tm zmp cog refzmp)
                 (list :time tm :zmp zmp :cog cog :refzmp refzmp))
             tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
@@ -500,8 +504,9 @@
                                 "replot '/tmp/test-preview-control-data-2.dat' using 1:4 title 'output cog' with lines;"
                                 "replot '/tmp/test-preview-control-data-2.dat' using 1:5 title 'input cog' with lines;"
                                 "pause -1;")))
-          (unix:system (format nil "gnuplot -e \"~A\""
-                               (let ((str "")) (dolist (gpc gp-command-list) (setq str (format nil "~A ~A" str gpc))) str)))))
+          (setq *g* (gnuplot))
+          (send *g* :command (apply #'concatenate string gp-command-list))
+          ))
       data
       )))
 
