@@ -188,7 +188,11 @@
     (eq goal-state gs))
   ;; :path-cost returns cost from 'from-node' to 'to-node' by 'action'.
   (:path-cost (from arc to)
-    (+ (send from :cost) (send arc :cost)))
+    (if (and (derivedp from costed-arc)
+	     (derivedp to costed-arc))
+	(+ (send from :cost) (send arc :cost))
+      1 ;; costed-graph expect from/to is costed-arc, but some applications, it uses normal arc. This is not recommended, but we do not want to raise error on this. see https://github.com/euslisp/jskeus/pull/603
+      ))
   ;;accessors
   (:start-state (&optional arg)
     (if arg (setq start-state arg))
