@@ -51,6 +51,7 @@
 (comp:compile-file-if-src-newer "irtmath.l" *objdir*)
 (comp:compile-file-if-src-newer "irtutil.l" *objdir*)
 (comp:compile-file-if-src-newer "irtgraph.l" *objdir*)
+(comp:compile-file-if-src-newer "gnuplotlib.l" *objdir*)
 
 (defun comp::compile-llib-file-if-src-newer (fname)
   (print (list 'compile fname))

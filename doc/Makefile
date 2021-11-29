@@ -22,7 +22,7 @@ copy_eus_tex:
 	(cd ${TMPDIR};for x in fig/*.jpg; do extractbb $$x; done) # workaround for https://github.com/backtracking/bibtex2html/issues/9
 	cp *.tex ${TMPDIR}
 	platex --version | grep utf8 || nkf --in-place -e ${TMPDIR}/*.tex
-	for x in irtrobot irtmodel irtsensor irtscene irtdyna irtgeo irtgl irtutil irtviewer irtx irtmath irtbvh irtcollada irtgraph irtimage irtpointcloud png irtcollision pqp bullet; do\
+	for x in irtrobot irtmodel irtsensor irtscene irtdyna irtgeo irtgl irtutil irtviewer irtx irtmath irtbvh irtcollada irtgraph gnuplotlib irtimage irtpointcloud png irtcollision pqp bullet; do\
 		irteusgl ../eus/lib/llib/documentation.l "(make-document \"../irteus/$$x.l\" \"${TMPDIR}/$$x-func.tex\")" "(exit)"; \
         done
 
