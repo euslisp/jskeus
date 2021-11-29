@@ -30,6 +30,7 @@
 
 (defmethod gnuplot
   (:init (host &key (clear t) ((:debug _debug)))
+     "Initialize gnuplot interface object with given host name"
      (when (eq (unix:system "which gnuplot") 256)
        (error "gnuplot is not installed. $ sudo apt-get install gnuplot"))
 	 (setq strm 
@@ -49,6 +50,7 @@
 	 self)
   (:clear
    ()
+   "Clear graph"
    #-:cygwin
    (if (fboundp 'x::query-window-title-list)
        (let ((bef (x::query-window-title-list)) aft dif)
@@ -64,6 +66,14 @@
    )
   ;; (send *G* :draw #f(0 1 2 3 4 5) #f(5 4 3 2 1 0) :xrange '(0 10) :yrange '(0 10) :title '("data1" "data2"))
   (:draw (&rest vs)
+         "Draw graph with given float vectors,
+:range, :xrange, :yrange, : range of each axis
+:title : title of graph
+:line-width : line width
+:direction : direction of the graph (:right, :left)
+:xscale, :xoffset : scale and offset for data
+:type : specify type of the graph (:lines, :2dmap)
+"
 	 (setq last-command vs)
          (if debug (warn ";; :draw ~S~%" vs))
 	 (let (str range xrange yrange title (clear nil) (line-width 1) (direction :right) (xscale 1.0) (xoffset 0.0) (type :lines))
@@ -150,6 +160,7 @@
                  )
 	   ))
   (:save (f &key (type "postscript eps color \"Times-Roman\" 24"))
+       "save graph as eps file"
 	 (format strm "set terminal ~A~%" type)
 	 (format strm "set output ~s~%" f)
 	 (if last-command (send-lexpr self :draw last-command)
@@ -166,7 +177,14 @@
   )
 
 (defun gnuplot (&key (host (unix:gethostname)))
-  (instance gnuplot :init host))
+  "Returns gnuplot interface instance
+ex)
+(setq *g* (gnuplot))
+(send *g* :draw #f(0 1 2 3 4 5) #f(5 4 3 2 1 0) :xrange '(0 10) :yrange '(0 10) :title '(\"data1\" \"data2\"))
+
+see irteus/gnuplotlib.l for more info
+"
+  (INSTANCE gnuplot :init host))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; plot function for 2d or 3d plot
