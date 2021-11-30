@@ -72,11 +72,13 @@
 :line-width : line width
 :direction : direction of the graph (:right, :left)
 :xscale, :xoffset : scale and offset for data
+:y2tics : list variable to specify when y2 range is used
+:y2range : set y2 tics and specify range
 :type : specify type of the graph (:lines, :2dmap)
 "
 	 (setq last-command vs)
          (if debug (warn ";; :draw ~S~%" vs))
-	 (let (str range xrange yrange title (clear nil) (line-width 1) (direction :right) (xscale 1.0) (xoffset 0.0) (type :lines))
+	 (let (str range xrange yrange title (clear nil) (line-width 1) (direction :right) y2tics y2range (xscale 1.0) (xoffset 0.0) (type :lines))
 	   (dotimes (i (length vs))
 	     (if (eq (elt vs i) :range) (setq range (elt vs (1+ i))))
 	     (if (eq (elt vs i) :xrange) (setq xrange (elt vs (1+ i))))
@@ -87,6 +89,8 @@
 	     (if (eq (elt vs i) :direction) (setq direction (elt vs (1+ i))))
 	     (if (eq (elt vs i) :xscale) (setq xscale (elt vs (1+ i))))
 	     (if (eq (elt vs i) :xoffset) (setq xoffset (elt vs (1+ i))))
+	     (if (eq (elt vs i) :y2tics) (setq y2tics (elt vs (1+ i))))
+	     (if (eq (elt vs i) :y2range) (setq y2range (elt vs (1+ i))))
              (if (eq (elt vs i) :type) (setq type (elt vs (1+ i))))
 	     )
 	   (setq vs (remove :range vs))
@@ -107,12 +111,19 @@
            (setq vs (remove xscale vs :test #'equal))
            (setq vs (remove :xoffset vs))
            (setq vs (remove xoffset vs :test #'equal))
+           (setq vs (remove :y2tics vs))
+           (setq vs (remove y2tics vs :test #'equal))
+           (setq vs (remove :y2range vs))
+           (setq vs (remove y2range vs :test #'equal))
            (setq vs (remove :type vs))
            (setq vs (remove type vs :test #'equal))
 	   ;;
 	   (if clear (send self :clear))
            (case type
                  (:lines ;; default
+                  (when y2tics
+                    (format strm "set y2tics~%")
+                    (if y2range (format strm "set y2range [~A:~A]~%" (first y2range) (second y2range))))
                   (format strm "plot ")
                   (if (setq range (or range xrange))
                       (format strm "[~A:~A]" (first range) (second range))
@@ -121,10 +132,12 @@
                   (format strm " '-'")
                   (if title (format strm " title \"~A\"" (pop title)))
                   (format strm " w lp lw ~A" line-width)
+                  (if (pop y2tics) (format strm " axis x1y2 "))
                   (dolist (v (cdr vs))
                     (format strm ", '-'")
                     (if title (format strm " title \"~A\"" (pop title)))
                     (format strm " w lp lw ~A" line-width)
+                    (if (pop y2tics) (format strm " axis x1y2 "))
                     )
                   (format strm "~%")	   
                   (dolist (v vs)
@@ -174,6 +187,23 @@
   (:reset () (format strm "reset~%"))
   (:command (msg) (format strm "~A~%" msg))
   (:quit () (format strm "quit~%"))
+  ;; online processing
+  (:proc-length (&optional n) (if n (setq data-length n)) data-length)
+  (:proc-clear ()
+	       (setq data nil))
+  (:proc-one (vs &rest args)
+	     (let ()
+	       (if (< (length data) (length vs))
+		   (while (< (length data) (length vs))
+		     (setq data (append data (list nil)))))
+	       (dotimes (i (length vs))
+		 (push (elt vs i) (elt data i)))
+	       (dotimes (i (length vs))
+		 (if (>= (length (elt data i)) data-length)
+		     (setf (elt data i) (butlast (elt data i) (- (length (elt data i)) data-length)))))
+	       (setq last-command (append data args))
+	       (send-lexpr self :draw last-command)
+	       last-command))
   )
 
 (defun gnuplot (&key (host (unix:gethostname)))
@@ -208,6 +238,19 @@ see irteus/gnuplotlib.l for more info
 	x11 additional-func
 	no-dump ((:graph-instance gp) (if (boundp 'user::*gp*) user::*gp* (setq user::*gp* (gnuplot))))
 	(fname (format nil "data~A" (sys::address gp))))
+  "plot function for 2d or 3d plot
+ordinate-list : list of data for ordinate axis
+     2D = (list (list y00 y01 ... y0n), ... (list ym0 ym1 ... ymn))
+     3D = (list (list z00 z01 ... z0n), ... (list zm0 zm1 ... zmn))
+abscissa-list : list of data for abscissa axes
+     2D = (list x0 x1 ... xn)
+     3D = (list xylist0 ... xylistn) ;; xylist = (list x y)
+:title : title of graph
+:xlabel, :ylabel, zlabel : label for each axis
+:keylist : legend of each data
+:xrange, :yrange, :zrange : range of each axis
+:mode : \"lines\" or \"points\"
+"
   (labels ((gen-range-string
             (range)
             (if range (format nil "[~A:~A]" (car range) (cadr range)) "[]"))
@@ -263,6 +306,7 @@ see irteus/gnuplotlib.l for more info
 
 #|
 ;; examples 
+(defun range (n) (do ((i 0 (incf i)) (ret nil)) ((>= i n) (nreverse ret)) (push i ret)))
 (defun test-gnuplot-0 ()
   (unless (boundp '*gp*) (setq *gp* (gnuplot)))
   (let ((leng 360))
