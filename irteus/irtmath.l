@@ -666,6 +666,12 @@
 #|
 (defun lms-draw (r point-list)
   (let ()
+    ;; graph-view
+    (graph-view (list (mapcar #'vector-y point-list)) (mapcar #'vector-x point-list)
+                :mode "point" :xrange '(0 80) :yrange '(0 50)
+                :keylist (list "data")
+                :graph-instance *gnuplot*)
+    ;; raw-command version
     (send *gnuplot* :command (format nil "plot [0:80][0:50] ~A * x + ~A title \"regression\", '-' with point title \"data\"~%~Ae"
                                      (/ (elt (car r) 0) (- (elt (car r) 1)))
                                      (/ (cadr r) (- (elt (car r) 1)))

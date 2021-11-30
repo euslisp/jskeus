@@ -295,6 +295,20 @@
              tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
      )
     (unless (or (null x::*display*) (= x::*display* 0))
+      ;; graph-view
+      (graph-view (list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2)) tm-list
+                  :xlabel "Time [s]" :ylabel "ZMP X [mm]"
+                  :keylist '("card zmp" "cog" "refmp"))
+      ;; online-version
+      (setq *gnuplot* (gnuplot))
+      (send *gnuplot* :proc-length (length tm-list))
+      (mapcar #'(lambda (tm zmp cog refzmp)
+                  (send *gnuplot* :proc-one (list zmp cog refzmp)
+                        :direction :left
+                        :title '("cart zmp" "cog" "refzmp")
+                        ))
+              tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
+      ;; raw-command version
       (let ((gp-command-list (list
                               "set xlabel 'Time [s]';"
                               "set ylabel 'ZMP X [mm]';"

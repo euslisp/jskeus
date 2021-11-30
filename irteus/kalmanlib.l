@@ -187,6 +187,9 @@
         (f (format nil "data_~a.dat" suffix) :direction :output)
       (dotimes (i (length x))
         (format f "~A ~A~%" (elt x i) (elt y i))))
+    ;; online gnuplotting
+    (if (not (boundp '*g*))
+        (send *g* :proc-length (length x)))
 
     ;; write estimated data
     (with-open-file
@@ -197,6 +200,13 @@
            (setq z (send kf :proc (float-vector (elt x i) (elt y i)) :adaptive t)))
           (t
            (setq z (send kf :proc (float-vector (elt x i) (elt y i))))))
+        ;; online gnuplotting
+        (send *g* :proc-one (list (elt y i) (elt z 1) (send kf :error) (aref (send kf :P) 1 1) -0.37727)
+              :direction :left
+              :xrange '(0 100)
+              :yrange '(-0.6 0)
+              :y2tics (list nil nil t t nil)
+              :title '("ovserved" "estimated" "error" "P covariance" "baseline"))
         (format f "~A ~A ~A ~A~%" (elt x i) (elt z 1) (send kf :error) (aref (send kf :P) 1 1))))
 
     ;; write graph data
