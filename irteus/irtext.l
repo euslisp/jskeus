@@ -47,7 +47,7 @@
   (load-library
    (format nil "~A~A/lib/libirteus"
 	   *eusdir* (unix:getenv "ARCHDIR"))
-   '("irtmath" "irtutil" "irtc" "irtgeoc" "irtgraph" "___time" "___pgsql")))
+   '("irtmath" "irtutil" "irtc" "irtgeoc" "irtgraph" "gnuplotlib" "___time" "___pgsql")))
 (defun load-irteusg ()
   (in-package "GEOMETRY")
   (load-library
