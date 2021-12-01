@@ -2,8 +2,8 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.5 (2021-12-01)
+------------------
 * copy gnuplotlib from euslib/jsk.l (`#261 <https://github.com/euslisp/jskeus/issues/261>`_)
 * [irtgeo.l] fix triangulation (`#585 <https://github.com/euslisp/jskeus/issues/585>`_)
 * [irtsensor.l] add :no-window arg in camera-model (`#588 <https://github.com/euslisp/jskeus/issues/588>`_)
