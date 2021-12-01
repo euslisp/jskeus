@@ -2,6 +2,22 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* copy gnuplotlib from euslib/jsk.l (`#261 <https://github.com/euslisp/jskeus/issues/261>`_)
+* [irtgeo.l] fix triangulation (`#585 <https://github.com/euslisp/jskeus/issues/585>`_)
+* [irtsensor.l] add :no-window arg in camera-model (`#588 <https://github.com/euslisp/jskeus/issues/588>`_)
+* [irtviewer.l] add irtviewer-no-window, irtviewer without xwindow (`#574 <https://github.com/euslisp/jskeus/issues/574>`_)
+* [irtgraph.l] do not set cost when arc is not costed-arc (`#603 <https://github.com/euslisp/jskeus/issues/603>`_)
+* .travise-osx.sh : osx 10.14-: fix for new libX11.dylib location (/opt/X11/lib:/opt/local/lib -> /usr/local/lib) (`#607 <https://github.com/euslisp/jskeus/issues/607>`_)
+* [irtutil.l] fix minjerk interpolation sometimes returns large acceleration (`#596 <https://github.com/euslisp/jskeus/issues/596>`_)
+* [demo/sample-robot-camera.l] add sample-robot-camera.l : demo to manipulatie camera model (:ray, :screen-point) (`#597 <https://github.com/euslisp/jskeus/issues/597>`_)
+* [irtcollada.l] fix irtcollada problem that mesh poses are incorrect if root link is moved from origin (`#600 <https://github.com/euslisp/jskeus/issues/600>`_)
+* [irtmath.l] add comment to quaternion (`#589 <https://github.com/euslisp/jskeus/issues/589>`_)
+* doc/conf.py: download deb archive.ubuntu.com manually (`#581 <https://github.com/euslisp/jskeus/issues/581>`_)
+
+* Contributors: Kei Okada, Naoki Hiraoka, Naoya Yamaguchi, Shingo Kitagawa, Yohei Kakiuchi
+
 1.2.4 (2020-07-03)
 ------------------
 * fix for debian release
