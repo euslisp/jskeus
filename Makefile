@@ -14,6 +14,12 @@ ifneq ($(GCC_MACHINE),)
  ifeq ($(GCC_MACHINE),i686-linux-gnu)
    MACHINE=x86
  endif
+ ifeq ($(GCC_MACHINE),aarch64-linux-gnu)
+   MACHINE=aarch64
+ endif
+ ifeq ($(GCC_MACHINE),arm-linux-gnueabihf)
+   MACHINE=armv7
+ endif
 endif
 ifeq ($(MACHINE),)
  MACHINE=$(shell uname -m)
