@@ -83,7 +83,7 @@ eus-installed: eus
 	cd eus/lisp && ln -sf $(MAKEFILE) Makefile && $(MAKE) eus0 eus1 eus2 eusg eusx eusgl eus
 
 irteus-installed: eus-installed
-	cd irteus; $(MAKE)
+	cd irteus; $(MAKE) MACHINE=$(MACHINE)
 
 clean:
 	-rm -f bashrc.eus manual.pdf jmanual.pdf
