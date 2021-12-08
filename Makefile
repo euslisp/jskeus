@@ -1,7 +1,7 @@
 all: eus-installed irteus-installed manuals bashrc.eus
 
-GIT_EUSURL ?= http://github.com/euslisp/EusLisp
-GIT_EUSBRANCH ?= master
+GIT_EUSURL ?= http://github.com/k-okada/EusLisp
+GIT_EUSBRANCH ?= armhf_focal
 
 EUSC_PATCH=eus.c_CUSTUM_EUSDIR.patch
 
