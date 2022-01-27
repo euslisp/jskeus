@@ -2575,7 +2575,9 @@
                (dotimes (i (/ (length print-args) 2)) ;; escape list
                  (unless (eq (elt print-args (* 2 i)) :move-target) ;; neglect :move-target because move-target is fixed later
                    (escape-list print-args (+ 1 (* 2 i)))))
-               (dotimes (i (length print-args)) (escape-robot-link print-args i)) ;; escape robot link
+               (dotimes (i (/ (length print-args) 2)) ;; escape list
+                 (unless (eq (elt print-args (* 2 i)) :move-target) ;; neglect :move-target because move-target is fixed later
+                   (escape-robot-link print-args (+ 1 (* 2 i))))) ;; escape robot link
 	       (dotimes (j (count :move-target print-args)) ;; escape move-target
 		 (if (setq i (position :move-target print-args :count (1+ j)))
 		     (cond ((atom (elt print-args (+ i 1)))
