@@ -2572,20 +2572,19 @@
                                      (if (consp l) (deep-copy-list l) l))
                                  lst)))
                (setq print-args (deep-copy-list args)) ;; generate deep copy list for destructive operation
-               (dotimes (i (/ (length print-args) 2)) ;; escape list
-                 (unless (eq (elt print-args (* 2 i)) :move-target) ;; neglect :move-target because move-target is fixed later
-                   (escape-list print-args (+ 1 (* 2 i)))))
-               (dotimes (i (/ (length print-args) 2)) ;; escape list
-                 (unless (eq (elt print-args (* 2 i)) :move-target) ;; neglect :move-target because move-target is fixed later
-                   (escape-robot-link print-args (+ 1 (* 2 i))))) ;; escape robot link
-	       (dotimes (j (count :move-target print-args)) ;; escape move-target
-		 (if (setq i (position :move-target print-args :count (1+ j)))
-		     (cond ((atom (elt print-args (+ i 1)))
-                            (setf (elt print-args (+ i 1)) (get-move-target-transform-list (elt print-args (+ i 1)))))
-			   (t
-			    (setf (elt print-args (+ i 1))
-				  (append '(list)
-					  (mapcar #'(lambda (x) (get-move-target-transform-list x)) (elt print-args (+ i 1)))))))))
+               (dotimes (i (/ (length print-args) 2))
+                 (if (not (eq (elt print-args (* 2 i)) :move-target))
+                     ;; escape args other than :move-target
+                     (progn
+                       (escape-list print-args (+ 1 (* 2 i))) ;; escape list
+                       (escape-robot-link print-args (+ 1 (* 2 i)))) ;; escape robot link
+                     ;; escape :move-target
+                     (cond ((atom (elt print-args (+ 1 (* 2 i))))
+                            (setf (elt print-args (+ 1 (* 2 i))) (get-move-target-transform-list (elt print-args (+ 1 (* 2 i))))))
+                           (t
+                            (setf (elt print-args (+ 1 (* 2 i)))
+                                  (append '(list)
+                                          (mapcar #'(lambda (x) (get-move-target-transform-list x)) (elt print-args (+ 1 (* 2 i))))))))))
 	       (setq command-init `(instance ,(send (class self) :name) :init)
 		     command-setup `(progn  (send r :newcoords (make-coords :4x4 ,(send self :4x4))) (mapc #'(lambda (j a) (send* j :joint-angle a ,joint-args)) (list . ,(mapcar #'(lambda (x) `(send r ,(intern (string-upcase x) *keyword-package*))) (send-all (remove-duplicates (append (send-all union-link-list :joint) joint-list)) :name))) ,(list 'quote av0)) (objects (list r))))
                (setq command-args ;; append target-coords and print-args
