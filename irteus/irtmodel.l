@@ -822,10 +822,10 @@
    "Returns angle-vector of this object, if vec is given, it updates angles of all joint. If given angle-vector violate min/max range, the value is modified."
    (let ((i 0))
      (when vec
-       (when (> (length vec) (length joint-list))
+       (when (> (length vec) (calc-target-joint-dimension joint-list))
          (warn ";; WARNING : Dimension of input vector: ~A > Dimension of joint-list: ~A~%"
                (length vec)
-               (length joint-list))))
+               (calc-target-joint-dimension joint-list))))
      (dolist (j joint-list)
        (when vec
            ;; for joint w/ min-max-table, see http://sourceforge.net/p/jskeus/tickets/43/
