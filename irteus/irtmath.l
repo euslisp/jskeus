@@ -665,23 +665,20 @@
 
 #|
 (defun lms-draw (r point-list)
-  (let (bs b str)
-    (setq bs nil)
-    (setq str "plot [0:80][0:50] '< echo \"")
-    (dotimes (i (length point-list))
-      (setq str (concatenate string str (format nil "~A ~A\\n"
-						(elt (elt point-list i) 0)
-						(elt (elt point-list i) 1)
-						)))
-      )
-    (setq str (concatenate string str (format nil "\"' title \"data\"~%")))
-    (format *gnuplot* "~a~%" str)
-
-    (setq str (format nil "replot ~A * x + ~A title \"regression\""
-		      (/ (elt (car r) 0) (- (elt (car r) 1)))
-		      (/ (cadr r) (- (elt (car r) 1)))
-		      ))
-    (format *gnuplot* "~a~%" str)
+  (let ()
+    ;; graph-view
+    (graph-view (list (mapcar #'vector-y point-list)) (mapcar #'vector-x point-list)
+                :mode "point" :xrange '(0 80) :yrange '(0 50)
+                :keylist (list "data")
+                :graph-instance *gnuplot*)
+    ;; raw-command version
+    (send *gnuplot* :command (format nil "plot [0:80][0:50] ~A * x + ~A title \"regression\", '-' with point title \"data\"~%~Ae"
+                                     (/ (elt (car r) 0) (- (elt (car r) 1)))
+                                     (/ (cadr r) (- (elt (car r) 1)))
+                                     (apply #'concatenate string
+                                            (mapcar #'(lambda (x) (format nil "~A ~A~%" (elt x 0) (elt x 1)))
+                                                    point-list))
+                                     ))
     t))
 
 (defun lms-demo (num)
@@ -696,7 +693,7 @@
 		    #f(39.0 27.0) #f(38.0 31.0) #f(32.0 25.0)))
 	)
     (when (not (boundp '*gnuplot*))
-      (setq *gnuplot* (piped-fork "gnuplot")))
+      (setq *gnuplot* (gnuplot)))
 
     (format t "apply lms with data~%")
     (setq r (lms data1))

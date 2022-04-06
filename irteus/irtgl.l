@@ -51,6 +51,8 @@
    (cond
     ((probe-file "/opt/local/lib/libGL.dylib")
      (setq gl-lib ( load-foreign "/opt/local/lib/libGL.dylib")))
+    ((probe-file "/usr/local/lib/libGL.dylib")
+     (setq gl-lib ( load-foreign "/usr/local/lib/libGL.dylib")))
     (t
      (setq gl-lib ( load-foreign "/opt/X11/lib/libGL.dylib")))))
 #+:cygwin
@@ -134,122 +136,6 @@
        (ctranspose-image-rows h step src)
        img))))
 
-(unless (assoc :color-org (send glviewsurface :methods))
-  (rplaca (assoc :color (send glviewsurface :methods)) :color-org))
-(defmethod glviewsurface
-  (:color 
-   (&optional color-vector)
-   "Returns color, if color-vector is given it set color"
-   (if color-vector (send self :color-org color-vector)
-     (let ((v (float-vector 0 0 0 0)))
-       (glgetfloatv GL_CURRENT_COLOR v)
-       (subseq v 0 3))))
-  (:line-width 
-   (&optional x)
-   "Returns line width, if x is given, it set line width"
-   (if x (glLineWidth (float x))
-     (let ((tmp (float-vector 0)))
-       (glGetFloatv GL_LINE_WIDTH tmp)
-       (elt tmp 0))
-     ))
-  (:point-size 
-   (&optional x)
-   "Returns point size, if x is given, it set point size"
-   (if x (glPointSize (float x))
-     (let ((tmp (float-vector 0)))
-       (glGetFloatv GL_POINT_SIZE tmp)
-       (elt tmp 0))
-     ))
-  (:3d-point (pos &key (depth-test t) (lighting t)) ;; redefined
-             "Draw 3D point"
-	     (if depth-test (glDisable GL_DEPTH_TEST))
-	     (if lighting (glDisable GL_LIGHTING))
-	     (glBegin GL_POINTS)
-	     (glVertex3fv pos)
-	     (glEnd)
-	     (if depth-test (glEnable GL_DEPTH_TEST))
-	     (if lighting (glEnable GL_LIGHTING)))
-  (:3d-line (start end &key (depth-test t) (lighting t)) ;; redefined
-            "Draw 3D line from start to end"
-	    (if depth-test (glDisable GL_DEPTH_TEST))
-	    (if lighting (glDisable GL_LIGHTING))
-	    (glBegin GL_LINE_STRIP)
-	    (glVertex3fv start)
-	    (glVertex3fv end)
-	    (glEnd)
-	    (if depth-test (glEnable GL_DEPTH_TEST))
-	    (if lighting (glEnable GL_LIGHTING)))
-  (:3d-lines (points &key (depth-test t) (lighting t))
-             "Draw 3D lines that connecting points"
-	     (if depth-test (glDisable GL_DEPTH_TEST))
-	     (if lighting (glDisable GL_LIGHTING))
-	     (glBegin GL_LINE_STRIP)
-	     (dolist (p points) (glVertex3fv p))
-	     (glEnd)
-	     (if depth-test (glEnable GL_DEPTH_TEST))
-	     (if lighting (glEnable GL_LIGHTING)))
-  ;;
-  (:makecurrent () (gl::glxMakeCurrent x::*display* x::drawable glcon))
-  (:redraw (&rest args) (send self :flush))
-  (:flush 
-   ()
-   "send glflush"
-   (send self :makecurrent)
-   (send self :glflush)
-   (send-super :flush)
-   )
-
-  ;;
-  (:write-to-image-file
-   (file &key (x 0) (y 0)
-	 (width x::width)
-	 (height x::height))
-   "Write current view to file name"
-   (let* ((glimg (send self :getglimage
-		       :x x :y y :width (1- width) :height height)))
-     (image::write-image-file file glimg)
-     ))
-  (:getglimage
-   (&key (x 0) (y 0)
-	 (width x::width)
-	 (height x::height)
-	 ((:imagebuf imgbuf) (make-string (* width height 3)))
-         (depthbuf))
-   "Get current view to a image object. It returns color-image24 object."
-   (let ((img (instance image::color-image24 :init width height imgbuf)))
-     (send self :makecurrent)
-     (glReadBuffer GL_FRONT)
-     (glPixelStorei GL_PACK_ALIGNMENT 1)
-     (glReadPixels x y width height GL_RGB GL_UNSIGNED_BYTE imgbuf)
-     #-(or :x86_64 :aarch64)
-     (if depthbuf (glReadPixels x y width height GL_DEPTH_COMPONENT GL_FLOAT depthbuf))
-     #+(or :x86_64 :aarch64)
-     (when depthbuf
-       (let ((fv (user::dvector2float-bytestring depthbuf)))
-	 (glReadPixels x y width height GL_DEPTH_COMPONENT GL_FLOAT fv)
-	 (user::float-bytestring2dvector fv depthbuf)))
-     ;; transpose
-     (transpose-image-rows img)
-     img))
-  (:string
-   (x y str &optional (fid x:font-courb24))
-   "Draw string to irtviewer. x:font-courb24 and x::font-helvetica-bold-12 are supported for fid."
-   (send self :makecurrent)
-   (glMatrixMode GL_PROJECTION)
-   (glPushMatrix)
-   (send self :2d-mode)
-   (unless (eq (get self :glxusexfont) fid)
-     (setf (get self :glxusexfont) fid)
-     (glxUseXfont fid 32 96 (+ 1000 32)))
-   (glRasterPos2i (round x) (- (send self :height) (round y)))
-   (glListBase 1000)
-   (glCallLists (length str) GL_UNSIGNED_BYTE str)
-   (send self :3d-mode)
-   (glMatrixMode GL_PROJECTION)
-   (glPopMatrix)
-   (glMatrixMode GL_MODELVIEW)
-   )
-  )
 
 (defun draw-globjects (vwr draw-things &key (clear t) (flush t) (draw-origin 150) (draw-floor nil) (floor-color #f(1 1 1)))
   (let (pcolor)
