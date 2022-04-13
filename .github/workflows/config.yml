@@ -25,8 +25,8 @@ jobs:
           - DOCKER_IMAGE: osrf/ubuntu_armhf:xenial
           - DOCKER_IMAGE: osrf/ubuntu_arm64:trusty
           - DOCKER_IMAGE: osrf/ubuntu_arm64:xenial
-          - DOCKER_IMAGE: osrf/ubuntu_arm64:bionic
-          - DOCKER_IMAGE: osrf/ubuntu_arm64:focal
+          - DOCKER_IMAGE: arm64v8/ubuntu:bionic
+          - DOCKER_IMAGE: arm64v8/ubuntu:focal
           - DOCKER_IMAGE: osrf/debian_arm64:stretch
       fail-fast: false
 
@@ -48,8 +48,9 @@ jobs:
           export TRAVIS_OS_NAME=linux
           export DOCKER_IMAGE=${{matrix.DOCKER_IMAGE}}
           if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then sudo apt-get install -y -qq qemu-user-static git; fi
+          if [[ "$DOCKER_IMAGE" == *"arm64v8"* ]]; then export QEMU_VOLUME="-v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-static"; fi #
           echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
-          docker run --rm -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "DOCKER_IMAGE=$DOCKER_IMAGE" -e "COLLISION_LIB=$COLLISION_LIB" -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"
+          docker run --rm $QEMU_VOLUME -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "DOCKER_IMAGE=$DOCKER_IMAGE" -e "COLLISION_LIB=$COLLISION_LIB" -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"
 
   doc:
     runs-on: ubuntu-latest
