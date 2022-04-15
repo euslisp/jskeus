@@ -226,23 +226,23 @@
      ;; set sensors
      (setq force-sensors
            (mapcar #'(lambda (l)
-                       (send (send self :limb l :end-coords :parent) :assoc
-                             (make-cascoords :coords (send self :limb l :end-coords :copy-worldcoords)
+                       (send (send self l :end-coords :parent) :assoc
+                             (make-cascoords :coords (send self l :end-coords :copy-worldcoords)
                                              :name (format nil "~A-fsensor" (string-downcase l)))))
                    (list :rarm :larm :rfleg :lfleg :rbleg :lbleg)))
      (setq imu-sensors
            (list (let ((sen (make-cascoords
-                             :worldpos (send (car (send self :limb :torso :waist-p :child-link :bodies)) :centroid)
+                             :worldpos (send (car (send self :torso :waist-p :child-link :bodies)) :centroid)
                              :name "torso-imusensor")))
-                   (send (send self :limb :torso :waist-p :child-link) :assoc sen)
+                   (send (send self :torso :waist-p :child-link) :assoc sen)
                    sen)))
      (setq cameras
            (mapcar #'(lambda (pos name)
                        (let ((sen (instance camera-model :init (make-cylinder 10 20) :name name)))
                          (send sen :rotate pi/2 :y)
                          (send sen :rotate -pi/2 :z)
-                         (send sen :locate (v+ pos (send (car (send (send self :limb :head :neck-p :child-link) :bodies)) :centroid)) :world)
-                         (send (send self :limb :head :neck-p :child-link) :assoc sen)
+                         (send sen :locate (v+ pos (send (car (send (send self :head :neck-p :child-link) :bodies)) :centroid)) :world)
+                         (send (send self :head :neck-p :child-link) :assoc sen)
                          sen))
                    (list (float-vector 0 30 0) (float-vector 0 -30 0))
                    (list "left-camera" "right-camera")))

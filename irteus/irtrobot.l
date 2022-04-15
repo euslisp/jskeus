@@ -178,6 +178,9 @@
                         (cons :root-link root-link)
                         (cons :collision-avoidance-links collision-avoidance-links)))))
      (setq limb-list (append limb-list (list l)))
+     (unless (find-method self limb)
+       (eval `(defmethod ,(send (class self) :name)
+                  (,limb (&rest args) (unless args (setq args (list nil))) (send* self :limb ,limb args)))))
      l))
   (:remove-limb
    (limb)
@@ -202,45 +205,45 @@
        (:angle-vector
 	(if args
 	    (progn
-	      (mapcar #'(lambda (link a)
-			  (send link :joint :joint-angle a))
-		      (send self :limb limb) (coerce (car args) cons))
-	      (send self :limb limb :angle-vector))
-	  (coerce (mapcar #'(lambda (link) (send link :joint :joint-angle))
-			  (send self :limb limb)) float-vector)))
+	      (mapcar #'(lambda (l a)
+			  (send l :joint :joint-angle a))
+		      (send self limb) (coerce (car args) cons))
+	      (send self limb :angle-vector))
+	  (coerce (mapcar #'(lambda (l) (send l :joint :joint-angle))
+			  (send self limb)) float-vector)))
        (:inverse-kinematics
 	 (let* ((link-list (if (memq :link-list args)
 			       (cadr (memq :link-list args))
 			     (send self :link-list
-				   (send self :limb limb :end-coords :parent)
-				   (send self :limb limb :root-link))))
+				   (send self limb :end-coords :parent)
+				   (send self limb :root-link))))
 		(collision-avoidance-link-pair
 		 (if (memq :collision-avoidance-link-pair args)
 		     (cadr (memq :collision-avoidance-link-pair args))
 		   (send self :collision-avoidance-link-pair-from-link-list link-list
-			 :collision-avoidance-links (send self :limb limb :collision-avoidance-links)))))
+			 :collision-avoidance-links (send self limb :collision-avoidance-links)))))
 	   (send* self :inverse-kinematics (car args)
 		  :move-target (if (memq :move-target args)
 				   (cadr (memq :move-target args))
-				 (send self :limb limb :end-coords))
+				 (send self limb :end-coords))
 		  :collision-avoidance-link-pair collision-avoidance-link-pair
 		  :link-list link-list
 		  (cdr args))))
        (:move-end
-	(send* self :limb limb :inverse-kinematics args))
+	(send* self limb :inverse-kinematics args))
        (:move-end-rot
-	(let ((coords (send self :limb limb :end-coords :copy-worldcoords))
+	(let ((coords (send self limb :end-coords :copy-worldcoords))
 	      (angle (pop args)) (axis (pop args)) (wrt (pop args)))
 	  (unless wrt (setq wrt :local))
-	  (send* self :limb limb :move-end
+	  (send* self limb :move-end
 		 (send coords :rotate (deg2rad angle) axis wrt) args)))
        (:move-end-pos
-	(let ((coords (send self :limb limb :end-coords :copy-worldcoords))
+	(let ((coords (send self limb :end-coords :copy-worldcoords))
 	      (pos (pop args)) (wrt (pop args)))
 	  (unless wrt (setq wrt :local))
-	  (send* self :limb limb :move-end (send coords :translate pos wrt) args)))
+	  (send* self limb :move-end (send coords :translate pos wrt) args)))
        (:look-at
-        (if (send self :limb :head :links) (send* self :inverse-kinematics-loop-for-look-at limb args)))
+        (if (send self :head :links) (send* self :inverse-kinematics-loop-for-look-at limb args)))
        (:collision-avoidance-links
         (let ((collision-avoidance-links (cond (l (cdr (assoc :collision-avoidance-links l)))
                                                ((member limb '(:rarm :larm :rleg :lleg :head :torso)) ;; obsoleted. for backward compatibility
@@ -261,7 +264,7 @@
 	(cond
 	 ((or (null method) (send bodyset-link :method method))
 	  (if method
-	      (send-all (send self :limb limb) method)
+	      (send-all (send self limb) method)
           (cond (l (cdr (assoc :links l)))
                 ((member limb '(:rarm :larm :rleg :lleg :head :torso)) ;; obsoleted. for backward compatibility
                  (cdr (assoc (intern (string-upcase limb)) (send self :slots))))
@@ -275,24 +278,17 @@
 	    ))))
        ) ;; case method
      )) ;; defmethod
-  (:limbs
-   ()
-   (cond (limb-list (mapcar #'car limb-list))
-         ((or rarm larm rleg lleg head torso) ;; obsoleted. for backward compatibility
-          (remove-if-not #'(lambda (l) (send self :limbs l))
-                         (list :rarm :larm :rleg :lleg :head :torso))
-         (t nil))))
   (:inverse-kinematics-loop-for-look-at
    (limb &rest args)
    (let* ((move-target
            (if (memq :move-target args)
                (cadr (memq :move-target args))
-             (send self :limb limb :end-coords)))
+             (send self limb :end-coords)))
           (link-list (if (memq :link-list args)
                          (cadr (memq :link-list args))
                        (send self :link-list
                              (send move-target :parent)
-                             (send self :limb limb :root-link))))
+                             (send self limb :root-link))))
           (stop (if (memq :stop args) (cadr (memq :stop args)) 100))
           (warnp (if (memq :warnp args) (cadr (memq :warnp args)) t))
           dif-pos dif-rot p-dif-rot (count 0))
@@ -359,7 +355,7 @@
    (limb &rest args)
    (cond
     ((memq :links args)
-     (sort (all-child-links (send self :limb limb :end-coords :parent)) #'(lambda (a b) (string< (string (send a :name)) (string (send b :name))))))
+     (sort (all-child-links (send self limb :end-coords :parent)) #'(lambda (a b) (string< (string (send a :name)) (string (send b :name))))))
     ((memq :joint-list args)
      (send-all (send self :gripper limb :links) :joint))
     ((memq :angle-vector args)
@@ -379,7 +375,7 @@
      (find sensor-name sens :test #'equal :key #'(lambda (x) (send x :name)))))
   (:get-sensors-method-by-limb
    (sensors-type limb)
-   (remove-if-not #'(lambda (x) (member (send x :parent) (all-child-links (send self :limb limb :root-link))))
+   (remove-if-not #'(lambda (x) (member (send x :parent) (all-child-links (send self limb :root-link))))
                   (send self sensors-type)))
   ;; sensor accessors
   (:force-sensors () "Returns force sensors." force-sensors)
@@ -398,13 +394,13 @@
 	 (unless args (setq args (list nil))) (send* self :limb :head args))
   (:torso (&rest args)
 	 (unless args (setq args (list nil))) (send* self :limb :torso args))
-  (:arms (&rest args) (list (send* self :limb :larm args) (send* self :limb :rarm args)))
-  (:legs (&rest args) (list (send* self :limb :lleg args) (send* self :limb :rleg args)))
+  (:arms (&rest args) (list (send* self :larm args) (send* self :rarm args)))
+  (:legs (&rest args) (list (send* self :lleg args) (send* self :rleg args)))
   (:look-at-hand
    (l/r)
    "look at hand position, l/r supports :rarm, :larm, :arms, and '(:rarm :larm)"
    (send self :look-at-target
-         (mapcar #'(lambda (x) (send self :limb x :end-coords))
+         (mapcar #'(lambda (x) (send self x :end-coords))
                  (cond
                   ((consp l/r) l/r)
                   ((eq l/r :arms) '(:rarm :larm))
@@ -463,19 +459,19 @@
    "move robot head to look at targets, look-at-target support t/nil float-vector coordinates, center of list of float-vector or list of coordinates"
    (cond
     ((float-vector-p look-at-target)
-     (send self :limb :head :look-at look-at-target))
+     (send self :head :look-at look-at-target))
     ((coordinates-p look-at-target)
-     (send self :limb :head :look-at (send look-at-target :worldpos)))
+     (send self :head :look-at (send look-at-target :worldpos)))
     ((and (consp look-at-target)
           (every #'identity (mapcar #'float-vector-p look-at-target)))
-     (send self :limb :head :look-at
+     (send self :head :look-at
            (scale (/ 1.0 (length look-at-target)) (reduce #'v+ look-at-target :initial-value #f(0 0 0)))))
     ((and (consp look-at-target)
           (every #'identity (mapcar #'coordinates-p look-at-target)))
-     (send self :limb :head :look-at
+     (send self :head :look-at
            (scale (/ 1.0 (length look-at-target)) (reduce #'v+ (send-all look-at-target :worldpos) :initial-value #f(0 0 0)))))
     ((null look-at-target))
-    (t (send self :limb :head :look-at (send (car target-coords) :worldpos)))
+    (t (send self :head :look-at (send (car target-coords) :worldpos)))
     ))
   ;; init-pose
   (:init-pose () "Set robot to initial posture." (send self :angle-vector (instantiate float-vector (send self :calc-target-joint-dimension (cdr (send self :links))))))
@@ -488,7 +484,7 @@
          (root-coords (send (car (send self :links)) :copy-worldcoords))
          (calc-torque-buffer-args (send self :calc-torque-buffer-args))
          (support-legs '(:rleg :lleg))
-         (distribute-total-wrench-to-torque-method (if (and (some #'(lambda (l) (send self :limb l)) support-legs) ;; For legged robots
+         (distribute-total-wrench-to-torque-method (if (and (some #'(lambda (l) (send self l)) support-legs) ;; For legged robots
                                                             (not (and force-list moment-list target-coords))) ;; If no force-list, moment-list, target-coords are specified
                                                        :distribute-total-wrench-to-torque-method-default)))
    "Returns torque vector"
@@ -511,19 +507,19 @@
    ;; set default force & moment by solving mimimum internal forces
    (let ((target-coords))
      (dolist (limb limbs)
-       (if (send self :limb limb)
-           (push (send self :limb limb :end-coords) target-coords)))
+       (if (send self limb)
+           (push (send self limb :end-coords) target-coords)))
      (let* ((ret-fm (send self :calc-contact-wrenches-from-total-wrench (send-all target-coords :worldpos)
                           :total-wrench (concatenate float-vector (send (car (send self :links)) :force) (send (car (send self :links)) :moment)))))
        (send self :calc-torque-from-ext-wrenches :force-list (car ret-fm) :moment-list (cadr ret-fm) :target-coords target-coords)
        )))
   (:calc-force-from-joint-torque
-   (limb all-torque &key (move-target (send self :limb limb :end-coords)) (use-torso))
+   (limb all-torque &key (move-target (send self limb :end-coords)) (use-torso))
    "Calculates end-effector force and moment from joint torques."
    (let* ((link-list
 	   (send self :link-list
 		 (send move-target :parent)
-		 (unless use-torso (car (send self :limb limb :links)))))
+		 (unless use-torso (car (send self limb :links)))))
 	  (jacobian
 	   (send self :calc-jacobian-from-link-list
 		 link-list
@@ -588,10 +584,10 @@
      ))
   (:joint-angle-limit-nspace-for-6dof
    (&key (avoid-nspace-gain 0.01) (limbs '(:rleg :lleg)))
-   (let* ((ll (mapcar #'(lambda (l) (send self :limb l :links)) limbs))
+   (let* ((ll (mapcar #'(lambda (l) (send self l :links)) limbs))
           (J (send self :calc-jacobian-from-link-list
                    (mapcar #'(lambda (l) (append (list (car (send self :links))) l)) ll)
-                   :move-target (mapcar #'(lambda (l) (send self :limb l :end-coords)) limbs)
+                   :move-target (mapcar #'(lambda (l) (send self l :end-coords)) limbs)
                    :translation-axis (make-list (length limbs) :initial-element t)
                    :rotation-axis (make-list (length limbs) :initial-element t)))
           (Jb (make-matrix (array-dimension J 0) 6))
@@ -613,7 +609,7 @@
        )))
   (:joint-order
    (limb &optional jname-list)
-   (let ((joint-list (mapcar #'(lambda (x) (cons x (find-if #'(lambda (y) (eq y (send self x))) (send self :limb limb :joint-list)))) (mapcan #'(lambda (x) (if (substringp (format nil "~A-" (symbol-name limb)) (string x)) (list x)))(send self :methods))))
+   (let ((joint-list (mapcar #'(lambda (x) (cons x (find-if #'(lambda (y) (eq y (send self x))) (send self limb :joint-list)))) (mapcan #'(lambda (x) (if (substringp (format nil "~A-" (symbol-name limb)) (string x)) (list x)))(send self :methods))))
          j (result) name)
      (unless jname-list
        (setq jname-list
@@ -645,12 +641,12 @@
    (let ((tmp-limbs
           (remove-duplicates
            (mapcar #'(lambda (l)
-                       (find-if #'(lambda (tmp-limb) (member l (send self :limb tmp-limb :links))) (send self :limbs)))
+                       (find-if #'(lambda (tmp-limb) (member l (send self tmp-limb :links))) (append (list :rarm :larm :rleg :lleg :torso :head) (mapcar #'car limb-list))))
                    (send-all (send self :joint-list) :child-link))))
          (ordered-joint-list (send self :joint-list)))
      (format t "    #f(~%      ")
      (dolist (tmp-limb tmp-limbs)
-       (dolist (j (send self :limb tmp-limb :joint-list))
+       (dolist (j (send self tmp-limb :joint-list))
          (format t "~6,2f " (elt vec (position j ordered-joint-list))))
        (format t "~%      "))
      (format t ")~%")
@@ -663,11 +659,11 @@
          (limbs
           (if (send self :force-sensors)
               (remove nil (mapcar #'(lambda (fs)
-                                      (find-if #'(lambda (l) (equal fs (car (send self :limb l :force-sensors)))) '(:rleg :lleg)))
+                                      (find-if #'(lambda (l) (equal fs (car (send self l :force-sensors)))) '(:rleg :lleg)))
                                   (send self :force-sensors)))
             '(:rleg :lleg)))
          (force-sensors (mapcar #'(lambda (l) (send self :force-sensor l)) limbs))
-         (cop-coords (mapcar #'(lambda (l) (send self :limb l :end-coords)) limbs))
+         (cop-coords (mapcar #'(lambda (l) (send self l :end-coords)) limbs))
          (fz-thre 1e-3) ;; [N]
          (limb-cop-fz-list
           (mapcar #'(lambda (fs f m cc)
@@ -714,9 +710,9 @@
        (setq legs (list legs)))
      (setq leg-coords (remove nil (mapcar #'(lambda (leg)
                                               (cond
-                                                ((eq leg :left) (send self :limb :lleg :end-coords))
-                                                ((eq leg :right) (send self :limb :rleg :end-coords))
-                                                (t (send self :limb leg :end-coords))))
+                                                ((eq leg :left) (send self :lleg :end-coords))
+                                                ((eq leg :right) (send self :rleg :end-coords))
+                                                (t (send self leg :end-coords))))
                                           legs)))
      (when (null leg-coords)
        (return-from :fix-leg-to-coords nil)) ;; leged robot is assumed.
@@ -743,9 +739,9 @@
          (let* ((legs (cond ((listp leg) leg) ((eq leg :both) '(:rleg :lleg)) (t (list leg))))
                 (leg-coords (remove nil (mapcar #'(lambda (leg)
                                                     (cond
-                                                      ((eq leg :left) (send self :limb :lleg :end-coords))
-                                                      ((eq leg :right) (send self :limb :rleg :end-coords))
-                                                      (t (send self :limb leg :end-coords))))
+                                                      ((eq leg :left) (send self :lleg :end-coords))
+                                                      ((eq leg :right) (send self :rleg :end-coords))
+                                                      (t (send self leg :end-coords))))
                                                 legs))))
            (scale (/ 1.0 (length leg-coords))
                   (reduce #'v+ (mapcar #'(lambda (leg) (send leg :worldpos)) leg-coords)))))
@@ -753,9 +749,9 @@
          (let* ((limbs (if (listp fix-limbs) fix-limbs (list fix-limbs))))
            (send-all (remove nil (mapcar #'(lambda (limb)
                                              (cond
-                                               ((eq limb :left) (send self :limb :lleg :end-coords))
-                                               ((eq limb :right) (send self :limb :rleg :end-coords))
-                                               (t (send self :limb limb :end-coords))))
+                                               ((eq limb :left) (send self :lleg :end-coords))
+                                               ((eq limb :right) (send self :rleg :end-coords))
+                                               (t (send self limb :end-coords))))
                                          limbs)) :copy-worldcoords)))
         (root-link-virtual-joint-weight #f(0.1 0.1 0.0 0.0 0.0 0.5)) ;; use only translation x, y and rotation z
         &allow-other-keys)
@@ -781,7 +777,7 @@
          ((:all-limbs al)
           (if (send self :force-sensors)
               (remove nil (mapcar #'(lambda (fs)
-                                      (find-if #'(lambda (l) (equal fs (car (send self :limb l :force-sensors)))) '(:rleg :lleg)))
+                                      (find-if #'(lambda (l) (equal fs (car (send self l :force-sensors)))) '(:rleg :lleg)))
                                   (send self :force-sensors)))
             '(:rleg :lleg)))
          ((:default-zmp-offsets dzo)
@@ -844,7 +840,7 @@
                                      (dotimes (i (length al))
                                        (setq fcoords (midcoords (/ 1.0 (+ i 1.0))
                                                                 fcoords
-                                                                (send self :limb (elt al i) :end-coords :worldcoords))))
+                                                                (send self (elt al i) :end-coords :worldcoords))))
                                      (send self :inverse-rotate-vector (send fcoords :rotate-vector #F(1 0 0)))))))
      ;; initial move centroid on foot
      (send gg :initialize-gait-parameter
@@ -866,7 +862,7 @@
                              (send self :angle-vector)
                              (send (car (send self :links)) :copy-worldcoords)
                              :dt dt :pZMPz (elt (elt ret 5) 2))))
-             (end-coords-list (mapcar #'(lambda (x) (send self :limb x :end-coords :copy-worldcoords)) (gg . all-limbs)))
+             (end-coords-list (mapcar #'(lambda (x) (send self x :end-coords :copy-worldcoords)) (gg . all-limbs)))
              (contact-state (elt ret 8))
              )
          (when debug-view
@@ -934,18 +930,18 @@
          (rleg_ (car legs)) (lleg_ (cadr legs)))
      (send self :reset-pose)
      (send self :fix-leg-to-coords (make-coords) legs)
-     (let ((dol (abs (elt (apply #'v- (mapcar #'(lambda (l) (send self :limb l :end-coords :worldpos)) legs)) 1))))
+     (let ((dol (abs (elt (apply #'v- (mapcar #'(lambda (l) (send self l :end-coords :worldpos)) legs)) 1))))
        (labels ((ik-test
                  (target-coords-func diff-func &optional (limit-func))
                  (send self :reset-pose)
                  (send self :fix-leg-to-coords (make-coords) legs)
-                 (let* ((tc (send self :limb rleg_ :end-coords :copy-worldcoords))
+                 (let* ((tc (send self rleg_ :end-coords :copy-worldcoords))
                         (init-tc (send tc :copy-worldcoords)))
                    (while (and
                            (send self :inverse-kinematics
                                  (funcall target-coords-func tc)
-                                 :link-list (send self :link-list (send self :limb rleg_ :end-coords :parent))
-                                 :move-target (send self :limb rleg_ :end-coords) :warnp nil)
+                                 :link-list (send self :link-list (send self rleg_ :end-coords :parent))
+                                 :move-target (send self rleg_ :end-coords) :warnp nil)
                            (if limit-func (funcall limit-func tc init-tc) t)
                            ))
                    (funcall diff-func tc init-tc))))
@@ -995,7 +991,7 @@
           (leg (if (eps= (float yy) 0.0)
                    (if (> th 0.0) lleg_ rleg_)
                  (if (> yy 0.0) lleg_ rleg_)))
-          (mc (apply #'midcoords 0.5 (mapcar #'(lambda (l) (send self :limb l :end-coords :copy-worldcoords)) legs)))
+          (mc (apply #'midcoords 0.5 (mapcar #'(lambda (l) (send self l :end-coords :copy-worldcoords)) legs)))
           (gc (send (make-coords :pos (float-vector xx yy 0) :rpy (float-vector (deg2rad th) 0 0)) :transform mc :world))
           (leg-translate-pos
            (mapcar #'(lambda (l)
@@ -1052,26 +1048,26 @@
      ;; calculate foot step list for quad walk
      (dolist (fs biped-fsl)
        (let* ((fs-leg-name (send fs :name))
-              (offset (send (send self :limb fs-leg-name :end-coords :copy-worldcoords) :transformation fs :world))
+              (offset (send (send self fs-leg-name :end-coords :copy-worldcoords) :transformation fs :world))
               (target-arm-name))
          (case type
                (:crawl
                 (dolist (l (list fs-leg-name (cond ((eq fs-leg-name lleg_) larm_) ((eq fs-leg-name rleg_) rarm_))))
-                  (push (list (make-coords :coords (send (send self :limb l :end-coords :copy-worldcoords) :transform offset :world) :name l))
+                  (push (list (make-coords :coords (send (send self l :end-coords :copy-worldcoords) :transform offset :world) :name l))
                         quadruped-fsl)))
                (:trot
                 (push (mapcar #'(lambda (l)
-                                  (make-coords :coords (send (send self :limb l :end-coords :copy-worldcoords) :transform offset :world) :name l))
+                                  (make-coords :coords (send (send self l :end-coords :copy-worldcoords) :transform offset :world) :name l))
                               (list fs-leg-name (setq target-arm-name (cond ((eq fs-leg-name lleg_) rarm_) ((eq fs-leg-name rleg_) larm_)))))
                       quadruped-fsl))
                (:pace
                 (push (mapcar #'(lambda (l)
-                                  (make-coords :coords (send (send self :limb l :end-coords :copy-worldcoords) :transform offset :world) :name l))
+                                  (make-coords :coords (send (send self l :end-coords :copy-worldcoords) :transform offset :world) :name l))
                               (list fs-leg-name (cond ((eq fs-leg-name lleg_) larm_) ((eq fs-leg-name rleg_) rarm_))))
                       quadruped-fsl))
                (:gallop
                 (push (mapcar #'(lambda (l)
-                                  (make-coords :coords (send (send self :limb l :end-coords :copy-worldcoords) :transform offset :world) :name l))
+                                  (make-coords :coords (send (send self l :end-coords :copy-worldcoords) :transform offset :world) :name l))
                               (list (cond ((eq fs-leg-name rleg_) rleg_) ((eq fs-leg-name lleg_) rarm_))
                                     (cond ((eq fs-leg-name rleg_) lleg_) ((eq fs-leg-name lleg_) larm_))))
                       quadruped-fsl))
@@ -1114,11 +1110,11 @@
              (if (and l (send l :descendants))
                  (append (list l) (flatten (mapcar #'all-descendant-links (remove-if-not #'(lambda (x) (derivedp x bodyset-link)) (send l :descendants)))))
                )))
-     (unless (send self :limb name :links) (return-from :make-sole-polygon nil))
-     (send-all (all-descendant-links (car (send self :limb name :links))) :worldcoords)
+     (unless (send self name :links) (return-from :make-sole-polygon nil))
+     (send-all (all-descendant-links (car (send self name :links))) :worldcoords)
      (let* ((target-nm (read-from-string (format nil "~A-sole-body" name)))
             (vs (remove-duplicates
-                 (flatten (send-all (flatten (send-all (all-descendant-links (car (send self :limb name :links))) :bodies)) :vertices))
+                 (flatten (send-all (flatten (send-all (all-descendant-links (car (send self name :links))) :bodies)) :vertices))
                  :test #'(lambda (x y) (eps-v= x y *epsilon*))))
             (min-vs (find-extream vs #'(lambda (x) (elt x 2)) #'<))
             (b (send
@@ -1127,7 +1123,7 @@
                   #'(lambda (p)
                       (< 5.0 (- (elt p 2) (elt min-vs 2)))) vs)) ;; 5.0 is margin
                 :body)))
-       (send (send self :limb name :end-coords :parent) :assoc b)
+       (send (send self name :end-coords :parent) :assoc b)
        (send self :put target-nm b)
        (send b :worldcoords)
        (let ((f (find-if #'(lambda (x) (memq :bottom (send x :id))) (send b :faces))))
@@ -1196,7 +1192,7 @@
   (:calc-static-balance-point
    (&key (target-points
           (mapcar #'(lambda (tmp-arm)
-                      (send (send self :limb tmp-arm :end-coords) :worldpos))
+                      (send (send self tmp-arm :end-coords) :worldpos))
                   '(:rarm :larm)))
          (force-list (make-list (length target-points) :initial-element (float-vector 0 0 0)))
          (moment-list (make-list (length target-points) :initial-element (float-vector 0 0 0)))

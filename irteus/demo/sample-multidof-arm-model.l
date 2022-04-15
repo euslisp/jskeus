@@ -73,7 +73,10 @@
    (let ((tpos 0))
      (dotimes (i (length links))
        (send (elt links i) :locate (float-vector 0 0 tpos) :world)
-       (setq tpos (+ tpos (elt arm-length-list i)))))
+       (setq tpos (+ tpos (elt arm-length-list i))))
+     (setq rarm-end-coords (make-cascoords :pos (float-vector 0 0 tpos))))
+   (setq rarm links)
+   (send (car (last links)) :assoc rarm-end-coords)
    (send self :assoc (car links))
    (setq joint-list
          (mapcar
@@ -92,9 +95,6 @@
      (eval `(defmethod ,(send (class self) :name)
               (,(read-from-string (format nil ":~A" (send j :name)))
                () (elt joint-list ,(position j joint-list))))))
-   (let ((rarm-end-coords (make-cascoords :pos (float-vector 0 0 (reduce #'+ arm-length-list)))))
-     (send (car (last links)) :assoc rarm-end-coords)
-     (send self :add-limb :rarm :links (cdr links) :end-coords rarm-end-coords :root-link (cadr links)))
    (send-super :init-ending)
    self)
   )
