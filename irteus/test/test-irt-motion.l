@@ -1287,6 +1287,11 @@
         )
     )))
 
+;; test for https://github.com/jsk-ros-pkg/jsk_pr2eus/issues/474, https://github.com/euslisp/jskeus/pull/611
+(deftest segfault-with-move-target-within-link
+  (let ((robot (instance sample-robot :init)))
+    (assert (null (send robot :rarm :inverse-kinematics (make-coords) :move-target (send robot :link :rleg-link5))))))
+
 (eval-when (load eval)
   (run-all-tests)
   (exit 0))
