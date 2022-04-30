@@ -153,8 +153,11 @@ IRTIMGCOBJECTS=$(INSTALLOBJDIR)/euspng.$(OSFX)
 IRTGLCOBJECTS=$(INSTALLOBJDIR)/irtglc.$(OSFX)
 NROBJECTS=$(INSTALLOBJDIR)/nr.$(OSFX)
 
-all: defun.h $(LIBNR) $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSIMG) $(LIBIRTEUSGL) make-link install-irtext.l
+all: irteusg irteusx irteusgl
 
+irteusg: $(INSTALLBINDIR)/irteusg$(ESFX)
+irteusx: $(INSTALLBINDIR)/irteusx$(ESFX)
+irteusgl: $(INSTALLBINDIR)/irteusgl$(ESFX)
 
 defun.h: $(EUSDIR)/include/eus.h
 	echo '#include "eus.h"\n#undef defun\npointer TEST();\nvoid test(void) {register context *ctx; pointer mod; defun(ctx,"TEST",mod,TEST,NULL);}' > test.c
@@ -222,11 +225,16 @@ PQP/$(ARCHDIR)/libPQP-static.a:
 $(LIBNR): $(NROBJECTS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBNR) $(NROBJECTS)
 
-BINS=$(BINDIR)/irteus$(ESFX) $(BINDIR)/irteusgl$(ESFX)
-make-link: $(BINS) $(EUSDIR)/irteus
-$(BINS):
+$(INSTALLBINDIR)/irteusg$(ESFX): $(LIBIRTEUS) $(LIBIRTEUSG) make-link install-irtext.l
+	(cd $(INSTALLBINDIR); ln -sf eusg$(ESFX) irteusg$(ESFX))
+$(INSTALLBINDIR)/irteusx$(ESFX): $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSIMG) make-link install-irtext.l
+	(cd $(INSTALLBINDIR); ln -sf eusx$(ESFX) irteusx$(ESFX))
+$(INSTALLBINDIR)/irteusgl$(ESFX): $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSIMG) $(LIBIRTEUSGL) make-link install-irtext.l
 	(cd $(INSTALLBINDIR); ln -sf eus$(ESFX) irteus$(ESFX))
 	(cd $(INSTALLBINDIR); ln -sf eusgl$(ESFX) irteusgl$(ESFX))
+
+make-link: $(EUSDIR)/irteus
+
 $(EUSDIR)/irteus:
 	(cd $(IRTEUSDIR); ln -sf ../irteus irteus)
 
@@ -246,6 +254,7 @@ clean:
 	-rm -f *~ *.stackdump
 	-rm -f $(EUSDIR)/irteus
 	-rm -f $(INSTALLOBJDIR)/compile_*.log
+	-rm -f $(INSTALLBINDIR)/irteus$(ESFX) $(INSTALLBINDIR)/irteusg$(ESFX) $(INSTALLBINDIR)/irteusx$(ESFX) $(INSTALLBINDIR)/irteusgl$(ESFX)
 	chmod a-x Makefile* *.l *.c
 	[ -e PQP ] && (cd PQP;make clean)
 	if [ -w $(EUSDIR)/lisp/image/jpeg/ ]; then make -C $(EUSDIR)/lisp/image/jpeg/ clean; else echo "EUSDIR/lisp/image/jpeg/ is not writable"; fi
