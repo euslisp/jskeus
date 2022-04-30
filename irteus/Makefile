@@ -207,10 +207,10 @@ $(IRTEUSXOBJS): $(INSTALLOBJDIR)/%.o: %.l compile_irtx.l
 
 $(filter-out $(INSTALLOBJDIR)/eusjpeg.o,$(IRTEUSIMGOBJS)): $(INSTALLOBJDIR)/%.o: %.l compile_irtimg.l
 	@[ compile_irtimg.l -nt $< ] && (set -x; rm -f $(IRTEUSIMGOBJS)) || echo "if compile_irtimg.l is older then target, so do not remove existing target object"
-	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtimg.l > $(INSTALLOBJDIR)/compile_irtimg.log
+	$(BINDIR)/eusg$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtimg.l > $(INSTALLOBJDIR)/compile_irtimg.log
 	-rm -f $(IRTEUSIMG_C) $(IRTEUSIMG_H)
 $(INSTALLOBJDIR)/eusjpeg.$(OSFX): $(EUSDIR)/lisp/image/jpeg/eusjpeg.l
-	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtimg.l > $(INSTALLOBJDIR)/compile_irtimg.log
+	$(BINDIR)/eusg$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtimg.l > $(INSTALLOBJDIR)/compile_irtimg.log
 	-rm -f $(INSTALLOBJDIR)/eusjpeg.c $(INSTALLOBJDIR)/eusjpeg.h
 
 
@@ -225,11 +225,11 @@ PQP/$(ARCHDIR)/libPQP-static.a:
 $(LIBNR): $(NROBJECTS)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBNR) $(NROBJECTS)
 
-$(INSTALLBINDIR)/irteusg$(ESFX): $(LIBIRTEUS) $(LIBIRTEUSG) make-link install-irtext.l
+$(INSTALLBINDIR)/irteusg$(ESFX): $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSIMG) make-link install-irtext.l
 	(cd $(INSTALLBINDIR); ln -sf eusg$(ESFX) irteusg$(ESFX))
-$(INSTALLBINDIR)/irteusx$(ESFX): $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSIMG) make-link install-irtext.l
+$(INSTALLBINDIR)/irteusx$(ESFX): $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSIMG) $(LIBIRTEUSX) make-link install-irtext.l
 	(cd $(INSTALLBINDIR); ln -sf eusx$(ESFX) irteusx$(ESFX))
-$(INSTALLBINDIR)/irteusgl$(ESFX): $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSIMG) $(LIBIRTEUSGL) make-link install-irtext.l
+$(INSTALLBINDIR)/irteusgl$(ESFX): $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSIMG) $(LIBIRTEUSX) $(LIBIRTEUSIMG) $(LIBIRTEUSGL) make-link install-irtext.l
 	(cd $(INSTALLBINDIR); ln -sf eus$(ESFX) irteus$(ESFX))
 	(cd $(INSTALLBINDIR); ln -sf eusgl$(ESFX) irteusgl$(ESFX))
 
