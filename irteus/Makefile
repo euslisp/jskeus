@@ -155,8 +155,8 @@ NROBJECTS=$(INSTALLOBJDIR)/nr.$(OSFX)
 
 all: defun.h $(LIBNR) $(LIBIRTEUS) $(LIBIRTEUSG) $(LIBIRTEUSX) $(LIBIRTEUSIMG) $(LIBIRTEUSGL) make-link install-irtext.l
 
-.PHONY: defun.h
-defun.h:
+
+defun.h: $(EUSDIR)/include/eus.h
 	echo '#include "eus.h"\n#undef defun\npointer TEST();\nvoid test(void) {register context *ctx; pointer mod; defun(ctx,"TEST",mod,TEST,NULL);}' > test.c
 	echo "// redefine defun for update defun() API () https://github.com/euslisp/EusLisp/pull/116" > defun.h
 	echo "#undef defun" >> defun.h
@@ -180,28 +180,39 @@ $(LIBIRTEUSIMG): $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOB
 $(LIBIRTEUSGL): $(IRTEUSGLOBJS) $(IRTGLCOBJECTS) $(LIBNR)
 	$(LD) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSGL) $(IRTEUSGLOBJS) $(IRTGLCOBJECTS) $(IMPLIB)
 
-$(IRTEUSOBJS): $(INSTALLOBJDIR)/compile_irt.log
-$(IRTEUSOBJS) $(INSTALLOBJDIR)/compile_irt.log: $(IRTEUS_L)
+$(filter-out $(INSTALLOBJDIR)/pgsql.o $(INSTALLOBJDIR)/time.o,$(IRTEUSOBJS)): $(INSTALLOBJDIR)/%.o: %.l compile_irt.l
+	@[ compile_irt.l -nt $< ] && (set -x; rm -f $(IRTEUSOBJS)) || echo "if compile_irt.l is older then target, so do not remove existing target object"
 	$(BINDIR)/eus2$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irt.l > $(INSTALLOBJDIR)/compile_irt.log
 	-rm -f $(IRTEUS_C) $(IRTEUS_H)
+$(INSTALLOBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l
+	$(BINDIR)/eus2$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irt.l > $(INSTALLOBJDIR)/compile_irt.log
+	-rm -f $(INSTALLOBJDIR)/pgsql.c $(INSTALLOBJDIR)/pgsql.h
+$(INSTALLOBJDIR)/time.$(OSFX): $(EUSDIR)/lib/llib/time.l
+	$(BINDIR)/eus2$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irt.l > $(INSTALLOBJDIR)/compile_irt.log
+	-rm -f $(INSTALLOBJDIR)/time.c $(INSTALLOBJDIR)/time.h
 
-$(IRTEUSGOBJS): $(INSTALLOBJDIR)/compile_irtg.log
-$(IRTEUSGOBJS) $(INSTALLOBJDIR)/compile_irtg.log: $(IRTEUSG_L)
+
+$(IRTEUSGOBJS): $(INSTALLOBJDIR)/%.o: %.l compile_irtg.l
+	@[ compile_irtg.l -nt $< ] && (set -x; rm -f $(IRTEUSGOBJS)) || echo "if compile_irtg.l is older then target, so do not remove existing target object"
 	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l > $(INSTALLOBJDIR)/compile_irtg.log
 	-rm -f $(IRTEUSG_C) $(IRTEUSG_H)
 
-$(IRTEUSXOBJS): $(INSTALLOBJDIR)/compile_irtx.log
-$(IRTEUSXOBJS) $(INSTALLOBJDIR)/compile_irtx.log: $(IRTEUSX_L)
+$(IRTEUSXOBJS): $(INSTALLOBJDIR)/%.o: %.l compile_irtx.l
+	@[ compile_irtx.l -nt $< ] && (set -x; rm -f $(IRTEUSXOBJS)) || echo "if compile_irtx.l is older then target, so do not remove existing target object"
 	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtx.l > $(INSTALLOBJDIR)/compile_irtx.log
 	-rm -f $(IRTEUSX_C) $(IRTEUSX_H)
 
-$(IRTEUSIMGOBJS): $(INSTALLOBJDIR)/compile_irtimg.log
-$(IRTEUSIMGOBJS) $(INSTALLOBJDIR)/compile_irtimg.log: $(IRTEUSIMG_L)
+$(filter-out $(INSTALLOBJDIR)/eusjpeg.o,$(IRTEUSIMGOBJS)): $(INSTALLOBJDIR)/%.o: %.l compile_irtimg.l
+	@[ compile_irtimg.l -nt $< ] && (set -x; rm -f $(IRTEUSIMGOBJS)) || echo "if compile_irtimg.l is older then target, so do not remove existing target object"
 	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtimg.l > $(INSTALLOBJDIR)/compile_irtimg.log
 	-rm -f $(IRTEUSIMG_C) $(IRTEUSIMG_H)
+$(INSTALLOBJDIR)/eusjpeg.$(OSFX): $(EUSDIR)/lisp/image/jpeg/eusjpeg.l
+	$(BINDIR)/eusx$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtimg.l > $(INSTALLOBJDIR)/compile_irtimg.log
+	-rm -f $(INSTALLOBJDIR)/eusjpeg.c $(INSTALLOBJDIR)/eusjpeg.h
 
-$(IRTEUSGLOBJS): $(INSTALLOBJDIR)/compile_irtgl.log
-$(IRTEUSGLOBJS) $(INSTALLOBJDIR)/compile_irtgl.log: $(IRTEUSGL_L)
+
+$(IRTEUSGLOBJS): $(INSTALLOBJDIR)/%.o: %.l compile_irtgl.l
+	@[ compile_irtgl.l -nt $< ] && (set -x; rm -f $(IRTEUSGLOBJS)) || echo "if compile_irtgl.l is older then target, so do not remove existing target object"
 	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtgl.l > $(INSTALLOBJDIR)/compile_irtgl.log
 	-rm -f $(IRTEUSGL_C) $(IRTEUSGL_H)
 
@@ -240,34 +251,6 @@ clean:
 	if [ -w $(EUSDIR)/lisp/image/jpeg/ ]; then make -C $(EUSDIR)/lisp/image/jpeg/ clean; else echo "EUSDIR/lisp/image/jpeg/ is not writable"; fi
 	-rm -f $(EUSDIR)/lib/llib/pgsql.c $(EUSDIR)/lib/llib/pgsql.h
 	-rm -f $(EUSDIR)/lib/llib/time.c $(EUSDIR)/lib/llib/time.h
-
-$(INSTALLOBJDIR)/irtmath.$(OSFX): irtmath.l
-$(INSTALLOBJDIR)/irtutil.$(OSFX): irtutil.l
-$(INSTALLOBJDIR)/irtgraph.$(OSFX): irtgraph.l
-$(INSTALLOBJDIR)/irtgeo.$(OSFX): irtgeo.l
-$(INSTALLOBJDIR)/irtscene.$(OSFX): irtscene.l
-$(INSTALLOBJDIR)/irtmodel.$(OSFX): irtmodel.l
-$(INSTALLOBJDIR)/irtdyna.$(OSFX): irtdyna.l
-$(INSTALLOBJDIR)/irtcollada.$(OSFX): irtcollada.l
-$(INSTALLOBJDIR)/irtstl.$(OSFX): irtstl.l
-$(INSTALLOBJDIR)/irtwrl.$(OSFX): irtwrl.l
-$(INSTALLOBJDIR)/irtsensor.$(OSFX): irtsensor.l
-$(INSTALLOBJDIR)/irtpointcloud.$(OSFX): irtpointcloud.l
-$(INSTALLOBJDIR)/irtrobot.$(OSFX): irtrobot.l
-$(INSTALLOBJDIR)/irtbvh.$(OSFX): irtbvh.l
-$(INSTALLOBJDIR)/irtx.$(OSFX): irtx.l
-$(INSTALLOBJDIR)/irtgl.$(OSFX): irtgl.l
-$(INSTALLOBJDIR)/irtglrgb.$(OSFX): irtglrgb.l
-$(INSTALLOBJDIR)/irtviewer.$(OSFX): irtviewer.l
-$(INSTALLOBJDIR)/irtimage.$(OSFX): irtimage.l
-$(INSTALLOBJDIR)/irtcollision.$(OSFX): irtcollision.l
-$(INSTALLOBJDIR)/gnuplotlib.$(OSFX): gnuplotlib.l
-$(INSTALLOBJDIR)/pqp.$(OSFX): pqp.l
-$(INSTALLOBJDIR)/bullet.$(OSFX): bullet.l
-$(INSTALLOBJDIR)/png.$(OSFX): png.l
-$(INSTALLOBJDIR)/pgsql.$(OSFX): $(EUSDIR)/lib/llib/pgsql.l
-$(INSTALLOBJDIR)/time.$(OSFX): $(EUSDIR)/lib/llib/time.l
-$(INSTALLOBJDIR)/eusjpeg.$(OSFX): $(EUSDIR)/lisp/image/jpeg/eusjpeg.l
 
 $(INSTALLOBJDIR)/irtc.$(OSFX): irtc.c defun.h
 	$(CC) $(CFLAGS) $(WFLAGS) -c irtc.c $(OBJOPT)$(INSTALLOBJDIR)/irtc.$(OSFX)
