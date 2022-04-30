@@ -32,7 +32,9 @@
   (:init (host &key (clear t) ((:debug _debug)))
      "Initialize gnuplot interface object with given host name"
      (when (eq (unix:system "which gnuplot") 256)
-       (error "gnuplot is not installed. $ sudo apt-get install gnuplot"))
+       (setq strm t)
+       (warning-message 1 "gnuplot is not installed. $ sudo apt-get install gnuplot~%")
+       (return-from :init self))
 	 (setq strm 
 	       (cond
 		((string= (unix:gethostname) host)

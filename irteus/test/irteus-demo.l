@@ -3,7 +3,7 @@
 (init-unit-test)
 
 (load "irteus/demo/demo.l")
-(if (or (null x::*display*) (= x::*display* 0)) ;; aboid to show  (window-main-one nil) was called, but no display is found. message to reduce outputs in travis
+(if (and (boundp 'x::*display*) (or (null x::*display*) (= x::*display* 0))) ;; aboid to show  (window-main-one nil) was called, but no display is found. message to reduce outputs in travis
     (defun x::window-main-one (&rest args) ))
 (defmacro do-until-key (&rest forms) (with-gensyms (do-until-key-counter tm) `(progn (setq tm (instance mtimer :init)) (dotimes (do-until-key-counter 10) ,@forms))))
 

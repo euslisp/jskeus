@@ -16,6 +16,7 @@
     ret))
 
 ;;memory_leak_transparent
+#+:gl
 (deftest memory-leak-transparent
   (let (vmrss-orig vmrss)
     (setq *cubes* (make-cubes 5000))

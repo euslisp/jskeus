@@ -224,6 +224,7 @@
 (load "models/h4-robot.l")
 (load "models/h7-robot.l")
 
+#+:gl
 (deftest test-image-node ()
   (let ((g (instance graph))
         (node-h3 (instance node :name "h3"))

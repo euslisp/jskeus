@@ -11,6 +11,12 @@
   (assert (setq *img* (read-image-file *test-img-path*)) "failed to read-image-file pr2.png")
   (assert (> (send (send *img* :monochromize) :brightest-pixel) 0.0)
           "nothing is drawn in image")
+  )
+
+#+:gl
+(deftest gl-transpose-image ()
+  (setq *test-img-path* (format nil "~A/irteus/test/pr2.png" *eusdir*))
+  (setq *img* (read-image-file *test-img-path*))
   (setq *src-img* (copy-object *img*))
   (gl::transpose-image-rows *img*)
   (assert (not (string= (send *src-img* :entity) (send *img* :entity)))
