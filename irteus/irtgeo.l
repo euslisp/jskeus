@@ -930,6 +930,85 @@
      ))
   )
 
+;; 2022.04.30 move objects, make-irtviwer, irtviewer-dummy, make-irtviewer-dummy from irtviewer.l
+(in-package "USER")
+(defun objects (&optional (objs t) vw)
+  (when
+      (and objs (not (boundp '*irtviewer*)) (null vw))
+    (warn ";; (make-irtviewer) executed~%")
+    (make-irtviewer))
+  (if (null vw) (setq vw *irtviewer*))
+  (let (objects)
+  (if (eq objs t) (setq objects (send vw :objects))
+    (setq objects (send vw :objects objs)))
+  (send vw :look-all)
+  objects))
+
+
+(proclaim '(special *irtviewer*))
+;; make-irtviewer is re-defined in irtviwer.l to instantiate x::irtviewer
+(defun make-irtviewer (&rest args)
+  (warning-message 1 ";; call make-irtviewer from irteusg, which does not support X/GL~%")
+  (make-irtviewer-dummy)
+  *irtviewer*)
+
+(defclass viewer-dummy
+  :super propertied-object
+  :slots ())
+(defmethod viewer-dummy
+  (:nomethod (&rest args) t)
+  )
+
+(defclass irtviewer-dummy
+  :super propertied-object
+  :slots (objects draw-things))
+(defmethod irtviewer-dummy
+  (:objects (&rest args)
+   (when
+       args
+     (cond
+      ((null (car args))
+       (setq objects nil))
+      ((consp (car args))
+       (setq objects (car args)))
+      ((atom (car args))
+       (setq objects (append args objects)))
+      ))
+   (send-all objects :worldcoords)
+   (setq draw-things (x::draw-things objects))
+   objects)
+  (:nomethod (&rest args) t)
+  ) ;;
+
+(defun make-irtviewer-dummy (&rest args)
+  (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")
+  (setq *irtviewer* (instance irtviewer-dummy))
+  (setq *viewer* (instance viewer-dummy))
+  (setf (get *viewer* :pickviewer) *irtviewer*)
+  *irtviewer*)
+
+(in-package "X")
+;; 2022.04.30 move draw-things from irtviewer.l
+(defun draw-things (objs)
+  (cond
+   ((atom objs)
+    (cond
+     ((null objs) nil)
+     ((find-method objs :draw) (list objs))
+     ((find-method objs :bodies) (send objs :bodies))
+     (t (list objs))))
+   (t
+    (append (draw-things (car objs))
+	    (draw-things (cdr objs))))
+   ))
+
+(defun window-main-one (&rest args)) ;; define to call lisp code with (x::window-main-one) with irteusg, this function will be override in irtx.l
+
+(in-package "GL")
+(defun transparent (&rest args) ;; define to call lisp code with (gl::transparent) with irteusg, this function will be override in irtx.l
+  (warning-message 1 ";; call gl::transparent from irteusg, which does not support GL~%"))
+
+(in-package "GEOMETRY")
 
 (provide :irtgeo "$Id$")
 
