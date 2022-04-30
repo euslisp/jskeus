@@ -813,6 +813,124 @@
         (normalize-vector
 	 (float-vector w (elt vec 0) (elt vec 1) (elt vec 2)))))))
 
+;; 2022.04.30 move (defmethod polygon :draw-on, (defmethod line :draw-on (defmethod faceset :draw-on :set-color from irtgl.l
+(defmethod polygon
+  (:draw-on
+   (&key ((:viewer vwer) *viewer*)
+         flush (width 1) (color #f(1 1 1)))
+   (if flush (send vwer :viewsurface :makecurrent))
+   (let ((pwidth (send vwer :viewsurface :line-width))
+         (pcolor (send vwer :viewsurface :color))
+	 (v (float-vector 0 0 0)))
+     (send vwer :viewsurface :line-width width)
+     (send vwer :viewsurface :color color)
+     (send vwer :viewsurface :3d-lines (send self :vertices))
+     (send vwer :viewsurface :line-width pwidth)
+     (send vwer :viewsurface :color pcolor)
+     (if flush (send vwer :viewsurface :flush))
+     ))
+  )
+
+(defmethod line
+  (:draw-on
+   (&key ((:viewer vwer) *viewer*)
+         flush (width 1) (color #f(1 1 1)))
+   (if flush (send vwer :viewsurface :makecurrent))
+   (let ((pwidth (send vwer :viewsurface :line-width))
+         (pcolor (send vwer :viewsurface :color))
+	 (v (float-vector 0 0 0)))
+     (send vwer :viewsurface :line-width width)
+     (send vwer :viewsurface :color color)
+     (send vwer :viewsurface :3d-line pvert nvert)
+     (send vwer :viewsurface :line-width pwidth)
+     (send vwer :viewsurface :color pcolor)
+     (if flush (send vwer :viewsurface :flush))
+     ))
+  )
+
+;; 2022.04.30 define dummy (defmethod faceset :set-color, :paste-texture-to-face it will be defined in irtgl.l with opengl code
+;; 2022.04.30 move (defmethod faceset :draw-on, from irtgl.l
+(defmethod faceset
+  (:set-color (col &rest args) (setf (get self :face-color) col))
+  (:paste-texture-to-face
+   (&rest args)
+   (warning-message 1 ";; call :paste-texture-to-face ~A from irteusg, which does not support GL~%" args))
+  (:draw-on
+   (&key ((:viewer vwer) *viewer*)
+         flush (width 1) (color #f(1 1 1)))
+   (if flush (send vwer :viewsurface :makecurrent))
+   (let ((pwidth (send vwer :viewsurface :line-width))
+         (pcolor (send vwer :viewsurface :color)))
+     (send vwer :viewsurface :line-width width)
+     (send vwer :viewsurface :color color)
+     (dolist (f (send self :faces))
+       (send vwer :viewsurface :3d-lines (send f :vertices)))
+     (send vwer :viewsurface :line-width pwidth)
+     (send vwer :viewsurface :color pcolor)
+     (if flush (send vwer :viewsurface :flush))
+     ))
+  ;;
+  )
+
+;; 2022.04.30 move (defmethod coordinates :vertices :draw-on, (defmethod geo::float-vector :vertices :draw-on from irtgl.l
+(defmethod coordinates
+  (:vertices () (list (send self :worldpos)))
+  (:draw-on
+   (&key ((:viewer vwer) user::*viewer*)
+	 flush (width (get self :width)) (color (get self :color))
+	 (size (get self :size)))
+   (if flush (send vwer :viewsurface :makecurrent))
+   (let ((pwidth (send vwer :viewsurface :line-width))
+         (pcolor (send vwer :viewsurface :color))
+	 (v (float-vector 0 0 0)) v2)
+     (if (null width) (setq width 1))
+     (if (null color) (setq color #f(1 1 1)))
+     (if (null size) (setq size 50))
+     (setq v2 (float-vector (* 0.3 size) 0 (* 0.7 size)))
+     (send vwer :viewsurface :line-width width)
+     (send vwer :viewsurface :color color)
+     (dotimes (i 3)
+       (setf (elt v i) size)
+       (send vwer :viewsurface :3d-line
+	     (send self :worldpos)
+	     (send self :transform-vector v))
+       (setf (elt v i) 0))
+     (setf (elt v 2) size)
+     (send vwer :viewsurface :3d-line
+	   (send self :transform-vector v)
+	   (send self :transform-vector v2))
+     (setf (elt v2 1) (elt v2 0)  (elt v2 0) 0)
+     (send vwer :viewsurface :3d-line
+	   (send self :transform-vector v)
+	   (send self :transform-vector v2))
+     (send vwer :viewsurface :line-width pwidth)
+     (send vwer :viewsurface :color pcolor)
+     (if flush (send vwer :viewsurface :flush))
+     ))
+  )
+
+(defmethod geo::float-vector
+  (:vertices () (list self))
+  (:draw-on
+   (&key ((:viewer vwer) *viewer*)
+         flush (width 1) (color #f(1 1 1)) (size 50))
+   (if flush (send vwer :viewsurface :makecurrent))
+   (let ((pwidth (send vwer :viewsurface :line-width))
+         (pcolor (send vwer :viewsurface :color))
+	 (v (float-vector 0 0 0)))
+     (send vwer :viewsurface :line-width width)
+     (send vwer :viewsurface :color color)
+     (dotimes (i 3)
+       (setf (elt v i) size)
+       (send vwer :viewsurface :3d-line self (v+ self v))
+       (setf (elt v i) 0))
+     (send vwer :viewsurface :line-width pwidth)
+     (send vwer :viewsurface :color pcolor)
+     (if flush (send vwer :viewsurface :flush))
+     ))
+  )
+
+
 (provide :irtgeo "$Id$")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
