@@ -197,7 +197,7 @@ $(INSTALLOBJDIR)/time.$(OSFX): $(EUSDIR)/lib/llib/time.l
 
 $(IRTEUSGOBJS): $(INSTALLOBJDIR)/%.o: %.l compile_irtg.l
 	@[ compile_irtg.l -nt $< ] && (set -x; rm -f $(IRTEUSGOBJS)) || echo "if compile_irtg.l is older then target, so do not remove existing target object"
-	$(BINDIR)/eusgl$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l > $(INSTALLOBJDIR)/compile_irtg.log
+	$(BINDIR)/eusg$(ESFX) "(setq *objdir* \"$(INSTALLOBJDIR)/\")" < ./compile_irtg.l > $(INSTALLOBJDIR)/compile_irtg.log
 	-rm -f $(IRTEUSG_C) $(IRTEUSG_H)
 
 $(IRTEUSXOBJS): $(INSTALLOBJDIR)/%.o: %.l compile_irtx.l
