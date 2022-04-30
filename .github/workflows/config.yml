@@ -52,6 +52,56 @@ jobs:
           echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
           docker run --rm $QEMU_VOLUME -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "DOCKER_IMAGE=$DOCKER_IMAGE" -e "COLLISION_LIB=$COLLISION_LIB" -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"
 
+  # test for non X11/GL environment, i.e. embedded environment
+  linux-nox:
+    runs-on: ubuntu-latest
+    container: ubuntu:20.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Checkout eus (on support_nonx, git install x11 lib, so auto-remove it)
+        shell: bash
+        run: |
+          set -xe
+          apt update -y -qq && apt install -y -qq git
+          git clone --branch support_nonx https://github.com/euslisp/EusLisp eus
+          apt purge -y -qq git
+          apt autoremove -y -qq
+      - name: Setup environmnet
+        shell: bash
+        run: |
+          set -xe
+          apt update -y -qq && apt install -y -qq make gcc g++ libjpeg-dev libpng-dev
+          dpkg --get-selections | egrep -e '(x11|gl)' || echo "OK"   ## show selected X/GL
+          dpkg --get-selections | egrep -q -e '(x11|gl)' && exit 1   ## exit 1, when X/GL found
+          exit 0
+      - name: Compile eusg (on support_nonx)
+        shell: bash
+        run: |
+          set -xe
+          make bashrc.eus
+          source bashrc.eus
+          cd eus/lisp
+          ln -sf Makefile.$ARCHDIR Makefile
+          make eus0 eus1 eus2 eusg
+      - name: Compile irteusg
+        shell: bash
+        run: |
+          set -xe
+          source bashrc.eus
+          cd irteus
+          make irteusg
+      - name: Run test
+        shell: bash
+        run: |
+          # fix eus/models for irteusg
+          sed -i 's/(send x:\*root\* :size)/#f\(1000\)/' eus/models/irt-all-*.l
+          sed -i '/\(send self :def-gl-vertices\)/ s/^/;/' eus/models/*.l
+          sed -i '/\(send self :make-collision-model-for-links\)/ s/^/;/' eus/models/*.l
+          source bashrc.eus
+          export EXIT_STATUS=0; for test_l in irteus/test/*.l; do irteusg $test_l; export TMP_EXIT_STATUS=$?; export EXIT_STATUS=`expr $TMP_EXIT_STATUS + $EXIT_STATUS`; done; [ $EXIT_STATUS == 0 ] || exit 1
+
   doc:
     runs-on: ubuntu-latest
     timeout-minutes: 60
