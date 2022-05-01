@@ -102,6 +102,71 @@ jobs:
           source bashrc.eus
           export EXIT_STATUS=0; for test_l in irteus/test/*.l; do irteusg $test_l; export TMP_EXIT_STATUS=$?; export EXIT_STATUS=`expr $TMP_EXIT_STATUS + $EXIT_STATUS`; done; [ $EXIT_STATUS == 0 ] || exit 1
 
+  # test for cross sompile
+  linux-nox-crosscompile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Clone Euslisp and Setup environmnet
+        shell: bash
+        run: |
+          set -xe
+          git clone --branch support_nonx https://github.com/euslisp/EusLisp eus
+          sudo apt update -y -qq
+          # remove unused packages
+          sudo dpkg -r --force-depends nginx || echo "OK"
+          sudo apt purge -y -qq build-essential gcc-9 gcc-10 || echo "OK"
+          sudo apt purge -y -qq libldap-* || echo "OK"
+          sudo apt purge -y -qq libx11* x11* libgl1* libglx* || echo "OK"
+          sudo apt autoremove -y -qq || echo "OK"
+          # install deb environment
+          sudo apt install -y -qq make binutils-aarch64-linux-gnu gcc-aarch64-linux-gnu g++-aarch64-linux-gnu qemu-user-static
+          exit 0
+      - name: Check environmnet
+        shell: bash
+        run: |
+          set -xe
+          dpkg --get-selections | egrep -e '(cc|ld)' || echo "OK"   ## show selected X/GL
+          dpkg --get-selections | egrep -e '(libpq|jpeg|png)' || echo "OK"   ## show selected X/GL
+          dpkg --get-selections | egrep -e '(x11|gl)' || echo "OK"   ## show selected X/GL
+          #dpkg --get-selections | egrep -q -e '(x11|gl)' && exit 1   ## exit 1, when X/GL found
+          exit 0
+      - name: Compile irteusg
+        shell: bash
+        run: |
+          set -xe
+          export TOPDIR=$(pwd)
+          export EUSDIR=$(pwd)/eus
+          export ARCHDIR=LinuxARM
+          export PATH=$EUSDIR/$ARCHDIR/bin:$EUSDIR/$ARCHDIR/lib:$PATH
+          export LD_LIBRARY_PATH=$EUSDIR/$ARCHDIR/lib:$EUSDIR/$ARCHDIR/bin:$LD_LIBRARY_PATH
+          export CC=aarch64-linux-gnu-gcc
+          export LD=aarch64-linux-gnu-ld
+          export AR=aarch64-linux-gnu-ar
+          export CXX=aarch64-linux-gnu-g++
+          export QEMU_LD_PREFIX=/usr/aarch64-linux-gnu/
+          cd $EUSDIR/lisp
+          ln -sf Makefile.Linux Makefile
+          CC=$CC LD=$LD make eus0 eus1 eus2 eusg
+          (cd $EUSDIR//test; CXX=$CXX make)
+          cd $TOPDIR/irteus
+          ARCHDIR=$ARCHDIR CC=$CC LD=$LD AR=$AR CXX=$CXX make irteusg
+      - name: Run test
+        shell: bash
+        run: |
+          sed -i 's/(send x:\*root\* :size)/#f\(1000\)/' eus/models/irt-all-*.l
+          sed -i '/\(send self :def-gl-vertices\)/ s/^/;/' eus/models/*.l
+          sed -i '/\(send self :make-collision-model-for-links\)/ s/^/;/' eus/models/*.l
+          export EUSDIR=$(pwd)/eus
+          export ARCHDIR=LinuxARM
+          export PATH=$EUSDIR/$ARCHDIR/bin:$EUSDIR/$ARCHDIR/lib:$PATH
+          export LD_LIBRARY_PATH=$EUSDIR/$ARCHDIR/lib:$EUSDIR/$ARCHDIR/bin:$LD_LIBRARY_PATH
+          export QEMU_LD_PREFIX=/usr/aarch64-linux-gnu/
+          set -xe
+          export EXIT_STATUS=0; for test_l in irteus/test/*.l; do irteusg $test_l; export TMP_EXIT_STATUS=$?; export EXIT_STATUS=`expr $TMP_EXIT_STATUS + $EXIT_STATUS`; done; [ $EXIT_STATUS == 0 ] || exit 1
+
   # doc:
   #   runs-on: ubuntu-latest
   #   timeout-minutes: 60
