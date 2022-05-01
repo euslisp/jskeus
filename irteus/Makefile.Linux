@@ -41,9 +41,8 @@
 ### ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ###
 
-CC=gcc
-CXX=g++
-LD=g++ -shared
+CC  ?= gcc
+CXX ?= g++
 OBJOPT=-o
 OUTOPT=-o 
 OSFX=o
@@ -52,7 +51,7 @@ LPFX=lib
 ARCH=Linux
 ESFX=
 #SOFLAGS=-g -falign-functions=4 -Xlinker --export-all-symbols --unresolved-symbols=ignore-all
-SOFLAGS=-g -falign-functions=4 -Xlinker --unresolved-symbols=ignore-all
+SOFLAGS=-shared -g -falign-functions=4 -Xlinker --unresolved-symbols=ignore-all
 IMPLIB=-L$(EUSDIR)/$(ARCH)/lib -leusgeo -L$(INSTALLLIBDIR) -lnr
 IMPLIBGL=-L$(EUSDIR)/$(ARCH)/lib -leusgl -L/usr/X11R6/lib -lGLU -lGL -lXext
 IMPLIBIMG=-ljpeg -lpng
@@ -75,5 +74,4 @@ CXXFLAGS+=-g -falign-functions=4
 ifeq ($(shell /bin/uname -m), x86_64)
 CC += -m32
 CXX += -m32
-LD += -m32
 endif
