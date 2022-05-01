@@ -2,8 +2,8 @@ include Makefile.$(ARCHDIR)
 
 PQPDIR		= src
 
-CFLAGS		= -I. -I.. -D$(ARCHDIR)
-LDFLAGS		= -L. -L..
+CFLAGS		+= -I. -I.. -D$(ARCHDIR)
+LDFLAGS		+= -L. -L..
 
 .SUFFIXES: .cpp
 
@@ -29,13 +29,13 @@ library: $(ARCHDIR)/$(LPFX)PQP.$(LSFX) \
 	$(ARCHDIR)/$(LPFX)PQP-static.a
 
 $(ARCHDIR)/$(LPFX)PQP.$(LSFX): $(OBJECTS)
-	$(LD) $(SOFLAGS) $(OUTOPT)$(ARCHDIR)/$(LPFX)PQP.$(LSFX) $(OBJECTS)
+	$(CXX) $(SOFLAGS) $(OUTOPT)$(ARCHDIR)/$(LPFX)PQP.$(LSFX) $(OBJECTS)
 
 $(ARCHDIR)/$(LPFX)PQP-static.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 $(OBJECTS):
-	$(CC) $(CFLAGS) -DCOMPILE_LIB -c $(PQPDIR)/$(*F).cpp $(OBJOPT)$@
+	$(CXX) $(CFLAGS) -DCOMPILE_LIB -c $(PQPDIR)/$(*F).cpp $(OBJOPT)$@
 
 clean:
 	rm -f $(CLEAN)

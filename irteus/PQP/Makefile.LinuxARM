@@ -1,9 +1,8 @@
-CC = c++ -O2 -fPIC
+CXX ?= c++
+CFLAGS =  -O2 -fPIC
 OBJOPT = -o 
 OUTOPT = -o 
-LD = c++
 SOFLAGS = -shared
-EXELD = c++
 EXESFX = 
 LSFX = so
 LPFX = lib
