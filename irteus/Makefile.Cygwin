@@ -54,7 +54,12 @@ ESFX=.exe
 SOFLAGS=-shared -g -falign-functions=4 -Wl,--export-all-symbols
 IMPLIB=$(EUSDIR)/$(ARCH)/bin/eusgl.a $(EUSDIR)/$(ARCH)/lib/libnr.$(LSFX)
 IMPLIBGL=$(EUSDIR)/$(ARCH)/bin/eusgl.a -L/usr/X11R6/lib -lGLU -lGL -lXext
-IMPLIBIMG=-ljpeg -lpng
+ifeq ($(HAVE_JPEG), 1)
+  IMPLIBIMG+=-ljpeg
+endif
+ifeq ($(HAVE_PNG), 1)
+  IMPLIBIMG+=-lpng
+endif
 EXPLIB=
 RAPID=-LRAPID/$(ARCHDIR) -lRAPID-static
 RAPIDLIB=RAPID/$(ARCHDIR)/$(LPFX)RAPID-static.a

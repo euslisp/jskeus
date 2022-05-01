@@ -41,8 +41,6 @@
 ### ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ###
 
-include ./Makefile.$(ARCHDIR)
-
 # directory where this package install object file to
 IRTEUSDIR=$(EUSDIR)
 INSTALLBINDIR=$(IRTEUSDIR)/$(ARCHDIR)/bin
@@ -69,6 +67,14 @@ else
 endif
 $(info "--      HAVE_PQP = ${HAVE_PQP}")
 
+
+HAVE_JPEG=$(shell echo "\#include <stdio.h>\n\#include \"jpeglib.h\"\n\#include \"jconfig.h\"\n" > test-jpeg.c; $(CC) -c test-jpeg.c > /dev/null 2>&1 && echo 1 || echo 0)
+$(info "--      HAVE_JPEG = ${HAVE_JPEG}")
+HAVE_PNG=$(shell echo "\#include <png.h>\nint main(){png_create_read_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);;}\n" > test-png.c; $(CC) test-png.c -lpng > /dev/null 2>&1 && echo 1 || echo 0)
+$(info "--      HAVE_PNG = ${HAVE_PNG}")
+
+include ./Makefile.$(ARCHDIR)
+
 # common
 WFLAGS= #-Wall
 
@@ -94,7 +100,14 @@ EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 IRTEUS=irtmath irtutil irtgraph gnuplotlib pgsql time
 IRTEUSG=irtgeo pqp bullet irtcollision irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud irtstl irtwrl
 IRTEUSX=irtx
-IRTEUSIMG=irtimage eusjpeg png
+IRTEUSIMG=irtimage
+ifeq ($(HAVE_JPEG), 1)
+  IRTEUSIMG+=eusjpeg
+  JPEGMEMCD=$(INSTALLLIBDIR)/jpegmemcd.$(LSFX)
+endif
+ifeq ($(HAVE_PNG), 1)
+  IRTEUSIMG+=png
+endif
 IRTEUSGL=irtgl irtglrgb irtviewer
 NR=nr
 
@@ -149,7 +162,9 @@ IRTEUSGL_L=$(addsuffix .l,$(IRTEUSGL))
 
 IRTCOBJECTS=$(INSTALLOBJDIR)/irtc.$(OSFX) $(INSTALLOBJDIR)/irtgeoc.$(OSFX)
 IRTGCOBJECTS=$(INSTALLOBJDIR)/CPQP.$(OSFX) $(INSTALLOBJDIR)/euspqp.$(OSFX) $(INSTALLOBJDIR)/CBULLET.$(OSFX) $(INSTALLOBJDIR)/eusbullet.$(OSFX)
-IRTIMGCOBJECTS=$(INSTALLOBJDIR)/euspng.$(OSFX)
+ifeq ($(HAVE_PNG), 1)
+  IRTIMGCOBJECTS=$(INSTALLOBJDIR)/euspng.$(OSFX)
+endif
 IRTGLCOBJECTS=$(INSTALLOBJDIR)/irtglc.$(OSFX)
 NROBJECTS=$(INSTALLOBJDIR)/nr.$(OSFX)
 
@@ -177,7 +192,7 @@ $(LIBIRTEUSG): $(IRTEUSGOBJS) $(IRTGCOBJECTS) $(LIBNR) $(PQPLIBSTATIC)
 $(LIBIRTEUSX): $(IRTEUSXOBJS) $(LIBNR)
 	$(CXX) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSX) $(IRTEUSXOBJS) $(IMPLIB)
 
-$(LIBIRTEUSIMG): $(INSTALLLIBDIR)/jpegmemcd.$(LSFX) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(LIBNR)
+$(LIBIRTEUSIMG): $(JPEGMEMCD) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(LIBNR)
 	$(CXX) $(SOFLAGS) $(OUTOPT)$(LIBIRTEUSIMG) $(IRTEUSIMGOBJS) $(IRTIMGCOBJECTS) $(IMPLIB) $(IMPLIBIMG)
 
 $(LIBIRTEUSGL): $(IRTEUSGLOBJS) $(IRTGLCOBJECTS) $(LIBNR)

@@ -52,7 +52,12 @@ ESFX=
 SOFLAGS=-dynamiclib -flat_namespace -undefined suppress -g -falign-functions=8
 IMPLIB=-L$(EUSDIR)/$(ARCHDIR)/lib -leusgeo -L$(INSTALLLIBDIR) -lnr
 IMPLIBGL=-L$(EUSDIR)/$(ARCHDIR)/lib -leusgl -L/usr/X11R6/lib -lGLU -lGL -lXext
-IMPLIBIMG=-L/opt/local/lib/jpeg6b/lib -ljpeg -L/opt/local/lib -lpng
+ifeq ($(HAVE_JPEG), 1)
+  IMPLIBIMG+=-L/opt/local/lib/jpeg6b/lib -ljpeg
+endif
+ifeq ($(HAVE_PNG), 1)
+  IMPLIBIMG+=-L/opt/local/lib -lpng
+endif
 EXPLIB=
 RAPID=-LRAPID/$(ARCHDIR) -lRAPID-static
 RAPIDLIB=RAPID/$(ARCHDIR)/$(LPFX)RAPID-static.a
