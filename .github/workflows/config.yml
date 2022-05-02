@@ -165,7 +165,7 @@ jobs:
           export LD_LIBRARY_PATH=$EUSDIR/$ARCHDIR/lib:$EUSDIR/$ARCHDIR/bin:$LD_LIBRARY_PATH
           export QEMU_LD_PREFIX=/usr/aarch64-linux-gnu/
           set -xe
-          export EXIT_STATUS=0; for test_l in irteus/test/*.l; do irteusg $test_l; export TMP_EXIT_STATUS=$?; export EXIT_STATUS=`expr $TMP_EXIT_STATUS + $EXIT_STATUS`; done; [ $EXIT_STATUS == 0 ] || exit 1
+          export EXIT_STATUS=0; for test_l in irteus/test/*.l; do [[ $test_l =~ all-robots-objects.l|irteus-demo.l|matrix.l|rendering.l|test-collision.l|test-irt-motion.l ]] && continue; irteusg $test_l; export TMP_EXIT_STATUS=$?; export EXIT_STATUS=`expr $TMP_EXIT_STATUS + $EXIT_STATUS`; done; [ $EXIT_STATUS == 0 ] || exit 1
 
   # doc:
   #   runs-on: ubuntu-latest
