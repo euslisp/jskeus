@@ -88,7 +88,10 @@ endif
 MODULES.L=irt_modules.l
 EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 
-IRTEUS=irtmath irtutil irtgraph gnuplotlib pgsql time
+IRTEUS=irtmath irtutil irtgraph gnuplotlib time
+ifneq (,$(wildcard /usr/lib/$(shell $(CC) -dumpmachine)/libpq.so)) # if /usr/lib/x86_64-linux-gnu/libpq.so exists, use pgsql
+IRTEUS+=pgsql
+endif
 IRTEUSG=irtgeo pqp bullet irtcollision irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud irtstl irtwrl
 IRTEUSX=irtx
 IRTEUSIMG=irtimage
