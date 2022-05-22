@@ -162,7 +162,15 @@ endif
 IRTGLCOBJECTS=$(INSTALLOBJDIR)/irtglc.$(OSFX)
 NROBJECTS=$(INSTALLOBJDIR)/nr.$(OSFX)
 
-all: irteusg irteusx irteusgl
+ifneq (,$(wildcard $(BINDIR)/eusgl))
+	IRTEUS_COMPILE_TARGET=irteusg irteusx irteusgl
+else ifneq (,$(wildcard $(BINDIR)/eusx))
+	IRTEUS_COMPILE_TARGET=irteusg irteusx
+else
+	IRTEUS_COMPILE_TARGET=irteusg
+endif
+$(info "Compile irteus with ${IRTEUS_COMPILE_TARGET}")
+all: ${IRTEUS_COMPILE_TARGET}
 
 irteusg: $(INSTALLBINDIR)/irteusg$(ESFX)
 irteusx: $(INSTALLBINDIR)/irteusx$(ESFX)
