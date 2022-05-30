@@ -88,6 +88,8 @@ ifeq ($(HAVE_BULLET), 1)
   BULLETLIB=`pkg-config bullet --libs`
 endif
 
+PNG_CFLAGS=`pkg-config libpng --cflags`
+
 MODULES.L=irt_modules.l
 EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 
@@ -284,7 +286,7 @@ $(INSTALLOBJDIR)/CBULLET.$(OSFX): CBULLET.cpp defun.h
 $(INSTALLOBJDIR)/eusbullet.$(OSFX): eusbullet.c defun.h
 	$(CC) $(CFLAGS) $(WFLAGS) $(BULLETCFLAGS) -c eusbullet.c $(OBJOPT)$(INSTALLOBJDIR)/eusbullet.$(OSFX)
 $(INSTALLOBJDIR)/euspng.$(OSFX): euspng.c defun.h
-	$(CC) $(CFLAGS) $(WFLAGS) -c euspng.c $(OBJOPT)$(INSTALLOBJDIR)/euspng.$(OSFX)
+	$(CC) $(PNG_CFLAGS) $(CFLAGS) $(WFLAGS) -c euspng.c $(OBJOPT)$(INSTALLOBJDIR)/euspng.$(OSFX)
 $(INSTALLOBJDIR)/nr.$(OSFX): nr.c defun.h
 	$(CC) $(CFLAGS) $(WFLAGS) -c nr.c $(OBJOPT)$(INSTALLOBJDIR)/nr.$(OSFX)
 
