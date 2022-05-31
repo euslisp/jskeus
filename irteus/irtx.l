@@ -88,7 +88,7 @@
     (setq pname "/usr/X11R6/bin/cygX11-6.dll"))
 
   ;; for receiving Window Manager Messages
-  (if (probe-file pname)
+  (if (and pname (probe-file pname))
       (setq x-lib (load-foreign pname))
     (setq x-lib (sys::sysmod)))
   (defforeign SetWMProtocols x-lib "XSetWMProtocols" () :integer))

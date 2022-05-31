@@ -52,6 +52,76 @@ jobs:
   #         echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
   #         docker run --rm $QEMU_VOLUME -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "DOCKER_IMAGE=$DOCKER_IMAGE" -e "COLLISION_LIB=$COLLISION_LIB" -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"
 
+
+  catkin:
+    runs-on: ubuntu-18.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Apt
+        run: |
+          echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y lsb-release wget gnupg2  # necessary for catkin-pkg to be installable
+          sudo apt-get install -qq -y dpkg  # necessary for catkin-pkg to be installable
+          echo "Testing branch $GITHUB_REF of $GITHUB_REPOSITORY"
+          sudo sh -c 'echo "deb http://packages.ros.org/ros-shadow-fixed/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
+          wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y python-catkin-tools python-rosdep
+          sudo apt-get install -qq -y build-essential git ros-melodic-rosbash ros-melodic-rospack
+      - name: Setup Src
+        shell: bash
+        run: |
+          export CI_SOURCE_PATH=$(pwd)
+          mkdir -p ~/catkin_ws/src
+          cd ~/catkin_ws/src
+          # checkout euslisp
+          git clone --depth 1 https://github.com/tork-a/euslisp-release euslisp
+          for file in CMakeLists.txt cmake/euslisp-extras.cmake.in env-hooks/99.euslisp.sh.in; do
+              wget https://raw.githubusercontent.com/tork-a/euslisp-release/master/patches/${file} -O euslisp/${file}
+          done
+          wget https://raw.githubusercontent.com/tork-a/euslisp-release/release/melodic/euslisp/package.xml -O euslisp/package.xml
+          # checkout jskeus
+          cp -r ${CI_SOURCE_PATH} ./jskeus
+          wget https://raw.githubusercontent.com/tork-a/jskeus-release/release/melodic/jskeus/package.xml -O jskeus/package.xml
+          wget https://raw.githubusercontent.com/tork-a/jskeus-release/master/patches/CMakeLists.txt -O jskeus/CMakeLists.txt
+          # rosdep install
+          cd ..
+          sudo rosdep init
+          rosdep update
+          rosdep install -y -r --rosdistro melodic --from-paths src --ignore-src
+      - name: Build
+        shell: bash
+        run: |
+          source /opt/ros/melodic/setup.bash
+          cd ~/catkin_ws
+          catkin build -v -i --make-args VERBOSE=1
+      - name: Test
+        shell: bash
+        run: |
+          cd ~/catkin_ws
+          ls -al devel
+          source devel/setup.bash
+          env
+          cd devel/share/euslisp
+          find jskeus/irteus/test -iname "*.l" | grep -v unittest.l | xargs -n1 irteusgl
+      - name: Cleanup
+        shell: bash
+        run: |
+          source /opt/ros/melodic/setup.bash
+          cd ~/catkin_ws
+          catkin clean --yes
+      - name: Build Install
+        shell: bash
+        run: |
+          source /opt/ros/melodic/setup.bash
+          cd ~/catkin_ws
+          catkin config --install
+          catkin build -v -i --make-args VERBOSE=1
+
   # test for non X11/GL environment, i.e. embedded environment
   linux-nox:
     runs-on: ubuntu-latest
