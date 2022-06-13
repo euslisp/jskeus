@@ -494,6 +494,7 @@ Args:
 
 (defmethod graph-search-solver
   (:solve-init (prblm)
+    (send self :clear-open-list)
     (setq close-list nil)
     (send self :add-to-open-list
           (instance solver-node :init (send prblm :start-state) :cost 0)))
