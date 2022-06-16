@@ -500,8 +500,9 @@ Args:
           (instance solver-node :init (send prblm :start-state) :cost 0)))
   (:find-node-in-close-list (n)
     (find (send n :state) close-list))
-  (:solve (prblm &key (verbose nil))
-    (send self :solve-init prblm)
+  (:solve (prblm &key (verbose nil) (resume nil))
+    (unless resume
+      (send self :solve-init prblm))
     (while (not (send self :null-open-list?))
 ;;;       (if verbose
 ;;;           (warn "current open-list num -> ~A -- ~A --~%"
@@ -523,8 +524,6 @@ Args:
               )))
     (warn "open-list is nil... -- ~A --~%" :solve)
     (warn "search was missed!! -- ~A --~%" :solve)
-    (send self :clear-open-list)
-    (setq close-list nil)
     nil)
   ;; open-list functions
   (:add-to-open-list (obj/list)
