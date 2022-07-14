@@ -351,7 +351,22 @@ Args:
          ;; fname finished with '.pdf', remove it
          (setq fname (subseq str 0 (1- (length str))))
          )))
-   (send self :write-to-file fname result-path title))
+   (send self :write-to-file fname result-path title "pdf"))
+  (:write-to-png (fname &optional result-path
+                        (title (string-right-trim ".png" fname)))
+   "write graph structure to png
+Args:
+  fname: filename for output
+  result-path: list of solver-node, it's result of (send solver :solve graph)
+  title: title of graph
+"
+   (when (substringp ".png" fname)
+     (let ((str (string-right-trim "png" fname)))
+       (when (= (elt str (1- (length str))) #\.)
+         ;; fname finished with '.png', remove it
+         (setq fname (subseq str 0 (1- (length str))))
+         )))
+   (send self :write-to-file fname result-path title "png"))
   (:original-draw-mode ()
    "change draw-mode to original mode"
    (send self :draw-both-arc nil)
