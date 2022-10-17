@@ -264,9 +264,7 @@
    position-list: list of control point
    time-list: list of time from start for each control point, time in first contrall point is zero, so length of this list is length of control point minus 1"
    (setq position-list pl)
-   (setq time-list tl)
-   (dotimes (i (length time-list))
-     (setf (elt time-list i) (float (elt time-list i))))  ;; to use compiled eps> properly (see https://github.com/euslisp/EusLisp/issues/406)
+   (setq time-list (mapcar #'float tl))  ;; float conversion is for compiled eps> (see https://github.com/euslisp/EusLisp/issues/406)
    (if (/= (length position-list) (1+ (length time-list)))
        (warning-message 1 "length of position-list must be length of time-list + 1"))
    (setq time 0.0)
