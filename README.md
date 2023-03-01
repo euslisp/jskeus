@@ -2,7 +2,6 @@
 
 [![Join the chat at https://gitter.im/euslisp/jskeus](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/euslisp/jskeus?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-
 This repository contains software developed and used by [JSK](http://www.jsk.t.u-tokyo.ac.jp) at The University of Tokyo.
 
 ## 1. Getting started
@@ -12,18 +11,22 @@ This repository contains software developed and used by [JSK](http://www.jsk.t.u
 #### 1.1.1 Setup ROS repository
 
 Please set `ROS_DISTRO` environment variable to your ROS distro. For example, if you use 18.04, run `export ROS_DISTRO=melodic`.
+
 ```
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
 wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
 echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
 sudo apt-get update
 ```
+
 #### 1.1.2 Install Euslisp
+
 ```
 sudo apt-get install ros-$ROS_DISTRO-euslisp
 ```
 
 ### 1.2 Install via Homebrew (OSX)
+
 ```
 brew install euslisp/jskeus/jskeus
 ```
@@ -31,11 +34,12 @@ brew install euslisp/jskeus/jskeus
 ## 2 Playing with Demo programs
 
 ### 2.1 Motion generation
+
 ```
 $ irteusgl irteus/demo/demo.l
 ```
-and type any command, such as '(crank-motion)' or '(dual-arm-ik)'
 
+and type any command, such as '(crank-motion)' or '(dual-arm-ik)'
 
 [![full-body-ik](images/Full-body-ik.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/full-body-ik.l)
 [![dual-arm-ik](images/Dual-arm-ik.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/dual-arm-ik.l)
@@ -47,14 +51,17 @@ and type any command, such as '(crank-motion)' or '(dual-arm-ik)'
 [![null-space-ik](images/Null-space-ik.png)](https://github.com/euslisp/jskeus/blob/master/irteus/demo/null-space-ik.l)
 
 ### 2.2 Robots and objects models
+
 ```
 $ irteusgl models/irt-all-robots.l "(make-all-robots)"
 ```
+
 ![all robots](images/irt-all-robots.png)
 
 ```
 $ irteusgl models/irt-all-objects.l "(make-all-objects)"
 ```
+
 ![all objects](images/irt-all-objects.png)
 
 ## 3 Getting started for ROS and PR2 users
@@ -64,12 +71,14 @@ $ irteusgl models/irt-all-objects.l "(make-all-objects)"
 #### 3.1.1 Setup ROS repository
 
 You can skip this procedure if you have already setup your ROS system
+
 ```
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
 wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
 echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
 sudo apt-get update
 ```
+
 #### 3.1.2 Install pr2/euslisp programs
 
 ```
@@ -79,6 +88,7 @@ sudo apt-get install ros-$ROS_DISTRO-pr2eus
 ### 3.3 Running demo programs
 
 #### 3.3.1 Visualization of pr2 robot
+
 ```
 $ rosrun euscollada pr2.sh
 ```
@@ -97,7 +107,8 @@ $ roslaunch ./pr2-read-state.launch
 $ roslaunch ./pr2-send-joints.launch
 ```
 
-You can use our script to set  `ROS_MASTER_URI` and `ROS_IP`
+You can use our script to set `ROS_MASTER_URI` and `ROS_IP`
+
 ```
 $ source `rospack find jsk_tools`/src/bashrc.ros
 $ rossetrobot pr1012.jsk.com # change to your environment
@@ -107,32 +118,35 @@ $ rossetip
 
 ![./pr2-read-state.launch](images/Pr2-read-state.png)
 
-
 Have a look at roseus package in http://github.com/jsk-ros-pkg repository for ROS client library for euslisp
 
 ### 3.4 Support and Trouble Shooting
-
 
 Open an issue on our [issue tracker](https://github.com/euslisp/jskeus/issues) if something doesn't work as expected, or if you want new features implemented.
 
 Use the [pull requests](https://github.com/euslisp/jskeus/pulls) system to send us solutions for the issues so we can implement them in this repository.
 
-### 3.5 Online Documents (Currently only Japanese is available)
+### 3.5 Online Documents
 
 See online [manual](http://euslisp.github.io/jskeus/)
 
-PDF files are also available from [here](https://github.com/euslisp/jskeus/raw/master/doc/jmanual.pdf)
+PDF files are also available below:
 
-### 3.6 Install euslisp from source code  (EXPERTS ONLY)
+- [日本語](https://github.com/euslisp/jskeus/raw/master/doc/jmanual.pdf)
+- [english](https://github.com/euslisp/jskeus/raw/master/doc/manual.pdf)
+
+### 3.6 Install euslisp from source code (EXPERTS ONLY)
 
 #### 3.6.1 Installing dependent libraries
 
 For Ubuntu users:
+
 ```
 $ sudo apt-get install git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi gsfonts-x11 texlive-fonts-extra xfonts-100dpi-transcoded xfonts-75dpi-transcoded msttcorefonts pkg-config libbullet-dev
 ```
 
 For Mac OSX users using Homebrew:
+
 ```
 $ brew install jpeg libpng mesalib-glw wget bullet
 ```
@@ -144,14 +158,16 @@ Also for Mac OSX lion (or older) users it's better to install the latest XQuartz
 
 (If XQuartz is older than 2.7.3, the installation of EusLisp will fail. You should install the latest XQuartz.)
 
-
 For Raspberry Pi users using debian(Raspbian "wheezy"):
+
 ```
 $ sudo apt-get install git gcc g++ libjpeg62-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng12-dev xfonts-100dpi xfonts-75dpi
 ## additional install for using OpenGL on raspberry pi
 $ sudo apt-get install libgl1-mesa-dri xserver-xorg-video-vesa xutils
 ```
+
 For Cygwin(only works with 32bit systems)
+
 ```
 Packages listed below should be intalled using setup.exe.
 
@@ -165,6 +181,7 @@ bitmap fonts (all bitmap font packages -75dpi, -100dpi, -misc )
 ```
 
 #### 3.6.2 Downloading and building EusLisp
+
 ```
 $ git clone http://github.com/euslisp/jskeus jskeus
 $ cd jskeus
@@ -173,7 +190,7 @@ you will see instructions to add EUSDIR, ARCHDIR, PATH, LD_LIBRARY_PATH environm
 $ echo "source ~/bashrc.eus" >> ~/.bashrc
 ```
 
-#### 3.6.3  Install ROS and jsk-ros-pkg repository
+#### 3.6.3 Install ROS and jsk-ros-pkg repository
 
 See http://wiki.ros.org/$ROS_DISTRO/Installation/Source for more details
 

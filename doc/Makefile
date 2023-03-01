@@ -18,6 +18,9 @@ copy_eus_tex:
 	cp ../eus/doc/jlatex/*.tex ${TMPDIR}
 	cp ../eus/doc/jlatex/*.sty ${TMPDIR}
 	cp -r ../eus/doc/jlatex/fig/* ./fig/* ${TMPDIR}/fig/
+	cp ../eus/doc/latex/*.tex ${TMPDIR}
+	cp ../eus/doc/latex/*.sty ${TMPDIR}
+	cp -r ../eus/doc/latex/fig/* ./fig/* ${TMPDIR}/fig/
 	(cd ${TMPDIR};for x in fig/*.ps;  do ps2ps $$x $$x.new; mv $$x.new $$x; done) ### ???? we need to run ps2ps to pass gs??
 	(cd ${TMPDIR};for x in fig/*.jpg; do extractbb $$x; done) # workaround for https://github.com/backtracking/bibtex2html/issues/9
 	cp *.tex ${TMPDIR}
@@ -34,14 +37,19 @@ current.tex:
 
 toc: copy_eus_tex current.tex
 	(cd ${TMPDIR}; makeindex jmanual.tex)
+	(cd ${TMPDIR}; makeindex manual.tex)
+
 
 dvi: toc
 	(cd ${TMPDIR}; platex jmanual.tex)
 	(cd ${TMPDIR}; platex jmanual.tex)
+	(cd ${TMPDIR}; platex manual.tex)
+	(cd ${TMPDIR}; platex manual.tex)
 	cp ${TMPDIR}/*.dvi .
 
 pdf: dvi
 	(cd ${TMPDIR}; dvipdfmx jmanual.dvi)
+	(cd ${TMPDIR}; dvipdfmx manual.dvi)
 	cp ${TMPDIR}/*.pdf .
 
 
@@ -54,7 +62,9 @@ distclean: clean
 html: dvi
 	mkdir -p ${TMPDIR}/html
 	(cd ${TMPDIR}; TRANSPARENT_COLOR="#ffffff" charset="UTF-8" latex2html -dir ${TMPDIR}/html -local_icons -split +3 -auto_prefix -init_file ${PWD}/../eus/doc/latex/.latex2html-init -iso_language JP -address "This document was generated using the LaTeX2HTML translator on `date` from <a href=\"http://github.com/euslisp/jskeus.git\">jskeus</a> version <a href=\"http://github.com/euslisp/jskeus/commit/`git -C ${PWD} rev-parse --verify HEAD`\">`git log -1  --oneline`</a>" -html_version="4.0,unicode" jmanual)
+	(cd ${TMPDIR}; TRANSPARENT_COLOR="#ffffff" charset="UTF-8" latex2html -dir ${TMPDIR}/html -local_icons -split +3 -auto_prefix -init_file ${PWD}/../eus/doc/latex/.latex2html-init -iso_language JP -address "This document was generated using the LaTeX2HTML translator on `date` from <a href=\"http://github.com/euslisp/jskeus.git\">jskeus</a> version <a href=\"http://github.com/euslisp/jskeus/commit/`git -C ${PWD} rev-parse --verify HEAD`\">`git log -1  --oneline`</a>" -html_version="4.0,unicode" manual)
 	(cd ${TMPDIR}/html; for imgfile in jmanual-img*.png; do pngtopnm $$imgfile > /tmp/$$imgfile.pnm; pnmtopng -transparent white /tmp/$$imgfile.pnm > $$imgfile || echo "Failed to convert $$imgfile"; done)
+	(cd ${TMPDIR}/html; for imgfile in manual-img*.png; do pngtopnm $$imgfile > /tmp/$$imgfile.pnm; pnmtopng -transparent white /tmp/$$imgfile.pnm > $$imgfile || echo "Failed to convert $$imgfile"; done)
 	(cd ${TMPDIR}/html; sed -i 's@</TITLE>@</TITLE>\n<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">@' j*.html index.html)
 	cp -r ${TMPDIR}/html ./
 
@@ -75,6 +85,11 @@ rst: current.tex copy_eus_tex latex.py
 	   name=`basename $$file .ps`; \
 	   echo \"Converting $$name.ps to $$name.png\";  ### ???? we need to run ps2ps to pass gs?? does not happy with pstopnm \
 	   pstopnm -stdout ../eus/doc/jlatex/fig/$$name.ps | pnmflip -rotate270 | pnmtopng - > fig/$$name.png; \
+	done
+	for file in ../eus/doc/latex/fig/*.ps; do \
+	   name=`basename $$file .ps`; \
+	   echo \"Converting $$name.ps to $$name.png\";  ### ???? we need to run ps2ps to pass gs?? does not happy with pstopnm \
+	   pstopnm -stdout ../eus/doc/latex/fig/$$name.ps | pnmflip -rotate270 | pnmtopng - > fig/$$name.png; \
 	done
 	cp jmanual.tex /tmp/jmanual.tex
 	sed -i 's@\\input{\(.*\)}@..include:: \1\n@g' /tmp/jmanual.tex     ### convert \input in tex to bypass pandoc EXCEPT current
