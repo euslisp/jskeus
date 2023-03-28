@@ -61,14 +61,14 @@
    (t (warn ";; Could not find file ~A~%" fname)
       (return-from read-image-file nil))))
 
-(defun write-image-file (fname img)
+(defun write-image-file (fname img &optional background)
   "write img to given fname"
   (cond
    ((or (string= (pathname-type fname) "jpg")
         (string= (pathname-type fname) "jpeg"))
     (write-jpeg-file fname img))
    ((string= (pathname-type fname) "png")
-    (write-png-file fname img))
+    (write-png-file fname img background))
    (t
     (write-pnm-file fname img))))
 
