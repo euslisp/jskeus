@@ -140,16 +140,46 @@ pointer PNG_WRITE_IMAGE(register context *ctx, int n, register pointer *argv)
   char *file_name;
   png_bytep image_ptr;
   int width, height, channels;
-  ckarg(5);
+  pointer bg;
+  ckarg2(5,6);
   if (isstring(argv[0])) file_name = (char *)(argv[0]->c.str.chars);
   else error(E_NOSTRING);
   width  = ckintval(argv[1]);
   height = ckintval(argv[2]);
   channels  = ckintval(argv[3]);
-  image_ptr = (png_bytep)(argv[4]->c.str.chars);
+
+  if (n==6 && argv[5]!=NIL) {  /* set background color */
+    bg = argv[5];
+    if (!isfltvector(bg)) error(E_NOVECTOR);
+    if (3!=vecsize(bg)) error(E_VECSIZE);
+  }else{
+    bg=NIL;
+  }
+
+  if(bg==NIL) {
+    image_ptr = (png_bytep)(argv[4]->c.str.chars);
+  } else {
+    int x, y;
+    png_byte bg_r=bg->c.fvec.fv[0]*255, bg_g=bg->c.fvec.fv[1]*255, bg_b=bg->c.fvec.fv[2]*255;
+    image_ptr = malloc(width*height*4);
+    for(y = 0; y < height; y++) {
+      for(x = 0; x < width; x++) {
+        png_byte r, g, b;
+        r = ((png_bytep)(argv[4]->c.str.chars))[(y*width+x)*3+0];
+        g = ((png_bytep)(argv[4]->c.str.chars))[(y*width+x)*3+1];
+        b = ((png_bytep)(argv[4]->c.str.chars))[(y*width+x)*3+2];
+        image_ptr[(y*width+x)*4+0] = r;
+        image_ptr[(y*width+x)*4+1] = g;
+        image_ptr[(y*width+x)*4+2] = b;
+        image_ptr[(y*width+x)*4+3] = ((r==bg_r)&&(g==bg_g)&&(b==bg_b))?0:255;
+      }
+    }
+  }
+
   FILE *fp = fopen(file_name, "wb");
   if (!fp) {
     error(E_OPENFILE);
+    if(bg!=NIL) {free(image_ptr);}
     return(NIL);
   }
 
@@ -161,12 +191,13 @@ pointer PNG_WRITE_IMAGE(register context *ctx, int n, register pointer *argv)
   if (setjmp(png_jmpbuf(png_ptr))) {
     png_destroy_write_struct(&png_ptr, &info_ptr);
     fclose(fp);
+    if(bg!=NIL) {free(image_ptr);}
     error(E_EOF);
     return(NIL);
   }
 
   png_init_io(png_ptr, fp);
-  png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB, //GRAY
+  png_set_IHDR(png_ptr, info_ptr, width, height, 8, (bg==NIL)?PNG_COLOR_TYPE_RGB:PNG_COLOR_TYPE_RGB_ALPHA, //GRAY
                PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
   png_bytep * row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * height);
   int y, byte_per_scanline = png_get_rowbytes(png_ptr, info_ptr);
@@ -183,6 +214,7 @@ pointer PNG_WRITE_IMAGE(register context *ctx, int n, register pointer *argv)
 
   fclose(fp);
 
+  if(bg!=NIL) {free(image_ptr);}
   return (T);
 }
 
