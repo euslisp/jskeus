@@ -1108,10 +1108,14 @@
 
 ;;;(eval-when (eval) (format t ";; loaded kdraw.l~%"))
 ;;;(eval-when (load) (format t ";; loaded kdraw.o~%"))
-(in-package "USER")
-(defun irtdraw-save (&key (fname (format nil "~A.eps" (send *robot* :name)))
-		     (y 300) (bodies (send *robot* :bodies)))
-  (hid2 bodies (send *irtviewer* :viewer))
+;;; (in-package "USER")
+
+(export '(irtdraw-save))
+
+(defun irtdraw-save (&key (fname (format nil "~A.eps" (send user::*robot* :name)))
+                       (y 300) (bodies (send user::*robot* :bodies)))
+  (let (p1)
+  (hid2 bodies (send user::*irtviewer* :viewer))
   (geo::open-kdraw-file fname)
   ;;(dolist (ei *hid*)
   ;;(send *viewer* :draw-edge-image ei t))
@@ -1119,8 +1123,8 @@
   (dolist (ei *hid*)
     (dolist (v (send ei :visible-segments))
       ;;(send *viewer* :draw-line-ndc (car v) (cadr v) nil (send ei :color))
-      (setq p1 (send (*viewer* . geo::port) :ndc-line-to-screen (car v) (cadr v) t))
-      ;;(if p1 (send (*viewer* . geo::surface) :draw-line (car p1) (cadr p1)))
+      (setq p1 (send (user::*viewer* . geo::port) :ndc-line-to-screen (car v) (cadr v) t))
+      ;;(if p1 (send (user::*viewer* . geo::surface) :draw-line (car p1) (cadr p1)))
       ;;(if p1 (format t ";; ~A ~A ~%" (car p1) (cadr p1)))
       (geo::kdraw-line (float-vector (elt (car p1) 0) (- y (elt (car p1) 1)))
 		       (float-vector (elt (cadr p1) 0) (- y (elt (cadr p1) 1))))
@@ -1131,7 +1135,7 @@
   (scale scale (v+ #f(1 0 0) (ei . geo::nvert2))))
   |#
   (geo::close-kdraw-file)
-  )
+  ))
 ;;
 
 #|
