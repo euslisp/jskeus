@@ -267,6 +267,10 @@
     ;; write graph to pdf file
     (warning-message 2 "write to /tmp/robots_in_jsk.pdf~%")
     (send g :write-to-pdf "/tmp/robots_in_jsk.pdf" nil "robots_in_jsk")
+
+    ;; write graph to png file
+    (warning-message 2 "write to /tmp/robots_in_jsk.png~%")
+    (send g :write-to-png "/tmp/robots_in_jsk.png" nil "robots_in_jsk")
     g))
 
 (eval-when (load eval)

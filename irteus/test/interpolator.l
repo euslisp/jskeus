@@ -239,6 +239,15 @@
         ))
     ))
 
+;; https://github.com/euslisp/jskeus/pull/625
+(defun test-interpolators-625
+  (&optional (ip-class linear-interpolator))
+  (let ((ip (instance ip-class :init)))
+    (send ip :reset :position-list (list #f(1 2 3) #f(3 4 5) #f(1 2 3)) :time-list (list 1000 1800))
+    (send ip :start-interpolation)
+    (send ip :pass-time 200)
+    (assert (send ip :interpolatingp))))
+
 (deftest test-linear-interpolator ()
   (let ((res (test-interpolators linear-interpolator)))))
 
@@ -256,6 +265,12 @@
 
 (deftest test-minjerk-absolute-interpolator-457-0005 ()
   (let ((res (test-interpolators-457 minjerk-interpolator 0.0005)))))
+
+(deftest test-linear-interpolator-625 ()
+  (let ((res (test-interpolators-625 linear-interpolator)))))
+
+(deftest test-minjerk-interpolator-625 ()
+  (let ((res (test-interpolators-625 minjerk-interpolator)))))
 
 
 #|
