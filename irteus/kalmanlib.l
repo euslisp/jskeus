@@ -187,6 +187,9 @@
         (f (format nil "data_~a.dat" suffix) :direction :output)
       (dotimes (i (length x))
         (format f "~A ~A~%" (elt x i) (elt y i))))
+    ;; online gnuplotting
+    (if (not (boundp '*g*))
+        (send *g* :proc-length (length x)))
 
     ;; write estimated data
     (with-open-file
@@ -197,23 +200,24 @@
            (setq z (send kf :proc (float-vector (elt x i) (elt y i)) :adaptive t)))
           (t
            (setq z (send kf :proc (float-vector (elt x i) (elt y i))))))
+        ;; online gnuplotting
+        (send *g* :proc-one (list (elt y i) (elt z 1) (send kf :error) (aref (send kf :P) 1 1) -0.37727)
+              :direction :left
+              :xrange '(0 100)
+              :yrange '(-0.6 0)
+              :y2tics (list nil nil t t nil)
+              :title '("ovserved" "estimated" "error" "P covariance" "baseline"))
         (format f "~A ~A ~A ~A~%" (elt x i) (elt z 1) (send kf :error) (aref (send kf :P) 1 1))))
 
     ;; write graph data
-    (let ((fname (format nil "visualize_~A.sh" suffix)))
-      (format t ";; Writing gnuplot script to ~s~%" fname)
-      (with-open-file
-          (f fname :direction :output :permission #o744)
-        (format f "#!/usr/bin/env gnuplot~%")
-        (format f "~%")
-        (format f "set title \"~A\"~%" suffix)
-        (format f "plot [0:100][-0.6:0] 'data_~a.dat' title \"observed\" with linespoints~%" suffix)
-        (format f "set y2tics~%")
-        (format f "set y2range [0:0.01]~%")
-        (format f "replot 'kalman_result_~a.dat' title \"estimated\" with linespoints~%" suffix)
-        (format f "replot 'kalman_result_~a.dat' using 3 axes x1y2 title \"error\" with linespoints~%" suffix)
-        (format f "replot 'kalman_result_~a.dat' using 4 axes x1y2 title 'P covariance' with linespoints~%" suffix)
-        (format f "replot -0.37727 title \"baseline\"~%")
-        (format f "pause -1~%"))
-      (piped-fork (concatenate string (unix:getwd) "/" fname))
+    (setq *g* (gnuplot))
+    (send *g* :command (format nil "set title \"~A\"" suffix))
+    (send *g* :command (format nil "plot [0:100][-0.6:0] 'data_~a.dat' title \"observed\" with linespoints" suffix))
+    (send *g* :command "set y2tics")
+    (send *g* :command "set y2range [0:0.01]")
+    (send *g* :command (format nil "replot 'kalman_result_~a.dat' title \"estimated\" with linespoints" suffix))
+    (send *g* :command (format nil "replot 'kalman_result_~a.dat' using 3 axes x1y2 title \"error\" with linespoints" suffix))
+    (send *g* :command (format nil "replot 'kalman_result_~a.dat' using 4 axes x1y2 title 'P covariance' with linespoints" suffix))
+    (send *g* :command "replot -0.37727 title \"baseline\"")
+    (send *g* :command "pause -1")
     t))

@@ -88,10 +88,12 @@ ifeq ($(HAVE_BULLET), 1)
   BULLETLIB=`pkg-config bullet --libs`
 endif
 
+PNG_CFLAGS=`pkg-config libpng --cflags`
+
 MODULES.L=irt_modules.l
 EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 
-IRTEUS=irtmath irtutil irtgraph pgsql time
+IRTEUS=irtmath irtutil irtgraph gnuplotlib pgsql time
 IRTEUSG=irtgeo pqp bullet irtcollision irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud irtstl irtwrl
 IRTEUSX=irtx
 IRTEUSIMG=irtimage eusjpeg png
@@ -261,6 +263,7 @@ $(INSTALLOBJDIR)/irtglrgb.$(OSFX): irtglrgb.l
 $(INSTALLOBJDIR)/irtviewer.$(OSFX): irtviewer.l
 $(INSTALLOBJDIR)/irtimage.$(OSFX): irtimage.l
 $(INSTALLOBJDIR)/irtcollision.$(OSFX): irtcollision.l
+$(INSTALLOBJDIR)/gnuplotlib.$(OSFX): gnuplotlib.l
 $(INSTALLOBJDIR)/pqp.$(OSFX): pqp.l
 $(INSTALLOBJDIR)/bullet.$(OSFX): bullet.l
 $(INSTALLOBJDIR)/png.$(OSFX): png.l
@@ -283,7 +286,7 @@ $(INSTALLOBJDIR)/CBULLET.$(OSFX): CBULLET.cpp defun.h
 $(INSTALLOBJDIR)/eusbullet.$(OSFX): eusbullet.c defun.h
 	$(CC) $(CFLAGS) $(WFLAGS) $(BULLETCFLAGS) -c eusbullet.c $(OBJOPT)$(INSTALLOBJDIR)/eusbullet.$(OSFX)
 $(INSTALLOBJDIR)/euspng.$(OSFX): euspng.c defun.h
-	$(CC) $(CFLAGS) $(WFLAGS) -c euspng.c $(OBJOPT)$(INSTALLOBJDIR)/euspng.$(OSFX)
+	$(CC) $(PNG_CFLAGS) $(CFLAGS) $(WFLAGS) -c euspng.c $(OBJOPT)$(INSTALLOBJDIR)/euspng.$(OSFX)
 $(INSTALLOBJDIR)/nr.$(OSFX): nr.c defun.h
 	$(CC) $(CFLAGS) $(WFLAGS) -c nr.c $(OBJOPT)$(INSTALLOBJDIR)/nr.$(OSFX)
 

@@ -84,6 +84,102 @@
     ))
 
 
+(deftest test-breadth-first-graph-search-1 ()
+  (let ((gr (instance graph :init)) solver path)
+    (setq solver (instance breadth-first-graph-search-solver :init))
+
+    (let ((test1 (instance node :init 'test1))
+	  (test2 (instance node :init 'test2))
+	  (test3 (instance node :init 'test3)))
+      (send gr :add-node test1)
+      (send gr :add-node test2)
+      (send gr :add-node test3)
+      ;; test for costed arc
+      (send gr :add-arc test1 test2)
+      (send gr :add-arc test2 test3)
+      (send gr :add-arc test3 test1))
+
+    (send gr :start-state (send gr :node 'test1))
+    (send gr :goal-state (send gr :node 'test3))
+    (setq path (send solver :solve gr :verbose nil))
+    (assert (equal (send-all (send-all path :state) :name)
+		   '(test1 test2 test3))
+	    "solve breadth-first algorithm successfully")
+    ))
+
+
+(deftest test-breadth-first-graph-search-2 ()
+  (let ((gr (instance graph :init)) solver path)
+    (setq solver (instance breadth-first-graph-search-solver :init))
+
+    (let ((test1 (instance node :init 'test1))
+	  (test2 (instance node :init 'test2))
+	  (test3 (instance node :init 'test3)))
+      (send gr :add-node test1)
+      (send gr :add-node test2)
+      (send gr :add-node test3)
+      ;; test for normal arc
+      (instance arc :init test1 test2)
+      (instance arc :init test2 test3)
+      (instance arc :init test3 test1))
+
+    (send gr :start-state (send gr :node 'test1))
+    (send gr :goal-state (send gr :node 'test3))
+    (setq path (send solver :solve gr :verbose nil))
+    (assert (equal (send-all (send-all path :state) :name)
+		   '(test1 test2 test3))
+	    "solve breadth-first algorithm successfully")
+    ))
+
+
+(deftest test-depth-first-graph-search-1 ()
+  (let ((gr (instance graph :init)) solver path)
+    (setq solver (instance depth-first-graph-search-solver :init))
+
+    (let ((test1 (instance node :init 'test1))
+	  (test2 (instance node :init 'test2))
+	  (test3 (instance node :init 'test3)))
+      (send gr :add-node test1)
+      (send gr :add-node test2)
+      (send gr :add-node test3)
+      ;; test for costed arc
+      (send gr :add-arc test1 test2)
+      (send gr :add-arc test2 test3)
+      (send gr :add-arc test3 test1))
+
+    (send gr :start-state (send gr :node 'test1))
+    (send gr :goal-state (send gr :node 'test3))
+    (setq path (send solver :solve gr :verbose nil))
+    (assert (equal (send-all (send-all path :state) :name)
+		   '(test1 test2 test3))
+	    "solve depth-first algorithm successfully")
+    ))
+
+
+(deftest test-depth-first-graph-search-2 ()
+  (let ((gr (instance graph :init)) solver path)
+    (setq solver (instance depth-first-graph-search-solver :init))
+
+    (let ((test1 (instance node :init 'test1))
+	  (test2 (instance node :init 'test2))
+	  (test3 (instance node :init 'test3)))
+      (send gr :add-node test1)
+      (send gr :add-node test2)
+      (send gr :add-node test3)
+      ;; test for normal arc
+      (instance arc :init test1 test2)
+      (instance arc :init test2 test3)
+      (instance arc :init test3 test1))
+
+    (send gr :start-state (send gr :node 'test1))
+    (send gr :goal-state (send gr :node 'test3))
+    (setq path (send solver :solve gr :verbose nil))
+    (assert (equal (send-all (send-all path :state) :name)
+		   '(test1 test2 test3))
+	    "solve depth-first algorithm successfully")
+    ))
+
+
 ;; a -- b -- c -- d -- e
 ;;      |         |
 ;;      f----g    h
@@ -171,6 +267,10 @@
     ;; write graph to pdf file
     (warning-message 2 "write to /tmp/robots_in_jsk.pdf~%")
     (send g :write-to-pdf "/tmp/robots_in_jsk.pdf" nil "robots_in_jsk")
+
+    ;; write graph to png file
+    (warning-message 2 "write to /tmp/robots_in_jsk.png~%")
+    (send g :write-to-png "/tmp/robots_in_jsk.png" nil "robots_in_jsk")
     g))
 
 (eval-when (load eval)

@@ -37,23 +37,24 @@
     nil
     ))
 
-(defun triangulation-with-multi-hole ()
+(defun triangulation-with-multi-hole (param-id)
   (let ((plate (make-cube 1000 1000 5))
         (params ;; params for holes (list (list segments radius center) .. )
-         (list
-          #| ;; failed even after ...
-          (list  9 87.841726125643674550 (float-vector -250.0 -250.0 0.0))
-          (list  6 36.824839027036261996 (float-vector -250.0  250.0 0.0))
-          (list  9 52.020745915260789616 (float-vector  250.0 -250.0 0.0))
-          (list 10 51.644968476707617810 (float-vector  250.0  250.0 0.0))
-          (list  6 63.093857512806295063 (float-vector    0.0    0.0 0.0))
-          |#
-          (list  9 87.8 (float-vector -250.0 -250.0 0.0))
-          (list  6 36.8 (float-vector -250.0  250.0 0.0))
-          (list  9 52.0 (float-vector  250.0 -250.0 0.0))
-          (list 10 51.6 (float-vector  250.0  250.0 0.0))
-          (list  6 63.0 (float-vector    0.0    0.0 0.0))
-          ))
+         (case param-id
+           (0 (list
+               (list  9 87.841726125643674550 (float-vector -250.0 -250.0 0.0))
+               (list  6 36.824839027036261996 (float-vector -250.0  250.0 0.0))
+               (list  9 52.020745915260789616 (float-vector  250.0 -250.0 0.0))
+               (list 10 51.644968476707617810 (float-vector  250.0  250.0 0.0))
+               (list  6 63.093857512806295063 (float-vector    0.0    0.0 0.0))
+               ))
+           (1 (list
+               (list  9 87.8 (float-vector -250.0 -250.0 0.0))
+               (list  6 36.8 (float-vector -250.0  250.0 0.0))
+               (list  9 52.0 (float-vector  250.0 -250.0 0.0))
+               (list 10 51.6 (float-vector  250.0  250.0 0.0))
+               (list  6 63.0 (float-vector    0.0    0.0 0.0))
+               ))))
         aface faces lines)
 
     ;; make plate with holes
@@ -91,8 +92,12 @@
   (triangulation-concave)
   )
 
-(deftest test-triangulation-with-hole
-  (triangulation-concave)
+(deftest test-triangulation-with-hole-0
+  (triangulation-with-multi-hole 0)
+  )
+
+(deftest test-triangulation-with-hole-1
+  (triangulation-with-multi-hole 1)
   )
 
 (eval-when (load eval)
