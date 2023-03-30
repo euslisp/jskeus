@@ -72,7 +72,7 @@ CXXFLAGS=$(CFLAGS)
 CFLAGS+= -g -falign-functions=4
 CXXFLAGS+=-g -falign-functions=4
 
-ifeq ($(shell /bin/uname -m), x86_64)
+ifeq ($(shell gcc -dumpmachine), x86_64-linux-gnu)
 CC += -m32
 CXX += -m32
 LD += -m32

@@ -18,7 +18,7 @@ ifneq ($(GCC_MACHINE),)
    MACHINE=aarch64
  endif
  ifeq ($(GCC_MACHINE),arm-linux-gnueabihf)
-   MACHINE=armv7
+   MACHINE=arm
  endif
 endif
 ifeq ($(MACHINE),)
@@ -32,7 +32,7 @@ ifeq ($(OS),Linux)
   export ARCHDIR=Linux64
   export MAKEFILE=Makefile.Linux64
  else
- ifneq (, $(findstring armv,$(MACHINE)))
+ ifneq (, $(findstring arm,$(MACHINE)))
   export ARCHDIR=LinuxARM
   export MAKEFILE=Makefile.LinuxARM
  else ifneq (, $(findstring aarch,$(MACHINE)))
