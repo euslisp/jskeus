@@ -63,7 +63,8 @@ FFTW=-L/usr/local/lib -lfftw -lrfftw
 
 SVNVERSION=\"$(shell git rev-parse --short HEAD)\"
 
-MACHINE=$(shell uname -m | sed 's/\(armv[0-9]\).*/\1/')
+# gcc -dumpmachine retruns target triplet consists of three fields separated by a hyphen (-).
+MACHINE=$(shell gcc -dumpmachine | sed 's/\(.*\)-.*-.*/\1/')
 THREAD= -DTHREADED -DPTHREAD
 
 CFLAGS=-O2 -D$(MACHINE) -D$(ARCH) -DLinux -DARM -D_REENTRANT -DGCC -I$(EUSDIR)/include $(THREAD) -DSVNVERSION=$(SVNVERSION) -fPIC
