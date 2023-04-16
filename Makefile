@@ -14,6 +14,12 @@ ifneq ($(GCC_MACHINE),)
  ifeq ($(GCC_MACHINE),i686-linux-gnu)
    MACHINE=x86
  endif
+ ifeq ($(GCC_MACHINE),aarch64-linux-gnu)
+   MACHINE=aarch64
+ endif
+ ifeq ($(GCC_MACHINE),arm-linux-gnueabihf)
+   MACHINE=arm
+ endif
 endif
 ifeq ($(MACHINE),)
  MACHINE=$(shell uname -m)
@@ -26,7 +32,7 @@ ifeq ($(OS),Linux)
   export ARCHDIR=Linux64
   export MAKEFILE=Makefile.Linux64
  else
- ifneq (, $(findstring armv,$(MACHINE)))
+ ifneq (, $(findstring arm,$(MACHINE)))
   export ARCHDIR=LinuxARM
   export MAKEFILE=Makefile.LinuxARM
  else ifneq (, $(findstring aarch,$(MACHINE)))

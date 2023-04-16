@@ -40,6 +40,57 @@
                  (every #'identity zmp-cog-p)))
            '(:rleg :lleg :both))))
 
+;; calc-zmp / calc-zmp-from-forces-moments
+(defun test-zmp-from-forces-moments (robot)
+  (let (zmp-p1 zmp-p2)
+    (labels ((calc-zmp-from-forces-moments
+	      ()
+	      (let* ((torque-vector (send robot :torque-vector))
+		     (rleg-force-moment (v- (send robot :calc-force-from-joint-torque :rleg torque-vector)))
+		     (lleg-force-moment (v- (send robot :calc-force-from-joint-torque :lleg torque-vector))))
+		(send robot :calc-zmp-from-forces-moments
+		      (list (subseq rleg-force-moment 0 3)
+			    (subseq lleg-force-moment 0 3))
+		      (list (subseq rleg-force-moment 3)
+			    (subseq lleg-force-moment 3))
+		      ))))
+    (objects (list robot))
+    (send robot :newcoords (make-coords))
+    (send robot :reset-pose)
+    (send robot :arms :shoulder-p :joint-angle -45)
+    (send robot :arms :elbow-p :joint-angle -45)
+    (send robot :fix-leg-to-coords (make-coords) '(:rleg :lleg))
+    (send *irtviewer* :look-all)
+    ;; calc-zmp
+    (do ((mid -0.0 (+ mid 0.05)))
+	((>= mid 1.1))
+	;; calc-zmp
+	(send robot :move-centroid-on-foot :both '(:rleg :lleg) :mid mid)
+	(setq zmp-p1 (send robot :calc-zmp))
+	;; calc-zmp-from-forces-moments
+	(setq zmp-p2 (calc-zmp-from-forces-moments))
+	;; draw centroid/zmp
+	(warning-message 2 "centroid:~A zmp:~A / ~A~%" (send robot :centroid) zmp-p1 zmp-p2)
+	(send *irtviewer* :draw-objects :flush nil)
+	(send (send robot :centroid) :draw-on :flush nil :size 80 :color #f(0 0 1) :width 4)
+	(send (transform #2f((1 0 0)(0 1 0)(0 0 0)) (send robot :centroid)) :draw-on :flush nil :size 80 :color #f(0 0 1) :width 4)
+	(send zmp-p1 :draw-on :flush nil :size 150 :color #f(1 0 0) :width 2)
+	(send zmp-p2 :draw-on :flush t :size 150 :color #f(1 1 0) :width 2)
+	)
+
+    (warning-message 3 "check centroid is not equal to zmp~%")
+    (warning-message 3 "centroid:~A zmp:~A / ~A~%" (send robot :centroid) zmp-p1 zmp-p2)
+    (assert (not (eps-v= zmp-p1
+			 (transform #2f((1 0 0)(0 1 0)(0 0 0)) (send robot :centroid)))))
+    (send robot :calc-zmp) (calc-zmp-from-forces-moments)
+    (send robot :calc-zmp) (setq zmp-p2 (calc-zmp-from-forces-moments))
+    (setq zmp-p1 (send robot :get :zmp))
+    (warning-message 3 "check centroid is not equal to zmp after calling :calc-zmp~%")
+    (warning-message 3 "centroid:~A zmp:~A / ~A~%" (send robot :centroid) zmp-p1 zmp-p2)
+    (assert (eps-v= zmp-p1
+		    (transform #2f((1 0 0)(0 1 0)(0 0 0)) (send robot :centroid))))
+    t)))
+
 (defun init-pose-torque-tests
   (robot)
   (mapcar #'(lambda (jnt)
@@ -909,6 +960,7 @@
 (deftest test-irtdyna-samplerobot
   (warning-message 2 ";; run test-zmp-comomn~%")
   (assert (test-zmp-comomn *sample-robot*))
+  (assert (test-zmp-from-forces-moments *sample-robot*))
   ;; Not sure why, but it fails only COLLISION_LIB=PQP with source compile
   (unless (derivedp #'test-torque-from-its-own-weight-common compiled-code)
     (warning-message 2 ";; run test-torque-from-its-own-weight-common~%")
