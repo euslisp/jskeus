@@ -348,7 +348,7 @@
        (send child-link :rotate (deg2rad relang) :z)
        )
      joint-angle))
-  (:joint-dof () "Returns DOF of linear joint, 2." 2)
+  (:joint-dof () "Returns DOF of wheel joint, 2." 2)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
   (:speed-to-angle (dv) "Returns [mm/deg] of given input in SI unit [m/rad]"
                    (float-vector (* 1000 (elt dv 0))
@@ -406,7 +406,7 @@
      (send child-link :translate (float-vector (elt joint-angle 0) (elt joint-angle 1) 0))
      (send child-link :rotate (deg2rad (elt joint-angle 2)) :z))
    joint-angle)
-  (:joint-dof () "Returns DOF of linear joint, 3." 3)
+  (:joint-dof () "Returns DOF of omniwheel joint, 3." 3)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
   (:speed-to-angle (dv) "Returns [mm/deg] of given input in SI unit [m/rad]"
                    (float-vector (* 1000 (elt dv 0))
@@ -499,7 +499,7 @@
 		  (map float-vector #'deg2rad v))))
 	(send self :joint-angle (map cons #'rad2deg (matrix-log (rpy-matrix (elt ja 0) (elt ja 1) (elt ja 2)))))))
     (map float-vector #'rad2deg (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad joint-angle))))))
-  (:joint-dof () "Returns DOF of linear joint, 3." 3)
+  (:joint-dof () "Returns DOF of sphere joint, 3." 3)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
   (:speed-to-angle (dv) "Returns degree of given input in radian"
                    (float-vector (rad2deg (elt dv 0))
@@ -657,7 +657,7 @@
     (concatenate float-vector
 		 (subseq joint-angle 0 3)
 		 (map float-vector #'rad2deg (car (rpy-angle (matrix-exponent (map float-vector #'deg2rad (subseq joint-angle 3 6))))))))
-  (:joint-dof () "Returns DOF of linear joint, 6." 6)
+  (:joint-dof () "Returns DOF of 6dof joint, 6." 6)
   (:calc-angle-speed-gain (dav i periodic-time) (calc-angle-speed-gain-vector self dav i periodic-time))
   (:speed-to-angle (dv) "Returns [mm/deg] of given input in SI unit [m/rad]"
                    (float-vector (* 1000 (elt dv 0))
