@@ -294,7 +294,7 @@
                  (format f "~A ~A ~A ~A~%" tm zmp cog refzmp))
              tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
      )
-    (unless (or (null x::*display*) (= x::*display* 0))
+    (when (and (boundp 'x::*display*) (not (or (null x::*display*) (= x::*display* 0))))
       ;; graph-view
       (graph-view (list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2)) tm-list
                   :xlabel "Time [s]" :ylabel "ZMP X [mm]"
@@ -353,7 +353,7 @@
                  (format f "~A ~A ~A ~A~%" tm zmp cog refzmp))
              tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
      )
-    (unless (or (null x::*display*) (= x::*display* 0))
+    (when (and (boundp 'x::*display*) (not (or (null x::*display*) (= x::*display* 0))))
       (let ((gp-command-list (list
                               "set xlabel 'Time [s]';"
                               "set ylabel 'ZMP X [mm]';"
@@ -407,7 +407,7 @@
                  (format f "~A ~A ~A ~A~%" tm zmp cog refzmp))
              tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
      )
-    (unless (or (null x::*display*) (= x::*display* 0))
+    (when (and (boundp 'x::*display*) (not (or (null x::*display*) (= x::*display* 0))))
       (let ((gp-command-list (list
                               "set xlabel 'Time [s]';"
                               "set ylabel 'ZMP X [mm]';"
@@ -454,7 +454,7 @@
                  (format f "~A ~A ~A ~A~%" tm zmp cog refzmp))
              tm-list (reverse zmp-list) (reverse cog-list) (reverse ref-zmp-list2))
      )
-    (unless (or (null x::*display*) (= x::*display* 0))
+    (when (and (boundp 'x::*display*) (not (or (null x::*display*) (= x::*display* 0))))
       (let ((gp-command-list (list
                               "set xlabel 'Time [s]';"
                               "set ylabel 'ZMP X [mm]';"
@@ -509,7 +509,7 @@
                (mapcar #'(lambda (x) (elt (cadr (memq :output-cog x)) 1)) data)
                (mapcar #'(lambda (x) (elt (cadr (memq :input-cog x)) 1)) data)
                ))
-      (unless (or (null x::*display*) (= x::*display* 0))
+      (when (and (boundp 'x::*display*) (not (or (null x::*display*) (= x::*display* 0))))
         (let ((gp-command-list (list
                                 "set xlabel 'Time [s]';"
                                 "set ylabel 'ZMP X [mm]';"

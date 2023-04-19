@@ -139,7 +139,7 @@
                                      ip)))
            ))
          (ret-list2 (mapcar #'(lambda (x) (elt x 0)) (cadr (memq :data ret-list)))))
-    (when (and (not (or (null x::*display*) (= x::*display* 0)))
+    (when (and (boundp 'x::*display*) (not (or (null x::*display*) (= x::*display* 0)))
                (functionp 'graph-view))
       (let ((r-pos (mapcar #'(lambda (x) (elt x 0)) (cadr (memq :data ret-list))))
             (r-vel (mapcar #'(lambda (x) (* 10 (elt x 0))) (cadr (memq :velocity ret-list))))
@@ -227,7 +227,7 @@
                   (format nil "~A vel: ~A, acc:~A, acc:~A, diff:~A~%" i (elt velocity i) real-acc calc-acc (norm (v- real-acc calc-acc)))))
         ))
 
-    (when (and (not (or (null x::*display*) (= x::*display* 0)))
+    (when (and (boundp 'x::*display*) (not (or (null x::*display*) (= x::*display* 0))))
                (functionp 'graph-view))
       (let ((r-pos (mapcar #'(lambda (x) (elt x 0)) (cadr (memq :data ret-list))))
             (r-vel (mapcar #'(lambda (x) (* 0.001 (elt x 0))) (cadr (memq :velocity ret-list))))

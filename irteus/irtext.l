@@ -54,19 +54,19 @@
    (format nil "~A~A/lib/libirteusg"
 	   *eusdir* (unix:getenv "ARCHDIR"))
    '("irtgeo" "euspqp" "pqp" "irtscene" "irtmodel" "irtdyna" "irtrobot" "irtsensor" "irtbvh" "irtcollada" "irtstl" "irtwrl" "irtpointcloud" "eusbullet" "bullet" "irtcollision"))
+  (in-package "IMAGE")
+  (load-library
+   (format nil "~A~A/lib/libirteusimg"
+	   *eusdir* (unix:getenv "ARCHDIR"))
+   '("eusjpeg" "euspng" "png" "irtimage"))
   (in-package "USER")
-  (import '(collada::convert-irtmodel-to-collada collada::eus2collada)))
+  (import '(collada::convert-irtmodel-to-collada collada::eus2collada image::read-image-file image::write-image-file)))
 (defun load-irteusx ()
   (in-package "X")
   (load-library
    (format nil "~A~A/lib/libirteusx"
 	   *eusdir* (unix:getenv "ARCHDIR"))
    '("irtx"))
-  (in-package "IMAGE")
-  (load-library
-   (format nil "~A~A/lib/libirteusimg"
-	   *eusdir* (unix:getenv "ARCHDIR"))
-   '("eusjpeg" "euspng" "png" "irtimage"))
   (in-package "USER")
   )
 (defun load-irteusgl ()

@@ -122,7 +122,7 @@
             (list j1-min-max-table j2-min-max-table))
 
     ;; display min-max table if needed
-    (unless (or (null x::*display*) (= x::*display* 0))
+    (when (and (boundp 'x::*display*) (not (or (null x::*display*) (= x::*display* 0))))
       (setq min-max-table-view
             (instance x::panel :create
                       :width  (round (- j1-org-max-angle j1-org-min-angle))
@@ -269,7 +269,7 @@
   (send *robot* :make-joint-min-max-table
         (send (send *robot* :j1) :parent-link) (send (send *robot* :j2) :child-link) (send *robot* :j1) (send *robot* :j2)
         :margin margin)
-  (unless (or (null x::*display*) (= x::*display* 0))
+  (when (and (boundp 'x::*display*) (not (or (null x::*display*) (= x::*display* 0))))
     (send *robot* :plot-joint-min-max-table (send *robot* :j1) (send *robot* :j2))
     ";; plot joint-min-max-table")
   (prog1

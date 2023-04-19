@@ -11,7 +11,7 @@
      (eval
       `(deftest ,(read-from-string (format nil "test-~A" model-func-name))
          (load (format nil "models/irt-all-~A.l" ,model-type-name))
-         (unless x::*root* (defun ,model-func-name ())) ;; do not create viwer
+         (when (and (boundp 'x::*root*) (null x::*root*)) (defun ,model-func-name ())) ;; do not create viwer
          (setq model-viewers (,model-func-name))
          (let (fname (fname-list ""))
            (dolist (viewer model-viewers)

@@ -1,9 +1,8 @@
-CC = c++ -O2 -falign-functions=8 -fPIC 
+CXX ?= c++
+CFLAGS = -O2 -falign-functions=8 -fPIC
 OBJOPT = -o 
 OUTOPT = -o 
-LD = c++
 SOFLAGS = -dynamiclib -flat_namespace -undefined suppress
-EXELD = c++
 EXESFX = 
 LSFX = so
 LPFX = lib

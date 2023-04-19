@@ -542,18 +542,7 @@
                                  :height (send viewer :viewsurface :height))))
   )
 
-(defun draw-things (objs)
-  (cond
-   ((atom objs)
-    (cond
-     ((null objs) nil)
-     ((find-method objs :draw) (list objs))
-     ((find-method objs :bodies) (send objs :bodies))
-     (t (list objs))))
-   (t
-    (append (draw-things (car objs))
-	    (draw-things (cdr objs))))
-   ))
+;; 2022.04.30 move draw-things to irtgeo.l
 
 
 (in-package "GEOMETRY")
@@ -583,21 +572,9 @@
 
 (in-package "USER")
 
-(defun objects (&optional (objs t) vw)
-  (when
-      (and objs (not (boundp '*irtviewer*)) (null vw))
-    (warn ";; (make-irtviewer) executed~%")
-    (make-irtviewer))
-  (if (null vw) (setq vw *irtviewer*))
-  (let (objects)
-  (if (eq objs t) (setq objects (send vw :objects))
-    (setq objects (send vw :objects objs)))
-  (send vw :look-all)
-  objects))
-
+;; 2022.04.30 move objects, make-irtviwer, irtviewer-dummy, make-irtviewer-dummy to irtgeo.l
 ;;
 ;;
-(proclaim '(special *irtviewer*))
 (defun make-irtviewer (&rest args)
   "Create irtviewer
   :view-name title
@@ -617,34 +594,6 @@
    (t
     (setq *irtviewer* (send-lexpr (instantiate x::irtviewer) :create args))))
    *irtviewer*)
-
-(defclass viewer-dummy
-  :super propertied-object
-  :slots ())
-(defmethod viewer-dummy
-  (:nomethod (&rest args) t)
-  )
-
-(defclass irtviewer-dummy
-  :super propertied-object
-  :slots (objects draw-things))
-(defmethod irtviewer-dummy
-  (:objects (&rest args)
-   (when
-       args
-     (cond
-      ((null (car args))
-       (setq objects nil))
-      ((consp (car args))
-       (setq objects (car args)))
-      ((atom (car args))
-       (setq objects (append args objects)))
-      ))
-   (send-all objects :worldcoords)
-   (setq draw-things (x::draw-things objects))
-   objects)
-  (:nomethod (&rest args) t)
-  ) ;;
 
 (defclass irtviewer-no-window
   :super propertied-object
@@ -669,13 +618,6 @@
   (:nomethod (&rest args)
    (send* irtviewer args))
   ) ;;
-
-(defun make-irtviewer-dummy (&rest args)
-  (warning-message 1 ";; no display is found. exit from (make-irtviewer)~%")
-  (setq *irtviewer* (instance irtviewer-dummy))
-  (setq *viewer* (instance viewer-dummy))
-  (setf (get *viewer* :pickviewer) *irtviewer*)
-  *irtviewer*)
 
 (defun geo::default-pixmapsurface (&rest args)
   (send-lexpr (instantiate gl::glpixmapsurface) :create args))

@@ -8,49 +8,50 @@ env:
   DISPLAY: '0:0'
 
 jobs:
-  linux:
-    strategy:
-      matrix:
-        include:
-          - DOCKER_IMAGE: ubuntu:trusty
-          - DOCKER_IMAGE: ubuntu:xenial
-          - DOCKER_IMAGE: ubuntu:bionic
-          - DOCKER_IMAGE: ubuntu:bionic
-            COLLISION_LIB: PQP
-          - DOCKER_IMAGE: ubuntu:bionic
-            COLLISION_LIB: BULLET
-          - DOCKER_IMAGE: ubuntu:focal
-          - DOCKER_IMAGE: debian:stretch
-          - DOCKER_IMAGE: osrf/ubuntu_armhf:trusty
-          - DOCKER_IMAGE: osrf/ubuntu_armhf:xenial
-          - DOCKER_IMAGE: osrf/ubuntu_arm64:trusty
-          - DOCKER_IMAGE: osrf/ubuntu_arm64:xenial
-          - DOCKER_IMAGE: arm64v8/ubuntu:bionic
-          - DOCKER_IMAGE: arm64v8/ubuntu:focal
-          - DOCKER_IMAGE: osrf/debian_arm64:stretch
-      fail-fast: false
+  # linux:
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - DOCKER_IMAGE: ubuntu:trusty
+  #         - DOCKER_IMAGE: ubuntu:xenial
+  #         - DOCKER_IMAGE: ubuntu:bionic
+  #         - DOCKER_IMAGE: ubuntu:bionic
+  #           COLLISION_LIB: PQP
+  #         - DOCKER_IMAGE: ubuntu:bionic
+  #           COLLISION_LIB: BULLET
+  #         - DOCKER_IMAGE: ubuntu:focal
+  #         - DOCKER_IMAGE: debian:stretch
+  #         - DOCKER_IMAGE: osrf/ubuntu_armhf:trusty
+  #         - DOCKER_IMAGE: osrf/ubuntu_armhf:xenial
+  #         - DOCKER_IMAGE: osrf/ubuntu_arm64:trusty
+  #         - DOCKER_IMAGE: osrf/ubuntu_arm64:xenial
+  #         - DOCKER_IMAGE: arm64v8/ubuntu:bionic
+  #         - DOCKER_IMAGE: arm64v8/ubuntu:focal
+  #         - DOCKER_IMAGE: osrf/debian_arm64:stretch
+  #     fail-fast: false
 
-    runs-on: ubuntu-18.04
-    timeout-minutes: 90
+  #   runs-on: ubuntu-18.04
+  #   timeout-minutes: 90
 
-    name: linux
+  #   name: linux
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Run test
-        shell: bash
-        run: |
-          set -x
-          export CI_SOURCE_PATH=$(pwd)
-          export REPOSITORY_NAME=${PWD##*/}
-          export TRAVIS_BRANCH=${GITHUB_REF#refs/heads/}
-          export TRAVIS_OS_NAME=linux
-          export DOCKER_IMAGE=${{matrix.DOCKER_IMAGE}}
-          if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then sudo apt-get install -y -qq qemu-user-static git; fi
-          if [[ "$DOCKER_IMAGE" == *"arm64v8"* ]]; then export QEMU_VOLUME="-v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-static"; fi #
-          echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
-          docker run --rm $QEMU_VOLUME -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "DOCKER_IMAGE=$DOCKER_IMAGE" -e "COLLISION_LIB=$COLLISION_LIB" -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+  #     - name: Run test
+  #       shell: bash
+  #       run: |
+  #         set -x
+  #         export CI_SOURCE_PATH=$(pwd)
+  #         export REPOSITORY_NAME=${PWD##*/}
+  #         export TRAVIS_BRANCH=${GITHUB_REF#refs/heads/}
+  #         export TRAVIS_OS_NAME=linux
+  #         export DOCKER_IMAGE=${{matrix.DOCKER_IMAGE}}
+  #         if [[ "$DOCKER_IMAGE" == *"arm"* ]]; then sudo apt-get install -y -qq qemu-user-static git; fi
+  #         if [[ "$DOCKER_IMAGE" == *"arm64v8"* ]]; then export QEMU_VOLUME="-v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-static"; fi #
+  #         echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
+  #         docker run --rm $QEMU_VOLUME -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "DOCKER_IMAGE=$DOCKER_IMAGE" -e "COLLISION_LIB=$COLLISION_LIB" -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"
+
 
   catkin:
     runs-on: ubuntu-18.04
@@ -121,56 +122,171 @@ jobs:
           catkin config --install
           catkin build -v -i --make-args VERBOSE=1
 
-  doc:
+  # test for non X11/GL environment, i.e. embedded environment
+  linux-nox:
+    runs-on: ubuntu-latest
+    container: ubuntu:20.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Checkout eus (on support_nonx, git install x11 lib, so auto-remove it)
+        shell: bash
+        run: |
+          set -xe
+          apt update -y -qq && apt install -y -qq git
+          git clone --branch support_nonx https://github.com/euslisp/EusLisp eus
+          apt purge -y -qq git
+          apt autoremove -y -qq
+      - name: Setup environmnet
+        shell: bash
+        run: |
+          set -xe
+          apt update -y -qq && apt install -y -qq make gcc g++ libjpeg-dev libpng-dev
+          dpkg --get-selections | egrep -e '(x11|gl)' || echo "OK"   ## show selected X/GL
+          dpkg --get-selections | egrep -q -e '(x11|gl)' && exit 1   ## exit 1, when X/GL found
+          exit 0
+      - name: Compile eusg (on support_nonx)
+        shell: bash
+        run: |
+          set -xe
+          make bashrc.eus
+          source bashrc.eus
+          cd eus/lisp
+          ln -sf Makefile.$ARCHDIR Makefile
+          make eus0 eus1 eus2 eusg
+      - name: Compile irteusg
+        shell: bash
+        run: |
+          set -xe
+          source bashrc.eus
+          cd irteus
+          make irteusg
+      - name: Run test
+        shell: bash
+        run: |
+          # fix eus/models for irteusg
+          sed -i 's/(send x:\*root\* :size)/#f\(1000\)/' eus/models/irt-all-*.l
+          sed -i '/\(send self :def-gl-vertices\)/ s/^/;/' eus/models/*.l
+          sed -i '/\(send self :make-collision-model-for-links\)/ s/^/;/' eus/models/*.l
+          source bashrc.eus
+          export EXIT_STATUS=0; for test_l in irteus/test/*.l; do irteusg $test_l; export TMP_EXIT_STATUS=$?; export EXIT_STATUS=`expr $TMP_EXIT_STATUS + $EXIT_STATUS`; done; [ $EXIT_STATUS == 0 ] || exit 1
+
+  # test for cross sompile
+  linux-nox-crosscompile:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Clone Euslisp and Setup environmnet
+        shell: bash
+        run: |
+          set -xe
+          git clone --branch support_nonx https://github.com/euslisp/EusLisp eus
+          sudo apt update -y -qq
+          # remove unused packages
+          sudo dpkg -r --force-depends nginx || echo "OK"
+          sudo apt purge -y -qq build-essential gcc-9 gcc-10 || echo "OK"
+          sudo apt purge -y -qq libldap-* || echo "OK"
+          sudo apt purge -y -qq libx11* x11* libgl1* libglx* || echo "OK"
+          sudo apt autoremove -y -qq || echo "OK"
+          # install deb environment
+          sudo apt install -y -qq make binutils-aarch64-linux-gnu gcc-aarch64-linux-gnu g++-aarch64-linux-gnu qemu-user-static
+          exit 0
+      - name: Check environmnet
+        shell: bash
+        run: |
+          set -xe
+          dpkg --get-selections | egrep -e '(cc|ld)' || echo "OK"   ## show selected X/GL
+          dpkg --get-selections | egrep -e '(libpq|jpeg|png)' || echo "OK"   ## show selected X/GL
+          dpkg --get-selections | egrep -e '(x11|gl)' || echo "OK"   ## show selected X/GL
+          #dpkg --get-selections | egrep -q -e '(x11|gl)' && exit 1   ## exit 1, when X/GL found
+          exit 0
+      - name: Compile irteusg
+        shell: bash
+        run: |
+          set -xe
+          export TOPDIR=$(pwd)
+          export EUSDIR=$(pwd)/eus
+          export ARCHDIR=LinuxARM
+          export PATH=$EUSDIR/$ARCHDIR/bin:$EUSDIR/$ARCHDIR/lib:$PATH
+          export LD_LIBRARY_PATH=$EUSDIR/$ARCHDIR/lib:$EUSDIR/$ARCHDIR/bin:$LD_LIBRARY_PATH
+          export CC=aarch64-linux-gnu-gcc
+          export LD=aarch64-linux-gnu-ld
+          export AR=aarch64-linux-gnu-ar
+          export CXX=aarch64-linux-gnu-g++
+          export QEMU_LD_PREFIX=/usr/aarch64-linux-gnu/
+          cd $EUSDIR/lisp
+          ln -sf Makefile.Linux Makefile
+          CC=$CC LD=$LD make eus0 eus1 eus2 eusg
+          (cd $EUSDIR//test; CXX=$CXX make)
+          cd $TOPDIR/irteus
+          ARCHDIR=$ARCHDIR CC=$CC LD=$LD AR=$AR CXX=$CXX make irteusg
       - name: Run test
         shell: bash
         run: |
-          set -x
-          sudo apt-get install -y -qq git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng-dev xfonts-100dpi xfonts-75dpi pkg-config libbullet-dev
-          make
-          sudo apt-get install -y -qq texlive-binaries texlive-lang-cjk texlive-lang-japanese poppler-utils nkf latex2html
-          (source bashrc.eus; cd doc/; make pdf)
-          (source bashrc.eus; cd doc/; make html)
+          sed -i 's/(send x:\*root\* :size)/#f\(1000\)/' eus/models/irt-all-*.l
+          sed -i '/\(send self :def-gl-vertices\)/ s/^/;/' eus/models/*.l
+          sed -i '/\(send self :make-collision-model-for-links\)/ s/^/;/' eus/models/*.l
+          export EUSDIR=$(pwd)/eus
+          export ARCHDIR=LinuxARM
+          export PATH=$EUSDIR/$ARCHDIR/bin:$EUSDIR/$ARCHDIR/lib:$PATH
+          export LD_LIBRARY_PATH=$EUSDIR/$ARCHDIR/lib:$EUSDIR/$ARCHDIR/bin:$LD_LIBRARY_PATH
+          export QEMU_LD_PREFIX=/usr/aarch64-linux-gnu/
+          set -xe
+          export EXIT_STATUS=0; for test_l in irteus/test/*.l; do [[ $test_l =~ all-robots-objects.l|irteus-demo.l|matrix.l|rendering.l|test-collision.l|test-irt-motion.l ]] && continue; irteusg $test_l; export TMP_EXIT_STATUS=$?; export EXIT_STATUS=`expr $TMP_EXIT_STATUS + $EXIT_STATUS`; done; [ $EXIT_STATUS == 0 ] || exit 1
+
+  # doc:
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 60
+
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+  #     - name: Run test
+  #       shell: bash
+  #       run: |
+  #         set -x
+  #         sudo apt-get install -y -qq git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng-dev xfonts-100dpi xfonts-75dpi pkg-config libbullet-dev
+  #         make
+  #         sudo apt-get install -y -qq texlive-binaries texlive-lang-cjk texlive-lang-japanese poppler-utils nkf latex2html
+  #         (source bashrc.eus; cd doc/; make pdf)
+  #         (source bashrc.eus; cd doc/; make html)
 
 
-  osx:
-    runs-on: macos-latest
-    timeout-minutes: 60
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Get brew cache directory
-        id: brew-cache
-        run: echo "::set-output name=dir::$(brew --cache)/downloads"
-      - name: Brew cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.brew-cache.outputs.dir }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/workflows/Brewfile') }}
-      - name: Brew config
-        run: |
-          cd .github/workflows/
-          brew config
-      - name: Run test
-        shell: bash
-        run: |
-          set -x
-          export CI_SOURCE_PATH=$(pwd)
-          export REPOSITORY_NAME=${PWD##*/}
-          export TRAVIS_BRANCH=${GITHUB_REF#refs/heads/}
-          export LC_CTYPE=C
-          echo insecure >> ~/.curlrc
-          export HOMEBREW_CURLRC=1
-          HOMEBREW_NO_AUTO_UPDATE=1 brew install coreutils
-          export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
-          # since macos-11, we need to install GL/gl.h
-          HOMEBREW_NO_AUTO_UPDATE=1 brew install mesa-glu
-          ./.travis-osx.sh
-      - name: Cleanup some brew downloads
-        run: cd ${{ steps.brew-cache.outputs.dir }} && ls -lsS | head -n 10 | awk '{ print $10 }' | xargs rm -rf
+  # osx:
+  #   runs-on: macos-latest
+  #   timeout-minutes: 60
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+  #     - name: Get brew cache directory
+  #       id: brew-cache
+  #       run: echo "::set-output name=dir::$(brew --cache)/downloads"
+  #     - name: Brew cache
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: ${{ steps.brew-cache.outputs.dir }}
+  #         key: ${{ runner.os }}-${{ hashFiles('.github/workflows/Brewfile') }}
+  #     - name: Brew config
+  #       run: |
+  #         cd .github/workflows/
+  #         brew config
+  #     - name: Run test
+  #       shell: bash
+  #       run: |
+  #         set -x
+  #         export CI_SOURCE_PATH=$(pwd)
+  #         export REPOSITORY_NAME=${PWD##*/}
+  #         export TRAVIS_BRANCH=${GITHUB_REF#refs/heads/}
+  #         export LC_CTYPE=C
+  #         echo insecure >> ~/.curlrc
+  #         export HOMEBREW_CURLRC=1
+  #         HOMEBREW_NO_AUTO_UPDATE=1 brew install coreutils
+  #         export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+  #         # since macos-11, we need to install GL/gl.h
+  #         HOMEBREW_NO_AUTO_UPDATE=1 brew install mesa-glu
+  #         ./.travis-osx.sh
+  #     - name: Cleanup some brew downloads
+  #       run: cd ${{ steps.brew-cache.outputs.dir }} && ls -lsS | head -n 10 | awk '{ print $10 }' | xargs rm -rf
