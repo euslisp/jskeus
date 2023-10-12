@@ -523,6 +523,7 @@
 ;; lmeds
 ;;http://www-pse.cheme.kyoto-u.ac.jp/~kano/document/text-PCA.pdf
 (defun lms (point-list)
+  "returns the result of line/plane/hyperplane fitting (regression) on point-list with least squares. The result consists of the normal vector and the signed distance to the origin"
   (let ((v^ (vector-mean point-list))
         (point-length (length point-list))
 	delx x v eigen-res eigen-val eigen-vec min-lam min-vec)
@@ -543,10 +544,12 @@
     ))
 
 (defun lms-estimate (res point-)
+  "returns the signed distance from the fitted line/plane/hyperplane to point-"
   (+ (v. point- (car res)) (cadr res))
   )
 
 (defun lms-error (result point-list)
+  "returns the mean of the square of the distance from the fitted line/plane/hyperplane to each point in point-list"
   (let ((ret-err 0) tmp-err)
     (dolist (l point-list)
       (setq tmp-err (lms-estimate result l))
@@ -555,13 +558,14 @@
     (/ ret-err (length point-list))
     ))
 
-;; choose num points randomly and apply lms to find the souliton with smallest errors
-;; to use ransac ransac
+;; choose num points randomly and apply lms to find the solution with the smallest error
+;; to use ransac
 ;;   :lmeds-error-func -> set to ransac-error
 ;;   :ransac-threshold err^2 (square of the distance from the plane)
 (defun lmeds (point-list &key (num 5) (err-rate 0.3) (iteration) (ransac-threshold)
 			 (lms-func #'lms) (lmeds-error-func #'lmeds-error)
 			 (lms-estimate-func #'lms-estimate))
+  "returns the result of line/plane/hyperplane fitting (regression) on point-list with LMedS. The result consists of the normal vector and the signed distance to the origin"
   (let (point-num r result result-list error-list iter
 		  comb-index comb-index-list point-list-tmp)
     ;; initialize variables
@@ -599,6 +603,7 @@
     ))
 
 (defun lmeds-error (result point-list &key (lms-estimate-func #'lms-estimate))
+  "returns the median of the square of the distance from the fitted line/plane/hyperplane to each point in point-list"
   (let (tmp-err err)
     (dolist (l point-list)
       (setq tmp-err (funcall lms-estimate-func result l))
@@ -608,6 +613,7 @@
     ))
 
 (defun lmeds-error-mat (result mat &key (lms-estimate-func #'lms-estimate))
+  "matrixed version of lmeds-error. mat is the matrixed version of point-list"
   (let ((size (array-dimension mat 0))
         (p (float-vector 0 0 0))
         tmp-err  err)
