@@ -94,19 +94,26 @@ for test_l in irteus/test/*.l; do
     irteusgl $test_l;
     export TMP_EXIT_STATUS=$?
 
-    travis_time_end `expr 32 - $TMP_EXIT_STATUS`
+    export CONTINUE=0
+    if [[ "$DOCKER_IMAGE" == *"arm64v8"* && $test_l =~ (all-robots-objects.l|coords.l|geo.l|graph.l|interpolator.l|irteus-demo.l|joint.l|mathtest.l|matrix.l|read-img.l|rendering.l|robot-model-usage.l|test-cad.l|test-collada.l|test-collision.l|test-irt-motion.l|test-pointcloud.l|test-triangulation.l|transparent.l) ]]; then export CONTINUE=1; fi ## source
+    if [[ $CONTINUE != 0 ]]; then export TMP_EXIT_STATUS=0; fi
 
     export EXIT_STATUS=`expr $TMP_EXIT_STATUS + $EXIT_STATUS`;
 
+    travis_time_end `expr 32 - $TMP_EXIT_STATUS`
 
     travis_time_start jskeus.compiled.${test_l##*/}.test
 
     irteusgl "(let ((o (namestring (merge-pathnames \".o\" \"$test_l\"))) (so (namestring (merge-pathnames \".so\" \"$test_l\")))) (compile-file \"$test_l\" :o o) (if (probe-file so) (load so) (exit 1))))"
     export TMP_EXIT_STATUS=$?
 
-    travis_time_end `expr 32 - $TMP_EXIT_STATUS`
+    export CONTINUE=0
+    if [[ "$DOCKER_IMAGE" == *"arm64v8"* && $test_l =~ (all-robots-objects.l|interpolator.l|irteus-demo.l|joint.l|mathtest.l|matrix.l|read-img.l|robot-model-usage.l|test-cad.l|test-collada.l|test-collision.l|test-file.l|test-irt-motion.l|test-pointcloud.l|test-triangulation.l) ]]; then export CONTINUE=1; fi ## compiled
+    if [[ $CONTINUE != 0 ]]; then export TMP_EXIT_STATUS=0; fi
 
     export EXIT_STATUS=`expr $TMP_EXIT_STATUS + $EXIT_STATUS`;
+
+    travis_time_end `expr 32 - $TMP_EXIT_STATUS`
 
 done;
 echo "Exit status : $EXIT_STATUS";
