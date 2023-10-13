@@ -21,6 +21,11 @@ function travis_time_end {
 }
 
 travis_time_start setup.apt-get_update
+# Use archive repository for Debian Stretch
+if [[ "$DOCKER_IMAGE" == *"stretch" ]]; then
+    sed -i 's/[[:alpha:]]*.debian.org/archive.debian.org/' /etc/apt/sources.list
+    sed -i '/stretch-updates/ s/^#*/#/' /etc/apt/sources.list
+fi
 if [ "$(which sudo)" == "" ]; then apt-get update && apt-get install -y sudo; else sudo apt-get update; fi
 travis_time_end
 
