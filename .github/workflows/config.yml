@@ -62,16 +62,16 @@ jobs:
         uses: actions/checkout@v2
       - name: Setup Apt
         run: |
-          echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections
-          sudo apt-get update -qq
-          sudo apt-get install -qq -y lsb-release wget gnupg2  # necessary for catkin-pkg to be installable
-          sudo apt-get install -qq -y dpkg  # necessary for catkin-pkg to be installable
+          echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+          apt-get update -qq
+          apt-get install -qq -y lsb-release wget gnupg2  # necessary for catkin-pkg to be installable
+          apt-get install -qq -y dpkg  # necessary for catkin-pkg to be installable
           echo "Testing branch $GITHUB_REF of $GITHUB_REPOSITORY"
-          sudo sh -c 'echo "deb http://packages.ros.org/ros-shadow-fixed/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
-          wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-          sudo apt-get update -qq
-          sudo apt-get install -qq -y python-catkin-tools python-rosdep
-          sudo apt-get install -qq -y build-essential git ros-melodic-rosbash ros-melodic-rospack
+          sh -c 'echo "deb http://packages.ros.org/ros-shadow-fixed/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
+          wget http://packages.ros.org/ros.key -O - | apt-key add -
+          apt-get update -qq
+          apt-get install -qq -y python-catkin-tools python-rosdep
+          apt-get install -qq -y build-essential git ros-melodic-rosbash ros-melodic-rospack
       - name: Setup Src
         shell: bash
         run: |
@@ -90,7 +90,7 @@ jobs:
           wget https://raw.githubusercontent.com/tork-a/jskeus-release/master/patches/CMakeLists.txt -O jskeus/CMakeLists.txt
           # rosdep install
           cd ..
-          sudo rosdep init
+          rosdep init
           rosdep update
           rosdep install -y -r --rosdistro melodic --from-paths src --ignore-src
       - name: Build
