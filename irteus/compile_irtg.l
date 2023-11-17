@@ -61,6 +61,7 @@
 (comp:compile-file-if-src-newer "irtcollada.l" user::*objdir*)
 (comp:compile-file-if-src-newer "irtstl.l" user::*objdir*)
 (comp:compile-file-if-src-newer "irtwrl.l" user::*objdir*)
+(comp:compile-file-if-src-newer "irtdraw.l" user::*objdir*)
 (comp:compile-file-if-src-newer "irtpointcloud.l" user::*objdir*)
 
 (exit 0)
