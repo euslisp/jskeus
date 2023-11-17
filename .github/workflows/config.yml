@@ -23,6 +23,8 @@ jobs:
           - DOCKER_IMAGE: debian:stretch
           - DOCKER_IMAGE: osrf/ubuntu_armhf:trusty
           - DOCKER_IMAGE: osrf/ubuntu_armhf:xenial
+          - DOCKER_IMAGE: osrf/ubuntu_armhf:bionic
+          - DOCKER_IMAGE: osrf/ubuntu_armhf:focal
           - DOCKER_IMAGE: osrf/ubuntu_arm64:trusty
           - DOCKER_IMAGE: osrf/ubuntu_arm64:xenial
           - DOCKER_IMAGE: arm64v8/ubuntu:bionic
@@ -133,6 +135,7 @@ jobs:
         shell: bash
         run: |
           set -x
+          sudo apt-get update
           sudo apt-get install -y -qq git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng-dev xfonts-100dpi xfonts-75dpi pkg-config libbullet-dev
           make
           sudo apt-get install -y -qq texlive-binaries texlive-lang-cjk texlive-lang-japanese poppler-utils nkf latex2html
