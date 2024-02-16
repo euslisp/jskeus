@@ -1093,7 +1093,7 @@
     &allow-other-keys)
    (let (jacobi# m m2 (k 0))
      ;; m : manipulability
-     (setq m (manipulability jacobi tmp-mrr tmat))
+     (setq m (manipulability (if weight (m* jacobi (diagonal weight)) jacobi) tmp-mrr tmat))
      (if (< m ml) (setq k (* mg (expt (- 1.0 (/ m  ml)) 2))))
      (when (and debug-view (not (memq :no-message debug-view)))
        (warn "k     :~7,3f (manipulability:~7,3f, gain:~7,3f, limit:~7,3f, len:~d)~%" k m mg ml (cadr (array-dimensions jacobi))))
