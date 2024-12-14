@@ -54,10 +54,22 @@ jobs:
 
   catkin:
     runs-on: ubuntu-latest
-    container: ubuntu:18.04
+    container:
+      image: ubuntu:18.04
+      volumes:
+        - /tmp/node20:/__e/node20
     timeout-minutes: 60
 
     steps:
+      - name: Try to replace `node` with an glibc 2.17
+        shell: bash
+        run: |
+          ls -lar /__e/node20 &&
+          apt-get install -y curl &&
+          curl -Lo /tmp/node.tar.gz https://unofficial-builds.nodejs.org/download/release/v20.17.0/node-v20.17.0-linux-x64-glibc-217.tar.gz &&
+          cd /__e/node20 &&
+          tar -x --strip-components=1 -f /tmp/node.tar.gz &&
+          ls -lar /__e/node20/bin/
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup Apt
