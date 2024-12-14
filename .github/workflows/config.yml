@@ -65,7 +65,7 @@ jobs:
         shell: bash
         run: |
           ls -lar /__e/node20 &&
-          apt-get install -y curl &&
+          apt update && apt-get install -y curl &&
           curl -Lo /tmp/node.tar.gz https://unofficial-builds.nodejs.org/download/release/v20.17.0/node-v20.17.0-linux-x64-glibc-217.tar.gz &&
           cd /__e/node20 &&
           tar -x --strip-components=1 -f /tmp/node.tar.gz &&
