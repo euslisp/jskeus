@@ -62,14 +62,15 @@
         img)
     nil))
 
-(defun write-png-file (fname img)
+(defun write-png-file (fname img &optional background)
   (let (byte-depth)
     (cond
      ((derivedp img grayscale-image) (setq byte-depth 1))
      ((derivedp img color-image24) (setq byte-depth (send img :byte-depth)))
      (t (error ";; write-png-file: unsupported image type ~A" img)))
   (png-write-image fname (send img :width) (send img :height) byte-depth
-                   (send img :entity))
+                   (send img :entity) background
+                   )
   ))
 
 (provide :png "@(#)$Id$")

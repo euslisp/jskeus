@@ -85,6 +85,9 @@ for test_l in irteus/test/*.l; do
 
     # osrf/ubuntu_arm64:trusty takes >50 min, skip irteus-demo.l
     [[ "$DOCKER_IMAGE" == *"arm64:trusty"* && $test_l =~ irteus-demo.l ]] && continue;
+    # arm64v8/ubuntu:focal takes >50 min, skip transport.l
+    [[ "$DOCKER_IMAGE" == "arm64v8/ubuntu:focal" && $test_l =~ transparent.l ]] && continue;
+
     # skip collision test because bullet of 2.83 or later version is not released in trusty and jessie.
     # https://github.com/euslisp/jskeus/blob/6cb08aa6c66fa8759591de25b7da68baf76d5f09/irteus/Makefile#L37
     [[ ( "$DOCKER_IMAGE" == *"trusty"* || "$DOCKER_IMAGE" == *"jessie"* ) && $test_l =~ test-collision.l ]] && continue;
@@ -101,6 +104,8 @@ for test_l in irteus/test/*.l; do
     export EXIT_STATUS=`expr $TMP_EXIT_STATUS + $EXIT_STATUS`;
 
     travis_time_end `expr 32 - $TMP_EXIT_STATUS`
+
+    [[ "$DOCKER_IMAGE" == "arm64v8/ubuntu:focal" ]] && continue;
 
     travis_time_start jskeus.compiled.${test_l##*/}.test
 

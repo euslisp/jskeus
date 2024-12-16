@@ -534,12 +534,14 @@
                         (t "000000")))
      ))
   (:save-image
-   (filename)
-   "save curent view to image, supported formats are jpg/png/pnm"
+   (filename &key background)
+   "save curent view to image, supported formats are jpg/png/pnm,
+    png supports transparent image with background. To use this feature, set :change-background #f(0 1 0) and specify #f(0 1 0) as background"
    (user::write-image-file filename
                            (send viewer :viewsurface :getglimage
                                  :width (- (send viewer :viewsurface :width) 1)
-                                 :height (send viewer :viewsurface :height))))
+                                 :height (send viewer :viewsurface :height))
+                           background))
   )
 
 (defun draw-things (objs)
