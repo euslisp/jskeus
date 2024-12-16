@@ -1,2 +1,56 @@
 \section{グラフ表現}
- \input{irtgraph-func}
+  グラフを利用するためには、\verb|graph|のインスタンスを作り、グラフを構成するノードとノード間を繋ぐエッジを追加していく。
+  エッジには方向があるため、無向グラフで二つのノードを接続する場合は\verb|:both|をtとして両方向に二つの\verb|arc|を追加する。
+  グラフの標準クラス\verb|graph|では全てのエッジのcostが1である。
+  作成したグラフはdot、pdf、pngなどの形式で保存でき、探索結果を引数に入れて経路を図示することもできる。
+
+  グラフ問題を解くソルバーは基底クラスの\verb|graph-search-solver|を継承しており、探索候補のノードをオープンリストに追加する順番やヒューリスティック関数を上書きする。
+  \verb|breadth-first-graph-search-solver|(幅優先探索)、\verb|depth-first-graph-search-solver|(深さ優先探索)、\verb|best-first-graph-search-solver|(最良優先探索)、\verb|a*-graph-search-solver|(A*探索)が実装されている。
+
+  グラフ問題を解く例を以下に示す。
+
+  {\baselineskip=10pt
+\begin{verbatim}
+;; Make graph
+(setq gr (instance graph :init))
+
+;; Add nodes
+(setq arad (instance node :init "Arad")
+      sibiu (instance node :init "Sibiu")
+      fagaras (instance node :init "Fagaras")
+      rimnicu (instance node :init "Rimnicu Vilcea")
+      pitesti (instance node :init "Pitesti")
+      bucharest (instance node :init "Bucharest")
+      zerind (instance node :init "Zerind")
+      oradea (instance node :init "Oradea"))
+(send gr :add-node arad)
+(send gr :add-node sibiu)
+(send gr :add-node fagaras)
+(send gr :add-node rimnicu)
+(send gr :add-node pitesti)
+(send gr :add-node bucharest)
+(send gr :add-node zerind)
+(send gr :add-node oradea)
+
+;; Add edges
+(setq ar1 (send gr :add-arc-from-to arad zerind :both t)
+      ar2 (send gr :add-arc-from-to zerind oradea :both t)
+      ar3 (send gr :add-arc-from-to oradea sibiu :both t)
+      ar4 (send gr :add-arc-from-to arad sibiu :both t)
+      ar5 (send gr :add-arc-from-to sibiu fagaras :both t)
+      ar6 (send gr :add-arc-from-to fagaras bucharest :both t)
+      ar7 (send gr :add-arc-from-to sibiu rimnicu :both t)
+      ar8 (send gr :add-arc-from-to rimnicu pitesti :both t)
+      ar9 (send gr :add-arc-from-to pitesti bucharest :both t))
+
+;; Search path from Arad to Bucharest
+(setq sol (instance breadth-first-graph-search-solver :init))
+(setq path (send sol :solve-by-name gr "Arad" "Bucharest"))
+
+;; Draw graph
+(send gr :write-to-pdf "test" path)))
+
+\end{verbatim}
+}
+
+\input{irtgraph-func}
