@@ -2,6 +2,87 @@
 Changelog for package jskeus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
+[Documentation]
+
+* [irteus/irtmath.l] Add docstring to lmeds functions & fix typo in comments (`#636 <https://github.com/euslisp/jskeus/issues/636>`_)
+* fixed formula of collision avoidance in jmanual (`#628 <https://github.com/euslisp/jskeus/issues/628>`_)
+* update comment in :joint-dof definition (`#632 <https://github.com/euslisp/jskeus/issues/632>`_)
+
+
+[Bug fix]
+
+* [irtrobot.l] fix bug in :calc-zmp-from-forces-moments (`#602 <https://github.com/euslisp/jskeus/issues/602>`_)
+  * add test for :calc-zmp-from-forces-moments
+
+* [irteus/irtutil.l] Enable to pass integer time-list to interpolator (`#625 <https://github.com/euslisp/jskeus/issues/625>`_)
+  * [irteus/irtutil.l] Optimize float conversion of time-list in interpolator, Reflect @Affonso-Gui's offline comment
+  * [irteus/irtutil.l] Enable to pass integer time-list to interpolator
+  * [irteus] Add test of passing integer time-list to interpolator
+    cf. https://github.com/euslisp/jskeus/pull/625
+
+* Avoid irteusx errors when a file named 'NIL' exists  (`#618 <https://github.com/euslisp/jskeus/issues/618>`_)
+* [irteus/irtmodel.l] fix Error in inverse-kinematics fail with :move-target (https://github.com/jsk-ros-pkg/jsk_pr2eus/issues/474) `#611 <https://github.com/euslisp/jskeus/issues/611>`_)
+  * add test code for (`#611 <https://github.com/euslisp/jskeus/issues/611>`_)
+  * [irteus/irtmodel.l] refactor conditional branch and comments for debug print of :inverse-kinematics
+
+[New features]
+
+* add write-to-png in irtgraph (`#623 <https://github.com/euslisp/jskeus/issues/623>`_)
+* [irteus/irtmodel.l] Display warning when input angle-vector dimension > the number of joints (`#612 <https://github.com/euslisp/jskeus/issues/612>`_)
+ * [irteus/irtmodel.l] Fix the case of multi dof link
+
+* [irteus/irtgraph.l] Add clear-open-list in solve-init (`#622 <https://github.com/euslisp/jskeus/issues/622>`_)
+  * [irteus/irtgraph.l] Add clear-open-list in solve-init
+  * [irteus/irtgraph.l] Add key :resume to solve-init
+  * [doc/irtgraph] Add example for irtgraph
+
+* png: enable to write transparent image with :background (`#630 <https://github.com/euslisp/jskeus/issues/630>`_)
+
+[Build]
+
+* use gcc -dumpmachine instaed of uname -m for docker environment (`#614 <https://github.com/euslisp/jskeus/issues/614>`_)
+  * use gcc -dumpmachine to detect target OS, istead of uname -m
+  see https://github.com/euslisp/EusLisp/pull/486 and https://github.com/euslisp/EusLisp/pull/485 for more info
+  * use arm64v8/ubuntu:{bionic,focal} instead of osrf/ubuntu_arm64, to fix segmentation fault
+
+[CI]
+
+* fix GA: runs-on ubuntu-latest and use container for 'catkin' check (`#638 <https://github.com/euslisp/jskeus/issues/638>`_)
+ * use archive repository for Debian Stretch
+ * skip a lot of test code for arm64v8, because qemu on ubuntu>18.04, see https://github.com/euslisp/jskeus/pull/615
+  * container does not have sudo
+
+* .github/workflows/config.yml: add test for compile in catkin (`#621 <https://github.com/euslisp/jskeus/issues/621>`_)
+  * add pkg-config libpng --cflags to set incldue dir when compile euspng
+    euspng requries <png.h> wihch libpng-dev provies, but irteus genrate png.h from png.l
+  * .github/workflows/config.yml: add test for compile in catkin
+
+* use arm64v8/ubuntu:{bionic,focal} instead of osrf/ubuntu_arm64, to fix segmentation fault (`#615 <https://github.com/euslisp/jskeus/issues/615>`_)
+  * use ubuntu-18.04 for host machine, in order to use previous qemu version for arm64v8/ubuntu https://launchpad.net/qemu/+packages
+  https://github.com/euslisp/EusLisp/pull/489
+  * apply same workaround as we have in EusLisp GA
+  * use arm64v8/ubuntu:{bionic,focal} instead of osrf/ubuntu_arm64, to fix segmentation fault
+
+* Fix CI (`#642 <https://github.com/euslisp/jskeus/issues/642>`_)
+  * .github/workflows/config.yml: use intel MacOS
+  * override node20 https://github.com/actions/upload-artifact/issues/616#issuecomment-2350667347
+  * .github/workflows/config.yml: add --platform for qemu environment
+  Fixes
+  ```
+  + docker run --rm --platform linux/amd64 -v /home/runner/work/EusLisp/EusLisp:/ws/euslisp -e ARCH=LinuxARM -t arm32v7/debian:unstable-slim bash -c '      set -x; set -e;      apt update -qq;      apt install -y -qq make gcc libgl-dev libglu1-mesa-dev libjpeg-dev libpng-dev libpq-dev libx11-dev libxext-dev;      CFLAGS='\''-Werror=implicit-function-declaration'\'' ARCH=LinuxARM EUSDIR=/ws/euslisp make -C /ws/euslisp/lisp/ -f Makefile.LinuxARM eus0;      CC='\''gcc -Werror'\'' ARCHDIR=LinuxARM EUSDIR=/ws/euslisp make -C /ws/euslisp/lisp/image/jpeg;      exit 0'
+  Unable to find image 'arm32v7/debian:unstable-slim' locally
+  unstable-slim: Pulling from arm32v7/debian
+  docker: no matching manifest for linux/amd64 in the manifest list entries.
+  ```
+  * osrf/ubuntu_arm64:trusty is deprecated
+    trusty: Pulling from osrf/ubuntu_arm64
+    docker: [DEPRECATION NOTICE] Docker Image Format v1 and Docker Image manifest version 2, schema 1 support is disabled by default and will be removed in an upcoming release. Suggest the author of docker.io/osrf/ubuntu_arm64:trusty to upgrade the image to the OCI Format or Docker Image manifest v2, schema 2. More information at https://docs.docker.com/go/deprecated-image-specs/.
+
+* Contributors: Aoi Nakane, Guilherme Affonso, Kei Okada, Masayuki Inaba, Naoki Hiraoka, Naoto Tsukamoto, Shingo Kitagawa, Shun Hasegawa, Masahiro Bando
+
 1.2.5 (2021-12-01)
 ------------------
 * copy gnuplotlib from euslib/jsk.l (`#261 <https://github.com/euslisp/jskeus/issues/261>`_)
