@@ -23,11 +23,6 @@ jobs:
           - DOCKER_IMAGE: debian:stretch
           - DOCKER_IMAGE: osrf/ubuntu_armhf:trusty
           - DOCKER_IMAGE: osrf/ubuntu_armhf:xenial
-          # - DOCKER_IMAGE: osrf/ubuntu_arm64:trusty  # deprecated
-          - DOCKER_IMAGE: osrf/ubuntu_arm64:xenial
-          - DOCKER_IMAGE: arm64v8/ubuntu:bionic
-          - DOCKER_IMAGE: arm64v8/ubuntu:focal
-          - DOCKER_IMAGE: osrf/debian_arm64:stretch
       fail-fast: false
 
     runs-on: ubuntu-latest
