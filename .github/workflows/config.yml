@@ -52,6 +52,43 @@ jobs:
           echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
           docker run $PLATFORM_OPTION --rm $QEMU_VOLUME -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "DOCKER_IMAGE=$DOCKER_IMAGE" -e "COLLISION_LIB=$COLLISION_LIB" -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"
 
+  linux-arm:
+    strategy:
+      matrix:
+        include:
+          - DOCKER_IMAGE: arm64v8/ubuntu:xenial
+          - DOCKER_IMAGE: arm64v8/ubuntu:bionic
+          - DOCKER_IMAGE: arm64v8/ubuntu:focal
+          - DOCKER_IMAGE: arm64v8/ubuntu:jammy
+          - DOCKER_IMAGE: arm64v8/ubuntu:noble
+          - DOCKER_IMAGE: arm64v8/debian:stretch
+          - DOCKER_IMAGE: arm64v8/debian:buster
+          - DOCKER_IMAGE: arm64v8/debian:bullseye
+          - DOCKER_IMAGE: arm64v8/debian:bookworm
+          - DOCKER_IMAGE: arm64v8/debian:trixie
+          - DOCKER_IMAGE: arm64v8/debian:sid
+      fail-fast: false
+
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+
+    name: linux-arm
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Run test
+        shell: bash
+        run: |
+          set -x
+          export CI_SOURCE_PATH=$(pwd)
+          export REPOSITORY_NAME=${PWD##*/}
+          export TRAVIS_BRANCH=${GITHUB_REF#refs/heads/}
+          export TRAVIS_OS_NAME=linux
+          export DOCKER_IMAGE=${{matrix.DOCKER_IMAGE}}
+          echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
+          docker run --rm $QEMU_VOLUME -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "DOCKER_IMAGE=$DOCKER_IMAGE" -e "COLLISION_LIB=$COLLISION_LIB" -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"
+
   catkin:
     runs-on: ubuntu-latest
     container:
