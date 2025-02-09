@@ -7,9 +7,19 @@ This repository contains software developed and used by [JSK](http://www.jsk.t.u
 
 ## 1. Getting started
 
-### 1.1 Install binary (RECOMMENDED: Ubuntu 18.04)
+### 1.1 Install from binary
 
-#### 1.1.1 Setup ROS repository
+Since Debian 11(Bullseye) / Ubuntu 22.04(jammy), euslisp/jskeus is distributed under official repository.
+See https://packages.debian.org/source/euslisp and https://launchpad.net/ubuntu/+source/euslisp
+
+```
+sudo apt update
+sudo apt install euslisp euslisp-dev jskeus jskeus-dev
+```
+
+### 1.2 Install for ROS1(~ Ubuntu 20.04) users
+
+#### 1.2.1 Setup ROS repository
 
 Please set `ROS_DISTRO` environment variable to your ROS distro. For example, if you use 18.04, run `export ROS_DISTRO=melodic`.
 ```
@@ -18,12 +28,12 @@ wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
 echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
 sudo apt-get update
 ```
-#### 1.1.2 Install Euslisp
+#### 1.2.2 Install Euslisp
 ```
 sudo apt-get install ros-$ROS_DISTRO-euslisp
 ```
 
-### 1.2 Install via Homebrew (OSX)
+### 1.3 Install via Homebrew (OSX)
 ```
 brew install euslisp/jskeus/jskeus
 ```

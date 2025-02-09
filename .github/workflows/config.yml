@@ -23,11 +23,6 @@ jobs:
           - DOCKER_IMAGE: debian:stretch
           - DOCKER_IMAGE: osrf/ubuntu_armhf:trusty
           - DOCKER_IMAGE: osrf/ubuntu_armhf:xenial
-          # - DOCKER_IMAGE: osrf/ubuntu_arm64:trusty  # deprecated
-          - DOCKER_IMAGE: osrf/ubuntu_arm64:xenial
-          - DOCKER_IMAGE: arm64v8/ubuntu:bionic
-          - DOCKER_IMAGE: arm64v8/ubuntu:focal
-          - DOCKER_IMAGE: osrf/debian_arm64:stretch
       fail-fast: false
 
     runs-on: ubuntu-latest
@@ -51,6 +46,43 @@ jobs:
           if [[ "$DOCKER_IMAGE" == *"arm64v8"* ]]; then export QEMU_VOLUME="-v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-static"; export PLATFORM_OPTION="--platform linux/aarch64"; fi #
           echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
           docker run $PLATFORM_OPTION --rm $QEMU_VOLUME -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "DOCKER_IMAGE=$DOCKER_IMAGE" -e "COLLISION_LIB=$COLLISION_LIB" -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"
+
+  linux-arm:
+    strategy:
+      matrix:
+        include:
+          - DOCKER_IMAGE: arm64v8/ubuntu:xenial
+          - DOCKER_IMAGE: arm64v8/ubuntu:bionic
+          - DOCKER_IMAGE: arm64v8/ubuntu:focal
+          - DOCKER_IMAGE: arm64v8/ubuntu:jammy
+          - DOCKER_IMAGE: arm64v8/ubuntu:noble
+          - DOCKER_IMAGE: arm64v8/debian:stretch
+          - DOCKER_IMAGE: arm64v8/debian:buster
+          - DOCKER_IMAGE: arm64v8/debian:bullseye
+          - DOCKER_IMAGE: arm64v8/debian:bookworm
+          - DOCKER_IMAGE: arm64v8/debian:trixie
+          - DOCKER_IMAGE: arm64v8/debian:sid
+      fail-fast: false
+
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+
+    name: linux-arm
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Run test
+        shell: bash
+        run: |
+          set -x
+          export CI_SOURCE_PATH=$(pwd)
+          export REPOSITORY_NAME=${PWD##*/}
+          export TRAVIS_BRANCH=${GITHUB_REF#refs/heads/}
+          export TRAVIS_OS_NAME=linux
+          export DOCKER_IMAGE=${{matrix.DOCKER_IMAGE}}
+          echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
+          docker run --rm $QEMU_VOLUME -v $CI_SOURCE_PATH:$CI_SOURCE_PATH -e "DOCKER_IMAGE=$DOCKER_IMAGE" -e "COLLISION_LIB=$COLLISION_LIB" -e "CI_SOURCE_PATH=$CI_SOURCE_PATH" -e "HOME=$HOME" -t $DOCKER_IMAGE sh -c "cd $CI_SOURCE_PATH; ./.travis.sh"
 
   catkin:
     runs-on: ubuntu-latest
@@ -145,6 +177,7 @@ jobs:
         shell: bash
         run: |
           set -x
+          sudo apt-get update -y -qq
           sudo apt-get install -y -qq git make gcc g++ libjpeg-dev libxext-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev libpq-dev libpng-dev xfonts-100dpi xfonts-75dpi pkg-config libbullet-dev
           make
           sudo apt-get install -y -qq texlive-binaries texlive-lang-cjk texlive-lang-japanese poppler-utils nkf latex2html
