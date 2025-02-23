@@ -1605,8 +1605,9 @@ M_{r} \bm{E}_3 & - M_{r} \hat{\bm{p}}_{B\to G}\\
 う場合の例を示す．ここでは，\verb|:calc-jacobian-from-link-list|のオプ
 ショナル引数として\verb|:rotation-axis|, \verb|:translation-axis|
 があり，それぞれ位置，姿勢での拘束条件を示す．
-\verb|t|は三軸拘束，\verb|nil|は拘束なし，その他に\verb|:x|,
-\verb|:y|, \verb|:z|を指定することができる．
+\verb|t|は三軸拘束，\verb|nil|は拘束なしを示し，その他に拘束なしの軸を
+エンドエフェクタの座標系で\verb|:x|, \verb|:y|, \verb|:z|, \verb|:xy|,
+\verb|:yz|, \verb|:zx|と指定することができる．
 
 {\baselineskip=10pt
 \begin{verbatim}
