@@ -219,7 +219,7 @@ $(BINS):
 	(cd $(INSTALLBINDIR); ln -sf eus$(ESFX) irteus$(ESFX))
 	(cd $(INSTALLBINDIR); ln -sf eusgl$(ESFX) irteusgl$(ESFX))
 $(EUSDIR)/irteus:
-	(cd $(IRTEUSDIR); ln -sf ../irteus irteus)
+	(cd $(IRTEUSDIR); rm -f irteus; ln -sf ../irteus irteus)
 
 install-irtext.l: $(IRTEUSDIR)/lib/irtext.l
 $(IRTEUSDIR)/lib/irtext.l: irtext.l
