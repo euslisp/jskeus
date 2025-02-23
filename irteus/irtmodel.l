@@ -52,7 +52,8 @@
   :slots (parent-link child-link joint-angle min-angle max-angle default-coords
 		      joint-velocity joint-acceleration joint-torque
 		      max-joint-velocity max-joint-torque
-                      joint-min-max-table joint-min-max-target))
+                      joint-min-max-table joint-min-max-target)
+  :documentation "abstract class of joint, users need to use rotational-joint, linear-joint, sphere-joint, 6dof-joint, wheel-joint or omniwheel-joint." )
 
 (defmethod joint
   (:init (&key (name (intern (format nil "joint~A" (sys::address self)) "KEYWORD"))
@@ -63,8 +64,7 @@
 	       ((:joint-min-max-table mm-table))
                ((:joint-min-max-target mm-target))
 	       &allow-other-keys)
-         "abstract class of joint, users need to use rotational-joint, linear-joint, sphere-joint, 6dof-joint, wheel-joint or omniwheel-joint.
-          use :parent-link/:child-link for specifying links that this joint connect to and :min/:min for range of joint angle in degree."
+         "use :parent-link/:child-link for specifying links that this joint connect to and :min/:min for range of joint angle in degree."
 	 (send self :name name)
 	 (setq parent-link plink child-link clink
 	       min-angle min max-angle max)
