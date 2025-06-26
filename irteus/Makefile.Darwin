@@ -53,7 +53,7 @@ ESFX=
 SOFLAGS=-g -falign-functions=8
 IMPLIB=-L$(EUSDIR)/$(ARCHDIR)/lib -leusgeo -L$(INSTALLLIBDIR) -lnr
 IMPLIBGL=-L$(EUSDIR)/$(ARCHDIR)/lib -leusgl -L/usr/X11R6/lib -lGLU -lGL -lXext
-IMPLIBIMG=-L/opt/local/lib/jpeg6b/lib -ljpeg -L/opt/local/lib -lpng
+IMPLIBIMG=-L/opt/local/lib/jpeg6b/lib -ljpeg -L/opt/local/lib -lpng -L/opt/homebrew/lib -L/usr/local/lib
 EXPLIB=
 RAPID=-LRAPID/$(ARCHDIR) -lRAPID-static
 RAPIDLIB=RAPID/$(ARCHDIR)/$(LPFX)RAPID-static.a
@@ -64,14 +64,23 @@ SVNVERSION=\"$(shell git rev-parse --short HEAD)\"
 ARCH=Darwin
 # copy from eus/lisp/Makefile.Darwin
 OS_VERSION=$(shell sw_vers -productVersion | sed s/\.[^.]*$$//)
+ARCH_TYPE=$(shell uname -m)
 ifeq ($(OS_VERSION), 10.5) 
  MACHINE=i386
 else
- MACHINE=x86_64
+ ifeq ($(ARCH_TYPE), arm64)
+  MACHINE=arm64
+ else
+  MACHINE=x86_64
+ endif
 endif
 THREAD= -DTHREADED -DPTHREAD
 
-CFLAGS=-O2 -D$(MACHINE) -D$(ARCH) -DLinux -D_REENTRANT -DGCC -I/opt/local/include -I$(EUSDIR)/include $(THREAD)  -DSVNVERSION=$(SVNVERSION)
+ifeq ($(MACHINE), arm64)
+CFLAGS=-O2 -D$(MACHINE) -Daarch64 -D$(ARCH) -DLinux -D_REENTRANT -DGCC -I/opt/local/include -I/opt/homebrew/include -I/usr/local/include -I$(EUSDIR)/include $(THREAD)  -DSVNVERSION=$(SVNVERSION)
+else
+CFLAGS=-O2 -D$(MACHINE) -D$(ARCH) -DLinux -D_REENTRANT -DGCC -I/opt/local/include -I/opt/homebrew/include -I/usr/local/include -I$(EUSDIR)/include $(THREAD)  -DSVNVERSION=$(SVNVERSION)
+endif
 CXXFLAGS=$(CFLAGS)
 
 CFLAGS+= -g -falign-functions=8 -fPIC
