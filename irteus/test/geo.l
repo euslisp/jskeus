@@ -11,7 +11,7 @@
          (normal (float-vector 0 0 0))
 	 eps)
     ;; somehow arm architecture needs to return #f(0 0 0) for small normalized vectors
-    (if (member :arm *features*)
+    (if (or (member :arm *features*) (member :aarch64 *features*))
 	(setq eps 1.0e-10)
       (setq eps 1.0e-20))
     (while vlist
