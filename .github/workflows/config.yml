@@ -112,7 +112,9 @@ jobs:
           apt-get install -qq -y dpkg  # necessary for catkin-pkg to be installable
           echo "Testing branch $GITHUB_REF of $GITHUB_REPOSITORY"
           sh -c 'echo "deb http://packages.ros.org/ros-shadow-fixed/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
-          wget http://packages.ros.org/ros.key -O - | apt-key add -
+          # Replace the old apt-key add with the new method for adding the key
+          # https://github.com/ros/rosdistro/pull/46048
+          curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
           apt-get update -qq
           apt-get install -qq -y python-catkin-tools python-rosdep
           apt-get install -qq -y build-essential git ros-melodic-rosbash ros-melodic-rospack
