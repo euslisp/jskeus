@@ -228,6 +228,8 @@ jobs:
           export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
           # since macos-11, we need to install GL/gl.h
           HOMEBREW_NO_AUTO_UPDATE=1 brew install mesa-glu
+          # since macos-14, we need to install GL/gl.h for mesalib-glw and X11 for xquartz
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install mesalib-glw xquartz
           ./.travis-osx.sh
       - name: Cleanup some brew downloads
         run: cd ${{ steps.brew-cache.outputs.dir }} && ls -lsS | head -n 10 | awk '{ print $10 }' | xargs rm -rf
