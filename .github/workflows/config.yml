@@ -112,7 +112,9 @@ jobs:
           apt-get install -qq -y dpkg  # necessary for catkin-pkg to be installable
           echo "Testing branch $GITHUB_REF of $GITHUB_REPOSITORY"
           sh -c 'echo "deb http://packages.ros.org/ros-shadow-fixed/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
-          wget http://packages.ros.org/ros.key -O - | apt-key add -
+          # Replace the old apt-key add with the new method for adding the key
+          # https://github.com/ros/rosdistro/pull/46048
+          curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
           apt-get update -qq
           apt-get install -qq -y python-catkin-tools python-rosdep
           apt-get install -qq -y build-essential git ros-melodic-rosbash ros-melodic-rospack
@@ -186,7 +188,18 @@ jobs:
 
 
   osx:
-    runs-on: macos-13  # https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md
+    strategy:
+      matrix:
+        include:
+          # https://github.com/actions/runner-images/tree/main/images/macos
+          # Note: To test macOS-x with Intel architecture,
+          # you need to use the paid macOS-x-large runner, as macOS-x is grouped with ARM-based runners.
+          # https://docs.github.com/en/actions/concepts/runners/about-larger-runners
+          - runs-on: macos-13  # Intel (x64)
+          - runs-on: macos-14  # ARM64 (Apple Silicon)
+          - runs-on: macos-15  # ARM64 (Apple Silicon)
+      fail-fast: false
+    runs-on: ${{ matrix.runs-on }}
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -195,7 +208,7 @@ jobs:
         id: brew-cache
         run: echo "::set-output name=dir::$(brew --cache)/downloads"
       - name: Brew cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ${{ steps.brew-cache.outputs.dir }}
           key: ${{ runner.os }}-${{ hashFiles('.github/workflows/Brewfile') }}
@@ -217,6 +230,10 @@ jobs:
           export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
           # since macos-11, we need to install GL/gl.h
           HOMEBREW_NO_AUTO_UPDATE=1 brew install mesa-glu
+          # since macos-14, we need to install GL/gl.h for mesalib-glw and X11 for xquartz
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install mesalib-glw xquartz
+          # since macos-13, we need to install jpeg
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install jpeg
           ./.travis-osx.sh
       - name: Cleanup some brew downloads
         run: cd ${{ steps.brew-cache.outputs.dir }} && ls -lsS | head -n 10 | awk '{ print $10 }' | xargs rm -rf
