@@ -17,6 +17,10 @@ sudo apt update
 sudo apt install euslisp euslisp-dev jskeus jskeus-dev
 ```
 
+#### Packaging Status
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/jskeus.svg)](https://repology.org/project/jskeus/versions)
+
 ### 1.2 Install for ROS1(~ Ubuntu 20.04) users
 
 #### 1.2.1 Setup ROS repository
