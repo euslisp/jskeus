@@ -95,6 +95,16 @@
    (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
                              (crawl-walk-motion-for-sample-robot :go-backward-over nil))))))
 
+(deftest test-trot-walk-motion-for-sample-centaur-robot
+  (assert
+   (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
+                             (trot-walk-motion-for-sample-centaur-robot))))))
+
+(deftest test-crawl-walk-motion-for-sample-centaur-robot
+  (assert
+   (not (some #'null (mapcar #'(lambda (x) (cadr (memq :angle-vector x)))
+                             (crawl-walk-motion-for-sample-centaur-robot))))))
+
 (deftest test-walk-motion-for-robots
   (assert
    (every #'identity
