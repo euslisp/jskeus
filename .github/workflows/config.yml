@@ -206,6 +206,7 @@ jobs:
           - runs-on: macos-15-intel  # Intel (x64)
           - runs-on: macos-14  # ARM64 (Apple Silicon)
           - runs-on: macos-15  # ARM64 (Apple Silicon)
+          - runs-on: macos-26  # ARM64 (Apple Silicon)
       fail-fast: false
     runs-on: ${{ matrix.runs-on }}
     timeout-minutes: 60
