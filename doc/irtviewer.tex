@@ -44,3 +44,42 @@ Irtviewerを作成して，背景を白にして，xy平面のグリッドを黒
 
 
 \input{irtviewer-func}
+
+
+\subsection{Animation GIF}
+
+\verb+with-save-animgif+ マクロを用いることでAnimation Gifファイルを生成することが出来る．
+
+
+{\baselineskip=10pt
+\begin{verbatim}
+(with-save-animgif "file"
+  (dotimes (a 45)
+    (send *robot* :larm-shoulder-r :joint-angle (* a 4))
+    (send *irtviewer*:draw-objects)))
+\end{verbatim}
+}
+
+\verb+with-save-mpeg+を用いることで\verb+mpeg+ファイルの生成も可能である．
+
+\subsection{Eps}
+
+\verb+irtdraw-save+ を用いることでEpsファイルを生成することが出来る．
+
+{\baselineskip=10pt
+\begin{verbatim}
+(defun irtdraw-demo-hand nil
+  (load "irteus/demo/demo.l")
+  (hand-grasp)
+  (irtdraw-save :fname "hand-grasp.eps"
+                :bodies (cons (cadr (objects))
+                              (send (car (objects)) :bodies)))
+  )
+(defun irtdraw-dual-arm nil
+  (load "irteus/demo/demo.l")
+  (dual-arm-ik)
+  (irtdraw-save :fname "dual-arm.eps"
+                :bodies (flatten (send-all (objects) :bodies)))
+  )
+\end{verbatim}
+}

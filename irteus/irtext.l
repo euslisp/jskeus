@@ -53,7 +53,7 @@
   (load-library
    (format nil "~A~A/lib/libirteusg"
 	   *eusdir* (unix:getenv "ARCHDIR"))
-   '("irtgeo" "euspqp" "pqp" "irtscene" "irtmodel" "irtdyna" "irtrobot" "irtsensor" "irtbvh" "irtcollada" "irtstl" "irtwrl" "irtpointcloud" "eusbullet" "bullet" "irtcollision"))
+   '("irtgeo" "euspqp" "pqp" "irtscene" "irtmodel" "irtdyna" "irtrobot" "irtsensor" "irtbvh" "irtcollada" "irtstl" "irtwrl" "irtdraw" "irtpointcloud" "eusbullet" "bullet" "irtcollision"))
   (in-package "USER")
   (import '(collada::convert-irtmodel-to-collada collada::eus2collada)))
 (defun load-irteusx ()

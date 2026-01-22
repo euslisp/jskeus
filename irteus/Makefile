@@ -94,7 +94,7 @@ MODULES.L=irt_modules.l
 EUSLIB_MODULES.L=$(addprefix $(EUSDIR)/lib/,$(MODULES.L))
 
 IRTEUS=irtmath irtutil irtgraph gnuplotlib pgsql time
-IRTEUSG=irtgeo pqp bullet irtcollision irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud irtstl irtwrl
+IRTEUSG=irtgeo pqp bullet irtcollision irtscene irtmodel irtsensor irtdyna irtrobot irtbvh irtcollada irtpointcloud irtstl irtwrl irtdraw
 IRTEUSX=irtx
 IRTEUSIMG=irtimage eusjpeg png
 IRTEUSGL=irtgl irtglrgb irtviewer
@@ -253,6 +253,7 @@ $(INSTALLOBJDIR)/irtdyna.$(OSFX): irtdyna.l
 $(INSTALLOBJDIR)/irtcollada.$(OSFX): irtcollada.l
 $(INSTALLOBJDIR)/irtstl.$(OSFX): irtstl.l
 $(INSTALLOBJDIR)/irtwrl.$(OSFX): irtwrl.l
+$(INSTALLOBJDIR)/irtdraw.$(OSFX): irtdraw.l
 $(INSTALLOBJDIR)/irtsensor.$(OSFX): irtsensor.l
 $(INSTALLOBJDIR)/irtpointcloud.$(OSFX): irtpointcloud.l
 $(INSTALLOBJDIR)/irtrobot.$(OSFX): irtrobot.l
