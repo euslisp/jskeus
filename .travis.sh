@@ -26,7 +26,16 @@ if [[ "$DOCKER_IMAGE" == *"stretch" || "$DOCKER_IMAGE" == *"buster" ]]; then
     sed -i 's/[[:alpha:]]*.debian.org/archive.debian.org/' /etc/apt/sources.list
     sed -i '/stretch-updates/ s/^#*/#/' /etc/apt/sources.list
 fi
-if [ "$(which sudo)" == "" ]; then apt-get update && apt-get install -y sudo; else sudo apt-get update; fi
+# Debian Bullseye's LTS support has ended, so deb.debian.org no longer serves
+# bullseye(-security) packages. Switch to the snapshot.debian.org mirror lines
+# the bullseye image ships commented out, and skip the Valid-Until check since
+# a frozen suite's Release file quickly goes stale.
+APT_GET_UPDATE_OPTS=""
+if [[ "$DOCKER_IMAGE" == *"bullseye" ]]; then
+    sed -i -e '/^# deb http:\/\/snapshot.debian.org/s/^# //' -e '/^deb http:\/\/deb.debian.org/s/^/# /' /etc/apt/sources.list
+    APT_GET_UPDATE_OPTS="-o Acquire::Check-Valid-Until=false"
+fi
+if [ "$(which sudo)" == "" ]; then apt-get update $APT_GET_UPDATE_OPTS && apt-get install -y sudo; else sudo apt-get update $APT_GET_UPDATE_OPTS; fi
 travis_time_end
 
 travis_time_start setup.apt-get_install

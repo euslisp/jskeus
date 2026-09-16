@@ -1194,7 +1194,7 @@ fs is geomatry::faceset"
 (defun make-glvertices-from-faces (flst &key (material))
   "returns glvertices instance
 flst is list of geomatry::face"
-  (setq flst (flatten (mapcar #'(lambda (f) (geometry::face-to-triangle-aux f)) flst)))
+  (setq flst (flatten (mapcar #'(lambda (f) (geometry::face-to-triangle-fast f)) flst)))
   (let ((mat (make-matrix (* 3 (length flst)) 3))
         (nom (make-matrix (* 3 (length flst)) 3))
         (idx (instantiate integer-vector (* 3 (length flst))))

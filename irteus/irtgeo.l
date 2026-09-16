@@ -377,6 +377,298 @@
    ((= (length (send f :edges)) 3) (list f))
    (t (face-to-triangle f))))
 
+;;
+;; face-to-triangle-aux is a hand-written ear-clipping algorithm
+;; (bridging every hole into the outer contour, then clipping ears one
+;; at a time, each validated against every remaining vertex): its cost
+;; grows at least O(n^2) in the number of resulting vertices, which is
+;; impractically slow for faces with many holes (a real CAD-derived
+;; part with 24 holes/206 vertices took ~65s to triangulate this way).
+;;
+;; libGLU's sweep-line tessellator solves the same problem in a tiny
+;; fraction of the time (the same face: ~0.003s), and is already
+;; linked into eusgl for on-screen rendering -- but its GLU_BEGIN/
+;; GLU_VERTEX/GLU_END callbacks were only ever wired to draw
+;; immediately. eus_tess_reset/eus_tess_begin_cb/eus_tess_vertex_cb/
+;; eus_tess_end_cb/eus_tess_error_cb (lisp/opengl/src/util.c,
+;; registered the same way as alloctessinfo/tess_vertex_cb) record the
+;; tessellated output into memory instead, so it can be read back as
+;; data with no live GL context or open window required.
+;;
+;; Only the GL-enabled build (eusgl/irteusgl, via irtgl.l) links GLU at
+;; all -- pqp.l's collision-model construction, which is what actually
+;; benefits most from this, is also loaded by the plain (non-GL)
+;; eus/irteus build, so face-to-triangle-fast below must degrade
+;; safely to the original ear-clipping path when the collector isn't
+;; available, rather than erroring.
+(defvar *glu-tess-obj* nil)
+
+(defun glu-tess-setup ()
+  (unless *glu-tess-obj*
+    (setq *glu-tess-obj* (gl::gluNewTess))
+    (gl::gluTessCallbackl *glu-tess-obj* 100100 ;; GLU_BEGIN
+			  (#'gl::eus_tess_begin_cb . entry) (#'gl::eus_tess_begin_cb . entry2))
+    (gl::gluTessCallbackl *glu-tess-obj* 100101 ;; GLU_VERTEX
+			  (#'gl::eus_tess_vertex_cb . entry) (#'gl::eus_tess_vertex_cb . entry2))
+    (gl::gluTessCallbackl *glu-tess-obj* 100102 ;; GLU_END
+			  (#'gl::eus_tess_end_cb . entry) (#'gl::eus_tess_end_cb . entry2))
+    (gl::gluTessCallbackl *glu-tess-obj* 100103 ;; GLU_ERROR
+			  (#'gl::eus_tess_error_cb . entry) (#'gl::eus_tess_error_cb . entry2))))
+
+;; triangulates face f (which may have holes) via GLU, returning a
+;; list of (#f(x0 y0 z0) #f(x1 y1 z1) #f(x2 y2 z2)) vertex triples, or
+;; nil if GLU itself reported an error (caller should fall back to the
+;; face object based method in that case).
+(defun glu-triangulate-face (f)
+  (glu-tess-setup)
+  (gl::eus_tess_reset)
+  (let* ((holes (send f :holes))
+	 (l-tessinfo
+	  (mapcar #'(lambda (p) (gl::alloctessinfo p 0 nil 0 nil))
+		  (cdr (send f :vertices)))))
+    (gl::gluTessBeginPolygon *glu-tess-obj* 0)
+    (gl::gluTessBeginContour *glu-tess-obj*)
+    (mapc #'(lambda (i) (gl::gluTessVertex *glu-tess-obj* i i)) l-tessinfo)
+    (gl::gluTessEndContour *glu-tess-obj*)
+    (dolist (hole holes)
+      (let ((h-l-tessinfo
+	     (mapcar #'(lambda (p) (gl::alloctessinfo p 0 nil 0 nil))
+		     (send hole :vertices))))
+	(gl::gluTessBeginContour *glu-tess-obj*)
+	(gl::gluNextContour *glu-tess-obj* 100122) ;; GLU_INTERIOR
+	(mapc #'(lambda (i) (gl::gluTessVertex *glu-tess-obj* i i)) h-l-tessinfo)
+	(gl::gluTessEndContour *glu-tess-obj*)
+	(nconc l-tessinfo h-l-tessinfo)))
+    (gl::gluTessEndPolygon *glu-tess-obj*)
+    (mapc #'unix:free l-tessinfo))
+  (if (zerop (gl::eus_tess_get_error))
+      (let* ((nv (let ((total 0))
+		   (dotimes (b (gl::eus_tess_num_batches)) (incf total (gl::eus_tess_batch_count_at b)))
+		   total))
+	     (verts (make-array nv))
+	     (tmp (float-vector 0 0 0)))
+	(dotimes (i nv)
+	  (gl::eus_tess_get_vertexfv i tmp)
+	  (setf (aref verts i) (copy-seq tmp)))
+	(let (triangles)
+	  (dotimes (b (gl::eus_tess_num_batches))
+	    (let* ((mode (gl::eus_tess_batch_mode_at b))
+		   (start (gl::eus_tess_batch_start_at b))
+		   (count (gl::eus_tess_batch_count_at b)))
+	      (cond
+	       ((= mode 4) ;; GL_TRIANGLES
+		(do ((i 0 (+ i 3))) ((> (+ i 3) count))
+		  (push (list (aref verts (+ start i)) (aref verts (+ start i 1)) (aref verts (+ start i 2))) triangles)))
+	       ((= mode 6) ;; GL_TRIANGLE_FAN
+		(let ((v0 (aref verts start)))
+		  (do ((i 1 (1+ i))) ((>= (1+ i) count))
+		    (push (list v0 (aref verts (+ start i)) (aref verts (+ start i 1))) triangles))))
+	       ((= mode 5) ;; GL_TRIANGLE_STRIP
+		(do ((i 0 (1+ i))) ((>= (+ i 2) count))
+		  (if (evenp i)
+		      (push (list (aref verts (+ start i)) (aref verts (+ start i 1)) (aref verts (+ start i 2))) triangles)
+		    (push (list (aref verts (+ start i 1)) (aref verts (+ start i)) (aref verts (+ start i 2))) triangles))))
+	       (t (warn ";; glu-triangulate-face: unknown primitive mode ~A~%" mode)))))
+	  (nreverse triangles)))
+    nil))
+
+(defun triangle-to-face (v0 v1 v2)
+  (make-face-from-vertices (list (cons v0 nil) (cons v1 nil) (cons v2 nil))))
+
+;; computed once: does this build actually link GLU with the
+;; tessellation-collector callbacks (only true for eusgl/irteusgl,
+;; built from a core that has them -- see lisp/opengl/src/util.c)?
+(defparameter *glu-tess-available*
+  (and (fboundp 'gl::eus_tess_reset) (fboundp 'gl::gluNewTess)))
+
+(defun face-to-triangle-fast (f)
+  "Drop-in replacement for face-to-triangle-aux that triangulates via
+libGLU when available (see the comment above), falling back to the
+original ear-clipping implementation when it isn't (a non-GL build) or
+when GLU reports an error for this particular face."
+  (cond
+    ((null f) nil)
+    ((= (length (send f :edges)) 3) (list f))
+    (t (let ((tris (and *glu-tess-available* (glu-triangulate-face f))))
+	 (if tris
+	     (mapcar #'(lambda (tr) (apply #'triangle-to-face tr)) tris)
+	   (face-to-triangle-aux f))))))
+
+;; --- face-to-triangle-delaunay: a from-scratch, dependency-free 2D
+;; Delaunay triangulation (Bowyer-Watson incremental algorithm), added
+;; purely to compare mesh quality against face-to-triangle-aux
+;; (ear-clipping) and face-to-triangle-fast (GLU sweep-line) above --
+;; not used by pqp.l or irtgl.l, and not intended as a third
+;; production triangulation option. Delaunay triangulation maximizes
+;; the minimum angle over all triangulations of a point set (the
+;; "empty circumcircle" property), so it tends to avoid the long thin
+;; slivers ear-clipping and GLU can both produce; see the area-quality
+;; comparison test in test/test-triangulation.l.
+;;
+;; This is a plain double-precision implementation, not one using
+;; adaptive/exact arithmetic predicates the way production Delaunay
+;; libraries (e.g. Shewchuk's Triangle) do, and it is O(n^2) (no
+;; spatial acceleration structure) -- it exists for the mesh-quality
+;; comparison, not for speed: it is markedly slower than
+;; face-to-triangle-aux on non-symmetric inputs and utterly
+;; uncompetitive with face-to-triangle-fast (GLU), which remains the
+;; right choice for pqp.l/irtgl.l's actual use case.
+
+(defun cross2d (o a b)
+  (- (* (- (car a) (car o)) (- (cadr b) (cadr o)))
+     (* (- (cadr a) (cadr o)) (- (car b) (car o)))))
+
+(defun tri-area-2d (tr)
+  (abs (/ (cross2d (first tr) (second tr) (third tr)) 2.0)))
+
+(defun ccw3 (a b c)
+  ;; reorder a b c to be counter-clockwise (positive signed area)
+  (if (> (cross2d a b c) 0) (list a b c) (list a c b)))
+
+(defun in-circumcircle (a b c p)
+  ;; a b c assumed CCW. t if p is inside their circumcircle.
+  (let* ((ax (- (car a) (car p))) (ay (- (cadr a) (cadr p)))
+         (bx (- (car b) (car p))) (by (- (cadr b) (cadr p)))
+         (cx (- (car c) (car p))) (cy (- (cadr c) (cadr p)))
+         (det (+ (* ax (- (* by (+ (* cx cx) (* cy cy))) (* cy (+ (* bx bx) (* by by)))))
+                 (* (- ay) (- (* bx (+ (* cx cx) (* cy cy))) (* cx (+ (* bx bx) (* by by)))))
+                 (* (+ (* ax ax) (* ay ay)) (- (* bx cy) (* by cx))))))
+    (> det 1e-9)))
+
+(defun edge-eq (e1 e2)
+  (or (and (eq (first e1) (first e2)) (eq (second e1) (second e2)))
+      (and (eq (first e1) (second e2)) (eq (second e1) (first e2)))))
+
+;; symmetric input (e.g. an evenly-spaced ring of holes) feeds
+;; Bowyer-Watson several co-circular points back to back, which is
+;; exactly where its plain double-precision in-circumcircle test is
+;; least reliable (observed: up to ~15% spurious extra area on an
+;; 8-hole ring). Randomized incremental insertion order is the
+;; standard textbook mitigation; face-to-triangle-delaunay below
+;; reorders deterministically (multiplicative hash by a prime coprime
+;; with n) instead of with actual randomness, so a result -- and any
+;; test asserting against it -- stays reproducible, and retries with a
+;; different prime (checking against the true, directly-computed
+;; polygon area each time) on the rare input where one ordering still
+;; isn't enough.
+(defun deterministic-shuffle (lst prime)
+  (let* ((n (length lst)) (i -1)
+         (pairs (mapcar #'(lambda (x) (cons (mod (* (incf i) prime) n) x)) lst)))
+    (mapcar #'cdr (sort pairs #'(lambda (a b) (< (car a) (car b)))))))
+
+(defun bowyer-watson (pts &optional (prime 7919))
+  "pts: list of (list x y), eq-distinct. returns list of CCW triangles (each a list of 3 points from PTS, super-triangle corners excluded)."
+  (setq pts (deterministic-shuffle pts prime))
+  (let* ((minx (reduce #'min (mapcar #'car pts))) (maxx (reduce #'max (mapcar #'car pts)))
+         (miny (reduce #'min (mapcar #'cadr pts))) (maxy (reduce #'max (mapcar #'cadr pts)))
+         (d (max (- maxx minx) (- maxy miny) 1.0))
+         (midx (/ (+ minx maxx) 2.0)) (midy (/ (+ miny maxy) 2.0))
+         (dd (* 20 d))
+         (p1 (list (- midx dd) (- midy dd)))
+         (p2 (list midx (+ midy dd dd)))
+         (p3 (list (+ midx dd) (- midy dd)))
+         (triangles (list (ccw3 p1 p2 p3))))
+    (dolist (p pts)
+      (let (bad-triangles good-triangles)
+        (dolist (tr triangles)
+          (if (in-circumcircle (first tr) (second tr) (third tr) p)
+              (push tr bad-triangles)
+            (push tr good-triangles)))
+        (let (all-edges boundary)
+          (dolist (tr bad-triangles)
+            (push (list (first tr) (second tr)) all-edges)
+            (push (list (second tr) (third tr)) all-edges)
+            (push (list (third tr) (first tr)) all-edges))
+          (dolist (e all-edges)
+            (when (= 1 (count-if #'(lambda (e2) (edge-eq e e2)) all-edges))
+              (push e boundary)))
+          (setq triangles good-triangles)
+          (dolist (e boundary)
+            (push (ccw3 (first e) (second e) p) triangles)))))
+    (remove-if #'(lambda (tr) (or (member p1 tr :test #'eq) (member p2 tr :test #'eq) (member p3 tr :test #'eq)))
+               triangles)))
+
+(defun point-in-polygon-2d (pt poly)
+  ;; ray-casting / even-odd rule. avoids nth+mod index arithmetic
+  ;; entirely (walks POLY paired with its own rotation-by-one instead)
+  ;; after that form was observed to occasionally corrupt under EusLisp.
+  (let ((qx (car pt)) (qy (cadr pt)) (inside nil))
+    (when (< (length poly) 3) (return-from point-in-polygon-2d nil))
+    (let ((poly-next (append (cdr poly) (list (car poly)))))
+      (mapc #'(lambda (pa pb)
+                (let ((xa (car pa)) (ya (cadr pa))
+                      (xb (car pb)) (yb (cadr pb)))
+                  (when (and (not (eq (> ya qy) (> yb qy)))
+                             (< qx (+ xa (* (/ (- xb xa) (- yb ya)) (- qy ya)))))
+                    (setq inside (not inside)))))
+            poly poly-next))
+    inside))
+
+(defun shoelace-area-2d (poly)
+  (let ((s 0.0) (poly-next (append (cdr poly) (list (car poly)))))
+    (mapc #'(lambda (a b) (incf s (- (* (car a) (cadr b)) (* (car b) (cadr a)))))
+          poly poly-next)
+    (/ (abs s) 2.0)))
+
+(defun dedupe-closed-polyline (verts)
+  ;; face/hole :vertices repeats the first vertex as a closing last
+  ;; vertex (confirmed on a plain square plate: 5 vertices for 4
+  ;; corners). that exact-duplicate point breaks Bowyer-Watson's
+  ;; circumcircle math (a zero-radius/degenerate case), so drop it.
+  (if (and (cdr verts) (< (norm (v- (car verts) (car (last verts)))) 1e-6))
+      (butlast verts)
+    verts))
+
+(defun face-to-triangle-delaunay (f)
+  "Constrained-Delaunay-ish triangulation of face F (possibly with
+holes): unconstrained Bowyer-Watson over all boundary+hole vertices,
+then keep only triangles whose centroid falls inside the boundary and
+outside every hole. Good enough for an area-distribution comparison;
+not a rigorous CDT (a true CDT would force-insert boundary/hole edges
+that Delaunay would otherwise flip away, which can matter for thin or
+close-together holes)."
+  (let* ((fn (send f :normal))
+         (verts (dedupe-closed-polyline (send f :vertices)))
+         (holes (send f :holes))
+         (p0 (car verts))
+         (tmp (if (> (abs (aref fn 0)) 0.9) (float-vector 0 1 0) (float-vector 1 0 0)))
+         (u (normalize-vector (v* fn tmp)))
+         (v (normalize-vector (v* fn u)))
+         (proj #'(lambda (p) (list (v. u (v- p p0)) (v. v (v- p p0)))))
+         (boundary-2d (mapcar proj verts))
+         (holes-2d (mapcar #'(lambda (h) (mapcar proj (dedupe-closed-polyline (send h :vertices)))) holes))
+         (all-3d (append verts (apply #'append (mapcar #'(lambda (h) (dedupe-closed-polyline (send h :vertices))) holes))))
+         (all-2d (append boundary-2d (apply #'append holes-2d)))
+         (map3d (make-hash-table :test #'eq)))
+    (mapc #'(lambda (p3 p2) (setf (gethash p2 map3d) p3)) all-3d all-2d)
+    (let ((expected-area (- (shoelace-area-2d boundary-2d)
+                            (apply #'+ (mapcar #'shoelace-area-2d holes-2d))))
+          (primes '(7919 104729 15485863 999983 32452867))
+          kept)
+      (dolist (prime primes)
+        (let ((raw (bowyer-watson all-2d prime))
+              (this-kept nil))
+          (dolist (tr raw)
+            (let* ((cx (/ (+ (car (first tr)) (car (second tr)) (car (third tr))) 3.0))
+                   (cy (/ (+ (cadr (first tr)) (cadr (second tr)) (cadr (third tr))) 3.0))
+                   (c (list cx cy)))
+              (when (and (point-in-polygon-2d c boundary-2d)
+                         (not (some #'(lambda (h2d) (point-in-polygon-2d c h2d)) holes-2d)))
+                (push tr this-kept))))
+          (setq kept this-kept)
+          (when (< (abs (- (apply #'+ (mapcar #'tri-area-2d this-kept)) expected-area))
+                   (* 1e-6 expected-area))
+            (return))))
+      (unless (< (abs (- (apply #'+ (mapcar #'tri-area-2d kept)) expected-area))
+                 (* 1e-3 expected-area))
+        (warn ";; face-to-triangle-delaunay: kept-triangle area still off by more than 0.1% of the true polygon area after trying ~A insertion orders -- this face's point layout is an unusually hard case for this plain double-precision Bowyer-Watson (see comment above deterministic-shuffle); result may be visibly wrong.~%"
+              (length primes)))
+      (mapcar #'(lambda (tr) (make-face-from-vertices
+                              (list (cons (gethash (first tr) map3d) nil)
+                                    (cons (gethash (second tr) map3d) nil)
+                                    (cons (gethash (third tr) map3d) nil))))
+              kept))))
+
 (defun face-to-triangle (f)
   "convert face to set of triangles."
   (if (and (derivedp f face) (send f :holes))

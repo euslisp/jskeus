@@ -95,6 +95,12 @@ jobs:
       volumes:
         - /tmp/node20:/__e/node20
     timeout-minutes: 60
+    env:
+      # GitHub Actions now forces Node 24 for actions targeting Node 20, but
+      # ubuntu:18.04's glibc (2.27) is too old for Node 24 (needs >= 2.28).
+      # This keeps actions/checkout on Node 20, for which the step below
+      # installs a glibc-2.17-compatible build into /__e/node20.
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
     steps:
       - name: Try to replace `node` with an glibc 2.17

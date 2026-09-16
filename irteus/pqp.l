@@ -56,7 +56,7 @@
      (setf (get self :pqpmodel) m)
      (pqpbeginmodel m)
      (dolist (f fs)
-       (dolist (poly (face-to-triangle-aux f))
+       (dolist (poly (face-to-triangle-fast f))
 	 (setq vs (send poly :vertices)
 	       v1 (send self :inverse-transform-vector (first vs))
 	       v2 (send self :inverse-transform-vector (second vs))
